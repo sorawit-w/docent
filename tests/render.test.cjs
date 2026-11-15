@@ -12,7 +12,7 @@ const CASES = [
   ["bug-report", "wide"], ["bug-report", "tall"], ["bug-report", "plates"],
   ["order", "wide"], ["order", "tall"], ["order", "plates"],
   ["review", "wide"], ["review", "tall"], ["review", "plates"],
-  ["long-route", "wide"], ["long-route", "tall"], ["branch", "plates"],
+  ["long-route", "wide"], ["long-route", "tall"], ["branch", "plates"], ["dense", "plates"],
 ];
 
 for (const [name, form] of CASES) {

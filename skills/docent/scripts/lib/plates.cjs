@@ -2,12 +2,13 @@
 // Every part has its own row, so a level line at a plate's height never meets another plate.
 // The router walks a grid of free lines (shortest path, few bends, no line on another line). Then each leg gets
 // its mark and its verb, and the whole drawing must pass the spacing rules in geometry.cjs.
-const { check, HEAD, RULE, dist } = require("./geometry.cjs");
+const { check, HEAD, RULE, dist, textBox } = require("./geometry.cjs");
 const { textWidth } = require("./text.cjs");
 
 const CARD_H = 52, MARGIN = 28, GAP = 44, TOP = 64, RADIUS = 8;
 const CHANNEL = 14; // a free upright line beside a column of plates
 const STEM = RULE.run + HEAD + RADIUS; // the straight line that an arrowhead needs behind it
+const NEAR = HEAD + 16; // no other line crosses a leg this close to its arrowhead
 const PAGE = 1104;
 const DIRS = [[1, 0], [0, 1], [-1, 0], [0, -1]]; // right, down, left, up
 
@@ -121,6 +122,8 @@ function draw(model, k) {
     if (i < 0 || j < 0 || blocked(xs[i], ys[j])) return null;
     const nodes = [[i, j]];
     while (dist(port.pt, [xs[i], ys[j]]) < least) {
+      // No other line may cross right behind an arrowhead.
+      if (dist(port.pt, [xs[i], ys[j]]) < NEAR && nodeUse.has(key(i, j))) return null;
       if (!passable(i, j, port.d, port.d) || !canStep(i, j, port.d)) return null;
       i += DIRS[port.d][0]; j += DIRS[port.d][1];
       nodes.push([i, j]);
@@ -199,13 +202,15 @@ function draw(model, k) {
     const into = (best.goal.port.d + 2) % 4;
     const stemNodes = best.goal.nodes.slice(0, -1).reverse().map(([i, j]) => [i, j, into]);
     const all = [...walk, ...stemNodes];
+    const end = best.goal.port.pt;
     all.forEach(([i, j, d], n) => {
       const out = n + 1 < all.length ? all[n + 1][2] : into;
-      nodeUse.set(key(i, j), d === out ? (nodeUse.has(key(i, j)) ? "b" : axis(d)) : "b");
+      const closed = d !== out || nodeUse.has(key(i, j)) || dist(end, [xs[i], ys[j]]) < NEAR;
+      nodeUse.set(key(i, j), closed ? "b" : axis(d));
       if (n + 1 < all.length) edgeUsed.add(edgeKey(i, j, out));
     });
     portUsed.add(`${src.index}:${start.pt}`).add(`${dst.index}:${best.goal.port.pt}`);
-    const end = best.goal.port.pt, tip = [end[0] + DIRS[best.goal.port.d][0] * 2, end[1] + DIRS[best.goal.port.d][1] * 2];
+    const tip = [end[0] + DIRS[best.goal.port.d][0] * 2, end[1] + DIRS[best.goal.port.d][1] * 2];
     const pts = [start.pt, ...all.map(([i, j]) => [xs[i], ys[j]]), tip];
     return pts.filter((p, n) => n === 0 || n === pts.length - 1 || !((pts[n - 1][0] === p[0] && p[0] === pts[n + 1][0]) || (pts[n - 1][1] === p[1] && p[1] === pts[n + 1][1])));
   }
@@ -221,40 +226,48 @@ function draw(model, k) {
 
   const problems = [];
   const gapCenters = cardX.slice(1).map((x0) => x0 - MARGIN - laneGap / 2);
+  // First every leg gets its path. Then each leg gets its mark and its verb, with all the lines known.
+  const routed = [];
   for (const leg of legs) {
     const pts = route(leg);
     if (!pts) { problems.push({ rule: "R5", kind: "no-path", leg: leg.n, msg: `no free path for leg ${leg.n}, from "${parts[leg.from].id}" to "${parts[leg.to].id}"` }); break; }
-    const sameLane = parts[leg.from].lane === parts[leg.to].lane;
-    const drawn = { n: leg.n, from: parts[leg.from].id, to: parts[leg.to].id, sameLane, radius: RADIUS, pts, mark: null, verb: null };
+    const away = [-9999, -9999 - 99 * leg.n]; // a place far outside, until the mark and the verb are set
+    routed.push({ n: leg.n, from: parts[leg.from].id, to: parts[leg.to].id, sameLane: parts[leg.from].lane === parts[leg.to].lane, radius: RADIUS, pts, mark: away, verb: { x: away[0], y: away[1], s: "", cls: "verb", anchor: "start" } });
+  }
+  scene.legs = routed;
+  for (const [index, drawn] of problems.length ? [] : routed.entries()) {
+    const leg = legs[index], pts = drawn.pts;
     // Where the mark may sit, best place first. A leg that crosses lanes keeps its mark in the gap between two lanes.
     const spots = [];
     const segs = pts.slice(0, -1).map((p, n) => ({ a: p, b: pts[n + 1], last: n === pts.length - 2 }));
     for (const { a, b } of segs.filter((s) => s.a[1] === s.b[1])) {
       for (const gx of a[0] < b[0] ? gapCenters : [...gapCenters].reverse()) if (gx > Math.min(a[0], b[0]) && gx < Math.max(a[0], b[0])) for (const shift of [0, -6, 6, -12, 12]) spots.push({ at: [gx + shift, a[1]], level: true });
     }
-    if (sameLane) {
+    if (drawn.sameLane) {
       for (const { a, b, last } of [...segs].sort((p, q) => dist(q.a, q.b) - dist(p.a, p.b))) {
         const len = dist(a, b) - (last ? HEAD : 0), ux = (b[0] - a[0]) / dist(a, b), uy = (b[1] - a[1]) / dist(a, b);
         for (const shift of [0, -8, 8, -16, 16, -24, 24]) spots.push({ at: [a[0] + ux * (len / 2 + shift), a[1] + uy * (len / 2 + shift)], level: a[1] === b[1] });
       }
     }
     // The verb sits above a mark on a level line, and to the right of a mark on an upright line.
+    // When that place is taken, it tries the other side, then the same places with the word moved to one side.
     let placed = null, fewest = Infinity;
     for (const spot of spots) {
       const [mx, my] = spot.at;
       const verbs = spot.level
-        ? [{ x: mx, y: my - 19, anchor: "middle" }, { x: mx, y: my + 28, anchor: "middle" }]
+        ? [{ x: mx, y: my - 19, anchor: "middle" }, { x: mx, y: my + 28, anchor: "middle" }, { x: mx + 12, y: my - 19, anchor: "end" }, { x: mx - 12, y: my - 19, anchor: "start" }, { x: mx + 12, y: my + 28, anchor: "end" }, { x: mx - 12, y: my + 28, anchor: "start" }]
         : [{ x: mx + 16, y: my + 4, anchor: "start" }, { x: mx - 16, y: my + 4, anchor: "end" }];
       for (const verb of verbs) {
         const trial = { ...drawn, mark: spot.at, verb: { ...verb, s: leg.verb, cls: "verb" } };
-        const found = check({ ...scene, w: 1e6, h: 1e6, gaps: [], legs: [...scene.legs, trial] }).filter((p) => p.leg === leg.n || p.otherLeg === leg.n).length;
+        const found = check({ ...scene, w: 1e6, h: 1e6, gaps: [], legs: routed.map((other, n) => (n === index ? trial : other)) }).filter((p) => p.leg === leg.n || p.otherLeg === leg.n).length;
         if (found < fewest) { fewest = found; placed = trial; }
         if (!found) break;
       }
       if (!fewest) break;
     }
     if (!placed) { problems.push({ rule: "R2", kind: "mark-none", leg: leg.n, msg: `no place for the mark of leg ${leg.n}` }); break; }
-    scene.legs.push(placed);
+    routed[index] = placed;
+    scene.legs = routed;
   }
 
   const extra = useGutter() ? laneGap + MARGIN : 0;
@@ -264,7 +277,9 @@ function draw(model, k) {
     if (c) scene.gaps.push({ x: x - laneGap, y: 0, w: laneGap, h: scene.h });
     scene.lanes.push({ icon: lane.icon, iconAt: lane.icon ? [x + 36, 39] : null, text: { x: x + (lane.icon ? 52 : 28), y: 44, s: lane.name, cls: "lane", anchor: "start" } });
   });
-  scene.w = cardX[count - 1] + cardW + MARGIN + extra + 12;
+  // A verb may sit on the ground beside the last panel; the drawing grows to hold it.
+  const verbRight = Math.max(0, ...scene.legs.map((leg) => textBox(leg.verb).x1));
+  scene.w = Math.max(cardX[count - 1] + cardW + MARGIN + extra + 12, Math.ceil(verbRight) + 12);
   return { scene, problems: problems.length ? problems : check(scene), order, rowOf };
 }
 

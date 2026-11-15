@@ -58,6 +58,8 @@ Keep names, notes and verbs short. A verb is one to three words. The renderer re
 
 A walkthrough needs a route with one leg for each step.
 
+In Plates every part has its own row, in the order in which the legs reach the parts. Two arrows may cross at a right angle; they never share a line. Plates is easiest to draw when most legs go from one lane to another. When `render` refuses a Plates diagram, move a part to another lane, remove a leg, or shorten a verb.
+
 ## Icons
 
 Built-in names: `person`, `team`, `computer`, `server`, `store`, `timer`, `key`, `document`, `message`, `branch`, `release`, `inspect`, `check`, `commit`, `merge`.
@@ -70,7 +72,7 @@ When no built-in icon fits, draw one in `icons`, to the rules in `DESIGN.md` (a 
 "icons": { "bug": "<circle cx=\"8\" cy=\"9\" r=\"3.5\"/><path d=\"M8 5.5V3M4.5 9h-2M13.5 9h-2\"/>" }
 ```
 
-An icon may hold only `path`, `circle`, `rect`, `line` and `polyline`, with their own geometry attributes. Anything else is rejected: `render` leaves the icon out and warns, and `check` reports an error. When no clear picture exists, use no icons. A wrong picture is worse than none.
+An icon may hold only these shapes and attributes: `path` (`d`), `circle` (`cx`, `cy`, `r`), `rect` (`x`, `y`, `width`, `height`, `rx`, `ry`), `line` (`x1`, `y1`, `x2`, `y2`) and `polyline` (`points`). Write each shape as one closed tag, such as `<circle cx="8" cy="8" r="4"/>`. Anything else is rejected: `render` leaves the icon out and warns, and `check` reports an error. A drawn icon belongs to one diagram; to use it in two diagrams, write it in both. When no clear picture exists, use no icons. A wrong picture is worse than none.
 
 ## What the renderer says
 
@@ -78,4 +80,6 @@ An icon may hold only `path`, `circle`, `rect`, `line` and `polyline`, with thei
 - `... cannot be drawn within the spacing rules: ...` — the data asks for more than the form can hold. Shorten the text that the message names, remove a part, or let the renderer pick the form.
 - `... warning: the drawing is 734px wide; beside the walkthrough steps there is room for 520px` — the drawing will scroll sideways beside the steps. Use fewer lanes or shorter names.
 
-To see one drawing without a document: `node scripts/render.cjs --data diagram.json > drawing.svg`.
+`render` draws every diagram that it can. When one is refused, the others are still drawn, and `render` ends with exit code 1.
+
+To see one drawing without a document: `node scripts/render.cjs --data diagram.json > drawing.svg`. The SVG goes to standard output, and the message goes to standard error.

@@ -1,0 +1,26 @@
+{
+  "id": "invoice",
+  "label": "An invoice between three teams: sales writes it, finance checks it, the customer pays or disputes it, and finance closes it.",
+  "lanes": [
+    { "id": "sales", "name": "Sales", "icon": "person" },
+    { "id": "finance", "name": "Finance", "icon": "team" },
+    { "id": "customer", "name": "Customer", "icon": "person" }
+  ],
+  "parts": [
+    { "id": "draft", "lane": "sales", "name": "Draft invoice", "note": "items and prices", "icon": "document" },
+    { "id": "checked", "lane": "finance", "name": "Checked invoice", "note": "tax and totals agree", "icon": "check" },
+    { "id": "sent", "lane": "customer", "name": "Received invoice", "note": "due in 30 days", "icon": "message" },
+    { "id": "payment", "lane": "customer", "name": "Payment", "note": "by bank transfer", "icon": "key" },
+    { "id": "dispute", "lane": "customer", "name": "Dispute", "note": "one item is wrong", "icon": "inspect" },
+    { "id": "ledger", "lane": "finance", "name": "Ledger entry", "note": "the invoice is closed", "icon": "store" }
+  ],
+  "legs": [
+    { "from": "draft", "to": "checked", "verb": "hand over" },
+    { "from": "checked", "to": "draft", "verb": "send back" },
+    { "from": "checked", "to": "sent", "verb": "send" },
+    { "from": "sent", "to": "payment", "verb": "pay" },
+    { "from": "sent", "to": "dispute", "verb": "dispute" },
+    { "from": "dispute", "to": "draft", "verb": "ask for a new invoice" },
+    { "from": "payment", "to": "ledger", "verb": "record" }
+  ]
+}

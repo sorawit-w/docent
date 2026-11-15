@@ -1,0 +1,513 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- The window title: "Document title — Host project". It does not name Docent. -->
+<title>Document title — Host project</title>
+<style>
+/* docent:kit 0.1.0 */
+/* Docent page styles. Tokens come from references/DESIGN.md. One file, no network. */
+:root {
+  color-scheme: light;
+  --bg: #fbfbfe; --panel: #f2f3f9; --fig: #f2f3f9;
+  --text: #1c1f2e; --muted: #575d75; --line: #d3d6e3;
+  --primary: #2f3fd0; --ink: #1b2260; --dot: #2f3fd0;
+  --ok: #1a7f37; --warn: #7d4e00; --err: #cf222e;
+  --serif: Charter, "Bitstream Charter", "Sitka Heading", "Sitka Text", Cambria, Georgia, serif;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --mono: ui-monospace, "SF Mono", "Cascadia Code", Consolas, Menlo, monospace;
+  --ease: cubic-bezier(0.23, 1, 0.32, 1);
+  --measure: 31rem; --margin-col: 220px; --gap: 48px;
+}
+/* Dark: the reader's system setting decides, unless the reader chose a theme with the switch. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #12141f; --panel: #0b0d15; --fig: #0b0d15;
+    --text: #e7e9f3; --muted: #959bb3; --line: #2d3146;
+    --primary: #8e9bff; --ink: #e7e9f3; --dot: #f2b824;
+    --ok: #3fb950; --warn: #d29922; --err: #f85149;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #12141f; --panel: #0b0d15; --fig: #0b0d15;
+  --text: #e7e9f3; --muted: #959bb3; --line: #2d3146;
+  --primary: #8e9bff; --ink: #e7e9f3; --dot: #f2b824;
+  --ok: #3fb950; --warn: #d29922; --err: #f85149;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-padding-top: 88px; -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 400 16px/1.65 var(--sans); caret-color: var(--primary); }
+::selection { background: color-mix(in srgb, var(--primary) 22%, transparent); }
+:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
+a { color: var(--primary); text-decoration-thickness: 1px; text-underline-offset: 0.2em; }
+a:hover { text-decoration-thickness: 2px; }
+.shell { max-width: 1200px; margin: 0 auto; padding: 0 40px; }
+
+/* Top bar. Its bottom line is the route; the dot marks the current section. */
+.topbar { position: sticky; top: 0; z-index: 2; background: var(--bg); border-bottom: 1px solid var(--line); }
+.topbar .shell { display: flex; align-items: center; gap: 32px; height: 56px; }
+.host { font-weight: 600; font-size: 14px; white-space: nowrap; }
+.route { flex: 1; min-width: 0; }
+.route ol { display: flex; gap: 28px; margin: 0; padding: 0; list-style: none; }
+.route a { display: block; padding: 6px 0; font-size: 14px; color: var(--muted); text-decoration: none; white-space: nowrap; }
+.route a:hover, .route a[aria-current] { color: var(--text); }
+.route-dot { position: absolute; left: 0; bottom: -4px; width: 7px; height: 7px; border-radius: 50%; background: var(--dot); opacity: 0; transform: translateX(var(--x, 0px)); }
+.ready .route-dot, .ready .rail-dot { transition: transform 320ms var(--ease); }
+.js .route-dot { opacity: 1; }
+.theme { display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px; border: 1px solid var(--line); border-radius: 6px; background: none; color: var(--text); font: 400 14px/1 var(--sans); cursor: pointer; }
+.theme:hover { border-color: var(--muted); }
+.theme:active { transform: translateY(1px); }
+.theme svg { width: 15px; height: 15px; }
+html:not(.js) .theme { display: none; }
+.theme[data-next="dark"] .icon-sun, .theme[data-next="light"] .icon-moon { display: none; }
+
+/* Title block: the title leads; facts about the document sit below it. */
+.title { padding: 80px 0 8px; }
+.title .row { margin-top: 24px; }
+h1, h2 { font-family: var(--serif); font-weight: 700; color: var(--ink); text-wrap: balance; margin: 0; }
+h1 { font-size: 52px; line-height: 1.06; letter-spacing: -0.02em; }
+.standfirst { font: 400 21px/1.5 var(--serif); margin: 0; text-wrap: pretty; }
+.facts { margin: 0; padding-left: 0; list-style: none; font-variant-numeric: tabular-nums; }
+
+section { padding-top: 72px; }
+h2 { font-size: 30px; line-height: 1.2; margin-bottom: 16px; }
+h3 { font: 600 18px/1.35 var(--sans); margin: 0; text-wrap: balance; }
+p { margin: 0 0 16px; max-width: var(--measure); text-wrap: pretty; }
+.term { text-decoration: underline; text-decoration-color: var(--primary); text-decoration-thickness: 2px; text-underline-offset: 0.22em; }
+code { font: 14px/1.55 var(--mono); background: var(--panel); padding: 0.1em 0.38em; border-radius: 6px; }
+.standfirst code { font-size: 18px; }
+
+/* Margin notes: the guide's remarks sit beside the text, like a wall label. */
+.row { display: grid; grid-template-columns: minmax(0, var(--measure)) var(--margin-col); column-gap: var(--gap); align-items: start; }
+.note { margin: 6px 0 16px; padding-top: 12px; border-top: 1px solid var(--line); font-size: 14px; line-height: 1.5; color: var(--muted); }
+.note strong { display: block; margin-bottom: 4px; font-weight: 600; color: var(--text); }
+
+/* Walkthrough: a rail with a node per step; one dot travels along it. */
+.walk { display: grid; grid-template-columns: minmax(0, 1fr) 536px; column-gap: 40px; align-items: start; margin-top: 24px; }
+.rail { position: relative; }
+.steps { position: relative; margin: 0; padding: 0; list-style: none; counter-reset: step; }
+.steps::before { content: ""; position: absolute; left: 4px; top: 10px; bottom: 10px; width: 1px; background: var(--line); }
+.steps li { position: relative; padding: 0 0 36px 32px; counter-increment: step; }
+.steps li:last-child { padding-bottom: 0; }
+.steps li::before { content: ""; position: absolute; left: 0; top: 8px; width: 9px; height: 9px; border-radius: 50%; border: 1px solid var(--muted); background: var(--bg); }
+.steps h3::before { content: counter(step); font-weight: 400; color: var(--muted); margin-right: 10px; font-variant-numeric: tabular-nums; }
+.steps p { margin: 6px 0 0; }
+.js .steps li:not(.is-current) h3, .js .steps li:not(.is-current) p { color: var(--muted); }
+.ready .steps h3, .ready .steps p { transition: color 120ms; }
+.rail-dot { position: absolute; left: 0; top: 8px; width: 9px; height: 9px; border-radius: 50%; background: var(--dot); opacity: 0; transform: translateY(var(--y, 0px)); }
+.js .rail-dot { opacity: 1; }
+.walk figure { position: sticky; top: 88px; }
+
+/* Figures: a well that holds a Docent diagram, with a plain caption. A diagram carries its own styles. */
+figure { margin: 0; }
+section > figure { margin-top: 24px; }
+.fig { background: var(--fig); border-radius: 12px; padding: 8px; overflow-x: auto; scrollbar-color: var(--line) transparent; }
+figcaption { margin-top: 12px; font-size: 14px; line-height: 1.5; color: var(--muted); }
+figcaption strong { font-weight: 600; color: var(--text); margin-right: 8px; }
+
+/* Tables: rules only, no boxes. */
+.table-wrap { overflow-x: auto; margin: 24px 0 0; scrollbar-color: var(--line) transparent; }
+table { width: 100%; min-width: 640px; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; vertical-align: top; padding: 12px 24px 12px 0; }
+thead th { border-bottom: 1px solid var(--text); padding-bottom: 10px; font-size: 14px; line-height: 1.5; font-weight: 600; color: var(--muted); }
+tbody th { font-weight: 600; white-space: nowrap; }
+tbody tr { border-bottom: 1px solid var(--line); }
+.state { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; font-weight: 600; }
+.state::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.state.ok { color: var(--ok); } .state.warn { color: var(--warn); } .state.err { color: var(--err); }
+
+/* Status note: a dot and a word carry the status. */
+.status { max-width: var(--measure); margin: 32px 0 0; }
+.status p { margin: 4px 0 0; }
+
+pre { margin: 20px 0 0; padding: 16px 20px; background: var(--panel); border-radius: 10px; overflow-x: auto; font: 14px/1.6 var(--mono); scrollbar-color: var(--line) transparent; }
+pre code { background: none; padding: 0; font-size: inherit; }
+.cm { color: var(--muted); }
+
+details { max-width: var(--measure); margin: 24px 0 0; }
+summary { display: flex; align-items: center; gap: 10px; padding: 4px 0; font-weight: 600; cursor: pointer; list-style: none; }
+summary::-webkit-details-marker { display: none; }
+summary svg { width: 12px; height: 12px; color: var(--muted); transition: transform 150ms var(--ease); }
+details[open] summary svg { transform: rotate(90deg); }
+details > p { margin: 8px 0 0 22px; }
+
+footer { margin-top: 96px; border-top: 1px solid var(--line); }
+footer .shell { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding-top: 24px; padding-bottom: 40px; font-size: 14px; color: var(--muted); }
+.brand { display: inline-flex; align-items: center; gap: 10px; font: 700 16px/1 var(--serif); color: var(--text); }
+.brand svg { width: 24px; height: 24px; }
+
+@media (max-width: 1100px) {
+  .walk { grid-template-columns: minmax(0, 1fr); row-gap: 32px; }
+  .walk figure { position: static; order: -1; }
+}
+@media (max-width: 900px) {
+  .row { grid-template-columns: minmax(0, 1fr); }
+  .note { max-width: var(--measure); }
+  .title .note { margin-top: 28px; }
+}
+@media (max-width: 720px) {
+  .shell { padding: 0 20px; }
+  .topbar { position: static; }
+  .topbar .shell { flex-wrap: wrap; gap: 4px 16px; height: auto; padding-top: 10px; padding-bottom: 8px; }
+  .host { flex: 1; }
+  .route { flex: none; order: 3; width: 100%; }
+  .route ol { flex-wrap: wrap; gap: 0 20px; }
+  .route a[aria-current] { text-decoration: underline; text-decoration-color: var(--dot); text-decoration-thickness: 2px; text-underline-offset: 0.4em; }
+  .route-dot { display: none; }
+  .title { padding-top: 48px; }
+  h1 { font-size: 32px; } h2 { font-size: 26px; }
+  section { padding-top: 56px; }
+  footer .shell { flex-direction: column; align-items: flex-start; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; }
+}
+@media print {
+  html:root:not([data-never]) { color-scheme: light; --bg: #ffffff; --panel: #f2f3f9; --fig: #f2f3f9; --text: #1c1f2e; --muted: #575d75; --line: #d3d6e3; --primary: #2f3fd0; --ink: #1b2260; --dot: #2f3fd0; --ok: #1a7f37; --warn: #7d4e00; --err: #cf222e; }
+  .topbar, .rail-dot { display: none !important; }
+  .steps li h3, .steps li p { color: var(--text) !important; }
+  .walk { grid-template-columns: minmax(0, 1fr); row-gap: 32px; } .walk figure { position: static; order: -1; }
+  figure, tr, .status, pre { break-inside: avoid; }
+  h2, h3 { break-after: avoid; }
+  @page { margin: 18mm; }
+}
+/* /docent:kit */
+</style>
+</head>
+<body>
+<!-- TOP BAR. The host project's name, one link for each section, and the theme switch.
+     Keep the button and the route-dot as they are. Each link points at the id of a section. -->
+<header class="topbar">
+  <div class="shell">
+    <span class="host">Host project</span>
+    <nav class="route" aria-label="On this page">
+      <ol>
+        <li><a href="#short">Short version</a></li>
+        <li><a href="#walk">Walkthrough</a></li>
+        <li><a href="#more">More</a></li>
+      </ol>
+    </nav>
+    <button class="theme" type="button">
+      <svg class="icon-moon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13.5 9.6A5.8 5.8 0 0 1 6.4 2.5a5.8 5.8 0 1 0 7.1 7.1Z"/></svg>
+      <svg class="icon-sun" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="8" cy="8" r="3"/><path d="M8 1.5v1.6M8 12.9v1.6M1.5 8h1.6M12.9 8h1.6M3.4 3.4l1.1 1.1M11.5 11.5l1.1 1.1M3.4 12.6l1.1-1.1M11.5 4.5l1.1-1.1"/></svg>
+      <span class="theme-text">Dark</span>
+    </button>
+    <span class="route-dot" aria-hidden="true"></span>
+  </div>
+</header>
+
+<main class="shell">
+  <!-- TITLE BLOCK. One h1, at most two lines. The opening paragraph (standfirst) says what the document is for.
+       The facts about the document sit in the margin note beside it, never above the title. -->
+  <div class="title">
+    <h1>Document title</h1>
+    <div class="row">
+      <p class="standfirst">The opening paragraph says what this document is for, in two or three short sentences.</p>
+      <div class="note" role="note" aria-label="About this document">
+        <strong>Guide</strong>
+        <ul class="facts">
+          <li>3 minutes to read</li>
+          <li>Updated 1 January 2026</li>
+          <li>Owner: Team name</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION. Each section has an id (for the top bar) and an h2.
+       A "row" puts text in the text column and one margin note beside it. Text with no note needs no row. -->
+  <section id="short" aria-labelledby="short-h">
+    <h2 id="short-h">The short version</h2>
+    <div class="row">
+      <div>
+        <p>Body text goes here. A <span class="term">highlighted term</span> has an underline in the ink color, and <code>code</code> sits in a small well.</p>
+        <p>A second paragraph. A link to <a href="#more">another section</a> looks like this.</p>
+      </div>
+      <div class="note" role="note">
+        <strong>Note</strong>
+        A margin note holds one remark of the guide, in one to three sentences.
+      </div>
+    </div>
+  </section>
+
+  <!-- WALKTHROUGH. Steps on the left, the diagram on the right. The page script marks the current step.
+       One step for each leg of the diagram, in the same order. A step heading is one sentence of at most six words.
+       The diagram block has "place": "walk". Change its data, then run render. Never edit the drawing. -->
+  <section id="walk" aria-labelledby="walk-h">
+    <h2 id="walk-h">Walk through the steps</h2>
+    <p>Follow the dot. Each step names one arrow in the figure.</p>
+    <div class="walk">
+      <div class="rail">
+      <ol class="steps">
+        <li>
+          <h3>The first thing happens.</h3>
+          <p>One or two sentences about the first step.</p>
+        </li>
+        <li>
+          <h3>The second thing happens.</h3>
+          <p>One or two sentences about the second step.</p>
+        </li>
+      </ol>
+      <span class="rail-dot" aria-hidden="true"></span>
+      </div>
+      <figure>
+        <div class="fig" role="region" aria-label="Figure 1, the steps" tabindex="0">
+<!-- docent:diagram
+{
+  "id": "steps",
+  "place": "walk",
+  "label": "Two steps: the first part goes to the second part, and the second part goes to the third part.",
+  "lanes": [
+    {"id": "one", "name": "First lane"},
+    {"id": "two", "name": "Second lane"}
+  ],
+  "parts": [
+    {"id": "a", "lane": "one", "name": "First part", "note": "a short note"},
+    {"id": "b", "lane": "two", "name": "Second part", "note": "a short note"},
+    {"id": "c", "lane": "two", "name": "Third part", "note": "a short note"}
+  ],
+  "legs": [
+    {"from": "a", "to": "b", "verb": "first verb"},
+    {"from": "b", "to": "c", "verb": "second verb"}
+  ]
+}
+-->
+<svg id="dg-steps" class="dg dg-tall" xmlns="http://www.w3.org/2000/svg" width="422" height="338" viewBox="0 0 422 338" role="img" aria-label="Two steps: the first part goes to the second part, and the second part goes to the third part.">
+<style>
+#dg-steps{display:block;flex:none;margin-inline:auto;font-family:var(--sans,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif)}
+#dg-steps .ground{fill:var(--fig,#f2f3f9)}
+#dg-steps .band{fill:var(--bg,#fbfbfe)}
+#dg-steps .track{stroke:var(--line,#d3d6e3)}
+#dg-steps .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-steps .head{fill:var(--text,#1c1f2e)}
+#dg-steps .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-steps .stop.end{fill:var(--text,#1c1f2e)}
+#dg-steps .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-steps .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-steps .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-steps .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-steps .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-steps .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-steps .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-steps .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-steps .sub,#dg-steps .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-steps .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+.js #dg-steps .leg.is-current .line{stroke:var(--primary,#2f3fd0);stroke-width:2.5}
+.js #dg-steps .leg.is-current .head,.js #dg-steps .leg.is-current .num{fill:var(--primary,#2f3fd0)}
+.js #dg-steps .leg.is-current .mark{stroke:var(--primary,#2f3fd0)}
+.js #dg-steps .leg.is-current .pulse{display:block;animation:2.4s linear infinite}
+@keyframes dg-steps-1{0%{transform:translate(114px,106px);opacity:0}8%{transform:translate(114px,106px);opacity:1}10.43%{transform:translate(114px,115px);opacity:1}58.29%{transform:translate(289px,145px);opacity:1}68%{transform:translate(289px,181px);opacity:1}88%{transform:translate(289px,181px);opacity:1}100%{transform:translate(289px,181px);opacity:0}}
+#dg-steps .pulse-1{transform:translate(156px,122.2px)}
+.js #dg-steps .leg.is-current .pulse-1{animation-name:dg-steps-1}
+@keyframes dg-steps-2{0%{transform:translate(289px,201px);opacity:0}8%{transform:translate(289px,201px);opacity:1}68%{transform:translate(289px,276px);opacity:1}88%{transform:translate(289px,276px);opacity:1}100%{transform:translate(289px,276px);opacity:0}}
+#dg-steps .pulse-2{transform:translate(289px,210px)}
+.js #dg-steps .leg.is-current .pulse-2{animation-name:dg-steps-2}
+@media (prefers-reduced-motion:reduce){#dg-steps .pulse{animation:none!important}}
+@media print{#dg-steps{max-width:100%;height:auto}#dg-steps .pulse{display:none!important}#dg-steps .leg .line{stroke:var(--text,#1c1f2e)!important;stroke-width:2px!important}#dg-steps .leg .head,#dg-steps .leg .num{fill:var(--text,#1c1f2e)!important}#dg-steps .leg .mark{stroke:var(--text,#1c1f2e)!important}}
+#dg-steps-phone{display:none}
+</style>
+<rect width="422" height="338" class="ground"/>
+<rect x="8" y="12" width="182" height="314" rx="10" class="band"/>
+<rect x="214" y="12" width="200" height="314" rx="10" class="band"/>
+<line x1="114" y1="62" x2="114" y2="312" class="track"/>
+<line x1="289" y1="62" x2="289" y2="312" class="track"/>
+<text x="30" y="42" class="lane" text-anchor="start">First lane</text>
+<text x="236" y="42" class="lane" text-anchor="start">Second lane</text>
+<g class="leg" data-leg="1"><path d="M114,106 L114,115 L289,145 L289,175" class="line"/><polygon points="284.5,173 293.5,173 289,181" class="head"/><circle cx="202" cy="130.09" r="10" class="mark"/><text x="202" y="134.09" class="num" text-anchor="middle">1</text><text x="202" y="113.09" class="verb" text-anchor="middle">first verb</text><circle r="6" class="pulse pulse-1"/></g>
+<g class="leg" data-leg="2"><path d="M289,201 L289,270" class="line"/><polygon points="284.5,268 293.5,268 289,276" class="head"/><circle cx="289" cy="234.5" r="10" class="mark"/><text x="289" y="238.5" class="num" text-anchor="middle">2</text><text x="310" y="238.5" class="verb" text-anchor="start">second verb</text><circle r="6" class="pulse pulse-2"/></g>
+<circle cx="114" cy="96" r="8" class="stop"/>
+<text x="93" y="101" class="name" text-anchor="end">First part</text>
+<text x="93" y="118" class="sub" text-anchor="end">a short note</text>
+<circle cx="289" cy="191" r="8" class="stop"/>
+<text x="310" y="196" class="name" text-anchor="start">Second part</text>
+<text x="310" y="213" class="sub" text-anchor="start">a short note</text>
+<circle cx="289" cy="286" r="8" class="stop end"/>
+<text x="310" y="291" class="name" text-anchor="start">Third part</text>
+<text x="310" y="308" class="sub" text-anchor="start">a short note</text>
+</svg>
+<svg id="dg-steps-phone" class="dg dg-track" xmlns="http://www.w3.org/2000/svg" width="264" height="312" viewBox="0 0 264 312" role="img" aria-label="Two steps: the first part goes to the second part, and the second part goes to the third part.">
+<style>
+#dg-steps-phone{flex:none;margin-inline:auto;font-family:var(--sans,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif)}
+#dg-steps-phone .ground{fill:var(--fig,#f2f3f9)}
+#dg-steps-phone .band{fill:var(--bg,#fbfbfe)}
+#dg-steps-phone .track{stroke:var(--line,#d3d6e3)}
+#dg-steps-phone .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-steps-phone .head{fill:var(--text,#1c1f2e)}
+#dg-steps-phone .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-steps-phone .stop.end{fill:var(--text,#1c1f2e)}
+#dg-steps-phone .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-steps-phone .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-steps-phone .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-steps-phone .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-steps-phone .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-steps-phone .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-steps-phone .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-steps-phone .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-steps-phone .sub,#dg-steps-phone .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-steps-phone .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+.js #dg-steps-phone .leg.is-current .line{stroke:var(--primary,#2f3fd0);stroke-width:2.5}
+.js #dg-steps-phone .leg.is-current .head,.js #dg-steps-phone .leg.is-current .num{fill:var(--primary,#2f3fd0)}
+.js #dg-steps-phone .leg.is-current .mark{stroke:var(--primary,#2f3fd0)}
+.js #dg-steps-phone .leg.is-current .pulse{display:block;animation:2.4s linear infinite}
+@keyframes dg-steps-phone-1{0%{transform:translate(30px,66px);opacity:0}8%{transform:translate(30px,66px);opacity:1}68%{transform:translate(30px,150px);opacity:1}88%{transform:translate(30px,150px);opacity:1}100%{transform:translate(30px,150px);opacity:0}}
+#dg-steps-phone .pulse-1{transform:translate(30px,76.08px)}
+.js #dg-steps-phone .leg.is-current .pulse-1{animation-name:dg-steps-phone-1}
+@keyframes dg-steps-phone-2{0%{transform:translate(30px,170px);opacity:0}8%{transform:translate(30px,170px);opacity:1}68%{transform:translate(30px,254px);opacity:1}88%{transform:translate(30px,254px);opacity:1}100%{transform:translate(30px,254px);opacity:0}}
+#dg-steps-phone .pulse-2{transform:translate(30px,180.08px)}
+.js #dg-steps-phone .leg.is-current .pulse-2{animation-name:dg-steps-phone-2}
+@media (prefers-reduced-motion:reduce){#dg-steps-phone .pulse{animation:none!important}}
+@media print{#dg-steps-phone{max-width:100%;height:auto}#dg-steps-phone .pulse{display:none!important}#dg-steps-phone .leg .line{stroke:var(--text,#1c1f2e)!important;stroke-width:2px!important}#dg-steps-phone .leg .head,#dg-steps-phone .leg .num{fill:var(--text,#1c1f2e)!important}#dg-steps-phone .leg .mark{stroke:var(--text,#1c1f2e)!important}}
+@media (max-width:518px){#dg-steps{display:none}#dg-steps-phone{display:block}}
+</style>
+<rect width="264" height="312" class="ground"/>
+<rect x="8" y="12" width="248" height="80" rx="10" class="band"/>
+<rect x="8" y="116" width="248" height="184" rx="10" class="band"/>
+<text x="240" y="32" class="lane" text-anchor="end">First lane</text>
+<text x="240" y="136" class="lane" text-anchor="end">Second lane</text>
+<g class="leg" data-leg="1"><path d="M30,66 L30,144" class="line"/><polygon points="25.5,142 34.5,142 30,150" class="head"/><circle cx="30" cy="104" r="10" class="mark"/><text x="30" y="108" class="num" text-anchor="middle">1</text><text x="51" y="108" class="verb" text-anchor="start">first verb</text><circle r="6" class="pulse pulse-1"/></g>
+<g class="leg" data-leg="2"><path d="M30,170 L30,248" class="line"/><polygon points="25.5,246 34.5,246 30,254" class="head"/><circle cx="30" cy="208" r="10" class="mark"/><text x="30" y="212" class="num" text-anchor="middle">2</text><text x="51" y="212" class="verb" text-anchor="start">second verb</text><circle r="6" class="pulse pulse-2"/></g>
+<circle cx="30" cy="56" r="8" class="stop"/>
+<text x="51" y="61" class="name" text-anchor="start">First part</text>
+<text x="51" y="78" class="sub" text-anchor="start">a short note</text>
+<circle cx="30" cy="160" r="8" class="stop"/>
+<text x="51" y="165" class="name" text-anchor="start">Second part</text>
+<text x="51" y="182" class="sub" text-anchor="start">a short note</text>
+<circle cx="30" cy="264" r="8" class="stop end"/>
+<text x="51" y="269" class="name" text-anchor="start">Third part</text>
+<text x="51" y="286" class="sub" text-anchor="start">a short note</text>
+</svg>
+<!-- /docent:diagram -->
+        </div>
+        <figcaption><strong>Figure 1</strong>A caption says what the figure shows, in one sentence.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- OTHER BLOCKS. A figure in the text flow, a table, a status note, a code block, and a closed section.
+       A figure in the text flow is a <figure> with a "fig" well and a diagram block without "place".
+       Remove the blocks that the document does not need. -->
+  <section id="more" aria-labelledby="more-h">
+    <h2 id="more-h">More blocks</h2>
+    <p>A table uses the full width. A state is a dot and a word: <code>ok</code>, <code>warn</code> or <code>err</code>.</p>
+    <div class="table-wrap" role="region" aria-label="Example table" tabindex="0">
+      <table>
+        <thead>
+          <tr><th scope="col">Case</th><th scope="col">What it means</th><th scope="col">What you do</th><th scope="col">State</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">First case</th><td>All is well.</td><td>Go on.</td><td><span class="state ok">Continue</span></td></tr>
+          <tr><th scope="row">Second case</th><td>Something needs care.</td><td>Fix it, then go on.</td><td><span class="state warn">Fix, then continue</span></td></tr>
+          <tr><th scope="row">Third case</th><td>Something is wrong.</td><td>Stop and ask.</td><td><span class="state err">Stop</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="status">
+      <span class="state warn">Warning</span>
+      <p>A status note is a dot, a word and one or two sentences. It has no box.</p>
+    </div>
+<pre tabindex="0" role="region" aria-label="Example commands"><code><span class="cm"># A comment line</span>
+command --option value</code></pre>
+    <details>
+      <summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>A closed section with a question as its title</summary>
+      <p>Its text opens when the reader asks for it, and it opens for printing.</p>
+    </details>
+  </section>
+</main>
+
+<!-- FOOTER. Docent's mark appears once, small. Keep it as it is. -->
+<footer>
+  <div class="shell">
+    <span class="brand">
+      <svg viewBox="0 0 64 64" role="img" aria-label="Docent"><rect width="64" height="64" rx="14" fill="#2f3fd0"/><path d="M20 37V18H30A14 14 0 0 1 30 46H29" fill="none" stroke="#ffffff" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="20" cy="46" r="4" fill="#f2b824"/></svg>
+      Docent
+    </span>
+    <span>A guide inside every document.</span>
+  </div>
+</footer>
+<script>
+// docent:kit 0.1.0
+(() => {
+  const root = document.documentElement;
+  root.classList.add('js');
+  // Theme: the page follows the reader's system setting. The switch sets a choice that wins over the system and is remembered.
+  const button = document.querySelector('.theme');
+  const system = matchMedia('(prefers-color-scheme: dark)');
+  const theme = () => root.dataset.theme || (system.matches ? 'dark' : 'light');
+  try {
+    const saved = localStorage.getItem('docent-theme');
+    if (saved === 'dark' || saved === 'light') root.dataset.theme = saved;
+  } catch { /* no saved choice can be read: follow the system */ }
+  if (button) {
+    const showSwitch = () => {
+      const next = theme() === 'dark' ? 'light' : 'dark';
+      button.dataset.next = next;
+      button.querySelector('.theme-text').textContent = next === 'dark' ? 'Dark' : 'Light';
+      button.setAttribute('aria-label', `Switch to the ${next} theme`);
+    };
+    showSwitch();
+    system.addEventListener('change', showSwitch);
+    button.addEventListener('click', () => {
+      root.dataset.theme = theme() === 'dark' ? 'light' : 'dark';
+      showSwitch();
+      try { localStorage.setItem('docent-theme', root.dataset.theme); } catch { /* private window: the choice lasts for this visit */ }
+    });
+  }
+  // A diagram outside a walkthrough runs its dot twice when it comes into view, then rests. Pointing at it runs it again.
+  const replay = (svg) => svg.querySelectorAll('.pulse').forEach((dot) => dot.getAnimations().forEach((run) => { run.cancel(); run.play(); }));
+  const seen = new IntersectionObserver((entries) => entries.forEach((entry) => {
+    if (!entry.isIntersecting) return;
+    entry.target.classList.add('is-playing');
+    seen.unobserve(entry.target);
+  }), { threshold: 0.6 });
+  document.querySelectorAll('svg.dg-auto').forEach((svg) => {
+    seen.observe(svg);
+    const well = svg.closest('.fig') || svg;
+    well.addEventListener('pointerenter', () => replay(svg));
+    well.addEventListener('focus', () => replay(svg));
+  });
+  // Print: open every closed section so its text prints, then close it again.
+  let opened = [];
+  addEventListener('beforeprint', () => { opened = [...document.querySelectorAll('details:not([open])')]; opened.forEach((d) => (d.open = true)); });
+  addEventListener('afterprint', () => { opened.forEach((d) => (d.open = false)); opened = []; });
+  // The route dot marks the current section. In each walkthrough, the rail dot marks the current step and the diagram lights the leg with the same number.
+  const bar = document.querySelector('.topbar .shell');
+  const routeDot = document.querySelector('.route-dot');
+  const links = [...document.querySelectorAll('.route a[href^="#"]')].filter((a) => document.getElementById(a.getAttribute('href').slice(1)));
+  const sections = links.map((a) => document.getElementById(a.getAttribute('href').slice(1)));
+  const walks = [...document.querySelectorAll('.walk')].map((walk) => ({
+    steps: [...walk.querySelectorAll('.steps > li')],
+    legs: [...walk.querySelectorAll('svg.dg .leg')],
+    dot: walk.querySelector('.rail-dot'),
+  })).filter((walk) => walk.steps.length);
+  const nearest = (items, line) => items.reduce((best, el) => (el.getBoundingClientRect().top <= line ? el : best), items[0]);
+  const update = () => {
+    if (sections.length) {
+      const section = nearest(sections, innerHeight * 0.35);
+      links.forEach((a, i) => (sections[i] === section ? a.setAttribute('aria-current', 'true') : a.removeAttribute('aria-current')));
+      if (bar && routeDot) {
+        const link = links[sections.indexOf(section)].getBoundingClientRect();
+        routeDot.style.setProperty('--x', `${link.left + link.width / 2 - bar.getBoundingClientRect().left - 3.5}px`);
+      }
+    }
+    walks.forEach(({ steps, legs, dot }) => {
+      const step = nearest(steps, innerHeight * 0.5);
+      const number = steps.indexOf(step) + 1;
+      steps.forEach((li) => li.classList.toggle('is-current', li === step));
+      legs.forEach((leg) => leg.classList.toggle('is-current', Number(leg.dataset.leg) === number));
+      if (dot) dot.style.setProperty('--y', `${step.offsetTop}px`);
+    });
+  };
+  let queued = false;
+  const schedule = () => { if (!queued) { queued = true; requestAnimationFrame(() => { queued = false; update(); }); } };
+  addEventListener('scroll', schedule, { passive: true });
+  addEventListener('resize', schedule);
+  update();
+  requestAnimationFrame(() => requestAnimationFrame(() => root.classList.add('ready')));
+})();
+// /docent:kit
+</script>
+</body>
+</html>

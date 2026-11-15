@@ -134,7 +134,7 @@ function check(scene) {
       }
     }
     for (const leg of legs) if (!(t.kind === "verb" && t.leg === leg.n) && rectPoint(t.box, leg.mark) - MARK < 2) bad("R5", "text-mark", `${t.what} touches mark ${leg.n}`, { leg: t.kind === "verb" ? t.leg : leg.n, otherLeg: leg.n, part: t.part, lane: t.lane });
-    for (const u of texts.slice(i + 1)) if (!(t.kind === u.kind && t.part === u.part && t.lane === u.lane && t.kind !== "verb") && rectRect(t.box, u.box) < 6) bad("R5", "text-text", `${t.what} and ${u.what} overlap`, { leg: t.leg ?? u.leg, part: t.part, other: u.part, lane: t.lane ?? u.lane });
+    for (const u of texts.slice(i + 1)) if (!(t.kind === u.kind && t.part === u.part && t.lane === u.lane && t.kind !== "verb") && rectRect(t.box, u.box) < 6) bad("R5", "text-text", `${t.what} and ${u.what} overlap`, { leg: t.leg ?? u.leg, otherLeg: t.leg && u.leg ? u.leg : undefined, part: t.part, other: u.part, lane: t.lane ?? u.lane });
     if (t.box.x0 < 4 || t.box.y0 < 4 || t.box.x1 > scene.w - 4 || t.box.y1 > scene.h - 4) bad("R5", "outside", `${t.what} is outside the drawing`, { leg: t.leg, part: t.part });
   });
   return out;

@@ -15,7 +15,8 @@ Docent is a design kit for documents: single HTML files that open without a netw
 |---|---|
 | [`references/DESIGN.md`](references/DESIGN.md) | The design rules. The single authority for colors, type, layout, diagrams, icons, motion and voice. |
 | [`references/diagrams.md`](references/diagrams.md) | How to write a diagram as data, and the names of the built-in icons. |
-| [`assets/specimen.html`](assets/specimen.html) | The sample page. It follows every rule and is made by the scripts. |
+| [`assets/template.html`](assets/template.html) | The starting page. It holds one of each block, and a comment names each block. |
+| [`assets/specimen.html`](assets/specimen.html) | The sample page: a full document that follows every rule. Read it as an example. |
 | `scripts/render.cjs` | Draws every diagram of a document from its data. |
 | `scripts/stamp.cjs` | Puts the page styles and the page script into a document. |
 | `scripts/check.cjs` | Tests a document against the rules. |
@@ -33,10 +34,10 @@ Do not use it for app screens, slide decks or marketing pages.
 ## How to work
 
 1. **Read the rules.** Read `references/DESIGN.md` in full before you write.
-2. **Start from the sample page.** Copy `assets/specimen.html` to the new file and replace its content. Keep its structure: the top bar, the title block, the sections, the figures. Do not edit anything between the `docent:kit` markers. Your own styles, if you need any, go in a separate `<style>` after the kit.
+2. **Start from the template.** Copy `assets/template.html` to the new file and replace its content. A comment names each block: the top bar, the title block, a section with a margin note, the walkthrough, a table, a status note, a code block and a closed section. Use the class names as they are, and remove the blocks that you do not need. Do not edit anything between the `docent:kit` markers. Your own styles, if you need any, go in a separate `<style>` after the kit.
 3. **Keep one file.** No fonts, scripts, styles or images from the network.
 4. **Write in the Docent voice.** Plain words, one idea per sentence. A step heading is one sentence of at most six words. The `<title>` is `Document title — Host project`.
-5. **Write each diagram as data.** Read `references/diagrams.md`. Draw a diagram only when it shows something that words cannot, and never draw the same thing twice. Let the renderer pick the form. Never write or edit the SVG by hand.
+5. **Write each diagram as data.** Read `references/diagrams.md`. Draw a diagram only when it shows something that words cannot, and never draw the same thing twice. Let the renderer pick the form. Never write or edit the SVG by hand: change the data in the block, and `render` replaces the drawing.
 6. **Run the three scripts**, in this order. `SKILL` stands for the folder that holds this file:
 
    ```bash
@@ -51,8 +52,8 @@ Do not use it for app screens, slide decks or marketing pages.
    node SKILL/scripts/check.cjs document.html
    ```
 
-   Fix every error that `check` reports, then run it again. Read every warning and decide.
-7. **Look at the result.** Open the document at desktop and phone width, in light and dark, and in print preview. `check` cannot do this for you.
+   `render` draws every diagram that it can. When it refuses one, it says why, leaves that block as it was, and ends with exit code 1. Fix every error that `render` and `check` report, then run them again. Read every warning and decide.
+7. **Look at the result.** Open the document in a browser at desktop and phone width, in light and dark, and in print preview. `check` cannot do this for you. If you have no browser, say so to the user.
 
 ## Who does what
 

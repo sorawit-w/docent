@@ -55,7 +55,8 @@ skills/docent/        the skill an agent installs
   SKILL.md            when to use it, and how to work
   VERSION             the version of the kit
   references/         DESIGN.md (the design rules) and diagrams.md (diagram data)
-  assets/             kit.css and kit.js (the page styles and script), specimen.html (the sample page)
+  assets/             kit.css and kit.js (the page styles and script), template.html (the starting page),
+                      specimen.html (the sample page)
   scripts/            render.cjs, stamp.cjs, check.cjs, and their parts in lib/
 tests/                tests for the scripts, with stored expected drawings
   browser/            checks that open the sample page in a browser
@@ -89,10 +90,10 @@ The browser checks open the sample page and test accessibility, themes, motion, 
 DOCENT_NODE_MODULES=/path/to/node_modules node tests/browser/check-render.cjs
 ```
 
-After a change to the kit or the renderer, make the sample page again and commit it:
+After a change to the kit or the renderer, make the sample page and the starting page again and commit them:
 
 ```bash
-node skills/docent/scripts/render.cjs skills/docent/assets/specimen.html && node skills/docent/scripts/stamp.cjs skills/docent/assets/specimen.html
+for page in specimen template; do node skills/docent/scripts/render.cjs skills/docent/assets/$page.html && node skills/docent/scripts/stamp.cjs skills/docent/assets/$page.html; done
 ```
 
 ## License
