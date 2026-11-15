@@ -1,5 +1,5 @@
 node_modules/
-prototype/shots/
+tests/browser/shots/
 __pycache__/
 .DS_Store
 

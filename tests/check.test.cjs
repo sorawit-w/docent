@@ -1,0 +1,79 @@
+const test = require("node:test");
+const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const path = require("node:path");
+const { checkDocument } = require("../skills/docent/scripts/check.cjs");
+const { stampHtml, cssBlock } = require("../skills/docent/scripts/lib/kit.cjs");
+const { renderDocument } = require("../skills/docent/scripts/lib/diagram.cjs");
+
+const specimen = fs.readFileSync(path.join(__dirname, "..", "skills", "docent", "assets", "specimen.html"), "utf8");
+const errorsOf = (change) => checkDocument(change(specimen)).errors.join("\n");
+const add = (where, what) => (html) => html.replace(where, `${what}${where}`);
+
+test("the sample page is the output of stamp and render, and it passes check", () => {
+  assert.equal(renderDocument(stampHtml(specimen).html).html, specimen, "run render and stamp on specimen.html, then commit it");
+  const { errors, warnings } = checkDocument(specimen);
+  assert.deepEqual(errors, []);
+  assert.equal(warnings.length, 2, "the sample page shows one workflow in three forms, so check warns twice");
+  assert.match(warnings[0], /should not draw the same thing twice/);
+});
+
+test("check refuses anything that loads from the network", () => {
+  assert.match(errorsOf(add("</head>", '<link rel="stylesheet" href="https://example.com/a.css">')), /<link> loads or points outside the file/);
+  assert.match(errorsOf(add("</main>", '<img src="https://example.com/a.png" alt="">')), /<img src="https:\/\/example.com\/a.png"> loads from outside the file/);
+  assert.match(errorsOf(add("</main>", '<script src="a.js"></script>')), /<script src="a.js"> loads from outside the file/);
+  assert.match(errorsOf(add("</head>", "<style>@import 'a.css';</style>")), /@import/);
+  assert.match(errorsOf(add("</head>", "<style>.x { background: url(https://example.com/a.png); }</style>")), /a style loads url\(https:\/\/example.com\/a.png\)/);
+  assert.match(errorsOf(add("</body>", "<script>fetch('/x')</script>")), /a script outside the kit can use the network/);
+  assert.equal(errorsOf(add("</main>", '<p><a href="https://example.com">a link to follow</a> <img alt="" src="data:image/gif;base64,R0lGODlhAQABAAAAACw="></p>')), "", "a link for the reader and an image inside the file are fine");
+});
+
+test("check keeps the page flat and the text at 14px or more", () => {
+  const style = (css) => add("</head>", `<style>${css}</style>`);
+  assert.match(errorsOf(style(".x { background: linear-gradient(red, blue); }")), /a gradient; the page is flat/);
+  assert.match(errorsOf(style(".x { box-shadow: 0 1px 2px gray; }")), /a shadow; the page is flat/);
+  assert.match(errorsOf(style(".x { filter: blur(2px); }")), /a filter; the page is flat/);
+  assert.match(errorsOf(add("</main>", '<svg viewBox="0 0 8 8"><defs><pattern id="p"/></defs></svg>')), /<pattern> is used/);
+  assert.match(errorsOf(style(".x { font-size: 12px; }")), /font-size: 12px; no text is below 14px/);
+  assert.match(errorsOf(style(".x { font: 600 13px/1.4 sans-serif; }")), /font: 13px; no text is below 14px/);
+  assert.match(errorsOf(add("</main>", '<p style="font-size: 0.8em">x</p>')), /font-size: 0.8em/);
+  assert.match(errorsOf(add("</main>", "<p><small>x</small></p>")), /<small> makes text smaller/);
+  assert.match(errorsOf(style(".x { text-transform: uppercase; }")), /uppercase/);
+  assert.match(errorsOf(style(".x { background: #fff; }")), /pure white or pure black/);
+  assert.equal(errorsOf(style(".x { font-size: 14px; margin: 0 0 12px; }")), "");
+});
+
+test("check tests the frame of the document and the format of its title", () => {
+  assert.match(errorsOf((h) => h.replace('<html lang="en">', "<html>")), /<html> has no lang/);
+  assert.match(errorsOf(add("</main>", "<h1>Second</h1>")), /2 <h1> headings/);
+  assert.match(errorsOf((h) => h.replace(/<title>.*<\/title>/, "<title>Report a bug</title>")), /its format is "Document title — Host project"/);
+  assert.match(errorsOf((h) => h.replace(/<title>.*<\/title>/, "<title>Report a bug and get a fix — Docent sample</title>")), /the <title> names Docent/);
+  const warned = checkDocument(specimen.replace(/<title>.*<\/title>/, "<title>Another title — Example project</title>")).warnings.join("\n");
+  assert.match(warned, /the <title> starts with "Another title", but the <h1> is "Report a bug and get a fix"/);
+});
+
+test("check finds a kit or a drawing that was changed by hand", () => {
+  assert.match(errorsOf((h) => h.replace("--primary: #2f3fd0;", "--primary: #ff0000;")), /the kit styles were changed by hand; run stamp/);
+  assert.match(errorsOf((h) => h.replace(cssBlock(), "")), /the document has no kit styles; run stamp/);
+  assert.match(errorsOf((h) => h.replace("docent:kit 0.1.0 */", "docent:kit 0.0.9 */")), /the kit styles are version 0\.0\.9/);
+  assert.match(errorsOf((h) => h.replace(' r="13" class="stop"/>', ' r="15" class="stop"/>')), /diagram 1 \("path"\): the drawing does not match its data; run render/);
+  assert.match(errorsOf((h) => h.replace('"verb": "file"', '"verb": "send"')), /the drawing does not match its data; run render/);
+  assert.match(errorsOf(add("</main>", '<svg class="dg dg-wide" viewBox="0 0 8 8"></svg>')), /a diagram sits outside a diagram block/);
+});
+
+test("check rejects an icon that is not made of plain shapes", () => {
+  const bad = specimen.replace('"id": "path",', '"id": "path",\n  "icons": {"bug": "<image href=\\"x.png\\"/>"},').replace('"note": "what went wrong", "icon": "document"', '"note": "what went wrong", "icon": "bug"');
+  const errors = checkDocument(renderDocument(bad).html).errors.join("\n");
+  assert.match(errors, /diagram 1 \("path"\): part "report": the icon "bug" is left out because <image> is not a plain shape/);
+});
+
+test("check ties a walkthrough to its diagram: one step for each leg", () => {
+  assert.match(errorsOf((h) => h.replace(/<li>\s*<h3>The maintainers release the fix\.<\/h3>[\s\S]*?<\/li>/, "")), /diagram 2 \("steps"\) has 4 legs, but its walkthrough has 3 steps/);
+  const long = checkDocument(specimen.replace("<h3>You file the report.</h3>", "<h3>You write and then file the full report.</h3>")).warnings.join("\n");
+  assert.match(long, /has 8 words; a step heading has at most six/);
+});
+
+test("the kit keeps the rules that check applies to an author's own styles", () => {
+  const page = `<!doctype html><html lang="en"><head><meta name="viewport" content="width=device-width"><title>T — H</title><style>${cssBlock().replace(/docent:kit/g, "kit")}</style></head><body><span class="host">H</span><h1>T</h1></body></html>`;
+  assert.deepEqual(checkDocument(page).errors, ["the document has no kit styles; run stamp", "the document has no kit script; run stamp"]);
+});
