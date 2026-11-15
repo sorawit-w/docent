@@ -68,7 +68,7 @@ h2 { font-size: 30px; line-height: 1.2; margin-bottom: 16px; }
 h3 { font: 600 18px/1.35 var(--sans); margin: 0; text-wrap: balance; }
 p { margin: 0 0 16px; max-width: var(--measure); text-wrap: pretty; }
 .term { text-decoration: underline; text-decoration-color: var(--primary); text-decoration-thickness: 2px; text-underline-offset: 0.22em; }
-code { font: 0.875em/1.55 var(--mono); background: var(--panel); padding: 0.1em 0.38em; border-radius: 6px; }
+code { font: 14px/1.55 var(--mono); background: var(--panel); padding: 0.1em 0.38em; border-radius: 6px; }
 .standfirst code { font-size: 18px; }
 
 /* Margin notes: the guide's remarks sit beside the text, like a wall label. */

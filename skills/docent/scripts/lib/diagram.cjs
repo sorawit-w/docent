@@ -96,6 +96,7 @@ function layout(model, form) {
 /** Draws one diagram. Returns { svg, form, warnings }. Throws when the data is wrong or no form keeps the rules. */
 function renderDiagram(data) {
   const { model, warnings } = readData(data);
+  const icons = [...warnings]; // every warning from the data is about an icon
   const forms = formsFor(model);
   let scene = null, reason = null;
   for (const form of forms) {
@@ -112,7 +113,7 @@ function renderDiagram(data) {
   if (!scene) throw reason;
   if (model.place === "walk" && scene.w > WALK) warnings.push(`the drawing is ${scene.w}px wide; beside the walkthrough steps there is room for ${WALK}px, so it will scroll sideways`);
   const svg = toSvg(scene, { id: `dg-${model.id}`, label: model.label, mode: model.place === "walk" ? "walk" : "auto" });
-  return { svg, form: scene.form, warnings, model, scene };
+  return { svg, form: scene.form, warnings, icons, model, scene };
 }
 
 /** Finds every diagram block in a document: [{ json, start, end, text }]. */
@@ -148,4 +149,4 @@ function renderDocument(html) {
   return { html: out + html.slice(at), results };
 }
 
-module.exports = { readData, formsFor, renderDiagram, renderDocument, findDiagrams, DataError, MOST };
+module.exports = { readData, formsFor, renderDiagram, renderDocument, findDiagrams, block, DataError, MOST };
