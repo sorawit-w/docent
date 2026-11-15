@@ -47,19 +47,19 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
   // Real size, real text widths, and the step-to-leg link.
   {
     const { page, context } = await open({ width: 1280 });
-    const sizes = await page.evaluate(() => [...document.querySelectorAll("svg.dg")].map((s) => ({ id: s.id, shown: Math.round(s.getBoundingClientRect().width), real: s.viewBox.baseVal.width })));
+    const sizes = await page.evaluate(() => [...document.querySelectorAll("svg.dg")].filter((s) => s.getBoundingClientRect().width).map((s) => ({ id: s.id, shown: Math.round(s.getBoundingClientRect().width), real: s.viewBox.baseVal.width })));
     ok("three drawings, each at its real size (names 14px, notes 12px)", sizes.length === 3 && sizes.every((s) => s.shown === s.real), sizes);
-    const texts = await page.evaluate(() => [...document.querySelectorAll("svg.dg text:not(.num)")].map((t) => ({ s: t.textContent, cls: t.getAttribute("class"), px: t.getComputedTextLength(), size: getComputedStyle(t).fontSize })));
+    const texts = await page.evaluate(() => [...document.querySelectorAll("svg.dg text:not(.num)")].filter((t) => t.getBoundingClientRect().width).map((t) => ({ s: t.textContent, cls: t.getAttribute("class"), px: t.getComputedTextLength(), size: getComputedStyle(t).fontSize })));
     const font = { name: [14, 600], lane: [14, 600], sub: [12, 400], verb: [12, 400] };
     const wider = texts.filter((t) => t.px > textWidth(t.s, ...font[t.cls]) + 0.5).map((t) => `${t.s}: ${t.px.toFixed(1)} > ${textWidth(t.s, ...font[t.cls])}`);
     ok("no text in a drawing is wider than the renderer assumed", wider.length === 0, wider);
     ok("text sizes in the drawings are 14px and 12px", texts.every((t) => t.size === `${font[t.cls][0]}px`), [...new Set(texts.map((t) => `${t.cls}:${t.size}`))]);
-    const icons = await page.evaluate(() => ({ perDrawing: [...document.querySelectorAll("svg.dg")].map((s) => s.querySelectorAll(".icon").length), leftovers: document.querySelectorAll("animateMotion, [filter], svg.dg image, svg.dg script").length }));
+    const icons = await page.evaluate(() => ({ perDrawing: [...document.querySelectorAll("svg.dg")].filter((s) => s.getBoundingClientRect().width).map((s) => s.querySelectorAll(".icon").length), leftovers: document.querySelectorAll("animateMotion, [filter], svg.dg image, svg.dg script").length }));
     ok("seven icons in each drawing, made of plain shapes", icons.perDrawing.join() === "7,7,7" && icons.leftovers === 0, icons);
 
     const current = () => page.evaluate(() => {
-      const walk = document.querySelector(".walk"), leg = walk.querySelector("svg.dg .leg.is-current"), dot = leg && getComputedStyle(leg.querySelector(".pulse"));
-      return { step: [...walk.querySelectorAll(".steps > li")].findIndex((li) => li.classList.contains("is-current")) + 1, legs: [...walk.querySelectorAll("svg.dg .leg.is-current")].map((g) => g.dataset.leg).join(), line: leg && getComputedStyle(leg.querySelector(".line")).stroke, dot: dot && `${dot.display} ${dot.animationName}`, others: document.querySelectorAll("svg.dg-auto .leg.is-current").length };
+      const walk = document.querySelector(".walk"), leg = [...walk.querySelectorAll("svg.dg .leg.is-current")].find((g) => g.getBoundingClientRect().width), dot = leg && getComputedStyle(leg.querySelector(".pulse"));
+      return { step: [...walk.querySelectorAll(".steps > li")].findIndex((li) => li.classList.contains("is-current")) + 1, legs: [...new Set([...walk.querySelectorAll("svg.dg .leg.is-current")].map((g) => g.dataset.leg))].join(), line: leg && getComputedStyle(leg.querySelector(".line")).stroke, dot: dot && `${dot.display} ${dot.animationName}`, others: document.querySelectorAll("svg.dg-auto .leg.is-current").length };
     });
     for (let i = 0; i < 4; i++) {
       await page.evaluate((n) => { const li = document.querySelectorAll(".steps > li")[n]; window.scrollTo(0, li.getBoundingClientRect().top + scrollY - innerHeight * 0.5 + 4); }, i);
@@ -128,6 +128,23 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     const { page, context } = await open({ width: 320, height: 800 });
     const flow = await page.evaluate(() => ({ scrollWidth: document.documentElement.scrollWidth, clientWidth: document.documentElement.clientWidth, inner: [...document.querySelectorAll(".fig, .table-wrap, pre")].filter((e) => e.scrollWidth > e.clientWidth + 1).length }));
     ok("at 320px the page does not scroll sideways", flow.scrollWidth === flow.clientWidth, flow);
+    const wells = await page.evaluate(() => [...document.querySelectorAll(".fig")].map((e) => ({ id: [...e.querySelectorAll("svg.dg")].find((s) => s.getBoundingClientRect().width).id, scrolls: e.scrollWidth > e.clientWidth + 1 })));
+    ok("at 320px every drawing fits its well", wells.map((w) => `${w.id}:${w.scrolls}`).join() === "dg-path-phone:false,dg-steps-phone:false,dg-parts-phone:false", wells);
+    await context.close();
+  }
+
+  // On a phone each route shows its single-track form, at real size, and it fits its well.
+  {
+    const { page, context } = await open({ width: 390, height: 844 });
+    const phone = await page.evaluate(() => [...document.querySelectorAll("svg.dg")].filter((s) => s.getBoundingClientRect().width).map((s) => ({ id: s.id, cls: s.getAttribute("class"), shown: Math.round(s.getBoundingClientRect().width), real: s.viewBox.baseVal.width, fits: s.closest(".fig").scrollWidth <= s.closest(".fig").clientWidth + 1 })));
+    ok("on a phone each route shows its single-track form, at real size, with no sideways scroll", phone.length === 3 && phone.every((d) => d.id.endsWith("-phone") && d.cls.includes("dg-track") && d.fits && d.shown === d.real), phone);
+    const lit = [];
+    for (let i = 0; i < 4; i++) {
+      await page.evaluate((n) => { const li = document.querySelectorAll(".steps > li")[n]; window.scrollTo(0, li.getBoundingClientRect().top + scrollY - innerHeight * 0.5 + 4); }, i);
+      await page.waitForTimeout(250);
+      lit.push(await page.evaluate(() => { const leg = document.querySelector("#dg-steps-phone .leg.is-current"), dot = getComputedStyle(leg.querySelector(".pulse")); return `${leg.dataset.leg}:${dot.display}:${dot.animationName}`; }));
+    }
+    ok("on a phone each walkthrough step lights its leg in the single-track form", lit.join() === [1, 2, 3, 4].map((n) => `${n}:block:dg-steps-phone-${n}`).join(), lit);
     await context.close();
   }
 
@@ -142,6 +159,7 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
   // A drawing copied out of the page keeps its light colors, because it carries its own styles.
   {
     const svg = html.match(/<svg id="dg-path"[\s\S]*?<\/svg>/)[0];
+    ok("the copied drawing is the main form only", !svg.includes("dg-path-phone\" "), "");
     const { page, context } = await open({ width: 1000, theme: "dark", content: `<!doctype html><html lang="en"><head><title>copy</title></head><body>${svg}</body></html>` });
     const alone = await page.evaluate(() => ({ name: getComputedStyle(document.querySelector(".name")).fill, band: getComputedStyle(document.querySelector(".band")).fill, line: getComputedStyle(document.querySelector(".line")).stroke, width: Math.round(document.querySelector("svg").getBoundingClientRect().width), dots: [...new Set([...document.querySelectorAll(".pulse")].map((d) => getComputedStyle(d).display))].join() }));
     ok("a drawing copied out of the page keeps its colors and its size", alone.name === LIGHT.text && alone.band === LIGHT.bg && alone.line === LIGHT.text && alone.width === 858 && alone.dots === "none", alone);

@@ -45,11 +45,20 @@ test("a walkthrough drawing lights the current leg; any other drawing runs one d
   assert.match(flow, /class="dg dg-wide dg-auto"/);
   assert.match(flow, /\.pulse\{display:block;animation:7\.6s linear 2 both\}/);
   for (const svg of [walk, flow]) {
-    assert.equal((svg.match(/@keyframes /g) || []).length, 4, "one set of keyframes for each leg");
+    assert.equal((svg.match(/@keyframes /g) || []).length, 8, "one set of keyframes for each leg, in the main form and in the phone form");
     assert.match(svg, /@media \(prefers-reduced-motion:reduce\)/);
     assert.match(svg, /@media print\{[^}]*\.pulse\{display:none!important\}/);
     assert.ok(!/animation[^;}]*(width|height|top|left|margin)/.test(svg), "only transform and opacity move");
   }
+});
+
+test("a route also gets a single-track form for phones; paths that branch do not", () => {
+  const route = renderDiagram(fixture("bug-report")).svg;
+  assert.match(route, /<svg id="dg-path" class="dg dg-wide dg-auto"/);
+  assert.match(route, /<svg id="dg-path-phone" class="dg dg-track dg-auto"[^>]* width="264"/);
+  assert.match(route, /#dg-path-phone\{display:none\}/, "the main form hides the phone form");
+  assert.match(route, /@media \(max-width:954px\)\{#dg-path\{display:none\}#dg-path-phone\{display:block\}\}/, "below the width that the main form needs, the phone form takes its place");
+  assert.ok(!renderDiagram(fixture("branch")).svg.includes("-phone"));
 });
 
 test("wrong data is refused with a plain reason", () => {
@@ -91,8 +100,9 @@ test("a bad icon is left out, and then no part of the diagram has an icon", () =
   const data = fixture("bug-report");
   data.icons = { bug: '<script>alert(1)</script>' };
   data.parts[0].icon = "bug";
-  const { svg, warnings } = renderDiagram(data);
-  assert.ok(!svg.includes("<script"));
+  const { svg: both, warnings } = renderDiagram(data);
+  const svg = both.slice(0, both.indexOf("</svg>")); // the main form
+  assert.ok(!both.includes("<script"));
   assert.match(warnings[0], /the icon "bug" is left out because <script> is not a plain shape/);
   assert.match(warnings[1], /only 4 of 5 parts have an icon/);
   assert.equal((svg.match(/class="icon"/g) || []).length, 0);
