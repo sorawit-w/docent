@@ -19,6 +19,7 @@ Version 0.2.0. The design is settled, and the three scripts exist with tests.
 | `check`: tests a document against the rules | Built. It reads the source only; it does not open a browser |
 | Built-in icon set | 15 icons |
 | Sample page ([`specimen.html`](skills/docent/assets/specimen.html)) | Made by the scripts |
+| Starting page ([`template.html`](skills/docent/assets/template.html)) | Not built on purpose: content and data only, so that an agent reads little. The scripts build it |
 | Brand: brief, texts, mark ([`brand/`](brand/)) | Written |
 
 Known limits:
@@ -57,8 +58,8 @@ skills/docent/        the skill an agent installs
   SKILL.md            when to use it, and how to work
   VERSION             the version of the kit
   references/         DESIGN.md (the design rules), diagrams.md (diagram data) and widgets.md (widget data)
-  assets/             kit.css and kit.js (the page styles and script), template.html (the starting page),
-                      specimen.html (the sample page)
+  assets/             kit.css and kit.js (the page styles and script), template.html (the starting page, not built),
+                      specimen.html (the sample page, built)
   scripts/            render.cjs, stamp.cjs, check.cjs, and their parts in lib/
 tests/                tests for the scripts, with stored expected drawings and widgets
   browser/            checks that open the sample page in a browser
@@ -92,11 +93,13 @@ The browser checks open the sample page and test accessibility, themes, motion, 
 DOCENT_NODE_MODULES=/path/to/node_modules node tests/browser/check-render.cjs
 ```
 
-After a change to the kit or the renderer, make the sample page and the starting page again and commit them:
+After a change to the kit or the renderer, make the sample page again and commit it:
 
 ```bash
-for page in specimen template; do node skills/docent/scripts/render.cjs skills/docent/assets/$page.html && node skills/docent/scripts/stamp.cjs skills/docent/assets/$page.html; done
+node skills/docent/scripts/render.cjs skills/docent/assets/specimen.html && node skills/docent/scripts/stamp.cjs skills/docent/assets/specimen.html
 ```
+
+Do not run the scripts on `template.html`. The starting page stays unbuilt: it holds content and data only, and a test fails when it holds more. The tests and the browser checks build it in memory.
 
 ## License
 

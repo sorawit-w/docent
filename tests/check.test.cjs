@@ -18,10 +18,17 @@ test("the sample page is the output of stamp and render, and it passes check", (
   assert.match(warnings[0], /should not draw the same thing twice/);
 });
 
-test("the starting page is the output of stamp and render, and it passes check with no warning", () => {
+test("the starting page holds content and data only; render and stamp build it into a page that passes check with no warning", () => {
   const template = fs.readFileSync(path.join(__dirname, "..", "skills", "docent", "assets", "template.html"), "utf8");
-  assert.equal(renderDocument(stampHtml(template).html).html, template, "run render and stamp on template.html, then commit it");
-  assert.deepEqual(checkDocument(template), { errors: [], warnings: [] });
+  assert.ok(!/docent:kit|<svg id="dg-|class="(choose|checks|decide)"/.test(template), "the starting page is not built: it has no kit, no drawing and no widget markup");
+  assert.ok(template.length < 16000, `the starting page has ${template.length} bytes; an agent reads all of it, so it stays below 16000`);
+  const made = renderDocument(template);
+  assert.deepEqual([...made.results, ...made.widgets].map((r) => [r.id, r.error, r.warnings.length]), [["glance", null, 0], ["steps", null, 0], ["case", null, 0], ["list", null, 0], ["choice", null, 0]]);
+  const stamped = stampHtml(made.html);
+  assert.deepEqual(stamped.actions, ["styles added", "script added"]);
+  assert.deepEqual(checkDocument(stamped.html), { errors: [], warnings: [] });
+  assert.equal(stampHtml(renderDocument(stamped.html).html).html, stamped.html, "building it again changes nothing");
+  assert.match(checkDocument(template).errors.join("\n"), /the document has no kit styles; run stamp/, "check says what an unbuilt page still needs");
 });
 
 test("check refuses anything that loads from the network", () => {

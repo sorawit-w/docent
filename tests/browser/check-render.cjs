@@ -1,4 +1,5 @@
-// Browser checks for the Docent sample page. They need playwright-core and axe-core:
+// Browser checks for the Docent sample page. The page is built first (render, then stamp), so the starting page can be given too.
+// They need playwright-core and axe-core:
 //   DOCENT_NODE_MODULES=/path/to/node_modules node tests/browser/check-render.cjs
 // The script prints one line for each check and exits with 1 when a check fails.
 const fs = require("node:fs");
@@ -9,8 +10,9 @@ const { chromium } = require(path.join(modules, "playwright-core"));
 const axePath = path.join(modules, "axe-core", "axe.min.js");
 const { textWidth } = require(path.join(root, "skills", "docent", "scripts", "lib", "text.cjs"));
 const { renderDocument } = require(path.join(root, "skills", "docent", "scripts", "lib", "diagram.cjs"));
+const { stampHtml } = require(path.join(root, "skills", "docent", "scripts", "lib", "kit.cjs"));
 const file = path.resolve(process.argv[2] || path.join(root, "skills", "docent", "assets", "specimen.html"));
-const html = fs.readFileSync(file, "utf8");
+const html = stampHtml(renderDocument(fs.readFileSync(file, "utf8")).html).html;
 const out = process.env.DOCENT_SHOTS || path.join(__dirname, "shots");
 fs.mkdirSync(out, { recursive: true });
 
