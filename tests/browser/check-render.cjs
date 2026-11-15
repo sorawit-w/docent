@@ -282,6 +282,15 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     await context.close();
   }
 
+  // A plain list in the text flow has a kit style, and the lists of the kit's own blocks keep theirs.
+  {
+    const content = html.replace('<section id="report"', '<section id="lists" aria-labelledby="lists-h"><h2 id="lists-h">Lists</h2><ul id="points"><li>One.</li><li>Two.</li></ul><ol id="numbers"><li>One.</li><li>Two.</li></ol></section>\n<section id="report"');
+    const { page, context } = await open({ width: 1280, content });
+    const lists = await page.evaluate(() => { const of = (sel) => { const c = getComputedStyle(document.querySelector(sel)); return `${c.paddingLeft} ${c.maxWidth} ${c.marginTop} ${c.listStyleType}`; }; return { points: of("#points"), numbers: of("#numbers"), line: of("#points li + li"), steps: of(".steps"), step: of(".steps li + li"), facts: of(".facts"), ticks: of("#wd-ready ul"), tick: of("#wd-ready li + li") }; });
+    ok("a plain list has the kit style, and the steps, the facts and the checklist keep theirs", lists.points === "24px 496px 0px disc" && lists.numbers === "24px 496px 0px decimal" && lists.line.startsWith("0px none 4px") && lists.steps === "0px none 0px none" && lists.step.startsWith("32px none 0px") && lists.facts === "0px none 0px none" && lists.ticks === "0px 496px 0px none" && lists.tick.startsWith("0px none 12px"), lists);
+    await context.close();
+  }
+
   // A part with a state: the outline and the status dot take the status color of the theme; the name and the icon stay in the text color.
   {
     const data = fs.readFileSync(path.join(root, "tests", "fixtures", "pipeline.json"), "utf8");

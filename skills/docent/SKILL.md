@@ -35,12 +35,13 @@ Do not use it for app screens, slide decks or marketing pages.
 ## How to work
 
 1. **Read the rules.** Read `references/DESIGN.md` in full before you write.
-2. **Start from the template.** Copy `assets/template.html` to the new file and replace its content. A comment names each block: the top bar, the title block, a section with a margin note, a figure in the text flow, the walkthrough, the three widgets, a table, a status note, a code block and a closed section. Use the class names as they are, and remove the blocks that you do not need. The template holds two drawings and three widgets that `render` made. When you copy such a block, change its data; you may delete what sits between `-->` and the closing marker, because `render` writes it again. Do not edit anything between the `docent:kit` markers. Your own styles, if you need any, go in a separate `<style>` after the kit.
+2. **Start from the template.** Copy `assets/template.html` to the new file and replace its content. A comment names each block: the top bar, the title block, a section with a margin note, a figure in the text flow, the walkthrough, the three widgets, lists, a table, a status note, a code block and a closed section. Use the class names as they are, and remove the blocks that you do not need. The template holds two drawings and three widgets that `render` made. When you copy such a block, change its data; you may delete what sits between `-->` and the closing marker, because `render` writes it again. Do not edit anything between the `docent:kit` markers. Your own styles, if you need any, go in a separate `<style>` after the kit.
 3. **Keep one file.** No fonts, scripts, styles or images from the network.
-4. **Write in the Docent voice.** Plain words, one idea per sentence. A step heading is one sentence of at most six words. The `<title>` is `Document title — Host project`.
-5. **Write each diagram as data.** Read `references/diagrams.md`. Draw a diagram only when it shows something that words cannot, and never draw the same thing twice. Let the renderer pick the form. Give a part a `state` (`ok`, `warn` or `err`) only when the document reports how that part ended; there is no other way to color a diagram. Never write or edit the SVG by hand: change the data in the block, and `render` replaces the drawing.
-6. **Write each widget as data, and only when the reader needs one.** Read `references/widgets.md`. A widget is allowed only when the reader must choose one case of several, track what is done, or decide between answers. In every other case write text, a table or a closed section. Docent has three widgets: a chooser, a checklist and a decision helper. Never write the markup of a widget by hand, and never write a widget of your own with a script.
-7. **Run the three scripts**, in this order. `SKILL` stands for the folder that holds this file:
+4. **Use the walkthrough only with a figure.** The walkthrough block needs a diagram beside its steps. Steps that have no figure are a plain numbered list (`<ol>`), and points are a plain `<ul>`. The kit styles both; write no styles of your own for a list.
+5. **Write in the Docent voice.** Plain words, one idea per sentence. A step heading is one sentence of at most six words. The `<title>` is `Document title — Host project`.
+6. **Write each diagram as data.** Read `references/diagrams.md`. Draw a diagram only when it shows something that words cannot, and never draw the same thing twice. Let the renderer pick the form. Give a part a `state` (`ok`, `warn` or `err`) only when the document reports how that part ended; there is no other way to color a diagram. Never write or edit the SVG by hand: change the data in the block, and `render` replaces the drawing.
+7. **Write each widget as data, and only when the reader needs one.** Read `references/widgets.md`. A widget is allowed only when the reader must choose one case of several, track what is done, or decide between answers. In every other case write text, a table or a closed section. Docent has three widgets: a chooser, a checklist and a decision helper. Never write the markup of a widget by hand, and never write a widget of your own with a script.
+8. **Run the three scripts**, in this order. `SKILL` stands for the folder that holds this file:
 
    ```bash
    node SKILL/scripts/render.cjs document.html
@@ -55,7 +56,7 @@ Do not use it for app screens, slide decks or marketing pages.
    ```
 
    `render` makes every diagram and every widget that it can. When it refuses one, it says why, leaves that block as it was, and ends with exit code 1. Fix every error that `render` and `check` report, then run them again. Read every warning and decide.
-8. **Look at the result.** Open the document in a browser at desktop and phone width, in light and dark, and in print preview. Use each widget once. `check` cannot do this for you. If you have no browser, say so to the user.
+9. **Look at the result.** Open the document in a browser at desktop and phone width, in light and dark, and in print preview. Use each widget once. `check` cannot do this for you. If you have no browser, say so to the user.
 
 ## Who does what
 

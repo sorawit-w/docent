@@ -75,7 +75,7 @@ Write every case in full. A reader on paper sees all cases, one below the other,
 
 ## Checklist
 
-The reader ticks each line when it is done. Use it for things to prepare or to check, which the reader can do in any order. For steps in a fixed order, write a walkthrough or numbered text, also when the reader does the steps: the order is what the reader needs there, and a checklist does not show it.
+The reader ticks each line when it is done. Use it for things to prepare or to check, which the reader can do in any order. For steps in a fixed order, write a walkthrough, or a numbered list (`<ol>`) when the steps have no figure, also when the reader does the steps: the order is what the reader needs there, and a checklist does not show it.
 
 ```html
 <!-- docent:widget
