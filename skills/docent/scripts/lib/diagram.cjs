@@ -8,6 +8,7 @@ const MOST = { lanes: 4, parts: 12, legs: 16, name: 32, note: 40, verb: 24, lane
 const PAGE = 1104; // the widest drawing that fits a full-width well
 const WALK = 520; // the widest drawing that fits beside the walkthrough steps
 const PHONE = 264; // the widest drawing that fits a 320px screen
+const ROOM = 96; // what the page takes beside a drawing: the page padding and the well padding
 const MARKER = /<!-- docent:diagram[ \t]*\n([\s\S]*?)\n[ \t]*-->[\s\S]*?<!-- \/docent:diagram -->/g;
 
 class DataError extends Error {}
@@ -114,13 +115,13 @@ function renderDiagram(data) {
   if (!scene) throw reason;
   if (model.place === "walk" && scene.w > WALK) warnings.push(`the drawing is ${scene.w}px wide; beside the walkthrough steps there is room for ${WALK}px, so it will scroll sideways`);
   const id = `dg-${model.id}`, mode = model.place === "walk" ? "walk" : "auto";
-  // A route also gets a single-track form for phones. It takes the place of the main form on a screen that is too narrow.
+  // A route also gets a single-track form. It takes the place of the main form on a screen or a sheet of paper that is too narrow.
   let phone = null;
   if (model.chain && scene.w > PHONE) {
     try { phone = layoutRoute(model, "track"); } catch (error) { warnings.push(`no phone form: ${error.message}`); }
   }
   const main = toSvg(scene, { id, label: model.label, mode, swap: phone && { phone: `${id}-phone` } });
-  const svg = phone ? `${main}\n${toSvg(phone, { id: `${id}-phone`, label: model.label, mode, swap: { main: id, below: Math.max(720, scene.w + 96) } })}` : main;
+  const svg = phone ? `${main}\n${toSvg(phone, { id: `${id}-phone`, label: model.label, mode, swap: { main: id, below: scene.w + ROOM } })}` : main;
   return { svg, form: scene.form, warnings, icons, model, scene };
 }
 

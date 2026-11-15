@@ -111,7 +111,7 @@ The palette is one ink, one light, and Docent's own grays. Every gray leans slig
 - **Neutral — Well (#f2f3f9):** The ground of figures and code. A well is one step darker than the page in both themes, and it has no outline.
 - **Status:** `success`, `warning` and `error` are for status only, as a small dot with a word beside it.
 
-**Diagrams.** Docent draws its own diagrams, in three forms (see Layout). A diagram uses the page's tokens and nothing else: lines, parts and names in the text color, notes in the muted color, tracks in the outline color, lane bands in the page color, and the well as its ground. Because it reads the tokens, one drawing serves both themes. Ultramarine marks the current leg, and the dot on it is ultramarine in light and lamp in dark. Docent does not use a third-party diagram renderer.
+**Diagrams.** Docent draws its own diagrams, in three forms (see Layout). A diagram uses the page's tokens and nothing else: lines, parts and names in the text color, notes in the muted color, tracks in the outline color, lane bands in the page color, and the well as its ground. Because it reads the tokens, one drawing serves both themes. Each drawing carries its own styles, with the light values as a fallback, so a drawing that is copied out of the page keeps the light colors. Ultramarine marks the current leg, and the dot on it is ultramarine in light and lamp in dark. Docent does not use a third-party diagram renderer.
 
 **Themes.** A document follows the reader's system setting: light on a light system, dark on a dark one. A switch lets the reader choose the other theme. That choice wins over the system and is remembered. Every `dark-*` token is the dark value of the token with the same name. The page is never pure white and never pure black.
 
@@ -133,6 +133,8 @@ Docent uses system fonts only, because every document is one file with nothing t
 
 **No label above a heading.** The title leads, across the page. Facts about the document (its kind, reading time, date and owner) sit in the margin beside the opening paragraph, not above the title.
 
+**The window title.** The `<title>` of a document is `Document title — Host project`. It does not name Docent.
+
 **Two widths.** A block is either as wide as the text column (31rem) or as wide as the page. Text, notes in the flow and warnings use the text column. Wells and tables use the full width, so their edges line up down the page. A drawing sits in the middle of its well at its real size.
 
 **Text column and margin column.** A margin column of 220px sits beside the text column. The margin holds the guide's remarks: a note, or the facts about the document. A margin label starts with one line above it and a short bold word. On narrow screens the margin label moves below its paragraph.
@@ -141,7 +143,7 @@ Docent uses system fonts only, because every document is one file with nothing t
 
 **The walkthrough.** Steps sit on a rail: one thin line with a small ring per step. One dot marks the current step and slides to the next. The other steps use the muted text color. The figure stays in view beside the steps on wide screens. On narrow screens and in print the figure comes first and the steps follow. With JavaScript off, every step has the full text color.
 
-**Diagrams have three forms.** All three show the same data: lanes (a person, a machine, a system), parts, and numbered legs from one part to the next. Each form has its own strength, and the renderer picks the form from where the diagram sits and what it must show. An author can name a form to override the choice.
+**Diagrams have three forms.** All three show the same data: lanes (a person, a machine, a system), parts, and numbered legs from one part to the next. Each form has its own strength, and the renderer picks the form from where the diagram sits and what it must show. An author can name a form to override the choice. A document does not draw the same thing twice; the sample page is the one exception, because it shows one workflow in all three forms.
 
 | Form | What it looks like | Use it when |
 |---|---|---|
@@ -149,17 +151,21 @@ Docent uses system fonts only, because every document is one file with nothing t
 | **Route, tall** | The same route, running down the page. | The diagram sits beside the walkthrough steps, or the workflow is long. |
 | **Plates** | Each lane is a panel. Each part is a plate with a name and a note. | The parts matter more than the order, a part needs more text, or the paths branch. |
 
+**How the renderer picks.** Paths that branch, and a note longer than 28 characters, give Plates. A diagram beside walkthrough steps gives Route tall. A route with more than five legs gives Route tall. Any other route gives Route wide. When the picked form cannot keep the spacing rules, or is wider than the page, the renderer tries the next form. A diagram has at most 4 lanes, 12 parts and 16 legs.
+
+**On a phone.** A route also has a single-track form. The route runs straight down, each visit to a lane is a band, and each leg that changes lane has its mark in the gap between two bands. This form takes the place of the main form on a screen that is too narrow for it, and it fits a screen of 320px. The same holds on paper: a route that is wider than the sheet prints in its single-track form. Paths that branch have no single-track form; their Plates drawing scrolls sideways inside its well on a narrow screen, and it shrinks to fit the sheet on paper.
+
 **Three layers.** Every diagram has the well as its ground, a band or panel for each lane in the page color, and the drawing on top. The ground has no pattern. The layers show which parts belong together before the reader reads a word.
 
 **Spacing rules.** A diagram must never look crowded. The renderer keeps these rules:
 
 - An arrowhead has a straight run of at least 28px behind it. It never sits on a bend.
 - A numbered mark sits in the gap between two lanes when a leg crosses lanes, and at the middle of the leg when it stays in one lane. It is at least 16px clear of every arrowhead, bend and part.
-- A verb sits beside its mark and stays 6px clear of every line.
+- A verb sits beside its mark and stays 6px clear of every line. It sits to the right of a mark on an upright or steep leg, and above a mark on a level or shallow leg. One exception: in Route wide, on a lane whose labels sit above the track, the verb of a level leg sits below the line, on the free side.
 - A leg inside one lane is at least 72px long, so its mark and its arrowhead both fit.
 - Nothing overlaps: no text on a line, no mark on an arrowhead, no dot on a mark.
 
-**Size and motion.** A diagram is shown at its real size, so names are 14px and notes are 12px. It is never stretched to fill a wider space. The dot moves in every diagram, in one of two ways:
+**Size and motion.** A diagram is shown at its real size, so names are 14px and notes are 12px. It is never stretched to fill a wider space, and on a screen it never shrinks to fit a narrower one. The dot moves in every diagram, in one of two ways:
 
 - **In a walkthrough,** the leg of the current step takes the ultramarine color and the dot travels along that leg.
 - **Anywhere else,** one dot travels the whole route by itself, leg by leg in the order of the numbers. Only one dot is in flight at a time, so the motion shows the order. The run plays twice and then rests, so the page is calm while the reader reads.
@@ -220,7 +226,7 @@ An icon lets the reader tell the parts of a diagram apart before reading a word.
 
 **Where an icon comes from.** A document can be about anything, so the icons are not all known in advance. The writing agent chooses in this order:
 
-1. **The built-in set.** Docent ships a small set for the kinds that appear in most documents: a person, a team, a computer, a server, a data store, a document, a message, a timer, a key, a branch, a release. The agent picks by kind.
+1. **The built-in set.** Docent ships a small set for the kinds that appear in most documents: a person, a team, a computer, a server, a data store, a document, a message, a timer, a key, a branch, a release. It also has four more: inspect, check, commit and merge. The agent picks by kind.
 2. **A drawn icon.** When no built-in icon fits, the agent draws one for this part, to the rules below.
 3. **No icon.** When no clear picture exists, the part is shown as a plain ring or plate. A wrong picture is worse than none.
 
@@ -233,4 +239,4 @@ An icon lets the reader tell the parts of a diagram apart before reading a word.
 - Two parts of the same kind share one icon. Two parts of different kinds never share one.
 - In one diagram, either every part has an icon or no part has one.
 
-**The check.** The renderer accepts an icon only if it is made of plain shapes (`path`, `circle`, `rect`, `line`, `polyline`) and nothing else: no script, style, link or image. An icon that fails the check is left out, and the part is shown without one.
+**The check.** The renderer accepts an icon only if it is made of plain shapes (`path`, `circle`, `rect`, `line`, `polyline`) and nothing else: no script, style, link or image. An icon that fails the check is left out. Then every part of that diagram is shown without an icon, because either every part has one or no part has one.

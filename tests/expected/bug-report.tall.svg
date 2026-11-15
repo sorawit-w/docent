@@ -35,7 +35,7 @@
 #dg-path .pulse-4{transform:translate(331px,435px)}
 .js #dg-path .leg.is-current .pulse-4{animation-name:dg-path-4}
 @media (prefers-reduced-motion:reduce){#dg-path .pulse{animation:none!important}}
-@media print{#dg-path .pulse{display:none!important}#dg-path .leg .line{stroke:var(--text,#1c1f2e)!important;stroke-width:2px!important}#dg-path .leg .head,#dg-path .leg .num{fill:var(--text,#1c1f2e)!important}#dg-path .leg .mark{stroke:var(--text,#1c1f2e)!important}}
+@media print{#dg-path{max-width:100%;height:auto}#dg-path .pulse{display:none!important}#dg-path .leg .line{stroke:var(--text,#1c1f2e)!important;stroke-width:2px!important}#dg-path .leg .head,#dg-path .leg .num{fill:var(--text,#1c1f2e)!important}#dg-path .leg .mark{stroke:var(--text,#1c1f2e)!important}}
 #dg-path-phone{display:none}
 </style>
 <rect width="468" height="568" class="ground"/>
@@ -109,8 +109,8 @@
 #dg-path-phone .pulse-4{transform:translate(30px,391.88px)}
 .js #dg-path-phone .leg.is-current .pulse-4{animation-name:dg-path-phone-4}
 @media (prefers-reduced-motion:reduce){#dg-path-phone .pulse{animation:none!important}}
-@media print{#dg-path-phone .pulse{display:none!important}#dg-path-phone .leg .line{stroke:var(--text,#1c1f2e)!important;stroke-width:2px!important}#dg-path-phone .leg .head,#dg-path-phone .leg .num{fill:var(--text,#1c1f2e)!important}#dg-path-phone .leg .mark{stroke:var(--text,#1c1f2e)!important}}
-@media not print{@media (max-width:720px){#dg-path{display:none}#dg-path-phone{display:block}}}
+@media print{#dg-path-phone{max-width:100%;height:auto}#dg-path-phone .pulse{display:none!important}#dg-path-phone .leg .line{stroke:var(--text,#1c1f2e)!important;stroke-width:2px!important}#dg-path-phone .leg .head,#dg-path-phone .leg .num{fill:var(--text,#1c1f2e)!important}#dg-path-phone .leg .mark{stroke:var(--text,#1c1f2e)!important}}
+@media (max-width:564px){#dg-path{display:none}#dg-path-phone{display:block}}
 </style>
 <rect width="264" height="520" class="ground"/>
 <rect x="8" y="12" width="248" height="80" rx="10" class="band"/>

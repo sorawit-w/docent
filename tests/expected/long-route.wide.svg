@@ -35,7 +35,7 @@
 @keyframes dg-backup-7{0%{transform:translate(1145px,176px);opacity:0}77.42%{transform:translate(1145px,176px);opacity:0}78.39%{transform:translate(1145px,176px);opacity:1}79.18%{transform:translate(1158px,176px);opacity:1}86.05%{transform:translate(1228px,88px);opacity:1}88.31%{transform:translate(1265px,88px);opacity:1}90.32%{transform:translate(1265px,88px);opacity:0}100%{transform:translate(1265px,88px);opacity:0}}
 .js #dg-backup .pulse-7{animation-name:dg-backup-7}
 @media (prefers-reduced-motion:reduce){#dg-backup .pulse{animation:none!important}#dg-backup .pulse{display:none!important}}
-@media print{#dg-backup .pulse{display:none!important}}
+@media print{#dg-backup{max-width:100%;height:auto}#dg-backup .pulse{display:none!important}}
 #dg-backup-phone{display:none}
 </style>
 <rect width="1360" height="264" class="ground"/>
@@ -124,8 +124,8 @@
 @keyframes dg-backup-phone-7{0%{transform:translate(30px,695px);opacity:0}77.42%{transform:translate(30px,695px);opacity:0}78.39%{transform:translate(30px,695px);opacity:1}88.31%{transform:translate(30px,769px);opacity:1}90.32%{transform:translate(30px,769px);opacity:0}100%{transform:translate(30px,769px);opacity:0}}
 .js #dg-backup-phone .pulse-7{animation-name:dg-backup-phone-7}
 @media (prefers-reduced-motion:reduce){#dg-backup-phone .pulse{animation:none!important}#dg-backup-phone .pulse{display:none!important}}
-@media print{#dg-backup-phone .pulse{display:none!important}}
-@media not print{@media (max-width:1456px){#dg-backup{display:none}#dg-backup-phone{display:block}}}
+@media print{#dg-backup-phone{max-width:100%;height:auto}#dg-backup-phone .pulse{display:none!important}}
+@media (max-width:1456px){#dg-backup{display:none}#dg-backup-phone{display:block}}
 </style>
 <rect width="264" height="832" class="ground"/>
 <rect x="8" y="12" width="248" height="184" rx="10" class="band"/>

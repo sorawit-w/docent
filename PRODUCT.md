@@ -36,16 +36,19 @@ Docent ships as an agent skill that carries scripts, not as written rules alone,
 
 - Every document is one self-contained HTML file with no network.
 - The page is flat: no gradients and no shadows. The accent is a mark and never a fill.
-- Three diagram forms (Route wide, Route tall, Plates) show the same data: lanes, parts, and numbered legs.
+- Three diagram forms (Route wide, Route tall, Plates) show the same data: lanes, parts, and numbered legs. A route also has a single-track form for phones.
 - No text below 14px outside diagrams. Inside diagrams, names are 14px and notes are 12px, shown at real size.
 - The theme follows the reader's system, and a switch wins. Print is light.
 - The design rules live in [`DESIGN.md`](DESIGN.md), the single authority for the design.
 - This repository names no other product.
 
-Open decisions:
+Decided on 2026-11-15:
 
-- The heading font: system fonts, or one heading font inside each document.
-- The format of a document's `<title>`.
+- The heading font stays a system font.
+- The `<title>` of a document is `Document title — Host project`.
+
+Open decision:
+
 - An optional local agent link, for later.
 
 ## Brand Commitments
@@ -57,7 +60,7 @@ Open decisions:
 
 ## Evidence on Hand
 
-- The sample page: [`skills/docent/assets/specimen.html`](skills/docent/assets/specimen.html).
+- The sample page, made by the scripts: [`skills/docent/assets/specimen.html`](skills/docent/assets/specimen.html).
 - The brand brief, short texts and the mark: [`brand/`](brand/).
 - No users, quotes, case studies or numbers exist. Future work must not invent them.
 

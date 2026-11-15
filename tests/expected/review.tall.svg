@@ -32,7 +32,7 @@
 #dg-review .pulse-3{transform:translate(48px,305px)}
 .js #dg-review .leg.is-current .pulse-3{animation-name:dg-review-3}
 @media (prefers-reduced-motion:reduce){#dg-review .pulse{animation:none!important}}
-@media print{#dg-review .pulse{display:none!important}#dg-review .leg .line{stroke:var(--text,#1c1f2e)!important;stroke-width:2px!important}#dg-review .leg .head,#dg-review .leg .num{fill:var(--text,#1c1f2e)!important}#dg-review .leg .mark{stroke:var(--text,#1c1f2e)!important}}
+@media print{#dg-review{max-width:100%;height:auto}#dg-review .pulse{display:none!important}#dg-review .leg .line{stroke:var(--text,#1c1f2e)!important;stroke-width:2px!important}#dg-review .leg .head,#dg-review .leg .num{fill:var(--text,#1c1f2e)!important}#dg-review .leg .mark{stroke:var(--text,#1c1f2e)!important}}
 </style>
 <rect width="226" height="433" class="ground"/>
 <rect x="8" y="12" width="210" height="409" rx="10" class="band"/>

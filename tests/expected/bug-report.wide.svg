@@ -29,7 +29,7 @@
 @keyframes dg-path-4{0%{transform:translate(643px,176px);opacity:0}63.16%{transform:translate(643px,176px);opacity:0}64.74%{transform:translate(643px,176px);opacity:1}80.92%{transform:translate(763px,176px);opacity:1}84.21%{transform:translate(763px,176px);opacity:0}100%{transform:translate(763px,176px);opacity:0}}
 .js #dg-path .pulse-4{animation-name:dg-path-4}
 @media (prefers-reduced-motion:reduce){#dg-path .pulse{animation:none!important}#dg-path .pulse{display:none!important}}
-@media print{#dg-path .pulse{display:none!important}}
+@media print{#dg-path{max-width:100%;height:auto}#dg-path .pulse{display:none!important}}
 #dg-path-phone{display:none}
 </style>
 <rect width="858" height="264" class="ground"/>
@@ -97,8 +97,8 @@
 @keyframes dg-path-phone-4{0%{transform:translate(30px,383px);opacity:0}63.16%{transform:translate(30px,383px);opacity:0}64.74%{transform:translate(30px,383px);opacity:1}80.92%{transform:translate(30px,457px);opacity:1}84.21%{transform:translate(30px,457px);opacity:0}100%{transform:translate(30px,457px);opacity:0}}
 .js #dg-path-phone .pulse-4{animation-name:dg-path-phone-4}
 @media (prefers-reduced-motion:reduce){#dg-path-phone .pulse{animation:none!important}#dg-path-phone .pulse{display:none!important}}
-@media print{#dg-path-phone .pulse{display:none!important}}
-@media not print{@media (max-width:954px){#dg-path{display:none}#dg-path-phone{display:block}}}
+@media print{#dg-path-phone{max-width:100%;height:auto}#dg-path-phone .pulse{display:none!important}}
+@media (max-width:954px){#dg-path{display:none}#dg-path-phone{display:block}}
 </style>
 <rect width="264" height="520" class="ground"/>
 <rect x="8" y="12" width="248" height="80" rx="10" class="band"/>

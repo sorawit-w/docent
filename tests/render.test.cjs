@@ -47,7 +47,7 @@ test("a walkthrough drawing lights the current leg; any other drawing runs one d
   for (const svg of [walk, flow]) {
     assert.equal((svg.match(/@keyframes /g) || []).length, 8, "one set of keyframes for each leg, in the main form and in the phone form");
     assert.match(svg, /@media \(prefers-reduced-motion:reduce\)/);
-    assert.match(svg, /@media print\{[^}]*\.pulse\{display:none!important\}/);
+    assert.match(svg, /@media print\{[^@]*\.pulse\{display:none!important\}/);
     assert.ok(!/animation[^;}]*(width|height|top|left|margin)/.test(svg), "only transform and opacity move");
   }
 });
@@ -124,4 +124,13 @@ test("render draws every diagram block of a document in place, and gives the sam
   const twice = renderDocument(page.replace('"again"', '"path"'));
   assert.match(twice.results[1].error, /two diagrams have the id "path"/);
   assert.match(renderDocument("<!-- docent:diagram\n{ not json\n-->\n<!-- /docent:diagram -->").results[0].error, /not valid JSON/);
+});
+
+test("the example in references/diagrams.md is drawn without a warning", () => {
+  const guide = fs.readFileSync(path.join(__dirname, "..", "skills", "docent", "references", "diagrams.md"), "utf8");
+  const page = guide.match(/```html\n([\s\S]*?)```/)[1];
+  const { results } = renderDocument(page);
+  assert.deepEqual(results.map((r) => [r.id, r.form, r.error, r.warnings]), [["order", "wide", null, []]]);
+  const own = JSON.parse(`{${guide.match(/```json\n([\s\S]*?)```/)[1]}}`).icons.bug;
+  assert.equal(iconProblem(own), null);
 });

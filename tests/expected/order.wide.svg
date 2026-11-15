@@ -29,7 +29,7 @@
 @keyframes dg-order-4{0%{transform:translate(663px,300px);opacity:0}63.16%{transform:translate(663px,300px);opacity:0}64.74%{transform:translate(663px,300px);opacity:1}65.51%{transform:translate(676px,300px);opacity:1}78.73%{transform:translate(746px,88px);opacity:1}80.92%{transform:translate(783px,88px);opacity:1}84.21%{transform:translate(783px,88px);opacity:0}100%{transform:translate(783px,88px);opacity:0}}
 .js #dg-order .pulse-4{animation-name:dg-order-4}
 @media (prefers-reduced-motion:reduce){#dg-order .pulse{animation:none!important}#dg-order .pulse{display:none!important}}
-@media print{#dg-order .pulse{display:none!important}}
+@media print{#dg-order{max-width:100%;height:auto}#dg-order .pulse{display:none!important}}
 #dg-order-phone{display:none}
 </style>
 <rect width="878" height="388" class="ground"/>
@@ -101,8 +101,8 @@
 @keyframes dg-order-phone-4{0%{transform:translate(30px,383px);opacity:0}63.16%{transform:translate(30px,383px);opacity:0}64.74%{transform:translate(30px,383px);opacity:1}80.92%{transform:translate(30px,457px);opacity:1}84.21%{transform:translate(30px,457px);opacity:0}100%{transform:translate(30px,457px);opacity:0}}
 .js #dg-order-phone .pulse-4{animation-name:dg-order-phone-4}
 @media (prefers-reduced-motion:reduce){#dg-order-phone .pulse{animation:none!important}#dg-order-phone .pulse{display:none!important}}
-@media print{#dg-order-phone .pulse{display:none!important}}
-@media not print{@media (max-width:974px){#dg-order{display:none}#dg-order-phone{display:block}}}
+@media print{#dg-order-phone{max-width:100%;height:auto}#dg-order-phone .pulse{display:none!important}}
+@media (max-width:974px){#dg-order{display:none}#dg-order-phone{display:block}}
 </style>
 <rect width="264" height="520" class="ground"/>
 <rect x="8" y="12" width="248" height="80" rx="10" class="band"/>

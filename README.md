@@ -4,70 +4,96 @@
 
 Docent is a design kit for documents: guides and reports written as single HTML files. It gives a document one calm look, a walkthrough that lights one step at a time, and workflow diagrams where a dot travels the route. A document opens in light or dark, prints cleanly, and stays readable without scripts.
 
-Docent is packaged as an agent skill. An agent that writes a document loads the skill, follows its rules, and (later) runs its scripts.
+Docent is packaged as an agent skill. An agent that writes a document loads the skill, follows its rules, and runs its scripts.
 
 ## Status
 
-Draft. The design is settled and a sample page shows it. The scripts are not built yet.
+Version 0.1.0. The design is settled, and the three scripts exist with tests.
 
 | Part | State |
 |---|---|
 | Design rules ([`DESIGN.md`](skills/docent/references/DESIGN.md)) | Written |
-| Sample page ([`specimen.html`](skills/docent/assets/specimen.html)) | Works; its diagrams were placed by hand |
+| `render`: draws diagrams from data | Built: Route wide, Route tall, Plates, and a single-track form for phones |
+| `stamp`: puts the styles and the page script into a document | Built |
+| `check`: tests a document against the rules | Built. It reads the source only; it does not open a browser |
+| Built-in icon set | 15 icons |
+| Sample page ([`specimen.html`](skills/docent/assets/specimen.html)) | Made by the scripts |
 | Brand: brief, texts, mark ([`brand/`](brand/)) | Written |
-| Script that draws diagrams | Not built |
-| Script that stamps the styles into a document | Not built |
-| Script that checks a document | Not built |
-| Built-in icon set | Seven icons so far |
+
+Known limits:
+
+- The renderer estimates text widths. The estimate was tested against the fonts of an Apple device only.
+- Paths that branch have no single-track form for phones.
+- A diagram has at most 4 lanes, 12 parts and 16 legs.
 
 ## See it
 
-Open [`skills/docent/assets/specimen.html`](skills/docent/assets/specimen.html) in a browser. Scroll the walkthrough, switch the theme, and open the print preview.
+Open [`skills/docent/assets/specimen.html`](skills/docent/assets/specimen.html) in a browser. Scroll the walkthrough, switch the theme, make the window narrow, and open the print preview.
+
+## Use it
+
+The scripts need Node 18 or newer and no packages.
+
+```bash
+node skills/docent/scripts/render.cjs document.html
+```
+
+```bash
+node skills/docent/scripts/stamp.cjs document.html
+```
+
+```bash
+node skills/docent/scripts/check.cjs document.html
+```
+
+[`SKILL.md`](skills/docent/SKILL.md) says how an agent works with them. [`diagrams.md`](skills/docent/references/diagrams.md) says how to write a diagram as data.
 
 ## What is in this repository
 
 ```
 skills/docent/        the skill an agent installs
-  SKILL.md            when to use it, and how to work today
-  references/         DESIGN.md, the design rules
-  assets/             specimen.html, the sample page
+  SKILL.md            when to use it, and how to work
+  VERSION             the version of the kit
+  references/         DESIGN.md (the design rules) and diagrams.md (diagram data)
+  assets/             kit.css and kit.js (the page styles and script), specimen.html (the sample page)
+  scripts/            render.cjs, stamp.cjs, check.cjs, and their parts in lib/
+tests/                tests for the scripts, with stored expected drawings
+  browser/            checks that open the sample page in a browser
 brand/                the brand brief, short texts, and the mark
-prototype/            the scripts used to draw and check the sample page
 DESIGN.md             a link to skills/docent/references/DESIGN.md
 ```
 
-## The prototype scripts
+## Tests
 
-These are working notes from the design phase, kept as the starting point for the real scripts. They are not part of the skill.
-
-- `prototype/route.py` holds the three diagram forms with hand-placed coordinates, the icons, and the motion rules. It writes the drawings into the sample page.
-- `prototype/check-render.cjs` loads the sample page in a browser and runs the checks: accessibility, themes, motion, print and narrow screens.
-- `prototype/measure.cjs` measures line length and block edges.
-- `prototype/contrast.py` prints the contrast of every color pair.
-
-Run them from the top of the repository:
+The tests need Node only:
 
 ```bash
-python3 prototype/route.py skills/docent/assets/specimen.html
+node --test tests/*.test.cjs
 ```
+
+When a drawing changes on purpose, look at it, then store the new expected output:
 
 ```bash
-python3 prototype/contrast.py
+UPDATE=1 node --test tests/*.test.cjs
 ```
 
-The two browser scripts need `playwright-core` and `axe-core`. Point `DOCENT_NODE_MODULES` at a `node_modules` folder that has both:
+The contrast of every color pair:
 
 ```bash
-DOCENT_NODE_MODULES=/path/to/node_modules node prototype/check-render.cjs
+python3 tests/contrast.py
 ```
 
-## What comes next
+The browser checks open the sample page and test accessibility, themes, motion, print, narrow screens and text widths. They need `playwright-core` and `axe-core`. Point `DOCENT_NODE_MODULES` at a `node_modules` folder that has both:
 
-1. A renderer that draws the three diagram forms from data and keeps the spacing rules.
-2. A script that stamps the styles and the page script into a document.
-3. A check that tests a document and rejects a bad icon.
-4. The built-in icon set.
-5. A single-track diagram form for phones.
+```bash
+DOCENT_NODE_MODULES=/path/to/node_modules node tests/browser/check-render.cjs
+```
+
+After a change to the kit or the renderer, make the sample page again and commit it:
+
+```bash
+node skills/docent/scripts/render.cjs skills/docent/assets/specimen.html && node skills/docent/scripts/stamp.cjs skills/docent/assets/specimen.html
+```
 
 ## License
 

@@ -31,7 +31,7 @@
 @keyframes dg-leave-5{0%{transform:translate(470px,334px);opacity:0}69.57%{transform:translate(470px,334px);opacity:0}70.87%{transform:translate(470px,334px);opacity:1}77.95%{transform:translate(470px,478px);opacity:1}84.24%{transform:translate(342px,478px);opacity:1}86.96%{transform:translate(342px,478px);opacity:0}100%{transform:translate(342px,478px);opacity:0}}
 .js #dg-leave .pulse-5{animation-name:dg-leave-5}
 @media (prefers-reduced-motion:reduce){#dg-leave .pulse{animation:none!important}#dg-leave .pulse{display:none!important}}
-@media print{#dg-leave .pulse{display:none!important}}
+@media print{#dg-leave{max-width:100%;height:auto}#dg-leave .pulse{display:none!important}}
 </style>
 <rect width="780" height="546" class="ground"/>
 <rect x="12" y="12" width="356" height="522" rx="10" class="band"/>
