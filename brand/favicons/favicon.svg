@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Docent">
+  <!-- Favicon form of the mark: heavier stroke and a larger dot, so it stays clear at 16 px. -->
+  <rect width="64" height="64" rx="14" fill="#2f3fd0"/>
+  <path d="M20 34V19H30A13.5 13.5 0 0 1 30 46" fill="none" stroke="#ffffff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="19" cy="46" r="4.5" fill="#f2b824"/>
+</svg>
