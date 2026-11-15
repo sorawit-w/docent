@@ -3,7 +3,7 @@
   "kind": "decision",
   "label": "Which plan fits?",
   "questions": [
-    {"text": "How many people use it?", "options": ["One", "2 to 10", "More"]},
+    {"text": "How many people use it?", "short": "People", "options": ["One", "2 to 10", "More"]},
     {"text": "Do you need `SSO`?", "options": ["Yes", "No"]}
   ],
   "answers": [

@@ -259,6 +259,14 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     await context.close();
   }
 
+  // On paper a table takes the width of the sheet. An A4 sheet with the page margins leaves 658px, less than a table needs on a screen.
+  {
+    const { page, context } = await open({ width: 658, height: 1123, media: "print" });
+    const tables = await page.evaluate(() => { dispatchEvent(new Event("beforeprint")); return [...document.querySelectorAll(".table-wrap")].map((wrap) => ({ over: Math.round(wrap.querySelector("table").getBoundingClientRect().right - wrap.getBoundingClientRect().right), shown: wrap.getBoundingClientRect().height > 0 })); });
+    ok("on paper no table is cut off", tables.length === 2 && tables.every((t) => t.shown && t.over <= 0), tables);
+    await context.close();
+  }
+
   // Choosers with the same cases change together, and the one that the reader used stays in place.
   {
     const twin = '<!-- docent:widget\n{"id": "twin", "kind": "chooser", "label": "Your system", "cases": [{"name": "macOS", "body": ["Short."]}, {"name": "Windows", "body": ["A longer text.", {"list": ["One.", "Two.", "Three.", "Four."]}]}, {"name": "Linux", "body": ["Short."]}]}\n-->\n<!-- /docent:widget -->\n';

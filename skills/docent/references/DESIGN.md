@@ -251,8 +251,8 @@ A document has few widgets. More than four is a sign that some are not needed.
 | Widget | With JavaScript off | On paper |
 |---|---|---|
 | Chooser | It works: the styles alone show the chosen case. | Every case prints, one below the other, each under its name. |
-| Checklist | The boxes can be ticked. There is no count and no memory. | The lines print with their boxes. |
-| Decision helper | The table of all cases, open. | The table of all cases. |
+| Checklist | The boxes can be ticked, and the button clears them. There is no count and no memory. | The lines print with their boxes. |
+| Decision helper | The table of all cases, open. | The table of all cases, at the width of the sheet. |
 
 **Memory.** A chooser remembers the choice, and a checklist remembers the ticks of this document. The page keeps both in the reader's own browser; nothing leaves the file. Choosers with the same cases change together, so the reader picks once.
 

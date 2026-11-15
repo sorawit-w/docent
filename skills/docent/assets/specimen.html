@@ -218,6 +218,7 @@ footer .shell { display: flex; align-items: center; justify-content: space-betwe
   .checks input:checked + label, .decide tr.is-out { color: var(--text) !important; }
   .steps li h3, .steps li p { color: var(--text) !important; }
   .walk { grid-template-columns: minmax(0, 1fr); row-gap: 32px; } .walk figure { position: static; order: -1; }
+  table { min-width: 0; } .table-wrap { overflow: visible; }
   figure, tr, .status, pre, .checks li { break-inside: avoid; }
   h2, h3 { break-after: avoid; }
   @page { margin: 18mm; }
@@ -860,8 +861,8 @@ footer .shell { display: flex; align-items: center; justify-content: space-betwe
   "kind": "decision",
   "label": "Which kind of report is it?",
   "questions": [
-    {"text": "Did you lose data?", "options": ["Yes", "No"]},
-    {"text": "Can you make the problem happen again?", "options": ["Yes", "No"]}
+    {"text": "Did you lose data?", "short": "Data lost", "options": ["Yes", "No"]},
+    {"text": "Can you make the problem happen again?", "short": "Happens again", "options": ["Yes", "No"]}
   ],
   "answers": [
     {"when": ["Yes", "any"], "title": "An urgent report", "text": "File it today, and say what was lost."},
@@ -888,7 +889,7 @@ footer .shell { display: flex; align-items: center; justify-content: space-betwe
 <summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>All cases</summary>
 <div class="table-wrap" role="region" aria-label="All cases: Which kind of report is it?" tabindex="0">
 <table>
-<thead><tr><th scope="col">Did you lose data?</th><th scope="col">Can you make the problem happen again?</th><th scope="col">Answer</th></tr></thead>
+<thead><tr><th scope="col">Data lost</th><th scope="col">Happens again</th><th scope="col">Answer</th></tr></thead>
 <tbody>
 <tr data-when="1,0"><td>Yes</td><td>Any</td><td><strong>An urgent report</strong>File it today, and say what was lost.</td></tr>
 <tr data-when="2,1"><td>No</td><td>Yes</td><td><strong>A normal report</strong>File it with the steps that show the problem.</td></tr>
