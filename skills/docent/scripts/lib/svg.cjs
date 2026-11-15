@@ -93,7 +93,8 @@ function styles(scene, id, mode, swap) {
     `${s} .sub,${s} .verb{font-size:12px;fill:${v("muted")}}`,
     `${s} .pulse{display:none;fill:${v("dot")};stroke:${v("bg")};stroke-width:2.5}`,
   ];
-  const print = [`${s} .pulse{display:none!important}`];
+  // On paper nothing scrolls: a drawing that is still wider than the page shrinks to fit it.
+  const print = [`${s}{max-width:100%;height:auto}`, `${s} .pulse{display:none!important}`];
   const still = [`${s} .pulse{animation:none!important}`];
   if (mode === "walk") {
     // The current step: its leg takes the ink color and its dot travels the leg.
@@ -127,7 +128,7 @@ function styles(scene, id, mode, swap) {
   }
   css.push(`@media (prefers-reduced-motion:reduce){${still.join("")}}`, `@media print{${print.join("")}}`);
   if (swap && swap.phone) css.push(`#${swap.phone}{display:none}`);
-  if (swap && swap.below) css.push(`@media not print{@media (max-width:${swap.below}px){#${swap.main}{display:none}${s}{display:block}}}`);
+  if (swap && swap.below) css.push(`@media (max-width:${swap.below}px){#${swap.main}{display:none}${s}{display:block}}`);
   return css.join("\n");
 }
 

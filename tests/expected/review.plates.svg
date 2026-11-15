@@ -27,7 +27,7 @@
 @keyframes dg-review-3{0%{transform:translate(190px,368px);opacity:0}53.33%{transform:translate(190px,368px);opacity:0}55.33%{transform:translate(190px,368px);opacity:1}75.83%{transform:translate(190px,440px);opacity:1}80%{transform:translate(190px,440px);opacity:0}100%{transform:translate(190px,440px);opacity:0}}
 .js #dg-review .pulse-3{animation-name:dg-review-3}
 @media (prefers-reduced-motion:reduce){#dg-review .pulse{animation:none!important}#dg-review .pulse{display:none!important}}
-@media print{#dg-review .pulse{display:none!important}}
+@media print{#dg-review{max-width:100%;height:auto}#dg-review .pulse{display:none!important}}
 #dg-review-phone{display:none}
 </style>
 <rect width="380" height="522" class="ground"/>
@@ -76,8 +76,8 @@
 @keyframes dg-review-phone-3{0%{transform:translate(30px,274px);opacity:0}53.33%{transform:translate(30px,274px);opacity:0}55.33%{transform:translate(30px,274px);opacity:1}75.83%{transform:translate(30px,358px);opacity:1}80%{transform:translate(30px,358px);opacity:0}100%{transform:translate(30px,358px);opacity:0}}
 .js #dg-review-phone .pulse-3{animation-name:dg-review-phone-3}
 @media (prefers-reduced-motion:reduce){#dg-review-phone .pulse{animation:none!important}#dg-review-phone .pulse{display:none!important}}
-@media print{#dg-review-phone .pulse{display:none!important}}
-@media not print{@media (max-width:720px){#dg-review{display:none}#dg-review-phone{display:block}}}
+@media print{#dg-review-phone{max-width:100%;height:auto}#dg-review-phone .pulse{display:none!important}}
+@media (max-width:476px){#dg-review{display:none}#dg-review-phone{display:block}}
 </style>
 <rect width="264" height="416" class="ground"/>
 <rect x="8" y="12" width="248" height="392" rx="10" class="band"/>

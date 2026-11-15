@@ -44,7 +44,7 @@
 #dg-backup .pulse-7{transform:translate(313.24px,757.2px)}
 .js #dg-backup .leg.is-current .pulse-7{animation-name:dg-backup-7}
 @media (prefers-reduced-motion:reduce){#dg-backup .pulse{animation:none!important}}
-@media print{#dg-backup .pulse{display:none!important}#dg-backup .leg .line{stroke:var(--text,#1c1f2e)!important;stroke-width:2px!important}#dg-backup .leg .head,#dg-backup .leg .num{fill:var(--text,#1c1f2e)!important}#dg-backup .leg .mark{stroke:var(--text,#1c1f2e)!important}}
+@media print{#dg-backup{max-width:100%;height:auto}#dg-backup .pulse{display:none!important}#dg-backup .leg .line{stroke:var(--text,#1c1f2e)!important;stroke-width:2px!important}#dg-backup .leg .head,#dg-backup .leg .num{fill:var(--text,#1c1f2e)!important}#dg-backup .leg .mark{stroke:var(--text,#1c1f2e)!important}}
 #dg-backup-phone{display:none}
 </style>
 <rect width="506" height="883" class="ground"/>
@@ -142,8 +142,8 @@
 #dg-backup-phone .pulse-7{transform:translate(30px,703.88px)}
 .js #dg-backup-phone .leg.is-current .pulse-7{animation-name:dg-backup-phone-7}
 @media (prefers-reduced-motion:reduce){#dg-backup-phone .pulse{animation:none!important}}
-@media print{#dg-backup-phone .pulse{display:none!important}#dg-backup-phone .leg .line{stroke:var(--text,#1c1f2e)!important;stroke-width:2px!important}#dg-backup-phone .leg .head,#dg-backup-phone .leg .num{fill:var(--text,#1c1f2e)!important}#dg-backup-phone .leg .mark{stroke:var(--text,#1c1f2e)!important}}
-@media not print{@media (max-width:720px){#dg-backup{display:none}#dg-backup-phone{display:block}}}
+@media print{#dg-backup-phone{max-width:100%;height:auto}#dg-backup-phone .pulse{display:none!important}#dg-backup-phone .leg .line{stroke:var(--text,#1c1f2e)!important;stroke-width:2px!important}#dg-backup-phone .leg .head,#dg-backup-phone .leg .num{fill:var(--text,#1c1f2e)!important}#dg-backup-phone .leg .mark{stroke:var(--text,#1c1f2e)!important}}
+@media (max-width:602px){#dg-backup{display:none}#dg-backup-phone{display:block}}
 </style>
 <rect width="264" height="832" class="ground"/>
 <rect x="8" y="12" width="248" height="184" rx="10" class="band"/>

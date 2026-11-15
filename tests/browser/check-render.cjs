@@ -99,6 +99,8 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     ok("the theme follows a light system", systemLight.bg === LIGHT.bg && systemLight.attr === "", systemLight);
     const paper = await open({ width: 794, height: 1123, theme: "dark", media: "print" });
     const print = await paper.page.evaluate(() => ({ bg: getComputedStyle(document.body).backgroundColor, text: getComputedStyle(document.body).color, topbar: getComputedStyle(document.querySelector(".topbar")).display, dots: [...new Set([...document.querySelectorAll("svg.dg .pulse")].map((p) => getComputedStyle(p).display))].join(), lines: [...new Set([...document.querySelectorAll("svg.dg .line")].map((l) => getComputedStyle(l).stroke))].join() }));
+    const cut = await paper.page.evaluate(() => [...document.querySelectorAll("svg.dg")].filter((s) => s.getBoundingClientRect().width).map((s) => ({ id: s.id, over: Math.round(s.getBoundingClientRect().right - s.closest(".fig").getBoundingClientRect().right) })));
+    ok("on paper no drawing is cut off", cut.length === 3 && cut.every((d) => d.over <= 0), cut);
     await paper.page.screenshot({ path: `${out}/print.png`, fullPage: true });
     await paper.context.close();
     ok("print is light on a dark system, without the top bar, without dots or a colored leg", print.bg === "rgb(255, 255, 255)" && print.text === LIGHT.text && print.topbar === "none" && print.dots === "none" && print.lines === LIGHT.text, print);
