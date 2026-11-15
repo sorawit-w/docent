@@ -1,0 +1,54 @@
+<svg id="dg-review" class="dg dg-tall" xmlns="http://www.w3.org/2000/svg" width="226" height="433" viewBox="0 0 226 433" role="img" aria-label="A text in three steps: draft, review and publish.">
+<style>
+#dg-review{display:block;flex:none;margin-inline:auto;font-family:var(--sans,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif)}
+#dg-review .ground{fill:var(--fig,#f2f3f9)}
+#dg-review .band{fill:var(--bg,#fbfbfe)}
+#dg-review .track{stroke:var(--line,#d3d6e3)}
+#dg-review .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-review .head{fill:var(--text,#1c1f2e)}
+#dg-review .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-review .stop.end{fill:var(--text,#1c1f2e)}
+#dg-review .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-review .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-review .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-review .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-review .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-review .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-review .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-review .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-review .sub,#dg-review .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-review .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+.js #dg-review .leg.is-current .line{stroke:var(--primary,#2f3fd0);stroke-width:2.5}
+.js #dg-review .leg.is-current .head,.js #dg-review .leg.is-current .num{fill:var(--primary,#2f3fd0)}
+.js #dg-review .leg.is-current .mark{stroke:var(--primary,#2f3fd0)}
+.js #dg-review .leg.is-current .pulse{display:block;animation:2.4s linear infinite}
+@keyframes dg-review-1{0%{transform:translate(48px,106px);opacity:0}8%{transform:translate(48px,106px);opacity:1}68%{transform:translate(48px,181px);opacity:1}88%{transform:translate(48px,181px);opacity:1}100%{transform:translate(48px,181px);opacity:0}}
+#dg-review .pulse-1{transform:translate(48px,115px)}
+.js #dg-review .leg.is-current .pulse-1{animation-name:dg-review-1}
+@keyframes dg-review-2{0%{transform:translate(48px,201px);opacity:0}8%{transform:translate(48px,201px);opacity:1}68%{transform:translate(48px,276px);opacity:1}88%{transform:translate(48px,276px);opacity:1}100%{transform:translate(48px,276px);opacity:0}}
+#dg-review .pulse-2{transform:translate(48px,210px)}
+.js #dg-review .leg.is-current .pulse-2{animation-name:dg-review-2}
+@keyframes dg-review-3{0%{transform:translate(48px,296px);opacity:0}8%{transform:translate(48px,296px);opacity:1}68%{transform:translate(48px,371px);opacity:1}88%{transform:translate(48px,371px);opacity:1}100%{transform:translate(48px,371px);opacity:0}}
+#dg-review .pulse-3{transform:translate(48px,305px)}
+.js #dg-review .leg.is-current .pulse-3{animation-name:dg-review-3}
+@media (prefers-reduced-motion:reduce){#dg-review .pulse{animation:none!important}}
+@media print{#dg-review .pulse{display:none!important}#dg-review .leg .line{stroke:var(--text,#1c1f2e)!important;stroke-width:2px!important}#dg-review .leg .head,#dg-review .leg .num{fill:var(--text,#1c1f2e)!important}#dg-review .leg .mark{stroke:var(--text,#1c1f2e)!important}}
+</style>
+<rect width="226" height="433" class="ground"/>
+<rect x="8" y="12" width="210" height="409" rx="10" class="band"/>
+<line x1="48" y1="62" x2="48" y2="407" class="track"/>
+<text x="30" y="42" class="lane" text-anchor="start">Writer</text>
+<g class="leg" data-leg="1"><path d="M48,106 L48,175" class="line"/><polygon points="43.5,173 52.5,173 48,181" class="head"/><circle cx="48" cy="139.5" r="10" class="mark"/><text x="48" y="143.5" class="num" text-anchor="middle">1</text><text x="69" y="143.5" class="verb" text-anchor="start">ask a colleague to read</text><circle r="6" class="pulse pulse-1"/></g>
+<g class="leg" data-leg="2"><path d="M48,201 L48,270" class="line"/><polygon points="43.5,268 52.5,268 48,276" class="head"/><circle cx="48" cy="234.5" r="10" class="mark"/><text x="48" y="238.5" class="num" text-anchor="middle">2</text><text x="69" y="238.5" class="verb" text-anchor="start">fix</text><circle r="6" class="pulse pulse-2"/></g>
+<g class="leg" data-leg="3"><path d="M48,296 L48,365" class="line"/><polygon points="43.5,363 52.5,363 48,371" class="head"/><circle cx="48" cy="329.5" r="10" class="mark"/><text x="48" y="333.5" class="num" text-anchor="middle">3</text><text x="69" y="333.5" class="verb" text-anchor="start">publish</text><circle r="6" class="pulse pulse-3"/></g>
+<circle cx="48" cy="96" r="8" class="stop"/>
+<text x="69" y="101" class="name" text-anchor="start">Draft</text>
+<circle cx="48" cy="191" r="8" class="stop"/>
+<text x="69" y="196" class="name" text-anchor="start">Review copy</text>
+<text x="69" y="213" class="sub" text-anchor="start">with comments</text>
+<circle cx="48" cy="286" r="8" class="stop"/>
+<text x="69" y="291" class="name" text-anchor="start">Final text</text>
+<circle cx="48" cy="381" r="8" class="stop end"/>
+<text x="69" y="386" class="name" text-anchor="start">Published page</text>
+<text x="69" y="403" class="sub" text-anchor="start">on the public site</text>
+</svg>

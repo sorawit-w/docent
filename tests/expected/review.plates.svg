@@ -1,0 +1,48 @@
+<svg id="dg-review" class="dg dg-plates dg-auto" xmlns="http://www.w3.org/2000/svg" width="380" height="522" viewBox="0 0 380 522" role="img" aria-label="A text in three steps: draft, review and publish.">
+<style>
+#dg-review{display:block;flex:none;margin-inline:auto;font-family:var(--sans,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif)}
+#dg-review .ground{fill:var(--fig,#f2f3f9)}
+#dg-review .band{fill:var(--bg,#fbfbfe)}
+#dg-review .track{stroke:var(--line,#d3d6e3)}
+#dg-review .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-review .head{fill:var(--text,#1c1f2e)}
+#dg-review .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-review .stop.end{fill:var(--text,#1c1f2e)}
+#dg-review .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-review .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-review .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-review .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-review .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-review .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-review .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-review .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-review .sub,#dg-review .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-review .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+.js #dg-review .pulse{display:block;animation:6s linear 2 both}
+.js #dg-review:not(.is-playing) .pulse{animation-play-state:paused}
+@keyframes dg-review-1{0%{transform:translate(190px,116px);opacity:0}2%{transform:translate(190px,116px);opacity:1}22.5%{transform:translate(190px,188px);opacity:1}26.67%{transform:translate(190px,188px);opacity:0}100%{transform:translate(190px,188px);opacity:0}}
+.js #dg-review .pulse-1{animation-name:dg-review-1}
+@keyframes dg-review-2{0%{transform:translate(190px,242px);opacity:0}26.67%{transform:translate(190px,242px);opacity:0}28.67%{transform:translate(190px,242px);opacity:1}49.17%{transform:translate(190px,314px);opacity:1}53.33%{transform:translate(190px,314px);opacity:0}100%{transform:translate(190px,314px);opacity:0}}
+.js #dg-review .pulse-2{animation-name:dg-review-2}
+@keyframes dg-review-3{0%{transform:translate(190px,368px);opacity:0}53.33%{transform:translate(190px,368px);opacity:0}55.33%{transform:translate(190px,368px);opacity:1}75.83%{transform:translate(190px,440px);opacity:1}80%{transform:translate(190px,440px);opacity:0}100%{transform:translate(190px,440px);opacity:0}}
+.js #dg-review .pulse-3{animation-name:dg-review-3}
+@media (prefers-reduced-motion:reduce){#dg-review .pulse{animation:none!important}#dg-review .pulse{display:none!important}}
+@media print{#dg-review .pulse{display:none!important}}
+</style>
+<rect width="380" height="522" class="ground"/>
+<rect x="12" y="12" width="356" height="498" rx="10" class="band"/>
+<text x="40" y="44" class="lane" text-anchor="start">Writer</text>
+<g class="leg" data-leg="1"><path d="M190,116 L190,182" class="line"/><polygon points="185.5,180 194.5,180 190,188" class="head"/><circle cx="190" cy="148" r="10" class="mark"/><text x="190" y="152" class="num" text-anchor="middle">1</text><text x="206" y="152" class="verb" text-anchor="start">ask a colleague to read</text><circle r="6" class="pulse pulse-1"/></g>
+<g class="leg" data-leg="2"><path d="M190,242 L190,308" class="line"/><polygon points="185.5,306 194.5,306 190,314" class="head"/><circle cx="190" cy="274" r="10" class="mark"/><text x="190" y="278" class="num" text-anchor="middle">2</text><text x="206" y="278" class="verb" text-anchor="start">fix</text><circle r="6" class="pulse pulse-2"/></g>
+<g class="leg" data-leg="3"><path d="M190,368 L190,434" class="line"/><polygon points="185.5,432 194.5,432 190,440" class="head"/><circle cx="190" cy="400" r="10" class="mark"/><text x="190" y="404" class="num" text-anchor="middle">3</text><text x="206" y="404" class="verb" text-anchor="start">publish</text><circle r="6" class="pulse pulse-3"/></g>
+<rect x="40" y="64" width="300" height="52" rx="10" class="card"/>
+<text x="58" y="95" class="name" text-anchor="start">Draft</text>
+<rect x="40" y="190" width="300" height="52" rx="10" class="card"/>
+<text x="58" y="213" class="name" text-anchor="start">Review copy</text>
+<text x="58" y="230" class="sub" text-anchor="start">with comments</text>
+<rect x="40" y="316" width="300" height="52" rx="10" class="card"/>
+<text x="58" y="347" class="name" text-anchor="start">Final text</text>
+<rect x="40" y="442" width="300" height="52" rx="10" class="card"/>
+<text x="58" y="465" class="name" text-anchor="start">Published page</text>
+<text x="58" y="482" class="sub" text-anchor="start">on the public site</text>
+</svg>

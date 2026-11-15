@@ -1,0 +1,16 @@
+{
+  "id": "review",
+  "label": "A text in three steps: draft, review and publish.",
+  "lanes": [{ "id": "writer", "name": "Writer" }],
+  "parts": [
+    { "id": "draft", "lane": "writer", "name": "Draft" },
+    { "id": "review", "lane": "writer", "name": "Review copy", "note": "with comments" },
+    { "id": "final", "lane": "writer", "name": "Final text" },
+    { "id": "page", "lane": "writer", "name": "Published page", "note": "on the public site" }
+  ],
+  "legs": [
+    { "from": "draft", "to": "review", "verb": "ask a colleague to read" },
+    { "from": "review", "to": "final", "verb": "fix" },
+    { "from": "final", "to": "page", "verb": "publish" }
+  ]
+}

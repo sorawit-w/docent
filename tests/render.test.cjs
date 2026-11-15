@@ -1,0 +1,117 @@
+// The renderer, tested against stored drawings. Run with UPDATE=1 to store new expected output after a wanted change.
+const test = require("node:test");
+const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const path = require("node:path");
+const { renderDiagram, renderDocument, formsFor, readData } = require("../skills/docent/scripts/lib/diagram.cjs");
+const { check } = require("../skills/docent/scripts/lib/geometry.cjs");
+const { iconProblem, ICONS } = require("../skills/docent/scripts/lib/icons.cjs");
+
+const fixture = (name) => JSON.parse(fs.readFileSync(path.join(__dirname, "fixtures", `${name}.json`), "utf8"));
+const CASES = [
+  ["bug-report", "wide"], ["bug-report", "tall"], ["bug-report", "plates"],
+  ["order", "wide"], ["order", "tall"], ["order", "plates"],
+  ["review", "wide"], ["review", "tall"], ["review", "plates"],
+  ["long-route", "wide"], ["long-route", "tall"], ["branch", "plates"],
+];
+
+for (const [name, form] of CASES) {
+  test(`${name} as ${form} matches the stored drawing and keeps every spacing rule`, () => {
+    const { svg, scene } = renderDiagram({ ...fixture(name), form, place: form === "tall" ? "walk" : "flow" });
+    assert.deepEqual(check(scene), []);
+    const file = path.join(__dirname, "expected", `${name}.${form}.svg`);
+    if (process.env.UPDATE) fs.writeFileSync(file, svg + "\n");
+    assert.equal(svg + "\n", fs.readFileSync(file, "utf8"), `${name}.${form}.svg changed; look at the drawing, then run with UPDATE=1`);
+  });
+}
+
+test("the renderer picks the form from where the diagram sits and what it shows", () => {
+  const pick = (data) => formsFor(readData(data).model)[0];
+  assert.equal(pick(fixture("bug-report")), "wide", "a short route in the text flow");
+  assert.equal(pick({ ...fixture("bug-report"), place: "walk" }), "tall", "a route beside walkthrough steps");
+  assert.equal(pick(fixture("long-route")), "tall", "a long route");
+  assert.equal(pick(fixture("branch")), "plates", "paths that branch");
+  assert.equal(pick({ ...fixture("bug-report"), form: "plates" }), "plates", "the author's choice wins");
+  const wordy = fixture("bug-report");
+  wordy.parts[0].note = "what went wrong, and on which day";
+  assert.equal(pick(wordy), "plates", "a part that needs more text");
+});
+
+test("a walkthrough drawing lights the current leg; any other drawing runs one dot along the whole route, twice", () => {
+  const walk = renderDiagram({ ...fixture("bug-report"), place: "walk" }).svg;
+  assert.match(walk, /class="dg dg-tall"/);
+  assert.match(walk, /\.leg\.is-current \.pulse\{display:block;animation:2\.4s linear infinite\}/);
+  const flow = renderDiagram(fixture("bug-report")).svg;
+  assert.match(flow, /class="dg dg-wide dg-auto"/);
+  assert.match(flow, /\.pulse\{display:block;animation:7\.6s linear 2 both\}/);
+  for (const svg of [walk, flow]) {
+    assert.equal((svg.match(/@keyframes /g) || []).length, 4, "one set of keyframes for each leg");
+    assert.match(svg, /@media \(prefers-reduced-motion:reduce\)/);
+    assert.match(svg, /@media print\{[^}]*\.pulse\{display:none!important\}/);
+    assert.ok(!/animation[^;}]*(width|height|top|left|margin)/.test(svg), "only transform and opacity move");
+  }
+});
+
+test("wrong data is refused with a plain reason", () => {
+  const data = fixture("bug-report");
+  const broken = (change, reason) => { const copy = structuredClone(data); change(copy); assert.throws(() => renderDiagram(copy), reason); };
+  broken((d) => (d.parts[0].lane = "nobody"), /names the lane "nobody"/);
+  broken((d) => (d.legs[0].to = "report"), /starts and ends at the same part/);
+  broken((d) => (d.parts[0].name = "x".repeat(40)), /40 characters long; the most is 32/);
+  broken((d) => (d.id = "Bad Id"), /"id" must be a short id/);
+  broken((d) => delete d.label, /"label" is missing/);
+  broken((d) => (d.parts[1].id = "report"), /two parts have the id "report"/);
+  assert.throws(() => renderDiagram({ ...fixture("branch"), form: "wide" }), /Route wide needs a route/);
+});
+
+test("the spacing rules catch a bad drawing", () => {
+  const good = () => renderDiagram({ ...fixture("bug-report"), form: "tall" }).scene;
+  const rulesOf = (change) => { const scene = good(); change(scene); return new Set(check(scene).map((p) => p.rule)); };
+  assert.ok(rulesOf((s) => { const pts = s.legs[0].pts; pts[2] = [pts[2][0], pts[3][1] - 20]; }).has("R1"), "R1: a short run behind the arrowhead");
+  assert.ok(rulesOf((s) => { s.legs[0].mark = [...s.legs[0].pts[1]]; }).has("R2"), "R2: a mark on a bend");
+  assert.ok(rulesOf((s) => { s.legs[0].verb.y = s.legs[0].mark[1] - 4; s.legs[0].verb.x += 30; }).has("R3"), "R3: a verb on a line");
+  assert.ok(rulesOf((s) => { const pts = s.legs[3].pts; pts[1] = [pts[1][0], pts[0][1] + 50]; }).has("R4"), "R4: a short leg inside one lane");
+  assert.ok(rulesOf((s) => { s.parts[1].texts[0].y = s.parts[0].texts[0].y; s.parts[1].texts[0].x = s.parts[0].texts[0].x; s.parts[1].texts[0].anchor = "end"; }).has("R5"), "R5: two texts in one place");
+});
+
+test("an icon is accepted only when it is made of plain shapes", () => {
+  for (const [name, markup] of Object.entries(ICONS)) assert.equal(iconProblem(markup), null, name);
+  assert.equal(iconProblem('<polyline points="2,8 6,12 14,4"/><line x1="1" y1="1" x2="3" y2="3"/>'), null);
+  assert.match(iconProblem('<script>alert(1)</script>'), /not a plain shape/);
+  assert.match(iconProblem('<style>*{fill:red}</style>'), /not a plain shape/);
+  assert.match(iconProblem('<image href="x.png"/>'), /not a plain shape/);
+  assert.match(iconProblem('<a href="https://example.com"><circle cx="8" cy="8" r="4"/></a>'), /not a plain shape/);
+  assert.match(iconProblem('<path d="M1 1h4" onload="x()"/>'), /attribute "onload"/);
+  assert.match(iconProblem('<path d="M1 1h4" style="fill:url(#a)"/>'), /attribute "style"/);
+  assert.match(iconProblem('<circle cx="8" cy="8" r="4"/>text'), /not a plain shape/);
+  assert.match(iconProblem('<circle cx="8" cy="8" r="1"/>'.repeat(7)), /7 shapes/);
+});
+
+test("a bad icon is left out, and then no part of the diagram has an icon", () => {
+  const data = fixture("bug-report");
+  data.icons = { bug: '<script>alert(1)</script>' };
+  data.parts[0].icon = "bug";
+  const { svg, warnings } = renderDiagram(data);
+  assert.ok(!svg.includes("<script"));
+  assert.match(warnings[0], /the icon "bug" is left out because <script> is not a plain shape/);
+  assert.match(warnings[1], /only 4 of 5 parts have an icon/);
+  assert.equal((svg.match(/class="icon"/g) || []).length, 0);
+  assert.equal((svg.match(/class="icon lane-icon"/g) || []).length, 2, "the lanes keep their icons");
+  const own = fixture("bug-report");
+  own.icons = { bug: '<circle cx="8" cy="9" r="3.5"/><path d="M8 5.5V3M4.5 9h-2M13.5 9h-2"/>' };
+  own.parts[0].icon = "bug";
+  assert.deepEqual(renderDiagram(own).warnings, [], "a drawn icon of plain shapes is accepted");
+});
+
+test("render draws every diagram block of a document in place, and gives the same result when it runs again", () => {
+  const data = JSON.stringify(fixture("bug-report"), null, 1);
+  const page = `<main>\n<!-- docent:diagram\n${data}\n-->\n<!-- /docent:diagram -->\n<p>text</p>\n<!-- docent:diagram\n${data.replace('"path"', '"again"')}\n-->\nold drawing\n<!-- /docent:diagram -->\n</main>`;
+  const first = renderDocument(page);
+  assert.deepEqual(first.results.map((r) => [r.id, r.form, r.error]), [["path", "wide", null], ["again", "wide", null]]);
+  assert.ok(first.html.includes('<svg id="dg-path"') && first.html.includes('<svg id="dg-again"') && !first.html.includes("old drawing"));
+  assert.ok(first.html.includes(data), "the data stays in the document");
+  assert.equal(renderDocument(first.html).html, first.html);
+  const twice = renderDocument(page.replace('"again"', '"path"'));
+  assert.match(twice.results[1].error, /two diagrams have the id "path"/);
+  assert.match(renderDocument("<!-- docent:diagram\n{ not json\n-->\n<!-- /docent:diagram -->").results[0].error, /not valid JSON/);
+});

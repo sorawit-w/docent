@@ -1,0 +1,27 @@
+{
+  "id": "backup",
+  "label": "A nightly backup in seven steps, from the timer to the report.",
+  "lanes": [
+    { "id": "server", "name": "Application server", "icon": "server" },
+    { "id": "store", "name": "Backup store", "icon": "computer" }
+  ],
+  "parts": [
+    { "id": "timer", "lane": "server", "name": "Night timer", "note": "02:00 every day", "icon": "inspect" },
+    { "id": "dump", "lane": "server", "name": "Database dump", "note": "one compressed file", "icon": "document" },
+    { "id": "upload", "lane": "store", "name": "Uploaded file", "note": "in the inbox folder", "icon": "document" },
+    { "id": "sum", "lane": "server", "name": "Checksum", "note": "computed on the server", "icon": "check" },
+    { "id": "verify", "lane": "store", "name": "Verified copy", "note": "checksums match", "icon": "check" },
+    { "id": "old", "lane": "store", "name": "Old copies", "note": "older than 30 days", "icon": "document" },
+    { "id": "log", "lane": "store", "name": "Store log", "note": "one line per night", "icon": "message" },
+    { "id": "report", "lane": "server", "name": "Morning report", "note": "sent to the team", "icon": "message" }
+  ],
+  "legs": [
+    { "from": "timer", "to": "dump", "verb": "start" },
+    { "from": "dump", "to": "upload", "verb": "copy" },
+    { "from": "upload", "to": "sum", "verb": "ask for the checksum" },
+    { "from": "sum", "to": "verify", "verb": "compare" },
+    { "from": "verify", "to": "old", "verb": "find" },
+    { "from": "old", "to": "log", "verb": "delete and record" },
+    { "from": "log", "to": "report", "verb": "summarize" }
+  ]
+}
