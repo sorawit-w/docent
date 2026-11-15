@@ -1,0 +1,10 @@
+{
+  "id": "install",
+  "kind": "chooser",
+  "label": "How you install",
+  "cases": [
+    {"name": "Installer", "body": ["Run this in the project folder. It needs version 3 or newer.", {"code": "app install\napp test", "label": "Commands for the installer"}]},
+    {"name": "From source", "body": ["Use `make` when the folder has a `Makefile`.", {"code": "make install"}, "A second command runs the tests.", {"code": "make test"}]},
+    {"name": "By hand", "body": [{"steps": ["Download the archive.", "Unpack it into `vendor/`.", "Check that 2 < 3 & the folder exists."]}, {"list": ["No lock file is written.", "Updates are not automatic."]}]}
+  ]
+}

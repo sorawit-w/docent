@@ -3,7 +3,7 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 const { checkDocument } = require("../skills/docent/scripts/check.cjs");
-const { stampHtml, cssBlock } = require("../skills/docent/scripts/lib/kit.cjs");
+const { VERSION, stampHtml, cssBlock } = require("../skills/docent/scripts/lib/kit.cjs");
 const { renderDocument } = require("../skills/docent/scripts/lib/diagram.cjs");
 
 const specimen = fs.readFileSync(path.join(__dirname, "..", "skills", "docent", "assets", "specimen.html"), "utf8");
@@ -61,7 +61,7 @@ test("check tests the frame of the document and the format of its title", () => 
 test("check finds a kit or a drawing that was changed by hand", () => {
   assert.match(errorsOf((h) => h.replace("--primary: #2f3fd0;", "--primary: #ff0000;")), /the kit styles were changed by hand; run stamp/);
   assert.match(errorsOf((h) => h.replace(cssBlock(), "")), /the document has no kit styles; run stamp/);
-  assert.match(errorsOf((h) => h.replace("docent:kit 0.1.0 */", "docent:kit 0.0.9 */")), /the kit styles are version 0\.0\.9/);
+  assert.match(errorsOf((h) => h.replace(`docent:kit ${VERSION} */`, "docent:kit 0.0.9 */")), /the kit styles are version 0\.0\.9/);
   assert.match(errorsOf((h) => h.replace(' r="13" class="stop"/>', ' r="15" class="stop"/>')), /diagram 1 \("path"\): the drawing does not match its data; run render/);
   assert.match(errorsOf((h) => h.replace('"verb": "file"', '"verb": "send"')), /the drawing does not match its data; run render/);
   assert.match(errorsOf(add("</main>", '<svg class="dg dg-wide" viewBox="0 0 8 8"></svg>')), /a diagram sits outside a diagram block/);
@@ -71,6 +71,27 @@ test("check rejects an icon that is not made of plain shapes", () => {
   const bad = specimen.replace('"id": "path",', '"id": "path",\n  "icons": {"bug": "<image href=\\"x.png\\"/>"},').replace('"note": "what went wrong", "icon": "document"', '"note": "what went wrong", "icon": "bug"');
   const errors = checkDocument(renderDocument(bad).html).errors.join("\n");
   assert.match(errors, /diagram 1 \("path"\): part "report": the icon "bug" is left out because <image> is not a plain shape/);
+});
+
+test("check finds a widget that was changed by hand, or that has no data", () => {
+  assert.match(errorsOf((h) => h.replace('<label class="opt" for="wd-system-1">macOS</label>', '<label class="opt" for="wd-system-1">Mac</label>')), /widget 2 \("system"\): the widget does not match its data; run render/);
+  assert.match(errorsOf((h) => h.replace('"Write the steps that lead to the problem.",', '"Write the steps.",')), /widget 3 \("ready"\): the widget does not match its data; run render/);
+  assert.match(errorsOf((h) => h.replace('{"when": ["No", "No"], "title": "A question first"', '{"when": ["No", "Yes"], "title": "A question first"')), /widget 1 \("kind"\): answers 2 and 3 both fit "No" and "Yes"/);
+  assert.match(errorsOf(add("</main>", '<form class="checks"><ul><li><input type="checkbox" id="a"><label for="a">By hand</label></li></ul></form>')), /a widget sits outside a widget block/);
+  assert.match(errorsOf(add("</main>", '<div class="choose extra"></div>')), /a widget sits outside a widget block/);
+  assert.equal(errorsOf(add("</main>", '<p class="chooser-note">A class with a longer name is fine.</p>')), "");
+});
+
+test("check warns when a document has more than 4 widgets; choosers with the same cases count as one", () => {
+  const list = (id) => `<!-- docent:widget\n{"id": "${id}", "kind": "checklist", "label": "List ${id}", "items": ["One line.", "Another line."]}\n-->\n<!-- /docent:widget -->\n`;
+  const chooser = (id) => `<!-- docent:widget\n{"id": "${id}", "kind": "chooser", "label": "Your system", "cases": [{"name": "macOS", "body": ["Text."]}, {"name": "Windows", "body": ["Text."]}, {"name": "Linux", "body": ["Text."]}]}\n-->\n<!-- /docent:widget -->\n`;
+  const withMore = (blocks) => checkDocument(renderDocument(specimen.replace("</main>", `${blocks}</main>`)).html);
+  const four = withMore(list("extra-a") + chooser("extra-b") + chooser("extra-c"));
+  assert.deepEqual(four.errors, []);
+  assert.equal(four.warnings.length, 2, "three widgets of the sample page, one more checklist, and choosers that change with the first one");
+  const five = withMore(list("extra-a") + list("extra-b"));
+  assert.deepEqual(five.errors, []);
+  assert.match(five.warnings.join("\n"), /the document has 5 widgets; a widget is for a reader who must choose, track or decide/);
 });
 
 test("check ties a walkthrough to its diagram: one step for each leg", () => {
