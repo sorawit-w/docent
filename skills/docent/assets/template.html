@@ -80,7 +80,7 @@ p { margin: 0 0 16px; max-width: var(--measure); text-wrap: pretty; }
 code { font: 14px/1.55 var(--mono); background: var(--panel); padding: 0.1em 0.38em; border-radius: 6px; }
 .standfirst code { font-size: 18px; }
 
-/* Lists in the text flow: points, or numbers for steps that have no figure. The rules are weak on purpose, so the lists of the kit's own blocks keep their styles. */
+/* Lists in the text flow: points, or numbers for steps that one actor does. The rules are weak on purpose, so the lists of the kit's own blocks keep their styles. */
 :where(main) :where(ul, ol):not(.steps, .facts) { max-width: var(--measure); margin: 0 0 16px; padding-left: 24px; }
 :where(main) :where(ul, ol):not(.steps, .facts) > :where(li + li) { margin-top: 4px; }
 
@@ -412,7 +412,8 @@ footer .shell { display: flex; align-items: center; justify-content: space-betwe
     </figure>
   </section>
 
-  <!-- WALKTHROUGH. Steps on the left, the diagram on the right. The page script marks the current step.
+  <!-- WALKTHROUGH. For steps with two or more actors: the diagram shows who acts and what moves.
+       Steps on the left, the diagram on the right. The page script marks the current step.
        One step for each leg of the diagram, in the same order. A step heading is one sentence of at most six words.
        The diagram block has "place": "walk". Change its data, then run render. Never edit the drawing. -->
   <section id="walk" aria-labelledby="walk-h">
@@ -664,7 +665,7 @@ footer .shell { display: flex; align-items: center; justify-content: space-betwe
   </section>
 
   <!-- OTHER BLOCKS. Lists, a table, a status note, a code block, and a closed section.
-       A list of points is a plain <ul>. Steps that have no figure are a plain <ol>: the walkthrough block needs its diagram.
+       A list of points is a plain <ul>. Steps that one actor does are a plain <ol>: the walkthrough block needs a diagram.
        Remove the blocks that the document does not need. -->
   <section id="more" aria-labelledby="more-h">
     <h2 id="more-h">More blocks</h2>
@@ -673,7 +674,7 @@ footer .shell { display: flex; align-items: center; justify-content: space-betwe
       <li>The first point.</li>
       <li>The second point.</li>
     </ul>
-    <p>Steps that have no figure are a numbered list:</p>
+    <p>Steps that one actor does are a numbered list:</p>
     <ol>
       <li>Do the first thing.</li>
       <li>Do the second thing.</li>
