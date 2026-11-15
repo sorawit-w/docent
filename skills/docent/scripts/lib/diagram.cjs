@@ -4,6 +4,7 @@ const { layoutRoute } = require("./route.cjs");
 const { toSvg } = require("./svg.cjs");
 const { DataError, fail, words, id, findBlocks, block, replaceBlocks } = require("./blocks.cjs");
 const { renderWidget } = require("./widget.cjs");
+const { textWidth } = require("./text.cjs");
 
 const FORMS = ["wide", "tall", "plates"];
 const MOST = { lanes: 4, parts: 12, legs: 16, name: 32, note: 40, verb: 24, lane: 28 };
@@ -100,7 +101,12 @@ function renderDiagram(data) {
     }
   }
   if (!scene) throw reason;
-  if (model.place === "walk" && scene.w > WALK) warnings.push(`the drawing is ${scene.w}px wide; beside the walkthrough steps there is room for ${WALK}px, so it will scroll sideways`);
+  if (model.place === "walk" && scene.w > WALK) {
+    // Say what makes the drawing wide: each lane is as wide as its widest name or note.
+    const widest = model.parts.flatMap((part) => [[part.name, textWidth(part.name, 14, 600)], [part.note, textWidth(part.note, 12, 400)]]).filter(([text]) => text).sort((a, b) => b[1] - a[1]).slice(0, 2).map(([text]) => `"${text}"`);
+    const lanes = scene.form === "tall" && model.lanes.length > 2 ? ` It has ${model.lanes.length} lanes, and two lanes fit there.` : "";
+    warnings.push(`the drawing is ${scene.w}px wide; beside the walkthrough steps there is room for ${WALK}px, so it will scroll sideways.${lanes} The widest texts are ${widest.join(" and ")}; shorter names and notes make the drawing narrower`);
+  }
   const id = `dg-${model.id}`, mode = model.place === "walk" ? "walk" : "auto";
   // A route also gets a single-track form. It takes the place of the main form on a screen or a sheet of paper that is too narrow.
   let phone = null;

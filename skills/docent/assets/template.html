@@ -219,6 +219,8 @@ footer .shell { display: flex; align-items: center; justify-content: space-betwe
   .steps li h3, .steps li p { color: var(--text) !important; }
   .walk { grid-template-columns: minmax(0, 1fr); row-gap: 32px; } .walk figure { position: static; order: -1; }
   table { min-width: 0; } .table-wrap { overflow: visible; }
+  /* A browser leaves out backgrounds on paper. These carry meaning, so they print: status dots, the rail of the steps, and the ground of figures and code. */
+  .state::before, .steps::before, .fig, pre, code { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   figure, tr, .status, pre, .checks li { break-inside: avoid; }
   h2, h3 { break-after: avoid; }
   @page { margin: 18mm; }
@@ -281,6 +283,131 @@ footer .shell { display: flex; align-items: center; justify-content: space-betwe
         A margin note holds one remark of the guide, in one to three sentences.
       </div>
     </div>
+    <!-- FIGURE IN THE TEXT FLOW. A figure with a "fig" well, a diagram block and a caption. This block has no "place", so the renderer picks the form.
+         Draw a diagram only when it shows something that words cannot. Change the data, then run render. Never edit the drawing. -->
+    <figure>
+      <div class="fig" role="region" aria-label="Figure 1, the path at a glance" tabindex="0">
+<!-- docent:diagram
+{
+  "id": "glance",
+  "label": "The path at a glance: the start goes to the middle, and the middle goes to the end.",
+  "lanes": [
+    {"id": "one", "name": "First lane"},
+    {"id": "two", "name": "Second lane"}
+  ],
+  "parts": [
+    {"id": "start", "lane": "one", "name": "Start", "note": "where it begins"},
+    {"id": "middle", "lane": "two", "name": "Middle", "note": "what happens"},
+    {"id": "end", "lane": "one", "name": "End", "note": "what comes out"}
+  ],
+  "legs": [
+    {"from": "start", "to": "middle", "verb": "send"},
+    {"from": "middle", "to": "end", "verb": "return"}
+  ]
+}
+-->
+<svg id="dg-glance" class="dg dg-wide dg-auto" xmlns="http://www.w3.org/2000/svg" width="540" height="264" viewBox="0 0 540 264" role="img" aria-label="The path at a glance: the start goes to the middle, and the middle goes to the end.">
+<style>
+#dg-glance{display:block;flex:none;margin-inline:auto;font-family:var(--sans,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif)}
+#dg-glance .ground{fill:var(--fig,#f2f3f9)}
+#dg-glance .band{fill:var(--bg,#fbfbfe)}
+#dg-glance .track{stroke:var(--line,#d3d6e3)}
+#dg-glance .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-glance .head{fill:var(--text,#1c1f2e)}
+#dg-glance .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-glance .stop.end{fill:var(--text,#1c1f2e)}
+#dg-glance .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-glance .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-glance .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-glance .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-glance .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-glance .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-glance .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-glance .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-glance .sub,#dg-glance .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-glance .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+.js #dg-glance .pulse{display:block;animation:4.4s linear 2 both}
+.js #dg-glance:not(.is-playing) .pulse{animation-play-state:paused}
+@keyframes dg-glance-1{0%{transform:translate(190px,88px);opacity:0}2.73%{transform:translate(190px,88px);opacity:1}4.96%{transform:translate(203px,88px);opacity:1}24.31%{transform:translate(273px,176px);opacity:1}30.68%{transform:translate(310px,176px);opacity:1}36.36%{transform:translate(310px,176px);opacity:0}100%{transform:translate(310px,176px);opacity:0}}
+.js #dg-glance .pulse-1{animation-name:dg-glance-1}
+@keyframes dg-glance-2{0%{transform:translate(330px,176px);opacity:0}36.36%{transform:translate(330px,176px);opacity:0}39.09%{transform:translate(330px,176px);opacity:1}41.33%{transform:translate(343px,176px);opacity:1}60.68%{transform:translate(413px,88px);opacity:1}67.05%{transform:translate(450px,88px);opacity:1}72.73%{transform:translate(450px,88px);opacity:0}100%{transform:translate(450px,88px);opacity:0}}
+.js #dg-glance .pulse-2{animation-name:dg-glance-2}
+@media (prefers-reduced-motion:reduce){#dg-glance .pulse{animation:none!important}#dg-glance .pulse{display:none!important}}
+@media print{#dg-glance{max-width:100%;height:auto}#dg-glance .pulse{display:none!important}}
+#dg-glance-phone{display:none}
+</style>
+<rect width="540" height="264" class="ground"/>
+<rect x="8" y="20" width="524" height="100" rx="10" class="band"/>
+<rect x="8" y="144" width="524" height="100" rx="10" class="band"/>
+<line x1="130" y1="88" x2="516" y2="88" class="track"/>
+<line x1="130" y1="176" x2="516" y2="176" class="track"/>
+<text x="24" y="93" class="lane" text-anchor="start">First lane</text>
+<text x="24" y="181" class="lane" text-anchor="start">Second lane</text>
+<g class="leg" data-leg="1"><path d="M190,88 L203,88 L273,176 L304,176" class="line"/><polygon points="302,180.5 302,171.5 310,176" class="head"/><circle cx="238" cy="132" r="10" class="mark"/><text x="238" y="136" class="num" text-anchor="middle">1</text><text x="254" y="136" class="verb" text-anchor="start">send</text><circle r="6" class="pulse pulse-1"/></g>
+<g class="leg" data-leg="2"><path d="M330,176 L343,176 L413,88 L444,88" class="line"/><polygon points="442,92.5 442,83.5 450,88" class="head"/><circle cx="378" cy="132" r="10" class="mark"/><text x="378" y="136" class="num" text-anchor="middle">2</text><text x="394" y="136" class="verb" text-anchor="start">return</text><circle r="6" class="pulse pulse-2"/></g>
+<circle cx="180" cy="88" r="8" class="stop"/>
+<text x="180" y="46" class="name" text-anchor="middle">Start</text>
+<text x="180" y="63" class="sub" text-anchor="middle">where it begins</text>
+<circle cx="320" cy="176" r="8" class="stop"/>
+<text x="320" y="211" class="name" text-anchor="middle">Middle</text>
+<text x="320" y="228" class="sub" text-anchor="middle">what happens</text>
+<circle cx="460" cy="88" r="8" class="stop end"/>
+<text x="460" y="46" class="name" text-anchor="middle">End</text>
+<text x="460" y="63" class="sub" text-anchor="middle">what comes out</text>
+</svg>
+<svg id="dg-glance-phone" class="dg dg-track dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="312" viewBox="0 0 264 312" role="img" aria-label="The path at a glance: the start goes to the middle, and the middle goes to the end.">
+<style>
+#dg-glance-phone{flex:none;margin-inline:auto;font-family:var(--sans,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif)}
+#dg-glance-phone .ground{fill:var(--fig,#f2f3f9)}
+#dg-glance-phone .band{fill:var(--bg,#fbfbfe)}
+#dg-glance-phone .track{stroke:var(--line,#d3d6e3)}
+#dg-glance-phone .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-glance-phone .head{fill:var(--text,#1c1f2e)}
+#dg-glance-phone .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-glance-phone .stop.end{fill:var(--text,#1c1f2e)}
+#dg-glance-phone .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-glance-phone .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-glance-phone .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-glance-phone .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-glance-phone .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-glance-phone .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-glance-phone .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-glance-phone .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-glance-phone .sub,#dg-glance-phone .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-glance-phone .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+.js #dg-glance-phone .pulse{display:block;animation:4.4s linear 2 both}
+.js #dg-glance-phone:not(.is-playing) .pulse{animation-play-state:paused}
+@keyframes dg-glance-phone-1{0%{transform:translate(30px,66px);opacity:0}2.73%{transform:translate(30px,66px);opacity:1}30.68%{transform:translate(30px,150px);opacity:1}36.36%{transform:translate(30px,150px);opacity:0}100%{transform:translate(30px,150px);opacity:0}}
+.js #dg-glance-phone .pulse-1{animation-name:dg-glance-phone-1}
+@keyframes dg-glance-phone-2{0%{transform:translate(30px,170px);opacity:0}36.36%{transform:translate(30px,170px);opacity:0}39.09%{transform:translate(30px,170px);opacity:1}67.05%{transform:translate(30px,254px);opacity:1}72.73%{transform:translate(30px,254px);opacity:0}100%{transform:translate(30px,254px);opacity:0}}
+.js #dg-glance-phone .pulse-2{animation-name:dg-glance-phone-2}
+@media (prefers-reduced-motion:reduce){#dg-glance-phone .pulse{animation:none!important}#dg-glance-phone .pulse{display:none!important}}
+@media print{#dg-glance-phone{max-width:100%;height:auto}#dg-glance-phone .pulse{display:none!important}}
+@media (max-width:636px){#dg-glance{display:none}#dg-glance-phone{display:block}}
+</style>
+<rect width="264" height="312" class="ground"/>
+<rect x="8" y="12" width="248" height="80" rx="10" class="band"/>
+<rect x="8" y="116" width="248" height="80" rx="10" class="band"/>
+<rect x="8" y="220" width="248" height="80" rx="10" class="band"/>
+<text x="240" y="32" class="lane" text-anchor="end">First lane</text>
+<text x="240" y="136" class="lane" text-anchor="end">Second lane</text>
+<text x="240" y="240" class="lane" text-anchor="end">First lane</text>
+<g class="leg" data-leg="1"><path d="M30,66 L30,144" class="line"/><polygon points="25.5,142 34.5,142 30,150" class="head"/><circle cx="30" cy="104" r="10" class="mark"/><text x="30" y="108" class="num" text-anchor="middle">1</text><text x="51" y="108" class="verb" text-anchor="start">send</text><circle r="6" class="pulse pulse-1"/></g>
+<g class="leg" data-leg="2"><path d="M30,170 L30,248" class="line"/><polygon points="25.5,246 34.5,246 30,254" class="head"/><circle cx="30" cy="208" r="10" class="mark"/><text x="30" y="212" class="num" text-anchor="middle">2</text><text x="51" y="212" class="verb" text-anchor="start">return</text><circle r="6" class="pulse pulse-2"/></g>
+<circle cx="30" cy="56" r="8" class="stop"/>
+<text x="51" y="61" class="name" text-anchor="start">Start</text>
+<text x="51" y="78" class="sub" text-anchor="start">where it begins</text>
+<circle cx="30" cy="160" r="8" class="stop"/>
+<text x="51" y="165" class="name" text-anchor="start">Middle</text>
+<text x="51" y="182" class="sub" text-anchor="start">what happens</text>
+<circle cx="30" cy="264" r="8" class="stop end"/>
+<text x="51" y="269" class="name" text-anchor="start">End</text>
+<text x="51" y="286" class="sub" text-anchor="start">what comes out</text>
+</svg>
+<!-- /docent:diagram -->
+      </div>
+      <figcaption><strong>Figure 1</strong>A caption says what the figure shows, in one sentence.</figcaption>
+    </figure>
   </section>
 
   <!-- WALKTHROUGH. Steps on the left, the diagram on the right. The page script marks the current step.
@@ -304,7 +431,7 @@ footer .shell { display: flex; align-items: center; justify-content: space-betwe
       <span class="rail-dot" aria-hidden="true"></span>
       </div>
       <figure>
-        <div class="fig" role="region" aria-label="Figure 1, the steps" tabindex="0">
+        <div class="fig" role="region" aria-label="Figure 2, the steps" tabindex="0">
 <!-- docent:diagram
 {
   "id": "steps",
@@ -431,7 +558,7 @@ footer .shell { display: flex; align-items: center; justify-content: space-betwe
 </svg>
 <!-- /docent:diagram -->
         </div>
-        <figcaption><strong>Figure 1</strong>A caption says what the figure shows, in one sentence.</figcaption>
+        <figcaption><strong>Figure 2</strong>The steps, one arrow for each step.</figcaption>
       </figure>
     </div>
   </section>
@@ -534,8 +661,7 @@ footer .shell { display: flex; align-items: center; justify-content: space-betwe
 <!-- /docent:widget -->
   </section>
 
-  <!-- OTHER BLOCKS. A figure in the text flow, a table, a status note, a code block, and a closed section.
-       A figure in the text flow is a <figure> with a "fig" well and a diagram block without "place".
+  <!-- OTHER BLOCKS. A table, a status note, a code block, and a closed section.
        Remove the blocks that the document does not need. -->
   <section id="more" aria-labelledby="more-h">
     <h2 id="more-h">More blocks</h2>

@@ -264,6 +264,9 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     const { page, context } = await open({ width: 658, height: 1123, media: "print" });
     const tables = await page.evaluate(() => { dispatchEvent(new Event("beforeprint")); return [...document.querySelectorAll(".table-wrap")].map((wrap) => ({ over: Math.round(wrap.querySelector("table").getBoundingClientRect().right - wrap.getBoundingClientRect().right), shown: wrap.getBoundingClientRect().height > 0 })); });
     ok("on paper no table is cut off", tables.length === 2 && tables.every((t) => t.shown && t.over <= 0), tables);
+    // A browser prints no background unless the style asks for it. The status dots, the rail of the steps and the grounds carry meaning.
+    const grounds = await page.evaluate(() => { const exact = (sel, pseudo) => { const style = getComputedStyle(document.querySelector(sel), pseudo); return (style.printColorAdjust || style.webkitPrintColorAdjust) === "exact"; }; return { dot: exact(".state", "::before"), rail: exact(".steps", "::before"), well: exact(".fig"), block: exact("pre"), code: exact("p code") }; });
+    ok("on paper the status dots, the rail and the grounds of figures and code are printed", Object.values(grounds).every(Boolean), grounds);
     await context.close();
   }
 
