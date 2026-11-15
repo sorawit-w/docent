@@ -170,7 +170,7 @@ Docent uses system fonts only, because every document is one file with nothing t
 - **In a walkthrough,** the leg of the current step takes the ultramarine color and the dot travels along that leg.
 - **Anywhere else,** one dot travels the whole route by itself, leg by leg in the order of the numbers. Only one dot is in flight at a time, so the motion shows the order. The run plays twice and then rests, so the page is calm while the reader reads.
 
-**Lists.** A list sits in the text column, with an indent of 24px and 4px between its lines. Points are a list with bullets. Steps that have no figure are a list with numbers; the walkthrough is for steps that have a figure beside them.
+**Lists.** A list sits in the text column, with an indent of 24px and 4px between its lines. Points are a list with bullets. Steps that one actor does are a list with numbers. Steps with two or more actors are a walkthrough, because its figure shows who acts and what moves.
 
 **Widgets.** A widget is a part of the page that the reader uses. Docent has three: a chooser, a checklist and a decision helper (see Widgets). A widget sits in the text flow and has no box. Its text uses the text column; a code block inside a chooser uses the full width, like any code block.
 
