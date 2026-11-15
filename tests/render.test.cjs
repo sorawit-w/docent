@@ -52,6 +52,12 @@ test("a walkthrough drawing lights the current leg; any other drawing runs one d
   }
 });
 
+test("a drawing that is too wide beside walkthrough steps gets a warning that names the cause", () => {
+  assert.deepEqual(renderDiagram({ ...fixture("bug-report"), place: "walk" }).warnings, [], "two lanes with short texts fit");
+  const [warning] = renderDiagram({ ...fixture("order"), place: "walk" }).warnings;
+  assert.match(warning, /^the drawing is \d+px wide; beside the walkthrough steps there is room for 520px, so it will scroll sideways\. It has 3 lanes, and two lanes fit there\. The widest texts are "packed and weighed" and "Payment check"; shorter names and notes make the drawing narrower$/);
+});
+
 test("a route also gets a single-track form for phones; paths that branch do not", () => {
   const route = renderDiagram(fixture("bug-report")).svg;
   assert.match(route, /<svg id="dg-path" class="dg dg-wide dg-auto"/);

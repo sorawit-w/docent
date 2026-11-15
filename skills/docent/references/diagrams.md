@@ -56,7 +56,7 @@ Keep names, notes and verbs short. A verb is one to three words. The renderer re
 - A **route** is data in which each leg starts where the leg before it ended, and every part is visited once. A route can be drawn in any form, and it also gets a single-track form for phones.
 - Any other data (paths that branch, an arrow that goes back, a part with no leg) is drawn as **Plates** only.
 
-A walkthrough needs a route with one leg for each step.
+A walkthrough needs a route with one leg for each step. Give it at most two lanes; the room beside the steps is 520px wide.
 
 In Plates every part has its own row, in the order in which the legs reach the parts. Two arrows may cross at a right angle; they never share a line. Plates is easiest to draw when most legs go from one lane to another. When `render` refuses a Plates diagram, move a part to another lane, remove a leg, or shorten a verb.
 
@@ -78,7 +78,7 @@ An icon may hold only these shapes and attributes: `path` (`d`), `circle` (`cx`,
 
 - `render doc.html: diagram 1 ("order") drawn as wide` — the drawing is in the document.
 - `... cannot be drawn within the spacing rules: ...` — the data asks for more than the form can hold. Shorten the text that the message names, remove a part, or let the renderer pick the form.
-- `... warning: the drawing is 734px wide; beside the walkthrough steps there is room for 520px` — the drawing will scroll sideways beside the steps. Use fewer lanes or shorter names.
+- `... warning: the drawing is 734px wide; beside the walkthrough steps there is room for 520px, so it will scroll sideways. It has 3 lanes, and two lanes fit there. The widest texts are "..." and "..."` — the drawing will scroll sideways beside the steps. Each lane is as wide as its widest name or note. Beside walkthrough steps, two lanes fit when the names have up to about 12 characters. Three lanes fit only when every name has about 4 characters. So use two lanes there, or shorten the texts that the message names.
 
 `render` draws every diagram that it can. When one is refused, the others are still drawn, and `render` ends with exit code 1.
 
