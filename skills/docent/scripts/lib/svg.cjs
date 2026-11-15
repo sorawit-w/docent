@@ -70,10 +70,11 @@ function travel(leg, start, end) {
   });
 }
 
-function styles(scene, id, mode) {
+function styles(scene, id, mode, swap) {
   const s = `#${id}`;
   const css = [
-    `${s}{display:block;flex:none;margin-inline:auto;font-family:var(--sans,${SANS})}`,
+    // A phone form stays hidden until the screen is narrow; the rule that hides it sits in the main drawing.
+    `${s}{${swap && swap.below ? "" : "display:block;"}flex:none;margin-inline:auto;font-family:var(--sans,${SANS})}`,
     `${s} .ground{fill:${v("fig")}}`,
     `${s} .band{fill:${v("bg")}}`,
     `${s} .track{stroke:${v("line")}}`,
@@ -125,14 +126,19 @@ function styles(scene, id, mode) {
     still.push(`${s} .pulse{display:none!important}`);
   }
   css.push(`@media (prefers-reduced-motion:reduce){${still.join("")}}`, `@media print{${print.join("")}}`);
+  if (swap && swap.phone) css.push(`#${swap.phone}{display:none}`);
+  if (swap && swap.below) css.push(`@media not print{@media (max-width:${swap.below}px){#${swap.main}{display:none}${s}{display:block}}}`);
   return css.join("\n");
 }
 
-/** scene: the laid-out drawing. options: { id, label, mode: "walk" | "auto" }. */
-function toSvg(scene, { id, label, mode }) {
+/**
+ * scene: the laid-out drawing. options: { id, label, mode: "walk" | "auto", swap }.
+ * swap ties a main drawing to its phone form: { phone: id } on the main one, { main: id, below: px } on the phone one.
+ */
+function toSvg(scene, { id, label, mode, swap }) {
   const out = [];
   out.push(`<svg id="${id}" class="dg dg-${scene.form}${mode === "auto" ? " dg-auto" : ""}" xmlns="http://www.w3.org/2000/svg" width="${num(scene.w)}" height="${num(scene.h)}" viewBox="0 0 ${num(scene.w)} ${num(scene.h)}" role="img" aria-label="${esc(label)}">`);
-  out.push(`<style>\n${styles(scene, id, mode)}\n</style>`);
+  out.push(`<style>\n${styles(scene, id, mode, swap)}\n</style>`);
   out.push(`<rect width="${num(scene.w)}" height="${num(scene.h)}" class="ground"/>`);
   for (const b of scene.bands) out.push(`<rect x="${num(b.x)}" y="${num(b.y)}" width="${num(b.w)}" height="${num(b.h)}" rx="10" class="band"/>`);
   for (const [x1, y1, x2, y2] of scene.tracks) out.push(`<line x1="${num(x1)}" y1="${num(y1)}" x2="${num(x2)}" y2="${num(y2)}" class="track"/>`);

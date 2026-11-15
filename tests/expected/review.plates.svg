@@ -28,6 +28,7 @@
 .js #dg-review .pulse-3{animation-name:dg-review-3}
 @media (prefers-reduced-motion:reduce){#dg-review .pulse{animation:none!important}#dg-review .pulse{display:none!important}}
 @media print{#dg-review .pulse{display:none!important}}
+#dg-review-phone{display:none}
 </style>
 <rect width="380" height="522" class="ground"/>
 <rect x="12" y="12" width="356" height="498" rx="10" class="band"/>
@@ -45,4 +46,53 @@
 <rect x="40" y="442" width="300" height="52" rx="10" class="card"/>
 <text x="58" y="465" class="name" text-anchor="start">Published page</text>
 <text x="58" y="482" class="sub" text-anchor="start">on the public site</text>
+</svg>
+<svg id="dg-review-phone" class="dg dg-track dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="416" viewBox="0 0 264 416" role="img" aria-label="A text in three steps: draft, review and publish.">
+<style>
+#dg-review-phone{flex:none;margin-inline:auto;font-family:var(--sans,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif)}
+#dg-review-phone .ground{fill:var(--fig,#f2f3f9)}
+#dg-review-phone .band{fill:var(--bg,#fbfbfe)}
+#dg-review-phone .track{stroke:var(--line,#d3d6e3)}
+#dg-review-phone .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-review-phone .head{fill:var(--text,#1c1f2e)}
+#dg-review-phone .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-review-phone .stop.end{fill:var(--text,#1c1f2e)}
+#dg-review-phone .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-review-phone .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-review-phone .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-review-phone .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-review-phone .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-review-phone .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-review-phone .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-review-phone .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-review-phone .sub,#dg-review-phone .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-review-phone .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+.js #dg-review-phone .pulse{display:block;animation:6s linear 2 both}
+.js #dg-review-phone:not(.is-playing) .pulse{animation-play-state:paused}
+@keyframes dg-review-phone-1{0%{transform:translate(30px,66px);opacity:0}2%{transform:translate(30px,66px);opacity:1}22.5%{transform:translate(30px,150px);opacity:1}26.67%{transform:translate(30px,150px);opacity:0}100%{transform:translate(30px,150px);opacity:0}}
+.js #dg-review-phone .pulse-1{animation-name:dg-review-phone-1}
+@keyframes dg-review-phone-2{0%{transform:translate(30px,170px);opacity:0}26.67%{transform:translate(30px,170px);opacity:0}28.67%{transform:translate(30px,170px);opacity:1}49.17%{transform:translate(30px,254px);opacity:1}53.33%{transform:translate(30px,254px);opacity:0}100%{transform:translate(30px,254px);opacity:0}}
+.js #dg-review-phone .pulse-2{animation-name:dg-review-phone-2}
+@keyframes dg-review-phone-3{0%{transform:translate(30px,274px);opacity:0}53.33%{transform:translate(30px,274px);opacity:0}55.33%{transform:translate(30px,274px);opacity:1}75.83%{transform:translate(30px,358px);opacity:1}80%{transform:translate(30px,358px);opacity:0}100%{transform:translate(30px,358px);opacity:0}}
+.js #dg-review-phone .pulse-3{animation-name:dg-review-phone-3}
+@media (prefers-reduced-motion:reduce){#dg-review-phone .pulse{animation:none!important}#dg-review-phone .pulse{display:none!important}}
+@media print{#dg-review-phone .pulse{display:none!important}}
+@media not print{@media (max-width:720px){#dg-review{display:none}#dg-review-phone{display:block}}}
+</style>
+<rect width="264" height="416" class="ground"/>
+<rect x="8" y="12" width="248" height="392" rx="10" class="band"/>
+<text x="240" y="32" class="lane" text-anchor="end">Writer</text>
+<g class="leg" data-leg="1"><path d="M30,66 L30,144" class="line"/><polygon points="25.5,142 34.5,142 30,150" class="head"/><circle cx="30" cy="104" r="10" class="mark"/><text x="30" y="108" class="num" text-anchor="middle">1</text><text x="51" y="108" class="verb" text-anchor="start">ask a colleague to read</text><circle r="6" class="pulse pulse-1"/></g>
+<g class="leg" data-leg="2"><path d="M30,170 L30,248" class="line"/><polygon points="25.5,246 34.5,246 30,254" class="head"/><circle cx="30" cy="208" r="10" class="mark"/><text x="30" y="212" class="num" text-anchor="middle">2</text><text x="51" y="212" class="verb" text-anchor="start">fix</text><circle r="6" class="pulse pulse-2"/></g>
+<g class="leg" data-leg="3"><path d="M30,274 L30,352" class="line"/><polygon points="25.5,350 34.5,350 30,358" class="head"/><circle cx="30" cy="312" r="10" class="mark"/><text x="30" y="316" class="num" text-anchor="middle">3</text><text x="51" y="316" class="verb" text-anchor="start">publish</text><circle r="6" class="pulse pulse-3"/></g>
+<circle cx="30" cy="56" r="8" class="stop"/>
+<text x="51" y="61" class="name" text-anchor="start">Draft</text>
+<circle cx="30" cy="160" r="8" class="stop"/>
+<text x="51" y="165" class="name" text-anchor="start">Review copy</text>
+<text x="51" y="182" class="sub" text-anchor="start">with comments</text>
+<circle cx="30" cy="264" r="8" class="stop"/>
+<text x="51" y="269" class="name" text-anchor="start">Final text</text>
+<circle cx="30" cy="368" r="8" class="stop end"/>
+<text x="51" y="373" class="name" text-anchor="start">Published page</text>
+<text x="51" y="390" class="sub" text-anchor="start">on the public site</text>
 </svg>

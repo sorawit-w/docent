@@ -140,6 +140,48 @@ function tall(model, k) {
   return scene;
 }
 
+// Single track, for phones: the route runs straight down. Each visit to a lane is a band, so a leg that changes
+// lane crosses the gap between two bands, and its mark sits in that gap.
+function track(model, k) {
+  const { lanes, parts, legs, chain, radius: r } = model;
+  const edge = r + 2, x = 30, textX = x + 21;
+  const y = [], bands = [], gaps = [];
+  chain.forEach((index, pos) => {
+    const extra = pos ? k.stub[pos - 1] + k.run[pos - 1] : 0;
+    if (pos && parts[chain[pos - 1]].lane === parts[index].lane) return y.push(y[pos - 1] + 104 + extra);
+    const top = pos ? y[pos - 1] + 36 + GAP : 12;
+    bands.push({ lane: parts[index].lane, y: top, first: pos });
+    y.push(top + 44 + extra);
+  });
+  const header = (lane) => x + 13 + 16 + (lane.icon ? 24 : 0) + nameW(lane.name);
+  const right = Math.max(...parts.map((p) => textX + labelW(p)), ...legs.map((leg) => textX + noteW(leg.verb)), ...bands.map((b) => header(lanes[b.lane])));
+  const w = Math.max(264, even(right + 24)) + k.tail;
+  bands.forEach((b, i) => {
+    const last = (i + 1 < bands.length ? bands[i + 1].first : chain.length) - 1;
+    Object.assign(b, { x: 8, w: w - 16, h: y[last] + 36 - b.y });
+    if (i) gaps.push({ x: 0, y: b.y - GAP, w, h: GAP });
+  });
+  const scene = { form: "track", w, h: y[y.length - 1] + 48, bands, gaps, tracks: [], lanes: [], parts: [], legs: [] };
+  for (const b of bands) {
+    const lane = lanes[b.lane], end = w - 24;
+    scene.lanes.push({ icon: lane.icon, iconAt: lane.icon ? [end - nameW(lane.name) - 14, b.y + 15] : null, text: { x: end, y: b.y + 20, s: lane.name, cls: "lane", anchor: "end" } });
+  }
+  const bandOf = (pos) => bands.findLast((b) => b.first <= pos);
+  chain.forEach((index, pos) => {
+    const part = parts[index], cy = y[pos];
+    const texts = [{ x: textX, y: cy + 5, s: part.name, cls: "name", anchor: "start" }];
+    if (part.note) texts.push({ x: textX, y: cy + 22, s: part.note, cls: "sub", anchor: "start" });
+    scene.parts.push({ id: part.id, shape: "stop", cx: x, cy, r, icon: part.icon, iconAt: [x, cy], end: pos === chain.length - 1, texts });
+  });
+  legs.forEach((leg, j) => {
+    const from = y[j] + edge, tip = y[j + 1] - edge;
+    const sameLane = bandOf(j) === bandOf(j + 1);
+    const my = sameLane ? (from + tip - HEAD) / 2 : bandOf(j + 1).y - GAP / 2;
+    scene.legs.push({ n: leg.n, from: parts[leg.from].id, to: parts[leg.to].id, sameLane, radius: 0, pts: [[x, from], [x, tip]], mark: [x, my], verb: { x: textX, y: my + 4, s: leg.verb, cls: "verb", anchor: "start" } });
+  });
+  return scene;
+}
+
 /** Adds room for the first problem. Returns false when no room can fix it. */
 function makeRoom(k, problem, model) {
   const grow = (list, i, by) => (i >= 0 && i < list.length && list[i] + by <= LIMIT ? ((list[i] += by), true) : false);
@@ -159,9 +201,9 @@ function makeRoom(k, problem, model) {
   return grow(k.stub, leg, 6);
 }
 
-/** Lays out a Route drawing. form is "wide" or "tall". Throws LayoutError when the rules cannot be kept. */
+/** Lays out a Route drawing. form is "wide", "tall" or "track". Throws LayoutError when the rules cannot be kept. */
 function layoutRoute(model, form) {
-  const draw = form === "wide" ? wide : tall;
+  const draw = { wide, tall, track }[form];
   const k = { stub: model.legs.map(() => 0), run: model.legs.map(() => 0), margin: 0, lead: 0, tail: 0 };
   let problems = [];
   for (let round = 0; round < 400; round++) {
