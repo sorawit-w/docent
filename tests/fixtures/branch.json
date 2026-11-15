@@ -1,0 +1,22 @@
+{
+  "id": "leave",
+  "label": "A leave request: the employee asks, the manager approves or refuses, and the calendar shows an approved leave.",
+  "lanes": [
+    { "id": "employee", "name": "Employee", "icon": "person" },
+    { "id": "manager", "name": "Manager", "icon": "team" }
+  ],
+  "parts": [
+    { "id": "request", "lane": "employee", "name": "Leave request", "note": "dates and a reason", "icon": "document" },
+    { "id": "review", "lane": "manager", "name": "Review", "note": "checks the team calendar", "icon": "inspect" },
+    { "id": "approved", "lane": "manager", "name": "Approval", "note": "the leave is booked", "icon": "check" },
+    { "id": "refused", "lane": "employee", "name": "Refusal", "note": "with a reason and other dates", "icon": "message" },
+    { "id": "calendar", "lane": "employee", "name": "Calendar entry", "note": "visible to the team", "icon": "document" }
+  ],
+  "legs": [
+    { "from": "request", "to": "review", "verb": "send" },
+    { "from": "review", "to": "approved", "verb": "approve" },
+    { "from": "review", "to": "refused", "verb": "refuse" },
+    { "from": "refused", "to": "request", "verb": "change the dates" },
+    { "from": "approved", "to": "calendar", "verb": "book" }
+  ]
+}

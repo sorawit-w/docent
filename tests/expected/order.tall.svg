@@ -1,0 +1,77 @@
+<svg id="dg-order" class="dg dg-tall" xmlns="http://www.w3.org/2000/svg" width="734" height="574" viewBox="0 0 734 574" role="img" aria-label="An order in four steps: the customer places an order, the shop sends a pick list, the warehouse packs a parcel, and the parcel goes to the customer.">
+<style>
+#dg-order{display:block;flex:none;margin-inline:auto;font-family:var(--sans,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif)}
+#dg-order .ground{fill:var(--fig,#f2f3f9)}
+#dg-order .band{fill:var(--bg,#fbfbfe)}
+#dg-order .track{stroke:var(--line,#d3d6e3)}
+#dg-order .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-order .head{fill:var(--text,#1c1f2e)}
+#dg-order .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-order .stop.end{fill:var(--text,#1c1f2e)}
+#dg-order .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-order .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-order .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-order .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-order .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-order .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-order .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-order .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-order .sub,#dg-order .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-order .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+.js #dg-order .leg.is-current .line{stroke:var(--primary,#2f3fd0);stroke-width:2.5}
+.js #dg-order .leg.is-current .head,.js #dg-order .leg.is-current .num{fill:var(--primary,#2f3fd0)}
+.js #dg-order .leg.is-current .mark{stroke:var(--primary,#2f3fd0)}
+.js #dg-order .leg.is-current .pulse{display:block;animation:2.4s linear infinite}
+@keyframes dg-order-1{0%{transform:translate(149px,111px);opacity:0}8%{transform:translate(149px,111px);opacity:1}10.44%{transform:translate(149px,120px);opacity:1}58.25%{transform:translate(323px,150px);opacity:1}68%{transform:translate(323px,186px);opacity:1}88%{transform:translate(323px,186px);opacity:1}100%{transform:translate(323px,186px);opacity:0}}
+#dg-order .pulse-1{transform:translate(190.76px,127.2px)}
+.js #dg-order .leg.is-current .pulse-1{animation-name:dg-order-1}
+@keyframes dg-order-2{0%{transform:translate(323px,216px);opacity:0}8%{transform:translate(323px,216px);opacity:1}10.99%{transform:translate(323px,231px);opacity:1}60.82%{transform:translate(571px,261px);opacity:1}68%{transform:translate(571px,297px);opacity:1}88%{transform:translate(571px,297px);opacity:1}100%{transform:translate(571px,297px);opacity:0}}
+#dg-order .pulse-2{transform:translate(382.52px,238.2px)}
+.js #dg-order .leg.is-current .pulse-2{animation-name:dg-order-2}
+@keyframes dg-order-3{0%{transform:translate(571px,327px);opacity:0}8%{transform:translate(571px,327px);opacity:1}68%{transform:translate(571px,402px);opacity:1}88%{transform:translate(571px,402px);opacity:1}100%{transform:translate(571px,402px);opacity:0}}
+#dg-order .pulse-3{transform:translate(571px,336px)}
+.js #dg-order .leg.is-current .pulse-3{animation-name:dg-order-3}
+@keyframes dg-order-4{0%{transform:translate(571px,432px);opacity:0}8%{transform:translate(571px,432px);opacity:1}9.15%{transform:translate(571px,441px);opacity:1}63.39%{transform:translate(149px,471px);opacity:1}68%{transform:translate(149px,507px);opacity:1}88%{transform:translate(149px,507px);opacity:1}100%{transform:translate(149px,507px);opacity:0}}
+#dg-order .pulse-4{transform:translate(250.28px,463.8px)}
+.js #dg-order .leg.is-current .pulse-4{animation-name:dg-order-4}
+@media (prefers-reduced-motion:reduce){#dg-order .pulse{animation:none!important}}
+@media print{#dg-order .pulse{display:none!important}#dg-order .leg .line{stroke:var(--text,#1c1f2e)!important;stroke-width:2px!important}#dg-order .leg .head,#dg-order .leg .num{fill:var(--text,#1c1f2e)!important}#dg-order .leg .mark{stroke:var(--text,#1c1f2e)!important}}
+</style>
+<rect width="734" height="574" class="ground"/>
+<rect x="8" y="12" width="216" height="550" rx="10" class="band"/>
+<rect x="248" y="12" width="224" height="550" rx="10" class="band"/>
+<rect x="496" y="12" width="230" height="550" rx="10" class="band"/>
+<line x1="149" y1="62" x2="149" y2="548" class="track"/>
+<line x1="323" y1="62" x2="323" y2="548" class="track"/>
+<line x1="571" y1="62" x2="571" y2="548" class="track"/>
+<g class="icon lane-icon" transform="translate(22,29)"><circle cx="8" cy="5" r="2.5"/><path d="M3 13.5c0-2.8 2.2-4.5 5-4.5s5 1.7 5 4.5"/></g>
+<text x="46" y="42" class="lane" text-anchor="start">Customer</text>
+<g class="icon lane-icon" transform="translate(262,29)"><rect x="3" y="3.5" width="10" height="7" rx="1"/><path d="M1.5 12.5h13"/></g>
+<text x="286" y="42" class="lane" text-anchor="start">Shop</text>
+<g class="icon lane-icon" transform="translate(510,29)"><circle cx="6" cy="5.5" r="2.25"/><path d="M1.75 13c0-2.4 1.9-3.75 4.25-3.75s4.25 1.35 4.25 3.75M10.5 3.5a2.25 2.25 0 0 1 0 4.25M12 9.6c1.4.5 2.25 1.7 2.25 3.4"/></g>
+<text x="534" y="42" class="lane" text-anchor="start">Warehouse</text>
+<g class="leg" data-leg="1"><path d="M149,111 L149,120 L323,150 L323,180" class="line"/><polygon points="318.5,178 327.5,178 323,186" class="head"/><circle cx="236" cy="135" r="10" class="mark"/><text x="236" y="139" class="num" text-anchor="middle">1</text><text x="236" y="118" class="verb" text-anchor="middle">place</text><circle r="6" class="pulse pulse-1"/></g>
+<g class="leg" data-leg="2"><path d="M323,216 L323,231 L571,261 L571,291" class="line"/><polygon points="566.5,289 575.5,289 571,297" class="head"/><circle cx="484" cy="250.48" r="10" class="mark"/><text x="484" y="254.48" class="num" text-anchor="middle">2</text><text x="484" y="233.48" class="verb" text-anchor="middle">send the list</text><circle r="6" class="pulse pulse-2"/></g>
+<g class="leg" data-leg="3"><path d="M571,327 L571,396" class="line"/><polygon points="566.5,394 575.5,394 571,402" class="head"/><circle cx="571" cy="360.5" r="10" class="mark"/><text x="571" y="364.5" class="num" text-anchor="middle">3</text><text x="592" y="364.5" class="verb" text-anchor="start">pack</text><circle r="6" class="pulse pulse-3"/></g>
+<g class="leg" data-leg="4"><path d="M571,432 L571,441 L149,471 L149,501" class="line"/><polygon points="144.5,499 153.5,499 149,507" class="head"/><circle cx="484" cy="447.18" r="10" class="mark"/><text x="484" y="451.18" class="num" text-anchor="middle">4</text><text x="484" y="430.18" class="verb" text-anchor="middle">ship</text><circle r="6" class="pulse pulse-4"/></g>
+<circle cx="149" cy="96" r="13" class="stop"/>
+<g class="icon" transform="translate(141,88)"><path d="M9.5 2.5h-5a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1v-7z"/><path d="M9.5 2.5v3h3M6 9h4M6 11.25h4"/></g>
+<text x="128" y="101" class="name" text-anchor="end">Order</text>
+<text x="128" y="118" class="sub" text-anchor="end">two books</text>
+<circle cx="323" cy="201" r="13" class="stop"/>
+<g class="icon" transform="translate(315,193)"><circle cx="8" cy="8" r="5.5"/><path d="M5.5 8.2l1.8 1.8 3.2-3.6"/></g>
+<text x="344" y="206" class="name" text-anchor="start">Payment check</text>
+<text x="344" y="223" class="sub" text-anchor="start">card accepted</text>
+<circle cx="571" cy="312" r="13" class="stop"/>
+<g class="icon" transform="translate(563,304)"><path d="M9.5 2.5h-5a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1v-7z"/><path d="M9.5 2.5v3h3M6 9h4M6 11.25h4"/></g>
+<text x="592" y="317" class="name" text-anchor="start">Pick list</text>
+<text x="592" y="334" class="sub" text-anchor="start">shelf numbers</text>
+<circle cx="571" cy="417" r="13" class="stop"/>
+<g class="icon" transform="translate(563,409)"><path d="M2.5 8.4V3.5a1 1 0 0 1 1-1h4.9l5.1 5.1a1 1 0 0 1 0 1.4l-4.5 4.5a1 1 0 0 1-1.4 0z"/><path d="M5.6 5.6h.01"/></g>
+<text x="592" y="422" class="name" text-anchor="start">Parcel</text>
+<text x="592" y="439" class="sub" text-anchor="start">packed and weighed</text>
+<circle cx="149" cy="522" r="13" class="stop end"/>
+<g class="icon on-end" transform="translate(141,514)"><path d="M2.5 4a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v6.5a1 1 0 0 1-1 1H7l-3 2.5v-2.5h-.5a1 1 0 0 1-1-1z"/><path d="M5.5 6.25h5M5.5 8.5h3"/></g>
+<text x="128" y="527" class="name" text-anchor="end">Delivery note</text>
+<text x="128" y="544" class="sub" text-anchor="end">signed at the door</text>
+</svg>

@@ -1,0 +1,22 @@
+{
+  "id": "order",
+  "label": "An order in four steps: the customer places an order, the shop sends a pick list, the warehouse packs a parcel, and the parcel goes to the customer.",
+  "lanes": [
+    { "id": "customer", "name": "Customer", "icon": "person" },
+    { "id": "shop", "name": "Shop", "icon": "computer" },
+    { "id": "warehouse", "name": "Warehouse", "icon": "team" }
+  ],
+  "parts": [
+    { "id": "order", "lane": "customer", "name": "Order", "note": "two books", "icon": "document" },
+    { "id": "payment", "lane": "shop", "name": "Payment check", "note": "card accepted", "icon": "check" },
+    { "id": "list", "lane": "warehouse", "name": "Pick list", "note": "shelf numbers", "icon": "document" },
+    { "id": "parcel", "lane": "warehouse", "name": "Parcel", "note": "packed and weighed", "icon": "release" },
+    { "id": "receipt", "lane": "customer", "name": "Delivery note", "note": "signed at the door", "icon": "message" }
+  ],
+  "legs": [
+    { "from": "order", "to": "payment", "verb": "place" },
+    { "from": "payment", "to": "list", "verb": "send the list" },
+    { "from": "list", "to": "parcel", "verb": "pack" },
+    { "from": "parcel", "to": "receipt", "verb": "ship" }
+  ]
+}

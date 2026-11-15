@@ -1,0 +1,21 @@
+{
+  "id": "path",
+  "label": "A bug report in four steps: the reporter files a report, the maintainers ask for steps, the reporter sends the steps, and the maintainers release a fix.",
+  "lanes": [
+    { "id": "reporter", "name": "Reporter", "icon": "person" },
+    { "id": "maintainers", "name": "Maintainers", "icon": "team" }
+  ],
+  "parts": [
+    { "id": "report", "lane": "reporter", "name": "Bug report", "note": "what went wrong", "icon": "document" },
+    { "id": "triage", "lane": "maintainers", "name": "Triage", "note": "a first check", "icon": "inspect" },
+    { "id": "steps", "lane": "reporter", "name": "Steps to repeat", "note": "a short, exact list", "icon": "message" },
+    { "id": "fix", "lane": "maintainers", "name": "Fix", "note": "a tested change", "icon": "check" },
+    { "id": "version", "lane": "maintainers", "name": "New version", "note": "ready to install", "icon": "release" }
+  ],
+  "legs": [
+    { "from": "report", "to": "triage", "verb": "file" },
+    { "from": "triage", "to": "steps", "verb": "ask for steps" },
+    { "from": "steps", "to": "fix", "verb": "send steps" },
+    { "from": "fix", "to": "version", "verb": "release" }
+  ]
+}

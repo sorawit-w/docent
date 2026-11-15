@@ -1,0 +1,68 @@
+<svg id="dg-leave" class="dg dg-plates dg-auto" xmlns="http://www.w3.org/2000/svg" width="780" height="546" viewBox="0 0 780 546" role="img" aria-label="A leave request: the employee asks, the manager approves or refuses, and the calendar shows an approved leave.">
+<style>
+#dg-leave{display:block;flex:none;margin-inline:auto;font-family:var(--sans,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif)}
+#dg-leave .ground{fill:var(--fig,#f2f3f9)}
+#dg-leave .band{fill:var(--bg,#fbfbfe)}
+#dg-leave .track{stroke:var(--line,#d3d6e3)}
+#dg-leave .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-leave .head{fill:var(--text,#1c1f2e)}
+#dg-leave .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-leave .stop.end{fill:var(--text,#1c1f2e)}
+#dg-leave .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-leave .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-leave .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-leave .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-leave .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-leave .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-leave .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-leave .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-leave .sub,#dg-leave .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-leave .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+.js #dg-leave .pulse{display:block;animation:9.2s linear 2 both}
+.js #dg-leave:not(.is-playing) .pulse{animation-play-state:paused}
+@keyframes dg-leave-1{0%{transform:translate(310px,116px);opacity:0}1.3%{transform:translate(310px,116px);opacity:1}5.17%{transform:translate(310px,168px);opacity:1}14.67%{transform:translate(438px,168px);opacity:1}17.39%{transform:translate(438px,168px);opacity:0}100%{transform:translate(438px,168px);opacity:0}}
+.js #dg-leave .pulse-1{animation-name:dg-leave-1}
+@keyframes dg-leave-2{0%{transform:translate(590px,208px);opacity:0}17.39%{transform:translate(590px,208px);opacity:0}18.7%{transform:translate(590px,208px);opacity:1}32.07%{transform:translate(590px,280px);opacity:1}34.78%{transform:translate(590px,280px);opacity:0}100%{transform:translate(590px,280px);opacity:0}}
+.js #dg-leave .pulse-2{animation-name:dg-leave-2}
+@keyframes dg-leave-3{0%{transform:translate(440px,196px);opacity:0}34.78%{transform:translate(440px,196px);opacity:0}36.09%{transform:translate(440px,196px);opacity:1}36.74%{transform:translate(426px,196px);opacity:1}45.56%{transform:translate(426px,386px);opacity:1}49.46%{transform:translate(342px,386px);opacity:1}52.17%{transform:translate(342px,386px);opacity:0}100%{transform:translate(342px,386px);opacity:0}}
+.js #dg-leave .pulse-3{animation-name:dg-leave-3}
+@keyframes dg-leave-4{0%{transform:translate(190px,374px);opacity:0}52.17%{transform:translate(190px,374px);opacity:0}53.48%{transform:translate(190px,374px);opacity:1}66.85%{transform:translate(190px,118px);opacity:1}69.57%{transform:translate(190px,118px);opacity:0}100%{transform:translate(190px,118px);opacity:0}}
+.js #dg-leave .pulse-4{animation-name:dg-leave-4}
+@keyframes dg-leave-5{0%{transform:translate(470px,334px);opacity:0}69.57%{transform:translate(470px,334px);opacity:0}70.87%{transform:translate(470px,334px);opacity:1}77.95%{transform:translate(470px,478px);opacity:1}84.24%{transform:translate(342px,478px);opacity:1}86.96%{transform:translate(342px,478px);opacity:0}100%{transform:translate(342px,478px);opacity:0}}
+.js #dg-leave .pulse-5{animation-name:dg-leave-5}
+@media (prefers-reduced-motion:reduce){#dg-leave .pulse{animation:none!important}#dg-leave .pulse{display:none!important}}
+@media print{#dg-leave .pulse{display:none!important}}
+</style>
+<rect width="780" height="546" class="ground"/>
+<rect x="12" y="12" width="356" height="522" rx="10" class="band"/>
+<rect x="412" y="12" width="356" height="522" rx="10" class="band"/>
+<g class="icon lane-icon" transform="translate(40,31)"><circle cx="8" cy="5" r="2.5"/><path d="M3 13.5c0-2.8 2.2-4.5 5-4.5s5 1.7 5 4.5"/></g>
+<text x="64" y="44" class="lane" text-anchor="start">Employee</text>
+<g class="icon lane-icon" transform="translate(440,31)"><circle cx="6" cy="5.5" r="2.25"/><path d="M1.75 13c0-2.4 1.9-3.75 4.25-3.75s4.25 1.35 4.25 3.75M10.5 3.5a2.25 2.25 0 0 1 0 4.25M12 9.6c1.4.5 2.25 1.7 2.25 3.4"/></g>
+<text x="464" y="44" class="lane" text-anchor="start">Manager</text>
+<g class="leg" data-leg="1"><path d="M310,116 L310,160 Q310,168 318,168 L432,168" class="line"/><polygon points="430,172.5 430,163.5 438,168" class="head"/><circle cx="390" cy="168" r="10" class="mark"/><text x="390" y="172" class="num" text-anchor="middle">1</text><text x="390" y="149" class="verb" text-anchor="middle">send</text><circle r="6" class="pulse pulse-1"/></g>
+<g class="leg" data-leg="2"><path d="M590,208 L590,274" class="line"/><polygon points="585.5,272 594.5,272 590,280" class="head"/><circle cx="590" cy="240" r="10" class="mark"/><text x="590" y="244" class="num" text-anchor="middle">2</text><text x="606" y="244" class="verb" text-anchor="start">approve</text><circle r="6" class="pulse pulse-2"/></g>
+<g class="leg" data-leg="3"><path d="M440,196 L433,196 Q426,196 426,203 L426,378 Q426,386 418,386 L348,386" class="line"/><polygon points="350,381.5 350,390.5 342,386" class="head"/><circle cx="390" cy="386" r="10" class="mark"/><text x="390" y="390" class="num" text-anchor="middle">3</text><text x="390" y="367" class="verb" text-anchor="middle">refuse</text><circle r="6" class="pulse pulse-3"/></g>
+<g class="leg" data-leg="4"><path d="M190,374 L190,124" class="line"/><polygon points="194.5,126 185.5,126 190,118" class="head"/><circle cx="190" cy="250" r="10" class="mark"/><text x="190" y="254" class="num" text-anchor="middle">4</text><text x="206" y="254" class="verb" text-anchor="start">change the dates</text><circle r="6" class="pulse pulse-4"/></g>
+<g class="leg" data-leg="5"><path d="M470,334 L470,470 Q470,478 462,478 L348,478" class="line"/><polygon points="350,473.5 350,482.5 342,478" class="head"/><circle cx="390" cy="478" r="10" class="mark"/><text x="390" y="482" class="num" text-anchor="middle">5</text><text x="390" y="459" class="verb" text-anchor="middle">book</text><circle r="6" class="pulse pulse-5"/></g>
+<rect x="40" y="64" width="300" height="52" rx="10" class="card"/>
+<g class="icon" transform="translate(56,82)"><path d="M9.5 2.5h-5a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1v-7z"/><path d="M9.5 2.5v3h3M6 9h4M6 11.25h4"/></g>
+<text x="86" y="87" class="name" text-anchor="start">Leave request</text>
+<text x="86" y="104" class="sub" text-anchor="start">dates and a reason</text>
+<rect x="440" y="156" width="300" height="52" rx="10" class="card"/>
+<g class="icon" transform="translate(456,174)"><circle cx="7" cy="7" r="4"/><path d="M10 10l3.5 3.5"/></g>
+<text x="486" y="179" class="name" text-anchor="start">Review</text>
+<text x="486" y="196" class="sub" text-anchor="start">checks the team calendar</text>
+<rect x="440" y="282" width="300" height="52" rx="10" class="card"/>
+<g class="icon" transform="translate(456,300)"><circle cx="8" cy="8" r="5.5"/><path d="M5.5 8.2l1.8 1.8 3.2-3.6"/></g>
+<text x="486" y="305" class="name" text-anchor="start">Approval</text>
+<text x="486" y="322" class="sub" text-anchor="start">the leave is booked</text>
+<rect x="40" y="374" width="300" height="52" rx="10" class="card"/>
+<g class="icon" transform="translate(56,392)"><path d="M2.5 4a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v6.5a1 1 0 0 1-1 1H7l-3 2.5v-2.5h-.5a1 1 0 0 1-1-1z"/><path d="M5.5 6.25h5M5.5 8.5h3"/></g>
+<text x="86" y="397" class="name" text-anchor="start">Refusal</text>
+<text x="86" y="414" class="sub" text-anchor="start">with a reason and other dates</text>
+<rect x="40" y="466" width="300" height="52" rx="10" class="card"/>
+<g class="icon" transform="translate(56,484)"><path d="M9.5 2.5h-5a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1v-7z"/><path d="M9.5 2.5v3h3M6 9h4M6 11.25h4"/></g>
+<text x="86" y="489" class="name" text-anchor="start">Calendar entry</text>
+<text x="86" y="506" class="sub" text-anchor="start">visible to the team</text>
+</svg>

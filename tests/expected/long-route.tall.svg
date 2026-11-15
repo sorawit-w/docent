@@ -1,0 +1,97 @@
+<svg id="dg-backup" class="dg dg-tall" xmlns="http://www.w3.org/2000/svg" width="506" height="883" viewBox="0 0 506 883" role="img" aria-label="A nightly backup in seven steps, from the timer to the report.">
+<style>
+#dg-backup{display:block;flex:none;margin-inline:auto;font-family:var(--sans,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif)}
+#dg-backup .ground{fill:var(--fig,#f2f3f9)}
+#dg-backup .band{fill:var(--bg,#fbfbfe)}
+#dg-backup .track{stroke:var(--line,#d3d6e3)}
+#dg-backup .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-backup .head{fill:var(--text,#1c1f2e)}
+#dg-backup .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-backup .stop.end{fill:var(--text,#1c1f2e)}
+#dg-backup .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-backup .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-backup .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-backup .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-backup .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-backup .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-backup .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-backup .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-backup .sub,#dg-backup .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-backup .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+.js #dg-backup .leg.is-current .line{stroke:var(--primary,#2f3fd0);stroke-width:2.5}
+.js #dg-backup .leg.is-current .head,.js #dg-backup .leg.is-current .num{fill:var(--primary,#2f3fd0)}
+.js #dg-backup .leg.is-current .mark{stroke:var(--primary,#2f3fd0)}
+.js #dg-backup .leg.is-current .pulse{display:block;animation:2.4s linear infinite}
+@keyframes dg-backup-1{0%{transform:translate(181px,111px);opacity:0}8%{transform:translate(181px,111px);opacity:1}68%{transform:translate(181px,186px);opacity:1}88%{transform:translate(181px,186px);opacity:1}100%{transform:translate(181px,186px);opacity:0}}
+#dg-backup .pulse-1{transform:translate(181px,120px)}
+.js #dg-backup .leg.is-current .pulse-1{animation-name:dg-backup-1}
+@keyframes dg-backup-2{0%{transform:translate(181px,216px);opacity:0}8%{transform:translate(181px,216px);opacity:1}10.44%{transform:translate(181px,225px);opacity:1}58.25%{transform:translate(355px,255px);opacity:1}68%{transform:translate(355px,291px);opacity:1}88%{transform:translate(355px,291px);opacity:1}100%{transform:translate(355px,291px);opacity:0}}
+#dg-backup .pulse-2{transform:translate(222.76px,232.2px)}
+.js #dg-backup .leg.is-current .pulse-2{animation-name:dg-backup-2}
+@keyframes dg-backup-3{0%{transform:translate(355px,321px);opacity:0}8%{transform:translate(355px,321px);opacity:1}10.44%{transform:translate(355px,330px);opacity:1}58.25%{transform:translate(181px,360px);opacity:1}68%{transform:translate(181px,396px);opacity:1}88%{transform:translate(181px,396px);opacity:1}100%{transform:translate(181px,396px);opacity:0}}
+#dg-backup .pulse-3{transform:translate(313.24px,337.2px)}
+.js #dg-backup .leg.is-current .pulse-3{animation-name:dg-backup-3}
+@keyframes dg-backup-4{0%{transform:translate(181px,426px);opacity:0}8%{transform:translate(181px,426px);opacity:1}10.44%{transform:translate(181px,435px);opacity:1}58.25%{transform:translate(355px,465px);opacity:1}68%{transform:translate(355px,501px);opacity:1}88%{transform:translate(355px,501px);opacity:1}100%{transform:translate(355px,501px);opacity:0}}
+#dg-backup .pulse-4{transform:translate(222.76px,442.2px)}
+.js #dg-backup .leg.is-current .pulse-4{animation-name:dg-backup-4}
+@keyframes dg-backup-5{0%{transform:translate(355px,531px);opacity:0}8%{transform:translate(355px,531px);opacity:1}68%{transform:translate(355px,606px);opacity:1}88%{transform:translate(355px,606px);opacity:1}100%{transform:translate(355px,606px);opacity:0}}
+#dg-backup .pulse-5{transform:translate(355px,540px)}
+.js #dg-backup .leg.is-current .pulse-5{animation-name:dg-backup-5}
+@keyframes dg-backup-6{0%{transform:translate(355px,636px);opacity:0}8%{transform:translate(355px,636px);opacity:1}68%{transform:translate(355px,711px);opacity:1}88%{transform:translate(355px,711px);opacity:1}100%{transform:translate(355px,711px);opacity:0}}
+#dg-backup .pulse-6{transform:translate(355px,645px)}
+.js #dg-backup .leg.is-current .pulse-6{animation-name:dg-backup-6}
+@keyframes dg-backup-7{0%{transform:translate(355px,741px);opacity:0}8%{transform:translate(355px,741px);opacity:1}10.44%{transform:translate(355px,750px);opacity:1}58.25%{transform:translate(181px,780px);opacity:1}68%{transform:translate(181px,816px);opacity:1}88%{transform:translate(181px,816px);opacity:1}100%{transform:translate(181px,816px);opacity:0}}
+#dg-backup .pulse-7{transform:translate(313.24px,757.2px)}
+.js #dg-backup .leg.is-current .pulse-7{animation-name:dg-backup-7}
+@media (prefers-reduced-motion:reduce){#dg-backup .pulse{animation:none!important}}
+@media print{#dg-backup .pulse{display:none!important}#dg-backup .leg .line{stroke:var(--text,#1c1f2e)!important;stroke-width:2px!important}#dg-backup .leg .head,#dg-backup .leg .num{fill:var(--text,#1c1f2e)!important}#dg-backup .leg .mark{stroke:var(--text,#1c1f2e)!important}}
+</style>
+<rect width="506" height="883" class="ground"/>
+<rect x="8" y="12" width="248" height="859" rx="10" class="band"/>
+<rect x="280" y="12" width="218" height="859" rx="10" class="band"/>
+<line x1="181" y1="62" x2="181" y2="857" class="track"/>
+<line x1="355" y1="62" x2="355" y2="857" class="track"/>
+<g class="icon lane-icon" transform="translate(22,29)"><rect x="2.5" y="2.5" width="11" height="4.5" rx="1"/><rect x="2.5" y="9" width="11" height="4.5" rx="1"/><path d="M5 4.75h.01M5 11.25h.01"/></g>
+<text x="46" y="42" class="lane" text-anchor="start">Application server</text>
+<g class="icon lane-icon" transform="translate(294,29)"><rect x="3" y="3.5" width="10" height="7" rx="1"/><path d="M1.5 12.5h13"/></g>
+<text x="318" y="42" class="lane" text-anchor="start">Backup store</text>
+<g class="leg" data-leg="1"><path d="M181,111 L181,180" class="line"/><polygon points="176.5,178 185.5,178 181,186" class="head"/><circle cx="181" cy="144.5" r="10" class="mark"/><text x="181" y="148.5" class="num" text-anchor="middle">1</text><text x="202" y="148.5" class="verb" text-anchor="start">start</text><circle r="6" class="pulse pulse-1"/></g>
+<g class="leg" data-leg="2"><path d="M181,216 L181,225 L355,255 L355,285" class="line"/><polygon points="350.5,283 359.5,283 355,291" class="head"/><circle cx="268" cy="240" r="10" class="mark"/><text x="268" y="244" class="num" text-anchor="middle">2</text><text x="268" y="223" class="verb" text-anchor="middle">copy</text><circle r="6" class="pulse pulse-2"/></g>
+<g class="leg" data-leg="3"><path d="M355,321 L355,330 L181,360 L181,390" class="line"/><polygon points="176.5,388 185.5,388 181,396" class="head"/><circle cx="268" cy="345" r="10" class="mark"/><text x="268" y="349" class="num" text-anchor="middle">3</text><text x="268" y="324.48" class="verb" text-anchor="middle">ask for the checksum</text><circle r="6" class="pulse pulse-3"/></g>
+<g class="leg" data-leg="4"><path d="M181,426 L181,435 L355,465 L355,495" class="line"/><polygon points="350.5,493 359.5,493 355,501" class="head"/><circle cx="268" cy="450" r="10" class="mark"/><text x="268" y="454" class="num" text-anchor="middle">4</text><text x="268" y="433" class="verb" text-anchor="middle">compare</text><circle r="6" class="pulse pulse-4"/></g>
+<g class="leg" data-leg="5"><path d="M355,531 L355,600" class="line"/><polygon points="350.5,598 359.5,598 355,606" class="head"/><circle cx="355" cy="564.5" r="10" class="mark"/><text x="355" y="568.5" class="num" text-anchor="middle">5</text><text x="376" y="568.5" class="verb" text-anchor="start">find</text><circle r="6" class="pulse pulse-5"/></g>
+<g class="leg" data-leg="6"><path d="M355,636 L355,705" class="line"/><polygon points="350.5,703 359.5,703 355,711" class="head"/><circle cx="355" cy="669.5" r="10" class="mark"/><text x="355" y="673.5" class="num" text-anchor="middle">6</text><text x="376" y="673.5" class="verb" text-anchor="start">delete and record</text><circle r="6" class="pulse pulse-6"/></g>
+<g class="leg" data-leg="7"><path d="M355,741 L355,750 L181,780 L181,810" class="line"/><polygon points="176.5,808 185.5,808 181,816" class="head"/><circle cx="268" cy="765" r="10" class="mark"/><text x="268" y="769" class="num" text-anchor="middle">7</text><text x="268" y="748" class="verb" text-anchor="middle">summarize</text><circle r="6" class="pulse pulse-7"/></g>
+<circle cx="181" cy="96" r="13" class="stop"/>
+<g class="icon" transform="translate(173,88)"><circle cx="7" cy="7" r="4"/><path d="M10 10l3.5 3.5"/></g>
+<text x="160" y="101" class="name" text-anchor="end">Night timer</text>
+<text x="160" y="118" class="sub" text-anchor="end">02:00 every day</text>
+<circle cx="181" cy="201" r="13" class="stop"/>
+<g class="icon" transform="translate(173,193)"><path d="M9.5 2.5h-5a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1v-7z"/><path d="M9.5 2.5v3h3M6 9h4M6 11.25h4"/></g>
+<text x="160" y="206" class="name" text-anchor="end">Database dump</text>
+<text x="160" y="223" class="sub" text-anchor="end">one compressed file</text>
+<circle cx="355" cy="306" r="13" class="stop"/>
+<g class="icon" transform="translate(347,298)"><path d="M9.5 2.5h-5a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1v-7z"/><path d="M9.5 2.5v3h3M6 9h4M6 11.25h4"/></g>
+<text x="376" y="311" class="name" text-anchor="start">Uploaded file</text>
+<text x="376" y="328" class="sub" text-anchor="start">in the inbox folder</text>
+<circle cx="181" cy="411" r="13" class="stop"/>
+<g class="icon" transform="translate(173,403)"><circle cx="8" cy="8" r="5.5"/><path d="M5.5 8.2l1.8 1.8 3.2-3.6"/></g>
+<text x="160" y="416" class="name" text-anchor="end">Checksum</text>
+<text x="160" y="433" class="sub" text-anchor="end">computed on the server</text>
+<circle cx="355" cy="516" r="13" class="stop"/>
+<g class="icon" transform="translate(347,508)"><circle cx="8" cy="8" r="5.5"/><path d="M5.5 8.2l1.8 1.8 3.2-3.6"/></g>
+<text x="376" y="521" class="name" text-anchor="start">Verified copy</text>
+<text x="376" y="538" class="sub" text-anchor="start">checksums match</text>
+<circle cx="355" cy="621" r="13" class="stop"/>
+<g class="icon" transform="translate(347,613)"><path d="M9.5 2.5h-5a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1v-7z"/><path d="M9.5 2.5v3h3M6 9h4M6 11.25h4"/></g>
+<text x="376" y="626" class="name" text-anchor="start">Old copies</text>
+<text x="376" y="643" class="sub" text-anchor="start">older than 30 days</text>
+<circle cx="355" cy="726" r="13" class="stop"/>
+<g class="icon" transform="translate(347,718)"><path d="M2.5 4a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v6.5a1 1 0 0 1-1 1H7l-3 2.5v-2.5h-.5a1 1 0 0 1-1-1z"/><path d="M5.5 6.25h5M5.5 8.5h3"/></g>
+<text x="376" y="731" class="name" text-anchor="start">Store log</text>
+<text x="376" y="748" class="sub" text-anchor="start">one line per night</text>
+<circle cx="181" cy="831" r="13" class="stop end"/>
+<g class="icon on-end" transform="translate(173,823)"><path d="M2.5 4a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v6.5a1 1 0 0 1-1 1H7l-3 2.5v-2.5h-.5a1 1 0 0 1-1-1z"/><path d="M5.5 6.25h5M5.5 8.5h3"/></g>
+<text x="160" y="836" class="name" text-anchor="end">Morning report</text>
+<text x="160" y="853" class="sub" text-anchor="end">sent to the team</text>
+</svg>
