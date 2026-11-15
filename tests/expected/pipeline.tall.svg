@@ -1,0 +1,170 @@
+<svg id="dg-pipeline" class="dg dg-tall" xmlns="http://www.w3.org/2000/svg" width="440" height="568" viewBox="0 0 440 568" role="img" aria-label="A change in four steps: the build passed, three tests failed, the review waits, and the release did not start.">
+<style>
+#dg-pipeline{display:block;flex:none;margin-inline:auto;font-family:var(--sans,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif)}
+#dg-pipeline .ground{fill:var(--fig,#f2f3f9)}
+#dg-pipeline .band{fill:var(--bg,#fbfbfe)}
+#dg-pipeline .track{stroke:var(--line,#d3d6e3)}
+#dg-pipeline .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-pipeline .head{fill:var(--text,#1c1f2e)}
+#dg-pipeline .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-pipeline .stop.end{fill:var(--text,#1c1f2e)}
+#dg-pipeline .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-pipeline .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-pipeline .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-pipeline .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-pipeline .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-pipeline .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-pipeline .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-pipeline .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-pipeline .sub,#dg-pipeline .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-pipeline .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-pipeline .stop.is-ok,#dg-pipeline .card.is-ok{stroke:var(--ok,#1a7f37);stroke-width:1.5}
+#dg-pipeline .flag.is-ok{fill:var(--ok,#1a7f37);stroke:var(--bg,#fbfbfe);stroke-width:2}
+#dg-pipeline .stop.is-err,#dg-pipeline .card.is-err{stroke:var(--err,#cf222e);stroke-width:1.5}
+#dg-pipeline .flag.is-err{fill:var(--err,#cf222e);stroke:var(--bg,#fbfbfe);stroke-width:2}
+#dg-pipeline .stop.is-warn,#dg-pipeline .card.is-warn{stroke:var(--warn,#7d4e00);stroke-width:1.5}
+#dg-pipeline .flag.is-warn{fill:var(--warn,#7d4e00);stroke:var(--bg,#fbfbfe);stroke-width:2}
+.js #dg-pipeline .leg.is-current .line{stroke:var(--primary,#2f3fd0);stroke-width:2.5}
+.js #dg-pipeline .leg.is-current .head,.js #dg-pipeline .leg.is-current .num{fill:var(--primary,#2f3fd0)}
+.js #dg-pipeline .leg.is-current .mark{stroke:var(--primary,#2f3fd0)}
+.js #dg-pipeline .leg.is-current .pulse{display:block;animation:2.4s linear infinite}
+@keyframes dg-pipeline-1{0%{transform:translate(147px,111px);opacity:0}8%{transform:translate(147px,111px);opacity:1}10.44%{transform:translate(147px,120px);opacity:1}58.25%{transform:translate(321px,150px);opacity:1}68%{transform:translate(321px,186px);opacity:1}88%{transform:translate(321px,186px);opacity:1}100%{transform:translate(321px,186px);opacity:0}}
+#dg-pipeline .pulse-1{transform:translate(188.76px,127.2px)}
+.js #dg-pipeline .leg.is-current .pulse-1{animation-name:dg-pipeline-1}
+@keyframes dg-pipeline-2{0%{transform:translate(321px,216px);opacity:0}8%{transform:translate(321px,216px);opacity:1}68%{transform:translate(321px,291px);opacity:1}88%{transform:translate(321px,291px);opacity:1}100%{transform:translate(321px,291px);opacity:0}}
+#dg-pipeline .pulse-2{transform:translate(321px,225px)}
+.js #dg-pipeline .leg.is-current .pulse-2{animation-name:dg-pipeline-2}
+@keyframes dg-pipeline-3{0%{transform:translate(321px,321px);opacity:0}8%{transform:translate(321px,321px);opacity:1}10.44%{transform:translate(321px,330px);opacity:1}58.25%{transform:translate(147px,360px);opacity:1}68%{transform:translate(147px,396px);opacity:1}88%{transform:translate(147px,396px);opacity:1}100%{transform:translate(147px,396px);opacity:0}}
+#dg-pipeline .pulse-3{transform:translate(279.24px,337.2px)}
+.js #dg-pipeline .leg.is-current .pulse-3{animation-name:dg-pipeline-3}
+@keyframes dg-pipeline-4{0%{transform:translate(147px,426px);opacity:0}8%{transform:translate(147px,426px);opacity:1}10.44%{transform:translate(147px,435px);opacity:1}58.25%{transform:translate(321px,465px);opacity:1}68%{transform:translate(321px,501px);opacity:1}88%{transform:translate(321px,501px);opacity:1}100%{transform:translate(321px,501px);opacity:0}}
+#dg-pipeline .pulse-4{transform:translate(188.76px,442.2px)}
+.js #dg-pipeline .leg.is-current .pulse-4{animation-name:dg-pipeline-4}
+@media (prefers-reduced-motion:reduce){#dg-pipeline .pulse{animation:none!important}}
+@media print{#dg-pipeline{max-width:100%;height:auto}#dg-pipeline .pulse{display:none!important}#dg-pipeline .leg .line{stroke:var(--text,#1c1f2e)!important;stroke-width:2px!important}#dg-pipeline .leg .head,#dg-pipeline .leg .num{fill:var(--text,#1c1f2e)!important}#dg-pipeline .leg .mark{stroke:var(--text,#1c1f2e)!important}}
+#dg-pipeline-phone{display:none}
+</style>
+<rect width="440" height="568" class="ground"/>
+<rect x="8" y="12" width="214" height="544" rx="10" class="band"/>
+<rect x="246" y="12" width="186" height="544" rx="10" class="band"/>
+<line x1="147" y1="62" x2="147" y2="542" class="track"/>
+<line x1="321" y1="62" x2="321" y2="542" class="track"/>
+<g class="icon lane-icon" transform="translate(22,29)"><circle cx="8" cy="5" r="2.5"/><path d="M3 13.5c0-2.8 2.2-4.5 5-4.5s5 1.7 5 4.5"/></g>
+<text x="46" y="42" class="lane" text-anchor="start">Author</text>
+<g class="icon lane-icon" transform="translate(260,29)"><rect x="2.5" y="2.5" width="11" height="4.5" rx="1"/><rect x="2.5" y="9" width="11" height="4.5" rx="1"/><path d="M5 4.75h.01M5 11.25h.01"/></g>
+<text x="284" y="42" class="lane" text-anchor="start">Build server</text>
+<g class="leg" data-leg="1"><path d="M147,111 L147,120 L321,150 L321,180" class="line"/><polygon points="316.5,178 325.5,178 321,186" class="head"/><circle cx="234" cy="135" r="10" class="mark"/><text x="234" y="139" class="num" text-anchor="middle">1</text><text x="234" y="118" class="verb" text-anchor="middle">push</text><circle r="6" class="pulse pulse-1"/></g>
+<g class="leg" data-leg="2"><path d="M321,216 L321,285" class="line"/><polygon points="316.5,283 325.5,283 321,291" class="head"/><circle cx="321" cy="249.5" r="10" class="mark"/><text x="321" y="253.5" class="num" text-anchor="middle">2</text><text x="342" y="253.5" class="verb" text-anchor="start">run</text><circle r="6" class="pulse pulse-2"/></g>
+<g class="leg" data-leg="3"><path d="M321,321 L321,330 L147,360 L147,390" class="line"/><polygon points="142.5,388 151.5,388 147,396" class="head"/><circle cx="234" cy="345" r="10" class="mark"/><text x="234" y="349" class="num" text-anchor="middle">3</text><text x="234" y="328" class="verb" text-anchor="middle">report</text><circle r="6" class="pulse pulse-3"/></g>
+<g class="leg" data-leg="4"><path d="M147,426 L147,435 L321,465 L321,495" class="line"/><polygon points="316.5,493 325.5,493 321,501" class="head"/><circle cx="234" cy="450" r="10" class="mark"/><text x="234" y="454" class="num" text-anchor="middle">4</text><text x="234" y="433" class="verb" text-anchor="middle">approve</text><circle r="6" class="pulse pulse-4"/></g>
+<circle cx="147" cy="96" r="13" class="stop"/>
+<g class="icon" transform="translate(139,88)"><circle cx="8" cy="8" r="2.5"/><path d="M1.5 8h4M10.5 8h4"/></g>
+<text x="126" y="101" class="name" text-anchor="end">Change</text>
+<text x="126" y="118" class="sub" text-anchor="end">one commit</text>
+<circle cx="321" cy="201" r="13" class="stop is-ok"/>
+<g class="icon" transform="translate(313,193)"><circle cx="8" cy="8" r="5.5"/><path d="M5.5 8.2l1.8 1.8 3.2-3.6"/></g>
+<circle cx="330.19" cy="191.81" r="3.5" class="flag is-ok"/>
+<text x="342" y="206" class="name" text-anchor="start">Build</text>
+<text x="342" y="223" class="sub" text-anchor="start">passed</text>
+<circle cx="321" cy="306" r="13" class="stop is-err"/>
+<g class="icon" transform="translate(313,298)"><circle cx="7" cy="7" r="4"/><path d="M10 10l3.5 3.5"/></g>
+<circle cx="330.19" cy="296.81" r="3.5" class="flag is-err"/>
+<text x="342" y="311" class="name" text-anchor="start">Tests</text>
+<text x="342" y="328" class="sub" text-anchor="start">3 tests failed</text>
+<circle cx="147" cy="411" r="13" class="stop is-warn"/>
+<g class="icon" transform="translate(139,403)"><path d="M2.5 4a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v6.5a1 1 0 0 1-1 1H7l-3 2.5v-2.5h-.5a1 1 0 0 1-1-1z"/><path d="M5.5 6.25h5M5.5 8.5h3"/></g>
+<circle cx="156.19" cy="401.81" r="3.5" class="flag is-warn"/>
+<text x="126" y="416" class="name" text-anchor="end">Review</text>
+<text x="126" y="433" class="sub" text-anchor="end">waits for the tests</text>
+<circle cx="321" cy="516" r="13" class="stop end"/>
+<g class="icon on-end" transform="translate(313,508)"><path d="M2.5 8.4V3.5a1 1 0 0 1 1-1h4.9l5.1 5.1a1 1 0 0 1 0 1.4l-4.5 4.5a1 1 0 0 1-1.4 0z"/><path d="M5.6 5.6h.01"/></g>
+<text x="342" y="521" class="name" text-anchor="start">Release</text>
+<text x="342" y="538" class="sub" text-anchor="start">not started</text>
+</svg>
+<svg id="dg-pipeline-phone" class="dg dg-track" xmlns="http://www.w3.org/2000/svg" width="264" height="520" viewBox="0 0 264 520" role="img" aria-label="A change in four steps: the build passed, three tests failed, the review waits, and the release did not start.">
+<style>
+#dg-pipeline-phone{flex:none;margin-inline:auto;font-family:var(--sans,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif)}
+#dg-pipeline-phone .ground{fill:var(--fig,#f2f3f9)}
+#dg-pipeline-phone .band{fill:var(--bg,#fbfbfe)}
+#dg-pipeline-phone .track{stroke:var(--line,#d3d6e3)}
+#dg-pipeline-phone .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-pipeline-phone .head{fill:var(--text,#1c1f2e)}
+#dg-pipeline-phone .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-pipeline-phone .stop.end{fill:var(--text,#1c1f2e)}
+#dg-pipeline-phone .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-pipeline-phone .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-pipeline-phone .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-pipeline-phone .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-pipeline-phone .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-pipeline-phone .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-pipeline-phone .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-pipeline-phone .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-pipeline-phone .sub,#dg-pipeline-phone .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-pipeline-phone .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-pipeline-phone .stop.is-ok,#dg-pipeline-phone .card.is-ok{stroke:var(--ok,#1a7f37);stroke-width:1.5}
+#dg-pipeline-phone .flag.is-ok{fill:var(--ok,#1a7f37);stroke:var(--bg,#fbfbfe);stroke-width:2}
+#dg-pipeline-phone .stop.is-err,#dg-pipeline-phone .card.is-err{stroke:var(--err,#cf222e);stroke-width:1.5}
+#dg-pipeline-phone .flag.is-err{fill:var(--err,#cf222e);stroke:var(--bg,#fbfbfe);stroke-width:2}
+#dg-pipeline-phone .stop.is-warn,#dg-pipeline-phone .card.is-warn{stroke:var(--warn,#7d4e00);stroke-width:1.5}
+#dg-pipeline-phone .flag.is-warn{fill:var(--warn,#7d4e00);stroke:var(--bg,#fbfbfe);stroke-width:2}
+.js #dg-pipeline-phone .leg.is-current .line{stroke:var(--primary,#2f3fd0);stroke-width:2.5}
+.js #dg-pipeline-phone .leg.is-current .head,.js #dg-pipeline-phone .leg.is-current .num{fill:var(--primary,#2f3fd0)}
+.js #dg-pipeline-phone .leg.is-current .mark{stroke:var(--primary,#2f3fd0)}
+.js #dg-pipeline-phone .leg.is-current .pulse{display:block;animation:2.4s linear infinite}
+@keyframes dg-pipeline-phone-1{0%{transform:translate(30px,71px);opacity:0}8%{transform:translate(30px,71px);opacity:1}68%{transform:translate(30px,145px);opacity:1}88%{transform:translate(30px,145px);opacity:1}100%{transform:translate(30px,145px);opacity:0}}
+#dg-pipeline-phone .pulse-1{transform:translate(30px,79.88px)}
+.js #dg-pipeline-phone .leg.is-current .pulse-1{animation-name:dg-pipeline-phone-1}
+@keyframes dg-pipeline-phone-2{0%{transform:translate(30px,175px);opacity:0}8%{transform:translate(30px,175px);opacity:1}68%{transform:translate(30px,249px);opacity:1}88%{transform:translate(30px,249px);opacity:1}100%{transform:translate(30px,249px);opacity:0}}
+#dg-pipeline-phone .pulse-2{transform:translate(30px,183.88px)}
+.js #dg-pipeline-phone .leg.is-current .pulse-2{animation-name:dg-pipeline-phone-2}
+@keyframes dg-pipeline-phone-3{0%{transform:translate(30px,279px);opacity:0}8%{transform:translate(30px,279px);opacity:1}68%{transform:translate(30px,353px);opacity:1}88%{transform:translate(30px,353px);opacity:1}100%{transform:translate(30px,353px);opacity:0}}
+#dg-pipeline-phone .pulse-3{transform:translate(30px,287.88px)}
+.js #dg-pipeline-phone .leg.is-current .pulse-3{animation-name:dg-pipeline-phone-3}
+@keyframes dg-pipeline-phone-4{0%{transform:translate(30px,383px);opacity:0}8%{transform:translate(30px,383px);opacity:1}68%{transform:translate(30px,457px);opacity:1}88%{transform:translate(30px,457px);opacity:1}100%{transform:translate(30px,457px);opacity:0}}
+#dg-pipeline-phone .pulse-4{transform:translate(30px,391.88px)}
+.js #dg-pipeline-phone .leg.is-current .pulse-4{animation-name:dg-pipeline-phone-4}
+@media (prefers-reduced-motion:reduce){#dg-pipeline-phone .pulse{animation:none!important}}
+@media print{#dg-pipeline-phone{max-width:100%;height:auto}#dg-pipeline-phone .pulse{display:none!important}#dg-pipeline-phone .leg .line{stroke:var(--text,#1c1f2e)!important;stroke-width:2px!important}#dg-pipeline-phone .leg .head,#dg-pipeline-phone .leg .num{fill:var(--text,#1c1f2e)!important}#dg-pipeline-phone .leg .mark{stroke:var(--text,#1c1f2e)!important}}
+@media (max-width:536px){#dg-pipeline{display:none}#dg-pipeline-phone{display:block}}
+</style>
+<rect width="264" height="520" class="ground"/>
+<rect x="8" y="12" width="248" height="80" rx="10" class="band"/>
+<rect x="8" y="116" width="248" height="184" rx="10" class="band"/>
+<rect x="8" y="324" width="248" height="80" rx="10" class="band"/>
+<rect x="8" y="428" width="248" height="80" rx="10" class="band"/>
+<g class="icon lane-icon" transform="translate(167,19)"><circle cx="8" cy="5" r="2.5"/><path d="M3 13.5c0-2.8 2.2-4.5 5-4.5s5 1.7 5 4.5"/></g>
+<text x="240" y="32" class="lane" text-anchor="end">Author</text>
+<g class="icon lane-icon" transform="translate(130,123)"><rect x="2.5" y="2.5" width="11" height="4.5" rx="1"/><rect x="2.5" y="9" width="11" height="4.5" rx="1"/><path d="M5 4.75h.01M5 11.25h.01"/></g>
+<text x="240" y="136" class="lane" text-anchor="end">Build server</text>
+<g class="icon lane-icon" transform="translate(167,331)"><circle cx="8" cy="5" r="2.5"/><path d="M3 13.5c0-2.8 2.2-4.5 5-4.5s5 1.7 5 4.5"/></g>
+<text x="240" y="344" class="lane" text-anchor="end">Author</text>
+<g class="icon lane-icon" transform="translate(130,435)"><rect x="2.5" y="2.5" width="11" height="4.5" rx="1"/><rect x="2.5" y="9" width="11" height="4.5" rx="1"/><path d="M5 4.75h.01M5 11.25h.01"/></g>
+<text x="240" y="448" class="lane" text-anchor="end">Build server</text>
+<g class="leg" data-leg="1"><path d="M30,71 L30,139" class="line"/><polygon points="25.5,137 34.5,137 30,145" class="head"/><circle cx="30" cy="104" r="10" class="mark"/><text x="30" y="108" class="num" text-anchor="middle">1</text><text x="51" y="108" class="verb" text-anchor="start">push</text><circle r="6" class="pulse pulse-1"/></g>
+<g class="leg" data-leg="2"><path d="M30,175 L30,243" class="line"/><polygon points="25.5,241 34.5,241 30,249" class="head"/><circle cx="30" cy="208" r="10" class="mark"/><text x="30" y="212" class="num" text-anchor="middle">2</text><text x="51" y="212" class="verb" text-anchor="start">run</text><circle r="6" class="pulse pulse-2"/></g>
+<g class="leg" data-leg="3"><path d="M30,279 L30,347" class="line"/><polygon points="25.5,345 34.5,345 30,353" class="head"/><circle cx="30" cy="312" r="10" class="mark"/><text x="30" y="316" class="num" text-anchor="middle">3</text><text x="51" y="316" class="verb" text-anchor="start">report</text><circle r="6" class="pulse pulse-3"/></g>
+<g class="leg" data-leg="4"><path d="M30,383 L30,451" class="line"/><polygon points="25.5,449 34.5,449 30,457" class="head"/><circle cx="30" cy="416" r="10" class="mark"/><text x="30" y="420" class="num" text-anchor="middle">4</text><text x="51" y="420" class="verb" text-anchor="start">approve</text><circle r="6" class="pulse pulse-4"/></g>
+<circle cx="30" cy="56" r="13" class="stop"/>
+<g class="icon" transform="translate(22,48)"><circle cx="8" cy="8" r="2.5"/><path d="M1.5 8h4M10.5 8h4"/></g>
+<text x="51" y="61" class="name" text-anchor="start">Change</text>
+<text x="51" y="78" class="sub" text-anchor="start">one commit</text>
+<circle cx="30" cy="160" r="13" class="stop is-ok"/>
+<g class="icon" transform="translate(22,152)"><circle cx="8" cy="8" r="5.5"/><path d="M5.5 8.2l1.8 1.8 3.2-3.6"/></g>
+<circle cx="39.19" cy="150.81" r="3.5" class="flag is-ok"/>
+<text x="51" y="165" class="name" text-anchor="start">Build</text>
+<text x="51" y="182" class="sub" text-anchor="start">passed</text>
+<circle cx="30" cy="264" r="13" class="stop is-err"/>
+<g class="icon" transform="translate(22,256)"><circle cx="7" cy="7" r="4"/><path d="M10 10l3.5 3.5"/></g>
+<circle cx="39.19" cy="254.81" r="3.5" class="flag is-err"/>
+<text x="51" y="269" class="name" text-anchor="start">Tests</text>
+<text x="51" y="286" class="sub" text-anchor="start">3 tests failed</text>
+<circle cx="30" cy="368" r="13" class="stop is-warn"/>
+<g class="icon" transform="translate(22,360)"><path d="M2.5 4a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v6.5a1 1 0 0 1-1 1H7l-3 2.5v-2.5h-.5a1 1 0 0 1-1-1z"/><path d="M5.5 6.25h5M5.5 8.5h3"/></g>
+<circle cx="39.19" cy="358.81" r="3.5" class="flag is-warn"/>
+<text x="51" y="373" class="name" text-anchor="start">Review</text>
+<text x="51" y="390" class="sub" text-anchor="start">waits for the tests</text>
+<circle cx="30" cy="472" r="13" class="stop end"/>
+<g class="icon on-end" transform="translate(22,464)"><path d="M2.5 8.4V3.5a1 1 0 0 1 1-1h4.9l5.1 5.1a1 1 0 0 1 0 1.4l-4.5 4.5a1 1 0 0 1-1.4 0z"/><path d="M5.6 5.6h.01"/></g>
+<text x="51" y="477" class="name" text-anchor="start">Release</text>
+<text x="51" y="494" class="sub" text-anchor="start">not started</text>
+</svg>

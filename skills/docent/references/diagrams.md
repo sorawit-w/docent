@@ -43,7 +43,7 @@ Put one block where the drawing belongs, inside the well of a figure:
 | `id` | yes | A short id, unique in the document: small letters, digits and `-`, starting with a letter. |
 | `label` | yes | One or two sentences that say what the drawing shows. A screen reader reads this in place of the drawing. |
 | `lanes` | yes | 1 to 4 lanes. Each has an `id`, a `name` (at most 28 characters) and, if you want, an `icon`. |
-| `parts` | yes | 2 to 12 parts. Each has an `id`, the `lane` it belongs to, a `name` (at most 32 characters) and, if you want, a `note` (at most 40 characters) and an `icon`. |
+| `parts` | yes | 2 to 12 parts. Each has an `id`, the `lane` it belongs to, a `name` (at most 32 characters) and, if you want, a `note` (at most 40 characters), an `icon` and a `state`. |
 | `legs` | yes | 1 to 16 legs, in order. Each goes `from` one part `to` another and has a `verb` (at most 24 characters). The legs are numbered in the order you write them. |
 | `place` | no | `"flow"` (the default) for a diagram in the text flow. `"walk"` for the diagram beside walkthrough steps: leg 1 lights with step 1, leg 2 with step 2, and so on. |
 | `form` | no | `"auto"` (the default), `"wide"`, `"tall"` or `"plates"`. Leave it out and the renderer picks. Name a form only when you have a reason. |
@@ -59,6 +59,28 @@ Keep names, notes and verbs short. A verb is one to three words. The renderer re
 A walkthrough needs a route with one leg for each step. Give it at most two lanes; the room beside the steps is 520px wide.
 
 In Plates every part has its own row, in the order in which the legs reach the parts. Two arrows may cross at a right angle; they never share a line. Plates is easiest to draw when most legs go from one lane to another. When `render` refuses a Plates diagram, move a part to another lane, remove a leg, or shorten a verb.
+
+## State
+
+A part can carry a state, when the document reports how that part ended:
+
+```json
+{"id": "tests", "lane": "server", "name": "Tests", "note": "3 tests failed", "icon": "inspect", "state": "err"}
+```
+
+| `state` | Means | Color |
+|---|---|---|
+| `"ok"` | It succeeded. | Green |
+| `"warn"` | It needs care, or it waits. | Amber |
+| `"err"` | It failed. | Red |
+
+The renderer draws the outline of the part in the status color and puts a small status dot on the outline. The name, the note and the icon keep their colors.
+
+- **Say the status in words.** A part with a state needs a `note` that says it, such as `"3 tests failed"`. Some readers cannot tell red from green, and a printed page may have no color. `render` refuses a part with a state and no note.
+- **Say it in the `label` too**, because a screen reader reads the label in place of the drawing.
+- **Use a state only for a status.** A state is not a way to make a part stand out, to mark a team, or to show which part is new. A part with no state is the normal case.
+- Only parts have a state. A leg has none: the color of a leg shows the current step of a walkthrough.
+- These three states are the only colors that an author can give. There is no field for another color.
 
 ## Icons
 

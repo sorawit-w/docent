@@ -13,6 +13,7 @@ const CASES = [
   ["order", "wide"], ["order", "tall"], ["order", "plates"],
   ["review", "wide"], ["review", "tall"], ["review", "plates"],
   ["long-route", "wide"], ["long-route", "tall"], ["branch", "plates"], ["dense", "plates"],
+  ["pipeline", "wide"], ["pipeline", "tall"], ["pipeline", "plates"],
 ];
 
 for (const [name, form] of CASES) {
@@ -56,6 +57,30 @@ test("a drawing that is too wide beside walkthrough steps gets a warning that na
   assert.deepEqual(renderDiagram({ ...fixture("bug-report"), place: "walk" }).warnings, [], "two lanes with short texts fit");
   const [warning] = renderDiagram({ ...fixture("order"), place: "walk" }).warnings;
   assert.match(warning, /^the drawing is \d+px wide; beside the walkthrough steps there is room for 520px, so it will scroll sideways\. It has 3 lanes, and two lanes fit there\. The widest texts are "packed and weighed" and "Payment check"; shorter names and notes make the drawing narrower$/);
+});
+
+test("a part with a state takes the status color on its outline and gets a status dot", () => {
+  const { svg, warnings } = renderDiagram(fixture("pipeline"));
+  assert.deepEqual(warnings, []);
+  const [main, phone] = svg.split('\n<svg id="dg-pipeline-phone"');
+  for (const form of [main, phone]) {
+    assert.equal((form.match(/class="stop is-(ok|warn|err)"/g) || []).length, 3, "three parts have a state");
+    assert.equal((form.match(/class="flag is-(ok|warn|err)"/g) || []).length, 3, "each of them has a status dot");
+    assert.match(form, /\.stop\.is-err,#dg-pipeline[\w-]* \.card\.is-err\{stroke:var\(--err,#cf222e\);stroke-width:1\.5\}/, "the color comes from the page, with the light value for a copy");
+    assert.match(form, /\.flag\.is-ok\{fill:var\(--ok,#1a7f37\);stroke:var\(--bg,#fbfbfe\);stroke-width:2\}/);
+    assert.ok(!/\.(icon|name|sub|line|head)[^{]*\{[^}]*--(ok|warn|err)/.test(form), "icons, texts and legs never take a status color");
+  }
+  assert.match(renderDiagram({ ...fixture("pipeline"), form: "plates" }).svg, /class="card is-warn"/);
+  assert.ok(!/is-(ok|warn|err)|--(ok|warn|err)/.test(renderDiagram(fixture("bug-report")).svg), "a drawing with no state carries no status rule");
+  const broken = (change, reason) => { const copy = fixture("pipeline"); change(copy); assert.throws(() => renderDiagram(copy), reason); };
+  broken((d) => (d.parts[1].state = "done"), /the state of part 2 must be "ok", "warn" or "err"/);
+  broken((d) => delete d.parts[1].note, /part 2 has a state but no note; the note must say the status in words/);
+  broken((d) => (d.parts[0].status = "ok"), /part 1 has the field "status"; the field is named "state"/);
+  const same = fixture("pipeline");
+  same.parts.forEach((part) => (part.state = "ok"));
+  const all = renderDiagram(same);
+  assert.match(all.warnings[0], /every part has the state "ok", so the color shows nothing/);
+  assert.deepEqual(all.icons, [], "this warning is not about an icon, so check reports it as a warning");
 });
 
 test("a route also gets a single-track form for phones; paths that branch do not", () => {
@@ -137,6 +162,9 @@ test("the example in references/diagrams.md is drawn without a warning", () => {
   const page = guide.match(/```html\n([\s\S]*?)```/)[1];
   const { results } = renderDocument(page);
   assert.deepEqual(results.map((r) => [r.id, r.form, r.error, r.warnings]), [["order", "wide", null, []]]);
-  const own = JSON.parse(`{${guide.match(/```json\n([\s\S]*?)```/)[1]}}`).icons.bug;
+  const blocks = [...guide.matchAll(/```json\n([\s\S]*?)```/g)].map((m) => m[1]);
+  const own = JSON.parse(`{${blocks.find((b) => b.includes('"icons"'))}}`).icons.bug;
   assert.equal(iconProblem(own), null);
+  const part = JSON.parse(blocks.find((b) => b.includes('"state"')));
+  assert.deepEqual([part.state, Boolean(part.note)], ["err", true], "the state example has a note that says the status");
 });

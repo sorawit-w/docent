@@ -109,9 +109,9 @@ The palette is one ink, one light, and Docent's own grays. Every gray leans slig
 - **Secondary — Ink (#1b2260):** The title and section headings, as text only. It is the dark form of the primary.
 - **Tertiary — Lamp (#f2b824):** The docent's lamp, and always a dot. It is the dot in the mark, and the route dot, the rail dot and the dot of a chosen option in dark mode. Lamp on the light page has a contrast of 1.74:1, so it is not used there; the dots in light mode are ultramarine.
 - **Neutral — Well (#f2f3f9):** The ground of figures and code. A well is one step darker than the page in both themes, and it has no outline.
-- **Status:** `success`, `warning` and `error` are for status only, as a small dot with a word beside it.
+- **Status:** `success`, `warning` and `error` are for status only, as a small dot with a word beside it. In a diagram, a part that carries a state takes the status color on its outline and gets the same small dot; its note says the status in words.
 
-**Diagrams.** Docent draws its own diagrams, in three forms (see Layout). A diagram uses the page's tokens and nothing else: lines, parts and names in the text color, notes in the muted color, tracks in the outline color, lane bands in the page color, and the well as its ground. Because it reads the tokens, one drawing serves both themes. Each drawing carries its own styles, with the light values as a fallback, so a drawing that is copied out of the page keeps the light colors. Ultramarine marks the current leg, and the dot on it is ultramarine in light and lamp in dark. Docent does not use a third-party diagram renderer.
+**Diagrams.** Docent draws its own diagrams, in three forms (see Layout). A diagram uses the page's tokens and nothing else: lines, parts and names in the text color, notes in the muted color, tracks in the outline color, lane bands in the page color, and the well as its ground. Because it reads the tokens, one drawing serves both themes. Each drawing carries its own styles, with the light values as a fallback, so a drawing that is copied out of the page keeps the light colors. Ultramarine marks the current leg, and the dot on it is ultramarine in light and lamp in dark. The one other color in a diagram is a status color, on the outline of a part that carries a state (see Status above). An author cannot give a diagram any other color. Docent does not use a third-party diagram renderer.
 
 **Themes.** A document follows the reader's system setting: light on a light system, dark on a dark one. A switch lets the reader choose the other theme. That choice wins over the system and is remembered. Every `dark-*` token is the dark value of the token with the same name. The page is never pure white and never pure black.
 
@@ -275,7 +275,7 @@ An icon lets the reader tell the parts of a diagram apart before reading a word.
 - A 16 by 16 grid, with a stroke of 1.5, round ends and round joins, and no fill.
 - One idea in one icon, in at most six shapes. It must read at 16px.
 - No letters, numbers or words. No logo and no brand mark.
-- It takes the text color. An icon never carries a status color.
+- It takes the text color. An icon never carries a status color, also inside a part that has a state.
 - Two parts of the same kind share one icon. Two parts of different kinds never share one.
 - In one diagram, either every part has an icon or no part has one.
 

@@ -7,7 +7,7 @@ const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replac
 const at = (p) => `transform:translate(${num(p[0])}px,${num(p[1])}px)`;
 const pct = (v) => `${Math.round(v * 100) / 100}%`;
 
-const LIGHT = { bg: "#fbfbfe", fig: "#f2f3f9", text: "#1c1f2e", muted: "#575d75", line: "#d3d6e3", primary: "#2f3fd0", dot: "#2f3fd0" };
+const LIGHT = { bg: "#fbfbfe", fig: "#f2f3f9", text: "#1c1f2e", muted: "#575d75", line: "#d3d6e3", primary: "#2f3fd0", dot: "#2f3fd0", ok: "#1a7f37", warn: "#7d4e00", err: "#cf222e" };
 const v = (name) => `var(--${name},${LIGHT[name]})`;
 const SANS = 'system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif';
 const CROSS = 1.6, PAUSE = 1.2; // seconds for one leg, and the rest before the run starts again
@@ -93,6 +93,8 @@ function styles(scene, id, mode, swap) {
     `${s} .sub,${s} .verb{font-size:12px;fill:${v("muted")}}`,
     `${s} .pulse{display:none;fill:${v("dot")};stroke:${v("bg")};stroke-width:2.5}`,
   ];
+  // A part with a state: its outline takes the status color, and a status dot sits on the outline. A drawing with no state carries none of these rules.
+  for (const state of new Set(scene.parts.map((part) => part.state).filter(Boolean))) css.push(`${s} .stop.is-${state},${s} .card.is-${state}{stroke:${v(state)};stroke-width:1.5}`, `${s} .flag.is-${state}{fill:${v(state)};stroke:${v("bg")};stroke-width:2}`);
   // On paper nothing scrolls: a drawing that is still wider than the page shrinks to fit it.
   const print = [`${s}{max-width:100%;height:auto}`, `${s} .pulse{display:none!important}`];
   const still = [`${s} .pulse{animation:none!important}`];
@@ -157,9 +159,15 @@ function toSvg(scene, { id, label, mode, swap }) {
     );
   }
   for (const part of scene.parts) {
-    if (part.shape === "card") out.push(`<rect x="${num(part.x)}" y="${num(part.y)}" width="${num(part.w)}" height="${num(part.h)}" rx="10" class="card"/>`);
-    else out.push(`<circle cx="${num(part.cx)}" cy="${num(part.cy)}" r="${num(part.r)}" class="${part.end ? "stop end" : "stop"}"/>`);
+    const is = part.state ? ` is-${part.state}` : "";
+    if (part.shape === "card") out.push(`<rect x="${num(part.x)}" y="${num(part.y)}" width="${num(part.w)}" height="${num(part.h)}" rx="10" class="card${is}"/>`);
+    else out.push(`<circle cx="${num(part.cx)}" cy="${num(part.cy)}" r="${num(part.r)}" class="${part.end ? "stop end" : "stop"}${is}"/>`);
     if (part.icon) out.push(icon(part.icon, part.iconAt, part.end && part.shape !== "card" ? "icon on-end" : "icon"));
+    // The status dot sits on the outline at the upper right: on the ring, or on the round corner of the plate. It stays inside the room that the part already keeps free.
+    if (part.state) {
+      const [fx, fy] = part.shape === "card" ? [part.x + part.w - 2.93, part.y + 2.93] : [part.cx + part.r * Math.SQRT1_2, part.cy - part.r * Math.SQRT1_2];
+      out.push(`<circle cx="${num(fx)}" cy="${num(fy)}" r="3.5" class="flag${is}"/>`);
+    }
     for (const t of part.texts) out.push(text(t));
   }
   out.push("</svg>");
