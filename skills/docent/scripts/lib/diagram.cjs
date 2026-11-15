@@ -7,6 +7,7 @@ const { renderWidget } = require("./widget.cjs");
 const { textWidth } = require("./text.cjs");
 
 const FORMS = ["wide", "tall", "plates"];
+const STATES = ["ok", "warn", "err"]; // success, needs care, failure: the status colors of the page
 const MOST = { lanes: 4, parts: 12, legs: 16, name: 32, note: 40, verb: 24, lane: 28 };
 const PAGE = 1104; // the widest drawing that fits a full-width well
 const WALK = 520; // the widest drawing that fits beside the walkthrough steps
@@ -40,9 +41,16 @@ function readData(data) {
   model.parts = data.parts.map((part, i) => {
     const lane = model.lanes.findIndex((l) => l.id === part?.lane);
     if (lane < 0) fail(`part ${i + 1} names the lane "${part?.lane}", which does not exist`);
-    return { index: i, id: id(part.id, `the id of part ${i + 1}`), lane, name: words(part.name, `the name of part ${i + 1}`, MOST.name), note: words(part.note, `the note of part ${i + 1}`, MOST.note, false), icon: iconOf(part.icon, `part "${part.id}"`) };
+    const made = { index: i, id: id(part.id, `the id of part ${i + 1}`), lane, name: words(part.name, `the name of part ${i + 1}`, MOST.name), note: words(part.note, `the note of part ${i + 1}`, MOST.note, false), icon: iconOf(part.icon, `part "${part.id}"`), state: part.state ?? null };
+    // A state is a status color. Color is never the only sign, so the note must say the status in words.
+    if (part.status != null) fail(`part ${i + 1} has the field "status"; the field is named "state"`);
+    if (made.state !== null && !STATES.includes(made.state)) fail(`the state of part ${i + 1} must be "ok", "warn" or "err"`);
+    if (made.state && !made.note) fail(`part ${i + 1} has a state but no note; the note must say the status in words, because color is never the only sign`);
+    return made;
   });
   unique(model.parts, "parts");
+  // When every part has the same state, the color tells the reader nothing.
+  if (model.parts.every((part) => part.state && part.state === model.parts[0].state)) warnings.push(`every part has the state "${model.parts[0].state}", so the color shows nothing; give a state only to the parts whose status the reader must see`);
   model.legs = data.legs.map((leg, i) => {
     const from = model.parts.findIndex((p) => p.id === leg?.from), to = model.parts.findIndex((p) => p.id === leg?.to);
     if (from < 0 || to < 0) fail(`leg ${i + 1} goes from "${leg?.from}" to "${leg?.to}"; both must be ids of parts`);
@@ -86,7 +94,7 @@ function layout(model, form) {
 /** Draws one diagram. Returns { svg, form, warnings }. Throws when the data is wrong or no form keeps the rules. */
 function renderDiagram(data) {
   const { model, warnings } = readData(data);
-  const icons = [...warnings]; // every warning from the data is about an icon
+  const icons = warnings.filter((w) => !w.startsWith("every part has the state")); // these warnings are about icons; check reports them as errors
   const forms = formsFor(model);
   let scene = null, reason = null;
   for (const form of forms) {
@@ -108,10 +116,12 @@ function renderDiagram(data) {
     warnings.push(`the drawing is ${scene.w}px wide; beside the walkthrough steps there is room for ${WALK}px, so it will scroll sideways.${lanes} The widest texts are ${widest.join(" and ")}; shorter names and notes make the drawing narrower`);
   }
   const id = `dg-${model.id}`, mode = model.place === "walk" ? "walk" : "auto";
+  const withStates = (drawing) => { for (const part of drawing.parts) part.state = model.parts.find((p) => p.id === part.id).state; return drawing; };
+  withStates(scene);
   // A route also gets a single-track form. It takes the place of the main form on a screen or a sheet of paper that is too narrow.
   let phone = null;
   if (model.chain && scene.w > PHONE) {
-    try { phone = layoutRoute(model, "track"); } catch (error) { warnings.push(`no phone form: ${error.message}`); }
+    try { phone = withStates(layoutRoute(model, "track")); } catch (error) { warnings.push(`no phone form: ${error.message}`); }
   }
   const main = toSvg(scene, { id, label: model.label, mode, swap: phone && { phone: `${id}-phone` } });
   const svg = phone ? `${main}\n${toSvg(phone, { id: `${id}-phone`, label: model.label, mode, swap: { main: id, below: scene.w + ROOM } })}` : main;

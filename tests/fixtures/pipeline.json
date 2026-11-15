@@ -1,0 +1,21 @@
+{
+  "id": "pipeline",
+  "label": "A change in four steps: the build passed, three tests failed, the review waits, and the release did not start.",
+  "lanes": [
+    {"id": "author", "name": "Author", "icon": "person"},
+    {"id": "server", "name": "Build server", "icon": "server"}
+  ],
+  "parts": [
+    {"id": "change", "lane": "author", "name": "Change", "note": "one commit", "icon": "commit"},
+    {"id": "build", "lane": "server", "name": "Build", "note": "passed", "icon": "check", "state": "ok"},
+    {"id": "tests", "lane": "server", "name": "Tests", "note": "3 tests failed", "icon": "inspect", "state": "err"},
+    {"id": "review", "lane": "author", "name": "Review", "note": "waits for the tests", "icon": "message", "state": "warn"},
+    {"id": "release", "lane": "server", "name": "Release", "note": "not started", "icon": "release"}
+  ],
+  "legs": [
+    {"from": "change", "to": "build", "verb": "push"},
+    {"from": "build", "to": "tests", "verb": "run"},
+    {"from": "tests", "to": "review", "verb": "report"},
+    {"from": "review", "to": "release", "verb": "approve"}
+  ]
+}

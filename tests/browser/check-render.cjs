@@ -282,6 +282,29 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     await context.close();
   }
 
+  // A part with a state: the outline and the status dot take the status color of the theme; the name and the icon stay in the text color.
+  {
+    const data = fs.readFileSync(path.join(root, "tests", "fixtures", "pipeline.json"), "utf8");
+    const figure = `<figure><div class="fig" role="region" aria-label="Figure 4, a change with its states" tabindex="0">\n<!-- docent:diagram\n${data}\n-->\n<!-- /docent:diagram -->\n</div><figcaption><strong>Figure 4</strong>A change with its states.</figcaption></figure>\n`;
+    const content = renderDocument(html.replace('<section id="report"', `${figure}<section id="report"`)).html;
+    const colors = (page) => page.evaluate(() => { const of = (sel, prop) => getComputedStyle(document.querySelector(`#dg-pipeline ${sel}`))[prop]; return { ok: of(".stop.is-ok", "stroke"), okDot: of(".flag.is-ok", "fill"), warn: of(".stop.is-warn", "stroke"), err: of(".stop.is-err", "stroke"), errDot: of(".flag.is-err", "fill"), plain: of(".stop:not([class*='is-'])", "stroke"), name: of(".name", "fill"), icon: of(".icon:not(.lane-icon)", "stroke") }; });
+    const light = await open({ width: 1280, content });
+    const inLight = await colors(light.page);
+    await light.page.addScriptTag({ path: axePath });
+    const axe = await light.page.evaluate(async () => (await window.axe.run(document.querySelector("#dg-pipeline").closest("figure"), { runOnly: { type: "tag", values: ["wcag2a", "wcag2aa", "wcag21aa", "best-practice"] } })).violations.map((v) => v.id));
+    await light.page.locator("#dg-pipeline").screenshot({ path: `${out}/states-light.png` });
+    await light.context.close();
+    const dark = await open({ width: 1280, theme: "dark", content });
+    const inDark = await colors(dark.page);
+    await dark.page.locator("#dg-pipeline").screenshot({ path: `${out}/states-dark.png` });
+    await dark.context.close();
+    const paper = await open({ width: 794, height: 1123, theme: "dark", media: "print", content });
+    const onPaper = await colors(paper.page);
+    await paper.context.close();
+    ok("a part with a state: status colors in light, and the name and the icon keep the text color", inLight.ok === "rgb(26, 127, 55)" && inLight.okDot === inLight.ok && inLight.warn === "rgb(125, 78, 0)" && inLight.err === "rgb(207, 34, 46)" && inLight.errDot === inLight.err && inLight.plain === LIGHT.text && inLight.name === LIGHT.text && inLight.icon === LIGHT.text && axe.length === 0, { inLight, axe });
+    ok("a part with a state: the dark status colors in dark, and the light ones on paper", inDark.ok === "rgb(63, 185, 80)" && inDark.warn === "rgb(210, 153, 34)" && inDark.err === "rgb(248, 81, 73)" && inDark.name === DARK.text && onPaper.ok === inLight.ok && onPaper.err === inLight.err, { inDark, onPaper });
+  }
+
   // A drawing copied out of the page keeps its light colors, because it carries its own styles.
   {
     const svg = html.match(/<svg id="dg-path"[\s\S]*?<\/svg>/)[0];
