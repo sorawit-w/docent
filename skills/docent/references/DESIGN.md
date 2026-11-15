@@ -163,7 +163,7 @@ Docent uses system fonts only, because every document is one file with nothing t
 - A numbered mark sits in the gap between two lanes when a leg crosses lanes, and at the middle of the leg when it stays in one lane. It is at least 16px clear of every arrowhead, bend and part.
 - A verb sits beside its mark and stays 6px clear of every line. It sits to the right of a mark on an upright or steep leg, and above a mark on a level or shallow leg. One exception: in Route wide, on a lane whose labels sit above the track, the verb of a level leg sits below the line, on the free side.
 - A leg inside one lane is at least 72px long, so its mark and its arrowhead both fit.
-- Nothing overlaps: no text on a line, no mark on an arrowhead, no dot on a mark.
+- Nothing overlaps: no text on a line, no mark on an arrowhead, no dot on a mark. In Plates two legs may cross at a right angle; they never share a line.
 
 **Size and motion.** A diagram is shown at its real size, so names are 14px and notes are 12px. It is never stretched to fill a wider space, and on a screen it never shrinks to fit a narrower one. The dot moves in every diagram, in one of two ways:
 

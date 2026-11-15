@@ -18,6 +18,12 @@ test("the sample page is the output of stamp and render, and it passes check", (
   assert.match(warnings[0], /should not draw the same thing twice/);
 });
 
+test("the starting page is the output of stamp and render, and it passes check with no warning", () => {
+  const template = fs.readFileSync(path.join(__dirname, "..", "skills", "docent", "assets", "template.html"), "utf8");
+  assert.equal(renderDocument(stampHtml(template).html).html, template, "run render and stamp on template.html, then commit it");
+  assert.deepEqual(checkDocument(template), { errors: [], warnings: [] });
+});
+
 test("check refuses anything that loads from the network", () => {
   assert.match(errorsOf(add("</head>", '<link rel="stylesheet" href="https://example.com/a.css">')), /<link> loads or points outside the file/);
   assert.match(errorsOf(add("</main>", '<img src="https://example.com/a.png" alt="">')), /<img src="https:\/\/example.com\/a.png"> loads from outside the file/);
