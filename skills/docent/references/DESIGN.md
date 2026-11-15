@@ -105,9 +105,9 @@ Docent belongs to no single project. It carries no host brand colors. The sample
 
 The palette is one ink, one light, and Docent's own grays. Every gray leans slightly toward ultramarine, so the grays and the ink read as one family.
 
-- **Primary — Ultramarine (#2f3fd0):** A mark, never a fill. Use it for links, the underline of a highlighted term, the route dot, the rail dot and the focus ring. Two or three marks in one view are enough. It is never a button, banner or block background.
+- **Primary — Ultramarine (#2f3fd0):** A mark, never a fill. Use it for links, the underline of a highlighted term, the route dot, the rail dot, the dot of a chosen option and the focus ring. Two or three marks in one view are enough. It is never a button, banner or block background.
 - **Secondary — Ink (#1b2260):** The title and section headings, as text only. It is the dark form of the primary.
-- **Tertiary — Lamp (#f2b824):** The docent's lamp, and always a dot. It is the dot in the mark, and the route dot and rail dot in dark mode. Lamp on the light page has a contrast of 1.74:1, so it is not used there; the dots in light mode are ultramarine.
+- **Tertiary — Lamp (#f2b824):** The docent's lamp, and always a dot. It is the dot in the mark, and the route dot, the rail dot and the dot of a chosen option in dark mode. Lamp on the light page has a contrast of 1.74:1, so it is not used there; the dots in light mode are ultramarine.
 - **Neutral — Well (#f2f3f9):** The ground of figures and code. A well is one step darker than the page in both themes, and it has no outline.
 - **Status:** `success`, `warning` and `error` are for status only, as a small dot with a word beside it.
 
@@ -170,6 +170,8 @@ Docent uses system fonts only, because every document is one file with nothing t
 - **In a walkthrough,** the leg of the current step takes the ultramarine color and the dot travels along that leg.
 - **Anywhere else,** one dot travels the whole route by itself, leg by leg in the order of the numbers. Only one dot is in flight at a time, so the motion shows the order. The run plays twice and then rests, so the page is calm while the reader reads.
 
+**Widgets.** A widget is a part of the page that the reader uses. Docent has three: a chooser, a checklist and a decision helper (see Widgets). A widget sits in the text flow and has no box. Its text uses the text column; a code block inside a chooser uses the full width, like any code block.
+
 **Tables use the full width.** On a phone a figure, a table or a code block scrolls sideways inside itself; the page never scrolls sideways.
 
 **Spacing.** More space goes above a heading than below it: 72px above a section, 16px below its heading. Blocks inside a section are 24px to 32px apart.
@@ -183,7 +185,7 @@ Corners are soft and consistent. Controls use `sm` (6px). Code blocks use `md` (
 ## Do's and Don'ts
 
 - Do let the content lead. Docent's mark appears once, small, in the footer or the cover.
-- Do use the dot to show where the reader is: the current section and the current step.
+- Do use the dot to show where the reader is: the current section, the current step and the chosen option.
 - Do keep WCAG AA contrast (4.5:1 for text, 3:1 for large text and for the focus ring).
 - Do keep the page readable with JavaScript off and in print.
 - Do separate blocks with space. Lines are for three things only: the route under the top bar, the rules of a table, and the line above a margin label.
@@ -217,8 +219,46 @@ Motion in Docent has one job: to show where to look or what comes next. If a mot
 | One dot travels the whole route of a diagram outside a walkthrough | Shows the order of the legs | 1.6s for each leg. The run plays twice when the diagram comes into view, then rests. It plays again when the reader points at the diagram or moves focus to it. | No dot; numbers and arrowheads show the order |
 | A section opens | Keeps the reader's place | The arrow turns in 150ms | Opens at once |
 | Theme switch | — | No animation | — |
+| A widget changes: a case shows, a line is ticked, an answer appears | — | No animation | — |
 
 Animate `transform` and `opacity` only. Nothing animates when the page loads or when content scrolls into view; the dots take their first place without sliding. Every animated state has a still form that carries the same information.
+
+## Widgets
+
+A widget lets the reader do one small thing on the page. Docent has three widgets and no others, and a script builds each one from data, so a widget looks and behaves the same in every document.
+
+**When a widget is allowed.** Only when the reader must do one of three things. In every other case, text, a table or a closed section is better.
+
+| The reader must | Widget | What it looks like |
+|---|---|---|
+| Choose one case of several | **Chooser** | A short label, then one option for each case. Below them, the text of the chosen case only. |
+| Track what is done | **Checklist** | A label, then one line for each thing, each with a box. Below the list, a count and a button that clears the ticks. |
+| Decide between answers | **Decision helper** | A label, then one to three questions with options. Below them, the one answer that fits. The table of all cases sits in a closed block. |
+
+A document has few widgets. More than four is a sign that some are not needed.
+
+**The look.**
+
+- An option is a control: 32px high, a thin outline, corners of 6px, and a small ring before its name. The chosen option has a darker outline, and its ring becomes the dot. The dot is ultramarine in light and lamp in dark, like every dot in Docent.
+- A box is 18px, with a thin outline and corners of 6px. The tick is drawn in the text color. A ticked line takes the muted color, the same way as a step that is not the current one.
+- The answer of a decision helper is a dot, a bold title and one or two sentences, like a status note.
+- The label of a widget is small text (14px, weight 600, muted).
+- A widget has no box, no fill and no line of its own. The accent is never a fill here: a chosen option is not a filled button.
+- A widget does not move. Nothing in it is animated.
+
+**Still forms.** Every widget is readable with JavaScript off and on paper, and it carries the same information there.
+
+| Widget | With JavaScript off | On paper |
+|---|---|---|
+| Chooser | It works: the styles alone show the chosen case. | Every case prints, one below the other, each under its name. |
+| Checklist | The boxes can be ticked. There is no count and no memory. | The lines print with their boxes. |
+| Decision helper | The table of all cases, open. | The table of all cases. |
+
+**Memory.** A chooser remembers the choice, and a checklist remembers the ticks of this document. The page keeps both in the reader's own browser; nothing leaves the file. Choosers with the same cases change together, so the reader picks once.
+
+**Keyboard.** Options are radio buttons and boxes are checkboxes, so the arrow keys, the space key and the Tab key work as in any form. The focus ring is the ultramarine ring of the page.
+
+**Text only.** A widget holds text: paragraphs, code, lists and short lines. It holds no markup of the author's own, and no script.
 
 ## Icons
 
