@@ -18,7 +18,7 @@ Docent has these three widgets and no others. Do not write a widget of your own 
 
 ## The block
 
-Put one block where the widget belongs, in the text flow of a section:
+Put one block where the widget belongs, in the text flow of a section. A widget does not sit inside a walkthrough step, a table, a margin note or a closed section.
 
 ```html
 <p>The command is different on each system.</p>
@@ -75,7 +75,7 @@ Write every case in full. A reader on paper sees all cases, one below the other,
 
 ## Checklist
 
-The reader ticks each line when it is done. Use it for things to prepare or to check, where the order does not matter much. For steps in a fixed order that the reader only reads, write a walkthrough or numbered text.
+The reader ticks each line when it is done. Use it for things to prepare or to check, which the reader can do in any order. For steps in a fixed order, write a walkthrough or numbered text, also when the reader does the steps: the order is what the reader needs there, and a checklist does not show it.
 
 ```html
 <!-- docent:widget
@@ -110,8 +110,8 @@ The reader answers one to three questions and gets the one answer that fits. Use
   "kind": "decision",
   "label": "Which kind of report is it?",
   "questions": [
-    {"text": "Did you lose data?", "options": ["Yes", "No"]},
-    {"text": "Can you make the problem happen again?", "options": ["Yes", "No"]}
+    {"text": "Did you lose data?", "short": "Data lost", "options": ["Yes", "No"]},
+    {"text": "Can you make the problem happen again?", "short": "Happens again", "options": ["Yes", "No"]}
   ],
   "answers": [
     {"when": ["Yes", "any"], "title": "An urgent report", "text": "File it today, and say what was lost."},
@@ -125,13 +125,14 @@ The reader answers one to three questions and gets the one answer that fits. Use
 
 | Field | What it is |
 |---|---|
-| `questions` | 1 to 3 questions. Each has a `text` (at most 80 characters) and 2 to 4 `options` (at most 24 characters each). |
+| `questions` | 1 to 3 questions. Each has a `text` (at most 80 characters), 2 to 4 `options` (at most 24 characters each) and, if you want, a `short` (at most 32 characters). |
+| `short` | The heading of the question's column in the table of all cases: two or three words, such as `"Data lost"`. Without it, the full question is the heading. |
 | `answers` | 2 to 12 answers. Each has `when`, a `title` (at most 48 characters) and a `text` (at most 160 characters). |
 | `when` | One entry for each question, in the order of the questions: the name of an option, or `"any"` for every option. |
 
 **Every mix of options must fit exactly one answer.** `render` tests each mix. It refuses the widget when a mix fits no answer, or fits two. So the reader always gets one answer, and the table has no row that disagrees with another row.
 
-The table of all cases is part of the widget. A reader with scripts off, and a reader on paper, sees only the table. So the table alone must make sense: write each question so that it reads well as a column heading.
+The table of all cases is part of the widget. A reader with scripts off, and a reader on paper, sees only the table. So the table alone must make sense. Give each question a `short` heading, so that a column is not as wide as a full question.
 
 ## What the reader gets
 

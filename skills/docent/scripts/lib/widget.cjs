@@ -4,7 +4,7 @@
 const { fail, words, id } = require("./blocks.cjs");
 
 const KINDS = ["chooser", "checklist", "decision"];
-const MOST = { cases: 5, blocks: 8, items: 12, questions: 3, options: 4, answers: 12, label: 60, name: 24, line: 160, note: 160, para: 400, code: 1200, question: 80, title: 48 };
+const MOST = { cases: 5, blocks: 8, items: 12, questions: 3, options: 4, answers: 12, label: 60, name: 24, short: 32, line: 160, note: 160, para: 400, code: 1200, question: 80, title: 48 };
 const ARROW = '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>';
 
 const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -82,11 +82,13 @@ function decision(data, w) {
   only(data, ["id", "kind", "label", "questions", "answers"], "the decision helper");
   const questions = list(data.questions, '"questions"', 1, MOST.questions).map((q, i) => {
     if (!q || typeof q !== "object") fail(`question ${i + 1} must be an object with "text" and "options"`);
-    only(q, ["text", "options"], `question ${i + 1}`);
+    only(q, ["text", "short", "options"], `question ${i + 1}`);
     const options = list(q.options, `the options of question ${i + 1}`, 2, MOST.options).map((o, j) => words(o, `option ${j + 1} of question ${i + 1}`, MOST.name));
     unique(options, `options of question ${i + 1}`);
     if (options.some((o) => o.toLowerCase() === "any")) fail(`question ${i + 1} has an option named "any"; in an answer, "any" stands for every option`);
-    return { text: words(q.text, `the text of question ${i + 1}`, MOST.question), options };
+    const text = words(q.text, `the text of question ${i + 1}`, MOST.question);
+    // The table of all cases has one column for each question. "short" is the heading of that column; without it the question is the heading.
+    return { text, short: words(q.short, `"short" of question ${i + 1}`, MOST.short, false) || text, options };
   });
   const answers = list(data.answers, '"answers"', 2, MOST.answers).map((a, i) => {
     const what = `answer ${i + 1}`;
@@ -128,7 +130,7 @@ function decision(data, w) {
       `<summary>${ARROW}All cases</summary>`,
       `<div class="table-wrap" role="region" aria-label="All cases: ${esc(w.label)}" tabindex="0">`,
       `<table>`,
-      `<thead><tr>${questions.map((q) => `<th scope="col">${inline(q.text)}</th>`).join("")}<th scope="col">Answer</th></tr></thead>`,
+      `<thead><tr>${questions.map((q) => `<th scope="col">${inline(q.short)}</th>`).join("")}<th scope="col">Answer</th></tr></thead>`,
       `<tbody>`,
       ...rows,
       `</tbody>`,

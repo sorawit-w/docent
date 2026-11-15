@@ -30,6 +30,8 @@ test("each widget has a still form: it is readable with scripts off and on paper
   assert.match(decision, /<details open>/, "the table of all cases is open until the page script closes it");
   assert.equal((decision.match(/<tr data-when="/g) || []).length, 4);
   assert.match(decision, /<tr data-when="0,1"><td>Any<\/td><td>Yes<\/td>/, "0 stands for any option");
+  assert.match(decision, /<legend>How many people use it\?<\/legend>/, "the question is asked in full");
+  assert.match(decision, /<th scope="col">People<\/th><th scope="col">Do you need <code>SSO<\/code>\?<\/th>/, "a column takes the short heading when the question has one");
 });
 
 test("a widget holds text only: every text is escaped, and `code` marks code", () => {
