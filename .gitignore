@@ -1,0 +1,7 @@
+node_modules/
+prototype/shots/
+__pycache__/
+.DS_Store
+
+# kerby project-state pin (machine-local) — written by `kerby install`
+.kerby/rulebooks.lock

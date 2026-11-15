@@ -1,0 +1,466 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Report a bug and get a fix — Docent sample</title>
+<style>
+/* Docent sample page. Tokens come from ../DESIGN.md. One file, no network. */
+:root {
+  color-scheme: light;
+  --bg: #fbfbfe; --panel: #f2f3f9; --fig: #f2f3f9;
+  --text: #1c1f2e; --muted: #575d75; --line: #d3d6e3;
+  --primary: #2f3fd0; --ink: #1b2260; --dot: #2f3fd0;
+  --ok: #1a7f37; --warn: #7d4e00; --err: #cf222e;
+  --serif: Charter, "Bitstream Charter", "Sitka Heading", "Sitka Text", Cambria, Georgia, serif;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --mono: ui-monospace, "SF Mono", "Cascadia Code", Consolas, Menlo, monospace;
+  --ease: cubic-bezier(0.23, 1, 0.32, 1);
+  --measure: 31rem; --margin-col: 220px; --gap: 48px;
+}
+/* Dark: the reader's system setting decides, unless the reader chose a theme with the switch. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #12141f; --panel: #0b0d15; --fig: #0b0d15;
+    --text: #e7e9f3; --muted: #959bb3; --line: #2d3146;
+    --primary: #8e9bff; --ink: #e7e9f3; --dot: #f2b824;
+    --ok: #3fb950; --warn: #d29922; --err: #f85149;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #12141f; --panel: #0b0d15; --fig: #0b0d15;
+  --text: #e7e9f3; --muted: #959bb3; --line: #2d3146;
+  --primary: #8e9bff; --ink: #e7e9f3; --dot: #f2b824;
+  --ok: #3fb950; --warn: #d29922; --err: #f85149;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-padding-top: 88px; -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 400 16px/1.65 var(--sans); caret-color: var(--primary); }
+::selection { background: color-mix(in srgb, var(--primary) 22%, transparent); }
+:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
+a { color: var(--primary); text-decoration-thickness: 1px; text-underline-offset: 0.2em; }
+a:hover { text-decoration-thickness: 2px; }
+.shell { max-width: 1200px; margin: 0 auto; padding: 0 40px; }
+
+/* Top bar. Its bottom line is the route; the dot marks the current section. */
+.topbar { position: sticky; top: 0; z-index: 2; background: var(--bg); border-bottom: 1px solid var(--line); }
+.topbar .shell { display: flex; align-items: center; gap: 32px; height: 56px; }
+.host { font-weight: 600; font-size: 14px; white-space: nowrap; }
+.route { flex: 1; min-width: 0; }
+.route ol { display: flex; gap: 28px; margin: 0; padding: 0; list-style: none; }
+.route a { display: block; padding: 6px 0; font-size: 14px; color: var(--muted); text-decoration: none; white-space: nowrap; }
+.route a:hover, .route a[aria-current] { color: var(--text); }
+.route-dot { position: absolute; left: 0; bottom: -4px; width: 7px; height: 7px; border-radius: 50%; background: var(--dot); opacity: 0; transform: translateX(var(--x, 0px)); }
+.ready .route-dot, .ready .rail-dot { transition: transform 320ms var(--ease); }
+.js .route-dot { opacity: 1; }
+.theme { display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px; border: 1px solid var(--line); border-radius: 6px; background: none; color: var(--text); font: 400 14px/1 var(--sans); cursor: pointer; }
+.theme:hover { border-color: var(--muted); }
+.theme:active { transform: translateY(1px); }
+.theme svg { width: 15px; height: 15px; }
+html:not(.js) .theme { display: none; }
+.theme[data-next="dark"] .icon-sun, .theme[data-next="light"] .icon-moon { display: none; }
+
+/* Title block: the title leads; facts about the document sit below it. */
+.title { padding: 80px 0 8px; }
+.title .row { margin-top: 24px; }
+h1, h2 { font-family: var(--serif); font-weight: 700; color: var(--ink); text-wrap: balance; margin: 0; }
+h1 { font-size: 52px; line-height: 1.06; letter-spacing: -0.02em; }
+.standfirst { font: 400 21px/1.5 var(--serif); margin: 0; text-wrap: pretty; }
+.facts { margin: 0; padding-left: 0; list-style: none; font-variant-numeric: tabular-nums; }
+
+section { padding-top: 72px; }
+h2 { font-size: 30px; line-height: 1.2; margin-bottom: 16px; }
+h3 { font: 600 18px/1.35 var(--sans); margin: 0; text-wrap: balance; }
+p { margin: 0 0 16px; max-width: var(--measure); text-wrap: pretty; }
+.term { text-decoration: underline; text-decoration-color: var(--primary); text-decoration-thickness: 2px; text-underline-offset: 0.22em; }
+code { font: 0.875em/1.55 var(--mono); background: var(--panel); padding: 0.1em 0.38em; border-radius: 6px; }
+.standfirst code { font-size: 18px; }
+
+/* Margin notes: the guide's remarks sit beside the text, like a wall label. */
+.row { display: grid; grid-template-columns: minmax(0, var(--measure)) var(--margin-col); column-gap: var(--gap); align-items: start; }
+.note { margin: 6px 0 16px; padding-top: 12px; border-top: 1px solid var(--line); font-size: 14px; line-height: 1.5; color: var(--muted); }
+.note strong { display: block; margin-bottom: 4px; font-weight: 600; color: var(--text); }
+
+/* Walkthrough: a rail with a node per step; one dot travels along it. */
+.walk { display: grid; grid-template-columns: minmax(0, 1fr) 536px; column-gap: 40px; align-items: start; margin-top: 24px; }
+.rail { position: relative; }
+.steps { position: relative; margin: 0; padding: 0; list-style: none; counter-reset: step; }
+.steps::before { content: ""; position: absolute; left: 4px; top: 10px; bottom: 10px; width: 1px; background: var(--line); }
+.steps li { position: relative; padding: 0 0 36px 32px; counter-increment: step; }
+.steps li:last-child { padding-bottom: 0; }
+.steps li::before { content: ""; position: absolute; left: 0; top: 8px; width: 9px; height: 9px; border-radius: 50%; border: 1px solid var(--muted); background: var(--bg); }
+.steps h3::before { content: counter(step); font-weight: 400; color: var(--muted); margin-right: 10px; font-variant-numeric: tabular-nums; }
+.steps p { margin: 6px 0 0; }
+.js .steps li:not(.is-current) h3, .js .steps li:not(.is-current) p { color: var(--muted); }
+.ready .steps h3, .ready .steps p { transition: color 120ms; }
+.rail-dot { position: absolute; left: 0; top: 8px; width: 9px; height: 9px; border-radius: 50%; background: var(--dot); opacity: 0; transform: translateY(var(--y, 0px)); }
+.js .rail-dot { opacity: 1; }
+.walk figure { position: sticky; top: 88px; }
+
+/* Figures: a well that holds Docent's own Route drawing, with a plain caption. */
+figure { margin: 0; }
+.fig { background: var(--fig); border-radius: 12px; padding: 8px; overflow-x: auto; scrollbar-color: var(--line) transparent; }
+.fig-wide, .fig-plates { margin-top: 24px; }
+/* Docent diagrams: Route (tall, wide) and Plates. They take their colors from the page, so one drawing serves both themes. */
+.route { display: block; width: 100%; height: auto; margin-inline: auto; font-family: var(--sans); }
+/* A drawing keeps its real size inside its well: it never stretches, and it scrolls sideways on a narrow screen. */
+.route-tall { min-width: 440px; max-width: 520px; }
+.route-wide { min-width: 640px; max-width: 890px; }
+.route-plates { min-width: 640px; max-width: 780px; }
+/* A diagram outside the walkthrough waits until it is in view, then runs twice. */
+.js .route-auto:not(.is-playing) .pulse { animation-play-state: paused; }
+/* Three layers: the well as the ground, a band for each lane, and the drawing on top. */
+.route .band { fill: var(--bg); }
+.route .track { stroke: var(--line); }
+.route .line { fill: none; stroke: var(--text); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.route .head { fill: var(--text); }
+.route .stop { fill: var(--bg); stroke: var(--text); stroke-width: 1.5; }
+.route .stop.end { fill: var(--text); }
+.route .mark { fill: var(--bg); stroke: var(--text); stroke-width: 1.25; }
+.route .card { fill: var(--bg); stroke: var(--line); }
+/* Icons: one grid, one stroke, the text color. */
+.route .icon { fill: none; stroke: var(--text); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.route .icon.on-end { stroke: var(--bg); }
+.route .icon.lane-icon { stroke: var(--muted); }
+.route .num { font-size: 12px; font-weight: 600; fill: var(--text); font-variant-numeric: tabular-nums; }
+.route .name { font-size: 14px; font-weight: 600; fill: var(--text); }
+.route .lane { font-size: 14px; font-weight: 600; fill: var(--muted); }
+.route .sub, .route .verb { font-size: 12px; fill: var(--muted); }
+.route .pulse { display: none; fill: var(--dot); stroke: var(--bg); stroke-width: 2.5; }
+/* The current step: its leg takes the ink color and its dot travels the leg. */
+.js .route .leg.is-current .line { stroke: var(--primary); stroke-width: 2.5; }
+.js .route .leg.is-current .head, .js .route .leg.is-current .num { fill: var(--primary); }
+.js .route .leg.is-current .mark { stroke: var(--primary); }
+.js .route .leg.is-current .pulse { display: block; animation: 2.4s linear infinite; }
+@keyframes tall-1{0%{transform:translate(176px,111px);opacity:0}8%{transform:translate(176px,111px);opacity:1}10.5%{transform:translate(176px,120px);opacity:1}59.4%{transform:translate(350px,150px);opacity:1}68.0%{transform:translate(350px,181px);opacity:1}88%{transform:translate(350px,181px);opacity:1}100%{transform:translate(350px,181px);opacity:0}}
+.route-tall .pulse-1{transform:translate(218px,127px)}
+.js .route-tall .leg.is-current .pulse-1{animation-name:tall-1}
+@keyframes tall-2{0%{transform:translate(350px,211px);opacity:0}8%{transform:translate(350px,211px);opacity:1}10.5%{transform:translate(350px,220px);opacity:1}59.4%{transform:translate(176px,250px);opacity:1}68.0%{transform:translate(176px,281px);opacity:1}88%{transform:translate(176px,281px);opacity:1}100%{transform:translate(176px,281px);opacity:0}}
+.route-tall .pulse-2{transform:translate(308px,227px)}
+.js .route-tall .leg.is-current .pulse-2{animation-name:tall-2}
+@keyframes tall-3{0%{transform:translate(176px,311px);opacity:0}8%{transform:translate(176px,311px);opacity:1}10.5%{transform:translate(176px,320px);opacity:1}59.4%{transform:translate(350px,350px);opacity:1}68.0%{transform:translate(350px,381px);opacity:1}88%{transform:translate(350px,381px);opacity:1}100%{transform:translate(350px,381px);opacity:0}}
+.route-tall .pulse-3{transform:translate(218px,327px)}
+.js .route-tall .leg.is-current .pulse-3{animation-name:tall-3}
+@keyframes tall-4{0%{transform:translate(350px,411px);opacity:0}8%{transform:translate(350px,411px);opacity:1}68.0%{transform:translate(350px,485px);opacity:1}88%{transform:translate(350px,485px);opacity:1}100%{transform:translate(350px,485px);opacity:0}}
+.route-tall .pulse-4{transform:translate(350px,420px)}
+.js .route-tall .leg.is-current .pulse-4{animation-name:tall-4}
+.route-wide.route-auto .pulse{display:block;animation:7.6s linear 2 both}
+@keyframes wide-auto-1{0.00%{transform:translate(215px,88px);opacity:0}1.58%{transform:translate(215px,88px);opacity:1}2.87%{transform:translate(228px,88px);opacity:1}14.08%{transform:translate(298px,176px);opacity:1}17.76%{transform:translate(335px,176px);opacity:1}21.05%{transform:translate(335px,176px);opacity:0}100%{transform:translate(335px,176px);opacity:0}}
+.route-wide.route-auto .pulse-1{animation-name:wide-auto-1}
+@keyframes wide-auto-2{0%{transform:translate(365px,176px);opacity:0}21.05%{transform:translate(365px,176px);opacity:0}22.63%{transform:translate(365px,176px);opacity:1}23.93%{transform:translate(378px,176px);opacity:1}35.13%{transform:translate(448px,88px);opacity:1}38.82%{transform:translate(485px,88px);opacity:1}42.11%{transform:translate(485px,88px);opacity:0}100%{transform:translate(485px,88px);opacity:0}}
+.route-wide.route-auto .pulse-2{animation-name:wide-auto-2}
+@keyframes wide-auto-3{0%{transform:translate(515px,88px);opacity:0}42.11%{transform:translate(515px,88px);opacity:0}43.68%{transform:translate(515px,88px);opacity:1}44.98%{transform:translate(528px,88px);opacity:1}56.18%{transform:translate(598px,176px);opacity:1}59.87%{transform:translate(635px,176px);opacity:1}63.16%{transform:translate(635px,176px);opacity:0}100%{transform:translate(635px,176px);opacity:0}}
+.route-wide.route-auto .pulse-3{animation-name:wide-auto-3}
+@keyframes wide-auto-4{0%{transform:translate(665px,176px);opacity:0}63.16%{transform:translate(665px,176px);opacity:0}64.74%{transform:translate(665px,176px);opacity:1}80.92%{transform:translate(795px,176px);opacity:1}84.21%{transform:translate(795px,176px);opacity:0}100%{transform:translate(795px,176px);opacity:0}}
+.route-wide.route-auto .pulse-4{animation-name:wide-auto-4}
+.route-plates.route-auto .pulse{display:block;animation:7.6s linear 2 both}
+@keyframes plates-auto-1{0.00%{transform:translate(340px,90px);opacity:0}1.58%{transform:translate(340px,90px);opacity:1}6.03%{transform:translate(390px,90px);opacity:1}14.21%{transform:translate(390px,182px);opacity:1}17.76%{transform:translate(430px,182px);opacity:1}21.05%{transform:translate(430px,182px);opacity:0}100%{transform:translate(430px,182px);opacity:0}}
+.route-plates.route-auto .pulse-1{animation-name:plates-auto-1}
+@keyframes plates-auto-2{0%{transform:translate(462px,208px);opacity:0}21.05%{transform:translate(462px,208px);opacity:0}22.63%{transform:translate(462px,208px);opacity:1}28.37%{transform:translate(462px,274px);opacity:1}38.82%{transform:translate(342px,274px);opacity:1}42.11%{transform:translate(342px,274px);opacity:0}100%{transform:translate(342px,274px);opacity:0}}
+.route-plates.route-auto .pulse-2{animation-name:plates-auto-2}
+@keyframes plates-auto-3{0%{transform:translate(310px,300px);opacity:0}42.11%{transform:translate(310px,300px);opacity:0}43.68%{transform:translate(310px,300px);opacity:1}48.44%{transform:translate(310px,350px);opacity:1}59.87%{transform:translate(430px,350px);opacity:1}63.16%{transform:translate(430px,350px);opacity:0}100%{transform:translate(430px,350px);opacity:0}}
+.route-plates.route-auto .pulse-3{animation-name:plates-auto-3}
+@keyframes plates-auto-4{0%{transform:translate(582px,376px);opacity:0}63.16%{transform:translate(582px,376px);opacity:0}64.74%{transform:translate(582px,376px);opacity:1}80.92%{transform:translate(582px,448px);opacity:1}84.21%{transform:translate(582px,448px);opacity:0}100%{transform:translate(582px,448px);opacity:0}}
+.route-plates.route-auto .pulse-4{animation-name:plates-auto-4}
+figcaption { margin-top: 12px; font-size: 14px; line-height: 1.5; color: var(--muted); }
+figcaption strong { font-weight: 600; color: var(--text); margin-right: 8px; }
+
+/* Tables: rules only, no boxes. */
+.table-wrap { overflow-x: auto; margin: 24px 0 0; scrollbar-color: var(--line) transparent; }
+table { width: 100%; min-width: 640px; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; vertical-align: top; padding: 12px 24px 12px 0; }
+thead th { border-bottom: 1px solid var(--text); padding-bottom: 10px; font-size: 14px; line-height: 1.5; font-weight: 600; color: var(--muted); }
+tbody th { font-weight: 600; white-space: nowrap; }
+tbody tr { border-bottom: 1px solid var(--line); }
+.state { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; font-weight: 600; }
+.state::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.state.ok { color: var(--ok); } .state.warn { color: var(--warn); } .state.err { color: var(--err); }
+
+/* Status note: a dot and a word carry the status; hairlines hold the block. */
+.status { max-width: var(--measure); margin: 32px 0 0; }
+.status p { margin: 4px 0 0; }
+
+pre { margin: 20px 0 0; padding: 16px 20px; background: var(--panel); border-radius: 10px; overflow-x: auto; font: 14px/1.6 var(--mono); scrollbar-color: var(--line) transparent; }
+pre code { background: none; padding: 0; font-size: inherit; }
+.cm { color: var(--muted); }
+
+details { max-width: var(--measure); margin: 24px 0 0; }
+summary { display: flex; align-items: center; gap: 10px; padding: 4px 0; font-weight: 600; cursor: pointer; list-style: none; }
+summary::-webkit-details-marker { display: none; }
+summary svg { width: 12px; height: 12px; color: var(--muted); transition: transform 150ms var(--ease); }
+details[open] summary svg { transform: rotate(90deg); }
+details > p { margin: 8px 0 0 22px; }
+
+footer { margin-top: 96px; border-top: 1px solid var(--line); }
+footer .shell { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding-top: 24px; padding-bottom: 40px; font-size: 14px; color: var(--muted); }
+.brand { display: inline-flex; align-items: center; gap: 10px; font: 700 16px/1 var(--serif); color: var(--text); }
+.brand svg { width: 24px; height: 24px; }
+
+@media (max-width: 1100px) {
+  .walk { grid-template-columns: minmax(0, 1fr); row-gap: 32px; }
+  .walk figure { position: static; order: -1; }
+}
+@media (max-width: 900px) {
+  .row { grid-template-columns: minmax(0, 1fr); }
+  .note { max-width: var(--measure); }
+  .title .note { margin-top: 28px; }
+}
+@media (max-width: 720px) {
+  .shell { padding: 0 20px; }
+  .topbar { position: static; }
+  .topbar .shell { flex-wrap: wrap; gap: 4px 16px; height: auto; padding-top: 10px; padding-bottom: 8px; }
+  .host { flex: 1; }
+  .route { flex: none; order: 3; width: 100%; }
+  .route ol { flex-wrap: wrap; gap: 0 20px; }
+  .route a[aria-current] { text-decoration: underline; text-decoration-color: var(--dot); text-decoration-thickness: 2px; text-underline-offset: 0.4em; }
+  .route-dot { display: none; }
+  .title { padding-top: 48px; }
+  h1 { font-size: 32px; } h2 { font-size: 26px; }
+  section { padding-top: 56px; }
+  footer .shell { flex-direction: column; align-items: flex-start; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; }
+  .route .pulse { animation: none !important; }
+  .route-auto .pulse { display: none !important; }
+}
+@media print {
+  html:root:not([data-never]) { color-scheme: light; --bg: #ffffff; --panel: #f2f3f9; --fig: #f2f3f9; --text: #1c1f2e; --muted: #575d75; --line: #d3d6e3; --primary: #2f3fd0; --ink: #1b2260; --dot: #2f3fd0; --ok: #1a7f37; --warn: #7d4e00; --err: #cf222e; }
+  .topbar, .rail-dot, .route .pulse { display: none !important; }
+  .route .leg .line { stroke: var(--text) !important; stroke-width: 2px !important; }
+  .route .leg .head, .route .leg .num { fill: var(--text) !important; }
+  .route .leg .mark { stroke: var(--text) !important; }
+  .steps li h3, .steps li p { color: var(--text) !important; }
+  .walk { grid-template-columns: minmax(0, 1fr); row-gap: 32px; } .walk figure { position: static; order: -1; }
+  figure, tr, .status, pre { break-inside: avoid; }
+  h2, h3 { break-after: avoid; }
+  @page { margin: 18mm; }
+}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="shell">
+    <span class="host">Example project</span>
+    <nav class="route" aria-label="On this page">
+      <ol>
+        <li><a href="#short">Short version</a></li>
+        <li><a href="#walk">Walkthrough</a></li>
+        <li><a href="#parts">Parts</a></li>
+        <li><a href="#results">Results</a></li>
+        <li><a href="#commands">Commands</a></li>
+      </ol>
+    </nav>
+    <button class="theme" type="button">
+      <svg class="icon-moon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13.5 9.6A5.8 5.8 0 0 1 6.4 2.5a5.8 5.8 0 1 0 7.1 7.1Z"/></svg>
+      <svg class="icon-sun" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="8" cy="8" r="3"/><path d="M8 1.5v1.6M8 12.9v1.6M1.5 8h1.6M12.9 8h1.6M3.4 3.4l1.1 1.1M11.5 11.5l1.1 1.1M3.4 12.6l1.1-1.1M11.5 4.5l1.1-1.1"/></svg>
+      <span class="theme-text">Dark</span>
+    </button>
+    <span class="route-dot" aria-hidden="true"></span>
+  </div>
+</header>
+
+<main class="shell">
+  <div class="title">
+    <h1>Report a bug and get a fix</h1>
+    <div class="row">
+      <p class="standfirst">A bug report goes from the reporter to the maintainers and comes back once. It ends in a new version, such as <code>2.4.1</code>. This guide shows the path and the four steps.</p>
+    <div class="note" role="note" aria-label="About this document">
+      <strong>Guide</strong>
+      <ul class="facts">
+        <li>4 minutes to read</li>
+        <li>Updated 15 November 2026</li>
+        <li>Owner: Maintainers</li>
+      </ul>
+    </div>
+    </div>
+  </div>
+
+  <section id="short" aria-labelledby="short-h">
+    <h2 id="short-h">The short version</h2>
+    <div class="row">
+      <div>
+        <p>A reporter finds a problem and writes a <span class="term">bug report</span>. The maintainers check each new report. This first check is called triage, and it gives the report a label such as <code>confirmed</code>.</p>
+        <p>The maintainers often need the exact steps that show the bug. You send the steps, and they write the fix. The <a href="#results">triage result</a> tells you what happens next.</p>
+      </div>
+      <div class="note" role="note">
+        <strong>Note</strong>
+        A report asks for a fix. It does not promise a date. The maintainers decide the order of the work.
+      </div>
+    </div>
+    <figure>
+      <div class="fig fig-wide" role="region" aria-label="Figure 1, the path of a bug report at a glance" tabindex="0">
+        <svg class="route route-wide route-auto" viewBox="0 0 890 264" role="img" aria-label="A bug report in four steps: the reporter files a report, the maintainers ask for steps, the reporter sends the steps, and the maintainers release a fix."><rect x="8" y="20" width="874" height="100" rx="10" class="band"/><rect x="8" y="144" width="874" height="100" rx="10" class="band"/><line x1="150" y1="88" x2="866" y2="88" class="track"/><line x1="150" y1="176" x2="866" y2="176" class="track"/><g class="icon lane-icon" transform="translate(24,60)"><circle cx="8" cy="5" r="2.5"/><path d="M3 13.5c0-2.8 2.2-4.5 5-4.5s5 1.7 5 4.5"/></g><text x="24" y="93" class="lane" text-anchor="start">Reporter</text><g class="icon lane-icon" transform="translate(24,148)"><circle cx="6" cy="5.5" r="2.25"/><path d="M1.75 13c0-2.4 1.9-3.75 4.25-3.75s4.25 1.35 4.25 3.75M10.5 3.5a2.25 2.25 0 0 1 0 4.25M12 9.6c1.4.5 2.25 1.7 2.25 3.4"/></g><text x="24" y="181" class="lane" text-anchor="start">Maintainers</text><g class="leg" data-leg="1"><path d="M215,88 L228,88 L298,176 L329,176" class="line"/><polygon points="327,171.5 327,180.5 335,176" class="head"/><circle cx="263" cy="132" r="10" class="mark"/><text x="263" y="136" class="num" text-anchor="middle">1</text><text x="279" y="136" class="verb" text-anchor="start">file</text><circle r="6" class="pulse pulse-1"/></g><g class="leg" data-leg="2"><path d="M365,176 L378,176 L448,88 L479,88" class="line"/><polygon points="477,83.5 477,92.5 485,88" class="head"/><circle cx="413" cy="132" r="10" class="mark"/><text x="413" y="136" class="num" text-anchor="middle">2</text><text x="429" y="136" class="verb" text-anchor="start">ask for steps</text><circle r="6" class="pulse pulse-2"/></g><g class="leg" data-leg="3"><path d="M515,88 L528,88 L598,176 L629,176" class="line"/><polygon points="627,171.5 627,180.5 635,176" class="head"/><circle cx="563" cy="132" r="10" class="mark"/><text x="563" y="136" class="num" text-anchor="middle">3</text><text x="579" y="136" class="verb" text-anchor="start">send steps</text><circle r="6" class="pulse pulse-3"/></g><g class="leg" data-leg="4"><path d="M665,176 L789,176" class="line"/><polygon points="787,171.5 787,180.5 795,176" class="head"/><circle cx="730" cy="176" r="10" class="mark"/><text x="730" y="180" class="num" text-anchor="middle">4</text><text x="730" y="154" class="verb" text-anchor="middle">release</text><circle r="6" class="pulse pulse-4"/></g><circle cx="200" cy="88" r="13" class="stop"/><g class="icon" transform="translate(192,80)"><path d="M9.5 2.5h-5a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1v-7z"/><path d="M9.5 2.5v3h3M6 9h4M6 11.25h4"/></g><circle cx="350" cy="176" r="13" class="stop"/><g class="icon" transform="translate(342,168)"><circle cx="7" cy="7" r="4"/><path d="M10 10l3.5 3.5"/></g><circle cx="500" cy="88" r="13" class="stop"/><g class="icon" transform="translate(492,80)"><path d="M2.5 4a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v6.5a1 1 0 0 1-1 1H7l-3 2.5v-2.5h-.5a1 1 0 0 1-1-1z"/><path d="M5.5 6.25h5M5.5 8.5h3"/></g><circle cx="650" cy="176" r="13" class="stop"/><g class="icon" transform="translate(642,168)"><circle cx="8" cy="8" r="5.5"/><path d="M5.5 8.2l1.8 1.8 3.2-3.6"/></g><circle cx="810" cy="176" r="13" class="stop end"/><g class="icon on-end" transform="translate(802,168)"><path d="M2.5 8.4V3.5a1 1 0 0 1 1-1h4.9l5.1 5.1a1 1 0 0 1 0 1.4l-4.5 4.5a1 1 0 0 1-1.4 0z"/><path d="M5.6 5.6h.01"/></g><text x="200" y="46" class="name" text-anchor="middle">Bug report</text><text x="200" y="63" class="sub" text-anchor="middle">what went wrong</text><text x="500" y="46" class="name" text-anchor="middle">Steps to repeat</text><text x="500" y="63" class="sub" text-anchor="middle">a short, exact list</text><text x="350" y="211" class="name" text-anchor="middle">Triage</text><text x="350" y="228" class="sub" text-anchor="middle">a first check</text><text x="650" y="211" class="name" text-anchor="middle">Fix</text><text x="650" y="228" class="sub" text-anchor="middle">a tested change</text><text x="810" y="211" class="name" text-anchor="middle">New version</text><text x="810" y="228" class="sub" text-anchor="middle">ready to install</text></svg>
+      </div>
+      <figcaption><strong>Figure 1</strong>The path at a glance. Each number is one step of the walkthrough below.</figcaption>
+    </figure>
+  </section>
+
+  <section id="walk" aria-labelledby="walk-h">
+    <h2 id="walk-h">Walk through a bug report</h2>
+    <p>Follow the dot. Each step names one arrow in the figure.</p>
+    <div class="walk">
+      <div class="rail">
+      <ol class="steps">
+        <li class="is-current">
+          <h3>You file the report.</h3>
+          <p>The report says what you did, what you expected, and what happened.</p>
+        </li>
+        <li>
+          <h3>The maintainers ask for steps.</h3>
+          <p>They check the report first. They can fix only a bug that they can see.</p>
+        </li>
+        <li>
+          <h3>You send the steps.</h3>
+          <p>Write a short, exact list. Add the version, such as <code>2.4.0</code>.</p>
+        </li>
+        <li>
+          <h3>The maintainers release the fix.</h3>
+          <p>They test the fix. Then it goes into a new version.</p>
+        </li>
+      </ol>
+      <span class="rail-dot" aria-hidden="true"></span>
+      </div>
+      <figure>
+        <div class="fig" role="region" aria-label="Figure 2, the path of a bug report step by step" tabindex="0">
+          <svg class="route route-tall" viewBox="0 0 520 552" role="img" aria-label="A bug report in four steps: the reporter files a report, the maintainers ask for steps, the reporter sends the steps, and the maintainers release a fix."><rect x="8" y="12" width="243" height="528" rx="10" class="band"/><rect x="275" y="12" width="237" height="528" rx="10" class="band"/><line x1="176" y1="62" x2="176" y2="526" class="track"/><line x1="350" y1="62" x2="350" y2="526" class="track"/><g class="icon lane-icon" transform="translate(22,29)"><circle cx="8" cy="5" r="2.5"/><path d="M3 13.5c0-2.8 2.2-4.5 5-4.5s5 1.7 5 4.5"/></g><text x="46" y="42" class="lane" text-anchor="start">Reporter</text><g class="icon lane-icon" transform="translate(289,29)"><circle cx="6" cy="5.5" r="2.25"/><path d="M1.75 13c0-2.4 1.9-3.75 4.25-3.75s4.25 1.35 4.25 3.75M10.5 3.5a2.25 2.25 0 0 1 0 4.25M12 9.6c1.4.5 2.25 1.7 2.25 3.4"/></g><text x="313" y="42" class="lane" text-anchor="start">Maintainers</text><g class="leg" data-leg="1"><path d="M176,111 L176,120 L350,150 L350,175" class="line"/><polygon points="345.5,173 354.5,173 350,181" class="head"/><circle cx="263" cy="135" r="10" class="mark"/><text x="263" y="139" class="num" text-anchor="middle">1</text><text x="263" y="118" class="verb" text-anchor="middle">file</text><circle r="6" class="pulse pulse-1"/></g><g class="leg" data-leg="2"><path d="M350,211 L350,220 L176,250 L176,275" class="line"/><polygon points="171.5,273 180.5,273 176,281" class="head"/><circle cx="263" cy="235" r="10" class="mark"/><text x="263" y="239" class="num" text-anchor="middle">2</text><text x="263" y="218" class="verb" text-anchor="middle">ask for steps</text><circle r="6" class="pulse pulse-2"/></g><g class="leg" data-leg="3"><path d="M176,311 L176,320 L350,350 L350,375" class="line"/><polygon points="345.5,373 354.5,373 350,381" class="head"/><circle cx="263" cy="335" r="10" class="mark"/><text x="263" y="339" class="num" text-anchor="middle">3</text><text x="263" y="318" class="verb" text-anchor="middle">send steps</text><circle r="6" class="pulse pulse-3"/></g><g class="leg" data-leg="4"><path d="M350,411 L350,479" class="line"/><polygon points="345.5,477 354.5,477 350,485" class="head"/><circle cx="350" cy="446" r="10" class="mark"/><text x="350" y="450" class="num" text-anchor="middle">4</text><text x="371" y="450" class="verb" text-anchor="start">release</text><circle r="6" class="pulse pulse-4"/></g><circle cx="176" cy="96" r="13" class="stop"/><g class="icon" transform="translate(168,88)"><path d="M9.5 2.5h-5a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1v-7z"/><path d="M9.5 2.5v3h3M6 9h4M6 11.25h4"/></g><circle cx="350" cy="196" r="13" class="stop"/><g class="icon" transform="translate(342,188)"><circle cx="7" cy="7" r="4"/><path d="M10 10l3.5 3.5"/></g><circle cx="176" cy="296" r="13" class="stop"/><g class="icon" transform="translate(168,288)"><path d="M2.5 4a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v6.5a1 1 0 0 1-1 1H7l-3 2.5v-2.5h-.5a1 1 0 0 1-1-1z"/><path d="M5.5 6.25h5M5.5 8.5h3"/></g><circle cx="350" cy="396" r="13" class="stop"/><g class="icon" transform="translate(342,388)"><circle cx="8" cy="8" r="5.5"/><path d="M5.5 8.2l1.8 1.8 3.2-3.6"/></g><circle cx="350" cy="500" r="13" class="stop end"/><g class="icon on-end" transform="translate(342,492)"><path d="M2.5 8.4V3.5a1 1 0 0 1 1-1h4.9l5.1 5.1a1 1 0 0 1 0 1.4l-4.5 4.5a1 1 0 0 1-1.4 0z"/><path d="M5.6 5.6h.01"/></g><text x="155" y="101" class="name" text-anchor="end">Bug report</text><text x="155" y="118" class="sub" text-anchor="end">what went wrong</text><text x="155" y="301" class="name" text-anchor="end">Steps to repeat</text><text x="155" y="318" class="sub" text-anchor="end">a short, exact list</text><text x="371" y="201" class="name" text-anchor="start">Triage</text><text x="371" y="218" class="sub" text-anchor="start">a first check</text><text x="371" y="401" class="name" text-anchor="start">Fix</text><text x="371" y="418" class="sub" text-anchor="start">a tested change</text><text x="371" y="505" class="name" text-anchor="start">New version</text><text x="371" y="522" class="sub" text-anchor="start">ready to install</text></svg>
+        </div>
+        <figcaption><strong>Figure 2</strong>The path of a bug report, step by step. The colored leg is the current step.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section id="parts" aria-labelledby="parts-h">
+    <h2 id="parts-h">The parts</h2>
+    <p>Five parts take part in a bug report. Two belong to the reporter, and three belong to the maintainers.</p>
+    <figure>
+      <div class="fig fig-plates" role="region" aria-label="Figure 3, the parts of a bug report" tabindex="0">
+        <svg class="route route-plates route-auto" viewBox="0 0 780 530" role="img" aria-label="A bug report in four steps: the reporter files a report, the maintainers ask for steps, the reporter sends the steps, and the maintainers release a fix."><rect x="12" y="12" width="356" height="506" rx="10" class="band"/><rect x="412" y="12" width="356" height="506" rx="10" class="band"/><g class="icon lane-icon" transform="translate(40,31)"><circle cx="8" cy="5" r="2.5"/><path d="M3 13.5c0-2.8 2.2-4.5 5-4.5s5 1.7 5 4.5"/></g><text x="64" y="44" class="lane" text-anchor="start">Reporter</text><g class="icon lane-icon" transform="translate(432,31)"><circle cx="6" cy="5.5" r="2.25"/><path d="M1.75 13c0-2.4 1.9-3.75 4.25-3.75s4.25 1.35 4.25 3.75M10.5 3.5a2.25 2.25 0 0 1 0 4.25M12 9.6c1.4.5 2.25 1.7 2.25 3.4"/></g><text x="456" y="44" class="lane" text-anchor="start">Maintainers</text><g class="leg" data-leg="1"><path d="M340,90 L382,90 Q390,90 390,98 L390,174 Q390,182 398,182 L424,182" class="line"/><polygon points="422,177.5 422,186.5 430,182" class="head"/><circle cx="390" cy="128" r="10" class="mark"/><text x="390" y="132" class="num" text-anchor="middle">1</text><text x="406" y="132" class="verb" text-anchor="start">file</text><circle r="6" class="pulse pulse-1"/></g><g class="leg" data-leg="2"><path d="M462,208 L462,266 Q462,274 454,274 L348,274" class="line"/><polygon points="350,269.5 350,278.5 342,274" class="head"/><circle cx="390" cy="274" r="10" class="mark"/><text x="390" y="278" class="num" text-anchor="middle">2</text><text x="412" y="297" class="verb" text-anchor="start">ask for steps</text><circle r="6" class="pulse pulse-2"/></g><g class="leg" data-leg="3"><path d="M310,300 L310,342 Q310,350 318,350 L424,350" class="line"/><polygon points="422,345.5 422,354.5 430,350" class="head"/><circle cx="390" cy="350" r="10" class="mark"/><text x="390" y="354" class="num" text-anchor="middle">3</text><text x="376" y="370" class="verb" text-anchor="end">send steps</text><circle r="6" class="pulse pulse-3"/></g><g class="leg" data-leg="4"><path d="M582,376 L582,442" class="line"/><polygon points="577.5,440 586.5,440 582,448" class="head"/><circle cx="582" cy="408" r="10" class="mark"/><text x="582" y="412" class="num" text-anchor="middle">4</text><text x="598" y="412" class="verb" text-anchor="start">release</text><circle r="6" class="pulse pulse-4"/></g><rect x="40" y="64" width="300" height="52" rx="10" class="card"/><g class="icon" transform="translate(56,82)"><path d="M9.5 2.5h-5a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1v-7z"/><path d="M9.5 2.5v3h3M6 9h4M6 11.25h4"/></g><text x="86" y="87" class="name" text-anchor="start">Bug report</text><text x="86" y="104" class="sub" text-anchor="start">what went wrong</text><rect x="432" y="156" width="300" height="52" rx="10" class="card"/><g class="icon" transform="translate(448,174)"><circle cx="7" cy="7" r="4"/><path d="M10 10l3.5 3.5"/></g><text x="478" y="179" class="name" text-anchor="start">Triage</text><text x="478" y="196" class="sub" text-anchor="start">a first check</text><rect x="40" y="248" width="300" height="52" rx="10" class="card"/><g class="icon" transform="translate(56,266)"><path d="M2.5 4a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v6.5a1 1 0 0 1-1 1H7l-3 2.5v-2.5h-.5a1 1 0 0 1-1-1z"/><path d="M5.5 6.25h5M5.5 8.5h3"/></g><text x="86" y="271" class="name" text-anchor="start">Steps to repeat</text><text x="86" y="288" class="sub" text-anchor="start">a short, exact list</text><rect x="432" y="324" width="300" height="52" rx="10" class="card"/><g class="icon" transform="translate(448,342)"><circle cx="8" cy="8" r="5.5"/><path d="M5.5 8.2l1.8 1.8 3.2-3.6"/></g><text x="478" y="347" class="name" text-anchor="start">Fix</text><text x="478" y="364" class="sub" text-anchor="start">a tested change</text><rect x="432" y="450" width="300" height="52" rx="10" class="card"/><g class="icon" transform="translate(448,468)"><path d="M2.5 8.4V3.5a1 1 0 0 1 1-1h4.9l5.1 5.1a1 1 0 0 1 0 1.4l-4.5 4.5a1 1 0 0 1-1.4 0z"/><path d="M5.6 5.6h.01"/></g><text x="478" y="473" class="name" text-anchor="start">New version</text><text x="478" y="490" class="sub" text-anchor="start">ready to install</text></svg>
+      </div>
+      <figcaption><strong>Figure 3</strong>The parts of a bug report and the four moves between them.</figcaption>
+    </figure>
+  </section>
+
+  <section id="results" aria-labelledby="results-h">
+    <h2 id="results-h">Triage results</h2>
+    <p>The first check ends in one of three ways.</p>
+    <div class="table-wrap" role="region" aria-label="Triage results table" tabindex="0">
+      <table>
+        <thead>
+          <tr><th scope="col">Result</th><th scope="col">What it means</th><th scope="col">What you do</th><th scope="col">State</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">Confirmed</th><td>The maintainers can see the bug.</td><td>Wait for the fix, then install the new version.</td><td><span class="state ok">Continue</span></td></tr>
+          <tr><th scope="row">Needs steps</th><td>The maintainers cannot see the bug yet.</td><td>Send the steps, then wait.</td><td><span class="state warn">Answer, then continue</span></td></tr>
+          <tr><th scope="row">Not a bug</th><td>The program works as designed.</td><td>Read the reply. Do not file the report again.</td><td><span class="state err">Stop</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="status">
+      <span class="state warn">Warning</span>
+      <p>A report with no steps often waits a long time. Send the steps with the first report when you can.</p>
+    </div>
+  </section>
+
+  <section id="commands" aria-labelledby="commands-h">
+    <h2 id="commands-h">Commands</h2>
+    <p>Run these in a terminal before you write the report.</p>
+<pre tabindex="0" role="region" aria-label="Commands to collect the details"><code><span class="cm"># 1. Note the version</span>
+app --version
+
+<span class="cm"># 2. Repeat the failing step and keep the log</span>
+app export --verbose &gt; bug.log
+
+<span class="cm"># 3. Check that the log holds no password</span>
+grep -i password bug.log</code></pre>
+    <details>
+      <summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>Why the maintainers ask for steps</summary>
+      <p>A fix needs a test. The test repeats your steps, and it fails before the fix. After the fix, the same test passes. The test stays, so the same bug cannot come back unseen.</p>
+    </details>
+  </section>
+</main>
+
+<footer>
+  <div class="shell">
+    <span class="brand">
+      <svg viewBox="0 0 64 64" role="img" aria-label="Docent"><rect width="64" height="64" rx="14" fill="#2f3fd0"/><path d="M20 37V18H30A14 14 0 0 1 30 46H29" fill="none" stroke="#ffffff" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="20" cy="46" r="4" fill="#f2b824"/></svg>
+      Docent
+    </span>
+    <span>A guide inside every document.</span>
+  </div>
+</footer>
+
+<script>
+(() => {
+  const root = document.documentElement;
+  root.classList.add('js');
+  // Theme: the page follows the reader's system setting. The switch sets a choice that wins over the system and is remembered.
+  const button = document.querySelector('.theme');
+  const system = matchMedia('(prefers-color-scheme: dark)');
+  const theme = () => root.dataset.theme || (system.matches ? 'dark' : 'light');
+  const showSwitch = () => {
+    const next = theme() === 'dark' ? 'light' : 'dark';
+    button.dataset.next = next;
+    button.querySelector('.theme-text').textContent = next === 'dark' ? 'Dark' : 'Light';
+    button.setAttribute('aria-label', `Switch to the ${next} theme`);
+  };
+  try {
+    const saved = localStorage.getItem('docent-theme');
+    if (saved === 'dark' || saved === 'light') root.dataset.theme = saved;
+  } catch { /* no saved choice can be read: follow the system */ }
+  showSwitch();
+  system.addEventListener('change', showSwitch);
+  button.addEventListener('click', () => {
+    root.dataset.theme = theme() === 'dark' ? 'light' : 'dark';
+    showSwitch();
+    try { localStorage.setItem('docent-theme', root.dataset.theme); } catch { /* private window: the choice lasts for this visit */ }
+  });
+  // A diagram outside the walkthrough runs its dot twice when it comes into view, then rests. Pointing at it runs it again.
+  const replay = (svg) => svg.querySelectorAll('.pulse').forEach((dot) => dot.getAnimations().forEach((run) => { run.cancel(); run.play(); }));
+  const seen = new IntersectionObserver((entries) => entries.forEach((entry) => {
+    if (!entry.isIntersecting) return;
+    entry.target.classList.add('is-playing');
+    seen.unobserve(entry.target);
+  }), { threshold: 0.6 });
+  document.querySelectorAll('.route-auto').forEach((svg) => {
+    seen.observe(svg);
+    const well = svg.closest('.fig');
+    well.addEventListener('pointerenter', () => replay(svg));
+    well.addEventListener('focus', () => replay(svg));
+  });
+  // Print: open every closed section so its text prints, then close it again.
+  let opened = [];
+  addEventListener('beforeprint', () => { opened = [...document.querySelectorAll('details:not([open])')]; opened.forEach((d) => (d.open = true)); });
+  addEventListener('afterprint', () => { opened.forEach((d) => (d.open = false)); opened = []; });
+  // The route dot marks the current section; the rail dot marks the current step.
+  const bar = document.querySelector('.topbar .shell');
+  const routeDot = document.querySelector('.route-dot');
+  const links = [...document.querySelectorAll('.route a')];
+  const sections = links.map((a) => document.querySelector(a.getAttribute('href')));
+  const steps = [...document.querySelectorAll('.steps li')];
+  const railDot = document.querySelector('.rail-dot');
+  const legs = [...document.querySelectorAll('.route-tall .leg')];
+  const nearest = (items, line) => items.reduce((best, el) => (el.getBoundingClientRect().top <= line ? el : best), items[0]);
+  const update = () => {
+    const section = nearest(sections, innerHeight * 0.35);
+    links.forEach((a, i) => (sections[i] === section ? a.setAttribute('aria-current', 'true') : a.removeAttribute('aria-current')));
+    const link = links[sections.indexOf(section)].getBoundingClientRect();
+    routeDot.style.setProperty('--x', `${link.left + link.width / 2 - bar.getBoundingClientRect().left - 3.5}px`);
+    const step = nearest(steps, innerHeight * 0.5);
+    steps.forEach((li) => li.classList.toggle('is-current', li === step));
+    legs.forEach((leg) => leg.classList.toggle('is-current', Number(leg.dataset.leg) === steps.indexOf(step) + 1));
+    railDot.style.setProperty('--y', `${step.offsetTop}px`);
+  };
+  let queued = false;
+  const schedule = () => { if (!queued) { queued = true; requestAnimationFrame(() => { queued = false; update(); }); } };
+  addEventListener('scroll', schedule, { passive: true });
+  addEventListener('resize', schedule);
+  update();
+  requestAnimationFrame(() => requestAnimationFrame(() => root.classList.add('ready')));
+})();
+</script>
+</body>
+</html>
