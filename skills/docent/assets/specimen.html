@@ -80,6 +80,10 @@ p { margin: 0 0 16px; max-width: var(--measure); text-wrap: pretty; }
 code { font: 14px/1.55 var(--mono); background: var(--panel); padding: 0.1em 0.38em; border-radius: 6px; }
 .standfirst code { font-size: 18px; }
 
+/* Lists in the text flow: points, or numbers for steps that have no figure. The rules are weak on purpose, so the lists of the kit's own blocks keep their styles. */
+:where(main) :where(ul, ol):not(.steps, .facts) { max-width: var(--measure); margin: 0 0 16px; padding-left: 24px; }
+:where(main) :where(ul, ol):not(.steps, .facts) > :where(li + li) { margin-top: 4px; }
+
 /* Margin notes: the guide's remarks sit beside the text, like a wall label. */
 .row { display: grid; grid-template-columns: minmax(0, var(--measure)) var(--margin-col); column-gap: var(--gap); align-items: start; }
 .note { margin: 6px 0 16px; padding-top: 12px; border-top: 1px solid var(--line); font-size: 14px; line-height: 1.5; color: var(--muted); }
@@ -153,8 +157,6 @@ input:focus-visible + .opt, .checks input:focus-visible + label::before { outlin
 .case-t { display: none; margin: 0 0 4px; font-weight: 600; }
 .case > .case-t + * { margin-top: 0; }
 .case > :last-child { margin-bottom: 0; }
-.case ul, .case ol { max-width: var(--measure); margin: 0 0 16px; padding-left: 24px; }
-.case li + li { margin-top: 4px; }
 /* Checklist: a box and a line of text. A ticked line takes the muted color. */
 .checks ul { max-width: var(--measure); margin: 0; padding: 0; list-style: none; }
 .checks li { position: relative; margin-top: 12px; }
