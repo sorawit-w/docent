@@ -1,3 +1,18 @@
 {
-  "buildPath": "code"
+  "buildPath": "code",
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "flat-type-hierarchy",
+        "value": "*",
+        "files": [
+          "skills/docent/assets/template.html"
+        ],
+        "createdAt": "2026-11-15T17:35:23.730Z",
+        "reason": "agent decided: the starting page is unbuilt on purpose and holds no styles; stamp adds the kit, which sets h1 52px, h2 30px and body 16px; tests check the built page"
+      }
+    ]
+  }
 }
