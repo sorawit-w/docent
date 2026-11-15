@@ -4,7 +4,11 @@
 // It does not open a browser. So it cannot test contrast, the phone layout, print or motion as a reader sees them.
 const fs = require("node:fs");
 const { VERSION, cssBlock, jsBlock, findKit } = require("./lib/kit.cjs");
-const { findDiagrams, renderDiagram, block } = require("./lib/diagram.cjs");
+const { renderDiagram } = require("./lib/diagram.cjs");
+const { renderWidget } = require("./lib/widget.cjs");
+const { findBlocks, block } = require("./lib/blocks.cjs");
+
+const MOST_WIDGETS = 4; // more widgets than this in one document gives a warning
 
 const plain = (s) => s.replace(/<[^>]*>/g, "").replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#39;|&apos;/g, "'").replace(/\s+/g, " ").trim();
 const local = (value) => /^(#|data:)/i.test(value.trim()) || value.trim() === "";
@@ -23,7 +27,7 @@ function checkDocument(html) {
   }
 
   // 2. Diagrams: each drawing must be the one that render makes from its data.
-  const diagrams = findDiagrams(html), ids = new Set(), shapes = new Map(), walks = [];
+  const diagrams = findBlocks(html, "diagram"), ids = new Set(), shapes = new Map(), walks = [];
   diagrams.forEach((found, n) => {
     const name = `diagram ${n + 1}`;
     let data;
@@ -35,7 +39,7 @@ function checkDocument(html) {
       ids.add(drawn.model.id);
       drawn.icons.forEach((w) => errors.push(`${label}: ${w}`));
       drawn.warnings.filter((w) => !drawn.icons.includes(w)).forEach((w) => warnings.push(`${label}: ${w}`));
-      if (found.text !== block(found.json, drawn.svg)) errors.push(`${label}: the drawing does not match its data; run render`);
+      if (found.text !== block("diagram", found.json, drawn.svg)) errors.push(`${label}: the drawing does not match its data; run render`);
       // A document should not draw the same thing twice.
       const shape = JSON.stringify([drawn.model.lanes.map((l) => l.name), drawn.model.parts.map((p) => [p.lane, p.name, p.note]), drawn.model.legs.map((l) => [l.from, l.to, l.verb])]);
       if (shapes.has(shape)) warnings.push(`${label} shows the same lanes, parts and legs as diagram "${shapes.get(shape)}"; a document should not draw the same thing twice`);
@@ -49,6 +53,27 @@ function checkDocument(html) {
   for (const found of [...diagrams].reverse()) rest = rest.slice(0, found.start) + rest.slice(found.end);
   if (/<svg\b[^>]*\bclass="[^"]*\bdg\b/.test(rest)) errors.push("a diagram sits outside a diagram block; put its data in a block and run render");
 
+  // 2b. Widgets: each widget must be the one that render makes from its data.
+  const widgets = findBlocks(rest, "widget"), widgetIds = new Set(), kinds = new Set();
+  widgets.forEach((found, n) => {
+    const name = `widget ${n + 1}`;
+    let data;
+    try { data = JSON.parse(found.json); } catch (error) { return errors.push(`${name}: the data is not valid JSON: ${error.message}`); }
+    try {
+      const built = renderWidget(data);
+      const label = `${name} ("${built.id}")`;
+      if (widgetIds.has(built.id)) errors.push(`${label}: another widget has the same id`);
+      widgetIds.add(built.id);
+      if (found.text !== block("widget", found.json, built.html)) errors.push(`${label}: the widget does not match its data; run render`);
+      kinds.add(built.key == null ? built.id : `chooser ${built.key}`); // choosers with the same options change together and count as one
+    } catch (error) {
+      errors.push(`${name}${data && data.id ? ` ("${data.id}")` : ""}: ${error.message}`);
+    }
+  });
+  for (const found of [...widgets].reverse()) rest = rest.slice(0, found.start) + rest.slice(found.end);
+  if (/\bclass="(?:[^"]*\s)?(choose|checks|decide)(?:\s[^"]*)?"/.test(rest)) errors.push("a widget sits outside a widget block; put its data in a block and run render");
+  if (kinds.size > MOST_WIDGETS) warnings.push(`the document has ${kinds.size} widgets; a widget is for a reader who must choose, track or decide, and more than ${MOST_WIDGETS} in one document is a sign that some are not needed`);
+
   // A walkthrough lights leg n for step n, so the numbers must agree.
   const lists = [...rest.matchAll(/<ol\b[^>]*\bclass="[^"]*\bsteps\b[^"]*"[^>]*>([\s\S]*?)<\/ol>/g)].map((m) => m[1]);
   if (lists.length !== walks.length) errors.push(`the document has ${lists.length} walkthrough step lists and ${walks.length} diagrams with "place": "walk"; each walkthrough needs one`);
@@ -61,7 +86,7 @@ function checkDocument(html) {
     }
   });
 
-  // From here on, test the author's own content: everything except the kit and the drawings.
+  // From here on, test the author's own content: everything except the kit, the drawings and the widgets.
   for (const k of findKit(rest)) rest = rest.replace(k.text, "");
   const noComments = rest.replace(/<!--[\s\S]*?-->/g, "");
   const css = [...noComments.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/g)].map((m) => m[1]).concat([...noComments.matchAll(/\bstyle="([^"]*)"/g)].map((m) => m[1])).join("\n");

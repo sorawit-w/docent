@@ -1,0 +1,11 @@
+{
+  "id": "release",
+  "kind": "checklist",
+  "label": "Before a release",
+  "items": [
+    "All tests pass.",
+    {"text": "The version in `package.json` is new.", "note": "A version that exists already cannot be published again."},
+    {"text": "The change log has an entry.", "note": ""},
+    "A second person read the change."
+  ]
+}

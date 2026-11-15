@@ -1,0 +1,31 @@
+<div class="choose" id="wd-install" role="group" aria-labelledby="wd-install-t">
+<span class="wd-t" id="wd-install-t">How you install</span>
+<input type="radio" name="wd-install" id="wd-install-1" checked><label class="opt" for="wd-install-1">Installer</label>
+<input type="radio" name="wd-install" id="wd-install-2"><label class="opt" for="wd-install-2">From source</label>
+<input type="radio" name="wd-install" id="wd-install-3"><label class="opt" for="wd-install-3">By hand</label>
+<div class="case">
+<p class="case-t">Installer</p>
+<p>Run this in the project folder. It needs version 3 or newer.</p>
+<pre tabindex="0" role="region" aria-label="Commands for the installer"><code>app install
+app test</code></pre>
+</div>
+<div class="case">
+<p class="case-t">From source</p>
+<p>Use <code>make</code> when the folder has a <code>Makefile</code>.</p>
+<pre tabindex="0" role="region" aria-label="Code for From source"><code>make install</code></pre>
+<p>A second command runs the tests.</p>
+<pre tabindex="0" role="region" aria-label="Code for From source, 2"><code>make test</code></pre>
+</div>
+<div class="case">
+<p class="case-t">By hand</p>
+<ol>
+<li>Download the archive.</li>
+<li>Unpack it into <code>vendor/</code>.</li>
+<li>Check that 2 &lt; 3 &amp; the folder exists.</li>
+</ol>
+<ul>
+<li>No lock file is written.</li>
+<li>Updates are not automatic.</li>
+</ul>
+</div>
+</div>

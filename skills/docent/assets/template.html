@@ -6,7 +6,7 @@
 <!-- The window title: "Document title — Host project". It does not name Docent. -->
 <title>Document title — Host project</title>
 <style>
-/* docent:kit 0.1.0 */
+/* docent:kit 0.2.0 */
 /* Docent page styles. Tokens come from references/DESIGN.md. One file, no network. */
 :root {
   color-scheme: light;
@@ -57,9 +57,9 @@ a:hover { text-decoration-thickness: 2px; }
 .route-dot { position: absolute; left: 0; bottom: -4px; width: 7px; height: 7px; border-radius: 50%; background: var(--dot); opacity: 0; transform: translateX(var(--x, 0px)); }
 .ready .route-dot, .ready .rail-dot { transition: transform 320ms var(--ease); }
 .js .route-dot { opacity: 1; }
-.theme { display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px; border: 1px solid var(--line); border-radius: 6px; background: none; color: var(--text); font: 400 14px/1 var(--sans); cursor: pointer; }
-.theme:hover { border-color: var(--muted); }
-.theme:active { transform: translateY(1px); }
+.theme, .wd-btn { display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px; border: 1px solid var(--line); border-radius: 6px; background: none; color: var(--text); font: 400 14px/1 var(--sans); cursor: pointer; }
+.theme:hover, .wd-btn:hover { border-color: var(--muted); }
+.theme:active, .wd-btn:active { transform: translateY(1px); }
 .theme svg { width: 15px; height: 15px; }
 html:not(.js) .theme { display: none; }
 .theme[data-next="dark"] .icon-sun, .theme[data-next="light"] .icon-moon { display: none; }
@@ -134,6 +134,52 @@ summary svg { width: 12px; height: 12px; color: var(--muted); transition: transf
 details[open] summary svg { transform: rotate(90deg); }
 details > p { margin: 8px 0 0 22px; }
 
+/* Widgets: the reader chooses, ticks or decides. A widget is plain controls and text, with no box. render makes its markup from data. */
+.choose, .checks, .decide { position: relative; margin: 24px 0 0; }
+:is(.choose, .checks, .decide) + * { margin-top: 24px; }
+.choose > input, .checks input, .decide input { position: absolute; width: 1px; height: 1px; margin: 0; opacity: 0; pointer-events: none; }
+.wd-t { margin: 0; max-width: none; font-size: 14px; line-height: 1.5; font-weight: 600; color: var(--muted); }
+.opt { display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px; border: 1px solid var(--line); border-radius: 6px; font-size: 14px; line-height: 1; cursor: pointer; }
+.opt::before { content: ""; width: 9px; height: 9px; border-radius: 50%; border: 1px solid var(--muted); }
+.opt:hover { border-color: var(--muted); }
+input:checked + .opt { border-color: var(--text); }
+input:checked + .opt::before { border-color: var(--dot); background: var(--dot); }
+input:focus-visible + .opt, .checks input:focus-visible + label::before { outline: 2px solid var(--primary); outline-offset: 3px; }
+/* Chooser: radio buttons and one panel for each case. The styles alone show the chosen case, so it works with scripts off. */
+.choose { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.choose > .wd-t { margin-right: 4px; }
+.choose > .case { display: none; flex-basis: 100%; min-width: 0; margin-top: 8px; }
+.choose > input:nth-of-type(1):checked ~ div:nth-of-type(1), .choose > input:nth-of-type(2):checked ~ div:nth-of-type(2), .choose > input:nth-of-type(3):checked ~ div:nth-of-type(3), .choose > input:nth-of-type(4):checked ~ div:nth-of-type(4), .choose > input:nth-of-type(5):checked ~ div:nth-of-type(5) { display: block; }
+.case-t { display: none; margin: 0 0 4px; font-weight: 600; }
+.case > .case-t + * { margin-top: 0; }
+.case > :last-child { margin-bottom: 0; }
+.case ul, .case ol { max-width: var(--measure); margin: 0 0 16px; padding-left: 24px; }
+.case li + li { margin-top: 4px; }
+/* Checklist: a box and a line of text. A ticked line takes the muted color. */
+.checks ul { max-width: var(--measure); margin: 0; padding: 0; list-style: none; }
+.checks li { position: relative; margin-top: 12px; }
+.checks label { display: block; position: relative; padding-left: 32px; cursor: pointer; }
+.checks label::before { content: ""; position: absolute; left: 0; top: 4px; width: 18px; height: 18px; border: 1.5px solid var(--muted); border-radius: 6px; }
+.checks label::after { content: ""; position: absolute; left: 6.5px; top: 7px; width: 5px; height: 9px; border: solid var(--text); border-width: 0 2px 2px 0; transform: rotate(45deg); opacity: 0; }
+.checks input:checked + label { color: var(--muted); }
+.checks input:checked + label::before { border-color: var(--text); }
+.checks input:checked + label::after { opacity: 1; }
+.checks .sub { display: block; font-size: 14px; line-height: 1.5; color: var(--muted); }
+.wd-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin: 16px 0 0; max-width: none; font-size: 14px; line-height: 1.5; color: var(--muted); font-variant-numeric: tabular-nums; }
+.wd-foot[hidden] { display: none; }
+/* Decision helper: questions, the one answer that fits, and the table of all cases. The table is the still form. */
+.decide fieldset { position: relative; display: flex; flex-wrap: wrap; gap: 8px; min-width: 0; margin: 16px 0 0; padding: 0; border: 0; }
+.decide legend { margin-bottom: 8px; padding: 0; font-weight: 600; }
+.decide-out { display: block; max-width: var(--measure); margin-top: 16px; }
+.decide-out:empty { display: none; }
+.decide-out strong { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+.decide-out strong::before { content: ""; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--dot); }
+.decide details { max-width: none; margin-top: 16px; }
+.decide .table-wrap { margin-top: 8px; }
+.decide td strong { display: block; font-weight: 600; }
+.decide tr.is-out { color: var(--muted); }
+html:not(.js) .decide-ask, html:not(.js) .wd-foot output { display: none; }
+
 footer { margin-top: 96px; border-top: 1px solid var(--line); }
 footer .shell { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding-top: 24px; padding-bottom: 40px; font-size: 14px; color: var(--muted); }
 .brand { display: inline-flex; align-items: center; gap: 10px; font: 700 16px/1 var(--serif); color: var(--text); }
@@ -167,10 +213,12 @@ footer .shell { display: flex; align-items: center; justify-content: space-betwe
 }
 @media print {
   html:root:not([data-never]) { color-scheme: light; --bg: #ffffff; --panel: #f2f3f9; --fig: #f2f3f9; --text: #1c1f2e; --muted: #575d75; --line: #d3d6e3; --primary: #2f3fd0; --ink: #1b2260; --dot: #2f3fd0; --ok: #1a7f37; --warn: #7d4e00; --err: #cf222e; }
-  .topbar, .rail-dot { display: none !important; }
+  .topbar, .rail-dot, .choose > .opt, .decide-ask, .wd-foot { display: none !important; }
+  .choose > .case { display: block !important; margin-top: 16px; } .case-t { display: block; }
+  .checks input:checked + label, .decide tr.is-out { color: var(--text) !important; }
   .steps li h3, .steps li p { color: var(--text) !important; }
   .walk { grid-template-columns: minmax(0, 1fr); row-gap: 32px; } .walk figure { position: static; order: -1; }
-  figure, tr, .status, pre { break-inside: avoid; }
+  figure, tr, .status, pre, .checks li { break-inside: avoid; }
   h2, h3 { break-after: avoid; }
   @page { margin: 18mm; }
 }
@@ -187,6 +235,7 @@ footer .shell { display: flex; align-items: center; justify-content: space-betwe
       <ol>
         <li><a href="#short">Short version</a></li>
         <li><a href="#walk">Walkthrough</a></li>
+        <li><a href="#widgets">Widgets</a></li>
         <li><a href="#more">More</a></li>
       </ol>
     </nav>
@@ -386,6 +435,104 @@ footer .shell { display: flex; align-items: center; justify-content: space-betwe
     </div>
   </section>
 
+  <!-- WIDGETS. A widget is for a reader who must choose, track or decide. Use one only then, and remove the ones that the document does not need.
+       A chooser shows one case of several. A checklist is ticked line by line. A decision helper gives the one answer that fits.
+       Each widget is a block of data. Change the data, then run render. Never edit the markup that render made. -->
+  <section id="widgets" aria-labelledby="widgets-h">
+    <h2 id="widgets-h">Widgets</h2>
+    <p>A chooser shows the text for the case that the reader picks.</p>
+<!-- docent:widget
+{
+  "id": "case",
+  "kind": "chooser",
+  "label": "Your case",
+  "cases": [
+    {"name": "First case", "body": ["Text for the first case. A word of `code` sits between two marks.", {"code": "command --for first"}]},
+    {"name": "Second case", "body": ["Text for the second case.", {"steps": ["Do the first thing.", "Do the second thing."]}]}
+  ]
+}
+-->
+<div class="choose" id="wd-case" role="group" aria-labelledby="wd-case-t">
+<span class="wd-t" id="wd-case-t">Your case</span>
+<input type="radio" name="wd-case" id="wd-case-1" checked><label class="opt" for="wd-case-1">First case</label>
+<input type="radio" name="wd-case" id="wd-case-2"><label class="opt" for="wd-case-2">Second case</label>
+<div class="case">
+<p class="case-t">First case</p>
+<p>Text for the first case. A word of <code>code</code> sits between two marks.</p>
+<pre tabindex="0" role="region" aria-label="Code for First case"><code>command --for first</code></pre>
+</div>
+<div class="case">
+<p class="case-t">Second case</p>
+<p>Text for the second case.</p>
+<ol>
+<li>Do the first thing.</li>
+<li>Do the second thing.</li>
+</ol>
+</div>
+</div>
+<!-- /docent:widget -->
+    <p>A checklist holds the lines that the reader ticks.</p>
+<!-- docent:widget
+{
+  "id": "list",
+  "kind": "checklist",
+  "label": "Before you start",
+  "items": [
+    {"text": "The first thing is ready.", "note": "A note says more about the line, in one sentence."},
+    "The second thing is ready."
+  ]
+}
+-->
+<form class="checks" id="wd-list" aria-labelledby="wd-list-t">
+<p class="wd-t" id="wd-list-t">Before you start</p>
+<ul>
+<li><input type="checkbox" id="wd-list-1"><label for="wd-list-1">The first thing is ready.<span class="sub">A note says more about the line, in one sentence.</span></label></li>
+<li><input type="checkbox" id="wd-list-2"><label for="wd-list-2">The second thing is ready.</label></li>
+</ul>
+<p class="wd-foot"><output></output><button class="wd-btn" type="reset">Clear the ticks</button></p>
+</form>
+<!-- /docent:widget -->
+    <p>A decision helper asks one to three questions and gives one answer.</p>
+<!-- docent:widget
+{
+  "id": "choice",
+  "kind": "decision",
+  "label": "Which way fits?",
+  "questions": [
+    {"text": "The first question?", "options": ["Yes", "No"]}
+  ],
+  "answers": [
+    {"when": ["Yes"], "title": "The first way", "text": "One sentence says what to do."},
+    {"when": ["No"], "title": "The second way", "text": "One sentence says what to do."}
+  ]
+}
+-->
+<div class="decide" id="wd-choice">
+<p class="wd-t" id="wd-choice-t">Which way fits?</p>
+<form class="decide-ask" aria-labelledby="wd-choice-t">
+<fieldset><legend>The first question?</legend>
+<input type="radio" name="wd-choice-q1" id="wd-choice-q1-1"><label class="opt" for="wd-choice-q1-1">Yes</label>
+<input type="radio" name="wd-choice-q1" id="wd-choice-q1-2"><label class="opt" for="wd-choice-q1-2">No</label>
+</fieldset>
+<output class="decide-out"></output>
+<p class="wd-foot"><button class="wd-btn" type="reset">Start again</button></p>
+</form>
+<details open>
+<summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>All cases</summary>
+<div class="table-wrap" role="region" aria-label="All cases: Which way fits?" tabindex="0">
+<table>
+<thead><tr><th scope="col">The first question?</th><th scope="col">Answer</th></tr></thead>
+<tbody>
+<tr data-when="1"><td>Yes</td><td><strong>The first way</strong>One sentence says what to do.</td></tr>
+<tr data-when="2"><td>No</td><td><strong>The second way</strong>One sentence says what to do.</td></tr>
+</tbody>
+</table>
+</div>
+</details>
+</div>
+<!-- /docent:widget -->
+  </section>
+
   <!-- OTHER BLOCKS. A figure in the text flow, a table, a status note, a code block, and a closed section.
        A figure in the text flow is a <figure> with a "fig" well and a diagram block without "place".
        Remove the blocks that the document does not need. -->
@@ -428,7 +575,7 @@ command --option value</code></pre>
   </div>
 </footer>
 <script>
-// docent:kit 0.1.0
+// docent:kit 0.2.0
 (() => {
   const root = document.documentElement;
   root.classList.add('js');
@@ -504,6 +651,55 @@ command --option value</code></pre>
   const schedule = () => { if (!queued) { queued = true; requestAnimationFrame(() => { queued = false; update(); }); } };
   addEventListener('scroll', schedule, { passive: true });
   addEventListener('resize', schedule);
+  // Widgets. Each one is readable without this script. The script adds memory, the count of a checklist and the answer of a decision helper.
+  const load = (key) => { try { return JSON.parse(localStorage.getItem(key)); } catch { return null; } };
+  const save = (key, value) => { try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* private window: it lasts for this visit */ } };
+  // Chooser: the choice is remembered, and choosers with the same options change together.
+  const choosers = [...document.querySelectorAll('.choose')].map((el) => ({
+    inputs: [...el.querySelectorAll(':scope > input')],
+    key: `docent-choice:${[...el.querySelectorAll(':scope > .opt')].map((label) => label.textContent).join('|')}`,
+  }));
+  const choose = (key, n) => choosers.forEach((c) => { if (c.key === key && c.inputs[n]) c.inputs[n].checked = true; });
+  choosers.forEach((c) => {
+    choose(c.key, load(c.key));
+    c.inputs.forEach((input, n) => input.addEventListener('change', () => {
+      const top = input.getBoundingClientRect().top;
+      choose(c.key, n);
+      scrollBy(0, input.getBoundingClientRect().top - top); // a chooser higher on the page changed its height: keep this one in place
+      save(c.key, n);
+      schedule();
+    }));
+  });
+  // Checklist: the ticks are remembered for this document, and the line below the list counts them.
+  document.querySelectorAll('form.checks').forEach((form) => {
+    const boxes = [...form.querySelectorAll('input')], out = form.querySelector('output'), key = `docent-ticks:${location.pathname}#${form.id}`;
+    const saved = load(key);
+    if (Array.isArray(saved) && saved.length === boxes.length) boxes.forEach((box, i) => (box.checked = saved[i] === true));
+    const show = () => { out.textContent = `${boxes.filter((box) => box.checked).length} of ${boxes.length} done`; };
+    const keep = () => { show(); save(key, boxes.map((box) => box.checked)); schedule(); };
+    form.addEventListener('change', keep);
+    form.addEventListener('reset', () => setTimeout(keep));
+    show();
+  });
+  // Decision helper: a row that no longer fits the answers takes the muted color. When every question has an answer, the one row that fits is shown as the answer.
+  document.querySelectorAll('.decide').forEach((el) => {
+    const form = el.querySelector('form'), out = el.querySelector('output'), again = el.querySelector('.wd-foot'), groups = [...el.querySelectorAll('fieldset')], rows = [...el.querySelectorAll('tbody tr')];
+    el.querySelector('details').open = false;
+    const show = () => {
+      const picked = groups.map((group) => [...group.querySelectorAll('input')].findIndex((input) => input.checked) + 1);
+      const fits = rows.filter((row) => {
+        const fit = row.dataset.when.split(',').every((option, q) => option === '0' || !picked[q] || Number(option) === picked[q]);
+        row.classList.toggle('is-out', !fit);
+        return fit;
+      });
+      out.innerHTML = picked.every(Boolean) && fits.length === 1 ? fits[0].lastElementChild.innerHTML : '';
+      again.hidden = !picked.some(Boolean);
+      schedule();
+    };
+    form.addEventListener('change', show);
+    form.addEventListener('reset', () => setTimeout(show));
+    show();
+  });
   update();
   requestAnimationFrame(() => requestAnimationFrame(() => root.classList.add('ready')));
 })();

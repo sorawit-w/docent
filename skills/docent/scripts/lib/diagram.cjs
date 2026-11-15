@@ -2,6 +2,8 @@
 const { ICONS, iconProblem } = require("./icons.cjs");
 const { layoutRoute } = require("./route.cjs");
 const { toSvg } = require("./svg.cjs");
+const { DataError, fail, words, id, findBlocks, block, replaceBlocks } = require("./blocks.cjs");
+const { renderWidget } = require("./widget.cjs");
 
 const FORMS = ["wide", "tall", "plates"];
 const MOST = { lanes: 4, parts: 12, legs: 16, name: 32, note: 40, verb: 24, lane: 28 };
@@ -9,21 +11,6 @@ const PAGE = 1104; // the widest drawing that fits a full-width well
 const WALK = 520; // the widest drawing that fits beside the walkthrough steps
 const PHONE = 264; // the widest drawing that fits a 320px screen
 const ROOM = 96; // what the page takes beside a drawing: the page padding and the well padding
-const MARKER = /<!-- docent:diagram[ \t]*\n([\s\S]*?)\n[ \t]*-->[\s\S]*?<!-- \/docent:diagram -->/g;
-
-class DataError extends Error {}
-const fail = (msg) => { throw new DataError(msg); };
-
-function words(value, what, most, required = true) {
-  if (value == null || value === "") return required ? fail(`${what} is missing`) : "";
-  if (typeof value !== "string") fail(`${what} must be text`);
-  const s = value.trim().replace(/\s+/g, " ");
-  if (!s) return required ? fail(`${what} is empty`) : "";
-  if (s.length > most) fail(`${what} is ${s.length} characters long; the most is ${most}: "${s}"`);
-  return s;
-}
-
-const id = (value, what) => (typeof value === "string" && /^[a-z][a-z0-9-]{0,39}$/.test(value) ? value : fail(`${what} must be a short id: small letters, digits and "-", starting with a letter`));
 
 /** Checks diagram data and returns the model that the layouts use, with a list of warnings. */
 function readData(data) {
@@ -125,37 +112,19 @@ function renderDiagram(data) {
   return { svg, form: scene.form, warnings, icons, model, scene };
 }
 
-/** Finds every diagram block in a document: [{ json, start, end, text }]. */
-function findDiagrams(html) {
-  return [...html.matchAll(MARKER)].map((m) => ({ json: m[1], text: m[0], start: m.index, end: m.index + m[0].length }));
-}
-
-const block = (json, svg) => `<!-- docent:diagram\n${json}\n-->\n${svg}\n<!-- /docent:diagram -->`;
-
-/** Draws every diagram block of a document in place. Returns { html, results: [{ id, form, warnings, error }] }. */
+/** Draws every diagram block and builds every widget block of a document, in place. Returns { html, results, widgets }: one result for each block, { id, form, warnings, error }. */
 function renderDocument(html) {
-  const results = [], seen = new Set();
-  let out = "", at = 0;
-  for (const found of findDiagrams(html)) {
-    const result = { id: null, form: null, warnings: [], error: null };
-    let text = found.text;
-    try {
-      let data;
-      try { data = JSON.parse(found.json); } catch (error) { fail(`the data is not valid JSON: ${error.message}`); }
-      result.id = data?.id ?? null;
-      const drawn = renderDiagram(data);
-      if (seen.has(drawn.model.id)) fail(`two diagrams have the id "${drawn.model.id}"`);
-      seen.add(drawn.model.id);
-      Object.assign(result, { form: drawn.form, warnings: drawn.warnings });
-      text = block(found.json, drawn.svg);
-    } catch (error) {
-      result.error = error.message;
-    }
-    out += html.slice(at, found.start) + text;
-    at = found.end;
-    results.push(result);
-  }
-  return { html: out + html.slice(at), results };
+  const diagrams = replaceBlocks(html, "diagram", (data) => {
+    const drawn = renderDiagram(data);
+    return { id: drawn.model.id, out: drawn.svg, form: drawn.form, warnings: drawn.warnings };
+  });
+  const widgets = replaceBlocks(diagrams.html, "widget", (data) => {
+    const built = renderWidget(data);
+    return { id: built.id, out: built.html, form: built.kind, warnings: built.warnings };
+  });
+  return { html: widgets.html, results: diagrams.results, widgets: widgets.results };
 }
+
+const findDiagrams = (html) => findBlocks(html, "diagram");
 
 module.exports = { readData, formsFor, renderDiagram, renderDocument, findDiagrams, block, DataError, MOST };

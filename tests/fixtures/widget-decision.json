@@ -1,0 +1,15 @@
+{
+  "id": "plan",
+  "kind": "decision",
+  "label": "Which plan fits?",
+  "questions": [
+    {"text": "How many people use it?", "options": ["One", "2 to 10", "More"]},
+    {"text": "Do you need `SSO`?", "options": ["Yes", "No"]}
+  ],
+  "answers": [
+    {"when": ["One", "No"], "title": "Free", "text": "One person, with no shared folders."},
+    {"when": ["2 to 10", "No"], "title": "Team", "text": "Shared folders for up to ten people."},
+    {"when": ["More", "No"], "title": "Business", "text": "No limit on people."},
+    {"when": ["any", "Yes"], "title": "Business", "text": "Only this plan has `SSO`."}
+  ]
+}

@@ -8,7 +8,9 @@ const modules = process.env.DOCENT_NODE_MODULES || path.join(root, "node_modules
 const { chromium } = require(path.join(modules, "playwright-core"));
 const axePath = path.join(modules, "axe-core", "axe.min.js");
 const { textWidth } = require(path.join(root, "skills", "docent", "scripts", "lib", "text.cjs"));
-const html = fs.readFileSync(process.argv[2] || path.join(root, "skills", "docent", "assets", "specimen.html"), "utf8");
+const { renderDocument } = require(path.join(root, "skills", "docent", "scripts", "lib", "diagram.cjs"));
+const file = path.resolve(process.argv[2] || path.join(root, "skills", "docent", "assets", "specimen.html"));
+const html = fs.readFileSync(file, "utf8");
 const out = process.env.DOCENT_SHOTS || path.join(__dirname, "shots");
 fs.mkdirSync(out, { recursive: true });
 
@@ -155,6 +157,117 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     const { page, context } = await open({ width: 1280, reducedMotion: "reduce" });
     const still = await page.evaluate(() => { const s = getComputedStyle(document.querySelector("svg.dg-tall .leg.is-current .pulse")); return { display: s.display, animation: s.animationName, auto: [...new Set([...document.querySelectorAll("svg.dg-auto .pulse")].map((d) => getComputedStyle(d).display))].join() }; });
     ok("reduced motion: no moving dot", still.display === "block" && still.animation === "none" && still.auto === "none", still);
+    await context.close();
+  }
+
+  // Widgets. The page is opened from its file here, so that it can remember.
+  {
+    const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+    const page = await context.newPage();
+    const errors = [];
+    page.on("console", (m) => m.type() === "error" && errors.push(m.text()));
+    page.on("pageerror", (e) => errors.push(String(e)));
+    await page.goto(`file://${file}`);
+    const state = () => page.evaluate(() => {
+      const shown = (el) => el.getBoundingClientRect().height > 0;
+      return {
+        cases: [...document.querySelectorAll("#wd-system .case")].map((c, i) => (shown(c) ? i + 1 : 0)).filter(Boolean).join(),
+        names: [...document.querySelectorAll("#wd-system .case-t")].filter(shown).length,
+        ticks: [...document.querySelectorAll("#wd-ready input")].map((b) => (b.checked ? 1 : 0)).join(""),
+        count: document.querySelector("#wd-ready output").textContent,
+        answer: document.querySelector("#wd-kind output").textContent,
+        out: [...document.querySelectorAll("#wd-kind tbody tr")].map((r) => (r.classList.contains("is-out") ? 1 : 0)).join(""),
+        table: document.querySelector("#wd-kind details").open,
+        again: shown(document.querySelector("#wd-kind .wd-foot")),
+      };
+    });
+    const fresh = await state();
+    ok("widgets at the start: the first case shows, no tick, no answer, and the table of all cases is closed", fresh.cases === "1" && fresh.names === 0 && fresh.ticks === "0000" && fresh.count === "0 of 4 done" && fresh.answer === "" && fresh.out === "000" && !fresh.table && !fresh.again, fresh);
+    await page.click('label[for="wd-system-3"]');
+    const picked = await state();
+    await page.focus("#wd-system-3");
+    await page.keyboard.press("ArrowLeft");
+    const byKey = await state();
+    ok("chooser: a click shows the chosen case only, and the arrow keys change the choice", picked.cases === "3" && byKey.cases === "2", { picked: picked.cases, byKey: byKey.cases });
+    await page.click('label[for="wd-ready-1"]');
+    await page.focus("#wd-ready-3");
+    await page.keyboard.press("Space");
+    const ticked = await state();
+    ok("checklist: a click or the space key ticks a line, and the count follows", ticked.ticks === "1010" && ticked.count === "2 of 4 done", ticked);
+    await page.click('label[for="wd-kind-q1-2"]');
+    const half = await state();
+    await page.click('label[for="wd-kind-q2-1"]');
+    const full = await state();
+    await page.click('label[for="wd-kind-q1-1"]');
+    const changed = await state();
+    ok("decision helper: rows that do not fit go out, and the one that fits is the answer", half.answer === "" && half.out === "100" && half.again && full.out === "101" && full.answer === "A normal reportFile it with the steps that show the problem." && changed.out === "011" && changed.answer.startsWith("An urgent report"), { half, full, changed });
+    await page.addScriptTag({ path: axePath });
+    const used = await page.evaluate(async () => { document.querySelector("#wd-kind details").open = true; return (await window.axe.run(document, { runOnly: { type: "tag", values: ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa", "best-practice"] } })).violations.map((v) => `${v.id}(${v.nodes.length}) ${v.nodes[0].target.join(" ")}`); });
+    ok("widgets in use: 0 axe violations", used.length === 0, used);
+    await page.locator("#report").screenshot({ path: `${out}/widgets-used.png` });
+    await page.reload();
+    const again = await state();
+    ok("after the page is opened again: the choice and the ticks are remembered", again.cases === "2" && again.ticks === "1010" && again.count === "2 of 4 done" && again.answer === "", again);
+    await page.click("#wd-ready button");
+    await page.waitForTimeout(100);
+    await page.reload();
+    const cleared = await state();
+    ok("checklist: the button clears the ticks, and they stay cleared", cleared.ticks === "0000" && cleared.count === "0 of 4 done", cleared);
+    await page.click('label[for="wd-kind-q1-2"]');
+    await page.click("#wd-kind button");
+    await page.waitForTimeout(100);
+    const reset = await state();
+    ok("decision helper: Start again clears the answers", reset.out === "000" && reset.answer === "" && !reset.again, reset);
+    ok("widgets: no script errors", errors.length === 0, errors);
+    await context.close();
+  }
+
+  // Widgets in dark: the chosen option carries the lamp dot.
+  {
+    const { page, context } = await open({ width: 1280, theme: "dark" });
+    const dots = await page.evaluate(() => ({ chosen: getComputedStyle(document.querySelector('label[for="wd-system-1"]'), "::before").backgroundColor, other: getComputedStyle(document.querySelector('label[for="wd-system-2"]'), "::before").backgroundColor }));
+    ok("widgets in dark: the chosen option has the lamp dot, the others have a ring", dots.chosen === DARK.lamp && dots.other === "rgba(0, 0, 0, 0)", dots);
+    await context.close();
+  }
+
+  // Widgets with scripts off: the chooser still works, the boxes can be ticked, and the decision helper is its table.
+  {
+    const context = await browser.newContext({ viewport: { width: 1280, height: 900 }, javaScriptEnabled: false });
+    const page = await context.newPage();
+    await page.setContent(html, { waitUntil: "load" });
+    await page.click('label[for="wd-system-2"]');
+    await page.click('label[for="wd-ready-2"]');
+    const shown = (sel) => page.locator(sel).evaluateAll((els) => els.map((el, i) => (el.getBoundingClientRect().height > 0 ? i + 1 : 0)).filter(Boolean).join());
+    const off = { cases: await shown("#wd-system .case"), ask: await shown("#wd-kind .decide-ask"), rows: await shown("#wd-kind tbody tr"), count: await shown("#wd-ready output"), button: await shown("#wd-ready button"), ticked: await page.locator("#wd-ready-2").isChecked() };
+    ok("with scripts off: the chooser shows the chosen case, a box can be ticked, and the decision helper shows its table only", off.cases === "2" && off.ask === "" && off.rows === "1,2,3" && off.count === "" && off.button === "1" && off.ticked, off);
+    await context.close();
+  }
+
+  // Widgets on paper: every case with its name, the boxes, and the full table.
+  {
+    const { page, context } = await open({ width: 794, height: 1123 });
+    await page.click('label[for="wd-kind-q1-2"]');
+    await page.click('label[for="wd-ready-1"]');
+    await page.evaluate(() => dispatchEvent(new Event("beforeprint")));
+    await page.emulateMedia({ media: "print" });
+    const paper = await page.evaluate(() => {
+      const shown = (sel) => [...document.querySelectorAll(sel)].filter((el) => el.getBoundingClientRect().height > 0).length;
+      return { cases: shown("#wd-system .case"), names: shown("#wd-system .case-t"), options: shown("#wd-system .opt"), ask: shown("#wd-kind .decide-ask"), rows: shown("#wd-kind tbody tr"), foot: shown(".wd-foot"), boxes: shown("#wd-ready li"), row: getComputedStyle(document.querySelector("#wd-kind tr.is-out")).color, line: getComputedStyle(document.querySelector('label[for="wd-ready-1"]')).color };
+    });
+    ok("on paper: every case prints under its name, the boxes print, and the full table prints in the text color", paper.cases === 3 && paper.names === 3 && paper.options === 0 && paper.ask === 0 && paper.rows === 3 && paper.foot === 0 && paper.boxes === 4 && paper.row === LIGHT.text && paper.line === LIGHT.text, paper);
+    await page.screenshot({ path: `${out}/widgets-print.png`, fullPage: true });
+    await context.close();
+  }
+
+  // Choosers with the same cases change together, and the one that the reader used stays in place.
+  {
+    const twin = '<!-- docent:widget\n{"id": "twin", "kind": "chooser", "label": "Your system", "cases": [{"name": "macOS", "body": ["Short."]}, {"name": "Windows", "body": ["A longer text.", {"list": ["One.", "Two.", "Three.", "Four."]}]}, {"name": "Linux", "body": ["Short."]}]}\n-->\n<!-- /docent:widget -->\n';
+    const { page, context } = await open({ width: 1280, content: renderDocument(html.replace('<section id="report"', `${twin}<section id="report"`)).html });
+    await page.evaluate(() => document.querySelector("#wd-system").scrollIntoView({ block: "center" }));
+    const before = await page.evaluate(() => document.querySelector('label[for="wd-system-2"]').getBoundingClientRect().top);
+    await page.click('label[for="wd-system-2"]');
+    const both = await page.evaluate(() => ({ twin: document.querySelector("#wd-twin-2").checked, own: document.querySelector("#wd-system-2").checked, top: document.querySelector('label[for="wd-system-2"]').getBoundingClientRect().top }));
+    ok("choosers with the same cases change together, and the one in use does not move", both.twin && both.own && Math.abs(both.top - before) < 1, { ...both, before });
     await context.close();
   }
 
