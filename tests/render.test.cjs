@@ -104,7 +104,7 @@ test("an optional leg is drawn dashed", () => {
 
 test("render warns when a whole arrow is off the first phone screen while its two parts show", () => {
   const { warnings, icons } = renderDiagram(fixture("skip"));
-  assert.deepEqual(warnings, ['on a phone this drawing scrolls sideways, and leg 3 ("skip the review") is not on the first screen: its two parts show there, but its arrow does not. Say this path in the text too']);
+  assert.deepEqual(warnings, ['on a phone this drawing scrolls sideways, and leg 3 ("skip the review") is not on the first screen: its two parts show there, but its arrow does not. Say this path in the text too. This warning stays after you did, because render cannot read the text']);
   assert.deepEqual(icons, [], "it is a warning for the author, not an error in check");
   assert.deepEqual(renderDiagram(fixture("bug-report")).warnings, [], "a route has a phone form, so it gets no such warning");
 });
