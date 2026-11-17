@@ -1,4 +1,4 @@
-<svg id="dg-invoice" class="dg dg-plates dg-auto" xmlns="http://www.w3.org/2000/svg" width="1218" height="646" viewBox="0 0 1218 646" role="img" aria-label="An invoice between three teams: sales writes it, finance checks it, the customer pays or disputes it, and finance closes it.">
+<svg id="dg-invoice" class="dg dg-plates dg-auto" xmlns="http://www.w3.org/2000/svg" width="1218" height="638" viewBox="0 0 1218 638" role="img" aria-label="An invoice between three teams: sales writes it, finance checks it, the customer pays or disputes it, and finance closes it.">
 <style>
 #dg-invoice{display:block;flex:none;margin-inline:auto;font-family:var(--sans,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif)}
 #dg-invoice .ground{fill:var(--fig,#f2f3f9)}
@@ -20,62 +20,62 @@
 #dg-invoice .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
 .js #dg-invoice .pulse{display:block;animation:12.4s linear 2 both}
 .js #dg-invoice:not(.is-playing) .pulse{animation-play-state:paused}
-@keyframes dg-invoice-1{0%{transform:translate(284px,116px);opacity:0}0.97%{transform:translate(284px,116px);opacity:1}4.13%{transform:translate(284px,176px);opacity:1}10.89%{transform:translate(412px,176px);opacity:1}12.9%{transform:translate(412px,176px);opacity:0}100%{transform:translate(412px,176px);opacity:0}}
+@keyframes dg-invoice-1{0%{transform:translate(284px,116px);opacity:0}0.97%{transform:translate(284px,116px);opacity:1}4.34%{transform:translate(284px,182px);opacity:1}10.89%{transform:translate(412px,182px);opacity:1}12.9%{transform:translate(412px,182px);opacity:0}100%{transform:translate(412px,182px);opacity:0}}
 .js #dg-invoice .pulse-1{animation-name:dg-invoice-1}
-@keyframes dg-invoice-2{0%{transform:translate(444px,164px);opacity:0}12.9%{transform:translate(444px,164px);opacity:0}13.87%{transform:translate(444px,164px);opacity:1}17.04%{transform:translate(444px,104px);opacity:1}23.79%{transform:translate(316px,104px);opacity:1}25.81%{transform:translate(316px,104px);opacity:0}100%{transform:translate(316px,104px);opacity:0}}
+@keyframes dg-invoice-2{0%{transform:translate(444px,156px);opacity:0}12.9%{transform:translate(444px,156px);opacity:0}13.87%{transform:translate(444px,156px);opacity:1}16.74%{transform:translate(444px,104px);opacity:1}23.79%{transform:translate(316px,104px);opacity:1}25.81%{transform:translate(316px,104px);opacity:0}100%{transform:translate(316px,104px);opacity:0}}
 .js #dg-invoice .pulse-2{animation-name:dg-invoice-2}
-@keyframes dg-invoice-3{0%{transform:translate(658px,216px);opacity:0}25.81%{transform:translate(658px,216px);opacity:0}26.77%{transform:translate(658px,216px);opacity:1}29.64%{transform:translate(658px,268px);opacity:1}36.69%{transform:translate(786px,268px);opacity:1}38.71%{transform:translate(786px,268px);opacity:0}100%{transform:translate(786px,268px);opacity:0}}
+@keyframes dg-invoice-3{0%{transform:translate(658px,208px);opacity:0}25.81%{transform:translate(658px,208px);opacity:0}26.77%{transform:translate(658px,208px);opacity:1}30.15%{transform:translate(658px,274px);opacity:1}36.69%{transform:translate(786px,274px);opacity:1}38.71%{transform:translate(786px,274px);opacity:0}100%{transform:translate(786px,274px);opacity:0}}
 .js #dg-invoice .pulse-3{animation-name:dg-invoice-3}
-@keyframes dg-invoice-4{0%{transform:translate(925px,308px);opacity:0}38.71%{transform:translate(925px,308px);opacity:0}39.68%{transform:translate(925px,308px);opacity:1}49.6%{transform:translate(925px,380px);opacity:1}51.61%{transform:translate(925px,380px);opacity:0}100%{transform:translate(925px,380px);opacity:0}}
+@keyframes dg-invoice-4{0%{transform:translate(925px,300px);opacity:0}38.71%{transform:translate(925px,300px);opacity:0}39.68%{transform:translate(925px,300px);opacity:1}49.6%{transform:translate(925px,372px);opacity:1}51.61%{transform:translate(925px,372px);opacity:0}100%{transform:translate(925px,372px);opacity:0}}
 .js #dg-invoice .pulse-4{animation-name:dg-invoice-4}
-@keyframes dg-invoice-5{0%{transform:translate(1062px,296px);opacity:0}51.61%{transform:translate(1062px,296px);opacity:0}52.58%{transform:translate(1062px,296px);opacity:1}54.95%{transform:translate(1148px,296px);opacity:1}60.19%{transform:translate(1148px,486px);opacity:1}62.5%{transform:translate(1064px,486px);opacity:1}64.52%{transform:translate(1064px,486px);opacity:0}100%{transform:translate(1064px,486px);opacity:0}}
+@keyframes dg-invoice-5{0%{transform:translate(1062px,274px);opacity:0}51.61%{transform:translate(1062px,274px);opacity:0}52.58%{transform:translate(1062px,274px);opacity:1}54.78%{transform:translate(1148px,274px);opacity:1}60.35%{transform:translate(1148px,492px);opacity:1}62.5%{transform:translate(1064px,492px);opacity:1}64.52%{transform:translate(1064px,492px);opacity:0}100%{transform:translate(1064px,492px);opacity:0}}
 .js #dg-invoice .pulse-5{animation-name:dg-invoice-5}
-@keyframes dg-invoice-6{0%{transform:translate(788px,486px);opacity:0}64.52%{transform:translate(788px,486px);opacity:0}65.48%{transform:translate(788px,486px);opacity:1}66.47%{transform:translate(702px,486px);opacity:1}70.99%{transform:translate(702px,90px);opacity:1}75.4%{transform:translate(316px,90px);opacity:1}77.42%{transform:translate(316px,90px);opacity:0}100%{transform:translate(316px,90px);opacity:0}}
+@keyframes dg-invoice-6{0%{transform:translate(788px,492px);opacity:0}64.52%{transform:translate(788px,492px);opacity:0}65.48%{transform:translate(788px,492px);opacity:1}66.44%{transform:translate(702px,492px);opacity:1}71.09%{transform:translate(702px,76px);opacity:1}75.4%{transform:translate(316px,76px);opacity:1}77.42%{transform:translate(316px,76px);opacity:0}100%{transform:translate(316px,76px);opacity:0}}
 .js #dg-invoice .pulse-6{animation-name:dg-invoice-6}
-@keyframes dg-invoice-7{0%{transform:translate(788px,422px);opacity:0}77.42%{transform:translate(788px,422px);opacity:0}78.39%{transform:translate(788px,422px);opacity:1}78.93%{transform:translate(774px,422px);opacity:1}85.03%{transform:translate(774px,578px);opacity:1}88.31%{transform:translate(690px,578px);opacity:1}90.32%{transform:translate(690px,578px);opacity:0}100%{transform:translate(690px,578px);opacity:0}}
+@keyframes dg-invoice-7{0%{transform:translate(788px,400px);opacity:0}77.42%{transform:translate(788px,400px);opacity:0}78.39%{transform:translate(788px,400px);opacity:1}78.88%{transform:translate(774px,400px);opacity:1}85.35%{transform:translate(774px,584px);opacity:1}88.31%{transform:translate(690px,584px);opacity:1}90.32%{transform:translate(690px,584px);opacity:0}100%{transform:translate(690px,584px);opacity:0}}
 .js #dg-invoice .pulse-7{animation-name:dg-invoice-7}
 @media (prefers-reduced-motion:reduce){#dg-invoice .pulse{animation:none!important}#dg-invoice .pulse{display:none!important}}
 @media print{#dg-invoice{max-width:100%;height:auto}#dg-invoice .pulse{display:none!important}}
 </style>
-<rect width="1218" height="646" class="ground"/>
-<rect x="12" y="12" width="330" height="622" rx="10" class="band"/>
-<rect x="386" y="12" width="330" height="622" rx="10" class="band"/>
-<rect x="760" y="12" width="402" height="622" rx="10" class="band"/>
+<rect width="1218" height="638" class="ground"/>
+<rect x="12" y="12" width="330" height="614" rx="10" class="band"/>
+<rect x="386" y="12" width="330" height="614" rx="10" class="band"/>
+<rect x="760" y="12" width="402" height="614" rx="10" class="band"/>
 <g class="icon lane-icon" transform="translate(40,31)"><circle cx="8" cy="5" r="2.5"/><path d="M3 13.5c0-2.8 2.2-4.5 5-4.5s5 1.7 5 4.5"/></g>
 <text x="64" y="44" class="lane" text-anchor="start">Sales</text>
 <g class="icon lane-icon" transform="translate(414,31)"><circle cx="6" cy="5.5" r="2.25"/><path d="M1.75 13c0-2.4 1.9-3.75 4.25-3.75s4.25 1.35 4.25 3.75M10.5 3.5a2.25 2.25 0 0 1 0 4.25M12 9.6c1.4.5 2.25 1.7 2.25 3.4"/></g>
 <text x="438" y="44" class="lane" text-anchor="start">Finance</text>
 <g class="icon lane-icon" transform="translate(788,31)"><circle cx="8" cy="5" r="2.5"/><path d="M3 13.5c0-2.8 2.2-4.5 5-4.5s5 1.7 5 4.5"/></g>
 <text x="812" y="44" class="lane" text-anchor="start">Customer</text>
-<g class="leg" data-leg="1"><path d="M284,116 L284,168 Q284,176 292,176 L406,176" class="line"/><polygon points="404,180.5 404,171.5 412,176" class="head"/><circle cx="364" cy="176" r="10" class="mark"/><text x="364" y="180" class="num" text-anchor="middle">1</text><text x="364" y="157" class="verb" text-anchor="middle">hand over</text><circle r="6" class="pulse pulse-1"/></g>
-<g class="leg" data-leg="2"><path d="M444,164 L444,112 Q444,104 436,104 L322,104" class="line"/><polygon points="324,99.5 324,108.5 316,104" class="head"/><circle cx="364" cy="104" r="10" class="mark"/><text x="364" y="108" class="num" text-anchor="middle">2</text><text x="364" y="132" class="verb" text-anchor="middle">send back</text><circle r="6" class="pulse pulse-2"/></g>
-<g class="leg" data-leg="3"><path d="M658,216 L658,260 Q658,268 666,268 L780,268" class="line"/><polygon points="778,272.5 778,263.5 786,268" class="head"/><circle cx="738" cy="268" r="10" class="mark"/><text x="738" y="272" class="num" text-anchor="middle">3</text><text x="738" y="249" class="verb" text-anchor="middle">send</text><circle r="6" class="pulse pulse-3"/></g>
-<g class="leg" data-leg="4"><path d="M925,308 L925,374" class="line"/><polygon points="920.5,372 929.5,372 925,380" class="head"/><circle cx="925" cy="340" r="10" class="mark"/><text x="925" y="344" class="num" text-anchor="middle">4</text><text x="941" y="344" class="verb" text-anchor="start">pay</text><circle r="6" class="pulse pulse-4"/></g>
-<g class="leg" data-leg="5"><path d="M1062,296 L1140,296 Q1148,296 1148,304 L1148,478 Q1148,486 1140,486 L1070,486" class="line"/><polygon points="1072,481.5 1072,490.5 1064,486" class="head"/><circle cx="1148" cy="391" r="10" class="mark"/><text x="1148" y="395" class="num" text-anchor="middle">5</text><text x="1164" y="395" class="verb" text-anchor="start">dispute</text><circle r="6" class="pulse pulse-5"/></g>
-<g class="leg" data-leg="6"><path d="M788,486 L710,486 Q702,486 702,478 L702,98 Q702,90 694,90 L322,90" class="line"/><polygon points="324,85.5 324,94.5 316,90" class="head"/><circle cx="738" cy="486" r="10" class="mark"/><text x="738" y="490" class="num" text-anchor="middle">6</text><text x="750" y="514" class="verb" text-anchor="end">ask for a new invoice</text><circle r="6" class="pulse pulse-6"/></g>
-<g class="leg" data-leg="7"><path d="M788,422 L781,422 Q774,422 774,429 L774,570 Q774,578 766,578 L696,578" class="line"/><polygon points="698,573.5 698,582.5 690,578" class="head"/><circle cx="738" cy="578" r="10" class="mark"/><text x="738" y="582" class="num" text-anchor="middle">7</text><text x="738" y="559" class="verb" text-anchor="middle">record</text><circle r="6" class="pulse pulse-7"/></g>
+<g class="leg" data-leg="1"><path d="M284,116 L284,174 Q284,182 292,182 L406,182" class="line"/><polygon points="404,186.5 404,177.5 412,182" class="head"/><circle cx="364" cy="182" r="10" class="mark"/><text x="364" y="186" class="num" text-anchor="middle">1</text><text x="364" y="163" class="verb" text-anchor="middle">hand over</text><circle r="6" class="pulse pulse-1"/></g>
+<g class="leg" data-leg="2"><path d="M444,156 L444,112 Q444,104 436,104 L322,104" class="line"/><polygon points="324,99.5 324,108.5 316,104" class="head"/><circle cx="364" cy="104" r="10" class="mark"/><text x="364" y="108" class="num" text-anchor="middle">2</text><text x="364" y="132" class="verb" text-anchor="middle">send back</text><circle r="6" class="pulse pulse-2"/></g>
+<g class="leg" data-leg="3"><path d="M658,208 L658,266 Q658,274 666,274 L780,274" class="line"/><polygon points="778,278.5 778,269.5 786,274" class="head"/><circle cx="738" cy="274" r="10" class="mark"/><text x="738" y="278" class="num" text-anchor="middle">3</text><text x="738" y="255" class="verb" text-anchor="middle">send</text><circle r="6" class="pulse pulse-3"/></g>
+<g class="leg" data-leg="4"><path d="M925,300 L925,366" class="line"/><polygon points="920.5,364 929.5,364 925,372" class="head"/><circle cx="925" cy="332" r="10" class="mark"/><text x="925" y="336" class="num" text-anchor="middle">4</text><text x="941" y="336" class="verb" text-anchor="start">pay</text><circle r="6" class="pulse pulse-4"/></g>
+<g class="leg" data-leg="5"><path d="M1062,274 L1140,274 Q1148,274 1148,282 L1148,484 Q1148,492 1140,492 L1070,492" class="line"/><polygon points="1072,487.5 1072,496.5 1064,492" class="head"/><circle cx="1148" cy="383" r="10" class="mark"/><text x="1148" y="387" class="num" text-anchor="middle">5</text><text x="1164" y="387" class="verb" text-anchor="start">dispute</text><circle r="6" class="pulse pulse-5"/></g>
+<g class="leg" data-leg="6"><path d="M788,492 L710,492 Q702,492 702,484 L702,84 Q702,76 694,76 L322,76" class="line"/><polygon points="324,71.5 324,80.5 316,76" class="head"/><circle cx="738" cy="492" r="10" class="mark"/><text x="738" y="496" class="num" text-anchor="middle">6</text><text x="750" y="520" class="verb" text-anchor="end">ask for a new invoice</text><circle r="6" class="pulse pulse-6"/></g>
+<g class="leg" data-leg="7"><path d="M788,400 L781,400 Q774,400 774,407 L774,576 Q774,584 766,584 L696,584" class="line"/><polygon points="698,579.5 698,588.5 690,584" class="head"/><circle cx="738" cy="584" r="10" class="mark"/><text x="738" y="588" class="num" text-anchor="middle">7</text><text x="738" y="565" class="verb" text-anchor="middle">record</text><circle r="6" class="pulse pulse-7"/></g>
 <rect x="40" y="64" width="274" height="52" rx="10" class="card"/>
 <g class="icon" transform="translate(56,82)"><path d="M9.5 2.5h-5a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1v-7z"/><path d="M9.5 2.5v3h3M6 9h4M6 11.25h4"/></g>
 <text x="86" y="87" class="name" text-anchor="start">Draft invoice</text>
 <text x="86" y="104" class="sub" text-anchor="start">items and prices</text>
-<rect x="414" y="164" width="274" height="52" rx="10" class="card"/>
-<g class="icon" transform="translate(430,182)"><circle cx="8" cy="8" r="5.5"/><path d="M5.5 8.2l1.8 1.8 3.2-3.6"/></g>
-<text x="460" y="187" class="name" text-anchor="start">Checked invoice</text>
-<text x="460" y="204" class="sub" text-anchor="start">tax and totals agree</text>
-<rect x="788" y="256" width="274" height="52" rx="10" class="card"/>
-<g class="icon" transform="translate(804,274)"><path d="M2.5 4a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v6.5a1 1 0 0 1-1 1H7l-3 2.5v-2.5h-.5a1 1 0 0 1-1-1z"/><path d="M5.5 6.25h5M5.5 8.5h3"/></g>
-<text x="834" y="279" class="name" text-anchor="start">Received invoice</text>
-<text x="834" y="296" class="sub" text-anchor="start">due in 30 days</text>
-<rect x="788" y="382" width="274" height="52" rx="10" class="card"/>
-<g class="icon" transform="translate(804,400)"><circle cx="5.25" cy="10.75" r="2.75"/><path d="M7.25 8.75l6.25-6.25M10.5 5.5l1.75 1.75M12.25 3.75L13.5 5"/></g>
-<text x="834" y="405" class="name" text-anchor="start">Payment</text>
-<text x="834" y="422" class="sub" text-anchor="start">by bank transfer</text>
-<rect x="788" y="474" width="274" height="52" rx="10" class="card"/>
-<g class="icon" transform="translate(804,492)"><circle cx="7" cy="7" r="4"/><path d="M10 10l3.5 3.5"/></g>
-<text x="834" y="497" class="name" text-anchor="start">Dispute</text>
-<text x="834" y="514" class="sub" text-anchor="start">one item is wrong</text>
-<rect x="414" y="566" width="274" height="52" rx="10" class="card"/>
-<g class="icon" transform="translate(430,584)"><path d="M3 4.5a5 2 0 0 0 10 0 5 2 0 0 0-10 0v7a5 2 0 0 0 10 0v-7"/><path d="M3 8a5 2 0 0 0 10 0"/></g>
-<text x="460" y="589" class="name" text-anchor="start">Ledger entry</text>
-<text x="460" y="606" class="sub" text-anchor="start">the invoice is closed</text>
+<rect x="414" y="156" width="274" height="52" rx="10" class="card"/>
+<g class="icon" transform="translate(430,174)"><circle cx="8" cy="8" r="5.5"/><path d="M5.5 8.2l1.8 1.8 3.2-3.6"/></g>
+<text x="460" y="179" class="name" text-anchor="start">Checked invoice</text>
+<text x="460" y="196" class="sub" text-anchor="start">tax and totals agree</text>
+<rect x="788" y="248" width="274" height="52" rx="10" class="card"/>
+<g class="icon" transform="translate(804,266)"><path d="M2.5 4a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v6.5a1 1 0 0 1-1 1H7l-3 2.5v-2.5h-.5a1 1 0 0 1-1-1z"/><path d="M5.5 6.25h5M5.5 8.5h3"/></g>
+<text x="834" y="271" class="name" text-anchor="start">Received invoice</text>
+<text x="834" y="288" class="sub" text-anchor="start">due in 30 days</text>
+<rect x="788" y="374" width="274" height="52" rx="10" class="card"/>
+<g class="icon" transform="translate(804,392)"><circle cx="5.25" cy="10.75" r="2.75"/><path d="M7.25 8.75l6.25-6.25M10.5 5.5l1.75 1.75M12.25 3.75L13.5 5"/></g>
+<text x="834" y="397" class="name" text-anchor="start">Payment</text>
+<text x="834" y="414" class="sub" text-anchor="start">by bank transfer</text>
+<rect x="788" y="466" width="274" height="52" rx="10" class="card"/>
+<g class="icon" transform="translate(804,484)"><circle cx="7" cy="7" r="4"/><path d="M10 10l3.5 3.5"/></g>
+<text x="834" y="489" class="name" text-anchor="start">Dispute</text>
+<text x="834" y="506" class="sub" text-anchor="start">one item is wrong</text>
+<rect x="414" y="558" width="274" height="52" rx="10" class="card"/>
+<g class="icon" transform="translate(430,576)"><path d="M3 4.5a5 2 0 0 0 10 0 5 2 0 0 0-10 0v7a5 2 0 0 0 10 0v-7"/><path d="M3 8a5 2 0 0 0 10 0"/></g>
+<text x="460" y="581" class="name" text-anchor="start">Ledger entry</text>
+<text x="460" y="598" class="sub" text-anchor="start">the invoice is closed</text>
 </svg>
