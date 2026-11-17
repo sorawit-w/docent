@@ -55,7 +55,9 @@ function readData(data) {
     const from = model.parts.findIndex((p) => p.id === leg?.from), to = model.parts.findIndex((p) => p.id === leg?.to);
     if (from < 0 || to < 0) fail(`leg ${i + 1} goes from "${leg?.from}" to "${leg?.to}"; both must be ids of parts`);
     if (from === to) fail(`leg ${i + 1} starts and ends at the same part`);
-    return { n: i + 1, from, to, verb: words(leg.verb, `the verb of leg ${i + 1}`, MOST.verb) };
+    // An optional leg is a path that only some readers take. It is drawn as a dashed arrow.
+    if (leg.optional != null && typeof leg.optional !== "boolean") fail(`"optional" of leg ${i + 1} must be true or false`);
+    return { n: i + 1, from, to, verb: words(leg.verb, `the verb of leg ${i + 1}`, MOST.verb), optional: leg.optional === true };
   });
 
   // In one diagram, either every part has an icon or no part has one. The same holds for lanes.
@@ -116,12 +118,24 @@ function renderDiagram(data) {
     warnings.push(`the drawing is ${scene.w}px wide; beside the walkthrough steps there is room for ${WALK}px, so it will scroll sideways.${lanes} The widest texts are ${widest.join(" and ")}; shorter names and notes make the drawing narrower`);
   }
   const id = `dg-${model.id}`, mode = model.place === "walk" ? "walk" : "auto";
-  const withStates = (drawing) => { for (const part of drawing.parts) part.state = model.parts.find((p) => p.id === part.id).state; return drawing; };
+  const withStates = (drawing) => {
+    for (const part of drawing.parts) part.state = model.parts.find((p) => p.id === part.id).state;
+    for (const leg of drawing.legs) leg.optional = model.legs[leg.n - 1].optional;
+    return drawing;
+  };
   withStates(scene);
   // A route also gets a single-track form. It takes the place of the main form on a screen or a sheet of paper that is too narrow.
   let phone = null;
   if (model.chain && scene.w > PHONE) {
     try { phone = withStates(layoutRoute(model, "track")); } catch (error) { warnings.push(`no phone form: ${error.message}`); }
+  }
+  // A drawing with no phone form scrolls sideways on a phone. It misleads when a whole arrow is off the first screen while both of its parts show there.
+  if (!phone && scene.w > PHONE) {
+    const left = (part) => (part.shape === "card" ? part.x : part.cx - part.r);
+    for (const leg of scene.legs) {
+      const ends = [leg.from, leg.to].map((end) => scene.parts.find((part) => part.id === end));
+      if (leg.pts.every(([x]) => x > PHONE) && ends.every((part) => left(part) < PHONE)) warnings.push(`on a phone this drawing scrolls sideways, and leg ${leg.n} ("${leg.verb.s}") is not on the first screen: its two parts show there, but its arrow does not. Say this path in the text too`);
+    }
   }
   const main = toSvg(scene, { id, label: model.label, mode, swap: phone && { phone: `${id}-phone` } });
   const svg = phone ? `${main}\n${toSvg(phone, { id: `${id}-phone`, label: model.label, mode, swap: { main: id, below: scene.w + ROOM } })}` : main;

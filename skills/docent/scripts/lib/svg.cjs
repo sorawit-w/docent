@@ -95,6 +95,8 @@ function styles(scene, id, mode, swap) {
   ];
   // A part with a state: its outline takes the status color, and a status dot sits on the outline. A drawing with no state carries none of these rules.
   for (const state of new Set(scene.parts.map((part) => part.state).filter(Boolean))) css.push(`${s} .stop.is-${state},${s} .card.is-${state}{stroke:${v(state)};stroke-width:1.5}`, `${s} .flag.is-${state}{fill:${v(state)};stroke:${v("bg")};stroke-width:2}`);
+  // An optional leg is dashed. A drawing with no optional leg carries no such rule.
+  if (scene.legs.some((leg) => leg.optional)) css.push(`${s} .leg.is-optional .line{stroke-dasharray:5 7}`);
   // On paper nothing scrolls: a drawing that is still wider than the page shrinks to fit it.
   const print = [`${s}{max-width:100%;height:auto}`, `${s} .pulse{display:none!important}`];
   const still = [`${s} .pulse{animation:none!important}`];
@@ -151,7 +153,7 @@ function toSvg(scene, { id, label, mode, swap }) {
   }
   for (const leg of scene.legs) {
     out.push(
-      `<g class="leg" data-leg="${leg.n}"><path d="${linePath(leg)}" class="line"/>${head(leg)}` +
+      `<g class="leg${leg.optional ? " is-optional" : ""}" data-leg="${leg.n}"><path d="${linePath(leg)}" class="line"/>${head(leg)}` +
         `<circle cx="${num(leg.mark[0])}" cy="${num(leg.mark[1])}" r="${MARK}" class="mark"/>` +
         text({ x: leg.mark[0], y: leg.mark[1] + 4, s: leg.n, cls: "num", anchor: "middle" }) +
         text(leg.verb) +
