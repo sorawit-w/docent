@@ -83,6 +83,12 @@ code { font: 14px/1.55 var(--mono); background: var(--panel); padding: 0.1em 0.3
 /* Lists in the text flow: points, or numbers for steps that one actor does. The rules are weak on purpose, so the lists of the kit's own blocks keep their styles. */
 :where(main) :where(ul, ol):not(.steps, .facts) { max-width: var(--measure); margin: 0 0 16px; padding-left: 24px; }
 :where(main) :where(ul, ol):not(.steps, .facts) > :where(li + li) { margin-top: 4px; }
+/* A block heading in the text flow has more space above it than below it. A step heading of a walkthrough has none. */
+:where(main) h3 { margin: 32px 0 8px; }
+h2 + h3 { margin-top: 0; }
+.steps h3 { margin: 0; }
+/* A code block, a table, a closed section, a walkthrough, a status note and a figure bring no space below them. Text that follows brings it. */
+:is(pre, .table-wrap, details, .walk, .status, figure) + :is(p, ul, ol) { margin-top: 24px; }
 
 /* Margin notes: the guide's remarks sit beside the text, like a wall label. */
 .row { display: grid; grid-template-columns: minmax(0, var(--measure)) var(--margin-col); column-gap: var(--gap); align-items: start; }
