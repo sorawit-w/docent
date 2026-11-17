@@ -58,6 +58,8 @@ Do not use it for app screens, slide decks or marketing pages.
    `render` makes every diagram and every widget that it can. When it refuses one, it says why, leaves that block as it was, and ends with exit code 1. Fix every error that `render` and `check` report, then run them again. Read every warning and decide.
 9. **Look at the result.** Open the document in a browser at desktop and phone width, in light and dark, and in print preview. Use each widget once. `check` cannot do this for you. If you have no browser, say so to the user.
 
+When the user asks for something that a rule forbids, follow the rule, say which rule it is, and offer the user's way. Do it the user's way when the user confirms.
+
 ## When a script cannot run
 
 - **The machine has no Node 18 or newer, and you write a document.** Write the document with its data blocks. Write no drawing, no widget markup and no page styles by hand. Give the user the three commands of step 8, and say that the document is not finished until they ran.
