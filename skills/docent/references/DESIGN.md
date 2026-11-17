@@ -153,7 +153,7 @@ Docent uses system fonts only, because every document is one file with nothing t
 
 **How the renderer picks.** Paths that branch, and a note longer than 28 characters, give Plates. A diagram beside walkthrough steps gives Route tall. A route with more than five legs gives Route tall. Any other route gives Route wide. When the picked form cannot keep the spacing rules, or is wider than the page, the renderer tries the next form. A diagram has at most 4 lanes, 12 parts and 16 legs.
 
-**On a phone.** A route also has a single-track form. The route runs straight down, each visit to a lane is a band, and each leg that changes lane has its mark in the gap between two bands. This form takes the place of the main form on a screen that is too narrow for it, and it fits a screen of 320px. The same holds on paper: a route that is wider than the sheet prints in its single-track form. Paths that branch have no single-track form; their Plates drawing scrolls sideways inside its well on a narrow screen, and it shrinks to fit the sheet on paper.
+**On a phone.** A route also has a single-track form. The route runs straight down, each visit to a lane is a band, and each leg that changes lane has its mark in the gap between two bands. This form takes the place of the main form on a screen that is too narrow for it, and it fits a screen of 320px. The same holds on paper: a route that is wider than the sheet prints in its single-track form. Paths that branch have no single-track form; their Plates drawing scrolls sideways inside its well on a narrow screen, and it shrinks to fit the sheet on paper. When a drawing is wider than its well, one line of small text under the well says so, because the part that shows can look complete.
 
 **Three layers.** Every diagram has the well as its ground, a band or panel for each lane in the page color, and the drawing on top. The ground has no pattern. The layers show which parts belong together before the reader reads a word.
 
@@ -171,7 +171,9 @@ Docent uses system fonts only, because every document is one file with nothing t
 - **In a walkthrough,** the leg of the current step takes the ultramarine color and the dot travels along that leg.
 - **Anywhere else,** one dot travels the whole route by itself, leg by leg in the order of the numbers. Only one dot is in flight at a time, so the motion shows the order. The run plays twice and then rests, so the page is calm while the reader reads.
 
-**Lists.** A list sits in the text column, with an indent of 24px and 4px between its lines. Points are a list with bullets. Steps that one actor does are a list with numbers. Steps with two or more actors are a walkthrough, because its figure shows who acts and what moves.
+**Lists.** A list sits in the text column, with an indent of 24px and 4px between its lines. Points are a list with bullets. Steps that one actor does are a list with numbers. Steps with two or more actors are a walkthrough, because its figure shows who acts and what moves. When a step of one actor holds a code block, a table or a widget, each step is a numbered block heading: the number stands before the heading in the muted color, as in a walkthrough.
+
+**Code blocks.** A code block sits in a well. With JavaScript on, a small button in its upper right corner copies the code. The button is part of the well: it has the well's ground, and a thin line on its left and lower edge. Its word changes from "Copy" to "Copied" for two seconds. It does not move.
 
 **Widgets.** A widget is a part of the page that the reader uses. Docent has three: a chooser, a checklist and a decision helper (see Widgets). A widget sits in the text flow and has no box. Its text uses the text column; a code block inside a chooser uses the full width, like any code block.
 
