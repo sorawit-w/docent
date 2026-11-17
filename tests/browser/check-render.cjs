@@ -310,6 +310,58 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     await context.close();
   }
 
+  // A numbered block heading, the line under a drawing that is wider than its well, and the copy button on code.
+  {
+    const skip = fs.readFileSync(path.join(root, "tests", "fixtures", "skip.json"), "utf8");
+    const extra = `<section id="extra" aria-labelledby="extra-h"><h2 id="extra-h">Extra</h2><h3 class="step">First</h3><p>Text.</p><pre tabindex="0" role="region" aria-label="A short command"><code>app start</code></pre><h3 class="step">Second</h3><pre tabindex="0" role="region" aria-label="A long command"><code>app get --all --from the-long-source-name --into the-long-folder-name --and-then verify --and-then report</code></pre><figure><div class="fig" role="region" aria-label="Figure 9, a request" tabindex="0">\n<!-- docent:diagram\n${skip}\n-->\n<!-- /docent:diagram -->\n</div><figcaption><strong>Figure 9</strong>A request.</figcaption></figure></section>\n`;
+    const content = renderDocument(html.replace('<section id="report"', `${extra}<section id="report"`)).html;
+    const look = (page) => page.evaluate(() => {
+      const shown = (el) => el.getBoundingClientRect().height > 0, extra = document.querySelector("#extra");
+      return {
+        numbers: [...extra.querySelectorAll("h3.step")].map((h) => `${getComputedStyle(h).counterIncrement}|${getComputedStyle(h, "::before").content}`).join(),
+        hint: shown(extra.querySelector(".fig-more")), otherHints: [...document.querySelectorAll(".fig-more")].filter((n) => !extra.contains(n) && shown(n)).length,
+        buttons: extra.querySelectorAll(".code > .copy").length, long: [...extra.querySelectorAll(".code")].map((c) => c.classList.contains("is-long")).join(),
+        dashed: getComputedStyle(extra.querySelector(".leg.is-optional .line")).strokeDasharray,
+      };
+    });
+    const wide = await open({ width: 1280, content });
+    const onDesk = await look(wide.page);
+    await wide.page.addScriptTag({ path: axePath });
+    const axe = await wide.page.evaluate(async () => (await window.axe.run(document.querySelector("#extra"), { runOnly: { type: "tag", values: ["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa", "best-practice"] } })).violations.map((v) => `${v.id} ${v.nodes[0].target.join(" ")}`));
+    await wide.context.close();
+    const narrow = await open({ width: 390, height: 844, content });
+    const onPhone = await look(narrow.page);
+    await narrow.page.locator("#extra").screenshot({ path: `${out}/extra-phone.png` });
+    await narrow.context.close();
+    const paper = await open({ width: 794, height: 1123, media: "print", content });
+    const onPaper = await paper.page.evaluate(() => [...document.querySelectorAll("#extra .copy, #extra .fig-more")].filter((el) => el.getBoundingClientRect().height > 0).length);
+    await paper.context.close();
+    ok("numbered block headings count up, an optional leg is dashed, and each code block has a copy button", onDesk.numbers === "block-step 1|counter(block-step),block-step 1|counter(block-step)" && onDesk.dashed === "5px, 7px" && onDesk.buttons === 2 && axe.length === 0, { onDesk, axe });
+    ok("a drawing that is wider than its well gets a line under it on a phone, and no line when it fits", onPhone.hint && !onDesk.hint && onPhone.otherHints === 0 && onDesk.otherHints === 0, { phone: onPhone.hint, desk: onDesk.hint, others: [onPhone.otherHints, onDesk.otherHints] });
+    ok("code that reaches the copy button starts below it, and short code keeps its place", onDesk.long === "false,false" && onPhone.long === "false,true", { desk: onDesk.long, phone: onPhone.long });
+    ok("on paper the copy button and the line under a drawing do not print", onPaper === 0, onPaper);
+  }
+
+  // The copy button copies the code. The page is opened from its file, as a reader opens it.
+  {
+    const context = await browser.newContext({ viewport: { width: 1280, height: 900 }, permissions: ["clipboard-read", "clipboard-write"] });
+    const page = await context.newPage();
+    await page.goto(`file://${file}`);
+    const code = await page.evaluate(() => document.querySelector(".code code").textContent);
+    await page.click(".code .copy");
+    const first = await page.evaluate(async () => ({ word: document.querySelector(".code .copy").textContent, clip: await navigator.clipboard.readText() }));
+    await page.evaluate(() => Object.defineProperty(navigator, "clipboard", { value: undefined, configurable: true }));
+    await page.click(".code .copy");
+    const second = await page.evaluate(() => document.querySelector(".code .copy").textContent);
+    ok("the copy button puts the code on the clipboard, also in a browser with no clipboard object", code.length > 10 && first.word === "Copied" && first.clip === code && second === "Copied", { first: first.word, same: first.clip === code, second });
+    // A code block in a chooser case is hidden at the start. It is measured when its case shows, so short code keeps its place.
+    await page.click('label[for="wd-system-3"]');
+    await page.waitForTimeout(150);
+    const shownLater = await page.evaluate(() => { const block = [...document.querySelectorAll("#wd-system .code")].find((c) => c.getBoundingClientRect().height > 0); return { found: !!block, long: block && block.classList.contains("is-long"), top: block && getComputedStyle(block.querySelector("pre")).paddingTop }; });
+    ok("short code in a chooser case that shows later keeps its place", shownLater.found && !shownLater.long && shownLater.top === "16px", shownLater);
+    await context.close();
+  }
+
   // A part with a state: the outline and the status dot take the status color of the theme; the name and the icon stay in the text color.
   {
     const data = fs.readFileSync(path.join(root, "tests", "fixtures", "pipeline.json"), "utf8");

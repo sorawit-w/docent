@@ -37,6 +37,59 @@
     well.addEventListener('pointerenter', () => replay(svg));
     well.addEventListener('focus', () => replay(svg));
   });
+  // A drawing that is wider than its well scrolls sideways, and the part that shows can look complete. A line under the well says that more is to the side.
+  const wells = [...document.querySelectorAll('.fig')].map((well) => {
+    const note = document.createElement('p');
+    note.className = 'fig-more';
+    note.hidden = true;
+    note.textContent = 'The drawing is wider than the screen. Scroll it sideways to see all of it.';
+    well.after(note);
+    return { well, note };
+  });
+  // A code block gets a button that copies the code. The block moves into a holder, so the button stays in place when the code scrolls sideways.
+  const blocks = [...document.querySelectorAll('pre')].map((pre) => {
+    const holder = document.createElement('div'), button = document.createElement('button');
+    holder.className = 'code';
+    pre.before(holder);
+    holder.append(pre, button);
+    button.type = 'button';
+    button.className = 'copy';
+    button.textContent = 'Copy';
+    button.setAttribute('aria-live', 'polite');
+    button.addEventListener('click', async () => {
+      const text = (pre.querySelector('code') || pre).textContent;
+      let done = false;
+      try { await navigator.clipboard.writeText(text); done = true; } catch { /* no clipboard here: select the code and copy the selection */ }
+      if (!done) {
+        const range = document.createRange(), selection = getSelection();
+        range.selectNodeContents(pre);
+        selection.removeAllRanges();
+        selection.addRange(range);
+        try { done = document.execCommand('copy'); } catch { /* the code stays selected, so the reader can copy it by hand */ }
+        if (done) selection.removeAllRanges();
+      }
+      button.textContent = done ? 'Copied' : 'Select and copy';
+      setTimeout(() => (button.textContent = 'Copy'), 2000);
+    });
+    return { holder, pre, button };
+  });
+  const fit = () => {
+    wells.forEach(({ well, note }) => (note.hidden = well.scrollWidth <= well.clientWidth + 1));
+    // When the widest line of code reaches the button, the code starts below the button. A block that is hidden now has no size; it is measured when it shows.
+    blocks.forEach(({ holder, pre, button }) => {
+      if (!pre.clientWidth) return;
+      const code = pre.querySelector('code') || pre;
+      holder.classList.toggle('is-long', pre.scrollWidth > pre.clientWidth + 1 || code.getBoundingClientRect().right > button.getBoundingClientRect().left - 8);
+    });
+  };
+  // Measure again when a well or a code block changes its size: the window changes, a chooser shows another case, or a closed section opens.
+  if ('ResizeObserver' in window) {
+    const watch = new ResizeObserver(fit);
+    wells.forEach(({ well }) => watch.observe(well));
+    blocks.forEach(({ pre }) => watch.observe(pre));
+  }
+  addEventListener('resize', fit);
+  fit();
   // Print: open every closed section so its text prints, then close it again.
   let opened = [];
   addEventListener('beforeprint', () => { opened = [...document.querySelectorAll('details:not([open])')]; opened.forEach((d) => (d.open = true)); });
