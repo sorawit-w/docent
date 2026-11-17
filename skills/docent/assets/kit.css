@@ -39,7 +39,7 @@ a:hover { text-decoration-thickness: 2px; }
 
 /* Top bar. Its bottom line is the route; the dot marks the current section. */
 .topbar { position: sticky; top: 0; z-index: 2; background: var(--bg); border-bottom: 1px solid var(--line); }
-.topbar .shell { display: flex; align-items: center; gap: 32px; height: 56px; }
+.topbar .shell { position: relative; display: flex; align-items: center; gap: 32px; height: 56px; }
 .host { font-weight: 600; font-size: 14px; white-space: nowrap; }
 .route { flex: 1; min-width: 0; }
 .route ol { display: flex; gap: 28px; margin: 0; padding: 0; list-style: none; }
