@@ -44,7 +44,7 @@ Put one block where the drawing belongs, inside the well of a figure:
 | `label` | yes | One or two sentences that say what the drawing shows. A screen reader reads this in place of the drawing. |
 | `lanes` | yes | 1 to 4 lanes. Each has an `id`, a `name` (at most 28 characters) and, if you want, an `icon`. |
 | `parts` | yes | 2 to 12 parts. Each has an `id`, the `lane` it belongs to, a `name` (at most 32 characters) and, if you want, a `note` (at most 40 characters), an `icon` and a `state`. |
-| `legs` | yes | 1 to 16 legs, in order. Each goes `from` one part `to` another and has a `verb` (at most 24 characters). The legs are numbered in the order you write them. |
+| `legs` | yes | 1 to 16 legs, in order. Each goes `from` one part `to` another and has a `verb` (at most 24 characters). A leg can also have `"optional": true`. The legs are numbered in the order you write them. |
 | `place` | no | `"flow"` (the default) for a diagram in the text flow. `"walk"` for the diagram beside walkthrough steps: leg 1 lights with step 1, leg 2 with step 2, and so on. |
 | `form` | no | `"auto"` (the default), `"wide"`, `"tall"` or `"plates"`. Leave it out and the renderer picks. Name a form only when you have a reason. |
 | `icons` | no | Icons that you draw for this diagram: an object from a name to the shapes of the icon. See below. |
@@ -59,6 +59,16 @@ Keep names, notes and verbs short. A verb is one to three words. The renderer re
 A walkthrough needs a route with one leg for each step. Give it at most two lanes; the room beside the steps is 520px wide.
 
 In Plates every part has its own row, in the order in which the legs reach the parts. Two arrows may cross at a right angle; they never share a line. Plates is easiest to draw when most legs go from one lane to another. When `render` refuses a Plates diagram, move a part to another lane, remove a leg, or shorten a verb.
+
+## Optional legs
+
+A leg with `"optional": true` is a path that only some readers take, or that happens only in some cases. It is drawn as a dashed arrow:
+
+```json
+{"from": "check", "to": "answer", "verb": "skip the review", "optional": true}
+```
+
+Say in the verb, or in the text beside the figure, who takes this path or when. A dashed arrow alone does not say it. Say it in the `label` too. A leg that every reader takes has no `optional`.
 
 ## State
 
@@ -101,6 +111,8 @@ An icon may hold only these shapes and attributes: `path` (`d`), `circle` (`cx`,
 - `render doc.html: diagram 1 ("order") drawn as wide` — the drawing is in the document.
 - `... cannot be drawn within the spacing rules: ...` — the data asks for more than the form can hold. Shorten the text that the message names, remove a part, or let the renderer pick the form.
 - `... warning: the drawing is 734px wide; beside the walkthrough steps there is room for 520px, so it will scroll sideways. It has 3 lanes, and two lanes fit there. The widest texts are "..." and "..."` — the drawing will scroll sideways beside the steps. Each lane is as wide as its widest name or note. Beside walkthrough steps, two lanes fit when the names have up to about 12 characters. Three lanes fit only when every name has about 4 characters. So use two lanes there, or shorten the texts that the message names.
+
+- `... warning: on a phone this drawing scrolls sideways, and leg 3 ("...") is not on the first screen: its two parts show there, but its arrow does not` — the drawing has paths that branch, so it has no single-track form. On a phone the reader sees the left part first, and there this arrow is missing. Say the path in the text too. With scripts on, the page shows a line under the figure that tells the reader to scroll.
 
 `render` draws every diagram that it can. When one is refused, the others are still drawn, and `render` ends with exit code 1.
 

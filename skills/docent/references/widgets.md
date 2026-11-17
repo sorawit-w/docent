@@ -125,7 +125,7 @@ The reader answers one to three questions and gets the one answer that fits. Use
 
 | Field | What it is |
 |---|---|
-| `questions` | 1 to 3 questions. Each has a `text` (at most 80 characters), 2 to 4 `options` (at most 24 characters each) and, if you want, a `short` (at most 32 characters). |
+| `questions` | 1 to 3 questions. Each has a `text` (at most 80 characters), 2 to 4 `options` (at most 32 characters each) and, if you want, a `short` (at most 32 characters). |
 | `short` | The heading of the question's column in the table of all cases: two or three words, such as `"Data lost"`. Without it, the full question is the heading. |
 | `answers` | 2 to 12 answers. Each has `when`, a `title` (at most 48 characters) and a `text` (at most 160 characters). |
 | `when` | One entry for each question, in the order of the questions: the name of an option, or `"any"` for every option. |

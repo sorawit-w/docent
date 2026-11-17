@@ -4,7 +4,7 @@
 const { fail, words, id } = require("./blocks.cjs");
 
 const KINDS = ["chooser", "checklist", "decision"];
-const MOST = { cases: 5, blocks: 8, items: 12, questions: 3, options: 4, answers: 12, label: 60, name: 24, short: 32, line: 160, note: 160, para: 400, code: 1200, question: 80, title: 48 };
+const MOST = { cases: 5, blocks: 8, items: 12, questions: 3, options: 4, answers: 12, label: 60, name: 24, option: 32, short: 32, line: 160, note: 160, para: 400, code: 1200, question: 80, title: 48 };
 const ARROW = '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>';
 
 const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -83,7 +83,7 @@ function decision(data, w) {
   const questions = list(data.questions, '"questions"', 1, MOST.questions).map((q, i) => {
     if (!q || typeof q !== "object") fail(`question ${i + 1} must be an object with "text" and "options"`);
     only(q, ["text", "short", "options"], `question ${i + 1}`);
-    const options = list(q.options, `the options of question ${i + 1}`, 2, MOST.options).map((o, j) => words(o, `option ${j + 1} of question ${i + 1}`, MOST.name));
+    const options = list(q.options, `the options of question ${i + 1}`, 2, MOST.options).map((o, j) => words(o, `option ${j + 1} of question ${i + 1}`, MOST.option));
     unique(options, `options of question ${i + 1}`);
     if (options.some((o) => o.toLowerCase() === "any")) fail(`question ${i + 1} has an option named "any"; in an answer, "any" stands for every option`);
     const text = words(q.text, `the text of question ${i + 1}`, MOST.question);

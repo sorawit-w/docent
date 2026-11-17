@@ -13,7 +13,7 @@ const CASES = [
   ["order", "wide"], ["order", "tall"], ["order", "plates"],
   ["review", "wide"], ["review", "tall"], ["review", "plates"],
   ["long-route", "wide"], ["long-route", "tall"], ["branch", "plates"], ["dense", "plates"],
-  ["pipeline", "wide"], ["pipeline", "tall"], ["pipeline", "plates"],
+  ["pipeline", "wide"], ["pipeline", "tall"], ["pipeline", "plates"], ["skip", "plates"],
 ];
 
 for (const [name, form] of CASES) {
@@ -81,6 +81,24 @@ test("a part with a state takes the status color on its outline and gets a statu
   const all = renderDiagram(same);
   assert.match(all.warnings[0], /every part has the state "ok", so the color shows nothing/);
   assert.deepEqual(all.icons, [], "this warning is not about an icon, so check reports it as a warning");
+});
+
+test("an optional leg is drawn dashed", () => {
+  const { svg } = renderDiagram(fixture("skip"));
+  assert.equal((svg.match(/<g class="leg is-optional" data-leg="3">/g) || []).length, 1, "leg 3 is the optional one");
+  assert.equal((svg.match(/<g class="leg" data-leg=/g) || []).length, 4, "the other four legs are plain");
+  assert.match(svg, /#dg-skip \.leg\.is-optional \.line\{stroke-dasharray:5 7\}/);
+  assert.ok(!/is-optional|stroke-dasharray/.test(renderDiagram(fixture("bug-report")).svg), "a drawing with no optional leg carries no dash rule");
+  const wrong = fixture("skip");
+  wrong.legs[2].optional = "yes";
+  assert.throws(() => renderDiagram(wrong), /"optional" of leg 3 must be true or false/);
+});
+
+test("render warns when a whole arrow is off the first phone screen while its two parts show", () => {
+  const { warnings, icons } = renderDiagram(fixture("skip"));
+  assert.deepEqual(warnings, ['on a phone this drawing scrolls sideways, and leg 3 ("skip the review") is not on the first screen: its two parts show there, but its arrow does not. Say this path in the text too']);
+  assert.deepEqual(icons, [], "it is a warning for the author, not an error in check");
+  assert.deepEqual(renderDiagram(fixture("bug-report")).warnings, [], "a route has a phone form, so it gets no such warning");
 });
 
 test("a route also gets a single-track form for phones; paths that branch do not", () => {

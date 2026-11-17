@@ -63,6 +63,12 @@ test("wrong widget data is refused with a plain reason", () => {
   broken("decision", (d) => d.answers.splice(0, 1), /no answer fits "One" and "No"; every mix of options needs one answer/);
   broken("decision", (d) => (d.answers[3].when = ["any", "any"]), /answers 1 and 4 both fit "One" and "No"/);
   broken("decision", (d) => (d.questions[1].options = ["Any", "No"]), /an option named "any"/);
+  broken("decision", (d) => (d.questions[1].options = ["x".repeat(33), "No"]), /option 1 of question 2 is 33 characters long; the most is 32/);
+  const long = fixture("decision");
+  long.questions[1].options = ["Yes, with a long fixed name 32ch", "No"];
+  long.answers.forEach((a) => (a.when[1] = a.when[1] === "Yes" ? long.questions[1].options[0] : a.when[1]));
+  assert.equal(long.questions[1].options[0].length, 32);
+  assert.match(renderWidget(long).html, />Yes, with a long fixed name 32ch<\/label>/, "an option may have 32 characters");
   broken("decision", (d) => d.questions.push({ text: "a?", options: ["x", "y"] }, { text: "b?", options: ["x", "y"] }), /"questions" must have 1 to 3 entries; it has 4/);
 });
 

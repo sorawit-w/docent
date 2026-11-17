@@ -1,0 +1,19 @@
+{
+  "id": "skip",
+  "label": "A request goes through a check. A small request skips the review and goes to the answer; this path is optional.",
+  "lanes": [{ "id": "team", "name": "Team" }],
+  "parts": [
+    { "id": "request", "lane": "team", "name": "Request", "note": "comes in" },
+    { "id": "check", "lane": "team", "name": "Check", "note": "size and kind" },
+    { "id": "review", "lane": "team", "name": "Review", "note": "for a large request" },
+    { "id": "answer", "lane": "team", "name": "Answer", "note": "written" },
+    { "id": "archive", "lane": "team", "name": "Archive", "note": "kept" }
+  ],
+  "legs": [
+    { "from": "request", "to": "check", "verb": "check" },
+    { "from": "check", "to": "review", "verb": "review" },
+    { "from": "check", "to": "answer", "verb": "skip the review", "optional": true },
+    { "from": "review", "to": "answer", "verb": "answer" },
+    { "from": "answer", "to": "archive", "verb": "file" }
+  ]
+}
