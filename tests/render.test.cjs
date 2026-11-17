@@ -67,6 +67,27 @@ test("a drawing that is too wide beside walkthrough steps gets a warning that na
   assert.deepEqual(more, []);
 });
 
+test("in Plates one leg meets the side of a plate at the middle, and two legs on one side take the two outer places", () => {
+  const branched = { ...fixture("bug-report") };
+  branched.parts = [...branched.parts, { id: "known", lane: "reporter", name: "Known issues", note: "an older report", icon: "document" }];
+  branched.legs = [...branched.legs, { from: "known", to: "triage", verb: "link", optional: true }];
+  const seen = { one: 0, two: 0 };
+  for (const data of [...["bug-report", "order", "long-route", "branch", "dense", "pipeline", "skip"].map(fixture), branched]) {
+    const { scene } = renderDiagram({ ...data, form: "plates", place: "flow" });
+    const sides = new Map();
+    for (const leg of scene.legs) for (const [id, [x, y]] of [[leg.from, leg.pts[0]], [leg.to, leg.pts[leg.pts.length - 1]]]) {
+      const card = scene.parts.find((part) => part.id === id);
+      const side = Math.abs(x - card.x) <= 2 ? "left" : Math.abs(x - card.x - card.w) <= 2 ? "right" : null;
+      if (side) sides.set(`${id}, ${side} side`, [...(sides.get(`${id}, ${side} side`) || []), Math.round(y - card.y - card.h / 2)].sort((p, q) => p - q));
+    }
+    for (const [side, at] of sides) {
+      if (at.length === 1) { seen.one += 1; assert.deepEqual(at, [0], `${data.id}: ${side}: one leg meets the middle`); }
+      if (at.length === 2) { seen.two += 1; assert.deepEqual(at, [-14, 14], `${data.id}: ${side}: two legs take the outer places`); }
+    }
+  }
+  assert.ok(seen.one >= 20 && seen.two >= 3, `the fixtures hold both cases: ${JSON.stringify(seen)}`);
+});
+
 test("a part with a state takes the status color on its outline and gets a status dot", () => {
   const { svg, warnings } = renderDiagram(fixture("pipeline"));
   assert.deepEqual(warnings, []);

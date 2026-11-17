@@ -10,6 +10,7 @@ const CHANNEL = 14; // a free upright line beside a column of plates
 const STEM = RULE.run + HEAD + RADIUS; // the straight line that an arrowhead needs behind it
 const NEAR = HEAD + 16; // no other line crosses a leg this close to its arrowhead
 const PAGE = 1104;
+const SIDE_PEN = 16; // the cost of the place that is not wanted on the side of a plate; more than the 14px that a place can save
 const DIRS = [[1, 0], [0, 1], [-1, 0], [0, -1]]; // right, down, left, up
 
 class PlatesError extends Error {
@@ -91,6 +92,7 @@ function draw(model, k) {
   const edgeUsed = new Set(); // "h" edges run right from a node, "v" edges run down
   const nodeUse = new Map(); // node -> "h", "v" (a line passes straight) or "b" (a bend)
   const portUsed = new Set();
+  const spread = new Set(); // the sides ("plate:direction") where two legs meet: they take the two outer places
   const edgeKey = (i, j, d) => (d === 0 ? `h${key(i, j)}` : d === 2 ? `h${key(i - 1, j)}` : d === 1 ? `v${key(i, j)}` : `v${key(i, j - 1)}`);
   const axis = (d) => (d % 2 === 0 ? "h" : "v");
   const passable = (i, j, din, dout) => {
@@ -107,11 +109,14 @@ function draw(model, k) {
   function ports(card, target) {
     const toward = target.lane > card.lane ? [card.x1 - 30, card.cx, card.x0 + 30] : target.lane < card.lane ? [card.x0 + 30, card.cx, card.x1 - 30] : [card.cx, card.x1 - 30, card.x0 + 30];
     const sideY = [card.cy, card.cy + 14, card.cy - 14];
+    // One leg meets the side of a plate at its middle. Two legs on one side take the two outer places, and a third takes the middle.
+    // A place makes the path up to 14px shorter or longer, so the place that is not wanted costs more than that.
+    const pen = (d, n) => ((n === 0) === spread.has(`${card.index}:${d}`) ? SIDE_PEN : 0);
     return [
       ...toward.map((x, n) => ({ pt: [x, card.y1], d: 1, pen: n * 8 })),
       ...toward.map((x, n) => ({ pt: [x, card.y0], d: 3, pen: n * 8 })),
-      ...sideY.map((y, n) => ({ pt: [card.x1, y], d: 0, pen: n ? 6 : 0 })),
-      ...sideY.map((y, n) => ({ pt: [card.x0, y], d: 2, pen: n ? 6 : 0 })),
+      ...sideY.map((y, n) => ({ pt: [card.x1, y], d: 0, pen: pen(0, n) })),
+      ...sideY.map((y, n) => ({ pt: [card.x0, y], d: 2, pen: pen(2, n) })),
     ].filter((p) => !portUsed.has(`${card.index}:${p.pt}`));
   }
 
@@ -224,16 +229,38 @@ function draw(model, k) {
     scene.parts.push({ id: part.id, shape: "card", x: card.x0, y: card.y0, w: cardW, h: CARD_H, icon: part.icon, iconAt: [card.x0 + 24, card.cy], end: false, texts });
   });
 
-  const problems = [];
   const gapCenters = cardX.slice(1).map((x0) => x0 - MARGIN - laneGap / 2);
   // First every leg gets its path. Then each leg gets its mark and its verb, with all the lines known.
-  const routed = [];
-  for (const leg of legs) {
-    const pts = route(leg);
-    if (!pts) { problems.push({ rule: "R5", kind: "no-path", leg: leg.n, msg: `no free path for leg ${leg.n}, from "${parts[leg.from].id}" to "${parts[leg.to].id}"` }); break; }
-    const away = [-9999, -9999 - 99 * leg.n]; // a place far outside, until the mark and the verb are set
-    routed.push({ n: leg.n, from: parts[leg.from].id, to: parts[leg.to].id, sameLane: parts[leg.from].lane === parts[leg.to].lane, radius: RADIUS, pts, mark: away, verb: { x: away[0], y: away[1], s: "", cls: "verb", anchor: "start" } });
+  const routeAll = () => {
+    edgeUsed.clear(); nodeUse.clear(); portUsed.clear();
+    const routed = [], problems = [];
+    for (const leg of legs) {
+      const pts = route(leg);
+      if (!pts) { problems.push({ rule: "R5", kind: "no-path", leg: leg.n, msg: `no free path for leg ${leg.n}, from "${parts[leg.from].id}" to "${parts[leg.to].id}"` }); break; }
+      const away = [-9999, -9999 - 99 * leg.n]; // a place far outside, until the mark and the verb are set
+      routed.push({ n: leg.n, from: parts[leg.from].id, to: parts[leg.to].id, sameLane: parts[leg.from].lane === parts[leg.to].lane, radius: RADIUS, pts, mark: away, verb: { x: away[0], y: away[1], s: "", cls: "verb", anchor: "start" } });
+    }
+    // The places that the legs took on each side of each plate, as px from the middle.
+    const sides = new Map();
+    for (const used of portUsed) {
+      const [index, at] = used.split(":"), [x, y] = at.split(",").map(Number), card = cards[index];
+      if (x !== card.x0 && x !== card.x1) continue;
+      const side = `${index}:${x === card.x1 ? 0 : 2}`;
+      sides.set(side, [...(sides.get(side) || []), Math.round(y - card.cy)]);
+    }
+    const pairs = [...sides].filter(([, at]) => at.length === 2 && at.includes(0)).map(([side]) => side); // two legs, right beside each other
+    const lone = [...sides].filter(([, at]) => at.length === 1 && at[0] !== 0).length; // one leg, off the middle
+    return { routed, problems, pairs, odd: pairs.length + lone };
+  };
+  // The legs are routed one by one, so the first leg on a side cannot know that a second one comes.
+  // When two legs end up right beside each other, the legs are routed once more, and that side gives its outer places first.
+  let pass = routeAll();
+  if (!pass.problems.length && pass.pairs.length) {
+    pass.pairs.forEach((side) => spread.add(side));
+    const again = routeAll();
+    if (!again.problems.length && again.odd < pass.odd) pass = again;
   }
+  const { routed, problems } = pass;
   scene.legs = routed;
   for (const [index, drawn] of problems.length ? [] : routed.entries()) {
     const leg = legs[index], pts = drawn.pts;
