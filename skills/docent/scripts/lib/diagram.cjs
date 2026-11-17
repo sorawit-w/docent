@@ -115,7 +115,11 @@ function renderDiagram(data) {
     // Say what makes the drawing wide: each lane is as wide as its widest name or note.
     const widest = model.parts.flatMap((part) => [[part.name, textWidth(part.name, 14, 600)], [part.note, textWidth(part.note, 12, 400)]]).filter(([text]) => text).sort((a, b) => b[1] - a[1]).slice(0, 2).map(([text]) => `"${text}"`);
     const lanes = scene.form === "tall" && model.lanes.length > 2 ? ` It has ${model.lanes.length} lanes, and two lanes fit there.` : "";
-    warnings.push(`the drawing is ${scene.w}px wide; beside the walkthrough steps there is room for ${WALK}px, so it will scroll sideways.${lanes} The widest texts are ${widest.join(" and ")}; shorter names and notes make the drawing narrower`);
+    // Data that is not a route is drawn as Plates. Then the cause is the extra path, not the texts, and the author must choose.
+    const cause = model.chain
+      ? `${lanes} The widest texts are ${widest.join(" and ")}; shorter names and notes make the drawing narrower`
+      : ` Its data is not a route (a path branches, or a leg does not start where the leg before it ended), so it is drawn as Plates, which needs more room. A walkthrough needs a route. Choose one: take the extra path out and keep the walkthrough, or keep the path, put the diagram in the text flow and write the steps as a numbered list`;
+    warnings.push(`the drawing is ${scene.w}px wide; beside the walkthrough steps there is room for ${WALK}px, so it will scroll sideways.${cause}`);
   }
   const id = `dg-${model.id}`, mode = model.place === "walk" ? "walk" : "auto";
   const withStates = (drawing) => {
