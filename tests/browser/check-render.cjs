@@ -293,6 +293,23 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     await context.close();
   }
 
+  // Space between blocks: a block that brings no space below it must not touch the text or the block heading that follows.
+  {
+    const pre = '<pre tabindex="0" role="region" aria-label="Code"><code>command --option</code></pre>';
+    const table = '<div class="table-wrap" role="region" aria-label="Table" tabindex="0"><table><thead><tr><th scope="col">A</th></tr></thead><tbody><tr><td>one</td></tr></tbody></table></div>';
+    const details = "<details><summary>A closed section</summary><p>Its text.</p></details>";
+    const status = '<div class="status"><span class="state warn">Warning</span><p>A status note.</p></div>';
+    const walk = '<div class="walk"><div class="rail"><p>Steps.</p></div></div>';
+    const p = "<p>A paragraph.</p>", h3 = "<h3>A block heading</h3>", ol = "<ol><li>One.</li><li>Two.</li></ol>";
+    const want = [[pre, p, 24], [pre, ol, 24], [pre, h3, 32], [table, p, 24], [table, h3, 32], [details, p, 24], [details, h3, 32], [status, p, 24], [walk, p, 24], [h3, p, 8], [p, h3, 32], [p, p, 16], ['<h2 id="gap-h">A section</h2>', h3, 16]];
+    const content = html.replace('<section id="report"', `${want.map(([a, b], i) => `<section class="gap-test" aria-label="Gap ${i}">${a}${b}</section>`).join("")}\n<section id="report"`);
+    const { page, context } = await open({ width: 1280, content });
+    const gaps = await page.evaluate(() => [...document.querySelectorAll(".gap-test")].map((s) => Math.round(s.children[1].getBoundingClientRect().top - s.children[0].getBoundingClientRect().bottom)));
+    const step = await page.evaluate(() => { const h = getComputedStyle(document.querySelector(".steps h3")); return `${h.marginTop} ${h.marginBottom}`; });
+    ok("blocks in a section keep space between them, and a step heading of a walkthrough keeps none", gaps.join() === want.map((w) => w[2]).join() && step === "0px 0px", { gaps: gaps.join(), want: want.map((w) => w[2]).join(), step });
+    await context.close();
+  }
+
   // A part with a state: the outline and the status dot take the status color of the theme; the name and the icon stay in the text color.
   {
     const data = fs.readFileSync(path.join(root, "tests", "fixtures", "pipeline.json"), "utf8");

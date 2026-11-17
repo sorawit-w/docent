@@ -176,7 +176,7 @@ Docent uses system fonts only, because every document is one file with nothing t
 
 **Tables use the full width.** On a phone a figure, a table or a code block scrolls sideways inside itself; the page never scrolls sideways.
 
-**Spacing.** More space goes above a heading than below it: 72px above a section, 16px below its heading. Blocks inside a section are 24px to 32px apart.
+**Spacing.** More space goes above a heading than below it: 72px above a section, 16px below its heading. Blocks inside a section are 24px to 32px apart, and two paragraphs are 16px apart. A block heading (h3) in the text flow has 32px above it and 8px below it. No block touches the block before it.
 
 **Print** is a first-class layout. The page prints in light colors on white paper, without the top bar, and without any moving part. A closed section opens for printing, so its text is on the paper.
 
