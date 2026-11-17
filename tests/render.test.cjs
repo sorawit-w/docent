@@ -57,6 +57,14 @@ test("a drawing that is too wide beside walkthrough steps gets a warning that na
   assert.deepEqual(renderDiagram({ ...fixture("bug-report"), place: "walk" }).warnings, [], "two lanes with short texts fit");
   const [warning] = renderDiagram({ ...fixture("order"), place: "walk" }).warnings;
   assert.match(warning, /^the drawing is \d+px wide; beside the walkthrough steps there is room for 520px, so it will scroll sideways\. It has 3 lanes, and two lanes fit there\. The widest texts are "packed and weighed" and "Payment check"; shorter names and notes make the drawing narrower$/);
+  // One more path makes the route into data that branches. Then the cause is the path, not the texts.
+  const branched = { ...fixture("bug-report"), place: "walk" };
+  branched.parts = [...branched.parts, { id: "known", lane: "reporter", name: "Known issues", note: "an older report", icon: "document" }];
+  branched.legs = [...branched.legs, { from: "known", to: "triage", verb: "link", optional: true }];
+  const [choice, ...more] = renderDiagram(branched).warnings.filter((w) => w.startsWith("the drawing is"));
+  assert.match(choice, /^the drawing is \d+px wide; beside the walkthrough steps there is room for 520px, so it will scroll sideways\. Its data is not a route .*, so it is drawn as Plates, which needs more room\. A walkthrough needs a route\. Choose one: take the extra path out and keep the walkthrough, or keep the path, put the diagram in the text flow and write the steps as a numbered list$/);
+  assert.ok(!/widest texts/.test(choice), "it does not send the author to shorten texts");
+  assert.deepEqual(more, []);
 });
 
 test("a part with a state takes the status color on its outline and gets a status dot", () => {
