@@ -77,6 +77,29 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     await context.close();
   }
 
+  // The two dots sit on what they mark, also on a screen that is wider than the page shell (1200px).
+  for (const width of [1024, 1280, 1728, 2560]) {
+    const { page, context } = await open({ width });
+    const off = [];
+    for (const where of ["at the top", "at step 3"]) {
+      if (where === "at step 3") await page.evaluate(() => { const li = document.querySelectorAll(".walk .steps > li")[2]; scrollTo(0, li.getBoundingClientRect().top + scrollY - innerHeight * 0.4); });
+      await page.waitForTimeout(600);
+      off.push(await page.evaluate(() => {
+        const mid = (el, side, size) => el.getBoundingClientRect()[side] + el.getBoundingClientRect()[size] / 2;
+        const link = document.querySelector(".route a[aria-current]"), dot = document.querySelector(".route-dot");
+        const step = document.querySelector(".walk .steps > li.is-current"), rail = document.querySelector(".walk .rail-dot");
+        const bullet = getComputedStyle(step, "::before");
+        return {
+          route: +(mid(dot, "left", "width") - mid(link, "left", "width")).toFixed(1),
+          line: +(mid(dot, "top", "height") - document.querySelector(".topbar").getBoundingClientRect().bottom).toFixed(1),
+          rail: +(mid(rail, "top", "height") - (step.getBoundingClientRect().top + parseFloat(bullet.top) + parseFloat(bullet.height) / 2)).toFixed(1),
+        };
+      }));
+    }
+    ok(`at ${width}px the top bar dot is under the current link and on the line, and the rail dot is on the current step`, off.every((o) => Math.abs(o.route) <= 1 && Math.abs(o.line + 0.5) <= 1 && Math.abs(o.rail) <= 1), off);
+    await context.close();
+  }
+
   // Dark colors come from the page tokens; the dot is the lamp.
   {
     const { page, context } = await open({ width: 1280, theme: "dark" });
