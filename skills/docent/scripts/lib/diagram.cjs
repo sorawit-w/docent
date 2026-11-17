@@ -138,7 +138,7 @@ function renderDiagram(data) {
     const left = (part) => (part.shape === "card" ? part.x : part.cx - part.r);
     for (const leg of scene.legs) {
       const ends = [leg.from, leg.to].map((end) => scene.parts.find((part) => part.id === end));
-      if (leg.pts.every(([x]) => x > PHONE) && ends.every((part) => left(part) < PHONE)) warnings.push(`on a phone this drawing scrolls sideways, and leg ${leg.n} ("${leg.verb.s}") is not on the first screen: its two parts show there, but its arrow does not. Say this path in the text too`);
+      if (leg.pts.every(([x]) => x > PHONE) && ends.every((part) => left(part) < PHONE)) warnings.push(`on a phone this drawing scrolls sideways, and leg ${leg.n} ("${leg.verb.s}") is not on the first screen: its two parts show there, but its arrow does not. Say this path in the text too. This warning stays after you did, because render cannot read the text`);
     }
   }
   const main = toSvg(scene, { id, label: model.label, mode, swap: phone && { phone: `${id}-phone` } });
