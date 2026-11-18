@@ -335,7 +335,8 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
 
   // A numbered block heading, the line under a drawing that is wider than its well, and the copy button on code.
   {
-    const skip = fs.readFileSync(path.join(root, "tests", "fixtures", "skip.json"), "utf8");
+    // A drawing that is not a route has a column form for phones; with one long part name the column is still wider than a 320px screen.
+    const skip = fs.readFileSync(path.join(root, "tests", "fixtures", "skip.json"), "utf8").replace('"name": "Answer"', '"name": "Answer written by the whole team"');
     const extra = `<section id="extra" aria-labelledby="extra-h"><h2 id="extra-h">Extra</h2><h3 class="step">First</h3><p>Text.</p><pre tabindex="0" role="region" aria-label="A short command"><code>app start</code></pre><h3 class="step">Second</h3><pre tabindex="0" role="region" aria-label="A long command"><code>app get --all --from the-long-source-name --into the-long-folder-name --and-then verify --and-then report</code></pre><figure><div class="fig" role="region" aria-label="Figure 9, a request" tabindex="0">\n<!-- docent:diagram\n${skip}\n-->\n<!-- /docent:diagram -->\n</div><figcaption><strong>Figure 9</strong>A request.</figcaption></figure></section>\n`;
     const content = renderDocument(html.replace('<section id="report"', `${extra}<section id="report"`)).html;
     const look = (page) => page.evaluate(() => {
@@ -354,7 +355,7 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     await wide.page.addScriptTag({ path: axePath });
     const axe = await wide.page.evaluate(async () => (await window.axe.run(document.querySelector("#extra"), { runOnly: { type: "tag", values: ["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa", "best-practice"] } })).violations.map((v) => `${v.id} ${v.nodes[0].target.join(" ")}`));
     await wide.context.close();
-    const narrow = await open({ width: 390, height: 844, content });
+    const narrow = await open({ width: 320, height: 700, content });
     const onPhone = await look(narrow.page);
     await narrow.page.locator("#extra").screenshot({ path: `${out}/extra-phone.png` });
     await narrow.context.close();
@@ -388,6 +389,26 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     ok("a long status label wraps, so the page does not scroll sideways at 390px or 320px", phone.page === phone.view && narrow.page === narrow.view && phone.label <= phone.main, { phone, narrow });
     ok("a closed section that holds a table is as wide as a table outside it", desk.inner === desk.flow && desk.flow > 1000, desk);
     ok("on paper a table with long code in its cells stays inside the page", paper.page === paper.view && paper.wide.every((r) => r <= paper.view), paper);
+  }
+
+  // The column form: a drawing that is not a route shows it on a phone and on paper, in place of Plates.
+  {
+    const branch = fs.readFileSync(path.join(root, "tests", "fixtures", "branch.json"), "utf8");
+    const content = renderDocument(html.replace('<section id="report"', `<section id="col" aria-labelledby="col-h"><h2 id="col-h">Column</h2><figure><div class="fig" role="region" aria-label="Figure 8, a leave request" tabindex="0">\n<!-- docent:diagram\n${branch}\n-->\n<!-- /docent:diagram -->\n</div><figcaption><strong>Figure 8</strong>A leave request.</figcaption></figure></section>\n<section id="report"`)).html;
+    const look = (page) => page.evaluate(() => { const shown = (id) => document.getElementById(id).getBoundingClientRect().width; return { main: shown("dg-leave"), column: shown("dg-leave-phone"), page: document.documentElement.scrollWidth, view: innerWidth }; });
+    const results = {};
+    for (const [name, opts] of [["desk", { width: 1280 }], ["phone", { width: 390, height: 844 }], ["narrow", { width: 320, height: 700 }], ["paper", { width: 658, height: 1123, media: "print" }]]) {
+      const view = await open({ ...opts, content });
+      results[name] = await look(view.page);
+      if (name === "phone") {
+        await view.page.addScriptTag({ path: axePath });
+        results.axe = await view.page.evaluate(async () => (await window.axe.run(document.querySelector("#col"), { runOnly: { type: "tag", values: ["wcag2a", "wcag2aa", "wcag21aa", "best-practice"] } })).violations.map((v) => v.id));
+        await view.page.locator("#col figure").screenshot({ path: `${out}/column-phone.png` });
+      }
+      await view.context.close();
+    }
+    const { desk, phone, narrow, paper } = results;
+    ok("a drawing that is not a route shows Plates on a desktop and the column form on a phone, at 320px and on paper, with no sideways scroll", desk.main > 0 && !desk.column && !phone.main && phone.column === 264 && narrow.column === 264 && !paper.main && paper.column > 0 && [phone, narrow].every((r) => r.page === r.view) && results.axe.length === 0, results);
   }
 
   // The value picker: a choice changes every place, in the text and in code. With scripts off, and on paper, the table of all values is there.

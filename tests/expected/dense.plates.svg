@@ -36,6 +36,7 @@
 .js #dg-invoice .pulse-7{animation-name:dg-invoice-7}
 @media (prefers-reduced-motion:reduce){#dg-invoice .pulse{animation:none!important}#dg-invoice .pulse{display:none!important}}
 @media print{#dg-invoice{max-width:100%;height:auto}#dg-invoice .pulse{display:none!important}}
+#dg-invoice-phone{display:none}
 </style>
 <rect width="1218" height="638" class="ground"/>
 <rect x="12" y="12" width="330" height="614" rx="10" class="band"/>
@@ -78,4 +79,81 @@
 <g class="icon" transform="translate(430,576)"><path d="M3 4.5a5 2 0 0 0 10 0 5 2 0 0 0-10 0v7a5 2 0 0 0 10 0v-7"/><path d="M3 8a5 2 0 0 0 10 0"/></g>
 <text x="460" y="581" class="name" text-anchor="start">Ledger entry</text>
 <text x="460" y="598" class="sub" text-anchor="start">the invoice is closed</text>
+</svg>
+<svg id="dg-invoice-phone" class="dg dg-column dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="784" viewBox="0 0 264 784" role="img" aria-label="An invoice between three teams: sales writes it, finance checks it, the customer pays or disputes it, and finance closes it.">
+<style>
+#dg-invoice-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-invoice-phone .ground{fill:var(--fig,#f2f3f9)}
+#dg-invoice-phone .band{fill:var(--bg,#fbfbfe)}
+#dg-invoice-phone .track{stroke:var(--line,#d3d6e3)}
+#dg-invoice-phone .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-invoice-phone .head{fill:var(--text,#1c1f2e)}
+#dg-invoice-phone .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-invoice-phone .stop.end{fill:var(--text,#1c1f2e)}
+#dg-invoice-phone .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-invoice-phone .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-invoice-phone .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-invoice-phone .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-invoice-phone .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-invoice-phone .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-invoice-phone .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-invoice-phone .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-invoice-phone .sub,#dg-invoice-phone .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-invoice-phone .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+.js #dg-invoice-phone .pulse{display:block;animation:6s linear 2 both}
+.js #dg-invoice-phone:not(.is-playing) .pulse{animation-play-state:paused}
+@keyframes dg-invoice-phone-1{0%{transform:translate(30px,71px);opacity:0}2%{transform:translate(30px,71px);opacity:1}22.5%{transform:translate(30px,145px);opacity:1}26.67%{transform:translate(30px,145px);opacity:0}100%{transform:translate(30px,145px);opacity:0}}
+.js #dg-invoice-phone .pulse-1{animation-name:dg-invoice-phone-1}
+@keyframes dg-invoice-phone-3{0%{transform:translate(30px,175px);opacity:0}26.67%{transform:translate(30px,175px);opacity:0}28.67%{transform:translate(30px,175px);opacity:1}49.17%{transform:translate(30px,289px);opacity:1}53.33%{transform:translate(30px,289px);opacity:0}100%{transform:translate(30px,289px);opacity:0}}
+.js #dg-invoice-phone .pulse-3{animation-name:dg-invoice-phone-3}
+@keyframes dg-invoice-phone-4{0%{transform:translate(30px,319px);opacity:0}53.33%{transform:translate(30px,319px);opacity:0}55.33%{transform:translate(30px,319px);opacity:1}75.83%{transform:translate(30px,433px);opacity:1}80%{transform:translate(30px,433px);opacity:0}100%{transform:translate(30px,433px);opacity:0}}
+.js #dg-invoice-phone .pulse-4{animation-name:dg-invoice-phone-4}
+@media (prefers-reduced-motion:reduce){#dg-invoice-phone .pulse{animation:none!important}#dg-invoice-phone .pulse{display:none!important}}
+@media print{#dg-invoice-phone{max-width:100%;height:auto}#dg-invoice-phone .pulse{display:none!important}}
+@media (max-width:1314px){#dg-invoice{display:none}#dg-invoice-phone{display:block}}
+</style>
+<rect width="264" height="784" class="ground"/>
+<rect x="8" y="12" width="248" height="80" rx="10" class="band"/>
+<rect x="8" y="116" width="248" height="120" rx="10" class="band"/>
+<rect x="8" y="260" width="248" height="408" rx="10" class="band"/>
+<rect x="8" y="692" width="248" height="80" rx="10" class="band"/>
+<g class="icon lane-icon" transform="translate(178,19)"><circle cx="8" cy="5" r="2.5"/><path d="M3 13.5c0-2.8 2.2-4.5 5-4.5s5 1.7 5 4.5"/></g>
+<text x="240" y="32" class="lane" text-anchor="end">Sales</text>
+<g class="icon lane-icon" transform="translate(160,123)"><circle cx="6" cy="5.5" r="2.25"/><path d="M1.75 13c0-2.4 1.9-3.75 4.25-3.75s4.25 1.35 4.25 3.75M10.5 3.5a2.25 2.25 0 0 1 0 4.25M12 9.6c1.4.5 2.25 1.7 2.25 3.4"/></g>
+<text x="240" y="136" class="lane" text-anchor="end">Finance</text>
+<g class="icon lane-icon" transform="translate(146,267)"><circle cx="8" cy="5" r="2.5"/><path d="M3 13.5c0-2.8 2.2-4.5 5-4.5s5 1.7 5 4.5"/></g>
+<text x="240" y="280" class="lane" text-anchor="end">Customer</text>
+<g class="icon lane-icon" transform="translate(160,699)"><circle cx="6" cy="5.5" r="2.25"/><path d="M1.75 13c0-2.4 1.9-3.75 4.25-3.75s4.25 1.35 4.25 3.75M10.5 3.5a2.25 2.25 0 0 1 0 4.25M12 9.6c1.4.5 2.25 1.7 2.25 3.4"/></g>
+<text x="240" y="712" class="lane" text-anchor="end">Finance</text>
+<g class="leg" data-leg="1"><path d="M30,71 L30,139" class="line"/><polygon points="25.5,137 34.5,137 30,145" class="head"/><circle r="6" class="pulse pulse-1"/><circle cx="30" cy="104" r="10" class="mark"/><text x="30" y="108" class="num" text-anchor="middle">1</text><text x="51" y="108" class="verb" text-anchor="start">hand over</text></g>
+<g class="leg" data-leg="3"><path d="M30,175 L30,283" class="line"/><polygon points="25.5,281 34.5,281 30,289" class="head"/><circle r="6" class="pulse pulse-3"/><circle cx="30" cy="248" r="10" class="mark"/><text x="30" y="252" class="num" text-anchor="middle">3</text><text x="51" y="252" class="verb" text-anchor="start">send</text></g>
+<g class="leg" data-leg="4"><path d="M30,319 L30,427" class="line"/><polygon points="25.5,425 34.5,425 30,433" class="head"/><circle r="6" class="pulse pulse-4"/><circle cx="30" cy="392" r="10" class="mark"/><text x="30" y="396" class="num" text-anchor="middle">4</text><text x="51" y="396" class="verb" text-anchor="start">pay</text></g>
+<g class="jump" data-leg="2"><circle cx="61" cy="206" r="10" class="mark"/><text x="61" y="210" class="num" text-anchor="middle">2</text><text x="77" y="210" class="verb" text-anchor="start">send back</text><text x="77" y="226" class="sub" text-anchor="start">back to Draft invoice</text></g>
+<g class="jump" data-leg="5"><circle cx="61" cy="350" r="10" class="mark"/><text x="61" y="354" class="num" text-anchor="middle">5</text><text x="77" y="354" class="verb" text-anchor="start">dispute</text><text x="77" y="370" class="sub" text-anchor="start">to Dispute</text></g>
+<g class="jump" data-leg="7"><circle cx="61" cy="494" r="10" class="mark"/><text x="61" y="498" class="num" text-anchor="middle">7</text><text x="77" y="498" class="verb" text-anchor="start">record</text><text x="77" y="514" class="sub" text-anchor="start">to Ledger entry</text></g>
+<g class="jump" data-leg="6"><circle cx="61" cy="638" r="10" class="mark"/><text x="61" y="642" class="num" text-anchor="middle">6</text><text x="77" y="642" class="verb" text-anchor="start">ask for a new invoice</text><text x="77" y="658" class="sub" text-anchor="start">back to Draft invoice</text></g>
+<circle cx="30" cy="56" r="13" class="stop"/>
+<g class="icon" transform="translate(22,48)"><path d="M9.5 2.5h-5a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1v-7z"/><path d="M9.5 2.5v3h3M6 9h4M6 11.25h4"/></g>
+<text x="51" y="61" class="name" text-anchor="start">Draft invoice</text>
+<text x="51" y="78" class="sub" text-anchor="start">items and prices</text>
+<circle cx="30" cy="160" r="13" class="stop"/>
+<g class="icon" transform="translate(22,152)"><circle cx="8" cy="8" r="5.5"/><path d="M5.5 8.2l1.8 1.8 3.2-3.6"/></g>
+<text x="51" y="165" class="name" text-anchor="start">Checked invoice</text>
+<text x="51" y="182" class="sub" text-anchor="start">tax and totals agree</text>
+<circle cx="30" cy="304" r="13" class="stop"/>
+<g class="icon" transform="translate(22,296)"><path d="M2.5 4a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v6.5a1 1 0 0 1-1 1H7l-3 2.5v-2.5h-.5a1 1 0 0 1-1-1z"/><path d="M5.5 6.25h5M5.5 8.5h3"/></g>
+<text x="51" y="309" class="name" text-anchor="start">Received invoice</text>
+<text x="51" y="326" class="sub" text-anchor="start">due in 30 days</text>
+<circle cx="30" cy="448" r="13" class="stop"/>
+<g class="icon" transform="translate(22,440)"><circle cx="5.25" cy="10.75" r="2.75"/><path d="M7.25 8.75l6.25-6.25M10.5 5.5l1.75 1.75M12.25 3.75L13.5 5"/></g>
+<text x="51" y="453" class="name" text-anchor="start">Payment</text>
+<text x="51" y="470" class="sub" text-anchor="start">by bank transfer</text>
+<circle cx="30" cy="592" r="13" class="stop"/>
+<g class="icon" transform="translate(22,584)"><circle cx="7" cy="7" r="4"/><path d="M10 10l3.5 3.5"/></g>
+<text x="51" y="597" class="name" text-anchor="start">Dispute</text>
+<text x="51" y="614" class="sub" text-anchor="start">one item is wrong</text>
+<circle cx="30" cy="736" r="13" class="stop end"/>
+<g class="icon on-end" transform="translate(22,728)"><path d="M3 4.5a5 2 0 0 0 10 0 5 2 0 0 0-10 0v7a5 2 0 0 0 10 0v-7"/><path d="M3 8a5 2 0 0 0 10 0"/></g>
+<text x="51" y="741" class="name" text-anchor="start">Ledger entry</text>
+<text x="51" y="758" class="sub" text-anchor="start">the invoice is closed</text>
 </svg>

@@ -120,7 +120,7 @@ test("a part with a state takes the status color on its outline and gets a statu
 });
 
 test("an optional leg is drawn dashed", () => {
-  const { svg } = renderDiagram(fixture("skip"));
+  const svg = renderDiagram(fixture("skip")).svg.split("\n<svg")[0]; // the main form; the column form shows leg 3 as a go-to row
   assert.equal((svg.match(/<g class="leg is-optional" data-leg="3">/g) || []).length, 1, "leg 3 is the optional one");
   assert.equal((svg.match(/<g class="leg" data-leg=/g) || []).length, 4, "the other four legs are plain");
   assert.match(svg, /#dg-skip \.leg\.is-optional \.line\{stroke-dasharray:5 7\}/);
@@ -130,20 +130,24 @@ test("an optional leg is drawn dashed", () => {
   assert.throws(() => renderDiagram(wrong), /"optional" of leg 3 must be true or false/);
 });
 
-test("render warns when a whole arrow is off the first phone screen while its two parts show", () => {
-  const { warnings, icons } = renderDiagram(fixture("skip"));
-  assert.deepEqual(warnings, ['on a phone this drawing scrolls sideways, and leg 3 ("skip the review") is not on the first screen: its two parts show there, but its arrow does not. Say this path in the text too. This warning stays after you did, because render cannot read the text']);
-  assert.deepEqual(icons, [], "it is a warning for the author, not an error in check");
-  assert.deepEqual(renderDiagram(fixture("bug-report")).warnings, [], "a route has a phone form, so it gets no such warning");
+test("data that is not a route gets the column form on a phone: a leg that is not to the next part becomes a go-to row", () => {
+  const { svg, warnings } = renderDiagram(fixture("skip"));
+  assert.deepEqual(warnings, [], "with a phone form, no arrow is off the first phone screen");
+  assert.match(svg, /<svg id="dg-skip-phone" class="dg dg-column dg-auto"[^>]* width="264"/);
+  assert.match(svg, /<g class="jump is-optional" data-leg="3"><circle [^>]*class="mark"\/><text [^>]*class="num"[^>]*>3<\/text><text [^>]*class="verb"[^>]*>skip the review<\/text><text [^>]*class="sub"[^>]*>to Answer<\/text><\/g>/, "the optional skip is a go-to row with a dashed mark");
+  assert.match(svg, /\.jump\.is-optional \.mark\{stroke-dasharray:3 3\}/);
+  const branch = renderDiagram(fixture("branch")).svg;
+  assert.match(branch, />back to Leave request<\/text>/, "a leg that goes up says \"back to\"");
+  assert.equal((branch.match(/class="stop end"/g) || []).length, 1, "a part where no leg starts has a filled ring");
 });
 
-test("a route also gets a single-track form for phones; paths that branch do not", () => {
+test("a route also gets a single-track form for phones", () => {
   const route = renderDiagram(fixture("bug-report")).svg;
   assert.match(route, /<svg id="dg-path" class="dg dg-wide dg-auto"/);
   assert.match(route, /<svg id="dg-path-phone" class="dg dg-track dg-auto"[^>]* width="264"/);
   assert.match(route, /#dg-path-phone\{display:none\}/, "the main form hides the phone form");
   assert.match(route, /@media \(max-width:954px\)\{#dg-path\{display:none\}#dg-path-phone\{display:block\}\}/, "below the width that the main form needs, the phone form takes its place");
-  assert.ok(!renderDiagram(fixture("branch")).svg.includes("-phone"));
+  assert.match(renderDiagram(fixture("branch")).svg, /<svg id="dg-leave-phone" class="dg dg-column/, "paths that branch get the column form instead");
 });
 
 test("wrong data is refused with a plain reason", () => {

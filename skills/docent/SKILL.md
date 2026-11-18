@@ -128,7 +128,7 @@ Say what was tested and what was not. Use these words:
 
 - The renderer estimates text widths, because it cannot measure them. The estimate is wide enough for Apple devices (tested). It was not tested on Windows, Android or Linux fonts.
 - A diagram has at most 4 lanes, 12 parts and 16 legs. Text that is too long is refused.
-- Paths that branch have no single-track form for phones. Their drawing scrolls sideways inside its well on a narrow screen. With scripts on, a line under the well tells the reader to scroll. `render` warns when a whole arrow is off the first phone screen; then say that path in the text too.
+- On a phone and on paper, a route takes its single-track form and any other data takes its column form, where a leg that is not to the next part is a go-to row ("to Answer"). Both fit a 320px screen when names have up to about 20 characters. A drawing that is still wider than its well scrolls sideways inside it; with scripts on, a line under the well tells the reader to scroll.
 - The styles count the steps of a numbered block heading and of a walkthrough. With scripts on, the page script writes each number as text, so a screen reader reads it. With scripts off, a screen reader in Chromium does not read the number.
 - With scripts on, each code block has a button that copies the code. With scripts off, the button and the line under a wide drawing do not show.
 - A value picker changes text only. A value cannot sit in a link address, an attribute, a drawing or another widget.

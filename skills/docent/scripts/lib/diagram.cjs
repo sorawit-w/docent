@@ -1,6 +1,6 @@
 // From diagram data to a drawing: checks the data, picks the form, lays it out, and writes the SVG.
 const { ICONS, iconProblem } = require("./icons.cjs");
-const { layoutRoute } = require("./route.cjs");
+const { layoutRoute, layoutColumn } = require("./route.cjs");
 const { toSvg } = require("./svg.cjs");
 const { DataError, fail, words, id, findBlocks, block, replaceBlocks } = require("./blocks.cjs");
 const { renderWidget, fillPlaces } = require("./widget.cjs");
@@ -132,6 +132,10 @@ function renderDiagram(data) {
   let phone = null;
   if (model.chain && scene.w > PHONE) {
     try { phone = withStates(layoutRoute(model, "track")); } catch (error) { warnings.push(`no phone form: ${error.message}`); }
+  }
+  // Data that is not a route gets the column form on a phone and on paper: every leg that is not to the next part is a go-to row.
+  if (!model.chain && scene.w > PHONE) {
+    try { phone = withStates(layoutColumn(model)); } catch (error) { warnings.push(`no phone form: ${error.message}`); }
   }
   // A drawing with no phone form scrolls sideways on a phone. It misleads when a whole arrow is off the first screen while both of its parts show there.
   if (!phone && scene.w > PHONE) {
