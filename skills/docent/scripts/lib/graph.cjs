@@ -165,6 +165,11 @@ function draw(g, k) {
   const chan = Array.from({ length: R + 1 }, (_, r) => {
     let h = r === 0 || r === R ? 3 * U + k.edge : 6 * U + k.gap + (k.rows[r] || 0);
     for (const b of boxes) { const [r0, r1] = boxRows(b); if (r0 === r) h += 4 * U; if (r1 + 1 === r) h += 2 * U; }
+    // The messages of a link stack beside it, half on each side: the rows they cross must be tall enough.
+    for (const e of edges) {
+      const n = e.labels.filter((l) => l.arrow).length;
+      if (n && e.a >= 0 && e.b >= 0 && Math.max(rank[e.a], rank[e.b]) === r && rank[e.a] !== rank[e.b]) h = Math.max(h, Math.ceil(n / 2) * 2 * U + 4 * U + k.gap);
+    }
     return up(h);
   });
   const colX = [], rowY = [];
@@ -415,6 +420,7 @@ function draw(g, k) {
         const len = dist(a, b);
         if (len < 1) continue;
         const fr = lb.at === "end" ? [0.75, 0.5, 0.9, 0.3, 0.1] : lb.at === "start" ? [0.25, 0.5, 0.1, 0.7, 0.9] : [0.5, 0.3, 0.7, 0.15, 0.85];
+        if (lb.arrow) { fr.length = 0; for (let d = U; d < len - U / 2; d += U) fr.push(d / len); } // messages stack in number order: try every lattice step, from the start of the segment
         if (lb.near && len > 40) fr.unshift(lb.at === "end" ? 1 - 20 / len : 20 / len); // a port's name: next to its square
         for (const f of fr) {
           const m = [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f];

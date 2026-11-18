@@ -49,3 +49,9 @@ test("long messages on a narrow drawing get room beside their line", () => {
   const { scene } = renderDiagram(d);
   for (const t of scene.legs.flatMap((l) => l.texts)) assert.ok(t.x > 0 && t.x < scene.w, t.s);
 });
+
+test("two lifelines can exchange the most messages there may be", () => {
+  const d = { id: "chatty", kind: "communication", label: "Twenty messages on one link.", lifelines: [{ id: "a", name: ": A" }, { id: "b", name: ": B" }], messages: Array.from({ length: 20 }, (_, i) => ({ n: String(i + 1), from: i % 2 ? "b" : "a", to: i % 2 ? "a" : "b", text: "message()" })) };
+  const { scene } = renderDiagram(d);
+  assert.equal(scene.legs[0].texts.length, 20);
+});
