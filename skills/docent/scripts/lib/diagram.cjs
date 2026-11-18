@@ -23,6 +23,22 @@ function renderSequence(data) {
   return { svg: `${main}\n${small}\n${inWords(steps)}`, form: "sequence", warnings: [], icons: [], model, scene };
 }
 
+/** A UML kind drawn by the graph layout: the drawing, a column for phones and paper, and the facts or steps in words. */
+const GRAPH_KINDS = { activity: "./activity.cjs" };
+function renderGraphKind(data) {
+  const { layoutGraph, layoutColumnGraph } = require("./graph.cjs");
+  const kind = require(GRAPH_KINDS[data.kind]);
+  const read = kind[`read${data.kind[0].toUpperCase()}${data.kind.slice(1)}`];
+  const model = read(data);
+  const scene = layoutGraph(kind.graphOf(model), data.kind);
+  const id = `dg-${model.id}`;
+  const phone = scene.w > PHONE ? layoutColumnGraph(kind.columnOf(model), data.kind) : null;
+  const main = toSvg(scene, { id, label: model.label, mode: "auto", swap: phone && { phone: `${id}-phone` } });
+  // On paper the main form prints, shrunk to the sheet, while it keeps at least 80% of its size; else the column prints.
+  const small = phone ? `\n${toSvg(phone, { id: `${id}-phone`, label: model.label, mode: "auto", swap: { main: id, below: scene.w + ROOM, printMain: scene.w * 0.8 <= SHEET } })}` : "";
+  return { svg: `${main}${small}\n${inWords(kind.wordsOf(model))}`, form: data.kind, warnings: [], icons: [], model, scene, phone };
+}
+
 const FORMS = ["wide", "tall", "plates"];
 const STATES = ["ok", "warn", "err"]; // success, needs care, failure: the status colors of the page
 const MOST = { lanes: 5, parts: 12, legs: 16, side: 2, name: 32, note: 40, verb: 24, lane: 28 };
@@ -154,7 +170,8 @@ function renderDiagram(data) {
   if (data && data.kind != null) {
     if (data.kind === "sequence") return renderSequence(data);
     if (data.kind === "flow") return renderFlow(data);
-    fail(`"kind" must be "sequence" or "flow", or left out for a workflow diagram`);
+    if (Object.hasOwn(GRAPH_KINDS, data.kind)) return renderGraphKind(data);
+    fail(`"kind" must be one of ${["sequence", "flow", ...Object.keys(GRAPH_KINDS)].map((k) => `"${k}"`).join(", ")}, or left out for a workflow diagram`);
   }
   const { model, warnings } = readData(data);
   const icons = warnings.filter((w) => !w.startsWith("every part has the state") && !w.startsWith("no leg has a verb")); // these warnings are about icons; check reports them as errors

@@ -195,6 +195,57 @@ A flowchart shows steps with decisions: a path that splits on a question, ends e
 - `render` also writes the steps in words, in a closed section under the drawing.
 - A flowchart sits in the text flow and has no `form`. When `render` says that there is "no free path" between two nodes, let the arrow back go to a nearer step, or split the flowchart in two.
 
+## Activity diagrams
+
+An activity diagram is a flowchart in UML notation: actions, decisions, paths that run at the same time, and who does each step. Write it with `"kind": "activity"` when the readers know UML or the document is a design; for other readers a flowchart (`"kind": "flow"`) says the same with fewer marks.
+
+```json
+{
+  "id": "order-flow",
+  "kind": "activity",
+  "label": "The shop takes an order and checks the stock. When the items are in stock, the warehouse packs them while the shop sends the invoice.",
+  "partitions": [{"id": "shop", "name": "Shop"}, {"id": "warehouse", "name": "Warehouse"}],
+  "nodes": [
+    {"id": "start", "type": "initial", "partition": "shop"},
+    {"id": "take", "name": "Take the order", "partition": "shop"},
+    {"id": "stock", "type": "decision", "partition": "shop"},
+    {"id": "split", "type": "fork", "partition": "warehouse"},
+    {"id": "pack", "name": "Pack the items", "partition": "warehouse"},
+    {"id": "invoice", "type": "send", "name": "Send the invoice", "partition": "shop"},
+    {"id": "both", "type": "join", "partition": "warehouse"},
+    {"id": "done", "type": "final", "partition": "warehouse"},
+    {"id": "tell", "name": "Tell the customer", "partition": "shop"},
+    {"id": "closed", "type": "flow-final", "partition": "shop"}
+  ],
+  "flows": [
+    {"from": "start", "to": "take"},
+    {"from": "take", "to": "stock"},
+    {"from": "stock", "to": "split", "guard": "in stock"},
+    {"from": "split", "to": "pack"},
+    {"from": "split", "to": "invoice"},
+    {"from": "pack", "to": "both"},
+    {"from": "invoice", "to": "both"},
+    {"from": "both", "to": "done"},
+    {"from": "stock", "to": "tell", "guard": "else"},
+    {"from": "tell", "to": "closed"}
+  ]
+}
+```
+
+| Field | What it is |
+|---|---|
+| `nodes` | 2 to 20, each with an `id` and a `type`. An `action` (the default type), an `object`, a `send` (a signal is sent) and an `accept` (the activity waits for an event) have a `name` of at most 32 characters; an object may have a `state` of at most 20 characters, drawn in brackets. An `initial`, `decision`, `merge`, `fork`, `join`, `final` or `flow-final` node has no name, as in UML. At most 4 forks. |
+| `flows` | 1 to 30, each `from` one node `to` another. Only a flow out of a decision has a `guard` (at most 24 characters, without brackets: the renderer adds them). |
+| `partitions` | Optional, at most 5, each with an `id` and a `name`. When a diagram has partitions, every node names one in `partition`, and each partition is a column. |
+
+- An initial node has one flow out and none in. A decision has one flow in and two or more out, each with a different guard; a merge has two or more in and one out. A fork has one in and two or more out; a join has two or more in and one out. An action, object, send or accept node has at most one flow out: to split the path, add a decision or a fork. A path ends at a `final` node (the activity ends) or a `flow-final` node (only this path ends).
+- Every node is reached from an initial node.
+- **The main path** is the first initial node, then each node's first flow, in the order you write the flows. One dot travels it; the other flows keep still.
+- The renderer puts the nodes in rows, routes each flow with right angles, and puts each guard beside its flow, near the decision. It draws each mark in UML notation: a filled dot, round-cornered actions, a hollow diamond, a thick bar, a ring around a dot, a ring with a cross. The lines are solid with an open arrowhead.
+- On a phone and on paper the diagram takes the column form: each node one under another, an arrow when a node's only flow goes to the next one, and else a row for each flow ("[else] to Tell the customer"). Partitions become bands.
+- `render` also writes the steps in words, in a closed section under the drawing, and a key to the marks the drawing uses.
+- When `render` says that there is "no free path" or "no room beside its line", make the diagram smaller: fewer flows back, or two diagrams.
+
 ## Optional legs
 
 A leg with `"optional": true` is a path that only some readers take, or that happens only in some cases. It is drawn as a dashed arrow:

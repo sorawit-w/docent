@@ -471,6 +471,27 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     ok("a flowchart shows two columns on a desktop, the column form on a phone and on paper, and its steps in words on paper", desk.main > 600 && !desk.column && desk.dots === 7 && !desk.words && !phone.main && phone.column === 264 && narrow.column === 264 && !paper.main && paper.column > 0 && paper.words && [phone, narrow].every((r) => r.page === r.view) && results.axe.length === 0, results);
   }
 
+  // The UML graph kinds: the drawing on a desktop, the column on a phone, and the words with the key on paper.
+  for (const name of ["activity"]) {
+    const data = fs.readFileSync(path.join(root, "tests", "fixtures", `${name}.json`), "utf8");
+    const did = `dg-${JSON.parse(data).id}`;
+    const content = renderDocument(html.replace('<section id="report"', `<section id="uml" aria-labelledby="uml-h"><h2 id="uml-h">UML</h2><figure><div class="fig" role="region" aria-label="Figure 8, ${name}" tabindex="0">\n<!-- docent:diagram\n${data}\n-->\n<!-- /docent:diagram -->\n</div><figcaption><strong>Figure 8</strong>A UML ${name} diagram.</figcaption></figure></section>\n<section id="report"`)).html;
+    const look = (page) => page.evaluate((id) => ({ main: document.getElementById(id).getBoundingClientRect().width, column: (document.getElementById(`${id}-phone`) || { getBoundingClientRect: () => ({ width: 0 }) }).getBoundingClientRect().width, words: document.querySelector("#uml .dg-words").open, key: [...document.querySelectorAll("#uml .dg-words ul li")].length, page: document.documentElement.scrollWidth, view: innerWidth }), did);
+    const results = {};
+    for (const [form, opts] of [["desk", { width: 1280 }], ["phone", { width: 390, height: 844 }], ["narrow", { width: 320, height: 700 }], ["paper", { width: 658, height: 1123, media: "print" }], ["dark", { width: 1280, theme: "dark" }]]) {
+      const view = await open({ ...opts, content });
+      if (form === "paper") await view.page.evaluate(() => dispatchEvent(new Event("beforeprint")));
+      results[form] = await look(view.page);
+      if (form === "desk" || form === "dark") {
+        await view.page.addScriptTag({ path: axePath });
+        results[`${form}Axe`] = await view.page.evaluate(async () => (await window.axe.run(document.querySelector("#uml"), { runOnly: { type: "tag", values: ["wcag2a", "wcag2aa", "wcag21aa", "best-practice"] } })).violations.map((v) => v.id));
+      }
+      await view.context.close();
+    }
+    const { desk, phone, narrow, paper } = results;
+    ok(`a UML ${name} diagram shows its drawing on a desktop, its column on a phone, and its words with a key on paper, in both themes with no contrast problem`, desk.main > 264 && !desk.column && !desk.words && !phone.main && phone.column === 264 && narrow.column === 264 && paper.words && paper.key > 0 && [phone, narrow].every((r) => r.page === r.view) && results.deskAxe.length === 0 && results.darkAxe.length === 0, results);
+  }
+
   // Two drawings in one figure: side by side when both fit, one below the other when they do not.
   {
     const block = (id, a, b) => `<!-- docent:diagram\n{"id": "${id}", "label": "${a} goes to ${b}.", "lanes": [{"id": "x", "name": "Team"}, {"id": "y", "name": "Service"}], "parts": [{"id": "p", "lane": "x", "name": "${a}"}, {"id": "q", "lane": "y", "name": "${b}"}], "legs": [{"from": "p", "to": "q", "verb": "send"}]}\n-->\n<!-- /docent:diagram -->\n`;

@@ -1,0 +1,37 @@
+{
+  "id": "order-flow",
+  "kind": "activity",
+  "label": "The shop takes an order and checks the stock. When the items are in stock, the warehouse packs them while the shop sends the invoice; the order ships when both are done. Otherwise the shop tells the customer and the order is closed.",
+  "partitions": [
+    { "id": "shop", "name": "Shop" },
+    { "id": "warehouse", "name": "Warehouse" }
+  ],
+  "nodes": [
+    { "id": "start", "type": "initial", "partition": "shop" },
+    { "id": "take", "name": "Take the order", "partition": "shop" },
+    { "id": "stock", "type": "decision", "partition": "shop" },
+    { "id": "split", "type": "fork", "partition": "warehouse" },
+    { "id": "pack", "name": "Pack the items", "partition": "warehouse" },
+    { "id": "invoice", "type": "send", "name": "Send the invoice", "partition": "shop" },
+    { "id": "both", "type": "join", "partition": "warehouse" },
+    { "id": "ship", "name": "Ship the order", "partition": "warehouse" },
+    { "id": "parcel", "type": "object", "name": "Parcel", "state": "shipped", "partition": "warehouse" },
+    { "id": "done", "type": "final", "partition": "warehouse" },
+    { "id": "tell", "name": "Tell the customer", "partition": "shop" },
+    { "id": "closed", "type": "flow-final", "partition": "shop" }
+  ],
+  "flows": [
+    { "from": "start", "to": "take" },
+    { "from": "take", "to": "stock" },
+    { "from": "stock", "to": "split", "guard": "in stock" },
+    { "from": "split", "to": "pack" },
+    { "from": "pack", "to": "both" },
+    { "from": "both", "to": "ship" },
+    { "from": "ship", "to": "parcel" },
+    { "from": "parcel", "to": "done" },
+    { "from": "split", "to": "invoice" },
+    { "from": "invoice", "to": "both" },
+    { "from": "stock", "to": "tell", "guard": "else" },
+    { "from": "tell", "to": "closed" }
+  ]
+}

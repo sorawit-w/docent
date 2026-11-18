@@ -136,7 +136,7 @@ function styles(scene, id, mode, swap) {
     const moving = scene.legs.filter((leg) => !leg.still); // in a flowchart only the main path moves
     const total = moving.length * CROSS + PAUSE;
     const when = (t) => (t / total) * 100;
-    css.push(`.js ${s} .pulse{display:block;animation:${num(total)}s linear 2 both}`, `.js ${s}:not(.is-playing) .pulse{animation-play-state:paused}`);
+    if (moving.length) css.push(`.js ${s} .pulse{display:block;animation:${num(total)}s linear 2 both}`, `.js ${s}:not(.is-playing) .pulse{animation-play-state:paused}`);
     moving.forEach((leg, k) => {
       const first = leg.pts[0], last = leg.pts[leg.pts.length - 1];
       const t0 = k * CROSS, t1 = t0 + CROSS;
@@ -168,6 +168,8 @@ function toSvg(scene, { id, label, mode, swap }) {
   for (const b of scene.bands) out.push(`<rect x="${num(b.x)}" y="${num(b.y)}" width="${num(b.w)}" height="${num(b.h)}" rx="10" class="band${b.inner ? " is-inner" : ""}"/>`);
   // A combined fragment: its ground in the page color goes under the tracks; its outline, tab and guards go over them.
   for (const f of scene.frames || []) if (!f.ref) out.push(`<rect x="${num(f.x)}" y="${num(f.y)}" width="${num(f.w)}" height="${num(f.h)}" class="band"/>`);
+  // The frames of a UML drawing (a package, a node, a boundary) go under its lines and nodes.
+  for (const raw of scene.under || []) out.push(raw);
   for (const [x1, y1, x2, y2] of scene.tracks) out.push(`<line x1="${num(x1)}" y1="${num(y1)}" x2="${num(x2)}" y2="${num(y2)}" class="track"/>`);
   for (const b of scene.bars || []) out.push(`<rect x="${num(b.x)}" y="${num(b.y)}" width="${num(b.w)}" height="${num(b.h)}" class="u-bar"/>`);
   for (const f of scene.frames || []) {
@@ -184,6 +186,12 @@ function toSvg(scene, { id, label, mode, swap }) {
     out.push(text(lane.text));
   }
   for (const leg of scene.legs) {
+    // A line of a UML graph: its end mark and its dash follow UML, and its labels sit beside it.
+    if (leg.u) {
+      const tip = leg.pts[leg.pts.length - 1], prev = leg.pts[leg.pts.length - 2];
+      out.push(`<g class="leg" data-leg="${leg.n}">${uml.line(leg.pts, leg.u)}${leg.u.end ? uml.end(leg.u.end, tip, prev) : ""}${leg.still ? "" : `<circle r="6" class="pulse pulse-${leg.n}"/>`}${leg.texts.map(text).join("")}</g>`);
+      continue;
+    }
     out.push(
       // The dot is drawn before the numbered mark, so it passes under the mark and the number stays readable.
       `<g class="leg${leg.optional ? " is-optional" : ""}${leg.reply ? " is-reply" : ""}" data-leg="${leg.n}"><path d="${linePath(leg)}" class="line"/>${head(leg)}` +
@@ -201,6 +209,7 @@ function toSvg(scene, { id, label, mode, swap }) {
     out.push(`<g class="jump${jump.optional ? " is-optional" : ""}"${n}><circle cx="${num(jump.mark[0])}" cy="${num(jump.mark[1])}" r="${MARK}" class="mark"/>` + (jump.n == null ? "" : text({ x: jump.mark[0], y: jump.mark[1] + 4, s: jump.n, cls: "num", anchor: "middle" })) + text(jump.verb) + text(jump.target) + (jump.more || []).map(text).join("") + `</g>`);
   }
   for (const part of scene.parts) {
+    if (part.svg != null) { out.push(part.svg, ...part.texts.map(text)); continue; } // a UML node draws its own marks
     const is = part.state ? ` is-${part.state}` : "";
     // A decision is a plate with pointed ends; a stop has a thick outline.
     if (part.shape === "card" && part.ask) {
