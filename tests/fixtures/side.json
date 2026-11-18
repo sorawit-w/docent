@@ -1,0 +1,90 @@
+{
+  "id": "side",
+  "label": "A bug report in four steps beside the walkthrough. A side path: if the report is known, the maintainers close it as a duplicate.",
+  "lanes": [
+    {
+      "id": "reporter",
+      "name": "Reporter",
+      "icon": "person"
+    },
+    {
+      "id": "maintainers",
+      "name": "Maintainers",
+      "icon": "team"
+    }
+  ],
+  "parts": [
+    {
+      "id": "report",
+      "lane": "reporter",
+      "name": "Bug report",
+      "note": "what went wrong",
+      "icon": "document"
+    },
+    {
+      "id": "triage",
+      "lane": "maintainers",
+      "name": "Triage",
+      "note": "a first check",
+      "icon": "inspect"
+    },
+    {
+      "id": "steps",
+      "lane": "reporter",
+      "name": "Steps to repeat",
+      "note": "a short, exact list",
+      "icon": "message"
+    },
+    {
+      "id": "fix",
+      "lane": "maintainers",
+      "name": "Fix",
+      "note": "a tested change",
+      "icon": "check"
+    },
+    {
+      "id": "version",
+      "lane": "maintainers",
+      "name": "New version",
+      "note": "ready to install",
+      "icon": "release"
+    },
+    {
+      "id": "closed",
+      "lane": "maintainers",
+      "name": "Closed",
+      "note": "as a duplicate",
+      "icon": "merge"
+    }
+  ],
+  "legs": [
+    {
+      "from": "report",
+      "to": "triage",
+      "verb": "file"
+    },
+    {
+      "from": "triage",
+      "to": "steps",
+      "verb": "ask for steps"
+    },
+    {
+      "from": "steps",
+      "to": "fix",
+      "verb": "send steps"
+    },
+    {
+      "from": "fix",
+      "to": "version",
+      "verb": "release"
+    }
+  ],
+  "side": [
+    {
+      "from": "report",
+      "to": "closed",
+      "verb": "if it is known"
+    }
+  ],
+  "place": "walk"
+}

@@ -67,12 +67,13 @@ const partToRect = (p, r) => (p.shape === "card" ? rectRect(partRect(p), r) : Ma
 function check(scene) {
   const out = [];
   const bad = (rule, kind, msg, more = {}) => out.push({ rule, kind, msg, ...more });
-  const legs = scene.legs, parts = scene.parts;
+  // A side leg is a line with a verb and no mark; it keeps every rule that does not concern a mark.
+  const legs = [...scene.legs, ...(scene.spurs || [])], parts = scene.parts;
   const texts = [];
   scene.lanes.forEach((lane, i) => texts.push({ box: textBox(lane.text), what: `the lane name "${lane.text.s}"`, kind: "lane", lane: i }));
   scene.lanes.forEach((lane, i) => lane.iconAt && texts.push({ box: { x0: lane.iconAt[0] - 8, y0: lane.iconAt[1] - 8, x1: lane.iconAt[0] + 8, y1: lane.iconAt[1] + 8 }, what: "a lane icon", kind: "lane", lane: i }));
   for (const part of parts) for (const t of part.texts) texts.push({ box: textBox(t), what: `"${t.s}"`, kind: "label", part: part.id });
-  for (const leg of legs) if (leg.verb.s) texts.push({ box: textBox(leg.verb), what: `the verb "${leg.verb.s}"`, kind: "verb", leg: leg.n });
+  for (const leg of legs) if (leg.verb.s) texts.push({ box: textBox(leg.verb), what: `the verb "${leg.verb.s}"`, kind: "verb", leg: leg.n ?? `side ${leg.to}` });
   for (const jump of scene.jumps || []) {
     const [mx, my] = jump.mark, part = `go-to ${jump.n}`;
     texts.push({ box: { x0: mx - MARK, y0: my - MARK, x1: mx + MARK, y1: my + MARK }, what: `the mark of go-to row ${jump.n}`, kind: "label", part });
@@ -86,8 +87,9 @@ function check(scene) {
     if (dist(a, b) < need - 0.01) bad("R1", "run", `leg ${leg.n}: the straight run behind the arrowhead is ${Math.round(dist(a, b) - HEAD - (segs.length > 1 ? leg.radius || 0 : 0))}px; it must be ${RULE.run}px`, { leg: leg.n });
     if (leg.sameLane && pathLength(leg) < RULE.sameLane - 0.01) bad("R4", "short", `leg ${leg.n} is ${Math.round(pathLength(leg))}px long; a leg inside one lane must be ${RULE.sameLane}px`, { leg: leg.n });
 
-    // R2: the mark.
-    const m = leg.mark;
+    // R2: the mark. A side leg has none.
+    const m = leg.mark || null;
+    if (m) {
     if (Math.min(...segs.map(([p, q]) => pointSeg(m, p, q))) > 0.6) bad("R2", "mark-off", `mark ${leg.n} is not on its leg`, { leg: leg.n });
     if (!leg.sameLane && scene.gaps.length && !scene.gaps.some((g) => inRect(m, { x0: g.x, y0: g.y, x1: g.x + g.w, y1: g.y + g.h }))) bad("R2", "mark-gap", `mark ${leg.n} is not in the gap between two lanes`, { leg: leg.n });
     for (const other of legs) {
@@ -95,14 +97,15 @@ function check(scene) {
       if (pointSeg(m, headBase(other), tip) - HEAD_HALF - MARK < RULE.markClear - 0.01) bad("R2", "mark-head", `mark ${leg.n} is less than ${RULE.markClear}px from the arrowhead of leg ${other.n}`, { leg: leg.n });
       for (const bend of other.pts.slice(1, -1)) if (dist(m, bend) - MARK - (other.radius || 0) < RULE.markClear - 0.01) bad("R2", "mark-bend", `mark ${leg.n} is less than ${RULE.markClear}px from a bend of leg ${other.n}`, { leg: leg.n });
       if (other !== leg && Math.min(...segsOf(other).map(([p, q]) => pointSeg(m, p, q))) - MARK < 4) bad("R5", "mark-line", `mark ${leg.n} sits on leg ${other.n}`, { leg: leg.n });
-      if (other.n > leg.n && dist(m, other.mark) < 2 * MARK + 4) bad("R5", "mark-mark", `marks ${leg.n} and ${other.n} overlap`, { leg: other.n });
+      if (other.mark && other.n > leg.n && dist(m, other.mark) < 2 * MARK + 4) bad("R5", "mark-mark", `marks ${leg.n} and ${other.n} overlap`, { leg: other.n });
     }
     for (const part of parts) if (partToPoint(part, m) - MARK < RULE.markClear - 0.01) bad("R2", "mark-part", `mark ${leg.n} is less than ${RULE.markClear}px from the part "${part.id}"`, { leg: leg.n });
+    }
 
     // R3: the verb. A leg may have none.
     if (leg.verb.s) {
       const verb = textBox(leg.verb);
-      if (rectPoint(verb, m) - MARK > RULE.verbNear) bad("R3", "verb-far", `the verb of leg ${leg.n} is not beside its mark`, { leg: leg.n });
+      if (m && rectPoint(verb, m) - MARK > RULE.verbNear) bad("R3", "verb-far", `the verb of leg ${leg.n} is not beside its mark`, { leg: leg.n });
       for (const other of legs) for (const [p, q] of segsOf(other)) if (rectSeg(verb, p, q) < RULE.verbClear - 0.01) { bad("R3", "verb-line", `the verb "${leg.verb.s}" is less than ${RULE.verbClear}px from the line of leg ${other.n}`, { leg: leg.n, otherLeg: other.n }); break; }
       for (const [x1, y1, x2, y2] of scene.tracks) if (rectSeg(verb, [x1, y1], [x2, y2]) < RULE.verbClear - 0.01) bad("R3", "verb-track", `the verb "${leg.verb.s}" is less than ${RULE.verbClear}px from a track`, { leg: leg.n });
       for (const part of parts) if (partToRect(part, verb) < RULE.verbClear - 0.01) bad("R3", "verb-part", `the verb "${leg.verb.s}" is less than ${RULE.verbClear}px from the part "${part.id}"`, { leg: leg.n });
@@ -114,7 +117,7 @@ function check(scene) {
       if (Math.min(...segs.map(([p, q]) => partToSeg(part, p, q))) < 8) bad("R5", "line-part", `leg ${leg.n} runs over or too close to the part "${part.id}"`, { leg: leg.n });
     }
     for (const other of legs) {
-      if (other.n <= leg.n) continue;
+      if (legs.indexOf(other) <= legs.indexOf(leg)) continue; // each pair once; a side leg has no number
       for (const [p, q] of segs) for (const [r, s] of segsOf(other)) {
         const d = segSeg(p, q, r, s);
         if (d >= 8) continue;
@@ -140,7 +143,7 @@ function check(scene) {
         if (partToRect(part, t.box) < 4) bad("R5", "text-part", `${t.what} is on or too close to the part "${part.id}"`, { part: t.part, lane: t.lane, other: part.id });
       }
     }
-    for (const leg of legs) if (!(t.kind === "verb" && t.leg === leg.n) && rectPoint(t.box, leg.mark) - MARK < 2) bad("R5", "text-mark", `${t.what} touches mark ${leg.n}`, { leg: t.kind === "verb" ? t.leg : leg.n, otherLeg: leg.n, part: t.part, lane: t.lane });
+    for (const leg of legs) if (leg.mark && !(t.kind === "verb" && t.leg === leg.n) && rectPoint(t.box, leg.mark) - MARK < 2) bad("R5", "text-mark", `${t.what} touches mark ${leg.n}`, { leg: t.kind === "verb" ? t.leg : leg.n, otherLeg: leg.n, part: t.part, lane: t.lane });
     for (const u of texts.slice(i + 1)) if (!(t.kind === u.kind && t.part === u.part && t.lane === u.lane && t.kind !== "verb") && rectRect(t.box, u.box) < 6) bad("R5", "text-text", `${t.what} and ${u.what} overlap`, { leg: t.leg ?? u.leg, otherLeg: t.leg && u.leg ? u.leg : undefined, part: t.part, other: u.part, lane: t.lane ?? u.lane });
     if (t.box.x0 < 4 || t.box.y0 < 4 || t.box.x1 > scene.w - 4 || t.box.y1 > scene.h - 4) bad("R5", "outside", `${t.what} is outside the drawing`, { leg: t.leg, part: t.part });
   });

@@ -411,6 +411,25 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     ok("a drawing that is not a route shows Plates on a desktop and the column form on a phone, at 320px and on paper, with no sideways scroll", desk.main > 0 && !desk.column && !phone.main && phone.column === 264 && narrow.column === 264 && !paper.main && paper.column > 0 && [phone, narrow].every((r) => r.page === r.view) && results.axe.length === 0, results);
   }
 
+  // A side leg beside walkthrough steps: the steps light legs 1 to 4, the side leg stays dashed and unlit, and a phone shows it as a go-to row.
+  {
+    const side = fs.readFileSync(path.join(root, "tests", "fixtures", "side.json"), "utf8").replace('"id": "side"', '"id": "steps"');
+    const content = renderDocument(html.replace(/(<!-- docent:diagram\n)\{\n  "id": "steps"[\s\S]*?(\n-->)/, (all, open, close) => `${open}${side.trim()}${close}`)).html;
+    const desk = await open({ width: 1280, content });
+    const lit = [];
+    for (let i = 0; i < 4; i++) {
+      await desk.page.evaluate((n) => { const li = document.querySelectorAll(".steps > li")[n]; window.scrollTo(0, li.getBoundingClientRect().top + scrollY - innerHeight * 0.5 + 4); }, i);
+      await desk.page.waitForTimeout(200);
+      lit.push(await desk.page.evaluate(() => [...document.querySelectorAll("#dg-steps .leg.is-current")].map((g) => g.dataset.leg).join()));
+    }
+    const spur = await desk.page.evaluate(() => { const line = document.querySelector("#dg-steps .side .line"); return { dash: getComputedStyle(line).strokeDasharray, stroke: getComputedStyle(line).stroke, current: document.querySelectorAll("#dg-steps .side.is-current, #dg-steps .side .is-current").length }; });
+    await desk.context.close();
+    const phone = await open({ width: 390, height: 844, content });
+    const row = await phone.page.evaluate(() => ({ shown: document.getElementById("dg-steps-phone").getBoundingClientRect().width, row: [...document.querySelectorAll("#dg-steps-phone .jump text")].map((t) => t.textContent).join("|"), page: document.documentElement.scrollWidth, view: innerWidth }));
+    await phone.context.close();
+    ok("a side leg beside walkthrough steps: steps light legs 1 to 4, the side leg is dashed and never lit, and a phone shows it as a go-to row", lit.join(" ") === "1 2 3 4" && spur.dash === "5px, 7px" && spur.stroke === LIGHT.text && spur.current === 0 && row.shown > 0 && row.row === "if it is known|to Closed" && row.page === row.view, { lit, spur, row });
+  }
+
   // Two drawings in one figure: side by side when both fit, one below the other when they do not.
   {
     const block = (id, a, b) => `<!-- docent:diagram\n{"id": "${id}", "label": "${a} goes to ${b}.", "lanes": [{"id": "x", "name": "Team"}, {"id": "y", "name": "Service"}], "parts": [{"id": "p", "lane": "x", "name": "${a}"}, {"id": "q", "lane": "y", "name": "${b}"}], "legs": [{"from": "p", "to": "q", "verb": "send"}]}\n-->\n<!-- /docent:diagram -->\n`;

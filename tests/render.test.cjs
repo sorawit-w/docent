@@ -14,7 +14,7 @@ const CASES = [
   ["review", "wide"], ["review", "tall"], ["review", "plates"],
   ["long-route", "wide"], ["long-route", "tall"], ["branch", "plates"], ["dense", "plates"],
   ["pipeline", "wide"], ["pipeline", "tall"], ["pipeline", "plates"], ["skip", "plates"],
-  ["five", "wide"], ["five", "tall"], ["five", "plates"],
+  ["five", "wide"], ["five", "tall"], ["five", "plates"], ["side", "tall"],
 ];
 
 for (const [name, form] of CASES) {
@@ -70,7 +70,7 @@ test("a drawing that is too wide beside walkthrough steps gets a warning that na
   branched.parts = [...branched.parts, { id: "known", lane: "reporter", name: "Known issues", note: "an older report", icon: "document" }];
   branched.legs = [...branched.legs, { from: "known", to: "triage", verb: "link", optional: true }];
   const [choice, ...more] = renderDiagram(branched).warnings.filter((w) => w.startsWith("the drawing is"));
-  assert.match(choice, /^the drawing is \d+px wide; beside the walkthrough steps there is room for 520px, so it will scroll sideways\. Its data is not a route .*, so it is drawn as Plates, which needs more room\. A walkthrough needs a route\. Choose one: take the extra path out and keep the walkthrough, or keep the path, put the diagram in the text flow and write the steps as a numbered list$/);
+  assert.match(choice, /^the drawing is \d+px wide; beside the walkthrough steps there is room for 520px, so it will scroll sideways\. Its data is not a route .*, so it is drawn as Plates, which needs more room\. A walkthrough needs a route\. Choose one: when the extra path is one short branch to a part of its own, write it as a side leg \("side"\); or take the extra path out; or put the diagram in the text flow and write the steps as a numbered list$/);
   assert.ok(!/widest texts/.test(choice), "it does not send the author to shorten texts");
   assert.deepEqual(more, []);
 });
@@ -245,4 +245,27 @@ test("a diagram has at most 5 lanes", () => {
   six.lanes.push({ id: "extra", name: "Extra" });
   six.parts[4].lane = "extra";
   assert.throws(() => renderDiagram(six), /a diagram has 1 to 5 lanes; this one has 6/);
+});
+
+test("a side leg beside walkthrough steps: dashed, no number, never lit, and the route keeps one leg for each step", () => {
+  const { svg, form, warnings, scene, model } = renderDiagram(fixture("side"));
+  assert.equal(form, "tall");
+  assert.deepEqual(warnings, [], "it still fits the 520px beside the steps");
+  assert.ok(scene.w <= 520);
+  assert.equal(model.legs.length, 4, "four legs, so four steps; the side leg is not counted");
+  assert.match(svg, /<g class="side"><path [^>]*class="line"\/><polygon [^>]*class="head"\/><text [^>]*class="verb"[^>]*>if it is known<\/text><\/g>/);
+  assert.ok(!/<g class="side"[^>]*data-leg/.test(svg), "a side leg has no number, so no step lights it");
+  assert.match(svg, /#dg-side \.side \.line\{stroke-dasharray:5 7\}/);
+  assert.match(svg, /<g class="jump is-optional"><circle [^>]*class="mark"\/><text [^>]*class="verb"[^>]*>if it is known<\/text><text [^>]*class="sub"[^>]*>to Closed<\/text><\/g>/, "on a phone it is a go-to row with no number");
+});
+
+test("wrong side legs are refused with a plain reason", () => {
+  const broken = (change, reason) => { const copy = fixture("side"); change(copy); assert.throws(() => renderDiagram(copy), reason); };
+  broken((d) => (d.side[0].to = "triage"), /goes to "triage", which a leg of the route also uses/);
+  broken((d) => (d.parts.at(-1).lane = "reporter"), /stays in one lane/);
+  broken((d) => d.side.push({ from: "steps", to: "closed", verb: "x" }, { from: "steps", to: "closed", verb: "y" }), /at most 2 side legs/);
+  broken((d) => d.side.push({ from: "steps", to: "closed", verb: "again" }), /two side legs go to "closed"/);
+  broken((d) => (d.form = "wide"), /a diagram with side legs is drawn as Route tall/);
+  broken((d) => delete d.side[0].verb, /the verb of side leg 1 is missing/);
+  broken((d) => d.legs.push({ from: "version", to: "report", verb: "again" }), /side legs need a route/);
 });

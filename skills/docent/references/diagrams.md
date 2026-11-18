@@ -45,6 +45,7 @@ Put one block where the drawing belongs, inside the well of a figure:
 | `lanes` | yes | 1 to 5 lanes. Each has an `id`, a `name` (at most 28 characters) and, if you want, an `icon`. |
 | `parts` | yes | 2 to 12 parts. Each has an `id`, the `lane` it belongs to, a `name` (at most 32 characters) and, if you want, a `note` (at most 40 characters), an `icon` and a `state`. |
 | `legs` | yes | 1 to 16 legs, in order. Each goes `from` one part `to` another and, if you want, has a `verb` (at most 24 characters). A leg can also have `"optional": true`. The legs are numbered in the order you write them. |
+| `side` | no | 1 or 2 side legs: a short dashed path from a part of the route to an extra part. See "Side legs". |
 | `place` | no | `"flow"` (the default) for a diagram in the text flow. `"walk"` for the diagram beside walkthrough steps: leg 1 lights with step 1, leg 2 with step 2, and so on. |
 | `form` | no | `"auto"` (the default), `"wide"`, `"tall"` or `"plates"`. Leave it out and the renderer picks. Name a form only when you have a reason. |
 | `icons` | no | Icons that you draw for this diagram: an object from a name to the shapes of the icon. See below. |
@@ -80,6 +81,26 @@ When the text has two separate chains (two flows that do not meet), write two di
 A walkthrough needs a route with one leg for each step. Give it at most two lanes; the room beside the steps is 520px wide.
 
 In Plates every part has its own row, in the order in which the legs reach the parts. Two arrows may cross at a right angle; they never share a line. Plates is easiest to draw when most legs go from one lane to another. When `render` refuses a Plates diagram, move a part to another lane, remove a leg, or shorten a verb.
+
+## Side legs
+
+A walkthrough needs a route, because step 1 lights leg 1, step 2 lights leg 2, and so on. When the text also needs one short branch beside the steps, such as "if the report is known, it is closed", write it as a **side leg**:
+
+```json
+"parts": [
+  ...,
+  {"id": "closed", "lane": "maintainers", "name": "Closed", "note": "as a duplicate", "icon": "merge"}
+],
+"side": [
+  {"from": "report", "to": "closed", "verb": "if it is known"}
+]
+```
+
+- A side leg goes from a part of the route to an extra part that only this side leg uses. The extra part sits in another lane, level with the part where the side leg starts.
+- It is drawn dashed, with its verb above it. It has no number, no step lights it, and no dot travels it. On a phone it is a go-to row with no number under the part where it starts.
+- The `verb` is needed: it says when the side path happens. Say the side path in the `label` too.
+- At most 2 side legs. A diagram with side legs is drawn as Route tall, beside the steps or in the text flow.
+- The walkthrough has one step for each leg of the route; side legs have no step.
 
 ## Optional legs
 
@@ -132,7 +153,7 @@ An icon may hold only these shapes and attributes: `path` (`d`), `circle` (`cx`,
 - `render doc.html: diagram 1 ("order") drawn as wide` — the drawing is in the document.
 - `... cannot be drawn within the spacing rules: ...` — the data asks for more than the form can hold. Shorten the text that the message names, remove a part, or let the renderer pick the form.
 - `... warning: the drawing is 734px wide; beside the walkthrough steps there is room for 520px, so it will scroll sideways. It has 3 lanes, and two lanes fit there. The widest texts are "..." and "..."` — the drawing will scroll sideways beside the steps. Each lane is as wide as its widest name or note. Beside walkthrough steps, two lanes fit when the names have up to about 12 characters. Three lanes fit only when every name has about 4 characters. So use two lanes there, or shorten the texts that the message names.
-- `... warning: the drawing is 796px wide; beside the walkthrough steps there is room for 520px, so it will scroll sideways. Its data is not a route ..., so it is drawn as Plates, which needs more room` — the diagram beside the steps has a path that branches, so it is not a route. Shorter texts do not help here. Choose one: take the extra path out and keep the walkthrough, or keep the path, put the diagram in the text flow (`"place": "flow"`) and write the steps as a numbered list.
+- `... warning: the drawing is 796px wide; beside the walkthrough steps there is room for 520px, so it will scroll sideways. Its data is not a route ..., so it is drawn as Plates, which needs more room` — the diagram beside the steps has a path that branches, so it is not a route. Shorter texts do not help here. Choose one: when the extra path is one short branch to a part of its own, write it as a side leg (see "Side legs" above); or take the extra path out; or put the diagram in the text flow (`"place": "flow"`) and write the steps as a numbered list.
 
 - `... warning: no phone form: The column form cannot be drawn within the spacing rules: ...` — rare: the column form failed, so the drawing scrolls on a phone. Shorten the text that the message names.
 - `... warning: on a phone this drawing scrolls sideways, and leg 3 ("...") is not on the first screen: its two parts show there, but its arrow does not` — only after the warning above: the drawing has no phone form. On a phone the reader sees the left part first, and there this arrow is missing. Say the path in the text too. The warning stays after you did, because `render` cannot read the text; tell the user that this warning is handled. With scripts on, the page shows a line under the figure that tells the reader to scroll.

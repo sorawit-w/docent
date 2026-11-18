@@ -6,6 +6,7 @@ const { textWidth } = require("./text.cjs");
 
 const GAP = 24; // between two lane bands
 const LIMIT = 240; // the most extra room one leg may take
+const JUMP = 40; // the height of one go-to row
 
 class LayoutError extends Error {
   constructor(form, problems) {
@@ -137,6 +138,16 @@ function tall(model, k) {
     const base = Math.min(mark[1] - 17, mark[1] - half * Math.abs(slope) - 10);
     scene.legs.push({ n: leg.n, from: a.id, to: b.id, sameLane: false, radius: 0, pts: [[xa, from], [xa, d0], [xb, d1], [xb, tip]], mark, verb: { x: mx, y: base, s: leg.verb, cls: "verb", anchor: "middle" } });
   });
+  // A side part sits on its own track, level with the part where its side leg starts. The side leg runs straight across, dashed, with its verb above it.
+  scene.spurs = [];
+  for (const leg of model.side) {
+    const a = parts[leg.from], b = parts[leg.to], xa = trackX[a.lane], xb = trackX[b.lane], cy = y[chain.indexOf(leg.from)], dir = Math.sign(xb - xa);
+    const tx = left(b) ? xb - 21 : xb + 21, anchor = left(b) ? "end" : "start";
+    const texts = [{ x: tx, y: cy + 5, s: b.name, cls: "name", anchor }];
+    if (b.note) texts.push({ x: tx, y: cy + 22, s: b.note, cls: "sub", anchor });
+    scene.parts.push({ id: b.id, shape: "stop", cx: xb, cy, r, icon: b.icon, iconAt: [xb, cy], end: true, texts });
+    scene.spurs.push({ from: a.id, to: b.id, optional: true, radius: 0, pts: [[xa + dir * edge, cy], [xb - dir * edge, cy]], verb: { x: (xa + xb) / 2, y: cy - 12, s: leg.verb, cls: "verb", anchor: "middle" } });
+  }
   return scene;
 }
 
@@ -146,22 +157,25 @@ function track(model, k) {
   const { lanes, parts, legs, chain, radius: r } = model;
   const edge = r + 2, x = 30, textX = x + 21;
   const y = [], bands = [], gaps = [];
+  // A side leg is a go-to row under the part where it starts, with no number: there is no room beside a single track.
+  const rows = chain.map((index) => model.side.filter((leg) => leg.from === index));
   chain.forEach((index, pos) => {
-    const extra = pos ? k.stub[pos - 1] + k.run[pos - 1] : 0;
-    if (pos && parts[chain[pos - 1]].lane === parts[index].lane) return y.push(y[pos - 1] + 104 + extra);
-    const top = pos ? y[pos - 1] + 36 + GAP : 12;
+    const extra = pos ? k.stub[pos - 1] + k.run[pos - 1] : 0, below = pos ? rows[pos - 1].length * JUMP : 0;
+    if (pos && parts[chain[pos - 1]].lane === parts[index].lane) return y.push(y[pos - 1] + 104 + extra + below);
+    const top = pos ? y[pos - 1] + 36 + below + GAP : 12;
     bands.push({ lane: parts[index].lane, y: top, first: pos });
     y.push(top + 44 + extra);
   });
   const header = (lane) => x + 13 + 16 + (lane.icon ? 24 : 0) + nameW(lane.name);
-  const right = Math.max(...parts.map((p) => textX + labelW(p)), ...legs.map((leg) => textX + noteW(leg.verb)), ...bands.map((b) => header(lanes[b.lane])));
+  const sideText = (leg) => `to ${parts[leg.to].name}`;
+  const right = Math.max(...chain.map((i) => textX + labelW(parts[i])), ...legs.map((leg) => textX + noteW(leg.verb)), ...model.side.map((leg) => textX + 26 + Math.max(noteW(leg.verb), noteW(sideText(leg)))), ...bands.map((b) => header(lanes[b.lane])));
   const w = Math.max(264, even(right + 24)) + k.tail;
   bands.forEach((b, i) => {
     const last = (i + 1 < bands.length ? bands[i + 1].first : chain.length) - 1;
-    Object.assign(b, { x: 8, w: w - 16, h: y[last] + 36 - b.y });
+    Object.assign(b, { x: 8, w: w - 16, h: y[last] + 36 + rows[last].length * JUMP - b.y });
     if (i) gaps.push({ x: 0, y: b.y - GAP, w, h: GAP });
   });
-  const scene = { form: "track", w, h: y[y.length - 1] + 48, bands, gaps, tracks: [], lanes: [], parts: [], legs: [] };
+  const scene = { form: "track", w, h: y[y.length - 1] + 48 + rows[chain.length - 1].length * JUMP, bands, gaps, tracks: [], lanes: [], parts: [], legs: [], jumps: [] };
   for (const b of bands) {
     const lane = lanes[b.lane], end = w - 24;
     scene.lanes.push({ icon: lane.icon, iconAt: lane.icon ? [end - nameW(lane.name) - 14, b.y + 15] : null, text: { x: end, y: b.y + 20, s: lane.name, cls: "lane", anchor: "end" } });
@@ -172,11 +186,15 @@ function track(model, k) {
     const texts = [{ x: textX, y: cy + 5, s: part.name, cls: "name", anchor: "start" }];
     if (part.note) texts.push({ x: textX, y: cy + 22, s: part.note, cls: "sub", anchor: "start" });
     scene.parts.push({ id: part.id, shape: "stop", cx: x, cy, r, icon: part.icon, iconAt: [x, cy], end: pos === chain.length - 1, texts });
+    rows[pos].forEach((leg, j) => {
+      const my = cy + 46 + j * JUMP;
+      scene.jumps.push({ n: null, from: part.id, to: parts[leg.to].id, optional: true, mark: [textX + 10, my], verb: { x: textX + 26, y: my + 4, s: leg.verb, cls: "verb", anchor: "start" }, target: { x: textX + 26, y: my + 20, s: sideText(leg), cls: "sub", anchor: "start" } });
+    });
   });
   legs.forEach((leg, j) => {
     const from = y[j] + edge, tip = y[j + 1] - edge;
     const sameLane = bandOf(j) === bandOf(j + 1);
-    const my = sameLane ? (from + tip - HEAD) / 2 : bandOf(j + 1).y - GAP / 2;
+    const my = sameLane ? (from + rows[j].length * JUMP + tip - HEAD) / 2 : bandOf(j + 1).y - GAP / 2;
     scene.legs.push({ n: leg.n, from: parts[leg.from].id, to: parts[leg.to].id, sameLane, radius: 0, pts: [[x, from], [x, tip]], mark: [x, my], verb: { x: textX, y: my + 4, s: leg.verb, cls: "verb", anchor: "start" } });
   });
   return scene;
@@ -186,7 +204,6 @@ function track(model, k) {
 // to a lane is a band, as in the single track. A leg to the next part in the column is an arrow straight down. Every
 // other leg (a skip, a branch, an arrow back) is a go-to row under the part where it starts: its numbered mark, its
 // verb, and the name of the part where it goes. So no line crosses another, and the drawing fits a phone.
-const JUMP = 40; // the height of one go-to row
 function column(model) {
   const { lanes, parts, legs, radius: r } = model;
   const edge = r + 2, x = 30, textX = x + 21;
