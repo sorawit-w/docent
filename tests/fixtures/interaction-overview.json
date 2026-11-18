@@ -1,0 +1,28 @@
+{
+  "id": "checkout-overview",
+  "kind": "interaction-overview",
+  "label": "A customer logs in, then pays. A failed payment is tried again; a paid order gets a receipt and the warehouse is told, at the same time.",
+  "nodes": [
+    { "id": "start", "type": "initial" },
+    { "id": "login", "ref": "Log in", "diagram": "login" },
+    { "id": "pay", "ref": "Pay for the order" },
+    { "id": "paid", "type": "decision" },
+    { "id": "split", "type": "fork" },
+    { "id": "receipt", "ref": "Send the receipt" },
+    { "id": "notify", "ref": "Tell the warehouse" },
+    { "id": "both", "type": "join" },
+    { "id": "end", "type": "final" }
+  ],
+  "flows": [
+    { "from": "start", "to": "login" },
+    { "from": "login", "to": "pay" },
+    { "from": "pay", "to": "paid" },
+    { "from": "paid", "to": "split", "guard": "paid" },
+    { "from": "split", "to": "receipt" },
+    { "from": "split", "to": "notify" },
+    { "from": "receipt", "to": "both" },
+    { "from": "notify", "to": "both" },
+    { "from": "both", "to": "end" },
+    { "from": "paid", "to": "pay", "guard": "failed" }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "id": "door-timing",
+  "kind": "timing",
+  "label": "A user presses the button at 1 second. The controller is busy for 2 seconds and opens the door at 3 seconds; the door must open within 3 seconds of the press. The door closes again at 8 seconds.",
+  "time": { "from": 0, "to": 10, "step": 1, "unit": "s" },
+  "lifelines": [
+    { "id": "user", "name": "User", "states": ["Waiting", "Idle"] },
+    { "id": "ctrl", "name": "Controller", "states": ["Busy", "Ready"] },
+    { "id": "door", "name": "Door", "states": ["Open", "Moving", "Closed"] }
+  ],
+  "changes": [
+    { "lifeline": "user", "at": 0, "state": "Idle" },
+    { "lifeline": "user", "at": 1, "state": "Waiting" },
+    { "lifeline": "user", "at": 4, "state": "Idle" },
+    { "lifeline": "ctrl", "at": 0, "state": "Ready" },
+    { "lifeline": "ctrl", "at": 1, "state": "Busy" },
+    { "lifeline": "ctrl", "at": 3, "state": "Ready" },
+    { "lifeline": "door", "at": 0, "state": "Closed" },
+    { "lifeline": "door", "at": 3, "state": "Moving" },
+    { "lifeline": "door", "at": 4, "state": "Open" },
+    { "lifeline": "door", "at": 8, "state": "Moving" },
+    { "lifeline": "door", "at": 9, "state": "Closed" }
+  ],
+  "messages": [
+    { "from": "user", "to": "ctrl", "at": 1, "verb": "press" },
+    { "from": "ctrl", "to": "door", "at": 3, "verb": "open" }
+  ],
+  "constraints": [
+    { "lifeline": "door", "from": 1, "to": 4, "text": "{≤ 3 s}" }
+  ]
+}

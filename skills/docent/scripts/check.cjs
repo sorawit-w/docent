@@ -41,7 +41,7 @@ function checkDocument(html) {
   }
 
   // 2. Diagrams: each drawing must be the one that render makes from its data.
-  const diagrams = findBlocks(html, "diagram"), ids = new Set(), shapes = new Map(), walks = [];
+  const diagrams = findBlocks(html, "diagram"), ids = new Set(), shapes = new Map(), walks = [], refs = [];
   diagrams.forEach((found, n) => {
     const name = `diagram ${n + 1}`;
     let data;
@@ -59,10 +59,13 @@ function checkDocument(html) {
       if (shapes.has(shape)) warnings.push(`${label} shows the same ${drawn.model.legs ? "lanes, parts and legs" : "data"} as diagram "${shapes.get(shape)}"; a document should not draw the same thing twice`);
       else shapes.set(shape, drawn.model.id);
       if (drawn.model.place === "walk") walks.push({ label, legs: drawn.model.legs.length });
+      for (const ref of drawn.model.refs || []) refs.push({ label, ref });
     } catch (error) {
       errors.push(`${name}${data && data.id ? ` ("${data.id}")` : ""}: ${error.message}`);
     }
   });
+  // An interaction overview links each ref frame to a sequence diagram in the same document.
+  for (const { label, ref } of refs) if (!ids.has(ref)) errors.push(`${label}: a ref frame links to the diagram "${ref}", which is not in this document`);
   // A well holds one drawing, or two for two separate chains. Beside walkthrough steps it holds one, because step n lights leg n.
   for (const [, attrs, inner] of html.matchAll(/<div\b([^>]*\bclass="fig\b[^"]*"[^>]*)>([\s\S]*?)<\/div>/g)) {
     const count = (inner.match(/<!-- docent:diagram\b/g) || []).length, name = (attrs.match(/aria-label="([^"]*)"/) || [])[1] || "a figure";

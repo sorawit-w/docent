@@ -293,6 +293,100 @@ A state machine diagram shows the states that one thing can be in, and the event
 - The renderer draws each mark in UML notation: round-cornered states with their actions under a line, a rounded frame for a composite state with a dashed line between its regions, a hollow diamond for a choice, H or H* in a ring, a thick bar, a cross. A transition to itself is a loop at the right of its state.
 - On a phone and on paper the diagram takes the column form; a composite state's regions become bands. `render` also writes the states and transitions in words, with a key to the marks.
 
+## Interaction overview diagrams
+
+An interaction overview diagram shows how several interactions follow one another: an activity diagram whose steps are ref frames, each standing for a sequence diagram. Write it with `"kind": "interaction-overview"` when a flow is made of several exchanges that each deserve their own sequence diagram:
+
+```json
+{
+  "id": "checkout-overview",
+  "kind": "interaction-overview",
+  "label": "A customer logs in, then pays. A failed payment is tried again; a paid order gets a receipt and the warehouse is told, at the same time.",
+  "nodes": [
+    { "id": "start", "type": "initial" },
+    { "id": "login", "ref": "Log in", "diagram": "login" },
+    { "id": "pay", "ref": "Pay for the order" },
+    { "id": "paid", "type": "decision" },
+    { "id": "split", "type": "fork" },
+    { "id": "receipt", "ref": "Send the receipt" },
+    { "id": "notify", "ref": "Tell the warehouse" },
+    { "id": "both", "type": "join" },
+    { "id": "end", "type": "final" }
+  ],
+  "flows": [
+    { "from": "start", "to": "login" },
+    { "from": "login", "to": "pay" },
+    { "from": "pay", "to": "paid" },
+    { "from": "paid", "to": "split", "guard": "paid" },
+    { "from": "split", "to": "receipt" },
+    { "from": "split", "to": "notify" },
+    { "from": "receipt", "to": "both" },
+    { "from": "notify", "to": "both" },
+    { "from": "both", "to": "end" },
+    { "from": "paid", "to": "pay", "guard": "failed" }
+  ]
+}
+```
+
+| Field | What it is |
+|---|---|
+| `nodes` | 2 to 20. An `interaction` (the default type) has a `ref`: the name of the interaction, at most 32 characters. It may name the sequence diagram that draws it in `diagram`: the `id` of that diagram, without `dg-`. The other types are `initial`, `decision`, `merge`, `fork`, `join`, `final` and `flow-final`, as in an activity diagram. At most 12 interactions. |
+| `flows` | As in an activity diagram. Only a flow out of a decision has a `guard`. |
+
+- It has no partitions: each interaction names its participants in its own sequence diagram.
+- The rules for flows, the main path and the dot are those of an activity diagram.
+- Each interaction is a frame with the tag `ref` and its name. The words under the drawing link each named interaction to its sequence diagram, and `check` reports a `diagram` that is not in the document.
+
+## Timing diagrams
+
+A timing diagram shows how the states of a few things change over time, read against a time axis: when each one changes, the messages between them at a moment, and how long a stretch may take. Write it with `"kind": "timing"` when the exact times matter, such as a timeout or a deadline; when only the order matters, a sequence diagram or a state machine says it more simply.
+
+```json
+{
+  "id": "door-timing",
+  "kind": "timing",
+  "label": "A user presses the button at 1 second. The controller is busy for 2 seconds and opens the door at 3 seconds; the door must open within 3 seconds of the press. The door closes again at 8 seconds.",
+  "time": { "from": 0, "to": 10, "step": 1, "unit": "s" },
+  "lifelines": [
+    { "id": "user", "name": "User", "states": ["Waiting", "Idle"] },
+    { "id": "ctrl", "name": "Controller", "states": ["Busy", "Ready"] },
+    { "id": "door", "name": "Door", "states": ["Open", "Moving", "Closed"] }
+  ],
+  "changes": [
+    { "lifeline": "user", "at": 0, "state": "Idle" },
+    { "lifeline": "user", "at": 1, "state": "Waiting" },
+    { "lifeline": "user", "at": 4, "state": "Idle" },
+    { "lifeline": "ctrl", "at": 0, "state": "Ready" },
+    { "lifeline": "ctrl", "at": 1, "state": "Busy" },
+    { "lifeline": "ctrl", "at": 3, "state": "Ready" },
+    { "lifeline": "door", "at": 0, "state": "Closed" },
+    { "lifeline": "door", "at": 3, "state": "Moving" },
+    { "lifeline": "door", "at": 4, "state": "Open" },
+    { "lifeline": "door", "at": 8, "state": "Moving" },
+    { "lifeline": "door", "at": 9, "state": "Closed" }
+  ],
+  "messages": [
+    { "from": "user", "to": "ctrl", "at": 1, "verb": "press" },
+    { "from": "ctrl", "to": "door", "at": 3, "verb": "open" }
+  ],
+  "constraints": [
+    { "lifeline": "door", "from": 1, "to": 4, "text": "{≤ 3 s}" }
+  ]
+}
+```
+
+| Field | What it is |
+|---|---|
+| `time` | The axis: `from`, `to` and `step` are numbers, and `unit` (at most 8 characters, such as `ms`) is optional. At most 24 steps. |
+| `lifelines` | 1 to 4, each with an `id`, a `name` (at most 20 characters) and 2 to 6 `states` (each at most 16 characters), listed from the top of its row down. |
+| `changes` | 1 to 20. Each sets one `lifeline` to one of its `state`s `at` a time on the axis. Every lifeline has a change at the start of the axis, and never changes to the state it is already in. |
+| `messages` | Optional, at most 10. Each goes `from` one lifeline `to` another, `at` a time, with a `verb` of at most 20 characters. |
+| `constraints` | Optional, at most 6. Each is on one `lifeline`, `from` one time `to` a later one, with a `text` in braces, such as `{≤ 3 s}`. |
+
+- Each lifeline is a row with its states at the left; a thick line steps from level to level at each change. A message is an arrow from the sender's line to the receiver's at its moment; a constraint is a line with a tick at each end, with its text above.
+- Nothing moves: a timing diagram has no dot.
+- On a phone the diagram becomes a table: one row for each change and each message, in time order. `render` also writes the moments in words, with a key to the marks.
+
 ## Optional legs
 
 A leg with `"optional": true` is a path that only some readers take, or that happens only in some cases. It is drawn as a dashed arrow:

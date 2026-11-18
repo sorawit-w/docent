@@ -7,7 +7,9 @@ const { wrap, PHONE_NODE } = require("./graph.cjs");
 
 const MOST = { nodes: 20, flows: 30, partitions: 5, forks: 4, name: 32, guard: 24, state: 20 };
 const TYPES = ["initial", "action", "decision", "merge", "fork", "join", "final", "flow-final", "object", "send", "accept"];
-const NAMED = ["action", "object", "send", "accept"];
+const NAMED = ["action", "object", "send", "accept", "interaction"];
+// An interaction overview diagram is an activity diagram whose nodes are interactions: each a ref frame that names a sequence diagram.
+const OVERVIEW = { types: ["initial", "interaction", "decision", "merge", "fork", "join", "final", "flow-final"], frames: 12 };
 const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 const nameW = (s) => textWidth(s, 14, 600);
 
@@ -34,6 +36,18 @@ function shape(n, degree, room = Infinity) {
       const ln = lines(44), w = Math.max(108, ...ln.map((l) => nameW(l) + 44)), h = 40 + 18 * (ln.length - 1);
       return { w, h, draw: (cx, cy) => ({ svg: uml.shapes[n.type]({ x: cx - w / 2, y: cy - h / 2, w, h }), texts: stack(ln, cx, cy, n.type === "send" ? -6 : 6) }) };
     }
+    case "interaction": {
+      // A ref frame: a box with the tab "ref" at its upper left and the interaction's name in the middle. With a diagram, the name links to it.
+      const ln = lines(32), w = Math.max(120, ...ln.map((l) => nameW(l) + 32)), h = 52 + 18 * (ln.length - 1);
+      return {
+        w, h,
+        draw: (cx, cy) => {
+          const x = cx - w / 2, y = cy - h / 2, t = stack(ln, cx, cy + 8);
+          const name = t.map((q) => `<text x="${q.x}" y="${q.y}" class="name" text-anchor="middle">${esc(q.s)}</text>`).join("");
+          return { svg: `<rect x="${x}" y="${y}" width="${w}" height="${h}" class="u-face"/>${uml.shapes.tab({ x, y, w: 40, h: 20 })}<text x="${x + 10}" y="${y + 14}" class="u-op">ref</text>${name}`, texts: [] };
+        },
+      };
+    }
     default: {
       const ln = lines(32), w = Math.max(96, ...ln.map((l) => nameW(l) + 32)), h = 40 + 18 * (ln.length - 1);
       return { w, h, draw: (cx, cy) => ({ svg: uml.shapes.rounded({ x: cx - w / 2, y: cy - h / 2, w, h }), texts: stack(ln, cx, cy) }) };
@@ -42,12 +56,15 @@ function shape(n, degree, room = Infinity) {
 }
 
 /** Checks activity data and returns the model: the graph, the column for phones and the steps in words. */
-function readActivity(data) {
-  if (data.place != null && data.place !== "flow") fail(`an activity diagram sits in the text flow; "place" must be "flow"`);
-  if (data.form != null) fail(`an activity diagram has no "form"; the renderer draws it, and a column on a phone`);
+function readActivity(data, overview = false) {
+  const kind = overview ? "an interaction overview diagram" : "an activity diagram";
+  const types = overview ? OVERVIEW.types : TYPES;
+  if (data.place != null && data.place !== "flow") fail(`${kind} sits in the text flow; "place" must be "flow"`);
+  if (data.form != null) fail(`${kind} has no "form"; the renderer draws it, and a column on a phone`);
   for (const key of ["nodes", "flows"]) if (!Array.isArray(data[key])) fail(`"${key}" must be a list`);
-  if (data.nodes.length < 2 || data.nodes.length > MOST.nodes) fail(`an activity diagram has 2 to ${MOST.nodes} nodes; this one has ${data.nodes.length}`);
-  if (data.flows.length < 1 || data.flows.length > MOST.flows) fail(`an activity diagram has 1 to ${MOST.flows} flows; this one has ${data.flows.length}`);
+  if (data.nodes.length < 2 || data.nodes.length > MOST.nodes) fail(`${kind} has 2 to ${MOST.nodes} nodes; this one has ${data.nodes.length}`);
+  if (data.flows.length < 1 || data.flows.length > MOST.flows) fail(`${kind} has 1 to ${MOST.flows} flows; this one has ${data.flows.length}`);
+  if (overview && data.partitions != null) fail(`an interaction overview diagram has no partitions; each interaction names its participants in its own sequence diagram`);
   if (data.partitions != null && !Array.isArray(data.partitions)) fail(`"partitions" must be a list`);
   const partitions = (data.partitions || []).map((p, i) => ({ id: id(p?.id, `the id of partition ${i + 1}`), name: words(p.name, `the name of partition ${i + 1}`, MOST.name) }));
   if (partitions.length > MOST.partitions) fail(`an activity diagram has at most ${MOST.partitions} partitions; this one has ${partitions.length}`);
@@ -56,17 +73,20 @@ function readActivity(data) {
     const what = `node ${i + 1}`;
     if (!node || typeof node !== "object" || Array.isArray(node)) fail(`${what} must be an object with "id"`);
     const nid = id(node.id, `the id of ${what}`);
-    const type = node.type ?? "action";
-    if (!TYPES.includes(type)) fail(`the type of ${what} ("${nid}") must be one of ${TYPES.join(", ")}`);
-    if (NAMED.includes(type) && node.name == null) fail(`${what} ("${nid}") is a${type === "action" || type === "object" || type === "accept" ? "n" : ""} ${type} and needs a "name"`);
-    if (!NAMED.includes(type) && node.name != null) fail(`${what} ("${nid}") is a ${type}, which has no name in UML; leave "name" out`);
+    const type = node.type ?? (overview ? "interaction" : "action");
+    if (!types.includes(type)) fail(`the type of ${what} ("${nid}") must be one of ${types.join(", ")}`);
+    const field = type === "interaction" ? "ref" : "name";
+    if (type === "interaction" && node.name != null) fail(`${what} ("${nid}") is an interaction; it names the interaction in "ref", not "name"`);
+    if (NAMED.includes(type) && node[field] == null) fail(`${what} ("${nid}") is a${["action", "object", "accept", "interaction"].includes(type) ? "n" : ""} ${type} and needs a "${field}"`);
+    if (!NAMED.includes(type) && (node.name != null || node.ref != null)) fail(`${what} ("${nid}") is a ${type}, which has no name in UML; leave "name" out`);
+    if (node.diagram != null && type !== "interaction") fail(`${what} ("${nid}") has a "diagram"; only an interaction names one`);
     if (node.state != null && type !== "object") fail(`${what} ("${nid}") has a "state"; only an object node has one`);
     let part = null;
     if (partitions.length) {
       part = partitions.findIndex((p) => p.id === node.partition);
       if (part < 0) fail(`${what} ("${nid}") names the partition "${node.partition}", which does not exist; when a diagram has partitions, every node sits in one`);
     } else if (node.partition != null) fail(`${what} ("${nid}") names a partition, but the diagram has no "partitions"`);
-    return { index: i, id: nid, type, name: NAMED.includes(type) ? words(node.name, `the name of ${what}`, MOST.name) : "", state: words(node.state, `the state of ${what}`, MOST.state, false), part };
+    return { index: i, id: nid, type, name: NAMED.includes(type) ? words(node[field], `the ${field} of ${what}`, MOST.name) : "", state: words(node.state, `the state of ${what}`, MOST.state, false), part, diagram: node.diagram == null ? null : id(node.diagram, `the diagram of ${what}`) };
   });
   nodes.forEach((n, i) => { if (nodes.findIndex((o) => o.id === n.id) !== i) fail(`two nodes have the id "${n.id}"`); });
   const at = (nid, where) => { const i = nodes.findIndex((n) => n.id === nid); return i < 0 ? fail(`${where} names "${nid}", which is not a node`) : i; };
@@ -102,8 +122,9 @@ function readActivity(data) {
   }
   for (const p of partitions) if (!nodes.some((n) => n.part === partitions.indexOf(p))) fail(`the partition "${p.id}" has no nodes; leave it out`);
   const starts = nodes.filter((n) => n.type === "initial");
-  if (!starts.length) fail(`an activity diagram starts at an initial node ({ "type": "initial" })`);
-  if (nodes.filter((n) => n.type === "fork").length > MOST.forks) fail(`an activity diagram has at most ${MOST.forks} forks`);
+  if (!starts.length) fail(`${kind} starts at an initial node ({ "type": "initial" })`);
+  if (overview && nodes.filter((n) => n.type === "interaction").length > OVERVIEW.frames) fail(`an interaction overview diagram has at most ${OVERVIEW.frames} interactions`);
+  if (nodes.filter((n) => n.type === "fork").length > MOST.forks) fail(`${kind} has at most ${MOST.forks} forks`);
   const seen = new Set(starts.map((n) => n.index)), todo = [...seen];
   while (todo.length) for (const f of outs[todo.pop()]) if (!seen.has(f.to)) { seen.add(f.to); todo.push(f.to); }
   const lost = nodes.find((n) => !seen.has(n.index));
@@ -117,7 +138,7 @@ function readActivity(data) {
   const order = [];
   const visit = (i) => { if (order.includes(i)) return; order.push(i); outs[i].forEach((f) => visit(f.to)); };
   for (const s of starts) visit(s.index);
-  return { id: id(data.id, '"id"'), label: words(data.label, '"label"', 400), kind: "activity", partitions, nodes, flows, outs, ins, order, mainFlows };
+  return { id: id(data.id, '"id"'), label: words(data.label, '"label"', 400), kind: overview ? "interaction-overview" : "activity", partitions, nodes, flows, outs, ins, order, mainFlows, refs: nodes.filter((n) => n.diagram).map((n) => n.diagram) };
 }
 
 /** How a node is named in a row of the column and in the words: by its name, or by what it is and where it comes. */
@@ -163,7 +184,7 @@ function wordsOf(model) {
     let say;
     switch (n.type) {
       case "initial": say = "Start."; break;
-      case "final": say = "The activity ends."; break;
+      case "final": say = model.kind === "activity" ? "The activity ends." : "It ends."; break;
       case "flow-final": say = "This path ends; the other paths go on."; break;
       case "decision": say = `Decide: ${o.map((f) => `if ${esc(f.guard)}, go to ${to(f)}`).join("; ")}.`; break;
       case "merge": say = "The paths meet here."; break;
@@ -172,6 +193,7 @@ function wordsOf(model) {
       case "object": say = `${esc(n.name)}${n.state ? ` (${esc(n.state)})` : ""} is passed on.`; break;
       case "send": say = `Send the signal “${esc(n.name)}”.`; break;
       case "accept": say = `Wait for “${esc(n.name)}”.`; break;
+      case "interaction": say = `The interaction “${n.diagram ? `<a href="#dg-${n.diagram}">${esc(n.name)}</a>` : esc(n.name)}” happens here${n.diagram ? "; its steps are in its own diagram" : ""}.`; break;
       default: say = esc(dot(n.name));
     }
     if (o.length === 1 && o[0].to !== next && !["decision", "fork"].includes(n.type)) say += ` Then ${order.indexOf(o[0].to) < k ? "back to" : "go to"} ${to(o[0])}.`;
@@ -181,6 +203,7 @@ function wordsOf(model) {
   const used = [];
   if (types.has("initial")) used.push("initial");
   if (types.has("action")) used.push("action");
+  if (types.has("interaction")) used.push("interaction");
   if (types.has("decision") || types.has("merge")) used.push("decision");
   if (types.has("fork") || types.has("join")) used.push("bar");
   if (types.has("object")) used.push("object");
@@ -194,6 +217,7 @@ function wordsOf(model) {
 }
 
 const OWN = {
+  interaction: "A frame marked ref: an interaction whose messages are drawn in its own sequence diagram.",
   action: "A box with round corners: an action, one step of the work.",
   object: "A plain box: a thing that the actions pass on, with its state in brackets.",
   send: "A box with a point: a signal is sent.",
@@ -203,4 +227,6 @@ const OWN = {
   final: "A ring around a filled dot: the activity ends.",
 };
 
-module.exports = { readActivity, graphOf, columnOf, wordsOf, MOST };
+const readOverview = (data) => readActivity(data, true);
+
+module.exports = { readActivity, readOverview, graphOf, columnOf, wordsOf, MOST };

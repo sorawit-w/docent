@@ -24,12 +24,12 @@ function renderSequence(data) {
 }
 
 /** A UML kind drawn by the graph layout: the drawing, a column for phones and paper, and the facts or steps in words. */
-const GRAPH_KINDS = { activity: "./activity.cjs", state: "./state.cjs" };
+const GRAPH_KINDS = { activity: ["./activity.cjs", "readActivity"], state: ["./state.cjs", "readState"], "interaction-overview": ["./activity.cjs", "readOverview"] };
 function renderGraphKind(data) {
   const { layoutGraph, layoutColumnGraph } = require("./graph.cjs");
-  const kind = require(GRAPH_KINDS[data.kind]);
-  const read = kind[`read${data.kind[0].toUpperCase()}${data.kind.slice(1)}`];
-  const model = read(data);
+  const [file, reader] = GRAPH_KINDS[data.kind];
+  const kind = require(file);
+  const model = kind[reader](data);
   const scene = layoutGraph(kind.graphOf(model), data.kind);
   const id = `dg-${model.id}`;
   const phone = scene.w > PHONE ? layoutColumnGraph(kind.columnOf(model), data.kind) : null;
@@ -37,6 +37,18 @@ function renderGraphKind(data) {
   // On paper the main form prints, shrunk to the sheet, while it keeps at least 80% of its size; else the column prints.
   const small = phone ? `\n${toSvg(phone, { id: `${id}-phone`, label: model.label, mode: "auto", swap: { main: id, below: scene.w + ROOM, printMain: scene.w * 0.8 <= SHEET } })}` : "";
   return { svg: `${main}${small}\n${inWords(kind.wordsOf(model))}`, form: data.kind, warnings: [], icons: [], model, scene, phone };
+}
+
+/** A timing diagram: rows of lifelines over a time axis, a table for phones and paper, and the changes in words. */
+function renderTiming(data) {
+  const { readTiming, layoutTiming, tableOf, wordsOf } = require("./timing.cjs");
+  const model = readTiming(data);
+  const scene = layoutTiming(model);
+  const id = `dg-${model.id}`;
+  const phone = scene.w > PHONE ? tableOf(model) : null;
+  const main = toSvg(scene, { id, label: model.label, mode: "auto", swap: phone && { phone: `${id}-phone` } });
+  const small = phone ? `\n${toSvg(phone, { id: `${id}-phone`, label: model.label, mode: "auto", swap: { main: id, below: scene.w + ROOM, printMain: scene.w * 0.8 <= SHEET } })}` : "";
+  return { svg: `${main}${small}\n${inWords(wordsOf(model))}`, form: "timing", warnings: [], icons: [], model, scene, phone };
 }
 
 const FORMS = ["wide", "tall", "plates"];
@@ -171,7 +183,8 @@ function renderDiagram(data) {
     if (data.kind === "sequence") return renderSequence(data);
     if (data.kind === "flow") return renderFlow(data);
     if (Object.hasOwn(GRAPH_KINDS, data.kind)) return renderGraphKind(data);
-    fail(`"kind" must be one of ${["sequence", "flow", ...Object.keys(GRAPH_KINDS)].map((k) => `"${k}"`).join(", ")}, or left out for a workflow diagram`);
+    if (data.kind === "timing") return renderTiming(data);
+    fail(`"kind" must be one of ${["sequence", "flow", ...Object.keys(GRAPH_KINDS), "timing"].map((k) => `"${k}"`).join(", ")}, or left out for a workflow diagram`);
   }
   const { model, warnings } = readData(data);
   const icons = warnings.filter((w) => !w.startsWith("every part has the state") && !w.startsWith("no leg has a verb")); // these warnings are about icons; check reports them as errors

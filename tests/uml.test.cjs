@@ -87,7 +87,7 @@ test("the key names only the marks a drawing uses, in plain sentences", () => {
 
 test("a UML drawing takes every color from the page tokens, and ultramarine only for the current message and the dot", () => {
   const { renderDiagram } = require("../skills/docent/scripts/lib/diagram.cjs");
-  for (const name of ["sequence", "sequence-uml", "activity", "state"]) {
+  for (const name of ["sequence", "sequence-uml", "activity", "state", "interaction-overview", "timing"]) {
     const data = JSON.parse(fs.readFileSync(path.join(__dirname, "fixtures", `${name}.json`), "utf8"));
     const svg = renderDiagram(data).svg;
     const bare = svg.replace(/var\(--[a-z]+,#[0-9a-f]{6}\)/g, "");
