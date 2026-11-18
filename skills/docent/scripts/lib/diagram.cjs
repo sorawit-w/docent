@@ -3,7 +3,7 @@ const { ICONS, iconProblem } = require("./icons.cjs");
 const { layoutRoute } = require("./route.cjs");
 const { toSvg } = require("./svg.cjs");
 const { DataError, fail, words, id, findBlocks, block, replaceBlocks } = require("./blocks.cjs");
-const { renderWidget } = require("./widget.cjs");
+const { renderWidget, fillPlaces } = require("./widget.cjs");
 const { textWidth } = require("./text.cjs");
 
 const FORMS = ["wide", "tall", "plates"];
@@ -154,9 +154,18 @@ function renderDocument(html) {
   });
   const widgets = replaceBlocks(diagrams.html, "widget", (data) => {
     const built = renderWidget(data);
-    return { id: built.id, out: built.html, form: built.kind, warnings: built.warnings };
+    return { id: built.id, out: built.html, form: built.kind, warnings: built.warnings, defaults: built.defaults };
   });
-  return { html: widgets.html, results: diagrams.results, widgets: widgets.results };
+  // Every place that shows a value gets the value of the first option of its value picker.
+  const defaults = {}, clash = [];
+  for (const w of widgets.results) {
+    for (const [key, value] of Object.entries(w.defaults || {})) {
+      if (Object.hasOwn(defaults, key)) clash.push(key);
+      defaults[key] = value;
+    }
+  }
+  const places = fillPlaces(widgets.html, defaults);
+  return { html: places.html, results: diagrams.results, widgets: widgets.results, places: { count: places.count, unknown: places.unknown, clash } };
 }
 
 const findDiagrams = (html) => findBlocks(html, "diagram");

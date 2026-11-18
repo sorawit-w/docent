@@ -3,8 +3,8 @@
 // Each widget is readable with scripts off and on paper; the page script adds memory and the answer of a decision helper.
 const { fail, words, id } = require("./blocks.cjs");
 
-const KINDS = ["chooser", "checklist", "decision"];
-const MOST = { cases: 5, blocks: 8, items: 12, questions: 3, options: 4, answers: 12, label: 60, name: 24, option: 32, short: 32, line: 160, note: 160, para: 400, code: 1200, question: 80, title: 48 };
+const KINDS = ["chooser", "checklist", "decision", "values"];
+const MOST = { values: 24, value: 120, cases: 5, blocks: 8, items: 12, questions: 3, options: 4, answers: 12, label: 60, name: 24, option: 32, short: 32, line: 160, note: 160, para: 400, code: 1200, question: 80, title: 48 };
 const ARROW = '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>';
 
 const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -143,15 +143,75 @@ function decision(data, w) {
 }
 
 /**
+ * A value picker: the reader picks one option, such as an environment, and every place in the text that is marked
+ * <var data-v="key"> shows the value for that option. render writes the value of the first option into each place.
+ * Its still form is the table of all values; the page script reads the values from that table.
+ */
+function values(data, w) {
+  only(data, ["id", "kind", "label", "options", "values"], "the value picker");
+  const options = list(data.options, '"options"', 2, MOST.cases).map((o, i) => words(o, `option ${i + 1}`, MOST.name));
+  unique(options, "options");
+  const rows = list(data.values, '"values"', 1, MOST.values).map((v, i) => {
+    const what = `value ${i + 1}`;
+    if (!v || typeof v !== "object" || Array.isArray(v)) fail(`${what} must be an object with "key" and "values"`);
+    only(v, ["key", "name", "values"], what);
+    const key = id(v.key, `the key of ${what}`);
+    const name = words(v.name, `the name of ${what}`, MOST.short, false) || key;
+    if (!Array.isArray(v.values) || v.values.length !== options.length) fail(`"values" of ${what} ("${key}") must have one value for each of the ${options.length} options`);
+    return { key, name, values: v.values.map((x, j) => words(x, `the value of "${key}" for "${options[j]}"`, MOST.value)) };
+  });
+  rows.forEach((r, i) => { if (rows.findIndex((other) => other.key === r.key) !== i) fail(`two values have the key "${r.key}"`); });
+  const radios = options.map((o, i) => `<input type="radio" name="${w.id}" id="${w.id}-${i + 1}"${i ? "" : " checked"}><label class="opt" for="${w.id}-${i + 1}">${esc(o)}</label>`);
+  return {
+    key: options.join("|"),
+    defaults: Object.fromEntries(rows.map((r) => [r.key, r.values[0]])),
+    html: [
+      `<div class="values" id="${w.id}" role="group" aria-labelledby="${w.id}-t">`,
+      `<span class="wd-t" id="${w.id}-t">${esc(w.label)}</span>`,
+      ...radios,
+      `<p class="values-now">The text shows the values for <strong>${esc(options[0])}</strong>.</p>`,
+      `<details open>`,
+      `<summary>${ARROW}All values</summary>`,
+      `<div class="table-wrap" role="region" aria-label="All values: ${esc(w.label)}" tabindex="0">`,
+      `<table>`,
+      `<thead><tr><th scope="col">Value</th>${options.map((o) => `<th scope="col">${esc(o)}</th>`).join("")}</tr></thead>`,
+      `<tbody>`,
+      ...rows.map((r) => `<tr data-v="${r.key}"><th scope="row">${esc(r.name)}</th>${r.values.map((x) => `<td><code>${esc(x)}</code></td>`).join("")}</tr>`),
+      `</tbody>`,
+      `</table>`,
+      `</div>`,
+      `</details>`,
+      `</div>`,
+    ].join("\n"),
+  };
+}
+
+/** The places in a document that show a value: <var data-v="key">...</var>. */
+const PLACE = /<var\b([^>]*?)\bdata-v="([^"]*)"([^>]*)>([\s\S]*?)<\/var>/g;
+
+/** Writes the value of the first option into every place. Returns { html, unknown: [keys that no value picker has], count }. */
+function fillPlaces(html, defaults) {
+  const unknown = new Set();
+  let count = 0;
+  // A place inside an HTML comment is not a place: the comment may explain how to write one.
+  const out = html.split(/(<!--[\s\S]*?-->)/).map((part, i) => (i % 2 ? part : part.replace(PLACE, (all, before, key, after) => {
+    if (!Object.hasOwn(defaults, key)) { unknown.add(key); return all; }
+    count += 1;
+    return `<var${before}data-v="${key}"${after}>${esc(defaults[key])}</var>`;
+  }))).join("");
+  return { html: out, unknown: [...unknown], count };
+}
+
+/**
  * Builds one widget. Returns { id, kind, html, key, warnings }. Throws when the data is wrong.
  * key: choosers with the same key change together; null for the other kinds.
  */
 function renderWidget(data) {
   if (!data || typeof data !== "object" || Array.isArray(data)) fail("the widget data must be one JSON object");
-  if (!KINDS.includes(data.kind)) fail(`"kind" must be "chooser", "checklist" or "decision"`);
+  if (!KINDS.includes(data.kind)) fail(`"kind" must be "chooser", "checklist", "decision" or "values"`);
   const w = { id: `wd-${id(data.id, '"id"')}`, label: words(data.label, '"label"', MOST.label) };
-  const built = { chooser, checklist, decision }[data.kind](data, w);
-  return { id: data.id, kind: data.kind, html: built.html, key: built.key, warnings: [] };
+  const built = { chooser, checklist, decision, values }[data.kind](data, w);
+  return { id: data.id, kind: data.kind, html: built.html, key: built.key, defaults: built.defaults || null, warnings: [] };
 }
 
-module.exports = { renderWidget, KINDS, MOST };
+module.exports = { renderWidget, fillPlaces, PLACE, esc, KINDS, MOST };

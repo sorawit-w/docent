@@ -1,0 +1,10 @@
+{
+  "id": "env",
+  "kind": "values",
+  "label": "Your environment",
+  "options": ["Development", "Staging", "Production"],
+  "values": [
+    {"key": "host", "name": "Host name", "values": ["dev.example.test", "staging.example.test", "example.test"]},
+    {"key": "port", "values": ["8080", "8443", "443"]}
+  ]
+}
