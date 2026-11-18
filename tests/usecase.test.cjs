@@ -46,6 +46,26 @@ test("the words say who takes part in what, and the phone list has one band per 
   assert.deepEqual(phone.notes.filter((n) => n.cls === "sub").map((n) => n.s), ["Customer", "Member", "Payment service"]);
 });
 
+test("an actor with many use cases reaches them all, as a comb off one trunk", () => {
+  const d = { id: "many", kind: "usecase", label: "A user does eight things.", system: "App", actors: [{ id: "a", name: "User" }], usecases: [], relations: [] };
+  for (let i = 0; i < 8; i++) { d.usecases.push({ id: `u${i}`, name: `Action ${i}` }); d.relations.push({ from: "a", to: `u${i}` }); }
+  const { scene } = renderDiagram(d);
+  assert.equal(scene.legs.length, 8);
+  const actor = scene.parts.find((p) => p.id === "a");
+  const atActor = scene.legs.filter(({ pts: [[x, y]] }) => x >= actor.x - 1 && x <= actor.x + actor.w + 1 && y >= actor.y - 1 && y <= actor.y + actor.h + 1);
+  assert.ok(atActor.length >= 1 && atActor.length < 8, `${atActor.length} lines leave the actor; the others branch off them`);
+});
+
+test("the boundary is as wide as the system's name", () => {
+  const d = { id: "wide", kind: "usecase", label: "A customer buys.", system: "Customer order management system", actors: [{ id: "a", name: "Customer" }], usecases: [{ id: "b", name: "Buy" }], relations: [{ from: "a", to: "b" }] };
+  const { scene } = renderDiagram(d);
+  const { textWidth } = require("../skills/docent/scripts/lib/text.cjs");
+  const [, x, w] = scene.under.find((u) => u.includes("u-frame")).match(/x="([\d.]+)" y="[\d.]+" width="([\d.]+)"/).map(Number);
+  const name = scene.notes.find((n) => n.s === d.system);
+  assert.ok(name.x + textWidth(d.system, 14, 600) + 8 <= x + w, "the name ends inside the boundary");
+  assert.ok(x + w + 12 <= scene.w, "the boundary ends inside the drawing");
+});
+
 test("wrong use case data is refused", () => {
   const bad = (change, message) => { const d = fixture(); change(d); assert.throws(() => renderDiagram(d), message); };
   bad((d) => delete d.system, /"system" .* is missing/);

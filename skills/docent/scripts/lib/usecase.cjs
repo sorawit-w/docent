@@ -155,7 +155,7 @@ function graphOf(model) {
       ...model.usecases.map((u) => ({ id: u.id, group: "system", rank: rank.get(u), col: col.get(u), ...caseShape(u) })),
       ...model.actors.filter((a) => a.side === "right").map((a) => ({ id: a.id, group: "right", rank: rank.get(a), col: col.get(a), ...actorShape(a) })),
     ],
-    edges: model.relations.map((r) => { const st = STYLE[r.type]; return { from: r.from.id, to: r.to.id, end: st.end, dashed: st.dashed, labels: st.label ? [{ s: st.label, at: "mid" }] : [], still: true }; }),
+    edges: model.relations.map((r) => { const st = STYLE[r.type]; return { from: r.from.id, to: r.to.id, end: st.end, dashed: st.dashed, bus: r.type === "association" ? r.from.id : undefined, labels: st.label ? [{ s: st.label, at: "mid" }] : [], still: true }; }),
     groups: [{ id: "system", name: model.system, kind: "box" }, ...(right ? [{ id: "right", name: "", kind: "free" }] : [])],
   };
 }
