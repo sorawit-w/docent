@@ -33,9 +33,9 @@
 <rect width="380" height="522" class="ground"/>
 <rect x="12" y="12" width="356" height="498" rx="10" class="band"/>
 <text x="40" y="44" class="lane" text-anchor="start">Writer</text>
-<g class="leg" data-leg="1"><path d="M190,116 L190,182" class="line"/><polygon points="185.5,180 194.5,180 190,188" class="head"/><circle cx="190" cy="148" r="10" class="mark"/><text x="190" y="152" class="num" text-anchor="middle">1</text><text x="206" y="152" class="verb" text-anchor="start">ask a colleague to read</text><circle r="6" class="pulse pulse-1"/></g>
-<g class="leg" data-leg="2"><path d="M190,242 L190,308" class="line"/><polygon points="185.5,306 194.5,306 190,314" class="head"/><circle cx="190" cy="274" r="10" class="mark"/><text x="190" y="278" class="num" text-anchor="middle">2</text><text x="206" y="278" class="verb" text-anchor="start">fix</text><circle r="6" class="pulse pulse-2"/></g>
-<g class="leg" data-leg="3"><path d="M190,368 L190,434" class="line"/><polygon points="185.5,432 194.5,432 190,440" class="head"/><circle cx="190" cy="400" r="10" class="mark"/><text x="190" y="404" class="num" text-anchor="middle">3</text><text x="206" y="404" class="verb" text-anchor="start">publish</text><circle r="6" class="pulse pulse-3"/></g>
+<g class="leg" data-leg="1"><path d="M190,116 L190,182" class="line"/><polygon points="185.5,180 194.5,180 190,188" class="head"/><circle r="6" class="pulse pulse-1"/><circle cx="190" cy="148" r="10" class="mark"/><text x="190" y="152" class="num" text-anchor="middle">1</text><text x="206" y="152" class="verb" text-anchor="start">ask a colleague to read</text></g>
+<g class="leg" data-leg="2"><path d="M190,242 L190,308" class="line"/><polygon points="185.5,306 194.5,306 190,314" class="head"/><circle r="6" class="pulse pulse-2"/><circle cx="190" cy="274" r="10" class="mark"/><text x="190" y="278" class="num" text-anchor="middle">2</text><text x="206" y="278" class="verb" text-anchor="start">fix</text></g>
+<g class="leg" data-leg="3"><path d="M190,368 L190,434" class="line"/><polygon points="185.5,432 194.5,432 190,440" class="head"/><circle r="6" class="pulse pulse-3"/><circle cx="190" cy="400" r="10" class="mark"/><text x="190" y="404" class="num" text-anchor="middle">3</text><text x="206" y="404" class="verb" text-anchor="start">publish</text></g>
 <rect x="40" y="64" width="300" height="52" rx="10" class="card"/>
 <text x="58" y="95" class="name" text-anchor="start">Draft</text>
 <rect x="40" y="190" width="300" height="52" rx="10" class="card"/>
@@ -82,9 +82,9 @@
 <rect width="264" height="416" class="ground"/>
 <rect x="8" y="12" width="248" height="392" rx="10" class="band"/>
 <text x="240" y="32" class="lane" text-anchor="end">Writer</text>
-<g class="leg" data-leg="1"><path d="M30,66 L30,144" class="line"/><polygon points="25.5,142 34.5,142 30,150" class="head"/><circle cx="30" cy="104" r="10" class="mark"/><text x="30" y="108" class="num" text-anchor="middle">1</text><text x="51" y="108" class="verb" text-anchor="start">ask a colleague to read</text><circle r="6" class="pulse pulse-1"/></g>
-<g class="leg" data-leg="2"><path d="M30,170 L30,248" class="line"/><polygon points="25.5,246 34.5,246 30,254" class="head"/><circle cx="30" cy="208" r="10" class="mark"/><text x="30" y="212" class="num" text-anchor="middle">2</text><text x="51" y="212" class="verb" text-anchor="start">fix</text><circle r="6" class="pulse pulse-2"/></g>
-<g class="leg" data-leg="3"><path d="M30,274 L30,352" class="line"/><polygon points="25.5,350 34.5,350 30,358" class="head"/><circle cx="30" cy="312" r="10" class="mark"/><text x="30" y="316" class="num" text-anchor="middle">3</text><text x="51" y="316" class="verb" text-anchor="start">publish</text><circle r="6" class="pulse pulse-3"/></g>
+<g class="leg" data-leg="1"><path d="M30,66 L30,144" class="line"/><polygon points="25.5,142 34.5,142 30,150" class="head"/><circle r="6" class="pulse pulse-1"/><circle cx="30" cy="104" r="10" class="mark"/><text x="30" y="108" class="num" text-anchor="middle">1</text><text x="51" y="108" class="verb" text-anchor="start">ask a colleague to read</text></g>
+<g class="leg" data-leg="2"><path d="M30,170 L30,248" class="line"/><polygon points="25.5,246 34.5,246 30,254" class="head"/><circle r="6" class="pulse pulse-2"/><circle cx="30" cy="208" r="10" class="mark"/><text x="30" y="212" class="num" text-anchor="middle">2</text><text x="51" y="212" class="verb" text-anchor="start">fix</text></g>
+<g class="leg" data-leg="3"><path d="M30,274 L30,352" class="line"/><polygon points="25.5,350 34.5,350 30,358" class="head"/><circle r="6" class="pulse pulse-3"/><circle cx="30" cy="312" r="10" class="mark"/><text x="30" y="316" class="num" text-anchor="middle">3</text><text x="51" y="316" class="verb" text-anchor="start">publish</text></g>
 <circle cx="30" cy="56" r="8" class="stop"/>
 <text x="51" y="61" class="name" text-anchor="start">Draft</text>
 <circle cx="30" cy="160" r="8" class="stop"/>

@@ -341,7 +341,9 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     const look = (page) => page.evaluate(() => {
       const shown = (el) => el.getBoundingClientRect().height > 0, extra = document.querySelector("#extra");
       return {
-        numbers: [...extra.querySelectorAll("h3.step")].map((h) => `${getComputedStyle(h).counterIncrement}|${getComputedStyle(h, "::before").content}`).join(),
+        // The styles count the steps; the page script writes each number as text, so a screen reader reads it.
+        numbers: [...extra.querySelectorAll("h3.step")].map((h) => `${h.textContent}|${getComputedStyle(h, "::before").content}`).join(),
+        walk: [...document.querySelectorAll(".steps h3 .step-n")].map((n) => n.textContent.trim()).join(),
         hint: shown(extra.querySelector(".fig-more")), otherHints: [...document.querySelectorAll(".fig-more")].filter((n) => !extra.contains(n) && shown(n)).length,
         buttons: extra.querySelectorAll(".code > .copy").length, long: [...extra.querySelectorAll(".code")].map((c) => c.classList.contains("is-long")).join(),
         dashed: getComputedStyle(extra.querySelector(".leg.is-optional .line")).strokeDasharray,
@@ -359,10 +361,33 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     const paper = await open({ width: 794, height: 1123, media: "print", content });
     const onPaper = await paper.page.evaluate(() => [...document.querySelectorAll("#extra .copy, #extra .fig-more")].filter((el) => el.getBoundingClientRect().height > 0).length);
     await paper.context.close();
-    ok("numbered block headings count up, an optional leg is dashed, and each code block has a copy button", onDesk.numbers === "block-step 1|counter(block-step),block-step 1|counter(block-step)" && onDesk.dashed === "5px, 7px" && onDesk.buttons === 2 && axe.length === 0, { onDesk, axe });
+    ok("numbered block headings count up, an optional leg is dashed, and each code block has a copy button", onDesk.numbers === "1 First|none,2 Second|none" && onDesk.walk === "1,2,3,4" && onDesk.dashed === "5px, 7px" && onDesk.buttons === 2 && axe.length === 0, { onDesk, axe });
     ok("a drawing that is wider than its well gets a line under it on a phone, and no line when it fits", onPhone.hint && !onDesk.hint && onPhone.otherHints === 0 && onDesk.otherHints === 0, { phone: onPhone.hint, desk: onDesk.hint, others: [onPhone.otherHints, onDesk.otherHints] });
     ok("code that reaches the copy button starts below it, and short code keeps its place", onDesk.long === "false,false" && onPhone.long === "false,true", { desk: onDesk.long, phone: onPhone.long });
     ok("on paper the copy button and the line under a drawing do not print", onPaper === 0, onPaper);
+  }
+
+  // A long status label wraps; code in a table cell breaks; a closed section that holds a table takes the full width.
+  {
+    const cell = (s) => `<tr><th scope="row">${s}</th><td><code>/srv/example/service/settings/production.override.yaml</code></td><td><code>example-cli deploy --environment=production --wait --timeout=600</code></td></tr>`;
+    const table = (id) => `<div class="table-wrap" id="${id}" role="region" aria-label="Table ${id}" tabindex="0"><table><thead><tr><th scope="col">Name</th><th scope="col">Path</th><th scope="col">Command</th></tr></thead><tbody>${cell("Config")}</tbody></table></div>`;
+    const blocks = `<section id="fit" aria-labelledby="fit-h"><h2 id="fit-h">Fit</h2><div class="status"><span class="state info">The second review must end before the release can start</span><p>Text.</p></div>${table("t-flow")}<details id="t-closed"><summary>A closed section with a table</summary><p>Text.</p>${table("t-in")}</details></section>\n`;
+    const content = html.replace('<section id="report"', `${blocks}<section id="report"`);
+    const measure = (page) => page.evaluate(() => {
+      document.querySelectorAll("details").forEach((d) => (d.open = true));
+      const box = (s) => document.querySelector(s).getBoundingClientRect();
+      return { page: document.documentElement.scrollWidth, view: innerWidth, label: Math.round(box("#fit .state").right), main: Math.round(box("main").right), inner: Math.round(box("#t-in").width), flow: Math.round(box("#t-flow").width), wide: [...document.querySelectorAll("#fit table")].map((t) => Math.round(t.getBoundingClientRect().right)) };
+    });
+    const results = {};
+    for (const [name, opts] of [["phone", { width: 390, height: 844 }], ["narrow", { width: 320, height: 700 }], ["desk", { width: 1280 }], ["paper", { width: 658, height: 900, media: "print" }]]) {
+      const view = await open({ ...opts, content });
+      results[name] = await measure(view.page);
+      await view.context.close();
+    }
+    const { phone, narrow, desk, paper } = results;
+    ok("a long status label wraps, so the page does not scroll sideways at 390px or 320px", phone.page === phone.view && narrow.page === narrow.view && phone.label <= phone.main, { phone, narrow });
+    ok("a closed section that holds a table is as wide as a table outside it", desk.inner === desk.flow && desk.flow > 1000, desk);
+    ok("on paper a table with long code in its cells stays inside the page", paper.page === paper.view && paper.wide.every((r) => r <= paper.view), paper);
   }
 
   // The copy button copies the code. The page is opened from its file, as a reader opens it.

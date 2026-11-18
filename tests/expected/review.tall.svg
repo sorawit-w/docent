@@ -38,9 +38,9 @@
 <rect x="8" y="12" width="210" height="409" rx="10" class="band"/>
 <line x1="48" y1="62" x2="48" y2="407" class="track"/>
 <text x="30" y="42" class="lane" text-anchor="start">Writer</text>
-<g class="leg" data-leg="1"><path d="M48,106 L48,175" class="line"/><polygon points="43.5,173 52.5,173 48,181" class="head"/><circle cx="48" cy="139.5" r="10" class="mark"/><text x="48" y="143.5" class="num" text-anchor="middle">1</text><text x="69" y="143.5" class="verb" text-anchor="start">ask a colleague to read</text><circle r="6" class="pulse pulse-1"/></g>
-<g class="leg" data-leg="2"><path d="M48,201 L48,270" class="line"/><polygon points="43.5,268 52.5,268 48,276" class="head"/><circle cx="48" cy="234.5" r="10" class="mark"/><text x="48" y="238.5" class="num" text-anchor="middle">2</text><text x="69" y="238.5" class="verb" text-anchor="start">fix</text><circle r="6" class="pulse pulse-2"/></g>
-<g class="leg" data-leg="3"><path d="M48,296 L48,365" class="line"/><polygon points="43.5,363 52.5,363 48,371" class="head"/><circle cx="48" cy="329.5" r="10" class="mark"/><text x="48" y="333.5" class="num" text-anchor="middle">3</text><text x="69" y="333.5" class="verb" text-anchor="start">publish</text><circle r="6" class="pulse pulse-3"/></g>
+<g class="leg" data-leg="1"><path d="M48,106 L48,175" class="line"/><polygon points="43.5,173 52.5,173 48,181" class="head"/><circle r="6" class="pulse pulse-1"/><circle cx="48" cy="139.5" r="10" class="mark"/><text x="48" y="143.5" class="num" text-anchor="middle">1</text><text x="69" y="143.5" class="verb" text-anchor="start">ask a colleague to read</text></g>
+<g class="leg" data-leg="2"><path d="M48,201 L48,270" class="line"/><polygon points="43.5,268 52.5,268 48,276" class="head"/><circle r="6" class="pulse pulse-2"/><circle cx="48" cy="234.5" r="10" class="mark"/><text x="48" y="238.5" class="num" text-anchor="middle">2</text><text x="69" y="238.5" class="verb" text-anchor="start">fix</text></g>
+<g class="leg" data-leg="3"><path d="M48,296 L48,365" class="line"/><polygon points="43.5,363 52.5,363 48,371" class="head"/><circle r="6" class="pulse pulse-3"/><circle cx="48" cy="329.5" r="10" class="mark"/><text x="48" y="333.5" class="num" text-anchor="middle">3</text><text x="69" y="333.5" class="verb" text-anchor="start">publish</text></g>
 <circle cx="48" cy="96" r="8" class="stop"/>
 <text x="69" y="101" class="name" text-anchor="start">Draft</text>
 <circle cx="48" cy="191" r="8" class="stop"/>
