@@ -84,3 +84,16 @@ test("the key names only the marks a drawing uses, in plain sentences", () => {
     assert.ok(s.length <= 120, `the sentence for ${k} is short: ${s.length} characters`);
   }
 });
+
+test("a UML drawing takes every color from the page tokens, and ultramarine only for the current message and the dot", () => {
+  const { renderDiagram } = require("../skills/docent/scripts/lib/diagram.cjs");
+  for (const name of ["sequence", "sequence-uml"]) {
+    const data = JSON.parse(fs.readFileSync(path.join(__dirname, "fixtures", `${name}.json`), "utf8"));
+    const svg = renderDiagram(data).svg;
+    const bare = svg.replace(/var\(--[a-z]+,#[0-9a-f]{6}\)/g, "");
+    assert.doesNotMatch(bare, /#[0-9a-f]{6}\b|rgb\(|hsl\(/i, `${name}: no color outside a page token`);
+    assert.doesNotMatch(bare, /(fill|stroke)="(?!none|currentColor)[^"]*"/, `${name}: no color written on an element`);
+    assert.doesNotMatch(svg, /gradient|filter|shadow/i, `${name}: flat, no gradient or shadow`);
+    for (const rule of svg.match(/[^{}\n]*\{[^{}]*var\(--(primary|dot),[^{}]*\}/g) || []) assert.match(rule, /is-current|pulse/, `${name}: ultramarine only marks the current message or the dot: ${rule}`);
+  }
+});
