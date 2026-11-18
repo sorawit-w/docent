@@ -61,6 +61,11 @@ function rows(g) {
 /** Columns: each group owns a range of columns; in each row of a group the nodes are ordered to cut crossings. */
 function columns(g, rank) {
   const n = g.nodes.length, R = Math.max(...rank) + 1;
+  if (g.nodes.every((node) => node.col != null)) { // a kind that places its nodes itself: each group spans its own columns
+    const col = g.nodes.map((node) => node.col), span = new Map();
+    g.nodes.forEach((node, v) => { const gr = node.group ?? -1, sp = span.get(gr); span.set(gr, sp ? [Math.min(sp[0], col[v]), Math.max(sp[1], col[v])] : [col[v], col[v]]); });
+    return { col, span, C: Math.max(...col) + 1, R };
+  }
   const groupOf = g.nodes.map((node) => node.group ?? -1);
   const first = [...new Set(groupOf)]; // groups in the order in which their first node comes
   // Groups that share a frame (the regions of a composite state) stand side by side, so the frame holds only them.
@@ -142,6 +147,15 @@ function draw(g, k) {
     for (const b of boxes) { const [c0, c1] = span.get(b.i); if (c0 === c) w += 2 * U; if (c1 + 1 === c) w += 2 * U; }
     return up(w + loopRoom[c]);
   });
+  // A box is at least as wide as its name; the room it lacks goes into the gap after it.
+  for (const b of boxes) {
+    if (b.frame) continue;
+    const [c0, c1] = span.get(b.i);
+    let wide = 4 * U;
+    for (let c = c0; c <= c1; c++) wide += colW[c] + (c > c0 ? gut[c] : 0);
+    const lack = (b.nameW || 0) + 28 - wide;
+    if (lack > 0) gut[c1 + 1] += up(lack);
+  }
   const head = lanes.length ? 4 * U : 0; // the lane names
   const chan = Array.from({ length: R + 1 }, (_, r) => {
     let h = r === 0 || r === R ? 3 * U + k.edge : 6 * U + k.gap + (k.rows[r] || 0);
@@ -162,7 +176,8 @@ function draw(g, k) {
     const [c0, c1] = span.get(i) || [0, 0];
     if (gr.kind === "lane") return { x0: colX[c0] - gut[c0] / 2 + U / 2, x1: colX[c1] + colW[c1] + gut[c1 + 1] / 2 - U / 2, y0: U, y1: H - U };
     const m = placed.filter((v) => v.group === i);
-    return { x0: Math.min(...m.map((v) => v.x0)) - 2 * U, x1: Math.max(...m.map((v) => v.x1)) + 2 * U, y0: Math.min(...m.map((v) => v.y0)) - 4 * U, y1: Math.max(...m.map((v) => v.y1)) + 2 * U };
+    const x0 = Math.min(...m.map((v) => v.x0)) - 2 * U;
+    return { x0, x1: Math.max(Math.max(...m.map((v) => v.x1)) + 2 * U, gr.frame ? 0 : x0 + up((gr.nameW || 0) + 28)), y0: Math.min(...m.map((v) => v.y0)) - 4 * U, y1: Math.max(...m.map((v) => v.y1)) + 2 * U };
   });
   // Groups that share a frame (the regions of a composite state) get one frame around them all, with a dashed line between.
   const lead = groups.map((_, i) => i), dividers = groups.map(() => []);
@@ -204,6 +219,7 @@ function draw(g, k) {
   };
   const markStep = (i, j, d) => { const ni = i + DIRS[d][0], nj = j + DIRS[d][1]; if (d === 0) hUsed[P(i, j)] = 1; else if (d === 2) hUsed[P(ni, nj)] = 1; else if (d === 1) vUsed[P(i, j)] = 1; else vUsed[P(i, nj)] = 1; };
   const portUsed = new Set();
+  const bus = new Map(); // bus name -> the lattice points of its lines so far, where a later line of the bus may branch off
 
   /** The ports of an end: on the lattice, on the border of the node's room (or of the group's frame). */
   function ports(end, toward, isEnd, edge) {
@@ -263,6 +279,12 @@ function draw(g, k) {
   function route(e, isBack) {
     const A = endOf(e.a), B = endOf(e.b), ca = center(A), cb = center(B);
     const starts = ports(A, facing(ca, cb, isBack), false, e).map((p) => ({ p, s: stem(p) })).filter((x) => x.s);
+    // A line of a bus may also start on a straight run of an earlier line of the same bus, at a right angle to it.
+    for (const [i, j] of (e.bus && bus.get(e.bus)) || []) {
+      const p = P(i, j), u = use[p];
+      if (u !== 2 || portUsed.has(p)) continue; // only off an upright run, so the bus is a comb
+      for (const d of [0, 2]) starts.push({ p: { d, pt: [i * U, j * U], vis: [i * U, j * U], L: 0, pen: 0, branch: true }, s: [[i, j]] });
+    }
     const goals = new Map();
     for (const p of ports(B, isBack ? facing(cb, ca, true) : facing(cb, ca, false), true, e)) {
       const s = stem(p);
@@ -324,6 +346,8 @@ function draw(g, k) {
       use[p] = din !== dout || use[p] ? 3 : axis(din);
     });
     for (const [i, j] of gs.slice(1)) use[P(i, j)] = 3; // the end stem
+    if (st.p.branch) use[P(...lat[0])] = 3; // where a line of a bus branches off, nothing else may cross
+    if (e.bus) { if (!bus.has(e.bus)) bus.set(e.bus, []); bus.get(e.bus).push(...lat.slice(1, -gs.length - 1)); }
     const all = [...lat.map(([i, j]) => [i * U, j * U])];
     all.unshift(st.p.vis); all.push(best.gl.p.vis);
     return simplify(all);
@@ -345,7 +369,8 @@ function draw(g, k) {
   // Then the other lines: the shortest first, each over the lattice that the lines before it left free.
   const todo = edges.map((e, n) => n).filter((n) => edges[n].a !== edges[n].b);
   const reach = (n) => { const e = edges[n]; const a = center(endOf(e.a)), b = center(endOf(e.b)); return Math.abs(a.cx - b.cx) + Math.abs(a.cy - b.cy); };
-  todo.sort((p, q) => (edges[p].first ? 0 : 1) - (edges[q].first ? 0 : 1) || reach(p) - reach(q) || p - q);
+  // The lines of a bus go first, the farthest first, so the nearer ones can branch off its trunk.
+  todo.sort((p, q) => (edges[p].first ? 0 : 1) - (edges[q].first ? 0 : 1) || (edges[p].bus ? 0 : 1) - (edges[q].bus ? 0 : 1) || (edges[p].bus ? reach(q) - reach(p) : reach(p) - reach(q)) || p - q);
   for (const n of todo) {
     const pts = route(edges[n], back.has(n));
     if (!pts) throw new GraphError(`no free path for the line from "${label(edges[n].a)}" to "${label(edges[n].b)}"`, { cause: { grow: "gap" } });
@@ -433,6 +458,7 @@ function checkGraph(out, edges) {
         const d = segSeg(p, q, r, s);
         if (d >= 8) continue;
         // Lines from or to the same node may meet at that node's border only.
+        if (e.bus && e.bus === edges[m].bus) continue; // lines of one bus share their trunk
         const shared = [e.a, e.b].filter((x) => x === edges[m].a || x === edges[m].b);
         if (shared.length && (i === 0 || i === pts.length - 2) && (j === 0 || j === qts.length - 2) && d >= 4) continue;
         const vert = (u, w) => Math.abs(u[0] - w[0]) < 1e-6;
@@ -458,7 +484,9 @@ function checkGraph(out, edges) {
  *   from and to are node ids, or group ids for a line to a whole frame. up: the line points up, so in the rows its
  *   end comes first (a generalization, a composition). first: route this line before the others (the main path).
  *   step: the place of a moving line on the main path, so the dot travels the lines in that order.
- * g.groups: [{ id, name, kind: "lane" | "box", draw?(rect) -> { svg, texts } }]
+ *   bus: lines with the same bus name may branch off one another, as a comb (the associations of one actor).
+ * g.groups: [{ id, name, kind: "lane" | "box" | "free", draw?(rect) -> { svg, texts } }]. A free group only owns its columns.
+ * When every node has both rank and col, the nodes stay where they are given.
  */
 function layoutGraph(g, form) {
   const idx = new Map(g.nodes.map((v, i) => [v.id, i]));
@@ -483,7 +511,9 @@ function layoutGraph(g, form) {
     const [a, b] = e.up ? [e.b, e.a] : [e.a, e.b];
     for (const x of ends(a, true)) for (const y of ends(b, false)) { rowEdges.push({ ...e, a: x, b: y }); owner.push(n); }
   });
-  const R0 = rows({ nodes, edges: rowEdges });
+  // A kind that places its nodes itself gives every node its row and column; no line then counts as going back.
+  const fixed = nodes.every((v) => v.rank != null && v.col != null);
+  const R0 = fixed ? { rank: nodes.map((v) => v.rank), back: new Set() } : rows({ nodes, edges: rowEdges });
   const R = { rank: R0.rank, back: new Set([...R0.back].map((k) => owner[k])) };
   // A line that the rows count backwards, and that is not drawn upward on purpose, goes back.
   const back = new Set([...R.back].filter((n) => !edges[n].up));
@@ -509,7 +539,7 @@ function scene(out, nodes, edges, groups, form) {
   const s = { form, uml: true, hideMarks: true, w: out.W, h: out.H, bands: [], gaps: [], tracks: [], lanes: [], parts: [], legs: [], notes: [], under: [] };
   out.rects.forEach((r, i) => {
     const gr = groups[out.lead[i]];
-    if (out.lead[i] !== i) return; // a region: its frame is drawn once, by the first region
+    if (out.lead[i] !== i || gr.kind === "free") return; // a region: its frame is drawn once, by the first region. A free group has no frame
     if (gr.kind === "lane") {
       s.bands.push({ x: r.x0, y: r.y0, w: r.x1 - r.x0, h: r.y1 - r.y0 });
       s.lanes.push({ text: { x: (r.x0 + r.x1) / 2, y: r.y0 + 28, s: gr.name, cls: "lane", anchor: "middle" } });

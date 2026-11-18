@@ -387,6 +387,52 @@ A timing diagram shows how the states of a few things change over time, read aga
 - Nothing moves: a timing diagram has no dot.
 - On a phone the diagram becomes a table: one row for each change and each message, in time order. `render` also writes the moments in words, with a key to the marks.
 
+## Use case diagrams
+
+A use case diagram shows who uses a system and for what: the actors outside it, the use cases inside it, and how they are linked. Write it with `"kind": "usecase"`:
+
+```json
+{
+  "id": "shop-usecases",
+  "kind": "usecase",
+  "label": "Customers browse the catalog and place orders; placing an order always includes paying, and a coupon may be applied. Members are customers who can also track orders. The payment service takes part in paying.",
+  "system": "Online shop",
+  "actors": [
+    { "id": "customer", "name": "Customer" },
+    { "id": "member", "name": "Member" },
+    { "id": "bank", "name": "Payment service", "side": "right" }
+  ],
+  "usecases": [
+    { "id": "browse", "name": "Browse the catalog" },
+    { "id": "order", "name": "Place an order" },
+    { "id": "pay", "name": "Pay" },
+    { "id": "coupon", "name": "Apply a coupon" },
+    { "id": "track", "name": "Track an order" }
+  ],
+  "relations": [
+    { "from": "customer", "to": "browse" },
+    { "from": "customer", "to": "order" },
+    { "from": "member", "to": "track" },
+    { "from": "member", "to": "customer", "type": "generalization" },
+    { "from": "order", "to": "pay", "type": "include" },
+    { "from": "coupon", "to": "order", "type": "extend" },
+    { "from": "bank", "to": "pay" }
+  ]
+}
+```
+
+| Field | What it is |
+|---|---|
+| `system` | The name of the system, at most 32 characters, drawn on its boundary. A diagram has one boundary. |
+| `actors` | 1 to 6, each with an `id` and a `name` of at most 20 characters: a person or another system. An actor stands at the left of the boundary, or at the right with `"side": "right"` (use it for a system that serves this one, such as a payment service). |
+| `usecases` | 1 to 16, each with an `id` and a `name` of at most 32 characters: something an actor does with the system, said as a verb and an object. |
+| `relations` | 1 to 30, each `from` one `to` another, with a `type`. An `association` (the default) goes from an actor to a use case it takes part in. An `include` goes from a use case to one it always uses; an `extend` goes from a use case to one it may add to. A `generalization` goes from an actor to a more general actor, or from a use case to a more general use case. |
+
+- Every actor and every use case has a relation. A use case never includes itself, by a chain or at once.
+- The renderer places every node: the actors in a column at their side, the use cases in a column inside the boundary, and each included, extending or more special use case one column to the right of the one it serves. It draws each mark in UML notation: a stick figure, an oval, solid lines for associations, dashed lines with an open arrowhead for «include» and «extend», and a hollow triangle for a generalization.
+- Nothing moves: a use case diagram has no dot and no walkthrough.
+- On a phone the diagram becomes a list with a band for each actor: the use cases it takes part in, each with what it includes and what may extend it. `render` also writes the diagram in words, with a key to the marks.
+
 ## Optional legs
 
 A leg with `"optional": true` is a path that only some readers take, or that happens only in some cases. It is drawn as a dashed arrow:

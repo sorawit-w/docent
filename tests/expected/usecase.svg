@@ -1,0 +1,146 @@
+<svg id="dg-shop-usecases" class="dg dg-usecase dg-auto" xmlns="http://www.w3.org/2000/svg" width="888" height="504" viewBox="0 0 888 504" role="img" aria-label="Customers browse the catalog and place orders; placing an order always includes paying, and a coupon may be applied. Members are customers who can also track orders. The payment service takes part in paying.">
+<style>
+#dg-shop-usecases{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-shop-usecases .ground{fill:var(--fig,#f2f3f9)}
+#dg-shop-usecases .band{fill:var(--bg,#fbfbfe)}
+#dg-shop-usecases .track{stroke:var(--line,#d3d6e3)}
+#dg-shop-usecases .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-shop-usecases .head{fill:var(--text,#1c1f2e)}
+#dg-shop-usecases .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-shop-usecases .stop.end{fill:var(--text,#1c1f2e)}
+#dg-shop-usecases .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-shop-usecases .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-shop-usecases .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-shop-usecases .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-shop-usecases .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-shop-usecases .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-shop-usecases .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-shop-usecases .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-shop-usecases .sub,#dg-shop-usecases .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-shop-usecases .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-shop-usecases .u-ln{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-shop-usecases .u-bold{stroke-width:2.5}
+#dg-shop-usecases .u-dash{stroke-dasharray:6 4;stroke-linecap:butt}
+#dg-shop-usecases .u-face{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linejoin:round}
+#dg-shop-usecases .u-ink{fill:var(--text,#1c1f2e)}
+#dg-shop-usecases .u-name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-shop-usecases .leg .line{stroke-width:1.5}
+#dg-shop-usecases .leg.is-reply .line{stroke-dasharray:6 4;stroke-linecap:butt}
+#dg-shop-usecases .ohead{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.js #dg-shop-usecases .leg.is-current .ohead{stroke:var(--primary,#2f3fd0)}
+#dg-shop-usecases .u-bar{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-shop-usecases .u-frame{fill:none;stroke:var(--muted,#575d75);stroke-width:1}
+#dg-shop-usecases .u-frame.is-filled{fill:var(--bg,#fbfbfe)}
+#dg-shop-usecases .u-div{stroke:var(--muted,#575d75);stroke-width:1;stroke-dasharray:6 4}
+#dg-shop-usecases .u-op{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e)}
+@media (prefers-reduced-motion:reduce){#dg-shop-usecases .pulse{animation:none!important}#dg-shop-usecases .pulse{display:none!important}}
+@media print{#dg-shop-usecases{max-width:100%;height:auto}#dg-shop-usecases .pulse{display:none!important}}
+#dg-shop-usecases-phone{display:none}
+</style>
+<rect width="888" height="504" class="ground"/>
+<rect x="204" y="36" width="480" height="408" class="u-frame"/>
+<text x="216" y="58" class="name" text-anchor="start">Online shop</text>
+<g class="leg" data-leg="1"><polyline points="84,207 84,108 229,108" class="u-ln"/></g>
+<g class="leg" data-leg="2"><polyline points="96,240 247.5,240" class="u-ln"/></g>
+<g class="leg" data-leg="3"><polyline points="96,396 246.5,396" class="u-ln"/></g>
+<g class="leg" data-leg="4"><polyline points="84,363 84,285" class="u-ln"/><polygon points="91,285 77,285 84,273" class="u-face"/></g>
+<g class="leg" data-leg="5"><polyline points="324,264 324,324 576,324 576,372" class="u-ln u-dash"/><polyline points="571.5,364 576,372 580.5,364" class="u-ln"/><text x="450" y="341" class="verb" text-anchor="middle">«include»</text></g>
+<g class="leg" data-leg="6"><polyline points="496,240 400.5,240" class="u-ln u-dash"/><polyline points="408.5,235.5 400.5,240 408.5,244.5" class="u-ln"/><text x="448.25" y="257" class="verb" text-anchor="middle">«extend»</text></g>
+<g class="leg" data-leg="7"><polyline points="767.5,396 636,396" class="u-ln"/></g>
+<g class="u-ln"><circle cx="84" cy="213" r="6" class="u-face"/><path d="M84,219 L84,233 M74,224 L94,224 M84,233 L76,247 M84,233 L92,247"/></g>
+<text x="84" y="269" class="name" text-anchor="middle">Customer</text>
+<g class="u-ln"><circle cx="84" cy="369" r="6" class="u-face"/><path d="M84,375 L84,389 M74,380 L94,380 M84,389 L76,403 M84,389 L92,403"/></g>
+<text x="84" y="425" class="name" text-anchor="middle">Member</text>
+<ellipse cx="324" cy="108" rx="95" ry="24" class="u-face"/>
+<text x="324" y="113" class="name" text-anchor="middle">Browse the catalog</text>
+<ellipse cx="324" cy="240" rx="76.5" ry="24" class="u-face"/>
+<text x="324" y="245" class="name" text-anchor="middle">Place an order</text>
+<ellipse cx="576" cy="396" rx="60" ry="24" class="u-face"/>
+<text x="576" y="401" class="name" text-anchor="middle">Pay</text>
+<ellipse cx="576" cy="240" rx="80" ry="24" class="u-face"/>
+<text x="576" y="245" class="name" text-anchor="middle">Apply a coupon</text>
+<ellipse cx="324" cy="396" rx="77.5" ry="24" class="u-face"/>
+<text x="324" y="401" class="name" text-anchor="middle">Track an order</text>
+<g class="u-ln"><circle cx="804" cy="360" r="6" class="u-face"/><path d="M804,366 L804,380 M794,371 L814,371 M804,380 L796,394 M804,380 L812,394"/></g>
+<text x="804" y="416" class="name" text-anchor="middle">Payment</text>
+<text x="804" y="434" class="name" text-anchor="middle">service</text>
+</svg>
+<svg id="dg-shop-usecases-phone" class="dg dg-usecase dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="846" viewBox="0 0 264 846" role="img" aria-label="Customers browse the catalog and place orders; placing an order always includes paying, and a coupon may be applied. Members are customers who can also track orders. The payment service takes part in paying.">
+<style>
+#dg-shop-usecases-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-shop-usecases-phone .ground{fill:var(--fig,#f2f3f9)}
+#dg-shop-usecases-phone .band{fill:var(--bg,#fbfbfe)}
+#dg-shop-usecases-phone .track{stroke:var(--line,#d3d6e3)}
+#dg-shop-usecases-phone .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-shop-usecases-phone .head{fill:var(--text,#1c1f2e)}
+#dg-shop-usecases-phone .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-shop-usecases-phone .stop.end{fill:var(--text,#1c1f2e)}
+#dg-shop-usecases-phone .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-shop-usecases-phone .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-shop-usecases-phone .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-shop-usecases-phone .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-shop-usecases-phone .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-shop-usecases-phone .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-shop-usecases-phone .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-shop-usecases-phone .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-shop-usecases-phone .sub,#dg-shop-usecases-phone .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-shop-usecases-phone .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-shop-usecases-phone .u-ln{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-shop-usecases-phone .u-bold{stroke-width:2.5}
+#dg-shop-usecases-phone .u-dash{stroke-dasharray:6 4;stroke-linecap:butt}
+#dg-shop-usecases-phone .u-face{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linejoin:round}
+#dg-shop-usecases-phone .u-ink{fill:var(--text,#1c1f2e)}
+#dg-shop-usecases-phone .u-name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-shop-usecases-phone .leg .line{stroke-width:1.5}
+#dg-shop-usecases-phone .leg.is-reply .line{stroke-dasharray:6 4;stroke-linecap:butt}
+#dg-shop-usecases-phone .ohead{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.js #dg-shop-usecases-phone .leg.is-current .ohead{stroke:var(--primary,#2f3fd0)}
+#dg-shop-usecases-phone .u-bar{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-shop-usecases-phone .u-frame{fill:none;stroke:var(--muted,#575d75);stroke-width:1}
+#dg-shop-usecases-phone .u-frame.is-filled{fill:var(--bg,#fbfbfe)}
+#dg-shop-usecases-phone .u-div{stroke:var(--muted,#575d75);stroke-width:1;stroke-dasharray:6 4}
+#dg-shop-usecases-phone .u-op{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e)}
+@media (prefers-reduced-motion:reduce){#dg-shop-usecases-phone .pulse{animation:none!important}#dg-shop-usecases-phone .pulse{display:none!important}}
+@media print{#dg-shop-usecases-phone{max-width:100%;height:auto}#dg-shop-usecases-phone .pulse{display:none!important}}
+@media (max-width:984px){#dg-shop-usecases{display:none}#dg-shop-usecases-phone{display:block}}
+</style>
+<rect width="264" height="846" class="ground"/>
+<rect x="8" y="8" width="248" height="374" rx="10" class="band"/>
+<rect x="8" y="394" width="248" height="246" rx="10" class="band"/>
+<rect x="8" y="652" width="248" height="194" rx="10" class="band"/>
+<text x="20" y="26" class="sub" text-anchor="start">Customer</text>
+<text x="20" y="412" class="sub" text-anchor="start">Member</text>
+<text x="20" y="670" class="sub" text-anchor="start">Payment service</text>
+<g class="u-ln"><circle cx="127" cy="46" r="6" class="u-face"/><path d="M127,52 L127,66 M117,57 L137,57 M127,66 L119,80 M127,66 L135,80"/></g>
+<text x="127" y="102" class="name" text-anchor="middle">Customer</text>
+<ellipse cx="127" cy="150" rx="95" ry="24" class="u-face"/>
+<text x="127" y="155" class="name" text-anchor="middle">Browse the catalog</text>
+<ellipse cx="127" cy="218" rx="76.5" ry="24" class="u-face"/>
+<text x="127" y="223" class="name" text-anchor="middle">Place an order</text>
+<polyline points="32,261 80,261" class="u-ln u-dash"/><polyline points="72,265.5 80,261 72,256.5" class="u-ln"/>
+<text x="92" y="265" class="verb" text-anchor="start">«include»</text>
+<text x="92" y="283" class="name" text-anchor="start">Pay</text>
+<polyline points="80,303 32,303" class="u-ln u-dash"/><polyline points="40,298.5 32,303 40,307.5" class="u-ln"/>
+<text x="92" y="307" class="verb" text-anchor="start">«extend»</text>
+<text x="92" y="325" class="name" text-anchor="start">Apply a coupon,</text>
+<text x="92" y="343" class="name" text-anchor="start">which may add to it</text>
+<g class="u-ln"><circle cx="127" cy="432" r="6" class="u-face"/><path d="M127,438 L127,452 M117,443 L137,443 M127,452 L119,466 M127,452 L135,466"/></g>
+<text x="127" y="488" class="name" text-anchor="middle">Member</text>
+<polyline points="32,511 68,511" class="u-ln"/><polygon points="68,518 68,504 80,511" class="u-face"/>
+<text x="92" y="515" class="verb" text-anchor="start">a kind of</text>
+<text x="92" y="533" class="name" text-anchor="start">Customer</text>
+<ellipse cx="127" cy="588" rx="77.5" ry="24" class="u-face"/>
+<text x="127" y="593" class="name" text-anchor="middle">Track an order</text>
+<g class="u-ln"><circle cx="127" cy="690" r="6" class="u-face"/><path d="M127,696 L127,710 M117,701 L137,701 M127,710 L119,724 M127,710 L135,724"/></g>
+<text x="127" y="746" class="name" text-anchor="middle">Payment service</text>
+<ellipse cx="127" cy="794" rx="60" ry="24" class="u-face"/>
+<text x="127" y="799" class="name" text-anchor="middle">Pay</text>
+</svg>
+<details class="dg-words">
+<summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>The diagram in words</summary>
+<p>The system: Online shop.</p>
+<ul><li>Customer takes part in “Browse the catalog” and “Place an order”.</li><li>Member takes part in “Track an order”. Member is a kind of Customer, and takes part in all that Customer does.</li><li>Payment service takes part in “Pay”.</li></ul>
+<ul><li>“Place an order” always includes “Pay”.</li><li>“Apply a coupon” may add to “Place an order”, under a condition.</li></ul>
+<p>Key to the marks:</p>
+<ul><li>A stick figure: an actor, a person or another system that uses this one.</li><li>An oval: a use case, something an actor does with the system.</li><li>The large box with the system's name: what is inside it is part of the system.</li><li>A solid line: the actor takes part in the use case.</li><li>A dashed line with an open arrowhead, marked «include»: the first use case always uses the second.</li><li>A dashed line with an open arrowhead, marked «extend»: the first use case may add to the second, under a condition.</li><li>A solid line with a hollow triangle: the actor or use case at the line's start is a kind of the one at the triangle.</li></ul>
+</details>
