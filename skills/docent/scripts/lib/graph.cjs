@@ -418,7 +418,9 @@ function draw(g, k) {
           const tries = a[0] === b[0]
             ? [{ x: m[0] + 8, y: m[1] + 4, anchor: "start" }, { x: m[0] - 8, y: m[1] + 4, anchor: "end" }]
             : [{ x: m[0], y: m[1] - 8, anchor: "middle" }, { x: m[0], y: m[1] + 17, anchor: "middle" }];
-          for (const t of tries) { const tx = { ...t, s: lb.s, cls }; const box = textBox(tx); if (free(box)) { done = { t: tx, box }; break; } }
+          // A message beside a link (a communication diagram) ends with a small arrow along the line, the way it travels.
+          const glyph = lb.arrow ? ((d) => (Math.abs(d[0]) >= Math.abs(d[1]) ? (d[0] > 0 ? "→" : "←") : d[1] > 0 ? "↓" : "↑"))(lb.arrow === "back" ? [a[0] - b[0], a[1] - b[1]] : [b[0] - a[0], b[1] - a[1]]) : "";
+          for (const t of tries) { const tx = { ...t, s: glyph ? `${lb.s} ${glyph}` : lb.s, cls }; const box = textBox(tx); if (free(box)) { done = { t: tx, box }; break; } }
           if (done) break;
         }
         if (done) break;
@@ -487,7 +489,7 @@ function checkGraph(out, edges) {
 /**
  * Lays out a graph and returns a scene that toSvg draws.
  * g.nodes: [{ id, w, h, group?, rank?, col?, ports?: "mid" | "tb" | "lr", round?, hit?, draw(cx, cy) -> { svg, texts } }]
- * g.edges: [{ from, to, end?, dashed?, labels?: [{ s, at?: "start" | "mid" | "end", cls?, near? }], still?, len?, up?, firsfirst?, port?: "start" | "end" | "both" }]
+ * g.edges: [{ from, to, end?, dashed?, labels?: [{ s, at?: "start" | "mid" | "end", cls?, near?, arrow?: "forward" | "back" }], still?, len?, up?, firsfirst?, port?: "start" | "end" | "both" }]
  *   port: a small square where the line meets the border of its node or frame (a port of a component or a part).
  *   from and to are node ids, or group ids for a line to a whole frame. up: the line points up, so in the rows its
  *   end comes first (a generalization, a composition). first: route this line before the others (the main path).
