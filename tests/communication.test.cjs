@@ -41,3 +41,11 @@ test("the data is checked, and each error says what to change", () => {
   broken((d) => (d.links = [{ from: "ui", to: "cart" }]), /which a message already joins/);
   broken((d) => (d.lifelines = d.lifelines.slice(0, 1)), /2 to 8 lifelines/);
 });
+
+test("long messages on a narrow drawing get room beside their line", () => {
+  const d = fixture();
+  d.lifelines = d.lifelines.slice(0, 3);
+  d.messages = d.messages.filter((m) => m.from.id !== "pay" && m.to !== "pay" && m.from !== "pay");
+  const { scene } = renderDiagram(d);
+  for (const t of scene.legs.flatMap((l) => l.texts)) assert.ok(t.x > 0 && t.x < scene.w, t.s);
+});

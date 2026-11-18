@@ -143,6 +143,9 @@ function draw(g, k) {
   // A loop on one node needs room at its right; a box needs room for its frame and its name.
   const loopRoom = new Array(C + 1).fill(0);
   edges.forEach((e) => { if (e.a === e.b && e.a >= 0) loopRoom[col[e.a] + 1] = Math.max(loopRoom[col[e.a] + 1], 60 + Math.max(0, ...e.labels.map((l) => textBox({ x: 0, y: 0, s: l.s, cls: l.cls || "verb" }).x1)) + 12); });
+  // A label with an arrow (a message of a communication diagram) may sit beside a line down the middle of the last column.
+  const longest = Math.max(0, ...edges.flatMap((e) => e.labels.filter((l) => l.arrow).map((l) => textBox({ x: 0, y: 0, s: `${l.s} →`, cls: l.cls || "verb" }).x1)));
+  loopRoom[C] = Math.max(loopRoom[C], longest + 16 - colW[C - 1] / 2 - 3 * U);
   const boxRows = (b) => { const m = nodes.map((_, v) => v).filter((v) => nodes[v].group === b.i); return [Math.min(...m.map((v) => rank[v])), Math.max(...m.map((v) => rank[v]))]; };
   const gut = Array.from({ length: C + 1 }, (_, c) => {
     let w = c === 0 || c === C ? 3 * U + k.edge : 6 * U + k.gap;
