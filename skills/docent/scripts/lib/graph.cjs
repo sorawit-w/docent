@@ -61,6 +61,11 @@ function rows(g) {
 /** Columns: each group owns a range of columns; in each row of a group the nodes are ordered to cut crossings. */
 function columns(g, rank) {
   const n = g.nodes.length, R = Math.max(...rank) + 1;
+  if (g.nodes.every((node) => node.col != null)) { // a kind that places its nodes itself: each group spans its own columns
+    const col = g.nodes.map((node) => node.col), span = new Map();
+    g.nodes.forEach((node, v) => { const gr = node.group ?? -1, sp = span.get(gr); span.set(gr, sp ? [Math.min(sp[0], col[v]), Math.max(sp[1], col[v])] : [col[v], col[v]]); });
+    return { col, span, C: Math.max(...col) + 1, R };
+  }
   const groupOf = g.nodes.map((node) => node.group ?? -1);
   const first = [...new Set(groupOf)]; // groups in the order in which their first node comes
   // Groups that share a frame (the regions of a composite state) stand side by side, so the frame holds only them.
@@ -458,7 +463,8 @@ function checkGraph(out, edges) {
  *   from and to are node ids, or group ids for a line to a whole frame. up: the line points up, so in the rows its
  *   end comes first (a generalization, a composition). first: route this line before the others (the main path).
  *   step: the place of a moving line on the main path, so the dot travels the lines in that order.
- * g.groups: [{ id, name, kind: "lane" | "box", draw?(rect) -> { svg, texts } }]
+ * g.groups: [{ id, name, kind: "lane" | "box" | "free", draw?(rect) -> { svg, texts } }]. A free group only owns its columns.
+ * When every node has both rank and col, the nodes stay where they are given.
  */
 function layoutGraph(g, form) {
   const idx = new Map(g.nodes.map((v, i) => [v.id, i]));
@@ -483,7 +489,9 @@ function layoutGraph(g, form) {
     const [a, b] = e.up ? [e.b, e.a] : [e.a, e.b];
     for (const x of ends(a, true)) for (const y of ends(b, false)) { rowEdges.push({ ...e, a: x, b: y }); owner.push(n); }
   });
-  const R0 = rows({ nodes, edges: rowEdges });
+  // A kind that places its nodes itself gives every node its row and column; no line then counts as going back.
+  const fixed = nodes.every((v) => v.rank != null && v.col != null);
+  const R0 = fixed ? { rank: nodes.map((v) => v.rank), back: new Set() } : rows({ nodes, edges: rowEdges });
   const R = { rank: R0.rank, back: new Set([...R0.back].map((k) => owner[k])) };
   // A line that the rows count backwards, and that is not drawn upward on purpose, goes back.
   const back = new Set([...R.back].filter((n) => !edges[n].up));
@@ -509,7 +517,7 @@ function scene(out, nodes, edges, groups, form) {
   const s = { form, uml: true, hideMarks: true, w: out.W, h: out.H, bands: [], gaps: [], tracks: [], lanes: [], parts: [], legs: [], notes: [], under: [] };
   out.rects.forEach((r, i) => {
     const gr = groups[out.lead[i]];
-    if (out.lead[i] !== i) return; // a region: its frame is drawn once, by the first region
+    if (out.lead[i] !== i || gr.kind === "free") return; // a region: its frame is drawn once, by the first region. A free group has no frame
     if (gr.kind === "lane") {
       s.bands.push({ x: r.x0, y: r.y0, w: r.x1 - r.x0, h: r.y1 - r.y0 });
       s.lanes.push({ text: { x: (r.x0 + r.x1) / 2, y: r.y0 + 28, s: gr.name, cls: "lane", anchor: "middle" } });
