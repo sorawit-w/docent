@@ -102,6 +102,51 @@ A walkthrough needs a route, because step 1 lights leg 1, step 2 lights leg 2, a
 - At most 2 side legs. A diagram with side legs is drawn as Route tall, beside the steps or in the text flow.
 - The walkthrough has one step for each leg of the route; side legs have no step.
 
+## Sequence diagrams
+
+A sequence diagram shows calls and replies between a few participants, in time order: a browser asks a web app, the web app asks a database, the replies come back. Write it with `"kind": "sequence"`:
+
+```json
+{
+  "id": "page",
+  "kind": "sequence",
+  "label": "The browser asks for a page. The web app reads it from the cache, or from the database when the cache does not have it.",
+  "participants": [
+    {"id": "browser", "name": "Browser"},
+    {"id": "app", "name": "Web app"},
+    {"id": "cache", "name": "Cache"},
+    {"id": "db", "name": "Database"}
+  ],
+  "messages": [
+    {"from": "browser", "to": "app", "verb": "ask for the page"},
+    {"from": "app", "to": "app", "verb": "check the session"},
+    {"alt": [
+      {"when": "If the cache has the page", "messages": [
+        {"from": "app", "to": "cache", "verb": "read"},
+        {"from": "cache", "to": "app", "verb": "page", "reply": true}
+      ]},
+      {"when": "If not", "messages": [
+        {"from": "app", "to": "db", "verb": "query"},
+        {"from": "db", "to": "app", "verb": "rows", "reply": true}
+      ]}
+    ]},
+    {"from": "app", "to": "browser", "verb": "page", "reply": true}
+  ]
+}
+```
+
+| Field | What it is |
+|---|---|
+| `participants` | 2 to 6. Each has an `id` and a `name` (at most 20 characters). |
+| `messages` | In time order, at most 24 in all. A message has `from`, `to` and a `verb` (at most 24 characters). `"reply": true` makes it a reply. A message from a participant to itself is a call to itself. |
+| `alt` | One group of alternatives, in place of a message: 2 or 3 cases, each with a `when` (at most 32 characters, such as "If not") and its own `messages`. A group cannot hold a group. |
+
+- On a desktop each participant is a plate at the top with a track below it, and each message is a level arrow with its number. A reply is a thin muted line with an open arrowhead. A call to itself is a small loop. Each case of the group is a band with its `when` as a label. One dot travels the messages in order, twice.
+- On a phone the drawing is a script: one row for each message, with its number, "From → To", and the verb.
+- On paper the desktop form prints, shrunk to the sheet when it keeps at least 80% of its size; else the script prints.
+- `render` also writes the steps in words, in a closed section under the drawing ("The diagram in words"). A screen reader reaches it, and it prints. The `label` stays a one- or two-sentence summary.
+- A sequence diagram sits in the text flow. It has no `form`, no `lanes`, no `parts` and no `legs`. Six participants with long names need more than the page; then the script shows on a desktop too.
+
 ## Optional legs
 
 A leg with `"optional": true` is a path that only some readers take, or that happens only in some cases. It is drawn as a dashed arrow:

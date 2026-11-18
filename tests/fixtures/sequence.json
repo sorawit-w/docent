@@ -1,0 +1,26 @@
+{
+  "id": "page",
+  "kind": "sequence",
+  "label": "The browser asks for a page. The web app checks the session, then reads the page from the cache, or from the database when the cache does not have it, and sends the page back.",
+  "participants": [
+    { "id": "browser", "name": "Browser" },
+    { "id": "app", "name": "Web app" },
+    { "id": "cache", "name": "Cache" },
+    { "id": "db", "name": "Database" }
+  ],
+  "messages": [
+    { "from": "browser", "to": "app", "verb": "ask for the page" },
+    { "from": "app", "to": "app", "verb": "check the session" },
+    { "alt": [
+      { "when": "If the cache has the page", "messages": [
+        { "from": "app", "to": "cache", "verb": "read" },
+        { "from": "cache", "to": "app", "verb": "page", "reply": true }
+      ] },
+      { "when": "If not", "messages": [
+        { "from": "app", "to": "db", "verb": "query" },
+        { "from": "db", "to": "app", "verb": "rows", "reply": true }
+      ] }
+    ] },
+    { "from": "app", "to": "browser", "verb": "page", "reply": true }
+  ]
+}

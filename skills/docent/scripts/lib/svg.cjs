@@ -45,6 +45,8 @@ function head(leg) {
   const len = dist(tip, prev);
   const ux = (tip[0] - prev[0]) / len, uy = (tip[1] - prev[1]) / len;
   const bx = tip[0] - ux * HEAD, by = tip[1] - uy * HEAD;
+  // A reply in a sequence diagram has an open arrowhead.
+  if (leg.reply) return `<polyline points="${num(bx - uy * HEAD_HALF)},${num(by + ux * HEAD_HALF)} ${num(tip[0])},${num(tip[1])} ${num(bx + uy * HEAD_HALF)},${num(by - ux * HEAD_HALF)}" class="ohead"/>`;
   return `<polygon points="${num(bx - uy * HEAD_HALF)},${num(by + ux * HEAD_HALF)} ${num(bx + uy * HEAD_HALF)},${num(by - ux * HEAD_HALF)} ${num(tip[0])},${num(tip[1])}" class="head"/>`;
 }
 
@@ -99,6 +101,8 @@ function styles(scene, id, mode, swap) {
   // An optional leg is dashed. A drawing with no optional leg carries no such rule.
   if (scene.legs.some((leg) => leg.optional)) css.push(`${s} .leg.is-optional .line{stroke-dasharray:5 7}`);
   if ((scene.spurs || []).length) css.push(`${s} .side .line{stroke-dasharray:5 7}`);
+  // A reply: a thin muted line with an open arrowhead. It is not dashed, because a dashed line means a path that only some readers take.
+  if (scene.legs.some((leg) => leg.reply)) css.push(`${s} .leg.is-reply .line{stroke:${v("muted")};stroke-width:1.5}`, `${s} .ohead{fill:none;stroke:${v("muted")};stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}`, `.js ${s} .leg.is-reply.is-current .ohead{stroke:${v("primary")}}`);
   // A go-to row of the column form: its mark is dashed when the leg is optional, like the line it stands for.
   if ((scene.jumps || []).some((jump) => jump.optional)) css.push(`${s} .jump.is-optional .mark{stroke-dasharray:3 3}`);
   // On paper nothing scrolls: a drawing that is still wider than the page shrinks to fit it.
@@ -137,6 +141,8 @@ function styles(scene, id, mode, swap) {
   css.push(`@media (prefers-reduced-motion:reduce){${still.join("")}}`, `@media print{${print.join("")}}`);
   if (swap && swap.phone) css.push(`#${swap.phone}{display:none}`);
   if (swap && swap.below) css.push(`@media (max-width:${swap.below}px){#${swap.main}{display:none}${s}{display:block}}`);
+  // On paper the main form may shrink instead, when it keeps at least 80% of its size.
+  if (swap && swap.printMain) css.push(`@media print{#${swap.main}{display:block!important}${s}{display:none!important}}`);
   return css.join("\n");
 }
 
@@ -151,6 +157,8 @@ function toSvg(scene, { id, label, mode, swap }) {
   out.push(`<rect width="${num(scene.w)}" height="${num(scene.h)}" class="ground"/>`);
   for (const b of scene.bands) out.push(`<rect x="${num(b.x)}" y="${num(b.y)}" width="${num(b.w)}" height="${num(b.h)}" rx="10" class="band"/>`);
   for (const [x1, y1, x2, y2] of scene.tracks) out.push(`<line x1="${num(x1)}" y1="${num(y1)}" x2="${num(x2)}" y2="${num(y2)}" class="track"/>`);
+  // The label of a band, as in a group of a sequence diagram. A knock-out in the band color stops the tracks behind it, so no text sits on a line.
+  for (const note of scene.notes || []) out.push(`${note.knock ? `<rect x="${num(note.knock.x)}" y="${num(note.knock.y)}" width="${num(note.knock.w)}" height="${num(note.knock.h)}" class="band"/>` : ""}${text(note)}`);
   for (const lane of scene.lanes) {
     if (lane.icon) out.push(icon(lane.icon, lane.iconAt, "icon lane-icon"));
     out.push(text(lane.text));
@@ -158,7 +166,7 @@ function toSvg(scene, { id, label, mode, swap }) {
   for (const leg of scene.legs) {
     out.push(
       // The dot is drawn before the numbered mark, so it passes under the mark and the number stays readable.
-      `<g class="leg${leg.optional ? " is-optional" : ""}" data-leg="${leg.n}"><path d="${linePath(leg)}" class="line"/>${head(leg)}` +
+      `<g class="leg${leg.optional ? " is-optional" : ""}${leg.reply ? " is-reply" : ""}" data-leg="${leg.n}"><path d="${linePath(leg)}" class="line"/>${head(leg)}` +
         `<circle r="6" class="pulse pulse-${leg.n}"/>` +
         `<circle cx="${num(leg.mark[0])}" cy="${num(leg.mark[1])}" r="${MARK}" class="mark"/>` +
         text({ x: leg.mark[0], y: leg.mark[1] + 4, s: leg.n, cls: "num", anchor: "middle" }) +
@@ -169,7 +177,7 @@ function toSvg(scene, { id, label, mode, swap }) {
   for (const spur of scene.spurs || []) out.push(`<g class="side"><path d="${linePath(spur)}" class="line"/>${head(spur)}${text(spur.verb)}</g>`);
   for (const jump of scene.jumps || []) {
     const n = jump.n == null ? "" : ` data-leg="${jump.n}"`; // a side leg in the single track has no number
-    out.push(`<g class="jump${jump.optional ? " is-optional" : ""}"${n}><circle cx="${num(jump.mark[0])}" cy="${num(jump.mark[1])}" r="${MARK}" class="mark"/>` + (jump.n == null ? "" : text({ x: jump.mark[0], y: jump.mark[1] + 4, s: jump.n, cls: "num", anchor: "middle" })) + text(jump.verb) + text(jump.target) + `</g>`);
+    out.push(`<g class="jump${jump.optional ? " is-optional" : ""}"${n}><circle cx="${num(jump.mark[0])}" cy="${num(jump.mark[1])}" r="${MARK}" class="mark"/>` + (jump.n == null ? "" : text({ x: jump.mark[0], y: jump.mark[1] + 4, s: jump.n, cls: "num", anchor: "middle" })) + text(jump.verb) + text(jump.target) + (jump.more || []).map(text).join("") + `</g>`);
   }
   for (const part of scene.parts) {
     const is = part.state ? ` is-${part.state}` : "";
