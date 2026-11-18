@@ -227,7 +227,7 @@ function column(model) {
     scene.parts.push({ id: part.id, shape: "stop", cx: x, cy, r, icon: part.icon, iconAt: [x, cy], end: !legs.some((l) => l.from === index), texts });
     jumps[i].forEach((leg, j) => {
       const my = cy + 46 + j * JUMP;
-      scene.jumps.push({ n: leg.n, from: part.id, to: parts[leg.to].id, optional: leg.optional, mark: [textX + 10, my], verb: { x: textX + 26, y: my + 4, s: leg.verb, cls: "verb", anchor: "start" }, target: { x: textX + 26, y: my + 20, s: target(leg), cls: "sub", anchor: "start" } });
+      scene.jumps.push({ n: leg.n, from: part.id, to: parts[leg.to].id, optional: leg.optional, mark: [textX + 10, my], verb: { x: textX + 26, y: my + 4, s: leg.verb, cls: "verb", anchor: "start" }, target: { x: textX + 26, y: my + (leg.verb ? 20 : 4), s: target(leg), cls: "sub", anchor: "start" } });
     });
     const leg = next[i];
     if (!leg) return;

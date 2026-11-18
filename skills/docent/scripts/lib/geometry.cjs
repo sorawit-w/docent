@@ -72,11 +72,11 @@ function check(scene) {
   scene.lanes.forEach((lane, i) => texts.push({ box: textBox(lane.text), what: `the lane name "${lane.text.s}"`, kind: "lane", lane: i }));
   scene.lanes.forEach((lane, i) => lane.iconAt && texts.push({ box: { x0: lane.iconAt[0] - 8, y0: lane.iconAt[1] - 8, x1: lane.iconAt[0] + 8, y1: lane.iconAt[1] + 8 }, what: "a lane icon", kind: "lane", lane: i }));
   for (const part of parts) for (const t of part.texts) texts.push({ box: textBox(t), what: `"${t.s}"`, kind: "label", part: part.id });
-  for (const leg of legs) texts.push({ box: textBox(leg.verb), what: `the verb "${leg.verb.s}"`, kind: "verb", leg: leg.n });
+  for (const leg of legs) if (leg.verb.s) texts.push({ box: textBox(leg.verb), what: `the verb "${leg.verb.s}"`, kind: "verb", leg: leg.n });
   for (const jump of scene.jumps || []) {
     const [mx, my] = jump.mark, part = `go-to ${jump.n}`;
     texts.push({ box: { x0: mx - MARK, y0: my - MARK, x1: mx + MARK, y1: my + MARK }, what: `the mark of go-to row ${jump.n}`, kind: "label", part });
-    for (const t of [jump.verb, jump.target]) texts.push({ box: textBox(t), what: `"${t.s}"`, kind: "label", part });
+    for (const t of [jump.verb, jump.target]) if (t.s) texts.push({ box: textBox(t), what: `"${t.s}"`, kind: "label", part });
   }
 
   for (const leg of legs) {
@@ -99,12 +99,14 @@ function check(scene) {
     }
     for (const part of parts) if (partToPoint(part, m) - MARK < RULE.markClear - 0.01) bad("R2", "mark-part", `mark ${leg.n} is less than ${RULE.markClear}px from the part "${part.id}"`, { leg: leg.n });
 
-    // R3: the verb.
-    const verb = textBox(leg.verb);
-    if (rectPoint(verb, m) - MARK > RULE.verbNear) bad("R3", "verb-far", `the verb of leg ${leg.n} is not beside its mark`, { leg: leg.n });
-    for (const other of legs) for (const [p, q] of segsOf(other)) if (rectSeg(verb, p, q) < RULE.verbClear - 0.01) { bad("R3", "verb-line", `the verb "${leg.verb.s}" is less than ${RULE.verbClear}px from the line of leg ${other.n}`, { leg: leg.n, otherLeg: other.n }); break; }
-    for (const [x1, y1, x2, y2] of scene.tracks) if (rectSeg(verb, [x1, y1], [x2, y2]) < RULE.verbClear - 0.01) bad("R3", "verb-track", `the verb "${leg.verb.s}" is less than ${RULE.verbClear}px from a track`, { leg: leg.n });
-    for (const part of parts) if (partToRect(part, verb) < RULE.verbClear - 0.01) bad("R3", "verb-part", `the verb "${leg.verb.s}" is less than ${RULE.verbClear}px from the part "${part.id}"`, { leg: leg.n });
+    // R3: the verb. A leg may have none.
+    if (leg.verb.s) {
+      const verb = textBox(leg.verb);
+      if (rectPoint(verb, m) - MARK > RULE.verbNear) bad("R3", "verb-far", `the verb of leg ${leg.n} is not beside its mark`, { leg: leg.n });
+      for (const other of legs) for (const [p, q] of segsOf(other)) if (rectSeg(verb, p, q) < RULE.verbClear - 0.01) { bad("R3", "verb-line", `the verb "${leg.verb.s}" is less than ${RULE.verbClear}px from the line of leg ${other.n}`, { leg: leg.n, otherLeg: other.n }); break; }
+      for (const [x1, y1, x2, y2] of scene.tracks) if (rectSeg(verb, [x1, y1], [x2, y2]) < RULE.verbClear - 0.01) bad("R3", "verb-track", `the verb "${leg.verb.s}" is less than ${RULE.verbClear}px from a track`, { leg: leg.n });
+      for (const part of parts) if (partToRect(part, verb) < RULE.verbClear - 0.01) bad("R3", "verb-part", `the verb "${leg.verb.s}" is less than ${RULE.verbClear}px from the part "${part.id}"`, { leg: leg.n });
+    }
 
     // R5: the line keeps away from parts that it does not join, and from other lines.
     for (const part of parts) {

@@ -1,0 +1,24 @@
+{
+  "id": "five",
+  "label": "A change passes five teams: the author writes it, a reviewer reads it, the build makes it, the testers try it, and the release team ships it.",
+  "lanes": [
+    { "id": "author", "name": "Author" },
+    { "id": "review", "name": "Reviewer" },
+    { "id": "build", "name": "Build" },
+    { "id": "test", "name": "Testers" },
+    { "id": "ship", "name": "Release" }
+  ],
+  "parts": [
+    { "id": "change", "lane": "author", "name": "Change", "note": "a short diff" },
+    { "id": "read", "lane": "review", "name": "Review", "note": "read once" },
+    { "id": "make", "lane": "build", "name": "Build", "note": "made and packed" },
+    { "id": "try", "lane": "test", "name": "Trial", "note": "on a test machine" },
+    { "id": "out", "lane": "ship", "name": "Release", "note": "for everyone" }
+  ],
+  "legs": [
+    { "from": "change", "to": "read", "verb": "send" },
+    { "from": "read", "to": "make", "verb": "approve" },
+    { "from": "make", "to": "try", "verb": "install" },
+    { "from": "try", "to": "out" }
+  ]
+}

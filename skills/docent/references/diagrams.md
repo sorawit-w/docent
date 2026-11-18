@@ -42,14 +42,34 @@ Put one block where the drawing belongs, inside the well of a figure:
 |---|---|---|
 | `id` | yes | A short id, unique in the document: small letters, digits and `-`, starting with a letter. |
 | `label` | yes | One or two sentences that say what the drawing shows. A screen reader reads this in place of the drawing. |
-| `lanes` | yes | 1 to 4 lanes. Each has an `id`, a `name` (at most 28 characters) and, if you want, an `icon`. |
+| `lanes` | yes | 1 to 5 lanes. Each has an `id`, a `name` (at most 28 characters) and, if you want, an `icon`. |
 | `parts` | yes | 2 to 12 parts. Each has an `id`, the `lane` it belongs to, a `name` (at most 32 characters) and, if you want, a `note` (at most 40 characters), an `icon` and a `state`. |
-| `legs` | yes | 1 to 16 legs, in order. Each goes `from` one part `to` another and has a `verb` (at most 24 characters). A leg can also have `"optional": true`. The legs are numbered in the order you write them. |
+| `legs` | yes | 1 to 16 legs, in order. Each goes `from` one part `to` another and, if you want, has a `verb` (at most 24 characters). A leg can also have `"optional": true`. The legs are numbered in the order you write them. |
 | `place` | no | `"flow"` (the default) for a diagram in the text flow. `"walk"` for the diagram beside walkthrough steps: leg 1 lights with step 1, leg 2 with step 2, and so on. |
 | `form` | no | `"auto"` (the default), `"wide"`, `"tall"` or `"plates"`. Leave it out and the renderer picks. Name a form only when you have a reason. |
 | `icons` | no | Icons that you draw for this diagram: an object from a name to the shapes of the icon. See below. |
 
-Keep names, notes and verbs short. A verb is one to three words. The renderer refuses text that is too long.
+Keep names, notes and verbs short. A verb is one to three words. Leave the verb out only when the leg means "and then"; the leg keeps its number. `render` warns when no leg has a verb. The renderer refuses text that is too long.
+
+## Two drawings in one figure
+
+When the text has two separate chains (two flows that do not meet), write two diagram blocks in one well. They stand side by side when both fit, and one below the other when they do not. Each keeps its own numbers, its own dot and its own phone form. Do not join two chains into one diagram: one drawing numbers its legs in one order, so the reader would read an order that is not there. A well holds at most two drawings, and the well beside walkthrough steps holds one; `check` reports an error otherwise.
+
+```html
+<figure>
+  <div class="fig" role="region" aria-label="Figure 3, an order and a refund" tabindex="0">
+<!-- docent:diagram
+{ ...the first chain... }
+-->
+<!-- /docent:diagram -->
+<!-- docent:diagram
+{ ...the second chain... }
+-->
+<!-- /docent:diagram -->
+  </div>
+  <figcaption><strong>Figure 3</strong>An order on the left, and a refund on the right.</figcaption>
+</figure>
+```
 
 ## Route or Plates
 

@@ -14,6 +14,7 @@ const CASES = [
   ["review", "wide"], ["review", "tall"], ["review", "plates"],
   ["long-route", "wide"], ["long-route", "tall"], ["branch", "plates"], ["dense", "plates"],
   ["pipeline", "wide"], ["pipeline", "tall"], ["pipeline", "plates"], ["skip", "plates"],
+  ["five", "wide"], ["five", "tall"], ["five", "plates"],
 ];
 
 for (const [name, form] of CASES) {
@@ -35,7 +36,7 @@ test("the renderer picks the form from where the diagram sits and what it shows"
   assert.equal(pick({ ...fixture("bug-report"), form: "plates" }), "plates", "the author's choice wins");
   const wordy = fixture("bug-report");
   wordy.parts[0].note = "what went wrong, and on which day";
-  assert.equal(pick(wordy), "plates", "a part that needs more text");
+  assert.equal(renderDiagram(wordy).form, "wide", "a long note no longer forces Plates: the spacing rules decide");
 });
 
 test("a walkthrough drawing lights the current leg; any other drawing runs one dot along the whole route, twice", () => {
@@ -225,4 +226,23 @@ test("the example in references/diagrams.md is drawn without a warning", () => {
   assert.equal(iconProblem(own), null);
   const part = JSON.parse(blocks.find((b) => b.includes('"state"')));
   assert.deepEqual([part.state, Boolean(part.note)], ["err", true], "the state example has a note that says the status");
+});
+
+test("a verb is optional: the leg keeps its numbered mark, and a drawing with no verb at all gets a warning", () => {
+  const five = renderDiagram(fixture("five"));
+  assert.deepEqual(five.warnings, []);
+  assert.match(five.svg, /data-leg="4">[^]*?class="num"[^>]*>4<\/text><\/g>/, "leg 4 has a mark and no verb text");
+  const none = fixture("five");
+  none.legs.forEach((leg) => delete leg.verb);
+  const bare = renderDiagram(none);
+  assert.match(bare.warnings.join(), /no leg has a verb, so the drawing shows the order and nothing else/);
+  assert.deepEqual(bare.icons, [], "it is a warning for the author, not an error in check");
+  for (const form of ["wide", "tall", "plates"]) assert.deepEqual(check(renderDiagram({ ...none, form }).scene), [], `no verb at all still keeps the rules in ${form}`);
+});
+
+test("a diagram has at most 5 lanes", () => {
+  const six = fixture("five");
+  six.lanes.push({ id: "extra", name: "Extra" });
+  six.parts[4].lane = "extra";
+  assert.throws(() => renderDiagram(six), /a diagram has 1 to 5 lanes; this one has 6/);
 });

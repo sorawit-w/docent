@@ -8,7 +8,7 @@ const { textWidth } = require("./text.cjs");
 
 const FORMS = ["wide", "tall", "plates"];
 const STATES = ["ok", "warn", "err"]; // success, needs care, failure: the status colors of the page
-const MOST = { lanes: 4, parts: 12, legs: 16, name: 32, note: 40, verb: 24, lane: 28 };
+const MOST = { lanes: 5, parts: 12, legs: 16, name: 32, note: 40, verb: 24, lane: 28 };
 const PAGE = 1104; // the widest drawing that fits a full-width well
 const WALK = 520; // the widest drawing that fits beside the walkthrough steps
 const PHONE = 264; // the widest drawing that fits a 320px screen
@@ -57,8 +57,10 @@ function readData(data) {
     if (from === to) fail(`leg ${i + 1} starts and ends at the same part`);
     // An optional leg is a path that only some readers take. It is drawn as a dashed arrow.
     if (leg.optional != null && typeof leg.optional !== "boolean") fail(`"optional" of leg ${i + 1} must be true or false`);
-    return { n: i + 1, from, to, verb: words(leg.verb, `the verb of leg ${i + 1}`, MOST.verb), optional: leg.optional === true };
+    // A verb is optional: a leg that means "and then" keeps its numbered mark, so the order still shows.
+    return { n: i + 1, from, to, verb: words(leg.verb, `the verb of leg ${i + 1}`, MOST.verb, false), optional: leg.optional === true };
   });
+  if (model.legs.every((leg) => !leg.verb)) warnings.push("no leg has a verb, so the drawing shows the order and nothing else; give the legs verbs, or write a numbered list");
 
   // In one diagram, either every part has an icon or no part has one. The same holds for lanes.
   for (const [list, what] of [[model.parts, "part"], [model.lanes, "lane"]]) {
@@ -82,7 +84,6 @@ function formsFor(model) {
   if (model.form !== "auto") return [model.form];
   if (!model.chain) return ["plates"];
   if (model.place === "walk") return ["tall", "plates"];
-  if (model.parts.some((part) => part.note.length > 28)) return ["plates"];
   if (model.legs.length > 5) return ["tall", "plates"];
   return ["wide", "tall", "plates"];
 }
@@ -96,7 +97,7 @@ function layout(model, form) {
 /** Draws one diagram. Returns { svg, form, warnings }. Throws when the data is wrong or no form keeps the rules. */
 function renderDiagram(data) {
   const { model, warnings } = readData(data);
-  const icons = warnings.filter((w) => !w.startsWith("every part has the state")); // these warnings are about icons; check reports them as errors
+  const icons = warnings.filter((w) => !w.startsWith("every part has the state") && !w.startsWith("no leg has a verb")); // these warnings are about icons; check reports them as errors
   const forms = formsFor(model);
   let scene = null, reason = null;
   for (const form of forms) {
