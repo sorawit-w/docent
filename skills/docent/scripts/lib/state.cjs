@@ -126,7 +126,7 @@ function readState(data) {
   return { id: id(data.id, '"id"'), label: words(data.label, '"label"', 400), kind: "state", all, nodes, composites, transitions, outs, ins, order, mainT };
 }
 
-const groupId = (c, r) => (c.regions > 1 ? `${c.id}--r${r}` : c.id);
+const groupId = (c, r) => (c.regions > 1 ? `${c.id}_r${r}` : c.id); // "_" never appears in a data id
 
 /** How a state is named in the words and the column. */
 function callName(model, n) {

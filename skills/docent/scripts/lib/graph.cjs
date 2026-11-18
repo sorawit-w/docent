@@ -241,7 +241,8 @@ function draw(g, k) {
         if (end.group != null && side === "top" && names.some((nm) => a >= nm.x0 - U && a <= nm.x1 + U)) continue;
         if (end.group != null && horiz && dividers[lead[end.group]].some((dx) => Math.abs(a - dx) < 2 * U)) continue; // never on a region's dashed line
         const pt = horiz ? [a, side === "top" ? r.y0 : r.y1] : [side === "left" ? r.x0 : r.x1, a];
-        const vis = node ? hit(node, side, horiz ? a - node.cx : a - node.cy) : pt;
+        // A frame with a tab (a package) starts its body below the tab, so a line from above meets the body.
+        const vis = node ? hit(node, side, horiz ? a - node.cx : a - node.cy) : side === "top" && groups[end.group].tab ? [pt[0], pt[1] + groups[end.group].tab] : pt;
         const gap = dist(pt, vis);
         const need = isEnd && edge.end ? uml.END[edge.end].len + 28 + 1 : 0;
         const L = Math.max(U, up(need - gap));
@@ -487,7 +488,8 @@ function checkGraph(out, edges) {
  *   end comes first (a generalization, a composition). first: route this line before the others (the main path).
  *   step: the place of a moving line on the main path, so the dot travels the lines in that order.
  *   bus: lines with the same bus name may branch off one another, as a comb (the associations of one actor).
- * g.groups: [{ id, name, kind: "lane" | "box" | "free", draw?(rect) -> { svg, texts } }]. A free group only owns its columns.
+ * g.groups: [{ id, name, kind: "lane" | "box" | "free", tab?, draw?(rect) -> { svg, texts } }]. A free group only owns its
+ *   columns. tab: the height of a tab at the top of a box frame (a package), where its body starts.
  * When every node has both rank and col, the nodes stay where they are given.
  */
 function layoutGraph(g, form) {

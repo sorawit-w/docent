@@ -510,6 +510,78 @@ An object diagram shows a moment in a running system: the objects that exist, th
 
 - Nothing moves in a class or an object diagram: there is no dot and no walkthrough.
 
+## Package diagrams
+
+A package diagram shows how a system's code or model is grouped, and which group needs which. Write it with `"kind": "package"`:
+
+```json
+{
+  "id": "shop-packages",
+  "kind": "package",
+  "label": "The shop has three packages: ordering, catalog and billing. Ordering imports the catalog and uses billing; all of the shop imports the shared utilities.",
+  "packages": [
+    { "id": "shop", "name": "Shop" },
+    { "id": "ordering", "name": "Ordering", "in": "shop", "members": ["Order", "OrderLine", "Cart"] },
+    { "id": "catalog", "name": "Catalog", "in": "shop", "members": ["Product", "Category"] },
+    { "id": "billing", "name": "Billing", "in": "shop", "members": ["Invoice", "Payment"] },
+    { "id": "util", "name": "Shared utilities", "members": ["Money", "Clock"] }
+  ],
+  "dependencies": [
+    { "from": "ordering", "to": "catalog" },
+    { "from": "ordering", "to": "billing", "type": "access" },
+    { "from": "shop", "to": "util" }
+  ]
+}
+```
+
+| Field | What it is |
+|---|---|
+| `packages` | 1 to 12, each with an `id` and a `name` (at most 28 characters). A package may sit `in` another one; packages nest one level deep. A package that holds no packages may list up to 8 `members` (at most 32 characters each), such as its main classes. |
+| `dependencies` | Optional, at most 20, each `from` one package `to` another, with a `type`: `import` (the default), `access`, `merge`, or `use` for a plain dependency. A dependency may start or end on a package that holds packages. |
+
+- A package that holds packages lists no members of its own, and no dependency joins a package to the package around it.
+- The renderer draws each package as a folder: its name in the tab and its members in the body. A package that holds packages is a frame around them, its name in the tab. A dependency is a dashed line with an open arrowhead and its keyword, such as «import».
+- On a phone the diagram becomes a list of folders, with the packages of one frame in a band, and a row for each dependency.
+
+## Profile diagrams
+
+A profile diagram shows how a team extends UML for its own models: the stereotypes it adds, and the UML metaclass each one extends. Write it with `"kind": "profile"` only for readers who model in UML:
+
+```json
+{
+  "id": "persistence-profile",
+  "kind": "profile",
+  "label": "The persistence profile adds two stereotypes. Entity extends Class and has a table name; Id extends Property. The shop model applies the profile.",
+  "profile": "Persistence",
+  "stereotypes": [
+    { "id": "entity", "name": "Entity", "attributes": ["table: String"] },
+    { "id": "idst", "name": "Id" }
+  ],
+  "metaclasses": [
+    { "id": "class", "name": "Class" },
+    { "id": "property", "name": "Property" }
+  ],
+  "extensions": [
+    { "from": "entity", "to": "class" },
+    { "from": "idst", "to": "property", "required": true }
+  ],
+  "appliedTo": ["Shop model"]
+}
+```
+
+| Field | What it is |
+|---|---|
+| `profile` | The name of the profile, drawn in the tab of its frame after «profile». |
+| `stereotypes` | 1 or more, each with an `id`, a `name` and up to 8 `attributes` (its tag definitions, such as `"table: String"`). |
+| `metaclasses` | The UML metaclasses that the stereotypes extend, each with an `id` and a `name`, such as `Class` or `Property`. At most 12 stereotypes and metaclasses together. |
+| `extensions` | Each `from` a stereotype `to` a metaclass. `"required": true` means every element of that metaclass carries the stereotype. |
+| `generalizations` | Optional: a stereotype `from` that is a kind of another, `to`. |
+| `appliedTo` | Optional, at most 3: the names of packages that use the profile. |
+
+- Every stereotype extends a metaclass or is a kind of another stereotype, and every metaclass is extended.
+- The renderer draws the profile as a frame with stereotype boxes marked «stereotype», metaclass boxes marked «metaclass» above them, extensions as solid lines with a filled triangle, and «apply» as a dashed line from each package that uses the profile.
+- Nothing moves in a package or a profile diagram: there is no dot and no walkthrough.
+
 ## Optional legs
 
 A leg with `"optional": true` is a path that only some readers take, or that happens only in some cases. It is drawn as a dashed arrow:
