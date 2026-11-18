@@ -1,0 +1,20 @@
+{
+  "id": "order-objects",
+  "kind": "object",
+  "label": "Ana has one order, number 1042, with two lines: two mugs and one teapot.",
+  "objects": [
+    { "id": "ana", "name": "ana", "class": "Customer", "slots": ["email = \"ana@example.test\""] },
+    { "id": "o1", "name": "o1042", "class": "Order", "slots": ["total = 46.00"] },
+    { "id": "l1", "class": "OrderLine", "slots": ["quantity = 2"] },
+    { "id": "l2", "class": "OrderLine", "slots": ["quantity = 1"] },
+    { "id": "mug", "name": "mug", "class": "Product", "slots": ["price = 12.00"] },
+    { "id": "pot", "name": "teapot", "class": "Product", "slots": ["price = 22.00"] }
+  ],
+  "links": [
+    { "from": "ana", "to": "o1", "name": "places" },
+    { "from": "o1", "to": "l1" },
+    { "from": "o1", "to": "l2" },
+    { "from": "l1", "to": "mug" },
+    { "from": "l2", "to": "pot" }
+  ]
+}

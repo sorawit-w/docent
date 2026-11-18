@@ -433,6 +433,83 @@ A use case diagram shows who uses a system and for what: the actors outside it, 
 - Nothing moves: a use case diagram has no dot and no walkthrough.
 - On a phone the diagram becomes a list with a band for each actor: the use cases it takes part in, each with what it includes and what may extend it. `render` also writes the diagram in words, with a key to the marks.
 
+## Class diagrams
+
+A class diagram shows the classes of a design, what each one holds and does, and how they relate. Write it with `"kind": "class"`:
+
+```json
+{
+  "id": "order-classes",
+  "kind": "class",
+  "label": "A customer places orders. An order owns its lines, and each line names a product. Payment is an interface that card payment implements; an order uses a payment.",
+  "classes": [
+    { "id": "customer", "name": "Customer", "attributes": ["- id: UUID", "- email: String"], "operations": ["+ placeOrder(): Order"] },
+    { "id": "order", "name": "Order", "attributes": ["- total: Money", { "text": "- count: Integer", "static": true }], "operations": ["+ addLine(p: Product, n: Integer)", "+ pay(with: Payment)"] },
+    { "id": "line", "name": "OrderLine", "attributes": ["- quantity: Integer"] },
+    { "id": "product", "name": "Product", "attributes": ["- name: String", "- price: Money"] },
+    { "id": "payment", "name": "Payment", "stereotype": "interface", "operations": [{ "text": "+ charge(amount: Money): Boolean", "abstract": true }] },
+    { "id": "card", "name": "CardPayment", "attributes": ["- last4: String"], "operations": ["+ charge(amount: Money): Boolean"] }
+  ],
+  "relations": [
+    { "from": "customer", "to": "order", "name": "places", "multiplicity": ["1", "0..*"], "navigable": true },
+    { "from": "order", "to": "line", "type": "composition", "multiplicity": ["1", "1..*"], "roles": ["", "lines"] },
+    { "from": "line", "to": "product", "multiplicity": ["*", "1"], "navigable": true },
+    { "from": "card", "to": "payment", "type": "realization" },
+    { "from": "order", "to": "payment", "type": "dependency", "stereotype": "use" }
+  ],
+  "notes": [
+    { "id": "n1", "text": "{total = sum of the line prices}", "on": "order" }
+  ]
+}
+```
+
+| Field | What it is |
+|---|---|
+| `classes` | 1 to 16, each with an `id` and a `name` (at most 28 characters). Optional: a `stereotype` without guillemets, such as `interface` or `enumeration`; `"abstract": true`, drawn in italics; up to 8 `attributes` and 8 `operations`. A member is text of at most 40 characters, such as `"- total: Money"`, or an object with `text` and `"static": true` (underlined) or, for an operation, `"abstract": true` (italics). Start a member with its visibility: `+` public, `-` private, `#` protected, `~` package. |
+| `relations` | At most 24, each `from` one class `to` another, with a `type`: `association` (the default), `aggregation` and `composition` (from the whole to the part), `generalization` (from the child to the parent), `realization` (from a class to the interface it implements) and `dependency` (from the class that needs to the class it needs). |
+| `notes` | Optional, at most 4, each with an `id`, a `text` of at most 80 characters and the class it is `on`. A constraint is a note in braces. |
+
+- An association, an aggregation and a composition may have a `name`, `multiplicity` and `roles`: each a list of two, for the `from` end and the `to` end (`""` for none). A multiplicity is `1`, `0..1`, `*`, `1..*` and the like. An association with `"navigable": true` gets an open arrowhead at its `to` end. A dependency may have a `stereotype`, such as `use`.
+- A class is never a kind of itself, by a chain. A realization goes to a class with the stereotype `interface`.
+- The renderer puts a parent above its children and a whole above its parts, and draws each mark in UML notation: a box in parts, a hollow triangle (dashed for a realization), a hollow or filled diamond at the whole, a dashed line with an open arrowhead for a dependency, a note with a folded corner.
+- Not drawn: templates, qualified and n-ary associations, and association classes (draw the link as a class with two associations).
+- On a phone the diagram becomes a list of cards, one per class, with a row under it for each relation that starts there. `render` also writes the classes and relations in words, with a key to the marks.
+
+## Object diagrams
+
+An object diagram shows a moment in a running system: the objects that exist, their values, and the links between them. Write it with `"kind": "object"`, often next to the class diagram it is an example of:
+
+```json
+{
+  "id": "order-objects",
+  "kind": "object",
+  "label": "Ana has one order, number 1042, with two lines: two mugs and one teapot.",
+  "objects": [
+    { "id": "ana", "name": "ana", "class": "Customer", "slots": ["email = \"ana@example.test\""] },
+    { "id": "o1", "name": "o1042", "class": "Order", "slots": ["total = 46.00"] },
+    { "id": "l1", "class": "OrderLine", "slots": ["quantity = 2"] },
+    { "id": "l2", "class": "OrderLine", "slots": ["quantity = 1"] },
+    { "id": "mug", "name": "mug", "class": "Product", "slots": ["price = 12.00"] },
+    { "id": "pot", "name": "teapot", "class": "Product", "slots": ["price = 22.00"] }
+  ],
+  "links": [
+    { "from": "ana", "to": "o1", "name": "places" },
+    { "from": "o1", "to": "l1" },
+    { "from": "o1", "to": "l2" },
+    { "from": "l1", "to": "mug" },
+    { "from": "l2", "to": "pot" }
+  ]
+}
+```
+
+| Field | What it is |
+|---|---|
+| `objects` | 1 to 12, each with an `id`, its `class` and an optional `name` (each at most 28 characters), drawn underlined as `name : Class`, and up to 8 `slots` such as `"total = 46.00"`. |
+| `links` | At most 16, each `from` one object `to` another, with an optional `name`. |
+| `notes` | As in a class diagram. |
+
+- Nothing moves in a class or an object diagram: there is no dot and no walkthrough.
+
 ## Optional legs
 
 A leg with `"optional": true` is a path that only some readers take, or that happens only in some cases. It is drawn as a dashed arrow:
