@@ -46,3 +46,11 @@ test("check reports a fit warning, and the document still passes", () => {
   assert.deepEqual(errors, []);
   assert.ok(warnings.some((w) => /\("one-way"\): every message goes one way and no reply comes back; this reads as a workflow/.test(w)), warnings.join("\n"));
 });
+
+test("a ring of links, or two separate chains, is not one chain", () => {
+  const base = { id: "ring", kind: "communication", label: "Three in a ring.", lifelines: [{ id: "a", name: ": A" }, { id: "b", name: ": B" }, { id: "c", name: ": C" }], messages: [{ n: "1", from: "a", to: "b", text: "x()" }, { n: "2", from: "b", to: "c", text: "y()" }] };
+  assert.match(renderDiagram(base).warnings.join(), /one chain/);
+  assert.deepEqual(renderDiagram({ ...base, messages: [...base.messages, { n: "3", from: "c", to: "a", text: "z()" }] }).warnings, []);
+  const two = { ...base, lifelines: [...base.lifelines, { id: "d", name: ": D" }], messages: [{ n: "1", from: "a", to: "b", text: "x()" }, { n: "2", from: "c", to: "d", text: "y()" }] };
+  assert.deepEqual(renderDiagram(two).warnings, []);
+});

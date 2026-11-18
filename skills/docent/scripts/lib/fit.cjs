@@ -14,8 +14,12 @@ function fitWarnings(kind, model) {
   }
   if ((kind === "class" && !model.relations.length) || (kind === "object" && !model.links.length)) out.push(`the ${kind} diagram has no ${kind === "class" ? "relations" : "links"}; this is a table of the ${kind === "class" ? "classes" : "objects"} and their members`);
   if (kind === "communication") {
+    // One chain: a path through every lifeline. Connected, one link fewer than lifelines, and no lifeline with three links.
     const degree = (l) => model.links.filter((k) => k.a === l || k.b === l).length;
-    if (model.lifelines.every((l) => degree(l) <= 2)) out.push("the links form one chain, so they add little; when the order matters more than the links, a sequence diagram reads better");
+    const seen = new Set([model.lifelines[0]]);
+    for (let grew = true; grew; ) { grew = false; for (const k of model.links) if (seen.has(k.a) !== seen.has(k.b)) { seen.add(k.a); seen.add(k.b); grew = true; } }
+    const path = seen.size === model.lifelines.length && model.links.length === model.lifelines.length - 1 && model.lifelines.every((l) => degree(l) <= 2);
+    if (path) out.push("the links form one chain, so they add little; when the order matters more than the links, a sequence diagram reads better");
   }
   return out;
 }
