@@ -109,7 +109,7 @@ The palette is one ink, one light, and Docent's own grays. Every gray leans slig
 - **Secondary — Ink (#1b2260):** The title and section headings, as text only. It is the dark form of the primary.
 - **Tertiary — Lamp (#f2b824):** The docent's lamp, and always a dot. It is the dot in the mark, and the route dot, the rail dot and the dot of a chosen option in dark mode. Lamp on the light page has a contrast of 1.74:1, so it is not used there; the dots in light mode are ultramarine.
 - **Neutral — Well (#f2f3f9):** The ground of figures and code. A well is one step darker than the page in both themes, and it has no outline.
-- **Status:** `success`, `warning` and `error` are for status only, as a small dot with a word beside it. In a diagram, a part that carries a state takes the status color on its outline and gets the same small dot; its note says the status in words.
+- **Status:** `success`, `warning` and `error` are for status only, as a small dot with a word beside it. Two more kinds of status note have no status color: plain information has a muted dot, and a thing that is planned, or not turned on yet, has a muted ring. The ring differs from the dot by its shape, so it does not need a color. A status label wraps on a narrow screen. In a diagram, a part that carries a state takes the status color on its outline and gets the same small dot; its note says the status in words.
 
 **Diagrams.** Docent draws its own diagrams, in three forms (see Layout). A diagram uses the page's tokens and nothing else: lines, parts and names in the text color, notes in the muted color, tracks in the outline color, lane bands in the page color, and the well as its ground. Because it reads the tokens, one drawing serves both themes. Each drawing carries its own styles, with the light values as a fallback, so a drawing that is copied out of the page keeps the light colors. Ultramarine marks the current leg, and the dot on it is ultramarine in light and lamp in dark. The one other color in a diagram is a status color, on the outline of a part that carries a state (see Status above). An author cannot give a diagram any other color. Docent does not use a third-party diagram renderer.
 
@@ -133,7 +133,7 @@ Docent uses system fonts only, because every document is one file with nothing t
 
 **No label above a heading.** The title leads, across the page. Facts about the document (its kind, reading time, date and owner) sit in the margin beside the opening paragraph, not above the title.
 
-**The window title.** The `<title>` of a document is `Document title — Host project`. It does not name Docent.
+**The window title.** The `<title>` of a document is `Document title — Host project`. It does not name Docent. When the title is long, the window title may be a shorter form of it, made of the title's own words in the same order: "Report a bug — Host project" for the title "How to report a bug and get a fix".
 
 **Two widths.** A block is either as wide as the text column (31rem) or as wide as the page. Text, notes in the flow and warnings use the text column. Wells and tables use the full width, so their edges line up down the page. A drawing sits in the middle of its well at its real size.
 
@@ -165,6 +165,7 @@ Docent uses system fonts only, because every document is one file with nothing t
 - A leg inside one lane is at least 72px long, so its mark and its arrowhead both fit.
 - Nothing overlaps: no text on a line, no mark on an arrowhead, no dot on a mark. In Plates two legs may cross at a right angle; they never share a line.
 - In Plates one leg meets the side of a plate at the middle of that side. Two legs on one side sit 14px above and 14px below the middle, and a third leg takes the middle. The renderer leaves this rule only when another line is in the way. A leg that leaves the top or the bottom of a plate for another lane starts near the corner on the side of that lane, so that its path has one bend.
+- The moving dot passes under a numbered mark, never over it, so the number stays readable.
 - A leg that only some readers take is drawn as a dashed arrow. Its verb, or the text beside the figure, says who takes it.
 
 **Size and motion.** A diagram is shown at its real size, so names are 14px and notes are 12px. It is never stretched to fill a wider space, and on a screen it never shrinks to fit a narrower one. The dot moves in every diagram, in one of two ways:
@@ -172,13 +173,15 @@ Docent uses system fonts only, because every document is one file with nothing t
 - **In a walkthrough,** the leg of the current step takes the ultramarine color and the dot travels along that leg.
 - **Anywhere else,** one dot travels the whole route by itself, leg by leg in the order of the numbers. Only one dot is in flight at a time, so the motion shows the order. The run plays twice and then rests, so the page is calm while the reader reads.
 
-**Lists.** A list sits in the text column, with an indent of 24px and 4px between its lines. Points are a list with bullets. Steps that one actor does are a list with numbers. Steps with two or more actors are a walkthrough, because its figure shows who acts and what moves. When a step of one actor holds a code block, a table or a widget, each step is a numbered block heading: the number stands before the heading in the muted color, as in a walkthrough.
+**Lists.** A list sits in the text column, with an indent of 24px and 4px between its lines. Points are a list with bullets. Steps that one actor does are a list with numbers. Steps with two or more actors are a walkthrough, because its figure shows who acts and what moves. When a step of one actor holds a code block, a table or a widget, each step is a numbered block heading: the number stands before the heading in the muted color, as in a walkthrough. The styles count the steps; with JavaScript on, the page script writes each number as text, so that a screen reader reads it.
+
+**Small headings and definitions.** A small heading (h4) names a part inside a block heading's part: 16px, weight 600, with 24px above it and 4px below it. A definition list holds terms and their meanings, in the text column: each term in weight 600, its meaning on the next line, and 12px between two pairs. Use it for a glossary or for fields and what they mean; use a table when each term has more than one fact.
 
 **Code blocks.** A code block sits in a well. With JavaScript on, a small button in its upper right corner copies the code. The button is part of the well: it has the well's ground, and a thin line on its left and lower edge. Its word changes from "Copy" to "Copied" for two seconds. It does not move.
 
 **Widgets.** A widget is a part of the page that the reader uses. Docent has three: a chooser, a checklist and a decision helper (see Widgets). A widget sits in the text flow and has no box. Its text uses the text column; a code block inside a chooser uses the full width, like any code block.
 
-**Tables use the full width.** On a phone a figure, a table or a code block scrolls sideways inside itself; the page never scrolls sideways.
+**Tables use the full width.** On a phone a figure, a table or a code block scrolls sideways inside itself; the page never scrolls sideways. Code in a table cell may break at any character, so a long path does not make the table wider. A closed section that holds a table, a code block or a figure takes the full width, like those blocks do outside it; its text keeps the text column.
 
 **Spacing.** More space goes above a heading than below it: 72px above a section, 16px below its heading. Blocks inside a section are 24px to 32px apart, and two paragraphs are 16px apart. A block heading (h3) in the text flow has 32px above it and 8px below it. No block touches the block before it.
 

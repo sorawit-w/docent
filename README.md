@@ -8,7 +8,7 @@ Docent is packaged as an agent skill. An agent that writes a document loads the 
 
 ## Status
 
-Version 0.2.0. The design is settled, and the three scripts exist with tests.
+Version 0.2.1. The design is settled, and the three scripts exist with tests.
 
 | Part | State |
 |---|---|
@@ -28,6 +28,22 @@ Known limits:
 - Paths that branch have no single-track form for phones.
 - A diagram has at most 4 lanes, 12 parts and 16 legs.
 - A widget holds text only. Docent has three widgets and no way to add one in a document.
+
+## Install
+
+The skill installs with the `skills` command. For one project, run this in the project's folder:
+
+```bash
+npx skills add sorawit-w/docent
+```
+
+For all your projects, add `-g` (global, for your user):
+
+```bash
+npx skills add sorawit-w/docent -g
+```
+
+The command asks which agents to install the skill for. `npx skills add --help` lists the other options.
 
 ## See it
 
