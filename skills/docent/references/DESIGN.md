@@ -147,6 +147,15 @@ Docent uses system fonts only, because every document is one file with nothing t
 
 **Flowcharts.** A flowchart shows steps, decisions and stops, with paths that split, end early or go back. The main path (each node's first exit) stands in the first column, and every other node in the second; each node has its own row, as in Plates. A decision is a plate with pointed ends, and a stop is a plate with a thick outline. The arrows have no numbers: the label of a decision's exit sits beside its arrow. An arrow back runs between the columns and never crosses a plate. One dot travels the main path, twice; the other arrows keep still. On a phone and on paper a flowchart takes the column form, and its steps are also written in words under the drawing.
 
+**UML diagrams.** A UML kind is a diagram kind named after one of the 14 diagram types of UML 2.5.1. Every mark it draws follows the UML notation, and it draws a chosen subset of the notation, never a look-alike (`docs/proposals/uml.md` lists the subset for each kind). Inside a UML kind:
+
+- Lines and arrowheads mean what UML says. A dashed line is a reply, a dependency, a realization, an «include» or an «extend». The rule "a dashed line means a path that only some readers take" holds for every other diagram, and one drawing never mixes the two meanings.
+- A mark may be filled in the text color: the initial node, the centre of a final node, a fork or join bar, a junction, a composition diamond, a filled arrowhead. Every other mark has the page color inside and the text color on its outline. Ultramarine is never a fill, and an author cannot color a UML diagram.
+- UML text keeps its form: stereotypes in guillemets («interface»), guards in brackets ([valid]), constraints in braces ({ordered}), the visibility marks + - # ~, and an object's name underlined. Names stay 14px and notes 12px.
+- Lines are 1.5px. An end mark has a straight run of at least 28px behind it, as an arrowhead does. A line stops where its end mark starts, so no line shows inside a hollow triangle or diamond.
+- The dot travels only a kind that has an order: the messages of a sequence or communication diagram, and the main path of an activity diagram, a state machine or an interaction overview. A structural kind (class, object, component, composite structure, deployment, package, profile, use case) has no dot and no walkthrough.
+- Every UML kind has a phone form that fits 320px, and its steps or facts are written in words under the drawing. The words end with a key to the marks: one plain sentence for each mark the drawing uses, and none for the marks it does not use, so a reader who does not know UML can still read it.
+
 **Diagrams have three forms.** All three show the same data: lanes (a person, a machine, a system), parts, and numbered legs from one part to the next. Each form has its own strength, and the renderer picks the form from where the diagram sits and what it must show. An author can name a form to override the choice. A document does not draw the same thing twice; the sample page is the one exception, because it shows one workflow in all three forms.
 
 | Form | What it looks like | Use it when |
@@ -171,10 +180,10 @@ Docent uses system fonts only, because every document is one file with nothing t
 - Nothing overlaps: no text on a line, no mark on an arrowhead, no dot on a mark. In Plates two legs may cross at a right angle; they never share a line.
 - In Plates one leg meets the side of a plate at the middle of that side. Two legs on one side sit 14px above and 14px below the middle, and a third leg takes the middle. The renderer leaves this rule only when another line is in the way. A leg that leaves the top or the bottom of a plate for another lane starts near the corner on the side of that lane, so that its path has one bend.
 - The moving dot passes under a numbered mark, never over it, so the number stays readable.
-- A leg that only some readers take is drawn as a dashed arrow.
+- A leg that only some readers take is drawn as a dashed arrow. In a UML kind a dashed line follows UML instead (see UML diagrams).
 - A side leg, beside a route in Route tall, goes straight across to an extra part in another lane, level with the part where it starts. It is dashed, it has no number, and no step lights it. It lets a walkthrough show one short branch and keep its route. Its verb, or the text beside the figure, says who takes it.
 
-**Size and motion.** A diagram is shown at its real size, so names are 14px and notes are 12px. It is never stretched to fill a wider space, and on a screen it never shrinks to fit a narrower one. The dot moves in every diagram, in one of two ways:
+**Size and motion.** A diagram is shown at its real size, so names are 14px and notes are 12px. It is never stretched to fill a wider space, and on a screen it never shrinks to fit a narrower one. The dot moves in every diagram except a structural UML kind, in one of two ways:
 
 - **In a walkthrough,** the leg of the current step takes the ultramarine color and the dot travels along that leg.
 - **Anywhere else,** one dot travels the whole route by itself, leg by leg in the order of the numbers. Only one dot is in flight at a time, so the motion shows the order. The run plays twice and then rests, so the page is calm while the reader reads.
