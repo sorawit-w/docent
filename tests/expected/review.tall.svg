@@ -1,6 +1,6 @@
 <svg id="dg-review" class="dg dg-tall" xmlns="http://www.w3.org/2000/svg" width="226" height="433" viewBox="0 0 226 433" role="img" aria-label="A text in three steps: draft, review and publish.">
 <style>
-#dg-review{display:block;flex:none;margin-inline:auto;font-family:var(--sans,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif)}
+#dg-review{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
 #dg-review .ground{fill:var(--fig,#f2f3f9)}
 #dg-review .band{fill:var(--bg,#fbfbfe)}
 #dg-review .track{stroke:var(--line,#d3d6e3)}

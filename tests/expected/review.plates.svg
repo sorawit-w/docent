@@ -1,6 +1,6 @@
 <svg id="dg-review" class="dg dg-plates dg-auto" xmlns="http://www.w3.org/2000/svg" width="380" height="522" viewBox="0 0 380 522" role="img" aria-label="A text in three steps: draft, review and publish.">
 <style>
-#dg-review{display:block;flex:none;margin-inline:auto;font-family:var(--sans,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif)}
+#dg-review{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
 #dg-review .ground{fill:var(--fig,#f2f3f9)}
 #dg-review .band{fill:var(--bg,#fbfbfe)}
 #dg-review .track{stroke:var(--line,#d3d6e3)}
@@ -49,7 +49,7 @@
 </svg>
 <svg id="dg-review-phone" class="dg dg-track dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="416" viewBox="0 0 264 416" role="img" aria-label="A text in three steps: draft, review and publish.">
 <style>
-#dg-review-phone{flex:none;margin-inline:auto;font-family:var(--sans,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif)}
+#dg-review-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
 #dg-review-phone .ground{fill:var(--fig,#f2f3f9)}
 #dg-review-phone .band{fill:var(--bg,#fbfbfe)}
 #dg-review-phone .track{stroke:var(--line,#d3d6e3)}

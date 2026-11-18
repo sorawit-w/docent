@@ -6,17 +6,18 @@
 <meta name="robots" content="noindex">
 <title>Report a bug and get a fix — Example project</title>
 <style>
-/* docent:kit 0.2.1 */
+/* docent:kit 0.3.0 */
 /* Docent page styles. Tokens come from references/DESIGN.md. One file, no network. */
 :root {
   color-scheme: light;
   --bg: #fbfbfe; --panel: #f2f3f9; --fig: #f2f3f9;
   --text: #1c1f2e; --muted: #575d75; --line: #d3d6e3;
-  --primary: #2f3fd0; --ink: #1b2260; --dot: #2f3fd0;
+  --primary: var(--host-accent, #2f3fd0); --ink: var(--host-ink, #1b2260); --dot: var(--host-accent, #2f3fd0);
   --ok: #1a7f37; --warn: #7d4e00; --err: #cf222e;
-  --serif: Charter, "Bitstream Charter", "Sitka Heading", "Sitka Text", Cambria, Georgia, serif;
-  --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --mono: ui-monospace, "SF Mono", "Cascadia Code", Consolas, Menlo, monospace;
+  /* A host project sets its own accent, heading color and fonts with the --host-* tokens. The kit never sets them, so they hold in every theme and in print. */
+  --serif: var(--host-serif, Charter, "Bitstream Charter", "Sitka Heading", "Sitka Text", Cambria, Georgia, serif);
+  --sans: var(--host-sans, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif);
+  --mono: var(--host-mono, ui-monospace, "SF Mono", "Cascadia Code", Consolas, Menlo, monospace);
   --ease: cubic-bezier(0.23, 1, 0.32, 1);
   --measure: 31rem; --margin-col: 220px; --gap: 48px;
 }
@@ -26,7 +27,7 @@
     color-scheme: dark;
     --bg: #12141f; --panel: #0b0d15; --fig: #0b0d15;
     --text: #e7e9f3; --muted: #959bb3; --line: #2d3146;
-    --primary: #8e9bff; --ink: #e7e9f3; --dot: #f2b824;
+    --primary: var(--host-accent-dark, #8e9bff); --ink: #e7e9f3; --dot: #f2b824;
     --ok: #3fb950; --warn: #d29922; --err: #f85149;
   }
 }
@@ -34,7 +35,7 @@
   color-scheme: dark;
   --bg: #12141f; --panel: #0b0d15; --fig: #0b0d15;
   --text: #e7e9f3; --muted: #959bb3; --line: #2d3146;
-  --primary: #8e9bff; --ink: #e7e9f3; --dot: #f2b824;
+  --primary: var(--host-accent-dark, #8e9bff); --ink: #e7e9f3; --dot: #f2b824;
   --ok: #3fb950; --warn: #d29922; --err: #f85149;
 }
 *, *::before, *::after { box-sizing: border-box; }
@@ -61,7 +62,7 @@ a:hover { text-decoration-thickness: 2px; }
 .theme:hover, .wd-btn:hover { border-color: var(--muted); }
 .theme:active, .wd-btn:active { transform: translateY(1px); }
 .theme svg { width: 15px; height: 15px; }
-html:not(.js) .theme { display: none; }
+html:not(.js) .theme, .theme[hidden] { display: none; }
 .theme[data-next="dark"] .icon-sun, .theme[data-next="light"] .icon-moon { display: none; }
 
 /* Title block: the title leads; facts about the document sit below it. */
@@ -84,12 +85,15 @@ dd { margin: 0 0 12px; }
 dd:last-child { margin-bottom: 0; }
 p { margin: 0 0 16px; max-width: var(--measure); text-wrap: pretty; }
 .term { text-decoration: underline; text-decoration-color: var(--primary); text-decoration-thickness: 2px; text-underline-offset: 0.22em; }
+/* A place that shows a value of a value picker. A dotted line under it says that it changes with the choice. */
+var { font-style: normal; }
+var[data-v] { text-decoration: underline dotted var(--muted); text-decoration-thickness: 1px; text-underline-offset: 0.25em; }
 code { font: 14px/1.55 var(--mono); background: var(--panel); padding: 0.1em 0.38em; border-radius: 6px; }
 .standfirst code { font-size: 18px; }
 
 /* Lists in the text flow: points, or numbers for steps that one actor does. The rules are weak on purpose, so the lists of the kit's own blocks keep their styles. */
-:where(main) :where(ul, ol):not(.steps, .facts) { max-width: var(--measure); margin: 0 0 16px; padding-left: 24px; }
-:where(main) :where(ul, ol):not(.steps, .facts) > :where(li + li) { margin-top: 4px; }
+:where(main) :where(ul, ol):not(.steps, .facts, .cards) { max-width: var(--measure); margin: 0 0 16px; padding-left: 24px; }
+:where(main) :where(ul, ol):not(.steps, .facts, .cards) > :where(li + li) { margin-top: 4px; }
 /* A block heading in the text flow has more space above it than below it. A step heading of a walkthrough has none. */
 :where(main) h3 { margin: 32px 0 8px; }
 h2 + h3, h3 + h4 { margin-top: 0; }
@@ -134,6 +138,14 @@ section > figure { margin-top: 24px; }
 figcaption { margin-top: 12px; font-size: 14px; line-height: 1.5; color: var(--muted); }
 figcaption strong { font-weight: 600; color: var(--text); margin-right: 8px; }
 
+/* Card grid: 3 to 8 short items side by side, each a heading or a large number and a line of text. A card is a label, like a margin note: a line above it, and no box. At most four in a row. */
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(max(160px, calc((100% - 72px) / 4)), 1fr)); gap: 24px; margin: 24px 0 0; padding: 0; list-style: none; }
+.cards > li { min-width: 0; padding-top: 12px; border-top: 1px solid var(--line); }
+.cards h3 { margin: 0 0 4px; font-size: 16px; line-height: 1.5; }
+.cards p { margin: 0; font-size: 14px; line-height: 1.5; color: var(--muted); }
+.cards .big { margin-bottom: 4px; font: 700 30px/1.2 var(--serif); color: var(--ink); font-variant-numeric: tabular-nums; }
+.cards + :is(p, ul, ol, dl) { margin-top: 24px; }
+
 /* Tables: rules only, no boxes. */
 .table-wrap { overflow-x: auto; margin: 24px 0 0; scrollbar-color: var(--line) transparent; }
 table { width: 100%; min-width: 640px; border-collapse: collapse; font-variant-numeric: tabular-nums; }
@@ -176,9 +188,9 @@ details[open] summary svg { transform: rotate(90deg); }
 details > p { margin: 8px 0 0 22px; }
 
 /* Widgets: the reader chooses, ticks or decides. A widget is plain controls and text, with no box. render makes its markup from data. */
-.choose, .checks, .decide { position: relative; margin: 24px 0 0; }
-:is(.choose, .checks, .decide) + * { margin-top: 24px; }
-.choose > input, .checks input, .decide input { position: absolute; width: 1px; height: 1px; margin: 0; opacity: 0; pointer-events: none; }
+.choose, .checks, .decide, .values { position: relative; margin: 24px 0 0; }
+:is(.choose, .checks, .decide, .values) + * { margin-top: 24px; }
+.choose > input, .checks input, .decide input, .values > input { position: absolute; width: 1px; height: 1px; margin: 0; opacity: 0; pointer-events: none; }
 .wd-t { margin: 0; max-width: none; font-size: 14px; line-height: 1.5; font-weight: 600; color: var(--muted); }
 .opt { display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px; border: 1px solid var(--line); border-radius: 6px; font-size: 14px; line-height: 1; cursor: pointer; }
 .opt::before { content: ""; width: 9px; height: 9px; border-radius: 50%; border: 1px solid var(--muted); }
@@ -218,6 +230,14 @@ input:focus-visible + .opt, .checks input:focus-visible + label::before { outlin
 .decide td strong { display: block; font-weight: 600; }
 .decide tr.is-out { color: var(--muted); }
 html:not(.js) .decide-ask, html:not(.js) .wd-foot output { display: none; }
+/* Value picker: options like a chooser, a line that names the chosen option, and the table of all values. With scripts off the options do nothing, so they are hidden, and the text shows the values of the first option. */
+.values { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.values > .wd-t { margin-right: 4px; }
+.values-now { flex-basis: 100%; max-width: none; margin: 4px 0 0; font-size: 14px; line-height: 1.5; color: var(--muted); }
+.values-now strong { font-weight: 600; color: var(--text); }
+.values details { flex-basis: 100%; min-width: 0; max-width: none; margin-top: 8px; }
+.values .table-wrap { margin-top: 8px; }
+html:not(.js) .values > input + .opt { display: none; }
 
 footer { margin-top: 96px; border-top: 1px solid var(--line); }
 footer .shell { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding-top: 24px; padding-bottom: 40px; font-size: 14px; color: var(--muted); }
@@ -251,8 +271,8 @@ footer .shell { display: flex; align-items: center; justify-content: space-betwe
   *, *::before, *::after { transition: none !important; }
 }
 @media print {
-  html:root:not([data-never]) { color-scheme: light; --bg: #ffffff; --panel: #f2f3f9; --fig: #f2f3f9; --text: #1c1f2e; --muted: #575d75; --line: #d3d6e3; --primary: #2f3fd0; --ink: #1b2260; --dot: #2f3fd0; --ok: #1a7f37; --warn: #7d4e00; --err: #cf222e; }
-  .topbar, .rail-dot, .choose > .opt, .decide-ask, .wd-foot, .copy, .fig-more { display: none !important; }
+  html:root:not([data-never]) { color-scheme: light; --bg: #ffffff; --panel: #f2f3f9; --fig: #f2f3f9; --text: #1c1f2e; --muted: #575d75; --line: #d3d6e3; --primary: var(--host-accent, #2f3fd0); --ink: var(--host-ink, #1b2260); --dot: var(--host-accent, #2f3fd0); --ok: #1a7f37; --warn: #7d4e00; --err: #cf222e; }
+  .topbar, .rail-dot, .choose > .opt, .values > .opt, .decide-ask, .wd-foot, .copy, .fig-more { display: none !important; }
   .choose > .case { display: block !important; margin-top: 16px; } .case-t { display: block; }
   .checks input:checked + label, .decide tr.is-out { color: var(--text) !important; }
   .steps li h3, .steps li p { color: var(--text) !important; }
@@ -260,7 +280,7 @@ footer .shell { display: flex; align-items: center; justify-content: space-betwe
   table { min-width: 0; } .table-wrap { overflow: visible; }
   /* A browser leaves out backgrounds on paper. These carry meaning, so they print: status dots, the rail of the steps, and the ground of figures and code. */
   .state::before, .steps::before, .fig, pre, code { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  figure, tr, .status, pre, .checks li { break-inside: avoid; }
+  figure, tr, .status, pre, .checks li, .cards > li { break-inside: avoid; }
   h2, h3 { break-after: avoid; }
   @page { margin: 18mm; }
 }
@@ -345,7 +365,7 @@ footer .shell { display: flex; align-items: center; justify-content: space-betwe
 -->
 <svg id="dg-path" class="dg dg-wide dg-auto" xmlns="http://www.w3.org/2000/svg" width="858" height="264" viewBox="0 0 858 264" role="img" aria-label="A bug report in four steps: the reporter files a report, the maintainers ask for steps, the reporter sends the steps, and the maintainers release a fix.">
 <style>
-#dg-path{display:block;flex:none;margin-inline:auto;font-family:var(--sans,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif)}
+#dg-path{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
 #dg-path .ground{fill:var(--fig,#f2f3f9)}
 #dg-path .band{fill:var(--bg,#fbfbfe)}
 #dg-path .track{stroke:var(--line,#d3d6e3)}
@@ -413,7 +433,7 @@ footer .shell { display: flex; align-items: center; justify-content: space-betwe
 </svg>
 <svg id="dg-path-phone" class="dg dg-track dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="520" viewBox="0 0 264 520" role="img" aria-label="A bug report in four steps: the reporter files a report, the maintainers ask for steps, the reporter sends the steps, and the maintainers release a fix.">
 <style>
-#dg-path-phone{flex:none;margin-inline:auto;font-family:var(--sans,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif)}
+#dg-path-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
 #dg-path-phone .ground{fill:var(--fig,#f2f3f9)}
 #dg-path-phone .band{fill:var(--bg,#fbfbfe)}
 #dg-path-phone .track{stroke:var(--line,#d3d6e3)}
@@ -542,7 +562,7 @@ footer .shell { display: flex; align-items: center; justify-content: space-betwe
 -->
 <svg id="dg-steps" class="dg dg-tall" xmlns="http://www.w3.org/2000/svg" width="468" height="568" viewBox="0 0 468 568" role="img" aria-label="A bug report in four steps: the reporter files a report, the maintainers ask for steps, the reporter sends the steps, and the maintainers release a fix.">
 <style>
-#dg-steps{display:block;flex:none;margin-inline:auto;font-family:var(--sans,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif)}
+#dg-steps{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
 #dg-steps .ground{fill:var(--fig,#f2f3f9)}
 #dg-steps .band{fill:var(--bg,#fbfbfe)}
 #dg-steps .track{stroke:var(--line,#d3d6e3)}
@@ -616,7 +636,7 @@ footer .shell { display: flex; align-items: center; justify-content: space-betwe
 </svg>
 <svg id="dg-steps-phone" class="dg dg-track" xmlns="http://www.w3.org/2000/svg" width="264" height="520" viewBox="0 0 264 520" role="img" aria-label="A bug report in four steps: the reporter files a report, the maintainers ask for steps, the reporter sends the steps, and the maintainers release a fix.">
 <style>
-#dg-steps-phone{flex:none;margin-inline:auto;font-family:var(--sans,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif)}
+#dg-steps-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
 #dg-steps-phone .ground{fill:var(--fig,#f2f3f9)}
 #dg-steps-phone .band{fill:var(--bg,#fbfbfe)}
 #dg-steps-phone .track{stroke:var(--line,#d3d6e3)}
@@ -730,7 +750,7 @@ footer .shell { display: flex; align-items: center; justify-content: space-betwe
 -->
 <svg id="dg-parts" class="dg dg-plates dg-auto" xmlns="http://www.w3.org/2000/svg" width="780" height="546" viewBox="0 0 780 546" role="img" aria-label="A bug report in four steps: the reporter files a report, the maintainers ask for steps, the reporter sends the steps, and the maintainers release a fix.">
 <style>
-#dg-parts{display:block;flex:none;margin-inline:auto;font-family:var(--sans,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif)}
+#dg-parts{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
 #dg-parts .ground{fill:var(--fig,#f2f3f9)}
 #dg-parts .band{fill:var(--bg,#fbfbfe)}
 #dg-parts .track{stroke:var(--line,#d3d6e3)}
@@ -796,7 +816,7 @@ footer .shell { display: flex; align-items: center; justify-content: space-betwe
 </svg>
 <svg id="dg-parts-phone" class="dg dg-track dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="520" viewBox="0 0 264 520" role="img" aria-label="A bug report in four steps: the reporter files a report, the maintainers ask for steps, the reporter sends the steps, and the maintainers release a fix.">
 <style>
-#dg-parts-phone{flex:none;margin-inline:auto;font-family:var(--sans,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif)}
+#dg-parts-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
 #dg-parts-phone .ground{fill:var(--fig,#f2f3f9)}
 #dg-parts-phone .band{fill:var(--bg,#fbfbfe)}
 #dg-parts-phone .track{stroke:var(--line,#d3d6e3)}
@@ -899,6 +919,13 @@ footer .shell { display: flex; align-items: center; justify-content: space-betwe
 
   <section id="report" aria-labelledby="report-h">
     <h2 id="report-h">Write your report</h2>
+    <p>A good report holds four things:</p>
+    <ul class="cards">
+      <li><h3>Steps</h3><p>What you did, in order, from the start.</p></li>
+      <li><h3>Result</h3><p>What happened, and what you expected.</p></li>
+      <li><h3>Version</h3><p>The version of the app and of your system.</p></li>
+      <li><h3>Log</h3><p>The lines of the log around the problem.</p></li>
+    </ul>
     <p>First decide which kind of report you have. Answer two questions.</p>
 <!-- docent:widget
 {
@@ -1008,9 +1035,41 @@ footer .shell { display: flex; align-items: center; justify-content: space-betwe
 
   <section id="commands" aria-labelledby="commands-h">
     <h2 id="commands-h">Commands</h2>
-    <p>Run these in a terminal before you write the report.</p>
+    <p>The commands differ a little for each release channel. Pick yours, and the text and the commands show its values.</p>
+<!-- docent:widget
+{
+  "id": "channel",
+  "kind": "values",
+  "label": "Your release channel",
+  "options": ["Stable", "Beta"],
+  "values": [
+    {"key": "channel", "name": "Channel", "values": ["stable", "beta"]},
+    {"key": "tracker", "name": "Report page", "values": ["bugs.example.test/stable", "bugs.example.test/beta"]}
+  ]
+}
+-->
+<div class="values" id="wd-channel" role="group" aria-labelledby="wd-channel-t">
+<span class="wd-t" id="wd-channel-t">Your release channel</span>
+<input type="radio" name="wd-channel" id="wd-channel-1" checked><label class="opt" for="wd-channel-1">Stable</label>
+<input type="radio" name="wd-channel" id="wd-channel-2"><label class="opt" for="wd-channel-2">Beta</label>
+<p class="values-now">The text shows the values for <strong>Stable</strong>.</p>
+<details open>
+<summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>All values</summary>
+<div class="table-wrap" role="region" aria-label="All values: Your release channel" tabindex="0">
+<table>
+<thead><tr><th scope="col">Value</th><th scope="col">Stable</th><th scope="col">Beta</th></tr></thead>
+<tbody>
+<tr data-v="channel"><th scope="row">Channel</th><td><code>stable</code></td><td><code>beta</code></td></tr>
+<tr data-v="tracker"><th scope="row">Report page</th><td><code>bugs.example.test/stable</code></td><td><code>bugs.example.test/beta</code></td></tr>
+</tbody>
+</table>
+</div>
+</details>
+</div>
+<!-- /docent:widget -->
+    <p>Run these in a terminal before you write the report. File the report at <var data-v="tracker">bugs.example.test/stable</var>.</p>
 <pre tabindex="0" role="region" aria-label="Commands to collect the details"><code><span class="cm"># 1. Note the version</span>
-app --version
+app --version --channel <var data-v="channel">stable</var>
 
 <span class="cm"># 2. Repeat the failing step and keep the log</span>
 app export --verbose &gt; bug.log
@@ -1044,7 +1103,7 @@ grep -i password bug.log</code></pre>
 </footer>
 
 <script>
-// docent:kit 0.2.1
+// docent:kit 0.3.0
 (() => {
   const root = document.documentElement;
   root.classList.add('js');
@@ -1052,11 +1111,14 @@ grep -i password bug.log</code></pre>
   const button = document.querySelector('.theme');
   const system = matchMedia('(prefers-color-scheme: dark)');
   const theme = () => root.dataset.theme || (system.matches ? 'dark' : 'light');
-  try {
+  // A theme written on <html> in the source is fixed: no saved choice and no switch.
+  const fixed = root.dataset.theme === 'light' || root.dataset.theme === 'dark';
+  if (fixed && button) button.hidden = true;
+  if (!fixed) try {
     const saved = localStorage.getItem('docent-theme');
     if (saved === 'dark' || saved === 'light') root.dataset.theme = saved;
   } catch { /* no saved choice can be read: follow the system */ }
-  if (button) {
+  if (button && !fixed) {
     const showSwitch = () => {
       const next = theme() === 'dark' ? 'light' : 'dark';
       button.dataset.next = next;
@@ -1203,6 +1265,25 @@ grep -i password bug.log</code></pre>
       save(c.key, n);
       schedule();
     }));
+  });
+  // Value picker: every place <var data-v="key"> shows the value of the chosen option. The values come from the table of all values. Pickers with the same options change together, and the choice is remembered.
+  const pickers = [...document.querySelectorAll('.values')].map((el) => ({
+    el,
+    inputs: [...el.querySelectorAll(':scope > input')],
+    names: [...el.querySelectorAll(':scope > .opt')].map((label) => label.textContent),
+    rows: [...el.querySelectorAll('tbody tr[data-v]')].map((tr) => ({ key: tr.dataset.v, cells: [...tr.querySelectorAll('td')].map((td) => td.textContent) })),
+  }));
+  const pick = (names, n) => pickers.forEach((p) => {
+    if (p.names.join('|') !== names || !p.inputs[n]) return;
+    p.inputs[n].checked = true;
+    p.el.querySelector('.values-now strong').textContent = p.names[n];
+    p.rows.forEach(({ key, cells }) => document.querySelectorAll(`var[data-v="${CSS.escape(key)}"]`).forEach((v) => (v.textContent = cells[n])));
+  });
+  pickers.forEach((p) => {
+    const key = `docent-values:${p.names.join('|')}`, saved = load(key);
+    if (Number.isInteger(saved)) pick(p.names.join('|'), saved);
+    p.inputs.forEach((input, n) => input.addEventListener('change', () => { pick(p.names.join('|'), n); save(key, n); }));
+    p.el.querySelector('details').open = false;
   });
   // Checklist: the ticks are remembered for this document, and the line below the list counts them.
   document.querySelectorAll('form.checks').forEach((form) => {

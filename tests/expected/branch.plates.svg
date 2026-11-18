@@ -1,6 +1,6 @@
 <svg id="dg-leave" class="dg dg-plates dg-auto" xmlns="http://www.w3.org/2000/svg" width="780" height="546" viewBox="0 0 780 546" role="img" aria-label="A leave request: the employee asks, the manager approves or refuses, and the calendar shows an approved leave.">
 <style>
-#dg-leave{display:block;flex:none;margin-inline:auto;font-family:var(--sans,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif)}
+#dg-leave{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
 #dg-leave .ground{fill:var(--fig,#f2f3f9)}
 #dg-leave .band{fill:var(--bg,#fbfbfe)}
 #dg-leave .track{stroke:var(--line,#d3d6e3)}

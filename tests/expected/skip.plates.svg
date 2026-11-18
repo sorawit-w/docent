@@ -1,6 +1,6 @@
 <svg id="dg-skip" class="dg dg-plates dg-auto" xmlns="http://www.w3.org/2000/svg" width="540" height="648" viewBox="0 0 540 648" role="img" aria-label="A request goes through a check. A small request skips the review and goes to the answer; this path is optional.">
 <style>
-#dg-skip{display:block;flex:none;margin-inline:auto;font-family:var(--sans,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif)}
+#dg-skip{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
 #dg-skip .ground{fill:var(--fig,#f2f3f9)}
 #dg-skip .band{fill:var(--bg,#fbfbfe)}
 #dg-skip .track{stroke:var(--line,#d3d6e3)}

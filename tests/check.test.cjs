@@ -20,10 +20,11 @@ test("the sample page is the output of stamp and render, and it passes check", (
 
 test("the starting page holds content and data only; render and stamp build it into a page that passes check with no warning", () => {
   const template = fs.readFileSync(path.join(__dirname, "..", "skills", "docent", "assets", "template.html"), "utf8");
-  assert.ok(!/docent:kit|<svg id="dg-|class="(choose|checks|decide)"/.test(template), "the starting page is not built: it has no kit, no drawing and no widget markup");
+  assert.ok(!/docent:kit|<svg id="dg-|class="(choose|checks|decide|values)"|<var data-v="[^"]+">[^<]/.test(template), "the starting page is not built: it has no kit, no drawing and no widget markup");
   assert.ok(template.length < 16000, `the starting page has ${template.length} bytes; an agent reads all of it, so it stays below 16000`);
   const made = renderDocument(template);
-  assert.deepEqual([...made.results, ...made.widgets].map((r) => [r.id, r.error, r.warnings.length]), [["glance", null, 0], ["steps", null, 0], ["case", null, 0], ["list", null, 0], ["choice", null, 0]]);
+  assert.deepEqual([...made.results, ...made.widgets].map((r) => [r.id, r.error, r.warnings.length]), [["glance", null, 0], ["steps", null, 0], ["case", null, 0], ["list", null, 0], ["choice", null, 0], ["where", null, 0]]);
+  assert.deepEqual(made.places, { count: 2, unknown: [], clash: [] }, "render fills both places of the value picker");
   const stamped = stampHtml(made.html);
   assert.deepEqual(stamped.actions, ["styles added", "script added"]);
   assert.deepEqual(checkDocument(stamped.html), { errors: [], warnings: [] });
@@ -72,7 +73,7 @@ test("check tests the frame of the document and the format of its title", () => 
 });
 
 test("check finds a kit or a drawing that was changed by hand", () => {
-  assert.match(errorsOf((h) => h.replace("--primary: #2f3fd0;", "--primary: #ff0000;")), /the kit styles were changed by hand or by a code formatter; run stamp/);
+  assert.match(errorsOf((h) => h.replace("--bg: #fbfbfe;", "--bg: #ff0000;")), /the kit styles were changed by hand or by a code formatter; run stamp/);
   assert.match(errorsOf((h) => h.replace(cssBlock(), "")), /the document has no kit styles; run stamp/);
   assert.match(errorsOf((h) => h.replace(`docent:kit ${VERSION} */`, "docent:kit 0.0.9 */")), /the kit styles are version 0\.0\.9/);
   assert.match(errorsOf((h) => h.replace(' r="13" class="stop"/>', ' r="15" class="stop"/>')), /diagram 1 \("path"\): the drawing does not match its data; run render/);
@@ -99,10 +100,10 @@ test("check warns when a document has more than 4 widgets; choosers with the sam
   const list = (id) => `<!-- docent:widget\n{"id": "${id}", "kind": "checklist", "label": "List ${id}", "items": ["One line.", "Another line."]}\n-->\n<!-- /docent:widget -->\n`;
   const chooser = (id) => `<!-- docent:widget\n{"id": "${id}", "kind": "chooser", "label": "Your system", "cases": [{"name": "macOS", "body": ["Text."]}, {"name": "Windows", "body": ["Text."]}, {"name": "Linux", "body": ["Text."]}]}\n-->\n<!-- /docent:widget -->\n`;
   const withMore = (blocks) => checkDocument(renderDocument(specimen.replace("</main>", `${blocks}</main>`)).html);
-  const four = withMore(list("extra-a") + chooser("extra-b") + chooser("extra-c"));
+  const four = withMore(chooser("extra-b") + chooser("extra-c"));
   assert.deepEqual(four.errors, []);
-  assert.equal(four.warnings.length, 2, "three widgets of the sample page, one more checklist, and choosers that change with the first one");
-  const five = withMore(list("extra-a") + list("extra-b"));
+  assert.equal(four.warnings.length, 2, "four widgets of the sample page, and choosers that change with its chooser");
+  const five = withMore(list("extra-a"));
   assert.deepEqual(five.errors, []);
   assert.match(five.warnings.join("\n"), /the document has 5 widgets; a widget is for a reader who must choose, track or decide/);
 });
@@ -116,4 +117,32 @@ test("check ties a walkthrough to its diagram: one step for each leg", () => {
 test("the kit keeps the rules that check applies to an author's own styles", () => {
   const page = `<!doctype html><html lang="en"><head><meta name="viewport" content="width=device-width"><title>T — H</title><style>${cssBlock().replace(/docent:kit/g, "kit")}</style></head><body><span class="host">H</span><h1>T</h1></body></html>`;
   assert.deepEqual(checkDocument(page).errors, ["the document has no kit styles; run stamp", "the document has no kit script; run stamp"]);
+});
+
+test("check ties each value place to a value picker", () => {
+  assert.match(errorsOf(add("</main>", '<p><var data-v="nope">x</var></p>')), /a place <var data-v="nope"> names a value that no value picker has/);
+  assert.match(errorsOf((h) => h.replace('<var data-v="channel">stable</var>', '<var data-v="channel">beta</var>')), /a place <var data-v="channel"> holds "beta", not the value of the first option; run render/);
+  const unused = checkDocument(specimen.replace(/File the report at <var data-v="tracker">[^<]*<\/var>\./, "File the report.")).warnings.join("\n");
+  assert.match(unused, /the value "tracker" of a value picker is shown in no place/);
+  const twice = specimen.replace("</main>", '<!-- docent:widget\n{"id": "again", "kind": "values", "label": "Again", "options": ["A", "B"], "values": [{"key": "channel", "values": ["a", "b"]}]}\n-->\n<!-- /docent:widget -->\n</main>');
+  assert.match(checkDocument(renderDocument(twice).html).errors.join("\n"), /another value picker has the key "channel"/);
+});
+
+test("check warns about a card grid with fewer than 3 or more than 8 cards", () => {
+  const grid = (n) => checkDocument(specimen.replace("</main>", `<ul class="cards">${"<li><h3>A</h3><p>B.</p></li>".repeat(n)}</ul></main>`)).warnings.filter((w) => w.includes("card grid"));
+  assert.deepEqual(grid(3), []);
+  assert.deepEqual(grid(8), []);
+  assert.match(grid(2).join(), /a card grid has 2 cards; it holds 3 to 8/);
+  assert.match(grid(9).join(), /a card grid has 9 cards/);
+});
+
+test("check tests the host tokens: contrast for a hex color, and a warning for a kit token set by hand", () => {
+  const style = (css) => checkDocument(specimen.replace("</head>", `<style>${css}</style></head>`));
+  assert.deepEqual(style(":root { --host-accent: #0b6e4f; --host-accent-dark: #6fd3a8; --host-ink: #0b3d2e; }"), { errors: [], warnings: style("").warnings });
+  assert.match(style(":root { --host-accent: #f2b824; }").errors.join(), /--host-accent #f2b824 has a contrast of 1\.\d\d:1 on #fbfbfe and 1\.\d\d:1 on #f2f3f9; text needs 4\.5:1/);
+  assert.match(style(":root { --host-accent-dark: #2f3fd0; }").errors.join(), /--host-accent-dark #2f3fd0 has a contrast of/);
+  assert.match(style(":root { --host-accent: rebeccapurple; }").warnings.join(), /check tests the contrast of a hex color only/);
+  assert.match(style(":root { --primary: #0b6e4f; }").warnings.join(), /a style sets --primary; the kit sets it in four places/);
+  assert.match(errorsOf((h) => h.replace('<html lang="en">', '<html lang="en" data-theme="sepia">')), /a fixed theme is "light" or "dark"/);
+  assert.equal(errorsOf((h) => h.replace('<html lang="en">', '<html lang="en" data-theme="light">')), "");
 });

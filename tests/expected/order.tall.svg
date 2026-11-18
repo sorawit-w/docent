@@ -1,6 +1,6 @@
 <svg id="dg-order" class="dg dg-tall" xmlns="http://www.w3.org/2000/svg" width="734" height="574" viewBox="0 0 734 574" role="img" aria-label="An order in four steps: the customer places an order, the shop sends a pick list, the warehouse packs a parcel, and the parcel goes to the customer.">
 <style>
-#dg-order{display:block;flex:none;margin-inline:auto;font-family:var(--sans,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif)}
+#dg-order{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
 #dg-order .ground{fill:var(--fig,#f2f3f9)}
 #dg-order .band{fill:var(--bg,#fbfbfe)}
 #dg-order .track{stroke:var(--line,#d3d6e3)}
@@ -78,7 +78,7 @@
 </svg>
 <svg id="dg-order-phone" class="dg dg-track" xmlns="http://www.w3.org/2000/svg" width="264" height="520" viewBox="0 0 264 520" role="img" aria-label="An order in four steps: the customer places an order, the shop sends a pick list, the warehouse packs a parcel, and the parcel goes to the customer.">
 <style>
-#dg-order-phone{flex:none;margin-inline:auto;font-family:var(--sans,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif)}
+#dg-order-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
 #dg-order-phone .ground{fill:var(--fig,#f2f3f9)}
 #dg-order-phone .band{fill:var(--bg,#fbfbfe)}
 #dg-order-phone .track{stroke:var(--line,#d3d6e3)}
