@@ -783,6 +783,11 @@ An icon may hold only these shapes and attributes: `path` (`d`), `circle` (`cx`,
 
 - `... warning: no phone form: The column form cannot be drawn within the spacing rules: ...` — rare: the column form failed, so the drawing scrolls on a phone. Shorten the text that the message names.
 - `... warning: on a phone this drawing scrolls sideways, and leg 3 ("...") is not on the first screen: its two parts show there, but its arrow does not` — only after the warning above: the drawing has no phone form. On a phone the reader sees the left part first, and there this arrow is missing. Say the path in the text too. The warning stays after you did, because `render` cannot read the text; tell the user that this warning is handled. With scripts on, the page shows a line under the figure that tells the reader to scroll.
+- Fit warnings: the data's shape says that another kind, or no diagram, may serve the reader better. They never change the drawing. Read each one, and change the kind or keep it:
+  - `... warning: every message goes one way and no reply comes back; this reads as a workflow` — a sequence diagram with no answers is a chain of hand-offs. A workflow diagram (no `"kind"`) shows it better.
+  - `... warning: the activity has no decision, no fork and at most one partition; this is a numbered list` — the steps run in one line; write them as `<ol>`.
+  - `... warning: the class diagram has no relations; this is a table of the classes and their members` — the same for an object diagram with no links.
+  - `... warning: the links form one chain, so they add little; ... a sequence diagram reads better` — a communication diagram earns its place when its links branch.
 
 `render` draws every diagram that it can. When one is refused, the others are still drawn, and `render` ends with exit code 1.
 

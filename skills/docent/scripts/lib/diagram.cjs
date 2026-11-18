@@ -7,6 +7,7 @@ const { renderWidget, fillPlaces } = require("./widget.cjs");
 const { textWidth } = require("./text.cjs");
 const { readSequence, layoutSequence } = require("./sequence.cjs");
 const { readFlow, inWords: flowWords } = require("./flow.cjs");
+const { fitWarnings } = require("./fit.cjs");
 
 const ARROW = '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>';
 /** The steps of a drawing in words, in a closed section under it, for a screen reader, a phone and paper. */
@@ -20,7 +21,7 @@ function renderSequence(data) {
   const main = toSvg(scene, { id, label: model.label, mode: "auto", swap: { phone: `${id}-phone` } });
   // On paper the desktop form prints, shrunk to the sheet, while it keeps at least 80% of its size; else the script prints.
   const small = toSvg(phone, { id: `${id}-phone`, label: model.label, mode: "auto", swap: { main: id, below: scene.w + ROOM, printMain: scene.w * 0.8 <= SHEET } });
-  return { svg: `${main}\n${small}\n${inWords(steps)}`, form: "sequence", warnings: [], icons: [], model, scene };
+  return { svg: `${main}\n${small}\n${inWords(steps)}`, form: "sequence", warnings: fitWarnings("sequence", model), icons: [], model, scene };
 }
 
 /** A UML kind drawn by the graph layout: the drawing, a column for phones and paper, and the facts or steps in words. */
@@ -36,7 +37,7 @@ function renderGraphKind(data) {
   const main = toSvg(scene, { id, label: model.label, mode: "auto", swap: phone && { phone: `${id}-phone` } });
   // On paper the main form prints, shrunk to the sheet, while it keeps at least 80% of its size; else the column prints.
   const small = phone ? `\n${toSvg(phone, { id: `${id}-phone`, label: model.label, mode: "auto", swap: { main: id, below: scene.w + ROOM, printMain: scene.w * 0.8 <= SHEET } })}` : "";
-  return { svg: `${main}${small}\n${inWords(kind.wordsOf(model))}`, form: data.kind, warnings: [], icons: [], model, scene, phone };
+  return { svg: `${main}${small}\n${inWords(kind.wordsOf(model))}`, form: data.kind, warnings: fitWarnings(data.kind, model), icons: [], model, scene, phone };
 }
 
 /** A timing diagram: rows of lifelines over a time axis, a table for phones and paper, and the changes in words. */
