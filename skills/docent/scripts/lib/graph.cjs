@@ -42,19 +42,21 @@ class Queue {
   get size() { return this.a.length; }
 }
 
-/** Rows: the longest path from a start over the lines that go forward. A line to a node on the current path goes back. */
+/**
+ * Rows: the longest path from a start over the lines that go forward. Lines are taken in order, the lines that point
+ * up first (a generalization, a composition), so a hierarchy keeps its order; a line that would close a loop with the
+ * lines taken before it goes back.
+ */
 function rows(g) {
   const n = g.nodes.length, out = g.nodes.map(() => []), back = new Set();
-  g.edges.forEach((e, k) => { if (e.a !== e.b && e.a >= 0 && e.b >= 0) out[e.a].push(k); });
-  const state = new Array(n).fill(0), done = [];
-  const visit = (v) => {
-    state[v] = 1;
-    for (const k of out[v]) { const w = g.edges[k].b; if (state[w] === 1) back.add(k); else if (!state[w]) visit(w); }
-    state[v] = 2; done.push(v);
-  };
-  for (let v = 0; v < n; v++) if (!state[v]) visit(v);
-  const rank = g.nodes.map((node) => node.rank ?? 0);
-  for (const v of done.reverse()) for (const k of out[v]) if (!back.has(k)) { const e = g.edges[k]; rank[e.b] = Math.max(rank[e.b], rank[v] + (e.len ?? 1)); }
+  const reaches = (from, to) => { const seen = new Set([from]), stack = [from]; while (stack.length) { const v = stack.pop(); if (v === to) return true; for (const k of out[v]) { const w = g.edges[k].b; if (!seen.has(w)) { seen.add(w); stack.push(w); } } } return false; };
+  const order = g.edges.map((e, k) => k).filter((k) => { const e = g.edges[k]; return e.a !== e.b && e.a >= 0 && e.b >= 0; });
+  order.sort((p, q) => (g.edges[p].up ? 0 : 1) - (g.edges[q].up ? 0 : 1) || p - q);
+  for (const k of order) { const e = g.edges[k]; if (reaches(e.b, e.a)) back.add(k); else out[e.a].push(k); }
+  const rank = g.nodes.map((node) => node.rank ?? 0), ins = new Array(n).fill(0);
+  for (let v = 0; v < n; v++) for (const k of out[v]) ins[g.edges[k].b]++;
+  const queue = [...Array(n).keys()].filter((v) => !ins[v]);
+  while (queue.length) { const v = queue.shift(); for (const k of out[v]) { const e = g.edges[k]; rank[e.b] = Math.max(rank[e.b], rank[v] + (e.len ?? 1)); if (!--ins[e.b]) queue.push(e.b); } }
   return { rank, back };
 }
 

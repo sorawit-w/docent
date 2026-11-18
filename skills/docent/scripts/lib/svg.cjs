@@ -109,7 +109,7 @@ function styles(scene, id, mode, swap) {
     css.push(uml.styles(id), `${s} .leg .line{stroke-width:1.5}`, `${s} .leg.is-reply .line{stroke-dasharray:6 4;stroke-linecap:butt}`, `${s} .ohead{fill:none;stroke:${v("text")};stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}`, `.js ${s} .leg.is-current .ohead{stroke:${v("primary")}}`);
     css.push(`${s} .u-bar{fill:${v("bg")};stroke:${v("text")};stroke-width:1.25}`, `${s} .u-frame{fill:none;stroke:${v("muted")};stroke-width:1}`, `${s} .u-frame.is-filled{fill:${v("bg")}}`, `${s} .u-div{stroke:${v("muted")};stroke-width:1;stroke-dasharray:6 4}`, `${s} .u-op{font-size:12px;font-weight:600;fill:${v("text")}}`);
     // The members of a class or the slots of an object: 12px in the text color; italic for abstract, underlined for static.
-    if (scene.parts.some((part) => part.svg && part.svg.includes("u-mem"))) css.push(`${s} .u-mem{font-size:12px;fill:${v("text")}}`, `${s} .u-it{font-style:italic}`, `${s} .u-ul{text-decoration:underline}`);
+    if (scene.parts.some((part) => part.svg && /u-(mem|ul|it)\b/.test(part.svg))) css.push(`${s} .u-mem{font-size:12px;fill:${v("text")}}`, `${s} .u-it{font-style:italic}`, `${s} .u-ul{text-decoration:underline}`);
   }
   // A reply outside UML: a thin muted line with an open arrowhead. It is not dashed, because a dashed line means a path that only some readers take.
   else if (scene.legs.some((leg) => leg.reply)) css.push(`${s} .leg.is-reply .line{stroke:${v("muted")};stroke-width:1.5}`, `${s} .ohead{fill:none;stroke:${v("muted")};stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}`, `.js ${s} .leg.is-reply.is-current .ohead{stroke:${v("primary")}}`);

@@ -58,6 +58,21 @@ test("the phone list has a card per class, with a row for each relation that sta
   assert.ok(rows.includes("implements Payment"));
 });
 
+test("a parent stays above its child when another line between them points the other way", () => {
+  const d = { id: "mix", kind: "class", label: "A child is a kind of its parent and also uses it.", classes: [{ id: "child", name: "Child" }, { id: "parent", name: "Parent" }], relations: [{ from: "child", to: "parent", name: "uses", navigable: true }, { from: "child", to: "parent", type: "generalization" }] };
+  const { scene } = renderDiagram(d);
+  const at = (id) => scene.parts.find((p) => p.id === id);
+  assert.ok(at("parent").y < at("child").y);
+});
+
+test("an object with no slots is still underlined, and an abstract class with no members still in italics", () => {
+  const obj = renderDiagram({ id: "bare", kind: "object", label: "One order.", objects: [{ id: "o", name: "o1", class: "Order" }], links: [] }).svg;
+  assert.match(obj, /class="name u-ul"/);
+  assert.match(obj, /\.u-ul\{text-decoration:underline\}/);
+  const cls = renderDiagram({ id: "abs", kind: "class", label: "An abstract shape.", classes: [{ id: "s", name: "Shape", abstract: true }], relations: [] }).svg;
+  assert.match(cls, /\.u-it\{font-style:italic\}/);
+});
+
 test("wrong class and object data is refused", () => {
   const bad = (name, change, message) => { const d = fixture(name); change(d); assert.throws(() => renderDiagram(d), message); };
   bad("class", (d) => (d.relations[0].multiplicity = ["1", "many"]), /not a UML multiplicity/);
