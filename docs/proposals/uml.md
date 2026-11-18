@@ -1,6 +1,6 @@
 # Proposal: UML diagrams, and how Docent picks a diagram
 
-Status: **proposed on 2026-11-18**. Nothing is built. Each numbered item below is built in its own pull request, in the order of the table, after this proposal is approved.
+Status: **approved on 2026-11-18**, with the recommended answer to each open decision (see "Decided" at the end). Each numbered item below is built in its own pull request, in the order of the table.
 
 ## The answer first
 
@@ -276,9 +276,11 @@ This split follows Product Principle 3: scripts do what must be identical, and t
 
 ---
 
-## Open decisions
+## Decided
 
-1. **The dot in structural diagrams.** Recommended: no dot, because nothing in a class or deployment diagram has an order (rule 4).
-2. **Dashed replies in existing sequence diagrams.** Recommended: change them in item 2, because the dashed reply is the UML notation.
-3. **`flow` beside `activity`.** Recommended: keep both. `flow` is for readers who do not know UML; `activity` is for those who do.
-4. **If the graph layout fails its test** (shared piece 2): require `row` for large drawings, or copy dagre into `scripts/lib/`. To be decided after the test, before item 7.
+Approved on 2026-11-18, each with the recommended answer:
+
+1. **The dot in structural diagrams.** No dot, because nothing in a class or deployment diagram has an order (rule 4).
+2. **Dashed replies in existing sequence diagrams.** Change them in item 2, because the dashed reply is the UML notation.
+3. **`flow` beside `activity`.** Keep both. `flow` is for readers who do not know UML; `activity` is for those who do.
+4. **If the graph layout fails its test** (shared piece 2): still open. Require `row` for large drawings, or copy dagre into `scripts/lib/`. Decided after the test, before item 7.
