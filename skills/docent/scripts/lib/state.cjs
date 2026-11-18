@@ -4,6 +4,7 @@
 const { fail, words, id } = require("./blocks.cjs");
 const { textWidth } = require("./text.cjs");
 const uml = require("./uml.cjs");
+const { wrap, PHONE_NODE } = require("./graph.cjs");
 
 const MOST = { states: 16, transitions: 30, regions: 2, name: 28, action: 28, trigger: 24, guard: 24, effect: 24 };
 const PSEUDO = ["initial", "final", "choice", "junction", "history", "deep-history", "fork", "join", "terminate"];
@@ -11,7 +12,7 @@ const TYPES = ["state", "composite", ...PSEUDO];
 const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
 /** The mark of each state or pseudostate, as a graph node. */
-function shape(n, degree) {
+function shape(n, degree, room = Infinity) {
   const mark = (w, h, svg, ports = "mid") => ({ w, h, ports, draw: (cx, cy) => ({ svg: svg(cx, cy), texts: [] }) });
   switch (n.type) {
     case "initial": return mark(16, 16, (cx, cy) => uml.nodes.initial([cx, cy]));
@@ -22,15 +23,16 @@ function shape(n, degree) {
     case "terminate": return mark(16, 16, (cx, cy) => uml.nodes.cross([cx, cy]));
     case "fork": case "join": { const w = Math.max(72, 24 * (degree + 1)); return mark(w, 6, (cx, cy) => uml.nodes.bar([cx, cy], w), "tb"); }
     default: {
-      const lines = n.actions.map(([k, v]) => `${k} / ${v}`);
-      const w = Math.max(96, textWidth(n.name, 14, 600) + 32, ...lines.map((l) => textWidth(l, 12) + 24));
-      const h = lines.length ? 44 + 18 * lines.length : 40;
+      const name = textWidth(n.name, 14, 600) + 32 <= room ? [n.name] : wrap(n.name, "name", room - 32);
+      const lines = n.actions.flatMap(([k, v]) => { const l = `${k} / ${v}`; return textWidth(l, 12) + 24 <= room ? [l] : wrap(l, "sub", room - 24); });
+      const w = Math.max(96, ...name.map((l) => textWidth(l, 14, 600) + 32), ...lines.map((l) => textWidth(l, 12) + 24));
+      const top = 32 + 18 * (name.length - 1), h = lines.length ? top + 12 + 18 * lines.length : 40 + 18 * (name.length - 1);
       return {
         w, h,
         draw: (cx, cy) => {
           const x = cx - w / 2, y = cy - h / 2;
-          if (!lines.length) return { svg: uml.shapes.rounded({ x, y, w, h }), texts: [{ x: cx, y: cy + 5, s: n.name, cls: "name", anchor: "middle" }] };
-          return { svg: uml.shapes.rounded({ x, y, w, h }) + `<line x1="${x}" y1="${y + 32}" x2="${x + w}" y2="${y + 32}" class="u-ln"/>`, texts: [{ x: cx, y: y + 21, s: n.name, cls: "name", anchor: "middle" }, ...lines.map((s, k) => ({ x: x + 12, y: y + 50 + 18 * k, s, cls: "sub", anchor: "start" }))] };
+          if (!lines.length) return { svg: uml.shapes.rounded({ x, y, w, h }), texts: name.map((s, k) => ({ x: cx, y: cy + 5 - 9 * (name.length - 1) + 18 * k, s, cls: "name", anchor: "middle" })) };
+          return { svg: uml.shapes.rounded({ x, y, w, h }) + `<line x1="${x}" y1="${y + top}" x2="${x + w}" y2="${y + top}" class="u-ln"/>`, texts: [...name.map((s, k) => ({ x: cx, y: y + 21 + 18 * k, s, cls: "name", anchor: "middle" })), ...lines.map((s, k) => ({ x: x + 12, y: y + top + 18 + 18 * k, s, cls: "sub", anchor: "start" }))] };
         },
       };
     }
@@ -93,6 +95,8 @@ function readState(data) {
     if ((n.type === "final" || n.type === "terminate") && o) fail(`${say} has a transition out; it ends the machine${n.type === "final" ? " or its region" : ""}`);
     if (n.type === "choice" && (k < 1 || o < 2)) fail(`${say} has ${k} transitions in and ${o} out; a choice has one or more in and two or more out`);
     if (n.type === "choice" && outs(n).some((t) => !t.guard)) fail(`a transition out of ${say} has no guard; each says when it is taken, such as "else"`);
+    // A small mark has four places where a line can meet it: one on each side.
+    if (["initial", "final", "choice", "junction", "history", "deep-history", "terminate"].includes(n.type) && k + o > 4) fail(`${say} has ${k + o} transitions; a ${n.type} has at most 4, one on each side. Split it in two`);
     if (n.type === "fork" && (k !== 1 || o < 2)) fail(`${say} has ${k} transitions in and ${o} out; a fork has one in and two or more out`);
     if (n.type === "join" && (k < 2 || o !== 1)) fail(`${say} has ${k} transitions in and ${o} out; a join has two or more in and one out`);
     if ((n.type === "history" || n.type === "deep-history") && o > 1) fail(`${say} has ${o} transitions out; a history has at most one, to the state it starts in the first time`);
@@ -108,7 +112,7 @@ function readState(data) {
   // The main path, for the dot: from the initial pseudostate, each state's first transition, until a state repeats.
   const main = [top[0]];
   for (;;) { const t = outs(main.at(-1))[0]; if (!t || main.includes(t.to)) break; main.push(t.to); }
-  const mainT = new Set(main.slice(1).map((to, i) => transitions.find((t) => t.from === main[i] && t.to === to).n));
+  const mainT = new Map(main.slice(1).map((to, i) => [transitions.find((t) => t.from === main[i] && t.to === to).n, i])); // transition -> its place on the main path
   // The order of the column: depth first from the start; a composite stands for its own states, in their order.
   const order = [];
   const visit = (n) => {
@@ -142,7 +146,7 @@ function graphOf(model) {
   const degree = (n) => Math.max(model.outs(n).length, model.ins(n).length);
   return {
     nodes: nodes.map((n) => ({ id: n.id, group: n.inside ? groupId(composites.find((c) => c.id === n.inside), n.region) : undefined, ...shape(n, degree(n)) })),
-    edges: transitions.map((t) => ({ from: endId(t.from), to: endId(t.to), end: "open", labels: labelOf(t) ? [{ s: labelOf(t), at: "mid" }] : [], still: !mainT.has(t.n), first: mainT.has(t.n) })),
+    edges: transitions.map((t) => ({ from: endId(t.from), to: endId(t.to), end: "open", labels: labelOf(t) ? [{ s: labelOf(t), at: "mid" }] : [], still: !mainT.has(t.n), first: mainT.has(t.n), step: mainT.get(t.n) })),
     groups,
   };
 }
@@ -153,7 +157,7 @@ function columnOf(model) {
   const groupName = (n) => { if (!n.inside) return null; const c = model.all.find((o) => o.id === n.inside); return c.regions > 1 ? `${c.name}, region ${n.region}` : c.name; };
   return order.map((n, k) => {
     const next = order[k + 1];
-    const node = { id: n.id, ...shape(n, Math.max(outs(n).length, model.ins(n).length)) };
+    const node = { id: n.id, ...shape(n, Math.max(outs(n).length, model.ins(n).length), PHONE_NODE) };
     const o = outs(n);
     if (o.length === 1 && o[0].to === next && o[0].to !== n && groupName(next) === groupName(n)) return { node, group: groupName(n), arrow: { end: "open", label: labelOf(o[0]) }, rows: [] };
     return { node, group: groupName(n), rows: o.map((t) => ({ end: "open", label: labelOf(t), target: t.to === n ? "back to itself" : `${t.to.type !== "composite" && order.indexOf(t.to) >= 0 && order.indexOf(t.to) < k ? "back to" : "to"} ${callName(model, t.to)}` })) };

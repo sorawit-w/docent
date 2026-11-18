@@ -3,6 +3,7 @@
 const { fail, words, id } = require("./blocks.cjs");
 const { textWidth } = require("./text.cjs");
 const uml = require("./uml.cjs");
+const { wrap, PHONE_NODE } = require("./graph.cjs");
 
 const MOST = { nodes: 20, flows: 30, partitions: 5, forks: 4, name: 32, guard: 24, state: 20 };
 const TYPES = ["initial", "action", "decision", "merge", "fork", "join", "final", "flow-final", "object", "send", "accept"];
@@ -10,9 +11,11 @@ const NAMED = ["action", "object", "send", "accept"];
 const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 const nameW = (s) => textWidth(s, 14, 600);
 
-/** The mark of each kind of node, as a graph node: its size, its ports and how it draws itself. */
-function shape(n, degree) {
-  const text = (cx, cy) => [{ x: cx, y: cy + 5, s: n.name, cls: "name", anchor: "middle" }];
+/** The mark of each kind of node, as a graph node: its size, its ports and how it draws itself. room: the widest it may
+ * be (the phone column); a longer name wraps onto more lines. */
+function shape(n, degree, room = Infinity) {
+  const lines = (pad) => (nameW(n.name) + pad <= room ? [n.name] : wrap(n.name, "name", room - pad));
+  const stack = (ln, cx, cy, dx = 0) => ln.map((s, k) => ({ x: cx + dx, y: cy + 5 - 9 * (ln.length - 1) + 18 * k, s, cls: "name", anchor: "middle" }));
   switch (n.type) {
     case "initial": return { w: 16, h: 16, ports: "mid", draw: (cx, cy) => ({ svg: uml.nodes.initial([cx, cy]), texts: [] }) };
     case "final": return { w: 20, h: 20, ports: "mid", draw: (cx, cy) => ({ svg: uml.nodes.final([cx, cy]), texts: [] }) };
@@ -23,16 +26,17 @@ function shape(n, degree) {
       return { w, h: 6, ports: "tb", draw: (cx, cy) => ({ svg: uml.nodes.bar([cx, cy], w), texts: [] }) };
     }
     case "object": {
-      const w = Math.max(96, nameW(n.name) + 32, n.state ? textWidth(`[${n.state}]`, 12) + 32 : 0), h = n.state ? 52 : 40;
-      return { w, h, draw: (cx, cy) => ({ svg: uml.shapes.compartments({ x: cx - w / 2, y: cy - h / 2, w, h }), texts: n.state ? [{ x: cx, y: cy - 2, s: n.name, cls: "name", anchor: "middle" }, { x: cx, y: cy + 16, s: `[${n.state}]`, cls: "sub", anchor: "middle" }] : text(cx, cy) }) };
+      const ln = lines(32), st = n.state ? `[${n.state}]` : "";
+      const w = Math.max(96, ...ln.map((l) => nameW(l) + 32), st ? textWidth(st, 12) + 32 : 0), h = 40 + 18 * (ln.length - 1) + (st ? 12 : 0);
+      return { w, h, draw: (cx, cy) => ({ svg: uml.shapes.compartments({ x: cx - w / 2, y: cy - h / 2, w, h }), texts: st ? [...stack(ln, cx, cy - 7), { x: cx, y: cy + h / 2 - 10, s: st, cls: "sub", anchor: "middle" }] : stack(ln, cx, cy) }) };
     }
     case "send": case "accept": {
-      const w = Math.max(108, nameW(n.name) + 44), h = 40;
-      return { w, h, draw: (cx, cy) => ({ svg: uml.shapes[n.type]({ x: cx - w / 2, y: cy - h / 2, w, h }), texts: [{ x: cx + (n.type === "send" ? -6 : 6), y: cy + 5, s: n.name, cls: "name", anchor: "middle" }] }) };
+      const ln = lines(44), w = Math.max(108, ...ln.map((l) => nameW(l) + 44)), h = 40 + 18 * (ln.length - 1);
+      return { w, h, draw: (cx, cy) => ({ svg: uml.shapes[n.type]({ x: cx - w / 2, y: cy - h / 2, w, h }), texts: stack(ln, cx, cy, n.type === "send" ? -6 : 6) }) };
     }
     default: {
-      const w = Math.max(96, nameW(n.name) + 32), h = 40;
-      return { w, h, draw: (cx, cy) => ({ svg: uml.shapes.rounded({ x: cx - w / 2, y: cy - h / 2, w, h }), texts: text(cx, cy) }) };
+      const ln = lines(32), w = Math.max(96, ...ln.map((l) => nameW(l) + 32)), h = 40 + 18 * (ln.length - 1);
+      return { w, h, draw: (cx, cy) => ({ svg: uml.shapes.rounded({ x: cx - w / 2, y: cy - h / 2, w, h }), texts: stack(ln, cx, cy) }) };
     }
   }
 }
@@ -85,6 +89,10 @@ function readActivity(data) {
     if (n.type === "decision" && (k !== 1 || o < 2)) fail(`${say} has ${k} flows in and ${o} out; a decision has one in and two or more out. To join paths, use a merge`);
     if (n.type === "decision" && outs[n.index].some((f) => !f.guard)) fail(`a flow out of ${say} has no guard; each flow out of a decision says when it is taken, such as "in stock" or "else"`);
     if (n.type === "decision" && new Set(outs[n.index].map((f) => f.guard.toLowerCase())).size < o) fail(`two flows out of ${say} have the same guard`);
+    // A small mark has four places where a line can meet it: one on each side.
+    if (n.type === "decision" && o > 3) fail(`${say} has ${o} flows out; a decision has at most 3, so that each line meets one side of the diamond. Split the choice in two decisions`);
+    if (n.type === "merge" && k > 3) fail(`${say} has ${k} flows in; a merge has at most 3, so that each line meets one side of the diamond. Use two merges`);
+    if ((n.type === "final" || n.type === "flow-final") && k > 4) fail(`${say} has ${k} flows in; a final node has at most 4, one on each side. Add a second final node`);
     if (n.type === "merge" && (k < 2 || o !== 1)) fail(`${say} has ${k} flows in and ${o} out; a merge has two or more in and one out`);
     if (n.type === "fork" && (k !== 1 || o < 2)) fail(`${say} has ${k} flows in and ${o} out; a fork has one in and two or more out`);
     if (n.type === "join" && (k < 2 || o !== 1)) fail(`${say} has ${k} flows in and ${o} out; a join has two or more in and one out`);
@@ -92,6 +100,7 @@ function readActivity(data) {
     if (n.type !== "initial" && !k) fail(`nothing flows into ${say}; every node except an initial node has a flow in`);
     if (!["final", "flow-final"].includes(n.type) && !o) fail(`${say} has no flow out; a path ends at a final node ("final" or "flow-final")`);
   }
+  for (const p of partitions) if (!nodes.some((n) => n.part === partitions.indexOf(p))) fail(`the partition "${p.id}" has no nodes; leave it out`);
   const starts = nodes.filter((n) => n.type === "initial");
   if (!starts.length) fail(`an activity diagram starts at an initial node ({ "type": "initial" })`);
   if (nodes.filter((n) => n.type === "fork").length > MOST.forks) fail(`an activity diagram has at most ${MOST.forks} forks`);
@@ -103,7 +112,7 @@ function readActivity(data) {
   // The main path, for the dot: from the first initial node, each node's first flow, until a node repeats or the path ends.
   const main = [starts[0].index];
   for (;;) { const f = outs[main.at(-1)][0]; if (!f || main.includes(f.to)) break; main.push(f.to); }
-  const mainFlows = new Set(main.slice(1).map((to, i) => flows.find((f) => f.from === main[i] && f.to === to).n));
+  const mainFlows = new Map(main.slice(1).map((to, i) => [flows.find((f) => f.from === main[i] && f.to === to).n, i])); // flow -> its place on the main path
   // The order of the column: the main path; after each split, the nodes of its other branches, each followed by where it leads.
   const order = [];
   const visit = (i) => { if (order.includes(i)) return; order.push(i); outs[i].forEach((f) => visit(f.to)); };
@@ -125,7 +134,7 @@ function graphOf(model) {
   const { nodes, flows, partitions, mainFlows } = model;
   return {
     nodes: nodes.map((n) => ({ id: n.id, group: n.part == null ? undefined : partitions[n.part].id, ...shape(n, Math.max(model.outs[n.index].length, model.ins[n.index].length)) })),
-    edges: flows.map((f) => ({ from: nodes[f.from].id, to: nodes[f.to].id, end: "open", labels: f.guard ? [{ s: `[${f.guard}]`, at: "start" }] : [], still: !mainFlows.has(f.n), first: mainFlows.has(f.n) })),
+    edges: flows.map((f) => ({ from: nodes[f.from].id, to: nodes[f.to].id, end: "open", labels: f.guard ? [{ s: `[${f.guard}]`, at: "start" }] : [], still: !mainFlows.has(f.n), first: mainFlows.has(f.n), step: mainFlows.get(f.n) })),
     groups: partitions.map((p) => ({ id: p.id, name: p.name, kind: "lane" })),
   };
 }
@@ -135,7 +144,7 @@ function columnOf(model) {
   const { nodes, order, outs, partitions } = model;
   return order.map((i, k) => {
     const n = nodes[i], next = order[k + 1], group = n.part == null ? null : partitions[n.part].name;
-    const node = { id: n.id, ...shape(n, Math.max(outs[i].length, model.ins[i].length)) };
+    const node = { id: n.id, ...shape(n, Math.max(outs[i].length, model.ins[i].length), PHONE_NODE) };
     const o = outs[i];
     if (o.length === 1 && o[0].to === next && nodes[next].part === n.part) return { node, group, arrow: { end: "open", label: o[0].guard ? `[${o[0].guard}]` : "" }, rows: [] };
     return { node, group, rows: o.map((f) => ({ end: "open", label: f.guard ? `[${f.guard}]` : "", target: `${order.indexOf(f.to) < k ? "back to" : "to"} ${callName(model, f.to)}` })) };

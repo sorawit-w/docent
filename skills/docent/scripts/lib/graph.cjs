@@ -457,6 +457,7 @@ function checkGraph(out, edges) {
  * g.edges: [{ from, to, end?, dashed?, labels?: [{ s, at?: "start" | "mid" | "end", cls? }], still?, len?, up?, first? }]
  *   from and to are node ids, or group ids for a line to a whole frame. up: the line points up, so in the rows its
  *   end comes first (a generalization, a composition). first: route this line before the others (the main path).
+ *   step: the place of a moving line on the main path, so the dot travels the lines in that order.
  * g.groups: [{ id, name, kind: "lane" | "box", draw?(rect) -> { svg, texts } }]
  */
 function layoutGraph(g, form) {
@@ -523,7 +524,7 @@ function scene(out, nodes, edges, groups, form) {
     s.parts.push({ id: v.id, shape: "raw", svg: made.svg, texts: made.texts, x: v.cx - v.w / 2, y: v.cy - v.h / 2, w: v.w, h: v.h });
   }
   // The lines that move come first, in order, so the dot travels them; the others keep still.
-  const order = edges.map((e, n) => n).sort((p, q) => (edges[p].still ? 1 : 0) - (edges[q].still ? 1 : 0) || p - q);
+  const order = edges.map((e, n) => n).sort((p, q) => (edges[p].still ? 1 : 0) - (edges[q].still ? 1 : 0) || (edges[p].step ?? p) - (edges[q].step ?? q) || p - q); // the moving lines in the order of the main path
   for (const n of order) {
     const e = edges[n];
     s.legs.push({ n: n + 1, from: e.from, to: e.to, pts: out.legs[n], still: Boolean(e.still), u: { end: e.end || null, dashed: Boolean(e.dashed) }, texts: out.labels[n], verb: { s: "" }, mark: out.legs[n][0] });
@@ -598,4 +599,6 @@ function layoutColumnGraph(items, form) {
   return s;
 }
 
-module.exports = { layoutGraph, layoutColumnGraph, GraphError, U, hit, wrap };
+const PHONE_NODE = 264 - 2 * 32; // the widest node in the column form, inside a band
+
+module.exports = { layoutGraph, layoutColumnGraph, GraphError, U, hit, wrap, PHONE_NODE };

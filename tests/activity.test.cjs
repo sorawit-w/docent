@@ -60,3 +60,27 @@ test("wrong activity data is refused with a plain reason", () => {
   bad((d) => (d.nodes[0].type = "action", d.nodes[0].name = "Begin"), /starts at an initial node|nothing flows into/);
   bad((d) => d.flows.push({ from: "done", to: "take" }), /has a flow out; a final node ends a path/);
 });
+
+test("the review findings: port limits, phone width, the dot's order, and empty partitions", () => {
+  const base = (nodes, flows, more = {}) => ({ id: "t", kind: "activity", label: "A test.", nodes, flows, ...more });
+  const four = base([{ id: "s", type: "initial" }, { id: "d", type: "decision" }, ...[1, 2, 3, 4].map((k) => ({ id: `e${k}`, type: "final" }))], [{ from: "s", to: "d" }, ...[1, 2, 3, 4].map((k) => ({ from: "d", to: `e${k}`, guard: `case ${k}` }))]);
+  assert.throws(() => renderDiagram(four), /a decision has at most 3, so that each line meets one side of the diamond/);
+  four.flows.pop(); four.nodes.pop();
+  assert.doesNotThrow(() => renderDiagram(four), "three ways out of a decision are drawn");
+  const long = base([{ id: "s", type: "initial" }, { id: "a", name: "Review the completed application" }, { id: "b", name: "Send the answer to the person" }, { id: "e", type: "final" }], [{ from: "a", to: "b" }, { from: "b", to: "e" }, { from: "s", to: "a" }]);
+  const drawn = renderDiagram(long);
+  assert.ok(!drawn.phone || drawn.phone.w === 264, "a long name wraps in the column");
+  assert.deepEqual(drawn.scene.legs.filter((l) => !l.still).map((l) => [l.from, l.to]), [["s", "a"], ["a", "b"], ["b", "e"]], "the dot travels from the start, whatever the order of the flows");
+  const empty = base([{ id: "s", type: "initial", partition: "used" }, { id: "e", type: "final", partition: "used" }], [{ from: "s", to: "e" }], { partitions: [{ id: "unused", name: "Unused" }, { id: "used", name: "Used" }] });
+  assert.throws(() => renderDiagram(empty), /the partition "unused" has no nodes; leave it out/);
+});
+
+test("a long action name wraps in the column form, which stays 264px wide", () => {
+  const { layoutColumnGraph, PHONE_NODE } = require("../skills/docent/scripts/lib/graph.cjs");
+  const { columnOf, readActivity } = require("../skills/docent/scripts/lib/activity.cjs");
+  const d = fixture();
+  d.nodes[1].name = "Review the completed application";
+  const col = layoutColumnGraph(columnOf(readActivity(d)), "activity");
+  assert.equal(col.w, 264);
+  assert.ok(col.parts.every((p) => p.w <= PHONE_NODE));
+});
