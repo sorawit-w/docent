@@ -72,21 +72,37 @@ function readTiming(data) {
   return { id: id(data.id, '"id"'), label: words(data.label, '"label"', 400), kind: "timing", time: { ...time, unit, count }, lifelines, messages, constraints };
 }
 
-const at = (t, unit) => `${num(t)}${unit ? ` ${unit}` : ""}`;
+// A time as written: twelve significant digits keep the input's precision and drop float noise such as 0.30000000000000004.
+const fmt = (t) => String(Number(t.toPrecision(12)));
+const at = (t, unit) => `${fmt(t)}${unit ? ` ${unit}` : ""}`;
 
 /** The drawing: rows of lifelines, time from left to right. */
 function layoutTiming(model) {
   const { time, lifelines, messages, constraints } = model;
   const nameW = Math.max(...lifelines.map((l) => textWidth(l.name, 14, 600))) + 24;
   const stateW = Math.max(...lifelines.flatMap((l) => l.states.map((s) => textWidth(s, 12)))) + 16;
-  const tickLabel = (k) => num(time.from + k * time.step);
+  const tickLabel = (k) => fmt(time.from + k * time.step);
   const step = Math.max(48, ...Array.from({ length: time.count + 1 }, (_, k) => textWidth(tickLabel(k), 12) + 16), ...messages.map((m) => textWidth(m.verb, 12) / 2 + 24));
   const x0 = 16 + nameW + stateW + 8, x = (t) => x0 + ((t - time.from) / time.step) * step;
   const xEnd = x(time.to);
   const s = { form: "timing", uml: true, hideMarks: true, w: 0, h: 0, bands: [], gaps: [], tracks: [], lanes: [], parts: [], legs: [], notes: [], under: [] };
+  // Constraints on one lifeline take slots from the top of its row: one that would meet another, by its line or its text, takes the next slot.
+  const slots = new Map();
+  for (const l of lifelines) {
+    const ends = [];
+    for (const c of constraints.filter((q) => q.l === l).sort((a, b) => a.from - b.from)) {
+      const mid = (x(c.from) + x(c.to)) / 2, half = textWidth(c.text, 12) / 2;
+      const from = Math.min(x(c.from), mid - half) - 8, to = Math.max(x(c.to), mid + half);
+      let k = ends.findIndex((e) => e < from);
+      if (k < 0) k = ends.length;
+      ends[k] = to;
+      slots.set(c, k);
+    }
+  }
+  const slotsOf = (l) => Math.max(0, ...constraints.filter((c) => c.l === l).map((c) => slots.get(c) + 1));
   let y = 16;
   const rows = lifelines.map((l) => {
-    const top = y, pad = constraints.some((c) => c.l === l) ? 40 : 20;
+    const top = y, n = slotsOf(l), pad = n ? 16 + 24 * n : 20;
     const level = (st) => top + pad + ROW / 2 + ROW * l.states.indexOf(st);
     y = top + pad + ROW * l.states.length + 16;
     return { l, top, bottom: y, level };
@@ -112,19 +128,20 @@ function layoutTiming(model) {
   }
   // Duration constraints: a line with a tick at each end, and the constraint above it.
   for (const c of constraints) {
-    const r = rows.find((q) => q.l === c.l), cy = r.top + 30, a = x(c.from), b = x(c.to);
+    const r = rows.find((q) => q.l === c.l), cy = r.top + 30 + 24 * slots.get(c), a = x(c.from), b = x(c.to);
     s.under.push(`<path d="M${num(a)},${cy - 5} L${num(a)},${cy + 5} M${num(a)},${cy} L${num(b)},${cy} M${num(b)},${cy - 5} L${num(b)},${cy + 5}" class="u-ln"/>`);
     s.notes.push({ x: (a + b) / 2, y: cy - 8, s: c.text, cls: "sub", anchor: "middle" });
   }
-  // Messages: an arrow from the sender's state line at its moment to the receiver's, leaning 12px forward so that it
+  // Messages: an arrow from the sender's state line at its moment to the receiver's, leaning 12px (forward, or back at the end of the axis) so that it
   // never runs on an upright step of either line.
   const busy = []; // boxes of texts and lines that a verb must keep clear of
-  for (const c of constraints) { const r = rows.find((q) => q.l === c.l); busy.push({ x0: x(c.from) - 4, x1: x(c.to) + 4, y0: r.top + 14, y1: r.top + 36 }); }
+  for (const c of constraints) { const r = rows.find((q) => q.l === c.l); const dy = 24 * slots.get(c); busy.push({ x0: x(c.from) - 4, x1: x(c.to) + 4, y0: r.top + 14 + dy, y1: r.top + 36 + dy }); }
   for (const r of rows) { busy.push({ x0: 0, x1: s.w || 1e9, y0: r.top - 4, y1: r.top + 4 }, { x0: 0, x1: 1e9, y0: r.bottom - 4, y1: r.bottom + 4 }); for (const st of r.l.states) busy.push({ x0: x0, x1: xEnd, y0: r.level(st) - 3, y1: r.level(st) + 3 }); }
   messages.forEach((m, i) => {
     const ra = rows.find((q) => q.l === m.from), rb = rows.find((q) => q.l === m.to);
     const stateAt = (l) => [...l.changes].reverse().find((c) => c.at <= m.at).state;
-    const p = [x(m.at), ra.level(stateAt(m.from))], q = [x(m.at) + 12, rb.level(stateAt(m.to))];
+    const lean = m.at === time.to ? -12 : 12; // at the end of the axis it leans back, to stay inside the frame
+    const p = [x(m.at), ra.level(stateAt(m.from))], q = [x(m.at) + lean, rb.level(stateAt(m.to))];
     if (Math.abs(q[1] - p[1]) < uml.END.open.len + 28) fail(`message ${i + 1} is too short to draw: its two state lines are too close`);
     // The verb sits beside the arrow, where it meets no line and no other text; a knock-out in the page color stops the guide lines behind it.
     const tw = textWidth(m.verb, 12);
@@ -134,12 +151,12 @@ function layoutTiming(model) {
     for (let d = 0; d <= 0.4; d += 0.05) for (const f of d ? [0.5 - d, 0.5 + d] : [0.5]) spots.push(f);
     for (const left of [false, true]) {
       for (const f of spots) {
-        const ax = p[0] + 12 * f, ty = p[1] + (q[1] - p[1]) * f + 4, tx = left ? ax - 8 - tw : ax + 8, box = { x0: tx - 2, x1: tx + tw + 2, y0: ty - 11, y1: ty + 3 };
-        if (tx - 4 >= 0 && !busy.some((b) => box.x0 < b.x1 && box.x1 > b.x0 && box.y0 < b.y1 && box.y1 > b.y0)) { place = { tx, ty, box }; break; }
+        const ax = p[0] + lean * f, ty = p[1] + (q[1] - p[1]) * f + 4, tx = left ? ax - 8 - tw : ax + 8, box = { x0: tx - 2, x1: tx + tw + 2, y0: ty - 11, y1: ty + 3 };
+        if (tx - 4 >= 0 && tx + tw + 4 <= xEnd + 28 && !busy.some((b) => box.x0 < b.x1 && box.x1 > b.x0 && box.y0 < b.y1 && box.y1 > b.y0)) { place = { tx, ty, box }; break; }
       }
       if (place) break;
     }
-    if (!place) { const f = 0.5; place = { tx: p[0] + 12 * f + 8, ty: p[1] + (q[1] - p[1]) * f + 4 }; place.box = { x0: place.tx - 2, x1: place.tx + tw + 2, y0: place.ty - 11, y1: place.ty + 3 }; }
+    if (!place) { const f = 0.5; place = { tx: p[0] + lean * f + 8, ty: p[1] + (q[1] - p[1]) * f + 4 }; place.box = { x0: place.tx - 2, x1: place.tx + tw + 2, y0: place.ty - 11, y1: place.ty + 3 }; }
     busy.push(place.box);
     s.notes.push({ x: place.tx, y: place.ty, s: m.verb, cls: "verb", anchor: "start", knock: { x: place.tx - 4, y: place.ty - 13, w: tw + 8, h: 18 } });
     s.legs.push({ n: i + 1, from: m.from.id, to: m.to.id, pts: [p, q], still: true, u: { end: "open", dashed: false }, texts: [], verb: { s: "" }, mark: p });

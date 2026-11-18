@@ -38,6 +38,39 @@ test("message verbs keep clear of lines and other texts", () => {
   }
 });
 
+test("a verb at the end of the axis stays inside the drawing", () => {
+  const d = fixture();
+  d.messages = [{ from: "user", to: "ctrl", at: 10, verb: "request permission" }];
+  const { scene } = renderDiagram(d);
+  const v = scene.notes.find((n) => n.cls === "verb");
+  assert.ok(v.x >= 0 && v.x + 130 <= scene.w, `“${v.s}” at ${v.x} runs past the width ${scene.w}`);
+});
+
+test("small times keep their precision in the axis and in the words", () => {
+  const d = fixture();
+  d.time = { from: 0, to: 0.01, step: 0.001, unit: "s" };
+  d.changes = d.changes.filter((c) => c.at === 0).concat([{ lifeline: "door", at: 0.003, state: "Moving" }]);
+  d.messages = [];
+  d.constraints = [{ lifeline: "door", from: 0.001, to: 0.003, text: "{< 2 ms}" }];
+  const { svg, scene } = renderDiagram(d);
+  const ticks = scene.notes.filter((n) => /^[\d.]+$/.test(n.s)).map((n) => n.s);
+  assert.equal(new Set(ticks).size, 11, "every tick has its own label");
+  assert.ok(ticks.includes("0.003"));
+  assert.match(svg, /At 0\.003 s: Door becomes Moving\./);
+  assert.match(svg, /From 0\.001 s to 0\.003 s/);
+});
+
+test("overlapping constraints on one lifeline take separate slots", () => {
+  const d = fixture();
+  d.constraints.push({ lifeline: "door", from: 0, to: 5, text: "{≤ 5 s}" });
+  const { scene } = renderDiagram(d);
+  const texts = scene.notes.filter((n) => /^\{/.test(n.s));
+  assert.equal(texts.length, 2);
+  assert.ok(Math.abs(texts[0].y - texts[1].y) >= 20, "the two constraints sit on different lines");
+  const one = renderDiagram(fixture()).scene;
+  assert.equal(scene.h - one.h, 24, "the row grows by one slot");
+});
+
 test("wrong timing data is refused", () => {
   const bad = (change, message) => { const d = fixture(); change(d); assert.throws(() => renderDiagram(d), message); };
   bad((d) => (d.time.step = 0), /"time" must run forward/);
