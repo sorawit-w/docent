@@ -1,0 +1,23 @@
+{
+  "id": "order-classes",
+  "kind": "class",
+  "label": "A customer places orders. An order owns its lines, and each line names a product. Payment is an interface that card payment implements; an order uses a payment.",
+  "classes": [
+    { "id": "customer", "name": "Customer", "attributes": ["- id: UUID", "- email: String"], "operations": ["+ placeOrder(): Order"] },
+    { "id": "order", "name": "Order", "attributes": ["- total: Money", { "text": "- count: Integer", "static": true }], "operations": ["+ addLine(p: Product, n: Integer)", "+ pay(with: Payment)"] },
+    { "id": "line", "name": "OrderLine", "attributes": ["- quantity: Integer"] },
+    { "id": "product", "name": "Product", "attributes": ["- name: String", "- price: Money"] },
+    { "id": "payment", "name": "Payment", "stereotype": "interface", "operations": [{ "text": "+ charge(amount: Money): Boolean", "abstract": true }] },
+    { "id": "card", "name": "CardPayment", "attributes": ["- last4: String"], "operations": ["+ charge(amount: Money): Boolean"] }
+  ],
+  "relations": [
+    { "from": "customer", "to": "order", "name": "places", "multiplicity": ["1", "0..*"], "navigable": true },
+    { "from": "order", "to": "line", "type": "composition", "multiplicity": ["1", "1..*"], "roles": ["", "lines"] },
+    { "from": "line", "to": "product", "multiplicity": ["*", "1"], "navigable": true },
+    { "from": "card", "to": "payment", "type": "realization" },
+    { "from": "order", "to": "payment", "type": "dependency", "stereotype": "use" }
+  ],
+  "notes": [
+    { "id": "n1", "text": "{total = sum of the line prices}", "on": "order" }
+  ]
+}
