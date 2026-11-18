@@ -6,6 +6,7 @@ const { DataError, fail, words, id, findBlocks, block, replaceBlocks } = require
 const { renderWidget, fillPlaces } = require("./widget.cjs");
 const { textWidth } = require("./text.cjs");
 const { readSequence, layoutSequence } = require("./sequence.cjs");
+const { readFlow, inWords: flowWords } = require("./flow.cjs");
 
 const ARROW = '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>';
 /** The steps of a drawing in words, in a closed section under it, for a screen reader, a phone and paper. */
@@ -133,10 +134,27 @@ function layout(model, form) {
 }
 
 /** Draws one diagram. Returns { svg, form, warnings }. Throws when the data is wrong or no form keeps the rules. */
+/** A flowchart: two columns drawn by the Plates layout, the column form for phones and paper, and the steps in words. */
+function renderFlow(data) {
+  const model = readFlow(data);
+  let scene;
+  try { scene = require("./plates.cjs").layoutPlates(model); } catch (error) { throw new Error(error.message.replace("Plates cannot", "The flowchart cannot")); }
+  const still = (drawing) => { for (const leg of drawing.legs) leg.still = model.legs[leg.n - 1].still; return drawing; };
+  still(scene);
+  const warnings = [];
+  let phone = null;
+  if (scene.w > PHONE) { try { phone = still(layoutColumn(model)); } catch (error) { warnings.push(`no phone form: ${error.message}`); } }
+  const id = `dg-${model.id}`;
+  const main = toSvg(scene, { id, label: model.label, mode: "auto", swap: phone && { phone: `${id}-phone` } });
+  const svg = phone ? `${main}\n${toSvg(phone, { id: `${id}-phone`, label: model.label, mode: "auto", swap: { main: id, below: scene.w + ROOM } })}` : main;
+  return { svg: `${svg}\n${inWords(flowWords(model))}`, form: "flow", warnings, icons: [], model, scene };
+}
+
 function renderDiagram(data) {
   if (data && data.kind != null) {
     if (data.kind === "sequence") return renderSequence(data);
-    fail(`"kind" must be "sequence", or left out for a workflow diagram`);
+    if (data.kind === "flow") return renderFlow(data);
+    fail(`"kind" must be "sequence" or "flow", or left out for a workflow diagram`);
   }
   const { model, warnings } = readData(data);
   const icons = warnings.filter((w) => !w.startsWith("every part has the state") && !w.startsWith("no leg has a verb")); // these warnings are about icons; check reports them as errors

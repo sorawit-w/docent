@@ -101,6 +101,7 @@ function styles(scene, id, mode, swap) {
   // An optional leg is dashed. A drawing with no optional leg carries no such rule.
   if (scene.legs.some((leg) => leg.optional)) css.push(`${s} .leg.is-optional .line{stroke-dasharray:5 7}`);
   if ((scene.spurs || []).length) css.push(`${s} .side .line{stroke-dasharray:5 7}`);
+  if (scene.parts.some((part) => part.stop)) css.push(`${s} .card.is-stop{stroke:${v("text")};stroke-width:2}`); // a stop of a flowchart
   // A reply: a thin muted line with an open arrowhead. It is not dashed, because a dashed line means a path that only some readers take.
   if (scene.legs.some((leg) => leg.reply)) css.push(`${s} .leg.is-reply .line{stroke:${v("muted")};stroke-width:1.5}`, `${s} .ohead{fill:none;stroke:${v("muted")};stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}`, `.js ${s} .leg.is-reply.is-current .ohead{stroke:${v("primary")}}`);
   // A go-to row of the column form: its mark is dashed when the leg is optional, like the line it stands for.
@@ -125,10 +126,11 @@ function styles(scene, id, mode, swap) {
     print.push(`${s} .leg .line{stroke:${v("text")}!important;stroke-width:2px!important}`, `${s} .leg .head,${s} .leg .num{fill:${v("text")}!important}`, `${s} .leg .mark{stroke:${v("text")}!important}`);
   } else {
     // Outside a walkthrough: one dot travels the whole route, leg by leg in order. The run plays twice, then rests.
-    const total = scene.legs.length * CROSS + PAUSE;
+    const moving = scene.legs.filter((leg) => !leg.still); // in a flowchart only the main path moves
+    const total = moving.length * CROSS + PAUSE;
     const when = (t) => (t / total) * 100;
     css.push(`.js ${s} .pulse{display:block;animation:${num(total)}s linear 2 both}`, `.js ${s}:not(.is-playing) .pulse{animation-play-state:paused}`);
-    scene.legs.forEach((leg, k) => {
+    moving.forEach((leg, k) => {
       const first = leg.pts[0], last = leg.pts[leg.pts.length - 1];
       const t0 = k * CROSS, t1 = t0 + CROSS;
       const frames = [`0%{${at(first)};opacity:0}`];
@@ -167,9 +169,9 @@ function toSvg(scene, { id, label, mode, swap }) {
     out.push(
       // The dot is drawn before the numbered mark, so it passes under the mark and the number stays readable.
       `<g class="leg${leg.optional ? " is-optional" : ""}${leg.reply ? " is-reply" : ""}" data-leg="${leg.n}"><path d="${linePath(leg)}" class="line"/>${head(leg)}` +
-        `<circle r="6" class="pulse pulse-${leg.n}"/>` +
-        `<circle cx="${num(leg.mark[0])}" cy="${num(leg.mark[1])}" r="${MARK}" class="mark"/>` +
-        text({ x: leg.mark[0], y: leg.mark[1] + 4, s: leg.n, cls: "num", anchor: "middle" }) +
+        (leg.still ? "" : `<circle r="6" class="pulse pulse-${leg.n}"/>`) +
+        // A flowchart has no numbers on its arrows: the layout keeps room for a mark, and the label of the exit sits beside that room.
+        (scene.hideMarks ? "" : `<circle cx="${num(leg.mark[0])}" cy="${num(leg.mark[1])}" r="${MARK}" class="mark"/>` + text({ x: leg.mark[0], y: leg.mark[1] + 4, s: leg.n, cls: "num", anchor: "middle" })) +
         text(leg.verb) + `</g>`,
     );
   }
@@ -181,7 +183,11 @@ function toSvg(scene, { id, label, mode, swap }) {
   }
   for (const part of scene.parts) {
     const is = part.state ? ` is-${part.state}` : "";
-    if (part.shape === "card") out.push(`<rect x="${num(part.x)}" y="${num(part.y)}" width="${num(part.w)}" height="${num(part.h)}" rx="10" class="card${is}"/>`);
+    // A decision is a plate with pointed ends; a stop has a thick outline.
+    if (part.shape === "card" && part.ask) {
+      const [x0, x1, y0, y1, cy, p] = [part.x, part.x + part.w, part.y, part.y + part.h, part.y + part.h / 2, 8];
+      out.push(`<path d="M${num(x0 + p)},${num(y0)} L${num(x1 - p)},${num(y0)} L${num(x1)},${num(cy)} L${num(x1 - p)},${num(y1)} L${num(x0 + p)},${num(y1)} L${num(x0)},${num(cy)} Z" class="card${is}"/>`);
+    } else if (part.shape === "card") out.push(`<rect x="${num(part.x)}" y="${num(part.y)}" width="${num(part.w)}" height="${num(part.h)}" rx="10" class="card${is}${part.stop ? " is-stop" : ""}"/>`);
     else out.push(`<circle cx="${num(part.cx)}" cy="${num(part.cy)}" r="${num(part.r)}" class="${part.end ? "stop end" : "stop"}${is}"/>`);
     if (part.icon) out.push(icon(part.icon, part.iconAt, part.end && part.shape !== "card" ? "icon on-end" : "icon"));
     // The status dot sits on the outline at the upper right: on the ring, or on the round corner of the plate. It stays inside the room that the part already keeps free.
