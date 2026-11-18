@@ -1,0 +1,152 @@
+<svg id="dg-checkout-overview" class="dg dg-interaction-overview dg-auto" xmlns="http://www.w3.org/2000/svg" width="504" height="912" viewBox="0 0 504 912" role="img" aria-label="A customer logs in, then pays. A failed payment is tried again; a paid order gets a receipt and the warehouse is told, at the same time.">
+<style>
+#dg-checkout-overview{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-checkout-overview .ground{fill:var(--fig,#f2f3f9)}
+#dg-checkout-overview .band{fill:var(--bg,#fbfbfe)}
+#dg-checkout-overview .track{stroke:var(--line,#d3d6e3)}
+#dg-checkout-overview .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-checkout-overview .head{fill:var(--text,#1c1f2e)}
+#dg-checkout-overview .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-checkout-overview .stop.end{fill:var(--text,#1c1f2e)}
+#dg-checkout-overview .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-checkout-overview .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-checkout-overview .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-checkout-overview .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-checkout-overview .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-checkout-overview .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-checkout-overview .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-checkout-overview .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-checkout-overview .sub,#dg-checkout-overview .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-checkout-overview .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-checkout-overview .u-ln{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-checkout-overview .u-bold{stroke-width:2.5}
+#dg-checkout-overview .u-dash{stroke-dasharray:6 4;stroke-linecap:butt}
+#dg-checkout-overview .u-face{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linejoin:round}
+#dg-checkout-overview .u-ink{fill:var(--text,#1c1f2e)}
+#dg-checkout-overview .u-name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-checkout-overview .leg .line{stroke-width:1.5}
+#dg-checkout-overview .leg.is-reply .line{stroke-dasharray:6 4;stroke-linecap:butt}
+#dg-checkout-overview .ohead{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.js #dg-checkout-overview .leg.is-current .ohead{stroke:var(--primary,#2f3fd0)}
+#dg-checkout-overview .u-bar{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-checkout-overview .u-frame{fill:none;stroke:var(--muted,#575d75);stroke-width:1}
+#dg-checkout-overview .u-frame.is-filled{fill:var(--bg,#fbfbfe)}
+#dg-checkout-overview .u-div{stroke:var(--muted,#575d75);stroke-width:1;stroke-dasharray:6 4}
+#dg-checkout-overview .u-op{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e)}
+.js #dg-checkout-overview .pulse{display:block;animation:12.4s linear 2 both}
+.js #dg-checkout-overview:not(.is-playing) .pulse{animation-play-state:paused}
+@keyframes dg-checkout-overview-1{0%{transform:translate(372px,56px);opacity:0}0.97%{transform:translate(372px,56px);opacity:1}10.89%{transform:translate(372px,142px);opacity:1}12.9%{transform:translate(372px,142px);opacity:0}100%{transform:translate(372px,142px);opacity:0}}
+.js #dg-checkout-overview .pulse-1{animation-name:dg-checkout-overview-1}
+@keyframes dg-checkout-overview-2{0%{transform:translate(372px,194px);opacity:0}12.9%{transform:translate(372px,194px);opacity:0}13.87%{transform:translate(372px,194px);opacity:1}23.79%{transform:translate(372px,286px);opacity:1}25.81%{transform:translate(372px,286px);opacity:0}100%{transform:translate(372px,286px);opacity:0}}
+.js #dg-checkout-overview .pulse-2{animation-name:dg-checkout-overview-2}
+@keyframes dg-checkout-overview-3{0%{transform:translate(372px,338px);opacity:0}25.81%{transform:translate(372px,338px);opacity:0}26.77%{transform:translate(372px,338px);opacity:1}36.69%{transform:translate(372px,420px);opacity:1}38.71%{transform:translate(372px,420px);opacity:0}100%{transform:translate(372px,420px);opacity:0}}
+.js #dg-checkout-overview .pulse-3{animation-name:dg-checkout-overview-3}
+@keyframes dg-checkout-overview-4{0%{transform:translate(372px,444px);opacity:0}38.71%{transform:translate(372px,444px);opacity:0}39.68%{transform:translate(372px,444px);opacity:1}49.6%{transform:translate(372px,525px);opacity:1}51.61%{transform:translate(372px,525px);opacity:0}100%{transform:translate(372px,525px);opacity:0}}
+.js #dg-checkout-overview .pulse-4{animation-name:dg-checkout-overview-4}
+@keyframes dg-checkout-overview-5{0%{transform:translate(372px,531px);opacity:0}51.61%{transform:translate(372px,531px);opacity:0}52.58%{transform:translate(372px,531px);opacity:1}53.88%{transform:translate(372px,576px);opacity:1}61.17%{transform:translate(120px,576px);opacity:1}62.5%{transform:translate(120px,622px);opacity:1}64.52%{transform:translate(120px,622px);opacity:0}100%{transform:translate(120px,622px);opacity:0}}
+.js #dg-checkout-overview .pulse-5{animation-name:dg-checkout-overview-5}
+@keyframes dg-checkout-overview-7{0%{transform:translate(120px,674px);opacity:0}64.52%{transform:translate(120px,674px);opacity:0}65.48%{transform:translate(120px,674px);opacity:1}66.81%{transform:translate(120px,720px);opacity:1}74.1%{transform:translate(372px,720px);opacity:1}75.4%{transform:translate(372px,765px);opacity:1}77.42%{transform:translate(372px,765px);opacity:0}100%{transform:translate(372px,765px);opacity:0}}
+.js #dg-checkout-overview .pulse-7{animation-name:dg-checkout-overview-7}
+@keyframes dg-checkout-overview-9{0%{transform:translate(372px,771px);opacity:0}77.42%{transform:translate(372px,771px);opacity:0}78.39%{transform:translate(372px,771px);opacity:1}88.31%{transform:translate(372px,854px);opacity:1}90.32%{transform:translate(372px,854px);opacity:0}100%{transform:translate(372px,854px);opacity:0}}
+.js #dg-checkout-overview .pulse-9{animation-name:dg-checkout-overview-9}
+@media (prefers-reduced-motion:reduce){#dg-checkout-overview .pulse{animation:none!important}#dg-checkout-overview .pulse{display:none!important}}
+@media print{#dg-checkout-overview{max-width:100%;height:auto}#dg-checkout-overview .pulse{display:none!important}}
+#dg-checkout-overview-phone{display:none}
+</style>
+<rect width="504" height="912" class="ground"/>
+<g class="leg" data-leg="1"><polyline points="372,56 372,142" class="u-ln"/><polyline points="367.5,134 372,142 376.5,134" class="u-ln"/><circle r="6" class="pulse pulse-1"/></g>
+<g class="leg" data-leg="2"><polyline points="372,194 372,286" class="u-ln"/><polyline points="367.5,278 372,286 376.5,278" class="u-ln"/><circle r="6" class="pulse pulse-2"/></g>
+<g class="leg" data-leg="3"><polyline points="372,338 372,420" class="u-ln"/><polyline points="367.5,412 372,420 376.5,412" class="u-ln"/><circle r="6" class="pulse pulse-3"/></g>
+<g class="leg" data-leg="4"><polyline points="372,444 372,525" class="u-ln"/><polyline points="367.5,517 372,525 376.5,517" class="u-ln"/><circle r="6" class="pulse pulse-4"/><text x="380" y="468.25" class="verb" text-anchor="start">[paid]</text></g>
+<g class="leg" data-leg="5"><polyline points="372,531 372,576 120,576 120,622" class="u-ln"/><polyline points="115.5,614 120,622 124.5,614" class="u-ln"/><circle r="6" class="pulse pulse-5"/></g>
+<g class="leg" data-leg="7"><polyline points="120,674 120,720 372,720 372,765" class="u-ln"/><polyline points="367.5,757 372,765 376.5,757" class="u-ln"/><circle r="6" class="pulse pulse-7"/></g>
+<g class="leg" data-leg="9"><polyline points="372,771 372,854" class="u-ln"/><polyline points="367.5,846 372,854 376.5,846" class="u-ln"/><circle r="6" class="pulse pulse-9"/></g>
+<g class="leg" data-leg="6"><polyline points="396,531 396,622" class="u-ln"/><polyline points="391.5,614 396,622 400.5,614" class="u-ln"/></g>
+<g class="leg" data-leg="8"><polyline points="396,674 396,765" class="u-ln"/><polyline points="391.5,757 396,765 400.5,757" class="u-ln"/></g>
+<g class="leg" data-leg="10"><polyline points="388,432 420,432 420,338" class="u-ln"/><polyline points="424.5,346 420,338 415.5,346" class="u-ln"/><text x="416.8" y="449" class="verb" text-anchor="middle">[failed]</text></g>
+<circle cx="372" cy="48" r="8" class="u-ink"/>
+<rect x="312" y="142" width="120" height="52" class="u-face"/><polygon points="312,142 352,142 352,154 344,162 312,162" class="u-face"/><text x="322" y="156" class="u-op">ref</text><text x="372" y="181" class="name" text-anchor="middle">Log in</text>
+<rect x="294.5" y="286" width="155" height="52" class="u-face"/><polygon points="294.5,286 334.5,286 334.5,298 326.5,306 294.5,306" class="u-face"/><text x="304.5" y="300" class="u-op">ref</text><text x="372" y="325" class="name" text-anchor="middle">Pay for the order</text>
+<polygon points="372,420 388,432 372,444 356,432" class="u-face"/>
+<rect x="336" y="525.5" width="72" height="5" class="u-ink"/>
+<rect x="44" y="622" width="152" height="52" class="u-face"/><polygon points="44,622 84,622 84,634 76,642 44,642" class="u-face"/><text x="54" y="636" class="u-op">ref</text><text x="120" y="661" class="name" text-anchor="middle">Send the receipt</text>
+<rect x="286.5" y="622" width="171" height="52" class="u-face"/><polygon points="286.5,622 326.5,622 326.5,634 318.5,642 286.5,642" class="u-face"/><text x="296.5" y="636" class="u-op">ref</text><text x="372" y="661" class="name" text-anchor="middle">Tell the warehouse</text>
+<rect x="336" y="765.5" width="72" height="5" class="u-ink"/>
+<circle cx="372" cy="864" r="10" class="u-face"/><circle cx="372" cy="864" r="6" class="u-ink"/>
+</svg>
+<svg id="dg-checkout-overview-phone" class="dg dg-interaction-overview dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="874" viewBox="0 0 264 874" role="img" aria-label="A customer logs in, then pays. A failed payment is tried again; a paid order gets a receipt and the warehouse is told, at the same time.">
+<style>
+#dg-checkout-overview-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-checkout-overview-phone .ground{fill:var(--fig,#f2f3f9)}
+#dg-checkout-overview-phone .band{fill:var(--bg,#fbfbfe)}
+#dg-checkout-overview-phone .track{stroke:var(--line,#d3d6e3)}
+#dg-checkout-overview-phone .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-checkout-overview-phone .head{fill:var(--text,#1c1f2e)}
+#dg-checkout-overview-phone .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-checkout-overview-phone .stop.end{fill:var(--text,#1c1f2e)}
+#dg-checkout-overview-phone .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-checkout-overview-phone .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-checkout-overview-phone .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-checkout-overview-phone .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-checkout-overview-phone .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-checkout-overview-phone .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-checkout-overview-phone .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-checkout-overview-phone .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-checkout-overview-phone .sub,#dg-checkout-overview-phone .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-checkout-overview-phone .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-checkout-overview-phone .u-ln{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-checkout-overview-phone .u-bold{stroke-width:2.5}
+#dg-checkout-overview-phone .u-dash{stroke-dasharray:6 4;stroke-linecap:butt}
+#dg-checkout-overview-phone .u-face{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linejoin:round}
+#dg-checkout-overview-phone .u-ink{fill:var(--text,#1c1f2e)}
+#dg-checkout-overview-phone .u-name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-checkout-overview-phone .leg .line{stroke-width:1.5}
+#dg-checkout-overview-phone .leg.is-reply .line{stroke-dasharray:6 4;stroke-linecap:butt}
+#dg-checkout-overview-phone .ohead{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.js #dg-checkout-overview-phone .leg.is-current .ohead{stroke:var(--primary,#2f3fd0)}
+#dg-checkout-overview-phone .u-bar{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-checkout-overview-phone .u-frame{fill:none;stroke:var(--muted,#575d75);stroke-width:1}
+#dg-checkout-overview-phone .u-frame.is-filled{fill:var(--bg,#fbfbfe)}
+#dg-checkout-overview-phone .u-div{stroke:var(--muted,#575d75);stroke-width:1;stroke-dasharray:6 4}
+#dg-checkout-overview-phone .u-op{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e)}
+@media (prefers-reduced-motion:reduce){#dg-checkout-overview-phone .pulse{animation:none!important}#dg-checkout-overview-phone .pulse{display:none!important}}
+@media print{#dg-checkout-overview-phone{max-width:100%;height:auto}#dg-checkout-overview-phone .pulse{display:none!important}}
+@media (max-width:600px){#dg-checkout-overview{display:none}#dg-checkout-overview-phone{display:block}}
+@media print{#dg-checkout-overview{display:block!important}#dg-checkout-overview-phone{display:none!important}}
+</style>
+<rect width="264" height="874" class="ground"/>
+<g class="leg" data-leg="1"><polyline points="105.5,32 105.5,88" class="u-ln"/><polyline points="101,80 105.5,88 110,80" class="u-ln"/></g>
+<g class="leg" data-leg="2"><polyline points="105.5,140 105.5,196" class="u-ln"/><polyline points="101,188 105.5,196 110,188" class="u-ln"/></g>
+<g class="leg" data-leg="3"><polyline points="105.5,248 105.5,304" class="u-ln"/><polyline points="101,296 105.5,304 110,296" class="u-ln"/></g>
+<g class="leg" data-leg="4"><polyline points="105.5,596 105.5,652" class="u-ln"/><polyline points="101,644 105.5,652 110,644" class="u-ln"/></g>
+<g class="leg" data-leg="5"><polyline points="105.5,658 105.5,714" class="u-ln"/><polyline points="101,706 105.5,714 110,706" class="u-ln"/></g>
+<circle cx="105.5" cy="24" r="8" class="u-ink"/>
+<rect x="45.5" y="88" width="120" height="52" class="u-face"/><polygon points="45.5,88 85.5,88 85.5,100 77.5,108 45.5,108" class="u-face"/><text x="55.5" y="102" class="u-op">ref</text><text x="105.5" y="127" class="name" text-anchor="middle">Log in</text>
+<rect x="28" y="196" width="155" height="52" class="u-face"/><polygon points="28,196 68,196 68,208 60,216 28,216" class="u-face"/><text x="38" y="210" class="u-op">ref</text><text x="105.5" y="235" class="name" text-anchor="middle">Pay for the order</text>
+<polygon points="105.5,304 121.5,316 105.5,328 89.5,316" class="u-face"/>
+<polyline points="20,347 68,347" class="u-ln"/><polyline points="60,351.5 68,347 60,342.5" class="u-ln"/>
+<text x="80" y="351" class="verb" text-anchor="start">[paid]</text>
+<text x="80" y="369" class="name" text-anchor="start">to the fork</text>
+<polyline points="20,389 68,389" class="u-ln"/><polyline points="60,393.5 68,389 60,384.5" class="u-ln"/>
+<text x="80" y="393" class="verb" text-anchor="start">[failed]</text>
+<text x="80" y="411" class="name" text-anchor="start">back to Pay for the</text>
+<text x="80" y="429" class="name" text-anchor="start">order</text>
+<rect x="69.5" y="460.5" width="72" height="5" class="u-ink"/>
+<polyline points="20,485 68,485" class="u-ln"/><polyline points="60,489.5 68,485 60,480.5" class="u-ln"/>
+<text x="80" y="489" class="name" text-anchor="start">to Send the receipt</text>
+<polyline points="20,509 68,509" class="u-ln"/><polyline points="60,513.5 68,509 60,504.5" class="u-ln"/>
+<text x="80" y="513" class="name" text-anchor="start">to Tell the warehouse</text>
+<rect x="29.5" y="544" width="152" height="52" class="u-face"/><polygon points="29.5,544 69.5,544 69.5,556 61.5,564 29.5,564" class="u-face"/><text x="39.5" y="558" class="u-op">ref</text><text x="105.5" y="583" class="name" text-anchor="middle">Send the receipt</text>
+<rect x="69.5" y="652.5" width="72" height="5" class="u-ink"/>
+<circle cx="105.5" cy="724" r="10" class="u-face"/><circle cx="105.5" cy="724" r="6" class="u-ink"/>
+<rect x="20" y="754" width="171" height="52" class="u-face"/><polygon points="20,754 60,754 60,766 52,774 20,774" class="u-face"/><text x="30" y="768" class="u-op">ref</text><text x="105.5" y="793" class="name" text-anchor="middle">Tell the warehouse</text>
+<polyline points="20,825 68,825" class="u-ln"/><polyline points="60,829.5 68,825 60,820.5" class="u-ln"/>
+<text x="80" y="829" class="name" text-anchor="start">back to the join after</text>
+<text x="80" y="847" class="name" text-anchor="start">Send the receipt</text>
+</svg>
+<details class="dg-words">
+<summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>The diagram in words</summary>
+<ol><li>Start.</li><li>The interaction “<a href="#dg-login">Log in</a>” happens here; its steps are in its own diagram.</li><li>The interaction “Pay for the order” happens here.</li><li>Decide: if paid, go to the fork; if failed, go to Pay for the order.</li><li>The path splits; these run at the same time: Send the receipt; Tell the warehouse.</li><li>The interaction “Send the receipt” happens here.</li><li>Wait here until every path that comes in is done.</li><li>It ends.</li><li>The interaction “Tell the warehouse” happens here. Then back to the join after Send the receipt.</li></ol>
+<p>Key to the marks:</p>
+<ul><li>A filled dot: where it starts.</li><li>A frame marked ref: an interaction whose messages are drawn in its own sequence diagram.</li><li>A hollow diamond: the path splits by a condition, or paths join again.</li><li>A thick bar: the path splits into paths that run at the same time, or those paths wait for each other.</li><li>A ring around a filled dot: the activity ends.</li><li>A solid line with an open arrowhead: the order of the steps. A condition in brackets says when that path is taken.</li></ul>
+</details>
