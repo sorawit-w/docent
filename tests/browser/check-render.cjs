@@ -288,7 +288,7 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
   {
     const { page, context } = await open({ width: 658, height: 1123, media: "print" });
     const tables = await page.evaluate(() => { dispatchEvent(new Event("beforeprint")); return [...document.querySelectorAll(".table-wrap")].map((wrap) => ({ over: Math.round(wrap.querySelector("table").getBoundingClientRect().right - wrap.getBoundingClientRect().right), shown: wrap.getBoundingClientRect().height > 0 })); });
-    ok("on paper no table is cut off", tables.length === 2 && tables.every((t) => t.shown && t.over <= 0), tables);
+    ok("on paper no table is cut off", tables.length === 3 && tables.every((t) => t.shown && t.over <= 0), tables);
     // A browser prints no background unless the style asks for it. The status dots, the rail of the steps and the grounds carry meaning.
     const grounds = await page.evaluate(() => { const exact = (sel, pseudo) => { const style = getComputedStyle(document.querySelector(sel), pseudo); return (style.printColorAdjust || style.webkitPrintColorAdjust) === "exact"; }; return { dot: exact(".state", "::before"), rail: exact(".steps", "::before"), well: exact(".fig"), block: exact("pre"), code: exact("p code") }; });
     ok("on paper the status dots, the rail and the grounds of figures and code are printed", Object.values(grounds).every(Boolean), grounds);
@@ -388,6 +388,59 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     ok("a long status label wraps, so the page does not scroll sideways at 390px or 320px", phone.page === phone.view && narrow.page === narrow.view && phone.label <= phone.main, { phone, narrow });
     ok("a closed section that holds a table is as wide as a table outside it", desk.inner === desk.flow && desk.flow > 1000, desk);
     ok("on paper a table with long code in its cells stays inside the page", paper.page === paper.view && paper.wide.every((r) => r <= paper.view), paper);
+  }
+
+  // The value picker: a choice changes every place, in the text and in code. With scripts off, and on paper, the table of all values is there.
+  {
+    const { page, context } = await open({ width: 1280 });
+    const places = () => page.evaluate(() => ({ text: [...document.querySelectorAll("var[data-v]")].map((v) => v.textContent).join(), now: document.querySelector("#wd-channel .values-now strong").textContent, code: document.querySelector("#commands pre code").textContent.split("\n")[1], open: document.querySelector("#wd-channel details").open }));
+    const first = await places();
+    await page.click('label[for="wd-channel-2"]');
+    const second = await places();
+    ok("a value picker shows the first option's values, and a choice changes every place, also inside code", first.text === "bugs.example.test/stable,stable" && first.now === "Stable" && !first.open && second.text === "bugs.example.test/beta,beta" && second.now === "Beta" && second.code === "app --version --channel beta", { first, second });
+    const still = await page.evaluate(() => { document.documentElement.classList.remove("js"); return { options: [...document.querySelectorAll("#wd-channel > .opt")].filter((o) => o.getBoundingClientRect().height > 0).length, rows: document.querySelectorAll("#wd-channel tbody tr").length }; });
+    ok("with scripts off the options of a value picker are hidden, and its table holds every value", still.options === 0 && still.rows === 2, still);
+    await context.close();
+    const paper = await open({ width: 658, height: 1123, media: "print" });
+    const printed = await paper.page.evaluate(() => { dispatchEvent(new Event("beforeprint")); const shown = (s) => [...document.querySelectorAll(s)].filter((e) => e.getBoundingClientRect().height > 0).length; return { options: shown("#wd-channel > .opt"), now: shown("#wd-channel .values-now"), rows: shown("#wd-channel tbody tr") }; });
+    ok("on paper a value picker prints the line that names the choice and the table of all values, without the options", printed.options === 0 && printed.now === 1 && printed.rows === 2, printed);
+    await paper.context.close();
+  }
+
+  // The card grid: at most four in a row, two on a phone, one on the narrowest screen; the page never scrolls sideways.
+  {
+    const rows = {};
+    for (const width of [1280, 390, 320]) {
+      const view = await open({ width, height: 900 });
+      rows[width] = await view.page.evaluate(() => ({ tops: new Set([...document.querySelectorAll(".cards > li")].map((li) => Math.round(li.getBoundingClientRect().top))).size, page: document.documentElement.scrollWidth, view: innerWidth }));
+      await view.context.close();
+    }
+    ok("a card grid of four shows 4 in a row at 1280px, 2 at 390px and 1 at 320px", rows[1280].tops === 1 && rows[390].tops === 2 && rows[320].tops === 4 && [1280, 390, 320].every((w) => rows[w].page === rows[w].view), rows);
+  }
+
+  // Host tokens: an accent, a dark accent and a font set before stamp hold in light, in dark and on paper. A drawing keeps the system font.
+  {
+    const host = html.replace("<head>", "<head>\n<style>:root { --host-accent: #0b6e4f; --host-accent-dark: #6fd3a8; --host-sans: Georgia, serif; }</style>");
+    const look = async (opts) => { const view = await open({ ...opts, content: host }); const r = await view.page.evaluate(() => ({ link: getComputedStyle(document.querySelector("main a")).color, body: getComputedStyle(document.body).fontFamily.split(",")[0], drawing: getComputedStyle(document.querySelector("svg.dg")).fontFamily.split(",")[0] })); await view.context.close(); return r; };
+    const [light, dark, paper] = [await look({ width: 1280 }), await look({ width: 1280, theme: "dark" }), await look({ width: 794, media: "print", theme: "dark" })];
+    ok("host tokens set before stamp win in light, in dark and on paper, and a drawing keeps the system font", light.link === "rgb(11, 110, 79)" && dark.link === "rgb(111, 211, 168)" && paper.link === "rgb(11, 110, 79)" && light.body === "Georgia" && light.drawing === "system-ui", { light, dark, paper });
+  }
+
+  // A theme written on <html> is fixed: a dark system and a saved dark choice do not change it, and the switch is hidden.
+  {
+    // Opened from a file, so the page has storage: a saved choice of "dark" is stored first, then the page loads again.
+    const file = path.join(require("node:os").tmpdir(), `docent-fixed-${process.pid}.html`);
+    fs.writeFileSync(file, html.replace('<html lang="en">', '<html lang="en" data-theme="light">'));
+    const context = await browser.newContext({ viewport: { width: 1280, height: 900 }, colorScheme: "dark" });
+    const page = await context.newPage();
+    await page.goto(`file://${file}`);
+    await page.evaluate(() => localStorage.setItem("docent-theme", "dark"));
+    await page.reload();
+    await page.waitForTimeout(300);
+    const r = await page.evaluate(() => ({ saved: localStorage.getItem("docent-theme"), bg: getComputedStyle(document.body).backgroundColor, theme: document.documentElement.dataset.theme, button: document.querySelector(".theme").getBoundingClientRect().width }));
+    ok("data-theme=\"light\" on <html> keeps the page light on a dark system and after a saved dark choice, and hides the switch", r.saved === "dark" && r.bg === LIGHT.bg && r.theme === "light" && r.button === 0, r);
+    await context.close();
+    fs.unlinkSync(file);
   }
 
   // The copy button copies the code. The page is opened from its file, as a reader opens it.

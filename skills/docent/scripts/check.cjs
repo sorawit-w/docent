@@ -5,10 +5,21 @@
 const fs = require("node:fs");
 const { VERSION, cssBlock, jsBlock, findKit } = require("./lib/kit.cjs");
 const { renderDiagram } = require("./lib/diagram.cjs");
-const { renderWidget } = require("./lib/widget.cjs");
+const { renderWidget, PLACE, esc } = require("./lib/widget.cjs");
 const { findBlocks, block } = require("./lib/blocks.cjs");
 
 const MOST_WIDGETS = 4; // more widgets than this in one document gives a warning
+const CARDS = [3, 8]; // a card grid holds 3 to 8 cards
+// The pages that the kit draws on, light and dark: a host color must read on both the page and the well.
+const GROUNDS = { light: ["#fbfbfe", "#f2f3f9"], dark: ["#12141f", "#0b0d15"] };
+const HOST = { "host-accent": "light", "host-accent-dark": "dark", "host-ink": "light" };
+
+const luminance = (hex) => {
+  const full = hex.length === 4 ? hex.replace(/^#(.)(.)(.)$/, "#$1$1$2$2$3$3") : hex;
+  const [r, g, b] = [1, 3, 5].map((i) => parseInt(full.slice(i, i + 2), 16) / 255).map((c) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4));
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+};
+const contrast = (a, b) => { const [x, y] = [luminance(a), luminance(b)].sort((m, n) => n - m); return (x + 0.05) / (y + 0.05); };
 
 const plain = (s) => s.replace(/<[^>]*>/g, "").replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#39;|&apos;/g, "'").replace(/\s+/g, " ").trim();
 const words = (s) => s.toLowerCase().match(/[\p{L}\p{N}]+/gu) || [];
@@ -57,7 +68,7 @@ function checkDocument(html) {
   if (/<svg\b[^>]*\bclass="[^"]*\bdg\b/.test(rest)) errors.push("a diagram sits outside a diagram block; put its data in a block and run render");
 
   // 2b. Widgets: each widget must be the one that render makes from its data.
-  const widgets = findBlocks(rest, "widget"), widgetIds = new Set(), kinds = new Set();
+  const widgets = findBlocks(rest, "widget"), widgetIds = new Set(), kinds = new Set(), defaults = {};
   widgets.forEach((found, n) => {
     const name = `widget ${n + 1}`;
     let data;
@@ -68,14 +79,33 @@ function checkDocument(html) {
       if (widgetIds.has(built.id)) errors.push(`${label}: another widget has the same id`);
       widgetIds.add(built.id);
       if (found.text !== block("widget", found.json, built.html)) errors.push(`${label}: the widget does not match its data; run render`);
-      kinds.add(built.key == null ? built.id : `chooser ${built.key}`); // choosers with the same options change together and count as one
+      kinds.add(built.key == null ? built.id : `${built.kind} ${built.key}`); // choosers or value pickers with the same options change together and count as one
+      for (const [key, value] of Object.entries(built.defaults || {})) {
+        if (Object.hasOwn(defaults, key)) errors.push(`${label}: another value picker has the key "${key}"; each key belongs to one value picker`);
+        defaults[key] = value;
+      }
     } catch (error) {
       errors.push(`${name}${data && data.id ? ` ("${data.id}")` : ""}: ${error.message}`);
     }
   });
   for (const found of [...widgets].reverse()) rest = rest.slice(0, found.start) + rest.slice(found.end);
-  if (/\bclass="(?:[^"]*\s)?(choose|checks|decide)(?:\s[^"]*)?"/.test(rest)) errors.push("a widget sits outside a widget block; put its data in a block and run render");
+  if (/\bclass="(?:[^"]*\s)?(choose|checks|decide|values)(?:\s[^"]*)?"/.test(rest)) errors.push("a widget sits outside a widget block; put its data in a block and run render");
   if (kinds.size > MOST_WIDGETS) warnings.push(`the document has ${kinds.size} widgets; a widget is for a reader who must choose, track or decide, and more than ${MOST_WIDGETS} in one document is a sign that some are not needed`);
+
+  // Places that show a value: each names a key of a value picker and holds the value of its first option.
+  const used = new Set();
+  for (const [, , key, , inner] of rest.replace(/<!--[\s\S]*?-->/g, "").matchAll(PLACE)) {
+    if (!Object.hasOwn(defaults, key)) { errors.push(`a place <var data-v="${key}"> names a value that no value picker has`); continue; }
+    used.add(key);
+    if (inner !== esc(defaults[key])) errors.push(`a place <var data-v="${key}"> holds "${plain(inner)}", not the value of the first option; run render`);
+  }
+  for (const key of Object.keys(defaults)) if (!used.has(key)) warnings.push(`the value "${key}" of a value picker is shown in no place; mark each place with <var data-v="${key}"></var>, or take the value out`);
+
+  // A card grid holds a few short items.
+  for (const [, inner] of rest.matchAll(/<ul\b[^>]*\bclass="[^"]*\bcards\b[^"]*"[^>]*>([\s\S]*?)<\/ul>/g)) {
+    const n = (inner.match(/<li\b/g) || []).length;
+    if (n < CARDS[0] || n > CARDS[1]) warnings.push(`a card grid has ${n} cards; it holds ${CARDS[0]} to ${CARDS[1]}. Use a list or a table for ${n < CARDS[0] ? "fewer" : "more"}`);
+  }
 
   // A walkthrough lights leg n for step n, so the numbers must agree.
   const lists = [...rest.matchAll(/<ol\b[^>]*\bclass="[^"]*\bsteps\b[^"]*"[^>]*>([\s\S]*?)<\/ol>/g)].map((m) => m[1]);
@@ -106,6 +136,14 @@ function checkDocument(html) {
       if (["src", "srcset", "href", "xlink:href", "poster", "data", "action", "background"].includes(a) && !local(value)) errors.push(`<${name} ${a}="${value.slice(0, 60)}"> loads from outside the file; a document is one file with no network`);
     }
   }
+  // Host colors and fonts go through the --host-* tokens. The kit sets its own tokens in four places (light, dark by the system, dark by the switch, print), so an author's value for one of them is lost in some of them.
+  for (const [, name] of css.matchAll(/(?:^|[;{\s])--(bg|panel|fig|text|muted|line|primary|ink|dot|ok|warn|err|serif|sans|mono)\s*:/g)) warnings.push(`a style sets --${name}; the kit sets it in four places, so your value is lost in dark mode or in print. Use the --host-* tokens (see SKILL.md)`);
+  for (const [, name, value] of css.matchAll(/--(host-accent-dark|host-accent|host-ink)\s*:\s*([^;}]+)/g)) {
+    const color = value.trim();
+    if (!/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(color)) { warnings.push(`--${name} is "${color}"; check tests the contrast of a hex color only, such as #2f3fd0`); continue; }
+    const low = GROUNDS[HOST[name]].map((ground) => [ground, contrast(color, ground)]).filter(([, ratio]) => ratio < 4.5);
+    if (low.length) errors.push(`--${name} ${color} has a contrast of ${low.map(([g, r]) => `${r.toFixed(2)}:1 on ${g}`).join(" and ")}; text needs 4.5:1`);
+  }
   if (/@import\b/i.test(css)) errors.push("a style uses @import; a document is one file with no network");
   for (const [, target] of css.matchAll(/url\(\s*["']?([^"')]*)/gi)) if (!local(target)) errors.push(`a style loads url(${target.slice(0, 60)}); a document is one file with no network`);
   if (scripts.trim()) {
@@ -129,6 +167,8 @@ function checkDocument(html) {
 
   // 6. The frame of the document.
   if (!/<html\b[^>]*\blang="[^"]+"/i.test(markup)) errors.push('<html> has no lang attribute');
+  const fixed = (markup.match(/<html\b[^>]*\bdata-theme="([^"]*)"/i) || [])[1];
+  if (fixed != null && !["light", "dark"].includes(fixed)) errors.push(`<html> has data-theme="${fixed}"; a fixed theme is "light" or "dark"`);
   if (!/<meta\b[^>]*name="viewport"/i.test(markup)) errors.push('the document has no <meta name="viewport">');
   const h1 = [...markup.matchAll(/<h1\b[^>]*>([\s\S]*?)<\/h1>/gi)];
   if (h1.length !== 1) errors.push(`the document has ${h1.length} <h1> headings; it must have one`);

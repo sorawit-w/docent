@@ -5,11 +5,14 @@
   const button = document.querySelector('.theme');
   const system = matchMedia('(prefers-color-scheme: dark)');
   const theme = () => root.dataset.theme || (system.matches ? 'dark' : 'light');
-  try {
+  // A theme written on <html> in the source is fixed: no saved choice and no switch.
+  const fixed = root.dataset.theme === 'light' || root.dataset.theme === 'dark';
+  if (fixed && button) button.hidden = true;
+  if (!fixed) try {
     const saved = localStorage.getItem('docent-theme');
     if (saved === 'dark' || saved === 'light') root.dataset.theme = saved;
   } catch { /* no saved choice can be read: follow the system */ }
-  if (button) {
+  if (button && !fixed) {
     const showSwitch = () => {
       const next = theme() === 'dark' ? 'light' : 'dark';
       button.dataset.next = next;
@@ -156,6 +159,25 @@
       save(c.key, n);
       schedule();
     }));
+  });
+  // Value picker: every place <var data-v="key"> shows the value of the chosen option. The values come from the table of all values. Pickers with the same options change together, and the choice is remembered.
+  const pickers = [...document.querySelectorAll('.values')].map((el) => ({
+    el,
+    inputs: [...el.querySelectorAll(':scope > input')],
+    names: [...el.querySelectorAll(':scope > .opt')].map((label) => label.textContent),
+    rows: [...el.querySelectorAll('tbody tr[data-v]')].map((tr) => ({ key: tr.dataset.v, cells: [...tr.querySelectorAll('td')].map((td) => td.textContent) })),
+  }));
+  const pick = (names, n) => pickers.forEach((p) => {
+    if (p.names.join('|') !== names || !p.inputs[n]) return;
+    p.inputs[n].checked = true;
+    p.el.querySelector('.values-now strong').textContent = p.names[n];
+    p.rows.forEach(({ key, cells }) => document.querySelectorAll(`var[data-v="${CSS.escape(key)}"]`).forEach((v) => (v.textContent = cells[n])));
+  });
+  pickers.forEach((p) => {
+    const key = `docent-values:${p.names.join('|')}`, saved = load(key);
+    if (Number.isInteger(saved)) pick(p.names.join('|'), saved);
+    p.inputs.forEach((input, n) => input.addEventListener('change', () => { pick(p.names.join('|'), n); save(key, n); }));
+    p.el.querySelector('details').open = false;
   });
   // Checklist: the ticks are remembered for this document, and the line below the list counts them.
   document.querySelectorAll('form.checks').forEach((form) => {

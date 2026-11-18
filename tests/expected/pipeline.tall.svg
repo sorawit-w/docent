@@ -1,6 +1,6 @@
 <svg id="dg-pipeline" class="dg dg-tall" xmlns="http://www.w3.org/2000/svg" width="440" height="568" viewBox="0 0 440 568" role="img" aria-label="A change in four steps: the build passed, three tests failed, the review waits, and the release did not start.">
 <style>
-#dg-pipeline{display:block;flex:none;margin-inline:auto;font-family:var(--sans,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif)}
+#dg-pipeline{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
 #dg-pipeline .ground{fill:var(--fig,#f2f3f9)}
 #dg-pipeline .band{fill:var(--bg,#fbfbfe)}
 #dg-pipeline .track{stroke:var(--line,#d3d6e3)}
@@ -83,7 +83,7 @@
 </svg>
 <svg id="dg-pipeline-phone" class="dg dg-track" xmlns="http://www.w3.org/2000/svg" width="264" height="520" viewBox="0 0 264 520" role="img" aria-label="A change in four steps: the build passed, three tests failed, the review waits, and the release did not start.">
 <style>
-#dg-pipeline-phone{flex:none;margin-inline:auto;font-family:var(--sans,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif)}
+#dg-pipeline-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
 #dg-pipeline-phone .ground{fill:var(--fig,#f2f3f9)}
 #dg-pipeline-phone .band{fill:var(--bg,#fbfbfe)}
 #dg-pipeline-phone .track{stroke:var(--line,#d3d6e3)}

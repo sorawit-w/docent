@@ -37,3 +37,22 @@ test("the page script writes each step number as text, so a screen reader in Chr
   assert.match(js, /span\.className = 'step-n'/);
   assert.match(rule("h3.is-numbered::before"), /content: none/);
 });
+
+test("the host tokens: the kit reads them and never sets them, so a host value holds in every theme and in print", () => {
+  assert.ok(!/--host-[a-z-]+\s*:/.test(css), "the kit does not set a --host-* token");
+  for (const token of ["host-accent", "host-accent-dark", "host-ink", "host-serif", "host-sans", "host-mono"]) assert.match(css, new RegExp(`var\\(--${token},`));
+  assert.equal((css.match(/--primary: var\(--host-accent, #2f3fd0\)/g) || []).length, 2, "light and print");
+  assert.equal((css.match(/--primary: var\(--host-accent-dark, #8e9bff\)/g) || []).length, 2, "dark by the system and dark by the switch");
+});
+
+test("a theme written on <html> is fixed: the page script hides the switch and reads no saved choice", () => {
+  assert.match(js, /const fixed = root\.dataset\.theme === 'light' \|\| root\.dataset\.theme === 'dark';/);
+  assert.match(js, /if \(!fixed\) try \{/);
+  assert.match(css, /\.theme\[hidden\] \{ display: none; \}/);
+});
+
+test("a card grid has no box and at most four cards in a row", () => {
+  assert.match(rule(".cards > li"), /border-top: 1px solid var\(--line\)/);
+  assert.ok(!/background|box-shadow|border:/.test(rule(".cards > li")));
+  assert.match(rule(".cards"), /calc\(\(100% - 72px\) \/ 4\)/);
+});

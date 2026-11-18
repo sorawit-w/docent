@@ -3,11 +3,12 @@
   color-scheme: light;
   --bg: #fbfbfe; --panel: #f2f3f9; --fig: #f2f3f9;
   --text: #1c1f2e; --muted: #575d75; --line: #d3d6e3;
-  --primary: #2f3fd0; --ink: #1b2260; --dot: #2f3fd0;
+  --primary: var(--host-accent, #2f3fd0); --ink: var(--host-ink, #1b2260); --dot: var(--host-accent, #2f3fd0);
   --ok: #1a7f37; --warn: #7d4e00; --err: #cf222e;
-  --serif: Charter, "Bitstream Charter", "Sitka Heading", "Sitka Text", Cambria, Georgia, serif;
-  --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --mono: ui-monospace, "SF Mono", "Cascadia Code", Consolas, Menlo, monospace;
+  /* A host project sets its own accent, heading color and fonts with the --host-* tokens. The kit never sets them, so they hold in every theme and in print. */
+  --serif: var(--host-serif, Charter, "Bitstream Charter", "Sitka Heading", "Sitka Text", Cambria, Georgia, serif);
+  --sans: var(--host-sans, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif);
+  --mono: var(--host-mono, ui-monospace, "SF Mono", "Cascadia Code", Consolas, Menlo, monospace);
   --ease: cubic-bezier(0.23, 1, 0.32, 1);
   --measure: 31rem; --margin-col: 220px; --gap: 48px;
 }
@@ -17,7 +18,7 @@
     color-scheme: dark;
     --bg: #12141f; --panel: #0b0d15; --fig: #0b0d15;
     --text: #e7e9f3; --muted: #959bb3; --line: #2d3146;
-    --primary: #8e9bff; --ink: #e7e9f3; --dot: #f2b824;
+    --primary: var(--host-accent-dark, #8e9bff); --ink: #e7e9f3; --dot: #f2b824;
     --ok: #3fb950; --warn: #d29922; --err: #f85149;
   }
 }
@@ -25,7 +26,7 @@
   color-scheme: dark;
   --bg: #12141f; --panel: #0b0d15; --fig: #0b0d15;
   --text: #e7e9f3; --muted: #959bb3; --line: #2d3146;
-  --primary: #8e9bff; --ink: #e7e9f3; --dot: #f2b824;
+  --primary: var(--host-accent-dark, #8e9bff); --ink: #e7e9f3; --dot: #f2b824;
   --ok: #3fb950; --warn: #d29922; --err: #f85149;
 }
 *, *::before, *::after { box-sizing: border-box; }
@@ -52,7 +53,7 @@ a:hover { text-decoration-thickness: 2px; }
 .theme:hover, .wd-btn:hover { border-color: var(--muted); }
 .theme:active, .wd-btn:active { transform: translateY(1px); }
 .theme svg { width: 15px; height: 15px; }
-html:not(.js) .theme { display: none; }
+html:not(.js) .theme, .theme[hidden] { display: none; }
 .theme[data-next="dark"] .icon-sun, .theme[data-next="light"] .icon-moon { display: none; }
 
 /* Title block: the title leads; facts about the document sit below it. */
@@ -75,12 +76,15 @@ dd { margin: 0 0 12px; }
 dd:last-child { margin-bottom: 0; }
 p { margin: 0 0 16px; max-width: var(--measure); text-wrap: pretty; }
 .term { text-decoration: underline; text-decoration-color: var(--primary); text-decoration-thickness: 2px; text-underline-offset: 0.22em; }
+/* A place that shows a value of a value picker. A dotted line under it says that it changes with the choice. */
+var { font-style: normal; }
+var[data-v] { text-decoration: underline dotted var(--muted); text-decoration-thickness: 1px; text-underline-offset: 0.25em; }
 code { font: 14px/1.55 var(--mono); background: var(--panel); padding: 0.1em 0.38em; border-radius: 6px; }
 .standfirst code { font-size: 18px; }
 
 /* Lists in the text flow: points, or numbers for steps that one actor does. The rules are weak on purpose, so the lists of the kit's own blocks keep their styles. */
-:where(main) :where(ul, ol):not(.steps, .facts) { max-width: var(--measure); margin: 0 0 16px; padding-left: 24px; }
-:where(main) :where(ul, ol):not(.steps, .facts) > :where(li + li) { margin-top: 4px; }
+:where(main) :where(ul, ol):not(.steps, .facts, .cards) { max-width: var(--measure); margin: 0 0 16px; padding-left: 24px; }
+:where(main) :where(ul, ol):not(.steps, .facts, .cards) > :where(li + li) { margin-top: 4px; }
 /* A block heading in the text flow has more space above it than below it. A step heading of a walkthrough has none. */
 :where(main) h3 { margin: 32px 0 8px; }
 h2 + h3, h3 + h4 { margin-top: 0; }
@@ -125,6 +129,14 @@ section > figure { margin-top: 24px; }
 figcaption { margin-top: 12px; font-size: 14px; line-height: 1.5; color: var(--muted); }
 figcaption strong { font-weight: 600; color: var(--text); margin-right: 8px; }
 
+/* Card grid: 3 to 8 short items side by side, each a heading or a large number and a line of text. A card is a label, like a margin note: a line above it, and no box. At most four in a row. */
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(max(160px, calc((100% - 72px) / 4)), 1fr)); gap: 24px; margin: 24px 0 0; padding: 0; list-style: none; }
+.cards > li { min-width: 0; padding-top: 12px; border-top: 1px solid var(--line); }
+.cards h3 { margin: 0 0 4px; font-size: 16px; line-height: 1.5; }
+.cards p { margin: 0; font-size: 14px; line-height: 1.5; color: var(--muted); }
+.cards .big { margin-bottom: 4px; font: 700 30px/1.2 var(--serif); color: var(--ink); font-variant-numeric: tabular-nums; }
+.cards + :is(p, ul, ol, dl) { margin-top: 24px; }
+
 /* Tables: rules only, no boxes. */
 .table-wrap { overflow-x: auto; margin: 24px 0 0; scrollbar-color: var(--line) transparent; }
 table { width: 100%; min-width: 640px; border-collapse: collapse; font-variant-numeric: tabular-nums; }
@@ -167,9 +179,9 @@ details[open] summary svg { transform: rotate(90deg); }
 details > p { margin: 8px 0 0 22px; }
 
 /* Widgets: the reader chooses, ticks or decides. A widget is plain controls and text, with no box. render makes its markup from data. */
-.choose, .checks, .decide { position: relative; margin: 24px 0 0; }
-:is(.choose, .checks, .decide) + * { margin-top: 24px; }
-.choose > input, .checks input, .decide input { position: absolute; width: 1px; height: 1px; margin: 0; opacity: 0; pointer-events: none; }
+.choose, .checks, .decide, .values { position: relative; margin: 24px 0 0; }
+:is(.choose, .checks, .decide, .values) + * { margin-top: 24px; }
+.choose > input, .checks input, .decide input, .values > input { position: absolute; width: 1px; height: 1px; margin: 0; opacity: 0; pointer-events: none; }
 .wd-t { margin: 0; max-width: none; font-size: 14px; line-height: 1.5; font-weight: 600; color: var(--muted); }
 .opt { display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px; border: 1px solid var(--line); border-radius: 6px; font-size: 14px; line-height: 1; cursor: pointer; }
 .opt::before { content: ""; width: 9px; height: 9px; border-radius: 50%; border: 1px solid var(--muted); }
@@ -209,6 +221,14 @@ input:focus-visible + .opt, .checks input:focus-visible + label::before { outlin
 .decide td strong { display: block; font-weight: 600; }
 .decide tr.is-out { color: var(--muted); }
 html:not(.js) .decide-ask, html:not(.js) .wd-foot output { display: none; }
+/* Value picker: options like a chooser, a line that names the chosen option, and the table of all values. With scripts off the options do nothing, so they are hidden, and the text shows the values of the first option. */
+.values { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.values > .wd-t { margin-right: 4px; }
+.values-now { flex-basis: 100%; max-width: none; margin: 4px 0 0; font-size: 14px; line-height: 1.5; color: var(--muted); }
+.values-now strong { font-weight: 600; color: var(--text); }
+.values details { flex-basis: 100%; min-width: 0; max-width: none; margin-top: 8px; }
+.values .table-wrap { margin-top: 8px; }
+html:not(.js) .values > input + .opt { display: none; }
 
 footer { margin-top: 96px; border-top: 1px solid var(--line); }
 footer .shell { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding-top: 24px; padding-bottom: 40px; font-size: 14px; color: var(--muted); }
@@ -242,8 +262,8 @@ footer .shell { display: flex; align-items: center; justify-content: space-betwe
   *, *::before, *::after { transition: none !important; }
 }
 @media print {
-  html:root:not([data-never]) { color-scheme: light; --bg: #ffffff; --panel: #f2f3f9; --fig: #f2f3f9; --text: #1c1f2e; --muted: #575d75; --line: #d3d6e3; --primary: #2f3fd0; --ink: #1b2260; --dot: #2f3fd0; --ok: #1a7f37; --warn: #7d4e00; --err: #cf222e; }
-  .topbar, .rail-dot, .choose > .opt, .decide-ask, .wd-foot, .copy, .fig-more { display: none !important; }
+  html:root:not([data-never]) { color-scheme: light; --bg: #ffffff; --panel: #f2f3f9; --fig: #f2f3f9; --text: #1c1f2e; --muted: #575d75; --line: #d3d6e3; --primary: var(--host-accent, #2f3fd0); --ink: var(--host-ink, #1b2260); --dot: var(--host-accent, #2f3fd0); --ok: #1a7f37; --warn: #7d4e00; --err: #cf222e; }
+  .topbar, .rail-dot, .choose > .opt, .values > .opt, .decide-ask, .wd-foot, .copy, .fig-more { display: none !important; }
   .choose > .case { display: block !important; margin-top: 16px; } .case-t { display: block; }
   .checks input:checked + label, .decide tr.is-out { color: var(--text) !important; }
   .steps li h3, .steps li p { color: var(--text) !important; }
@@ -251,7 +271,7 @@ footer .shell { display: flex; align-items: center; justify-content: space-betwe
   table { min-width: 0; } .table-wrap { overflow: visible; }
   /* A browser leaves out backgrounds on paper. These carry meaning, so they print: status dots, the rail of the steps, and the ground of figures and code. */
   .state::before, .steps::before, .fig, pre, code { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  figure, tr, .status, pre, .checks li { break-inside: avoid; }
+  figure, tr, .status, pre, .checks li, .cards > li { break-inside: avoid; }
   h2, h3 { break-after: avoid; }
   @page { margin: 18mm; }
 }

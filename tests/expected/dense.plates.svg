@@ -1,6 +1,6 @@
 <svg id="dg-invoice" class="dg dg-plates dg-auto" xmlns="http://www.w3.org/2000/svg" width="1218" height="638" viewBox="0 0 1218 638" role="img" aria-label="An invoice between three teams: sales writes it, finance checks it, the customer pays or disputes it, and finance closes it.">
 <style>
-#dg-invoice{display:block;flex:none;margin-inline:auto;font-family:var(--sans,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif)}
+#dg-invoice{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
 #dg-invoice .ground{fill:var(--fig,#f2f3f9)}
 #dg-invoice .band{fill:var(--bg,#fbfbfe)}
 #dg-invoice .track{stroke:var(--line,#d3d6e3)}

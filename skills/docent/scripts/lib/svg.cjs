@@ -74,7 +74,7 @@ function styles(scene, id, mode, swap) {
   const s = `#${id}`;
   const css = [
     // A phone form stays hidden until the screen is narrow; the rule that hides it sits in the main drawing.
-    `${s}{${swap && swap.below ? "" : "display:block;"}flex:none;margin-inline:auto;font-family:var(--sans,${SANS})}`,
+    `${s}{${swap && swap.below ? "" : "display:block;"}flex:none;margin-inline:auto;font-family:${SANS}}`, // the system sans-serif, not a host font: the layout estimates its text widths
     `${s} .ground{fill:${v("fig")}}`,
     `${s} .band{fill:${v("bg")}}`,
     `${s} .track{stroke:${v("line")}}`,
