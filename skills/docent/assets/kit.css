@@ -66,6 +66,13 @@ h1 { font-size: 52px; line-height: 1.06; letter-spacing: -0.02em; }
 section { padding-top: 72px; }
 h2 { font-size: 30px; line-height: 1.2; margin-bottom: 16px; }
 h3 { font: 600 18px/1.35 var(--sans); margin: 0; text-wrap: balance; }
+/* A small heading inside a part of a section: body size, weight 600. */
+h4 { font: 600 16px/1.5 var(--sans); margin: 24px 0 4px; }
+/* A definition list: each term in weight 600, its meaning below it. */
+dl { max-width: var(--measure); margin: 0 0 16px; }
+dt { font-weight: 600; }
+dd { margin: 0 0 12px; }
+dd:last-child { margin-bottom: 0; }
 p { margin: 0 0 16px; max-width: var(--measure); text-wrap: pretty; }
 .term { text-decoration: underline; text-decoration-color: var(--primary); text-decoration-thickness: 2px; text-underline-offset: 0.22em; }
 code { font: 14px/1.55 var(--mono); background: var(--panel); padding: 0.1em 0.38em; border-radius: 6px; }
@@ -76,14 +83,17 @@ code { font: 14px/1.55 var(--mono); background: var(--panel); padding: 0.1em 0.3
 :where(main) :where(ul, ol):not(.steps, .facts) > :where(li + li) { margin-top: 4px; }
 /* A block heading in the text flow has more space above it than below it. A step heading of a walkthrough has none. */
 :where(main) h3 { margin: 32px 0 8px; }
-h2 + h3 { margin-top: 0; }
+h2 + h3, h3 + h4 { margin-top: 0; }
 .steps h3 { margin: 0; }
 /* A numbered block heading: one of several steps that one actor does, where a step holds a code block, a table or a widget. The kit writes the number, and the count starts again in each section. */
 section { counter-reset: block-step; }
 h3.step { counter-increment: block-step; }
 h3.step::before { content: counter(block-step); font-weight: 400; color: var(--muted); margin-right: 10px; font-variant-numeric: tabular-nums; }
+/* With scripts on, the page script writes the number as text, so that a screen reader reads it. It looks the same as the counted number. */
+h3.is-numbered::before { content: none !important; }
+.step-n { font-weight: 400; color: var(--muted); margin-right: 6px; font-variant-numeric: tabular-nums; }
 /* A code block, a table, a closed section, a walkthrough, a status note and a figure bring no space below them. Text that follows brings it. */
-:is(pre, .code, .table-wrap, details, .walk, .status, figure) + :is(p, ul, ol) { margin-top: 24px; }
+:is(pre, .code, .table-wrap, details, .walk, .status, figure) + :is(p, ul, ol, dl) { margin-top: 24px; }
 
 /* Margin notes: the guide's remarks sit beside the text, like a wall label. */
 .row { display: grid; grid-template-columns: minmax(0, var(--measure)) var(--margin-col); column-gap: var(--gap); align-items: start; }
@@ -122,9 +132,15 @@ th, td { text-align: left; vertical-align: top; padding: 12px 24px 12px 0; }
 thead th { border-bottom: 1px solid var(--text); padding-bottom: 10px; font-size: 14px; line-height: 1.5; font-weight: 600; color: var(--muted); }
 tbody th { font-weight: 600; white-space: nowrap; }
 tbody tr { border-bottom: 1px solid var(--line); }
-.state { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; font-weight: 600; }
-.state::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.state { display: inline-flex; align-items: baseline; gap: 8px; font-weight: 600; }
+.state::before { content: ""; flex: none; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
 .state.ok { color: var(--ok); } .state.warn { color: var(--warn); } .state.err { color: var(--err); }
+/* Two states with no status color: plain information takes a muted dot, and a thing that is planned or not on yet takes a muted ring. */
+.state.info, .state.plan { color: var(--text); }
+.state.info::before { background: var(--muted); }
+.state.plan::before { background: none; border: 1.5px solid var(--muted); }
+/* Code in a cell may break anywhere, so a long path or command does not make the table wider than its place. */
+:is(td, th) code { overflow-wrap: anywhere; }
 
 /* Status note: a dot and a word carry the status. */
 .status { max-width: var(--measure); margin: 32px 0 0; }
@@ -142,6 +158,8 @@ pre code { background: none; padding: 0; font-size: inherit; }
 .cm { color: var(--muted); }
 
 details { max-width: var(--measure); margin: 24px 0 0; }
+/* A closed section that holds a table, a code block or a figure takes the full width, like those blocks do outside it. Its text keeps the text column. */
+details:has(> .table-wrap, > pre, > .code, > figure) { max-width: none; }
 summary { display: flex; align-items: center; gap: 10px; padding: 4px 0; font-weight: 600; cursor: pointer; list-style: none; }
 summary::-webkit-details-marker { display: none; }
 summary svg { width: 12px; height: 12px; color: var(--muted); transition: transform 150ms var(--ease); }

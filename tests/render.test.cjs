@@ -53,6 +53,13 @@ test("a walkthrough drawing lights the current leg; any other drawing runs one d
   }
 });
 
+test("the dot passes under the numbered mark of its leg, so the number stays readable", () => {
+  const { svg } = renderDiagram(fixture("bug-report"));
+  const legs = [...svg.matchAll(/<g class="leg[^"]*" data-leg="\d+">([\s\S]*?)<\/g>/g)].map((m) => m[1]);
+  assert.ok(legs.length >= 4);
+  for (const leg of legs) assert.ok(leg.indexOf('class="pulse') < leg.indexOf('class="mark"'), "the dot comes before the mark, so the mark is drawn on top");
+});
+
 test("a drawing that is too wide beside walkthrough steps gets a warning that names the cause", () => {
   assert.deepEqual(renderDiagram({ ...fixture("bug-report"), place: "walk" }).warnings, [], "two lanes with short texts fit");
   const [warning] = renderDiagram({ ...fixture("order"), place: "walk" }).warnings;

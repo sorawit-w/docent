@@ -153,11 +153,12 @@ function toSvg(scene, { id, label, mode, swap }) {
   }
   for (const leg of scene.legs) {
     out.push(
+      // The dot is drawn before the numbered mark, so it passes under the mark and the number stays readable.
       `<g class="leg${leg.optional ? " is-optional" : ""}" data-leg="${leg.n}"><path d="${linePath(leg)}" class="line"/>${head(leg)}` +
+        `<circle r="6" class="pulse pulse-${leg.n}"/>` +
         `<circle cx="${num(leg.mark[0])}" cy="${num(leg.mark[1])}" r="${MARK}" class="mark"/>` +
         text({ x: leg.mark[0], y: leg.mark[1] + 4, s: leg.n, cls: "num", anchor: "middle" }) +
-        text(leg.verb) +
-        `<circle r="6" class="pulse pulse-${leg.n}"/></g>`,
+        text(leg.verb) + `</g>`,
     );
   }
   for (const part of scene.parts) {

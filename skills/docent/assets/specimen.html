@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex">
 <title>Report a bug and get a fix — Example project</title>
 <style>
-/* docent:kit 0.2.0 */
+/* docent:kit 0.2.1 */
 /* Docent page styles. Tokens come from references/DESIGN.md. One file, no network. */
 :root {
   color-scheme: light;
@@ -75,6 +75,13 @@ h1 { font-size: 52px; line-height: 1.06; letter-spacing: -0.02em; }
 section { padding-top: 72px; }
 h2 { font-size: 30px; line-height: 1.2; margin-bottom: 16px; }
 h3 { font: 600 18px/1.35 var(--sans); margin: 0; text-wrap: balance; }
+/* A small heading inside a part of a section: body size, weight 600. */
+h4 { font: 600 16px/1.5 var(--sans); margin: 24px 0 4px; }
+/* A definition list: each term in weight 600, its meaning below it. */
+dl { max-width: var(--measure); margin: 0 0 16px; }
+dt { font-weight: 600; }
+dd { margin: 0 0 12px; }
+dd:last-child { margin-bottom: 0; }
 p { margin: 0 0 16px; max-width: var(--measure); text-wrap: pretty; }
 .term { text-decoration: underline; text-decoration-color: var(--primary); text-decoration-thickness: 2px; text-underline-offset: 0.22em; }
 code { font: 14px/1.55 var(--mono); background: var(--panel); padding: 0.1em 0.38em; border-radius: 6px; }
@@ -85,14 +92,17 @@ code { font: 14px/1.55 var(--mono); background: var(--panel); padding: 0.1em 0.3
 :where(main) :where(ul, ol):not(.steps, .facts) > :where(li + li) { margin-top: 4px; }
 /* A block heading in the text flow has more space above it than below it. A step heading of a walkthrough has none. */
 :where(main) h3 { margin: 32px 0 8px; }
-h2 + h3 { margin-top: 0; }
+h2 + h3, h3 + h4 { margin-top: 0; }
 .steps h3 { margin: 0; }
 /* A numbered block heading: one of several steps that one actor does, where a step holds a code block, a table or a widget. The kit writes the number, and the count starts again in each section. */
 section { counter-reset: block-step; }
 h3.step { counter-increment: block-step; }
 h3.step::before { content: counter(block-step); font-weight: 400; color: var(--muted); margin-right: 10px; font-variant-numeric: tabular-nums; }
+/* With scripts on, the page script writes the number as text, so that a screen reader reads it. It looks the same as the counted number. */
+h3.is-numbered::before { content: none !important; }
+.step-n { font-weight: 400; color: var(--muted); margin-right: 6px; font-variant-numeric: tabular-nums; }
 /* A code block, a table, a closed section, a walkthrough, a status note and a figure bring no space below them. Text that follows brings it. */
-:is(pre, .code, .table-wrap, details, .walk, .status, figure) + :is(p, ul, ol) { margin-top: 24px; }
+:is(pre, .code, .table-wrap, details, .walk, .status, figure) + :is(p, ul, ol, dl) { margin-top: 24px; }
 
 /* Margin notes: the guide's remarks sit beside the text, like a wall label. */
 .row { display: grid; grid-template-columns: minmax(0, var(--measure)) var(--margin-col); column-gap: var(--gap); align-items: start; }
@@ -131,9 +141,15 @@ th, td { text-align: left; vertical-align: top; padding: 12px 24px 12px 0; }
 thead th { border-bottom: 1px solid var(--text); padding-bottom: 10px; font-size: 14px; line-height: 1.5; font-weight: 600; color: var(--muted); }
 tbody th { font-weight: 600; white-space: nowrap; }
 tbody tr { border-bottom: 1px solid var(--line); }
-.state { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; font-weight: 600; }
-.state::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.state { display: inline-flex; align-items: baseline; gap: 8px; font-weight: 600; }
+.state::before { content: ""; flex: none; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
 .state.ok { color: var(--ok); } .state.warn { color: var(--warn); } .state.err { color: var(--err); }
+/* Two states with no status color: plain information takes a muted dot, and a thing that is planned or not on yet takes a muted ring. */
+.state.info, .state.plan { color: var(--text); }
+.state.info::before { background: var(--muted); }
+.state.plan::before { background: none; border: 1.5px solid var(--muted); }
+/* Code in a cell may break anywhere, so a long path or command does not make the table wider than its place. */
+:is(td, th) code { overflow-wrap: anywhere; }
 
 /* Status note: a dot and a word carry the status. */
 .status { max-width: var(--measure); margin: 32px 0 0; }
@@ -151,6 +167,8 @@ pre code { background: none; padding: 0; font-size: inherit; }
 .cm { color: var(--muted); }
 
 details { max-width: var(--measure); margin: 24px 0 0; }
+/* A closed section that holds a table, a code block or a figure takes the full width, like those blocks do outside it. Its text keeps the text column. */
+details:has(> .table-wrap, > pre, > .code, > figure) { max-width: none; }
 summary { display: flex; align-items: center; gap: 10px; padding: 4px 0; font-weight: 600; cursor: pointer; list-style: none; }
 summary::-webkit-details-marker { display: none; }
 summary svg { width: 12px; height: 12px; color: var(--muted); transition: transform 150ms var(--ease); }
@@ -368,10 +386,10 @@ footer .shell { display: flex; align-items: center; justify-content: space-betwe
 <text x="24" y="93" class="lane" text-anchor="start">Reporter</text>
 <g class="icon lane-icon" transform="translate(24,148)"><circle cx="6" cy="5.5" r="2.25"/><path d="M1.75 13c0-2.4 1.9-3.75 4.25-3.75s4.25 1.35 4.25 3.75M10.5 3.5a2.25 2.25 0 0 1 0 4.25M12 9.6c1.4.5 2.25 1.7 2.25 3.4"/></g>
 <text x="24" y="181" class="lane" text-anchor="start">Maintainers</text>
-<g class="leg" data-leg="1"><path d="M193,88 L206,88 L276,176 L307,176" class="line"/><polygon points="305,180.5 305,171.5 313,176" class="head"/><circle cx="241" cy="132" r="10" class="mark"/><text x="241" y="136" class="num" text-anchor="middle">1</text><text x="257" y="136" class="verb" text-anchor="start">file</text><circle r="6" class="pulse pulse-1"/></g>
-<g class="leg" data-leg="2"><path d="M343,176 L356,176 L426,88 L457,88" class="line"/><polygon points="455,92.5 455,83.5 463,88" class="head"/><circle cx="391" cy="132" r="10" class="mark"/><text x="391" y="136" class="num" text-anchor="middle">2</text><text x="407" y="136" class="verb" text-anchor="start">ask for steps</text><circle r="6" class="pulse pulse-2"/></g>
-<g class="leg" data-leg="3"><path d="M493,88 L506,88 L576,176 L607,176" class="line"/><polygon points="605,180.5 605,171.5 613,176" class="head"/><circle cx="541" cy="132" r="10" class="mark"/><text x="541" y="136" class="num" text-anchor="middle">3</text><text x="557" y="136" class="verb" text-anchor="start">send steps</text><circle r="6" class="pulse pulse-3"/></g>
-<g class="leg" data-leg="4"><path d="M643,176 L757,176" class="line"/><polygon points="755,180.5 755,171.5 763,176" class="head"/><circle cx="699" cy="176" r="10" class="mark"/><text x="699" y="180" class="num" text-anchor="middle">4</text><text x="699" y="154" class="verb" text-anchor="middle">release</text><circle r="6" class="pulse pulse-4"/></g>
+<g class="leg" data-leg="1"><path d="M193,88 L206,88 L276,176 L307,176" class="line"/><polygon points="305,180.5 305,171.5 313,176" class="head"/><circle r="6" class="pulse pulse-1"/><circle cx="241" cy="132" r="10" class="mark"/><text x="241" y="136" class="num" text-anchor="middle">1</text><text x="257" y="136" class="verb" text-anchor="start">file</text></g>
+<g class="leg" data-leg="2"><path d="M343,176 L356,176 L426,88 L457,88" class="line"/><polygon points="455,92.5 455,83.5 463,88" class="head"/><circle r="6" class="pulse pulse-2"/><circle cx="391" cy="132" r="10" class="mark"/><text x="391" y="136" class="num" text-anchor="middle">2</text><text x="407" y="136" class="verb" text-anchor="start">ask for steps</text></g>
+<g class="leg" data-leg="3"><path d="M493,88 L506,88 L576,176 L607,176" class="line"/><polygon points="605,180.5 605,171.5 613,176" class="head"/><circle r="6" class="pulse pulse-3"/><circle cx="541" cy="132" r="10" class="mark"/><text x="541" y="136" class="num" text-anchor="middle">3</text><text x="557" y="136" class="verb" text-anchor="start">send steps</text></g>
+<g class="leg" data-leg="4"><path d="M643,176 L757,176" class="line"/><polygon points="755,180.5 755,171.5 763,176" class="head"/><circle r="6" class="pulse pulse-4"/><circle cx="699" cy="176" r="10" class="mark"/><text x="699" y="180" class="num" text-anchor="middle">4</text><text x="699" y="154" class="verb" text-anchor="middle">release</text></g>
 <circle cx="178" cy="88" r="13" class="stop"/>
 <g class="icon" transform="translate(170,80)"><path d="M9.5 2.5h-5a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1v-7z"/><path d="M9.5 2.5v3h3M6 9h4M6 11.25h4"/></g>
 <text x="178" y="46" class="name" text-anchor="middle">Bug report</text>
@@ -440,10 +458,10 @@ footer .shell { display: flex; align-items: center; justify-content: space-betwe
 <text x="240" y="240" class="lane" text-anchor="end">Reporter</text>
 <g class="icon lane-icon" transform="translate(131,331)"><circle cx="6" cy="5.5" r="2.25"/><path d="M1.75 13c0-2.4 1.9-3.75 4.25-3.75s4.25 1.35 4.25 3.75M10.5 3.5a2.25 2.25 0 0 1 0 4.25M12 9.6c1.4.5 2.25 1.7 2.25 3.4"/></g>
 <text x="240" y="344" class="lane" text-anchor="end">Maintainers</text>
-<g class="leg" data-leg="1"><path d="M30,71 L30,139" class="line"/><polygon points="25.5,137 34.5,137 30,145" class="head"/><circle cx="30" cy="104" r="10" class="mark"/><text x="30" y="108" class="num" text-anchor="middle">1</text><text x="51" y="108" class="verb" text-anchor="start">file</text><circle r="6" class="pulse pulse-1"/></g>
-<g class="leg" data-leg="2"><path d="M30,175 L30,243" class="line"/><polygon points="25.5,241 34.5,241 30,249" class="head"/><circle cx="30" cy="208" r="10" class="mark"/><text x="30" y="212" class="num" text-anchor="middle">2</text><text x="51" y="212" class="verb" text-anchor="start">ask for steps</text><circle r="6" class="pulse pulse-2"/></g>
-<g class="leg" data-leg="3"><path d="M30,279 L30,347" class="line"/><polygon points="25.5,345 34.5,345 30,353" class="head"/><circle cx="30" cy="312" r="10" class="mark"/><text x="30" y="316" class="num" text-anchor="middle">3</text><text x="51" y="316" class="verb" text-anchor="start">send steps</text><circle r="6" class="pulse pulse-3"/></g>
-<g class="leg" data-leg="4"><path d="M30,383 L30,451" class="line"/><polygon points="25.5,449 34.5,449 30,457" class="head"/><circle cx="30" cy="416" r="10" class="mark"/><text x="30" y="420" class="num" text-anchor="middle">4</text><text x="51" y="420" class="verb" text-anchor="start">release</text><circle r="6" class="pulse pulse-4"/></g>
+<g class="leg" data-leg="1"><path d="M30,71 L30,139" class="line"/><polygon points="25.5,137 34.5,137 30,145" class="head"/><circle r="6" class="pulse pulse-1"/><circle cx="30" cy="104" r="10" class="mark"/><text x="30" y="108" class="num" text-anchor="middle">1</text><text x="51" y="108" class="verb" text-anchor="start">file</text></g>
+<g class="leg" data-leg="2"><path d="M30,175 L30,243" class="line"/><polygon points="25.5,241 34.5,241 30,249" class="head"/><circle r="6" class="pulse pulse-2"/><circle cx="30" cy="208" r="10" class="mark"/><text x="30" y="212" class="num" text-anchor="middle">2</text><text x="51" y="212" class="verb" text-anchor="start">ask for steps</text></g>
+<g class="leg" data-leg="3"><path d="M30,279 L30,347" class="line"/><polygon points="25.5,345 34.5,345 30,353" class="head"/><circle r="6" class="pulse pulse-3"/><circle cx="30" cy="312" r="10" class="mark"/><text x="30" y="316" class="num" text-anchor="middle">3</text><text x="51" y="316" class="verb" text-anchor="start">send steps</text></g>
+<g class="leg" data-leg="4"><path d="M30,383 L30,451" class="line"/><polygon points="25.5,449 34.5,449 30,457" class="head"/><circle r="6" class="pulse pulse-4"/><circle cx="30" cy="416" r="10" class="mark"/><text x="30" y="420" class="num" text-anchor="middle">4</text><text x="51" y="420" class="verb" text-anchor="start">release</text></g>
 <circle cx="30" cy="56" r="13" class="stop"/>
 <g class="icon" transform="translate(22,48)"><path d="M9.5 2.5h-5a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1v-7z"/><path d="M9.5 2.5v3h3M6 9h4M6 11.25h4"/></g>
 <text x="51" y="61" class="name" text-anchor="start">Bug report</text>
@@ -571,10 +589,10 @@ footer .shell { display: flex; align-items: center; justify-content: space-betwe
 <text x="46" y="42" class="lane" text-anchor="start">Reporter</text>
 <g class="icon lane-icon" transform="translate(270,29)"><circle cx="6" cy="5.5" r="2.25"/><path d="M1.75 13c0-2.4 1.9-3.75 4.25-3.75s4.25 1.35 4.25 3.75M10.5 3.5a2.25 2.25 0 0 1 0 4.25M12 9.6c1.4.5 2.25 1.7 2.25 3.4"/></g>
 <text x="294" y="42" class="lane" text-anchor="start">Maintainers</text>
-<g class="leg" data-leg="1"><path d="M157,111 L157,120 L331,150 L331,180" class="line"/><polygon points="326.5,178 335.5,178 331,186" class="head"/><circle cx="244" cy="135" r="10" class="mark"/><text x="244" y="139" class="num" text-anchor="middle">1</text><text x="244" y="118" class="verb" text-anchor="middle">file</text><circle r="6" class="pulse pulse-1"/></g>
-<g class="leg" data-leg="2"><path d="M331,216 L331,225 L157,255 L157,285" class="line"/><polygon points="152.5,283 161.5,283 157,291" class="head"/><circle cx="244" cy="240" r="10" class="mark"/><text x="244" y="244" class="num" text-anchor="middle">2</text><text x="244" y="223" class="verb" text-anchor="middle">ask for steps</text><circle r="6" class="pulse pulse-2"/></g>
-<g class="leg" data-leg="3"><path d="M157,321 L157,330 L331,360 L331,390" class="line"/><polygon points="326.5,388 335.5,388 331,396" class="head"/><circle cx="244" cy="345" r="10" class="mark"/><text x="244" y="349" class="num" text-anchor="middle">3</text><text x="244" y="328" class="verb" text-anchor="middle">send steps</text><circle r="6" class="pulse pulse-3"/></g>
-<g class="leg" data-leg="4"><path d="M331,426 L331,495" class="line"/><polygon points="326.5,493 335.5,493 331,501" class="head"/><circle cx="331" cy="459.5" r="10" class="mark"/><text x="331" y="463.5" class="num" text-anchor="middle">4</text><text x="352" y="463.5" class="verb" text-anchor="start">release</text><circle r="6" class="pulse pulse-4"/></g>
+<g class="leg" data-leg="1"><path d="M157,111 L157,120 L331,150 L331,180" class="line"/><polygon points="326.5,178 335.5,178 331,186" class="head"/><circle r="6" class="pulse pulse-1"/><circle cx="244" cy="135" r="10" class="mark"/><text x="244" y="139" class="num" text-anchor="middle">1</text><text x="244" y="118" class="verb" text-anchor="middle">file</text></g>
+<g class="leg" data-leg="2"><path d="M331,216 L331,225 L157,255 L157,285" class="line"/><polygon points="152.5,283 161.5,283 157,291" class="head"/><circle r="6" class="pulse pulse-2"/><circle cx="244" cy="240" r="10" class="mark"/><text x="244" y="244" class="num" text-anchor="middle">2</text><text x="244" y="223" class="verb" text-anchor="middle">ask for steps</text></g>
+<g class="leg" data-leg="3"><path d="M157,321 L157,330 L331,360 L331,390" class="line"/><polygon points="326.5,388 335.5,388 331,396" class="head"/><circle r="6" class="pulse pulse-3"/><circle cx="244" cy="345" r="10" class="mark"/><text x="244" y="349" class="num" text-anchor="middle">3</text><text x="244" y="328" class="verb" text-anchor="middle">send steps</text></g>
+<g class="leg" data-leg="4"><path d="M331,426 L331,495" class="line"/><polygon points="326.5,493 335.5,493 331,501" class="head"/><circle r="6" class="pulse pulse-4"/><circle cx="331" cy="459.5" r="10" class="mark"/><text x="331" y="463.5" class="num" text-anchor="middle">4</text><text x="352" y="463.5" class="verb" text-anchor="start">release</text></g>
 <circle cx="157" cy="96" r="13" class="stop"/>
 <g class="icon" transform="translate(149,88)"><path d="M9.5 2.5h-5a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1v-7z"/><path d="M9.5 2.5v3h3M6 9h4M6 11.25h4"/></g>
 <text x="136" y="101" class="name" text-anchor="end">Bug report</text>
@@ -649,10 +667,10 @@ footer .shell { display: flex; align-items: center; justify-content: space-betwe
 <text x="240" y="240" class="lane" text-anchor="end">Reporter</text>
 <g class="icon lane-icon" transform="translate(131,331)"><circle cx="6" cy="5.5" r="2.25"/><path d="M1.75 13c0-2.4 1.9-3.75 4.25-3.75s4.25 1.35 4.25 3.75M10.5 3.5a2.25 2.25 0 0 1 0 4.25M12 9.6c1.4.5 2.25 1.7 2.25 3.4"/></g>
 <text x="240" y="344" class="lane" text-anchor="end">Maintainers</text>
-<g class="leg" data-leg="1"><path d="M30,71 L30,139" class="line"/><polygon points="25.5,137 34.5,137 30,145" class="head"/><circle cx="30" cy="104" r="10" class="mark"/><text x="30" y="108" class="num" text-anchor="middle">1</text><text x="51" y="108" class="verb" text-anchor="start">file</text><circle r="6" class="pulse pulse-1"/></g>
-<g class="leg" data-leg="2"><path d="M30,175 L30,243" class="line"/><polygon points="25.5,241 34.5,241 30,249" class="head"/><circle cx="30" cy="208" r="10" class="mark"/><text x="30" y="212" class="num" text-anchor="middle">2</text><text x="51" y="212" class="verb" text-anchor="start">ask for steps</text><circle r="6" class="pulse pulse-2"/></g>
-<g class="leg" data-leg="3"><path d="M30,279 L30,347" class="line"/><polygon points="25.5,345 34.5,345 30,353" class="head"/><circle cx="30" cy="312" r="10" class="mark"/><text x="30" y="316" class="num" text-anchor="middle">3</text><text x="51" y="316" class="verb" text-anchor="start">send steps</text><circle r="6" class="pulse pulse-3"/></g>
-<g class="leg" data-leg="4"><path d="M30,383 L30,451" class="line"/><polygon points="25.5,449 34.5,449 30,457" class="head"/><circle cx="30" cy="416" r="10" class="mark"/><text x="30" y="420" class="num" text-anchor="middle">4</text><text x="51" y="420" class="verb" text-anchor="start">release</text><circle r="6" class="pulse pulse-4"/></g>
+<g class="leg" data-leg="1"><path d="M30,71 L30,139" class="line"/><polygon points="25.5,137 34.5,137 30,145" class="head"/><circle r="6" class="pulse pulse-1"/><circle cx="30" cy="104" r="10" class="mark"/><text x="30" y="108" class="num" text-anchor="middle">1</text><text x="51" y="108" class="verb" text-anchor="start">file</text></g>
+<g class="leg" data-leg="2"><path d="M30,175 L30,243" class="line"/><polygon points="25.5,241 34.5,241 30,249" class="head"/><circle r="6" class="pulse pulse-2"/><circle cx="30" cy="208" r="10" class="mark"/><text x="30" y="212" class="num" text-anchor="middle">2</text><text x="51" y="212" class="verb" text-anchor="start">ask for steps</text></g>
+<g class="leg" data-leg="3"><path d="M30,279 L30,347" class="line"/><polygon points="25.5,345 34.5,345 30,353" class="head"/><circle r="6" class="pulse pulse-3"/><circle cx="30" cy="312" r="10" class="mark"/><text x="30" y="316" class="num" text-anchor="middle">3</text><text x="51" y="316" class="verb" text-anchor="start">send steps</text></g>
+<g class="leg" data-leg="4"><path d="M30,383 L30,451" class="line"/><polygon points="25.5,449 34.5,449 30,457" class="head"/><circle r="6" class="pulse pulse-4"/><circle cx="30" cy="416" r="10" class="mark"/><text x="30" y="420" class="num" text-anchor="middle">4</text><text x="51" y="420" class="verb" text-anchor="start">release</text></g>
 <circle cx="30" cy="56" r="13" class="stop"/>
 <g class="icon" transform="translate(22,48)"><path d="M9.5 2.5h-5a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1v-7z"/><path d="M9.5 2.5v3h3M6 9h4M6 11.25h4"/></g>
 <text x="51" y="61" class="name" text-anchor="start">Bug report</text>
@@ -751,10 +769,10 @@ footer .shell { display: flex; align-items: center; justify-content: space-betwe
 <text x="64" y="44" class="lane" text-anchor="start">Reporter</text>
 <g class="icon lane-icon" transform="translate(440,31)"><circle cx="6" cy="5.5" r="2.25"/><path d="M1.75 13c0-2.4 1.9-3.75 4.25-3.75s4.25 1.35 4.25 3.75M10.5 3.5a2.25 2.25 0 0 1 0 4.25M12 9.6c1.4.5 2.25 1.7 2.25 3.4"/></g>
 <text x="464" y="44" class="lane" text-anchor="start">Maintainers</text>
-<g class="leg" data-leg="1"><path d="M310,116 L310,174 Q310,182 318,182 L432,182" class="line"/><polygon points="430,186.5 430,177.5 438,182" class="head"/><circle cx="390" cy="182" r="10" class="mark"/><text x="390" y="186" class="num" text-anchor="middle">1</text><text x="390" y="163" class="verb" text-anchor="middle">file</text><circle r="6" class="pulse pulse-1"/></g>
-<g class="leg" data-leg="2"><path d="M470,208 L470,266 Q470,274 462,274 L348,274" class="line"/><polygon points="350,269.5 350,278.5 342,274" class="head"/><circle cx="390" cy="274" r="10" class="mark"/><text x="390" y="278" class="num" text-anchor="middle">2</text><text x="390" y="255" class="verb" text-anchor="middle">ask for steps</text><circle r="6" class="pulse pulse-2"/></g>
-<g class="leg" data-leg="3"><path d="M310,300 L310,358 Q310,366 318,366 L432,366" class="line"/><polygon points="430,370.5 430,361.5 438,366" class="head"/><circle cx="390" cy="366" r="10" class="mark"/><text x="390" y="370" class="num" text-anchor="middle">3</text><text x="390" y="347" class="verb" text-anchor="middle">send steps</text><circle r="6" class="pulse pulse-3"/></g>
-<g class="leg" data-leg="4"><path d="M590,392 L590,458" class="line"/><polygon points="585.5,456 594.5,456 590,464" class="head"/><circle cx="590" cy="424" r="10" class="mark"/><text x="590" y="428" class="num" text-anchor="middle">4</text><text x="606" y="428" class="verb" text-anchor="start">release</text><circle r="6" class="pulse pulse-4"/></g>
+<g class="leg" data-leg="1"><path d="M310,116 L310,174 Q310,182 318,182 L432,182" class="line"/><polygon points="430,186.5 430,177.5 438,182" class="head"/><circle r="6" class="pulse pulse-1"/><circle cx="390" cy="182" r="10" class="mark"/><text x="390" y="186" class="num" text-anchor="middle">1</text><text x="390" y="163" class="verb" text-anchor="middle">file</text></g>
+<g class="leg" data-leg="2"><path d="M470,208 L470,266 Q470,274 462,274 L348,274" class="line"/><polygon points="350,269.5 350,278.5 342,274" class="head"/><circle r="6" class="pulse pulse-2"/><circle cx="390" cy="274" r="10" class="mark"/><text x="390" y="278" class="num" text-anchor="middle">2</text><text x="390" y="255" class="verb" text-anchor="middle">ask for steps</text></g>
+<g class="leg" data-leg="3"><path d="M310,300 L310,358 Q310,366 318,366 L432,366" class="line"/><polygon points="430,370.5 430,361.5 438,366" class="head"/><circle r="6" class="pulse pulse-3"/><circle cx="390" cy="366" r="10" class="mark"/><text x="390" y="370" class="num" text-anchor="middle">3</text><text x="390" y="347" class="verb" text-anchor="middle">send steps</text></g>
+<g class="leg" data-leg="4"><path d="M590,392 L590,458" class="line"/><polygon points="585.5,456 594.5,456 590,464" class="head"/><circle r="6" class="pulse pulse-4"/><circle cx="590" cy="424" r="10" class="mark"/><text x="590" y="428" class="num" text-anchor="middle">4</text><text x="606" y="428" class="verb" text-anchor="start">release</text></g>
 <rect x="40" y="64" width="300" height="52" rx="10" class="card"/>
 <g class="icon" transform="translate(56,82)"><path d="M9.5 2.5h-5a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1v-7z"/><path d="M9.5 2.5v3h3M6 9h4M6 11.25h4"/></g>
 <text x="86" y="87" class="name" text-anchor="start">Bug report</text>
@@ -823,10 +841,10 @@ footer .shell { display: flex; align-items: center; justify-content: space-betwe
 <text x="240" y="240" class="lane" text-anchor="end">Reporter</text>
 <g class="icon lane-icon" transform="translate(131,331)"><circle cx="6" cy="5.5" r="2.25"/><path d="M1.75 13c0-2.4 1.9-3.75 4.25-3.75s4.25 1.35 4.25 3.75M10.5 3.5a2.25 2.25 0 0 1 0 4.25M12 9.6c1.4.5 2.25 1.7 2.25 3.4"/></g>
 <text x="240" y="344" class="lane" text-anchor="end">Maintainers</text>
-<g class="leg" data-leg="1"><path d="M30,71 L30,139" class="line"/><polygon points="25.5,137 34.5,137 30,145" class="head"/><circle cx="30" cy="104" r="10" class="mark"/><text x="30" y="108" class="num" text-anchor="middle">1</text><text x="51" y="108" class="verb" text-anchor="start">file</text><circle r="6" class="pulse pulse-1"/></g>
-<g class="leg" data-leg="2"><path d="M30,175 L30,243" class="line"/><polygon points="25.5,241 34.5,241 30,249" class="head"/><circle cx="30" cy="208" r="10" class="mark"/><text x="30" y="212" class="num" text-anchor="middle">2</text><text x="51" y="212" class="verb" text-anchor="start">ask for steps</text><circle r="6" class="pulse pulse-2"/></g>
-<g class="leg" data-leg="3"><path d="M30,279 L30,347" class="line"/><polygon points="25.5,345 34.5,345 30,353" class="head"/><circle cx="30" cy="312" r="10" class="mark"/><text x="30" y="316" class="num" text-anchor="middle">3</text><text x="51" y="316" class="verb" text-anchor="start">send steps</text><circle r="6" class="pulse pulse-3"/></g>
-<g class="leg" data-leg="4"><path d="M30,383 L30,451" class="line"/><polygon points="25.5,449 34.5,449 30,457" class="head"/><circle cx="30" cy="416" r="10" class="mark"/><text x="30" y="420" class="num" text-anchor="middle">4</text><text x="51" y="420" class="verb" text-anchor="start">release</text><circle r="6" class="pulse pulse-4"/></g>
+<g class="leg" data-leg="1"><path d="M30,71 L30,139" class="line"/><polygon points="25.5,137 34.5,137 30,145" class="head"/><circle r="6" class="pulse pulse-1"/><circle cx="30" cy="104" r="10" class="mark"/><text x="30" y="108" class="num" text-anchor="middle">1</text><text x="51" y="108" class="verb" text-anchor="start">file</text></g>
+<g class="leg" data-leg="2"><path d="M30,175 L30,243" class="line"/><polygon points="25.5,241 34.5,241 30,249" class="head"/><circle r="6" class="pulse pulse-2"/><circle cx="30" cy="208" r="10" class="mark"/><text x="30" y="212" class="num" text-anchor="middle">2</text><text x="51" y="212" class="verb" text-anchor="start">ask for steps</text></g>
+<g class="leg" data-leg="3"><path d="M30,279 L30,347" class="line"/><polygon points="25.5,345 34.5,345 30,353" class="head"/><circle r="6" class="pulse pulse-3"/><circle cx="30" cy="312" r="10" class="mark"/><text x="30" y="316" class="num" text-anchor="middle">3</text><text x="51" y="316" class="verb" text-anchor="start">send steps</text></g>
+<g class="leg" data-leg="4"><path d="M30,383 L30,451" class="line"/><polygon points="25.5,449 34.5,449 30,457" class="head"/><circle r="6" class="pulse pulse-4"/><circle cx="30" cy="416" r="10" class="mark"/><text x="30" y="420" class="num" text-anchor="middle">4</text><text x="51" y="420" class="verb" text-anchor="start">release</text></g>
 <circle cx="30" cy="56" r="13" class="stop"/>
 <g class="icon" transform="translate(22,48)"><path d="M9.5 2.5h-5a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1v-7z"/><path d="M9.5 2.5v3h3M6 9h4M6 11.25h4"/></g>
 <text x="51" y="61" class="name" text-anchor="start">Bug report</text>
@@ -872,6 +890,10 @@ footer .shell { display: flex; align-items: center; justify-content: space-betwe
     <div class="status">
       <span class="state warn">Warning</span>
       <p>A report with no steps often waits a long time. Send the steps with the first report when you can.</p>
+    </div>
+    <div class="status">
+      <span class="state plan">Planned</span>
+      <p>A form that adds the version for you is planned. Until it is turned on, type the version by hand.</p>
     </div>
   </section>
 
@@ -995,6 +1017,15 @@ app export --verbose &gt; bug.log
 
 <span class="cm"># 3. Check that the log holds no password</span>
 grep -i password bug.log</code></pre>
+    <p>Each line of the log has three parts:</p>
+    <dl>
+      <dt>Time</dt>
+      <dd>When the program wrote the line, to the second.</dd>
+      <dt>Level</dt>
+      <dd>How serious the line is: <code>info</code>, <code>warn</code> or <code>error</code>.</dd>
+      <dt>Message</dt>
+      <dd>What happened, in the program's own words.</dd>
+    </dl>
     <details>
       <summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>Why the maintainers ask for steps</summary>
       <p>A fix needs a test. The test repeats your steps, and it fails before the fix. After the fix, the same test passes. The test stays, so the same bug cannot come back unseen.</p>
@@ -1013,7 +1044,7 @@ grep -i password bug.log</code></pre>
 </footer>
 
 <script>
-// docent:kit 0.2.0
+// docent:kit 0.2.1
 (() => {
   const root = document.documentElement;
   root.classList.add('js');
@@ -1040,6 +1071,18 @@ grep -i password bug.log</code></pre>
       try { localStorage.setItem('docent-theme', root.dataset.theme); } catch { /* private window: the choice lasts for this visit */ }
     });
   }
+  // Step numbers. The styles count the steps, but a screen reader in Chromium does not read a number that the styles count. So the script writes each number as text, in place of the counted one.
+  const number = (heading, n) => {
+    const span = document.createElement('span');
+    span.className = 'step-n';
+    span.textContent = `${n} `;
+    heading.prepend(span);
+    heading.classList.add('is-numbered');
+  };
+  const groups = new Map();
+  document.querySelectorAll('h3.step').forEach((h) => { const s = h.closest('section'); groups.set(s, [...(groups.get(s) || []), h]); });
+  groups.forEach((list) => list.forEach((h, i) => number(h, i + 1)));
+  document.querySelectorAll('.steps').forEach((ol) => [...ol.children].forEach((li, i) => { const h = li.querySelector('h3'); if (h) number(h, i + 1); }));
   // A diagram outside a walkthrough runs its dot twice when it comes into view, then rests. Pointing at it runs it again.
   const replay = (svg) => svg.querySelectorAll('.pulse').forEach((dot) => dot.getAnimations().forEach((run) => { run.cancel(); run.play(); }));
   const seen = new IntersectionObserver((entries) => entries.forEach((entry) => {
