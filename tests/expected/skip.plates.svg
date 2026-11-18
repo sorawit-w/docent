@@ -33,6 +33,7 @@
 .js #dg-skip .pulse-5{animation-name:dg-skip-5}
 @media (prefers-reduced-motion:reduce){#dg-skip .pulse{animation:none!important}#dg-skip .pulse{display:none!important}}
 @media print{#dg-skip{max-width:100%;height:auto}#dg-skip .pulse{display:none!important}}
+#dg-skip-phone{display:none}
 </style>
 <rect width="540" height="648" class="ground"/>
 <rect x="12" y="12" width="428" height="624" rx="10" class="band"/>
@@ -57,4 +58,63 @@
 <rect x="40" y="568" width="300" height="52" rx="10" class="card"/>
 <text x="58" y="591" class="name" text-anchor="start">Archive</text>
 <text x="58" y="608" class="sub" text-anchor="start">kept</text>
+</svg>
+<svg id="dg-skip-phone" class="dg dg-column dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="560" viewBox="0 0 264 560" role="img" aria-label="A request goes through a check. A small request skips the review and goes to the answer; this path is optional.">
+<style>
+#dg-skip-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-skip-phone .ground{fill:var(--fig,#f2f3f9)}
+#dg-skip-phone .band{fill:var(--bg,#fbfbfe)}
+#dg-skip-phone .track{stroke:var(--line,#d3d6e3)}
+#dg-skip-phone .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-skip-phone .head{fill:var(--text,#1c1f2e)}
+#dg-skip-phone .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-skip-phone .stop.end{fill:var(--text,#1c1f2e)}
+#dg-skip-phone .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-skip-phone .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-skip-phone .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-skip-phone .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-skip-phone .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-skip-phone .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-skip-phone .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-skip-phone .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-skip-phone .sub,#dg-skip-phone .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-skip-phone .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-skip-phone .jump.is-optional .mark{stroke-dasharray:3 3}
+.js #dg-skip-phone .pulse{display:block;animation:7.6s linear 2 both}
+.js #dg-skip-phone:not(.is-playing) .pulse{animation-play-state:paused}
+@keyframes dg-skip-phone-1{0%{transform:translate(30px,66px);opacity:0}1.58%{transform:translate(30px,66px);opacity:1}17.76%{transform:translate(30px,150px);opacity:1}21.05%{transform:translate(30px,150px);opacity:0}100%{transform:translate(30px,150px);opacity:0}}
+.js #dg-skip-phone .pulse-1{animation-name:dg-skip-phone-1}
+@keyframes dg-skip-phone-2{0%{transform:translate(30px,170px);opacity:0}21.05%{transform:translate(30px,170px);opacity:0}22.63%{transform:translate(30px,170px);opacity:1}38.82%{transform:translate(30px,294px);opacity:1}42.11%{transform:translate(30px,294px);opacity:0}100%{transform:translate(30px,294px);opacity:0}}
+.js #dg-skip-phone .pulse-2{animation-name:dg-skip-phone-2}
+@keyframes dg-skip-phone-4{0%{transform:translate(30px,314px);opacity:0}42.11%{transform:translate(30px,314px);opacity:0}43.68%{transform:translate(30px,314px);opacity:1}59.87%{transform:translate(30px,398px);opacity:1}63.16%{transform:translate(30px,398px);opacity:0}100%{transform:translate(30px,398px);opacity:0}}
+.js #dg-skip-phone .pulse-4{animation-name:dg-skip-phone-4}
+@keyframes dg-skip-phone-5{0%{transform:translate(30px,418px);opacity:0}63.16%{transform:translate(30px,418px);opacity:0}64.74%{transform:translate(30px,418px);opacity:1}80.92%{transform:translate(30px,502px);opacity:1}84.21%{transform:translate(30px,502px);opacity:0}100%{transform:translate(30px,502px);opacity:0}}
+.js #dg-skip-phone .pulse-5{animation-name:dg-skip-phone-5}
+@media (prefers-reduced-motion:reduce){#dg-skip-phone .pulse{animation:none!important}#dg-skip-phone .pulse{display:none!important}}
+@media print{#dg-skip-phone{max-width:100%;height:auto}#dg-skip-phone .pulse{display:none!important}}
+@media (max-width:636px){#dg-skip{display:none}#dg-skip-phone{display:block}}
+</style>
+<rect width="264" height="560" class="ground"/>
+<rect x="8" y="12" width="248" height="536" rx="10" class="band"/>
+<text x="240" y="32" class="lane" text-anchor="end">Team</text>
+<g class="leg" data-leg="1"><path d="M30,66 L30,144" class="line"/><polygon points="25.5,142 34.5,142 30,150" class="head"/><circle r="6" class="pulse pulse-1"/><circle cx="30" cy="104" r="10" class="mark"/><text x="30" y="108" class="num" text-anchor="middle">1</text><text x="51" y="108" class="verb" text-anchor="start">check</text></g>
+<g class="leg" data-leg="2"><path d="M30,170 L30,288" class="line"/><polygon points="25.5,286 34.5,286 30,294" class="head"/><circle r="6" class="pulse pulse-2"/><circle cx="30" cy="248" r="10" class="mark"/><text x="30" y="252" class="num" text-anchor="middle">2</text><text x="51" y="252" class="verb" text-anchor="start">review</text></g>
+<g class="leg" data-leg="4"><path d="M30,314 L30,392" class="line"/><polygon points="25.5,390 34.5,390 30,398" class="head"/><circle r="6" class="pulse pulse-4"/><circle cx="30" cy="352" r="10" class="mark"/><text x="30" y="356" class="num" text-anchor="middle">4</text><text x="51" y="356" class="verb" text-anchor="start">answer</text></g>
+<g class="leg" data-leg="5"><path d="M30,418 L30,496" class="line"/><polygon points="25.5,494 34.5,494 30,502" class="head"/><circle r="6" class="pulse pulse-5"/><circle cx="30" cy="456" r="10" class="mark"/><text x="30" y="460" class="num" text-anchor="middle">5</text><text x="51" y="460" class="verb" text-anchor="start">file</text></g>
+<g class="jump is-optional" data-leg="3"><circle cx="61" cy="206" r="10" class="mark"/><text x="61" y="210" class="num" text-anchor="middle">3</text><text x="77" y="210" class="verb" text-anchor="start">skip the review</text><text x="77" y="226" class="sub" text-anchor="start">to Answer</text></g>
+<circle cx="30" cy="56" r="8" class="stop"/>
+<text x="51" y="61" class="name" text-anchor="start">Request</text>
+<text x="51" y="78" class="sub" text-anchor="start">comes in</text>
+<circle cx="30" cy="160" r="8" class="stop"/>
+<text x="51" y="165" class="name" text-anchor="start">Check</text>
+<text x="51" y="182" class="sub" text-anchor="start">size and kind</text>
+<circle cx="30" cy="304" r="8" class="stop"/>
+<text x="51" y="309" class="name" text-anchor="start">Review</text>
+<text x="51" y="326" class="sub" text-anchor="start">for a large request</text>
+<circle cx="30" cy="408" r="8" class="stop"/>
+<text x="51" y="413" class="name" text-anchor="start">Answer</text>
+<text x="51" y="430" class="sub" text-anchor="start">written</text>
+<circle cx="30" cy="512" r="8" class="stop end"/>
+<text x="51" y="517" class="name" text-anchor="start">Archive</text>
+<text x="51" y="534" class="sub" text-anchor="start">kept</text>
 </svg>

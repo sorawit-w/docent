@@ -8,12 +8,12 @@ Docent is packaged as an agent skill. An agent that writes a document loads the 
 
 ## Status
 
-Version 0.3.0. The design is settled, and the three scripts exist with tests.
+Version 0.4.0. The design is settled, and the three scripts exist with tests.
 
 | Part | State |
 |---|---|
 | Design rules ([`DESIGN.md`](skills/docent/references/DESIGN.md)) | Written |
-| `render`: draws diagrams from data | Built: Route wide, Route tall, Plates, and a single-track form for phones |
+| `render`: draws diagrams from data | Built: Route wide, Route tall, Plates, a single-track form for phones, and a column form for phones for data that is not a route |
 | `render`: builds widgets from data | Built: chooser, value picker, checklist, decision helper. Each is readable with scripts off and on paper |
 | `stamp`: puts the styles and the page script into a document | Built |
 | `check`: tests a document against the rules | Built. It reads the source only; it does not open a browser |
@@ -25,7 +25,6 @@ Version 0.3.0. The design is settled, and the three scripts exist with tests.
 Known limits:
 
 - The renderer estimates text widths. The estimate was tested against the fonts of an Apple device only.
-- Paths that branch have no single-track form for phones.
 - A diagram has at most 4 lanes, 12 parts and 16 legs.
 - A widget holds text only. Docent has four widgets and no way to add one in a document.
 - No colored badges and no syntax colors in code, by design (see `DESIGN.md`).

@@ -9,7 +9,7 @@ const LIMIT = 240; // the most extra room one leg may take
 
 class LayoutError extends Error {
   constructor(form, problems) {
-    super(`Route ${form} cannot be drawn within the spacing rules: ${problems[0].msg}`);
+    super(`${form === "column" ? "The column form" : `Route ${form}`} cannot be drawn within the spacing rules: ${problems[0].msg}`);
     this.problems = problems;
   }
 }
@@ -182,6 +182,72 @@ function track(model, k) {
   return scene;
 }
 
+// Column, for phones, for data that is not a route: the parts stand in one column, in the order of Plates. Each visit
+// to a lane is a band, as in the single track. A leg to the next part in the column is an arrow straight down. Every
+// other leg (a skip, a branch, an arrow back) is a go-to row under the part where it starts: its numbered mark, its
+// verb, and the name of the part where it goes. So no line crosses another, and the drawing fits a phone.
+const JUMP = 40; // the height of one go-to row
+function column(model) {
+  const { lanes, parts, legs, radius: r } = model;
+  const edge = r + 2, x = 30, textX = x + 21;
+  const order = model.chain || [...new Set([...legs.flatMap((leg) => [leg.from, leg.to]), ...parts.map((p) => p.index)])];
+  const pos = new Map(order.map((index, i) => [index, i]));
+  // The leg to the next part in the column is drawn; the first one wins when two legs join the same pair.
+  const next = order.map((index, i) => legs.find((leg) => leg.from === index && leg.to === order[i + 1]) || null);
+  const jumps = order.map((index, i) => legs.filter((leg) => leg.from === index && leg !== next[i]));
+  const y = [], bands = [], gaps = [];
+  order.forEach((index, i) => {
+    const extra = i ? jumps[i - 1].length * JUMP : 0;
+    if (i && parts[order[i - 1]].lane === parts[index].lane) return y.push(y[i - 1] + 104 + extra);
+    const top = i ? y[i - 1] + 36 + extra + GAP : 12;
+    bands.push({ lane: parts[index].lane, y: top, first: i });
+    y.push(top + 44);
+  });
+  const header = (lane) => x + 13 + 16 + (lane.icon ? 24 : 0) + nameW(lane.name);
+  const target = (leg) => `${pos.get(leg.to) > pos.get(leg.from) ? "to" : "back to"} ${parts[leg.to].name}`;
+  const right = Math.max(...parts.map((p) => textX + labelW(p)), ...legs.map((leg) => textX + 26 + Math.max(noteW(leg.verb), noteW(target(leg)))), ...bands.map((b) => header(lanes[b.lane])));
+  const w = Math.max(264, even(right + 24));
+  bands.forEach((b, i) => {
+    const last = (i + 1 < bands.length ? bands[i + 1].first : order.length) - 1;
+    Object.assign(b, { x: 8, w: w - 16, h: y[last] + 36 + jumps[last].length * JUMP - b.y });
+    if (i) gaps.push({ x: 0, y: b.y - GAP, w, h: GAP });
+  });
+  const lastPos = order.length - 1;
+  const scene = { form: "column", w, h: y[lastPos] + 48 + jumps[lastPos].length * JUMP, bands, gaps, tracks: [], lanes: [], parts: [], legs: [], jumps: [] };
+  for (const b of bands) {
+    const lane = lanes[b.lane], end = w - 24;
+    scene.lanes.push({ icon: lane.icon, iconAt: lane.icon ? [end - nameW(lane.name) - 14, b.y + 15] : null, text: { x: end, y: b.y + 20, s: lane.name, cls: "lane", anchor: "end" } });
+  }
+  const bandOf = (i) => bands.findLast((b) => b.first <= i);
+  order.forEach((index, i) => {
+    const part = parts[index], cy = y[i];
+    const texts = [{ x: textX, y: cy + 5, s: part.name, cls: "name", anchor: "start" }];
+    if (part.note) texts.push({ x: textX, y: cy + 22, s: part.note, cls: "sub", anchor: "start" });
+    // A part where no leg starts ends a path, so its ring is filled, like the last stop of a route.
+    scene.parts.push({ id: part.id, shape: "stop", cx: x, cy, r, icon: part.icon, iconAt: [x, cy], end: !legs.some((l) => l.from === index), texts });
+    jumps[i].forEach((leg, j) => {
+      const my = cy + 46 + j * JUMP;
+      scene.jumps.push({ n: leg.n, from: part.id, to: parts[leg.to].id, optional: leg.optional, mark: [textX + 10, my], verb: { x: textX + 26, y: my + 4, s: leg.verb, cls: "verb", anchor: "start" }, target: { x: textX + 26, y: my + 20, s: target(leg), cls: "sub", anchor: "start" } });
+    });
+    const leg = next[i];
+    if (!leg) return;
+    const from = cy + edge, tip = y[i + 1] - edge;
+    const sameLane = bandOf(i) === bandOf(i + 1);
+    // In the middle of the leg below the go-to rows of this part, as in the single track; or in the gap between two bands.
+    const my = sameLane ? (from + jumps[i].length * JUMP + tip - HEAD) / 2 : bandOf(i + 1).y - GAP / 2;
+    scene.legs.push({ n: leg.n, from: part.id, to: parts[leg.to].id, sameLane, radius: 0, pts: [[x, from], [x, tip]], mark: [x, my], verb: { x: textX, y: my + 4, s: leg.verb, cls: "verb", anchor: "start" } });
+  });
+  return scene;
+}
+
+/** Lays out the Column form. Throws LayoutError when it cannot keep the spacing rules. */
+function layoutColumn(model) {
+  const scene = column(model);
+  const problems = check(scene);
+  if (problems.length) throw new LayoutError("column", problems);
+  return scene;
+}
+
 /** Adds room for the first problem. Returns false when no room can fix it. */
 function makeRoom(k, problem, model) {
   const grow = (list, i, by) => (i >= 0 && i < list.length && list[i] + by <= LIMIT ? ((list[i] += by), true) : false);
@@ -215,4 +281,4 @@ function layoutRoute(model, form) {
   throw new LayoutError(form, problems);
 }
 
-module.exports = { layoutRoute, LayoutError };
+module.exports = { layoutRoute, layoutColumn, LayoutError };

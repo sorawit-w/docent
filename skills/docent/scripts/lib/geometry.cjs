@@ -73,6 +73,11 @@ function check(scene) {
   scene.lanes.forEach((lane, i) => lane.iconAt && texts.push({ box: { x0: lane.iconAt[0] - 8, y0: lane.iconAt[1] - 8, x1: lane.iconAt[0] + 8, y1: lane.iconAt[1] + 8 }, what: "a lane icon", kind: "lane", lane: i }));
   for (const part of parts) for (const t of part.texts) texts.push({ box: textBox(t), what: `"${t.s}"`, kind: "label", part: part.id });
   for (const leg of legs) texts.push({ box: textBox(leg.verb), what: `the verb "${leg.verb.s}"`, kind: "verb", leg: leg.n });
+  for (const jump of scene.jumps || []) {
+    const [mx, my] = jump.mark, part = `go-to ${jump.n}`;
+    texts.push({ box: { x0: mx - MARK, y0: my - MARK, x1: mx + MARK, y1: my + MARK }, what: `the mark of go-to row ${jump.n}`, kind: "label", part });
+    for (const t of [jump.verb, jump.target]) texts.push({ box: textBox(t), what: `"${t.s}"`, kind: "label", part });
+  }
 
   for (const leg of legs) {
     const segs = segsOf(leg);
