@@ -24,7 +24,7 @@ test("a package that holds packages is a frame around them, and a dependency to 
   for (const id of ["ordering", "catalog", "billing"]) { const p = scene.parts.find((q) => q.id === id); assert.ok(p.x > x && p.y > y && p.x + p.w < x + w, `${id} is inside Shop`); }
   assert.ok(!scene.parts.some((p) => p.id === "shop"), "Shop is a frame, not a folder of its own");
   const leg = scene.legs.find((l) => l.to === "util");
-  assert.equal(leg.from, "group-shop");
+  assert.equal(leg.from, "frame_shop");
   assert.deepEqual(leg.u, { end: "open", dashed: true });
   assert.deepEqual(scene.legs.map((l) => l.texts.map((t) => t.s).join()).sort(), ["«access»", "«import»", "«import»"]);
 });
@@ -33,11 +33,28 @@ test("a profile draws stereotypes extending metaclasses with a filled triangle, 
   const { svg, scene } = renderDiagram(fixture("profile"));
   const leg = (from, to) => scene.legs.find((l) => l.from === from && l.to === to);
   assert.deepEqual(leg("entity", "class").u, { end: "hollow-filled", dashed: false });
-  assert.deepEqual(leg("applied-1", "the-profile").u, { end: "open", dashed: true });
+  assert.deepEqual(leg("applied_1", "profile_frame").u, { end: "open", dashed: true });
   assert.ok(scene.parts.find((p) => p.id === "class").y < scene.parts.find((p) => p.id === "entity").y, "the metaclass stands above the stereotype");
   const words = svg.split('<details class="dg-words">')[1];
-  assert.match(words, /<li>The stereotype «Id» extends the metaclass Property; every Property must carry it\.<\/li>/);
+  assert.match(words, /<li>The stereotype «Id» extends the metaclass Property \(every Property must carry it\)\.<\/li>/);
   assert.match(words, /A solid line with a filled triangle/);
+});
+
+test("ids from the data never meet the ids the renderer makes", () => {
+  const d = { id: "ids", kind: "package", label: "Two packages.", packages: [{ id: "a", name: "A" }, { id: "inner", name: "Inner", in: "a" }, { id: "frame-a", name: "Frame A" }], dependencies: [{ from: "a", to: "frame-a" }] };
+  const { scene } = renderDiagram(d);
+  const leg = scene.legs[0];
+  assert.equal(leg.from, "frame_a");
+  assert.equal(leg.to, "frame-a");
+  assert.notDeepEqual(leg.pts[0], leg.pts.at(-1));
+});
+
+test("a stereotype that is a kind of another still names its attributes in words", () => {
+  const d = JSON.parse(fs.readFileSync(path.join(__dirname, "fixtures", "profile.json"), "utf8"));
+  d.stereotypes.push({ id: "child", name: "Child", attributes: ["special: String"] });
+  d.generalizations = [{ from: "child", to: "entity" }];
+  const words = renderDiagram(d).svg.split('<details class="dg-words">')[1];
+  assert.match(words, /<li>The stereotype «Child» is a kind of «Entity», and adds “special: String”\.<\/li>/);
 });
 
 test("the words and the phone list of a package diagram", () => {

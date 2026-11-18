@@ -29,7 +29,7 @@ test("a state machine draws states with their actions, a composite state with tw
   const self = scene.legs.find((l) => l.from === "new" && l.to === "new");
   assert.equal(self.pts.length, 4, "a transition to itself is a loop at the right of its state");
   assert.ok(self.pts.every(([x]) => x >= self.pts[0][0]), "out of its right side and back in");
-  const into = scene.legs.find((l) => l.to === "shipping--r1");
+  const into = scene.legs.find((l) => l.to === "shipping_r1");
   const frame = scene.under[0].match(/x="([\d.]+)" y="([\d.]+)" width="([\d.]+)" height="([\d.]+)"/).slice(1).map(Number);
   assert.equal(into.pts.at(-1)[1], frame[1], "a transition to the composite state ends on its frame");
   assert.deepEqual(scene.legs.filter((l) => !l.still).map((l) => l.n), [1, 2, 3, 5, 10, 11], "the dot travels the main path: start, New, the choice, Paid, Shipping, Shipped, the end");

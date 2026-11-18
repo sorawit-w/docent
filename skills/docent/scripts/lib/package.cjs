@@ -126,22 +126,22 @@ function readProfile(data) {
   for (const s of stereotypes) if (!extensions.some((e) => e.from === s) && !generalizations.some((g) => g.from === s)) fail(`the stereotype "${s.id}" extends no metaclass; give it an extension, or make it a kind of another stereotype`);
   for (const m of metaclasses) if (!extensions.some((e) => e.to === m)) fail(`no stereotype extends the metaclass "${m.id}"; leave it out`);
   if (data.appliedTo != null && !Array.isArray(data.appliedTo)) fail(`"appliedTo" must be a list of the packages that use the profile`);
-  const applied = (data.appliedTo || []).map((p, i) => ({ kind: "package", id: `applied-${i + 1}`, name: words(p, `package ${i + 1} of "appliedTo"`, MOST.name), title: words(p, "", MOST.name), members: [] }));
+  const applied = (data.appliedTo || []).map((p, i) => ({ kind: "package", id: `applied_${i + 1}`, name: words(p, `package ${i + 1} of "appliedTo"`, MOST.name), title: words(p, "", MOST.name), members: [] }));
   if (applied.length > 3) fail(`a profile is applied to at most 3 packages in one diagram`);
   return { id: id(data.id, '"id"'), label: words(data.label, '"label"', 400), kind: "profile", name, stereotypes, metaclasses, extensions, generalizations, applied };
 }
 
-const PROFILE = "the-profile"; // the group id of the profile frame
+const PROFILE = "profile_frame"; // the group id of the profile frame. Internal ids hold "_", which a data id never does
 
 /** The graph for graph.cjs. */
 function graphOf(model) {
   if (model.kind === "package") {
     const framed = model.packages.filter((p) => p.holds.length);
-    const endId = (p) => (p.holds.length ? `group-${p.id}` : p.id);
+    const endId = (p) => (p.holds.length ? `frame_${p.id}` : p.id);
     return {
-      nodes: model.packages.filter((p) => !p.holds.length).map((p) => ({ id: p.id, group: p.inside ? `group-${p.inside}` : undefined, ...folderShape(p) })),
+      nodes: model.packages.filter((p) => !p.holds.length).map((p) => ({ id: p.id, group: p.inside ? `frame_${p.inside}` : undefined, ...folderShape(p) })),
       edges: model.dependencies.map((d) => ({ from: endId(d.from), to: endId(d.to), end: "open", dashed: true, labels: d.type === "use" ? [] : [{ s: `«${d.type}»`, at: "mid" }], still: true })),
-      groups: framed.map((p) => ({ id: `group-${p.id}`, name: p.name, kind: "box", tab: TAB, draw: frameDraw(p.name) })),
+      groups: framed.map((p) => ({ id: `frame_${p.id}`, name: p.name, kind: "box", tab: TAB, draw: frameDraw(p.name) })),
     };
   }
   const title = `«profile» ${model.name}`;
@@ -195,8 +195,14 @@ function wordsOf(model) {
     return `<ul>${lines.join("")}</ul>${deps.length ? `\n<ul>${deps.join("")}</ul>` : ""}\n${uml.keyHtml(used, OWN)}`;
   }
   const lines = [
-    ...model.extensions.map((e) => `<li>The stereotype «${esc(e.from.name)}» extends the metaclass ${esc(e.to.name)}${e.required ? "; every " + esc(e.to.name) + " must carry it" : ""}${e.from.attributes.length ? `, and adds ${e.from.attributes.map((a) => `“${esc(a.s)}”`).join(", ")}` : ""}.</li>`),
-    ...model.generalizations.map((g) => `<li>«${esc(g.from.name)}» is a kind of «${esc(g.to.name)}».</li>`),
+    ...model.stereotypes.map((st) => {
+      const say = [
+        ...model.extensions.filter((e) => e.from === st).map((e) => `extends the metaclass ${esc(e.to.name)}${e.required ? ` (every ${esc(e.to.name)} must carry it)` : ""}`),
+        ...model.generalizations.filter((g) => g.from === st).map((g) => `is a kind of «${esc(g.to.name)}»`),
+      ];
+      if (st.attributes.length) say.push(`adds ${st.attributes.map((a) => `“${esc(a.s)}”`).join(", ")}`);
+      return `<li>The stereotype «${esc(st.name)}» ${say.join(", and ")}.</li>`;
+    }),
     ...model.applied.map((p) => `<li>The package ${esc(p.name)} applies the profile.</li>`),
   ];
   used.push("stereotypeBox", "metaclassBox", "extension");

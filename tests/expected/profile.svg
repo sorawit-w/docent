@@ -117,7 +117,7 @@
 <details class="dg-words">
 <summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>The diagram in words</summary>
 <p>The profile Persistence.</p>
-<ul><li>The stereotype «Entity» extends the metaclass Class, and adds “table: String”.</li><li>The stereotype «Id» extends the metaclass Property; every Property must carry it.</li><li>The package Shop model applies the profile.</li></ul>
+<ul><li>The stereotype «Entity» extends the metaclass Class, and adds “table: String”.</li><li>The stereotype «Id» extends the metaclass Property (every Property must carry it).</li><li>The package Shop model applies the profile.</li></ul>
 <p>Key to the marks:</p>
 <ul><li>A folder: a package, its name in the tab, and what it holds in its body.</li><li>A box marked «stereotype»: a new kind of model element that the profile adds.</li><li>A box marked «metaclass»: a kind of element in UML itself, such as Class, that a stereotype extends.</li><li>A solid line with a filled triangle: the stereotype at the line's start extends the metaclass at the triangle.</li><li>A dashed line marked «apply»: the package uses the profile.</li></ul>
 </details>
