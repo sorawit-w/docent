@@ -1,0 +1,32 @@
+{
+  "id": "checkout",
+  "kind": "sequence",
+  "label": "The shop app logs the user in, then the server checks each item, takes the payment, and sends a receipt without waiting. A session is made for the order and ended when it is done.",
+  "participants": [
+    { "id": "app", "name": "Shop app" },
+    { "id": "server", "name": "Server" },
+    { "id": "stock", "name": "Stock" },
+    { "id": "session", "name": "Session" },
+    { "id": "mail", "name": "Mail" }
+  ],
+  "messages": [
+    { "ref": "Log in", "over": ["app", "server"] },
+    { "from": "app", "to": "server", "verb": "place the order" },
+    { "from": "server", "to": "session", "verb": "open", "create": true },
+    { "loop": { "when": "for each item", "messages": [
+      { "from": "server", "to": "stock", "verb": "reserve" },
+      { "opt": { "when": "If the item is low", "messages": [
+        { "from": "stock", "to": "stock", "verb": "order more" }
+      ] } },
+      { "from": "stock", "to": "server", "verb": "reserved", "reply": true }
+    ] } },
+    { "break": { "when": "If a payment fails", "messages": [
+      { "from": "server", "to": "app", "verb": "refused", "reply": true }
+    ] } },
+    { "par": [
+      { "messages": [ { "from": "server", "to": "mail", "verb": "send the receipt", "async": true } ] },
+      { "messages": [ { "from": "server", "to": "session", "verb": "close", "destroy": true } ] }
+    ] },
+    { "from": "server", "to": "app", "verb": "order placed", "reply": true }
+  ]
+}
