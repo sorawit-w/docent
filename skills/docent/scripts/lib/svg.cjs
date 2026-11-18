@@ -1,6 +1,7 @@
 // Writes a laid-out drawing as inline SVG. The drawing carries its own styles, so a copy outside the page keeps
 // its (light) colors. Inside a Docent page it reads the page's tokens, so one drawing serves both themes.
 const { HEAD, HEAD_HALF, MARK, dist, segsOf } = require("./geometry.cjs");
+const uml = require("./uml.cjs");
 
 const num = (v) => String(Math.round(v * 100) / 100);
 const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -45,8 +46,8 @@ function head(leg) {
   const len = dist(tip, prev);
   const ux = (tip[0] - prev[0]) / len, uy = (tip[1] - prev[1]) / len;
   const bx = tip[0] - ux * HEAD, by = tip[1] - uy * HEAD;
-  // A reply in a sequence diagram has an open arrowhead.
-  if (leg.reply) return `<polyline points="${num(bx - uy * HEAD_HALF)},${num(by + ux * HEAD_HALF)} ${num(tip[0])},${num(tip[1])} ${num(bx + uy * HEAD_HALF)},${num(by - ux * HEAD_HALF)}" class="ohead"/>`;
+  // A reply in a sequence diagram, and a message that does not wait, have an open arrowhead.
+  if (leg.reply || leg.open) return `<polyline points="${num(bx - uy * HEAD_HALF)},${num(by + ux * HEAD_HALF)} ${num(tip[0])},${num(tip[1])} ${num(bx + uy * HEAD_HALF)},${num(by - ux * HEAD_HALF)}" class="ohead"/>`;
   return `<polygon points="${num(bx - uy * HEAD_HALF)},${num(by + ux * HEAD_HALF)} ${num(bx + uy * HEAD_HALF)},${num(by - ux * HEAD_HALF)} ${num(tip[0])},${num(tip[1])}" class="head"/>`;
 }
 
@@ -98,12 +99,18 @@ function styles(scene, id, mode, swap) {
   ];
   // A part with a state: its outline takes the status color, and a status dot sits on the outline. A drawing with no state carries none of these rules.
   for (const state of new Set(scene.parts.map((part) => part.state).filter(Boolean))) css.push(`${s} .stop.is-${state},${s} .card.is-${state}{stroke:${v(state)};stroke-width:1.5}`, `${s} .flag.is-${state}{fill:${v(state)};stroke:${v("bg")};stroke-width:2}`);
+  if (scene.bands.some((b) => b.inner)) css.push(`${s} .band.is-inner{stroke:${v("muted")};stroke-width:1}`);
   // An optional leg is dashed. A drawing with no optional leg carries no such rule.
   if (scene.legs.some((leg) => leg.optional)) css.push(`${s} .leg.is-optional .line{stroke-dasharray:5 7}`);
   if ((scene.spurs || []).length) css.push(`${s} .side .line{stroke-dasharray:5 7}`);
   if (scene.parts.some((part) => part.stop)) css.push(`${s} .card.is-stop{stroke:${v("text")};stroke-width:2}`); // a stop of a flowchart
-  // A reply: a thin muted line with an open arrowhead. It is not dashed, because a dashed line means a path that only some readers take.
-  if (scene.legs.some((leg) => leg.reply)) css.push(`${s} .leg.is-reply .line{stroke:${v("muted")};stroke-width:1.5}`, `${s} .ohead{fill:none;stroke:${v("muted")};stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}`, `.js ${s} .leg.is-reply.is-current .ohead{stroke:${v("primary")}}`);
+  // A UML drawing: its lines are 1.5px and follow UML, so a reply is dashed with an open arrowhead (references/DESIGN.md, UML diagrams).
+  if (scene.uml) {
+    css.push(uml.styles(id), `${s} .leg .line{stroke-width:1.5}`, `${s} .leg.is-reply .line{stroke-dasharray:6 4;stroke-linecap:butt}`, `${s} .ohead{fill:none;stroke:${v("text")};stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}`, `.js ${s} .leg.is-current .ohead{stroke:${v("primary")}}`);
+    css.push(`${s} .u-bar{fill:${v("bg")};stroke:${v("text")};stroke-width:1.25}`, `${s} .u-frame{fill:none;stroke:${v("muted")};stroke-width:1}`, `${s} .u-frame.is-filled{fill:${v("bg")}}`, `${s} .u-div{stroke:${v("muted")};stroke-width:1;stroke-dasharray:6 4}`, `${s} .u-op{font-size:12px;font-weight:600;fill:${v("text")}}`);
+  }
+  // A reply outside UML: a thin muted line with an open arrowhead. It is not dashed, because a dashed line means a path that only some readers take.
+  else if (scene.legs.some((leg) => leg.reply)) css.push(`${s} .leg.is-reply .line{stroke:${v("muted")};stroke-width:1.5}`, `${s} .ohead{fill:none;stroke:${v("muted")};stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}`, `.js ${s} .leg.is-reply.is-current .ohead{stroke:${v("primary")}}`);
   // A go-to row of the column form: its mark is dashed when the leg is optional, like the line it stands for.
   if ((scene.jumps || []).some((jump) => jump.optional)) css.push(`${s} .jump.is-optional .mark{stroke-dasharray:3 3}`);
   // On paper nothing scrolls: a drawing that is still wider than the page shrinks to fit it.
@@ -157,8 +164,19 @@ function toSvg(scene, { id, label, mode, swap }) {
   out.push(`<svg id="${id}" class="dg dg-${scene.form}${mode === "auto" ? " dg-auto" : ""}" xmlns="http://www.w3.org/2000/svg" width="${num(scene.w)}" height="${num(scene.h)}" viewBox="0 0 ${num(scene.w)} ${num(scene.h)}" role="img" aria-label="${esc(label)}">`);
   out.push(`<style>\n${styles(scene, id, mode, swap)}\n</style>`);
   out.push(`<rect width="${num(scene.w)}" height="${num(scene.h)}" class="ground"/>`);
-  for (const b of scene.bands) out.push(`<rect x="${num(b.x)}" y="${num(b.y)}" width="${num(b.w)}" height="${num(b.h)}" rx="10" class="band"/>`);
+  // A band inside a band (a fragment inside a fragment, in the script form) has an outline, so its edge shows.
+  for (const b of scene.bands) out.push(`<rect x="${num(b.x)}" y="${num(b.y)}" width="${num(b.w)}" height="${num(b.h)}" rx="10" class="band${b.inner ? " is-inner" : ""}"/>`);
+  // A combined fragment: its ground in the page color goes under the tracks; its outline, tab and guards go over them.
+  for (const f of scene.frames || []) if (!f.ref) out.push(`<rect x="${num(f.x)}" y="${num(f.y)}" width="${num(f.w)}" height="${num(f.h)}" class="band"/>`);
   for (const [x1, y1, x2, y2] of scene.tracks) out.push(`<line x1="${num(x1)}" y1="${num(y1)}" x2="${num(x2)}" y2="${num(y2)}" class="track"/>`);
+  for (const b of scene.bars || []) out.push(`<rect x="${num(b.x)}" y="${num(b.y)}" width="${num(b.w)}" height="${num(b.h)}" class="u-bar"/>`);
+  for (const f of scene.frames || []) {
+    out.push(`<rect x="${num(f.x)}" y="${num(f.y)}" width="${num(f.w)}" height="${num(f.h)}" class="u-frame${f.ref ? " is-filled" : ""}"/>`);
+    for (const d of f.dividers) out.push(`<line x1="${num(f.x)}" y1="${num(d)}" x2="${num(f.x + f.w)}" y2="${num(d)}" class="u-div"/>`);
+    out.push(uml.shapes.tab({ x: f.x, y: f.y, w: f.tabW, h: 20 }).replace('class="u-face"', 'class="u-frame is-filled"'), text({ x: f.x + 10, y: f.y + 14, s: f.op, cls: "u-op" }));
+    for (const g of f.guards) out.push(`<rect x="${num(g.knock.x)}" y="${num(g.knock.y)}" width="${num(g.knock.w)}" height="${num(g.knock.h)}" class="band"/>${text(g)}`);
+    if (f.name) out.push(text(f.name));
+  }
   // The label of a band, as in a group of a sequence diagram. A knock-out in the band color stops the tracks behind it, so no text sits on a line.
   for (const note of scene.notes || []) out.push(`${note.knock ? `<rect x="${num(note.knock.x)}" y="${num(note.knock.y)}" width="${num(note.knock.w)}" height="${num(note.knock.h)}" class="band"/>` : ""}${text(note)}`);
   for (const lane of scene.lanes) {
@@ -175,6 +193,7 @@ function toSvg(scene, { id, label, mode, swap }) {
         text(leg.verb) + `</g>`,
     );
   }
+  for (const c of scene.crosses || []) out.push(uml.nodes.cross(c));
   // A side leg: dashed, with its verb, and no number, no mark and no dot.
   for (const spur of scene.spurs || []) out.push(`<g class="side"><path d="${linePath(spur)}" class="line"/>${head(spur)}${text(spur.verb)}</g>`);
   for (const jump of scene.jumps || []) {
@@ -187,7 +206,7 @@ function toSvg(scene, { id, label, mode, swap }) {
     if (part.shape === "card" && part.ask) {
       const [x0, x1, y0, y1, cy, p] = [part.x, part.x + part.w, part.y, part.y + part.h, part.y + part.h / 2, 8];
       out.push(`<path d="M${num(x0 + p)},${num(y0)} L${num(x1 - p)},${num(y0)} L${num(x1)},${num(cy)} L${num(x1 - p)},${num(y1)} L${num(x0 + p)},${num(y1)} L${num(x0)},${num(cy)} Z" class="card${is}"/>`);
-    } else if (part.shape === "card") out.push(`<rect x="${num(part.x)}" y="${num(part.y)}" width="${num(part.w)}" height="${num(part.h)}" rx="10" class="card${is}${part.stop ? " is-stop" : ""}"/>`);
+    } else if (part.shape === "card") out.push(`<rect x="${num(part.x)}" y="${num(part.y)}" width="${num(part.w)}" height="${num(part.h)}"${part.sharp ? "" : ' rx="10"'} class="card${is}${part.stop ? " is-stop" : ""}"/>`);
     else out.push(`<circle cx="${num(part.cx)}" cy="${num(part.cy)}" r="${num(part.r)}" class="${part.end ? "stop end" : "stop"}${is}"/>`);
     if (part.icon) out.push(icon(part.icon, part.iconAt, part.end && part.shape !== "card" ? "icon on-end" : "icon"));
     // The status dot sits on the outline at the upper right: on the ring, or on the round corner of the plate. It stays inside the room that the part already keeps free.

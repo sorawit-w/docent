@@ -104,7 +104,7 @@ A walkthrough needs a route, because step 1 lights leg 1, step 2 lights leg 2, a
 
 ## Sequence diagrams
 
-A sequence diagram shows calls and replies between a few participants, in time order: a browser asks a web app, the web app asks a database, the replies come back. Write it with `"kind": "sequence"`:
+A sequence diagram shows messages between a few participants, in time order: a browser asks a web app, the web app asks a database, the replies come back. It is drawn in UML notation. Write it with `"kind": "sequence"`:
 
 ```json
 {
@@ -138,13 +138,21 @@ A sequence diagram shows calls and replies between a few participants, in time o
 | Field | What it is |
 |---|---|
 | `participants` | 2 to 6. Each has an `id` and a `name` (at most 20 characters). |
-| `messages` | In time order, at most 24 in all. A message has `from`, `to` and a `verb` (at most 24 characters). `"reply": true` makes it a reply. A message from a participant to itself is a call to itself. |
-| `alt` | One group of alternatives, in place of a message: 2 or 3 cases, each with a `when` (at most 32 characters, such as "If not") and its own `messages`. A group cannot hold a group. |
+| `messages` | In time order, at most 30 messages in all. A message has `from`, `to` and a `verb` (at most 24 characters). A message from a participant to itself is a call to itself. |
+| `"reply": true` | The message answers a call: a dashed line with an open arrowhead. |
+| `"async": true` | The sender does not wait for an answer: a solid line with an open arrowhead. With neither, a message is a call that waits: a filled arrowhead. |
+| `"create": true` | The message creates its receiver. The receiver's box starts at this row, and no message may use the receiver before it. |
+| `"destroy": true` | The message ends its receiver. Its track stops at a cross, and no message may use the receiver after it. |
+| `alt`, `par` | A fragment with 2 or 3 cases, in place of a message: `{"alt": [{"when": "If not", "messages": [...]}, ...]}`. `alt`: one case happens. `par`: the cases happen at the same time. A `when` is at most 32 characters; it is needed for `alt` and may be left out for `par`. |
+| `opt`, `loop`, `break`, `critical` | A fragment with one case: `{"loop": {"when": "for each item", "messages": [...]}}`. `opt`: only when the condition holds. `loop`: repeated. `break`: when the condition holds, these messages happen and the rest is skipped. `critical`: one step that nothing can interrupt; its `when` may be left out. |
+| `ref` | A frame for steps drawn in another diagram, in place of a message: `{"ref": "Log in", "over": ["browser", "app"]}`. `over` names the participants it covers, and they must stand side by side. The name is at most 32 characters. |
 
-- On a desktop each participant is a plate at the top with a track below it, and each message is a level arrow with its number. A reply is a thin muted line with an open arrowhead. A call to itself is a small loop. Each case of the group is a band with its `when` as a label. One dot travels the messages in order, twice.
-- On a phone the drawing is a script: one row for each message, with its number, "From → To", and the verb.
+- A fragment may hold one more fragment, not more. Write the `when` as the condition, such as "If the cache has the page" or "for each item"; the drawing puts it in brackets.
+- The activation bars are worked out from the messages: a call starts a bar on its receiver, and the receiver's last reply to the caller ends it. A call with no reply gets a short bar.
+- On a desktop each participant is a plain box at the top with a track below it, and each message is a level arrow with its number. Each fragment is a frame with its operator in a tab and its guards in brackets. One dot travels the messages in order, twice.
+- On a phone the drawing is a script: one row for each message, with its number, "From → To", and the verb. A reply, a message that does not wait, a create and a destroy say so before the verb. Each case of a fragment is a band named by its operator and guard.
 - On paper the desktop form prints, shrunk to the sheet when it keeps at least 80% of its size; else the script prints.
-- `render` also writes the steps in words, in a closed section under the drawing ("The diagram in words"). A screen reader reaches it, and it prints. The `label` stays a one- or two-sentence summary.
+- `render` also writes the steps in words, in a closed section under the drawing ("The diagram in words"), and ends them with a key to the marks the drawing uses. A screen reader reaches it, and it prints. The `label` stays a one- or two-sentence summary.
 - A sequence diagram sits in the text flow. It has no `form`, no `lanes`, no `parts` and no `legs`. Six participants with long names need more than the page; then the script shows on a desktop too.
 
 ## Flowcharts
