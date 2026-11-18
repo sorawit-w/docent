@@ -472,7 +472,7 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
   }
 
   // The UML graph kinds: the drawing on a desktop, the column on a phone, and the words with the key on paper.
-  for (const name of ["activity"]) {
+  for (const name of ["activity", "state"]) {
     const data = fs.readFileSync(path.join(root, "tests", "fixtures", `${name}.json`), "utf8");
     const did = `dg-${JSON.parse(data).id}`;
     const content = renderDocument(html.replace('<section id="report"', `<section id="uml" aria-labelledby="uml-h"><h2 id="uml-h">UML</h2><figure><div class="fig" role="region" aria-label="Figure 8, ${name}" tabindex="0">\n<!-- docent:diagram\n${data}\n-->\n<!-- /docent:diagram -->\n</div><figcaption><strong>Figure 8</strong>A UML ${name} diagram.</figcaption></figure></section>\n<section id="report"`)).html;

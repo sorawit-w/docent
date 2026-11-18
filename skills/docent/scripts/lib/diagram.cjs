@@ -24,7 +24,7 @@ function renderSequence(data) {
 }
 
 /** A UML kind drawn by the graph layout: the drawing, a column for phones and paper, and the facts or steps in words. */
-const GRAPH_KINDS = { activity: "./activity.cjs" };
+const GRAPH_KINDS = { activity: "./activity.cjs", state: "./state.cjs" };
 function renderGraphKind(data) {
   const { layoutGraph, layoutColumnGraph } = require("./graph.cjs");
   const kind = require(GRAPH_KINDS[data.kind]);

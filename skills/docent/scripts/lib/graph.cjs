@@ -62,7 +62,11 @@ function rows(g) {
 function columns(g, rank) {
   const n = g.nodes.length, R = Math.max(...rank) + 1;
   const groupOf = g.nodes.map((node) => node.group ?? -1);
-  const order = [...new Set(groupOf)]; // groups in the order in which their first node comes
+  const first = [...new Set(groupOf)]; // groups in the order in which their first node comes
+  // Groups that share a frame (the regions of a composite state) stand side by side, so the frame holds only them.
+  const frameOf = (gr) => (gr >= 0 && g.groups && g.groups[gr].frame) || null;
+  const order = [];
+  for (const gr of first) { if (order.includes(gr)) continue; const f = frameOf(gr); order.push(...(f ? first.filter((o) => frameOf(o) === f) : [gr])); }
   const near = g.nodes.map(() => []);
   for (const e of g.edges) if (e.a >= 0 && e.b >= 0 && e.a !== e.b) { near[e.a].push(e.b); near[e.b].push(e.a); }
   const lists = new Map(); // "group:row" -> nodes in order
@@ -160,6 +164,16 @@ function draw(g, k) {
     const m = placed.filter((v) => v.group === i);
     return { x0: Math.min(...m.map((v) => v.x0)) - 2 * U, x1: Math.max(...m.map((v) => v.x1)) + 2 * U, y0: Math.min(...m.map((v) => v.y0)) - 4 * U, y1: Math.max(...m.map((v) => v.y1)) + 2 * U };
   });
+  // Groups that share a frame (the regions of a composite state) get one frame around them all, with a dashed line between.
+  const lead = groups.map((_, i) => i), dividers = groups.map(() => []);
+  for (const key of new Set(groups.map((gr) => gr.frame).filter(Boolean))) {
+    const members = groups.map((gr, i) => i).filter((i) => groups[i].frame === key).sort((a, b) => rects[a].x0 - rects[b].x0);
+    const own = members.map((i) => rects[i]);
+    const union = { x0: Math.min(...own.map((r) => r.x0)), x1: Math.max(...own.map((r) => r.x1)), y0: Math.min(...own.map((r) => r.y0)), y1: Math.max(...own.map((r) => r.y1)) };
+    for (const i of members) { rects[i] = union; lead[i] = members[0]; }
+    for (let n = 1; n < own.length; n++) dividers[members[0]].push(up((own[n - 1].x1 + own[n].x0) / 2));
+    groups[members[0]] = { ...groups[members[0]], dividers: dividers[members[0]] };
+  }
 
   // The lattice: each point is free, blocked (inside a node or a name), or used by a line along one axis or both.
   const nx = Math.floor(W / U) + 1, ny = Math.floor(H / U) + 1;
@@ -170,7 +184,8 @@ function draw(g, k) {
   if (head) block(0, 0, W, head + U);
   const names = [];
   rects.forEach((r, i) => {
-    if (groups[i].kind !== "box") return;
+    if (groups[i].kind !== "box" || lead[i] !== i) return;
+    for (const dx of dividers[i]) for (let j2 = r.y0 / U; j2 <= r.y1 / U; j2++) { use[P(dx / U, j2)] = use[P(dx / U, j2)] ? 3 : 2; if (j2 < r.y1 / U) vUsed[P(dx / U, j2)] = 1; }
     // The frame is a line: a line may cross it at a right angle, and never run along it.
     const [i0, i1, j0, j1] = [r.x0 / U, r.x1 / U, r.y0 / U, r.y1 / U];
     for (let i2 = i0; i2 <= i1; i2++) { use[P(i2, j0)] = use[P(i2, j0)] ? 3 : 1; use[P(i2, j1)] = use[P(i2, j1)] ? 3 : 1; if (i2 < i1) { hUsed[P(i2, j0)] = 1; hUsed[P(i2, j1)] = 1; } }
@@ -206,6 +221,7 @@ function draw(g, k) {
         const a = node && node.ports === "mid" ? mid : at;
         if (a <= lo + U - 1e-6 || a >= hi - U + 1e-6) continue;
         if (end.group != null && side === "top" && names.some((nm) => a >= nm.x0 - U && a <= nm.x1 + U)) continue;
+        if (end.group != null && horiz && dividers[lead[end.group]].some((dx) => Math.abs(a - dx) < 2 * U)) continue; // never on a region's dashed line
         const pt = horiz ? [a, side === "top" ? r.y0 : r.y1] : [side === "left" ? r.x0 : r.x1, a];
         const vis = node ? hit(node, side, horiz ? a - node.cx : a - node.cy) : pt;
         const gap = dist(pt, vis);
@@ -343,6 +359,7 @@ function draw(g, k) {
   for (const t of g.texts || []) solid.push(textBox(t));
   const frames = rects.filter((_, i) => groups[i].kind === "box");
   const frameSegs = frames.flatMap((r) => [[[r.x0, r.y0], [r.x1, r.y0]], [[r.x1, r.y0], [r.x1, r.y1]], [[r.x1, r.y1], [r.x0, r.y1]], [[r.x0, r.y1], [r.x0, r.y0]]]);
+  rects.forEach((r, i) => { for (const dx of dividers[i]) frameSegs.push([[dx, r.y0], [dx, r.y1]]); });
   const texts = [];
   const free = (box) => {
     if (box.x0 < 4 || box.y0 < 4 || box.x1 > W - 4 || box.y1 > H - 4) return false;
@@ -379,7 +396,7 @@ function draw(g, k) {
       labelled[n].push(done.t);
     }
   });
-  return { W, H, placed, rects, legs, labels: labelled, names, head, lanes, colX, rowY, back, rank, col };
+  return { W, H, placed, rects, lead, legs, labels: labelled, names, head, lanes, colX, rowY, back, rank, col };
 }
 
 const middleFirst = (pts) => { const n = pts.length - 1, m = Math.floor((n - 1) / 2), out = [m]; for (let s = 1; out.length < n; s++) { if (m + s < n) out.push(m + s); if (m - s >= 0) out.push(m - s); } return out; };
@@ -450,9 +467,23 @@ function layoutGraph(g, form) {
   const nodes = g.nodes.map((v) => ({ ...v, group: v.group == null ? undefined : gidx.get(v.group) }));
   const edges = g.edges.map((e) => ({ ...e, labels: e.labels || [], a: at(e.from), b: at(e.to) }));
   // In the rows, a line to a group counts as a line to its first node; a line that points up counts the other way round.
-  const first = (v) => (v >= 0 ? v : nodes.findIndex((n) => n.group === -v - 1));
-  const rowEdges = edges.map((e) => (e.up ? { ...e, a: first(e.b), b: first(e.a) } : { ...e, a: first(e.a), b: first(e.b) }));
-  const R = rows({ nodes, edges: rowEdges });
+  // A line into a frame counts as a line to each node of the frame that nothing inside leads to (its starts); a line
+  // out of a frame counts as a line from each node that leads nowhere inside (its ends). So a frame's regions start together.
+  const frameOfGroup = (gi) => (groups[gi].frame ? groups.map((gr, i) => i).filter((i) => groups[i].frame === groups[gi].frame) : [gi]);
+  const inside = (gi) => nodes.map((n, i) => i).filter((i) => frameOfGroup(gi).includes(nodes[i].group));
+  const ends = (v, out) => {
+    if (v >= 0) return [v];
+    const m = inside(-v - 1), within = edges.filter((e) => m.includes(e.a) && m.includes(e.b) && e.a !== e.b);
+    const list = m.filter((i) => !within.some((e) => (out ? e.a : e.b) === i));
+    return list.length ? list : [m[0]];
+  };
+  const rowEdges = [], owner = [];
+  edges.forEach((e, n) => {
+    const [a, b] = e.up ? [e.b, e.a] : [e.a, e.b];
+    for (const x of ends(a, true)) for (const y of ends(b, false)) { rowEdges.push({ ...e, a: x, b: y }); owner.push(n); }
+  });
+  const R0 = rows({ nodes, edges: rowEdges });
+  const R = { rank: R0.rank, back: new Set([...R0.back].map((k) => owner[k])) };
   // A line that the rows count backwards, and that is not drawn upward on purpose, goes back.
   const back = new Set([...R.back].filter((n) => !edges[n].up));
   const k = { gap: 0, edge: 0, rows: [] };
@@ -476,12 +507,13 @@ function layoutGraph(g, form) {
 function scene(out, nodes, edges, groups, form) {
   const s = { form, uml: true, hideMarks: true, w: out.W, h: out.H, bands: [], gaps: [], tracks: [], lanes: [], parts: [], legs: [], notes: [], under: [] };
   out.rects.forEach((r, i) => {
-    const gr = groups[i];
+    const gr = groups[out.lead[i]];
+    if (out.lead[i] !== i) return; // a region: its frame is drawn once, by the first region
     if (gr.kind === "lane") {
       s.bands.push({ x: r.x0, y: r.y0, w: r.x1 - r.x0, h: r.y1 - r.y0 });
       s.lanes.push({ text: { x: (r.x0 + r.x1) / 2, y: r.y0 + 28, s: gr.name, cls: "lane", anchor: "middle" } });
     } else {
-      const made = gr.draw ? gr.draw({ x: r.x0, y: r.y0, w: r.x1 - r.x0, h: r.y1 - r.y0 }) : { svg: `<rect x="${r.x0}" y="${r.y0}" width="${r.x1 - r.x0}" height="${r.y1 - r.y0}" class="u-frame"/>`, texts: [{ x: r.x0 + 12, y: r.y0 + 22, s: gr.name, cls: "name", anchor: "start" }] };
+      const made = gr.draw ? gr.draw({ x: r.x0, y: r.y0, w: r.x1 - r.x0, h: r.y1 - r.y0 }, gr.dividers || []) : { svg: `<rect x="${r.x0}" y="${r.y0}" width="${r.x1 - r.x0}" height="${r.y1 - r.y0}" class="u-frame"/>`, texts: [{ x: r.x0 + 12, y: r.y0 + 22, s: gr.name, cls: "name", anchor: "start" }] };
       s.under.push(made.svg);
       s.notes.push(...made.texts);
     }

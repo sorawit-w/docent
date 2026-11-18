@@ -1,0 +1,193 @@
+<svg id="dg-order-states" class="dg dg-state dg-auto" xmlns="http://www.w3.org/2000/svg" width="1056" height="1200" viewBox="0 0 1056 1200" role="img" aria-label="An order is new until it is paid. A paid order is shipped: it is packed and labeled at the same time, then it goes out. A new order that waits too long is cancelled.">
+<style>
+#dg-order-states{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-order-states .ground{fill:var(--fig,#f2f3f9)}
+#dg-order-states .band{fill:var(--bg,#fbfbfe)}
+#dg-order-states .track{stroke:var(--line,#d3d6e3)}
+#dg-order-states .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-order-states .head{fill:var(--text,#1c1f2e)}
+#dg-order-states .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-order-states .stop.end{fill:var(--text,#1c1f2e)}
+#dg-order-states .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-order-states .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-order-states .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-order-states .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-order-states .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-order-states .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-order-states .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-order-states .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-order-states .sub,#dg-order-states .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-order-states .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-order-states .u-ln{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-order-states .u-bold{stroke-width:2.5}
+#dg-order-states .u-dash{stroke-dasharray:6 4;stroke-linecap:butt}
+#dg-order-states .u-face{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linejoin:round}
+#dg-order-states .u-ink{fill:var(--text,#1c1f2e)}
+#dg-order-states .u-name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-order-states .leg .line{stroke-width:1.5}
+#dg-order-states .leg.is-reply .line{stroke-dasharray:6 4;stroke-linecap:butt}
+#dg-order-states .ohead{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.js #dg-order-states .leg.is-current .ohead{stroke:var(--primary,#2f3fd0)}
+#dg-order-states .u-bar{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-order-states .u-frame{fill:none;stroke:var(--muted,#575d75);stroke-width:1}
+#dg-order-states .u-frame.is-filled{fill:var(--bg,#fbfbfe)}
+#dg-order-states .u-div{stroke:var(--muted,#575d75);stroke-width:1;stroke-dasharray:6 4}
+#dg-order-states .u-op{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e)}
+.js #dg-order-states .pulse{display:block;animation:10.8s linear 2 both}
+.js #dg-order-states:not(.is-playing) .pulse{animation-play-state:paused}
+@keyframes dg-order-states-1{0%{transform:translate(132px,56px);opacity:0}1.11%{transform:translate(132px,56px);opacity:1}12.5%{transform:translate(132px,137px);opacity:1}14.81%{transform:translate(132px,137px);opacity:0}100%{transform:translate(132px,137px);opacity:0}}
+.js #dg-order-states .pulse-1{animation-name:dg-order-states-1}
+@keyframes dg-order-states-2{0%{transform:translate(132px,199px);opacity:0}14.81%{transform:translate(132px,199px);opacity:0}15.93%{transform:translate(132px,199px);opacity:1}27.31%{transform:translate(132px,288px);opacity:1}29.63%{transform:translate(132px,288px);opacity:0}100%{transform:translate(132px,288px);opacity:0}}
+.js #dg-order-states .pulse-2{animation-name:dg-order-states-2}
+@keyframes dg-order-states-3{0%{transform:translate(132px,312px);opacity:0}29.63%{transform:translate(132px,312px);opacity:0}30.74%{transform:translate(132px,312px);opacity:1}42.13%{transform:translate(132px,401px);opacity:1}44.44%{transform:translate(132px,401px);opacity:0}100%{transform:translate(132px,401px);opacity:0}}
+.js #dg-order-states .pulse-3{animation-name:dg-order-states-3}
+@keyframes dg-order-states-5{0%{transform:translate(217px,432px);opacity:0}44.44%{transform:translate(217px,432px);opacity:0}45.56%{transform:translate(217px,432px);opacity:1}54.59%{transform:translate(816px,432px);opacity:1}56.94%{transform:translate(816px,588px);opacity:1}59.26%{transform:translate(816px,588px);opacity:0}100%{transform:translate(816px,588px);opacity:0}}
+.js #dg-order-states .pulse-5{animation-name:dg-order-states-5}
+@keyframes dg-order-states-10{0%{transform:translate(816px,900px);opacity:0}59.26%{transform:translate(816px,900px);opacity:0}60.37%{transform:translate(816px,900px);opacity:1}64.47%{transform:translate(816px,1032px);opacity:1}71.76%{transform:translate(581px,1032px);opacity:1}74.07%{transform:translate(581px,1032px);opacity:0}100%{transform:translate(581px,1032px);opacity:0}}
+.js #dg-order-states .pulse-10{animation-name:dg-order-states-10}
+@keyframes dg-order-states-11{0%{transform:translate(492px,1063px);opacity:0}74.07%{transform:translate(492px,1063px);opacity:0}75.19%{transform:translate(492px,1063px);opacity:1}86.57%{transform:translate(492px,1142px);opacity:1}88.89%{transform:translate(492px,1142px);opacity:0}100%{transform:translate(492px,1142px);opacity:0}}
+.js #dg-order-states .pulse-11{animation-name:dg-order-states-11}
+@media (prefers-reduced-motion:reduce){#dg-order-states .pulse{animation:none!important}#dg-order-states .pulse{display:none!important}}
+@media print{#dg-order-states{max-width:100%;height:auto}#dg-order-states .pulse{display:none!important}}
+#dg-order-states-phone{display:none}
+</style>
+<rect width="1056" height="1200" class="ground"/>
+<rect x="660" y="588" width="360" height="312" rx="10" class="u-face"/><line x1="840" y1="588" x2="840" y2="900" class="u-ln u-dash"/>
+<text x="672" y="609" class="name" text-anchor="start">Shipping</text>
+<g class="leg" data-leg="1"><polyline points="132,56 132,137" class="u-ln"/><polyline points="127.5,129 132,137 136.5,129" class="u-ln"/><circle r="6" class="pulse pulse-1"/></g>
+<g class="leg" data-leg="2"><polyline points="132,199 132,288" class="u-ln"/><polyline points="127.5,280 132,288 136.5,280" class="u-ln"/><circle r="6" class="pulse pulse-2"/><text x="140" y="247.5" class="verb" text-anchor="start">pay</text></g>
+<g class="leg" data-leg="3"><polyline points="132,312 132,401" class="u-ln"/><polyline points="127.5,393 132,401 136.5,393" class="u-ln"/><circle r="6" class="pulse pulse-3"/><text x="140" y="360.5" class="verb" text-anchor="start">[card valid]</text></g>
+<g class="leg" data-leg="5"><polyline points="217,432 816,432 816,588" class="u-ln"/><polyline points="811.5,580 816,588 820.5,580" class="u-ln"/><circle r="6" class="pulse pulse-5"/><text x="516.5" y="449" class="verb" text-anchor="middle">pick</text></g>
+<g class="leg" data-leg="10"><polyline points="816,900 816,1032 581,1032" class="u-ln"/><polyline points="589,1027.5 581,1032 589,1036.5" class="u-ln"/><circle r="6" class="pulse pulse-10"/><text x="824" y="970" class="verb" text-anchor="start">hand over</text></g>
+<g class="leg" data-leg="11"><polyline points="492,1063 492,1142" class="u-ln"/><polyline points="487.5,1134 492,1142 496.5,1134" class="u-ln"/><circle r="6" class="pulse pulse-11"/></g>
+<g class="leg" data-leg="4"><polyline points="148,300 180,300 180,199" class="u-ln"/><polyline points="184.5,207 180,199 175.5,207" class="u-ln"/><text x="188" y="253.5" class="verb" text-anchor="start">[else] / show error</text></g>
+<g class="leg" data-leg="6"><polyline points="732,656 732,736" class="u-ln"/><polyline points="727.5,728 732,736 736.5,728" class="u-ln"/></g>
+<g class="leg" data-leg="7"><polyline points="732,776 732,854" class="u-ln"/><polyline points="727.5,846 732,854 736.5,846" class="u-ln"/><text x="740" y="819" class="verb" text-anchor="start">boxed</text></g>
+<g class="leg" data-leg="8"><polyline points="948,656 948,736" class="u-ln"/><polyline points="943.5,728 948,736 952.5,728" class="u-ln"/></g>
+<g class="leg" data-leg="9"><polyline points="948,776 948,854" class="u-ln"/><polyline points="943.5,846 948,854 952.5,846" class="u-ln"/><text x="956" y="819" class="verb" text-anchor="start">printed</text></g>
+<g class="leg" data-leg="12"><polyline points="203,192 492,192 492,280" class="u-ln"/><polyline points="487.5,272 492,280 496.5,272" class="u-ln"/><text x="347.5" y="209" class="verb" text-anchor="middle">after 7 days</text></g>
+<g class="leg" data-leg="13"><polyline points="203,156 252,156 252,180 203,180" class="u-ln"/><polyline points="211,175.5 203,180 211,184.5" class="u-ln"/><text x="260" y="172" class="verb" text-anchor="start">edit</text></g>
+<g class="leg" data-leg="14"><polyline points="440,300 384,300 384,1152 482,1152" class="u-ln"/><polyline points="474,1156.5 482,1152 474,1147.5" class="u-ln"/></g>
+<circle cx="132" cy="48" r="8" class="u-ink"/>
+<rect x="61" y="137" width="142" height="62" rx="10" class="u-face"/><line x1="61" y1="169" x2="203" y2="169" class="u-ln"/>
+<text x="132" y="158" class="name" text-anchor="middle">New</text>
+<text x="73" y="187" class="sub" text-anchor="start">entry / reserve stock</text>
+<polygon points="132,288 148,300 132,312 116,300" class="u-face"/>
+<rect x="47" y="401" width="170" height="62" rx="10" class="u-face"/><line x1="47" y1="433" x2="217" y2="433" class="u-ln"/>
+<text x="132" y="422" class="name" text-anchor="middle">Paid</text>
+<text x="59" y="451" class="sub" text-anchor="start">do / notify the warehouse</text>
+<circle cx="732" cy="648" r="8" class="u-ink"/>
+<rect x="684" y="736" width="96" height="40" rx="10" class="u-face"/>
+<text x="732" y="761" class="name" text-anchor="middle">Packing</text>
+<circle cx="732" cy="864" r="10" class="u-face"/><circle cx="732" cy="864" r="6" class="u-ink"/>
+<circle cx="948" cy="648" r="8" class="u-ink"/>
+<rect x="900" y="736" width="96" height="40" rx="10" class="u-face"/>
+<text x="948" y="761" class="name" text-anchor="middle">Labeling</text>
+<circle cx="948" cy="864" r="10" class="u-face"/><circle cx="948" cy="864" r="6" class="u-ink"/>
+<rect x="403" y="1001" width="178" height="62" rx="10" class="u-face"/><line x1="403" y1="1033" x2="581" y2="1033" class="u-ln"/>
+<text x="492" y="1022" class="name" text-anchor="middle">Shipped</text>
+<text x="415" y="1051" class="sub" text-anchor="start">exit / send the tracking link</text>
+<rect x="440" y="280" width="104" height="40" rx="10" class="u-face"/>
+<text x="492" y="305" class="name" text-anchor="middle">Cancelled</text>
+<circle cx="492" cy="1152" r="10" class="u-face"/><circle cx="492" cy="1152" r="6" class="u-ink"/>
+</svg>
+<svg id="dg-order-states-phone" class="dg dg-state dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="1330" viewBox="0 0 264 1330" role="img" aria-label="An order is new until it is paid. A paid order is shipped: it is packed and labeled at the same time, then it goes out. A new order that waits too long is cancelled.">
+<style>
+#dg-order-states-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-order-states-phone .ground{fill:var(--fig,#f2f3f9)}
+#dg-order-states-phone .band{fill:var(--bg,#fbfbfe)}
+#dg-order-states-phone .track{stroke:var(--line,#d3d6e3)}
+#dg-order-states-phone .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-order-states-phone .head{fill:var(--text,#1c1f2e)}
+#dg-order-states-phone .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-order-states-phone .stop.end{fill:var(--text,#1c1f2e)}
+#dg-order-states-phone .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-order-states-phone .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-order-states-phone .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-order-states-phone .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-order-states-phone .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-order-states-phone .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-order-states-phone .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-order-states-phone .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-order-states-phone .sub,#dg-order-states-phone .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-order-states-phone .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-order-states-phone .u-ln{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-order-states-phone .u-bold{stroke-width:2.5}
+#dg-order-states-phone .u-dash{stroke-dasharray:6 4;stroke-linecap:butt}
+#dg-order-states-phone .u-face{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linejoin:round}
+#dg-order-states-phone .u-ink{fill:var(--text,#1c1f2e)}
+#dg-order-states-phone .u-name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-order-states-phone .leg .line{stroke-width:1.5}
+#dg-order-states-phone .leg.is-reply .line{stroke-dasharray:6 4;stroke-linecap:butt}
+#dg-order-states-phone .ohead{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.js #dg-order-states-phone .leg.is-current .ohead{stroke:var(--primary,#2f3fd0)}
+#dg-order-states-phone .u-bar{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-order-states-phone .u-frame{fill:none;stroke:var(--muted,#575d75);stroke-width:1}
+#dg-order-states-phone .u-frame.is-filled{fill:var(--bg,#fbfbfe)}
+#dg-order-states-phone .u-div{stroke:var(--muted,#575d75);stroke-width:1;stroke-dasharray:6 4}
+#dg-order-states-phone .u-op{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e)}
+@media (prefers-reduced-motion:reduce){#dg-order-states-phone .pulse{animation:none!important}#dg-order-states-phone .pulse{display:none!important}}
+@media print{#dg-order-states-phone{max-width:100%;height:auto}#dg-order-states-phone .pulse{display:none!important}}
+@media (max-width:1152px){#dg-order-states{display:none}#dg-order-states-phone{display:block}}
+</style>
+<rect width="264" height="1330" class="ground"/>
+<rect x="8" y="570" width="248" height="248" rx="10" class="band"/>
+<rect x="8" y="830" width="248" height="248" rx="10" class="band"/>
+<text x="20" y="588" class="sub" text-anchor="start">Shipping, region 1</text>
+<text x="20" y="848" class="sub" text-anchor="start">Shipping, region 2</text>
+<g class="leg" data-leg="1"><polyline points="121,24 121,80" class="u-ln"/><polyline points="116.5,72 121,80 125.5,72" class="u-ln"/></g>
+<g class="leg" data-leg="2"><polyline points="121,618 121,674" class="u-ln"/><polyline points="116.5,666 121,674 125.5,666" class="u-ln"/></g>
+<g class="leg" data-leg="3"><polyline points="121,714 121,770" class="u-ln"/><polyline points="116.5,762 121,770 125.5,762" class="u-ln"/><text x="131" y="746" class="verb" text-anchor="start">boxed</text></g>
+<g class="leg" data-leg="4"><polyline points="121,878 121,934" class="u-ln"/><polyline points="116.5,926 121,934 125.5,926" class="u-ln"/></g>
+<g class="leg" data-leg="5"><polyline points="121,974 121,1030" class="u-ln"/><polyline points="116.5,1022 121,1030 125.5,1022" class="u-ln"/><text x="131" y="1006" class="verb" text-anchor="start">printed</text></g>
+<g class="leg" data-leg="6"><polyline points="121,1152 121,1208" class="u-ln"/><polyline points="116.5,1200 121,1208 125.5,1200" class="u-ln"/></g>
+<circle cx="121" cy="16" r="8" class="u-ink"/>
+<rect x="50" y="80" width="142" height="62" rx="10" class="u-face"/><line x1="50" y1="112" x2="192" y2="112" class="u-ln"/>
+<text x="121" y="101" class="name" text-anchor="middle">New</text>
+<text x="62" y="130" class="sub" text-anchor="start">entry / reserve stock</text>
+<polyline points="32,161 80,161" class="u-ln"/><polyline points="72,165.5 80,161 72,156.5" class="u-ln"/>
+<text x="92" y="165" class="verb" text-anchor="start">pay</text>
+<text x="92" y="183" class="name" text-anchor="start">to the choice</text>
+<polyline points="32,203 80,203" class="u-ln"/><polyline points="72,207.5 80,203 72,198.5" class="u-ln"/>
+<text x="92" y="207" class="verb" text-anchor="start">after 7 days</text>
+<text x="92" y="225" class="name" text-anchor="start">to Cancelled</text>
+<polyline points="32,245 80,245" class="u-ln"/><polyline points="72,249.5 80,245 72,240.5" class="u-ln"/>
+<text x="92" y="249" class="verb" text-anchor="start">edit</text>
+<text x="92" y="267" class="name" text-anchor="start">back to itself</text>
+<polygon points="121,298 137,310 121,322 105,310" class="u-face"/>
+<polyline points="32,341 80,341" class="u-ln"/><polyline points="72,345.5 80,341 72,336.5" class="u-ln"/>
+<text x="92" y="345" class="verb" text-anchor="start">[card valid]</text>
+<text x="92" y="363" class="name" text-anchor="start">to Paid</text>
+<polyline points="32,383 80,383" class="u-ln"/><polyline points="72,387.5 80,383 72,378.5" class="u-ln"/>
+<text x="92" y="387" class="verb" text-anchor="start">[else] / show error</text>
+<text x="92" y="405" class="name" text-anchor="start">back to New</text>
+<rect x="36" y="436" width="170" height="62" rx="10" class="u-face"/><line x1="36" y1="468" x2="206" y2="468" class="u-ln"/>
+<text x="121" y="457" class="name" text-anchor="middle">Paid</text>
+<text x="48" y="486" class="sub" text-anchor="start">do / notify the warehouse</text>
+<polyline points="32,517 80,517" class="u-ln"/><polyline points="72,521.5 80,517 72,512.5" class="u-ln"/>
+<text x="92" y="521" class="verb" text-anchor="start">pick</text>
+<text x="92" y="539" class="name" text-anchor="start">to Shipping</text>
+<circle cx="121" cy="610" r="8" class="u-ink"/>
+<rect x="73" y="674" width="96" height="40" rx="10" class="u-face"/>
+<text x="121" y="699" class="name" text-anchor="middle">Packing</text>
+<circle cx="121" cy="780" r="10" class="u-face"/><circle cx="121" cy="780" r="6" class="u-ink"/>
+<circle cx="121" cy="870" r="8" class="u-ink"/>
+<rect x="73" y="934" width="96" height="40" rx="10" class="u-face"/>
+<text x="121" y="959" class="name" text-anchor="middle">Labeling</text>
+<circle cx="121" cy="1040" r="10" class="u-face"/><circle cx="121" cy="1040" r="6" class="u-ink"/>
+<rect x="32" y="1090" width="178" height="62" rx="10" class="u-face"/><line x1="32" y1="1122" x2="210" y2="1122" class="u-ln"/>
+<text x="121" y="1111" class="name" text-anchor="middle">Shipped</text>
+<text x="44" y="1140" class="sub" text-anchor="start">exit / send the tracking link</text>
+<circle cx="121" cy="1218" r="10" class="u-face"/><circle cx="121" cy="1218" r="6" class="u-ink"/>
+<rect x="69" y="1248" width="104" height="40" rx="10" class="u-face"/>
+<text x="121" y="1273" class="name" text-anchor="middle">Cancelled</text>
+<polyline points="32,1307 80,1307" class="u-ln"/><polyline points="72,1311.5 80,1307 72,1302.5" class="u-ln"/>
+<text x="92" y="1311" class="name" text-anchor="start">back to the end</text>
+</svg>
+<details class="dg-words">
+<summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>The diagram in words</summary>
+<ol><li>The machine starts here. Go to New.</li><li>The state New. On entry: reserve stock. On “pay”, go to the choice. On “after 7 days”, go to Cancelled. On “edit”, stay in it and start it again.</li><li>A choice. If card valid, go to Paid. If else, go to New, doing “show error”.</li><li>The state Paid. While in it: notify the warehouse. On “pick”, go to Shipping.</li><li>Shipping, region 1: Here it starts. Go to Packing.</li><li>Shipping, region 1: The state Packing. On “boxed”, go to the end in Shipping.</li><li>Shipping, region 1: This region is done.</li><li>Shipping, region 2: Here it starts. Go to Labeling.</li><li>Shipping, region 2: The state Labeling. On “printed”, go to the end in Shipping.</li><li>Shipping, region 2: This region is done.</li><li>The state Shipped. On exit: send the tracking link. Go to the end.</li><li>The machine ends.</li><li>The state Cancelled. Go to the end.</li></ol>
+<ul><li>Shipping is a state with states inside, in 2 regions that are active at the same time. From any state inside, on “hand over”, go to Shipped.</li></ul>
+<p>Key to the marks:</p>
+<ul><li>A filled dot: where it starts.</li><li>A box with round corners: a state. Below its name: what it does on entry, while in it (do), and on exit.</li><li>A large box with round corners and states inside: a state made of smaller states.</li><li>A hollow diamond: a choice; the path that is taken depends on the condition in brackets.</li><li>A ring around a filled dot: the machine, or the region, is done.</li><li>A dashed line inside a state: its regions, which are active at the same time.</li><li>A solid line with an open arrowhead: a change of state. Its label is the event, a condition in brackets, and after a slash what is done.</li></ul>
+</details>
