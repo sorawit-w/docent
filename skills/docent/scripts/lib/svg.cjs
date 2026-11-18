@@ -191,7 +191,7 @@ function toSvg(scene, { id, label, mode, swap }) {
     // A line of a UML graph: its end mark and its dash follow UML, and its labels sit beside it.
     if (leg.u) {
       const tip = leg.pts[leg.pts.length - 1], prev = leg.pts[leg.pts.length - 2];
-      out.push(`<g class="leg" data-leg="${leg.n}">${uml.line(leg.pts, leg.u)}${leg.u.end ? uml.end(leg.u.end, tip, prev) : ""}${leg.still ? "" : `<circle r="6" class="pulse pulse-${leg.n}"/>`}${leg.texts.map(text).join("")}</g>`);
+      out.push(`<g class="leg" data-leg="${leg.n}">${uml.line(leg.pts, leg.u)}${leg.u.end ? uml.end(leg.u.end, tip, prev) : ""}${leg.u.port && leg.u.port !== "end" ? uml.signs.port(leg.pts[0]) : ""}${leg.u.port && leg.u.port !== "start" ? uml.signs.port(tip) : ""}${leg.still ? "" : `<circle r="6" class="pulse pulse-${leg.n}"/>`}${leg.texts.map(text).join("")}</g>`);
       continue;
     }
     out.push(

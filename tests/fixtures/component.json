@@ -1,0 +1,19 @@
+{
+  "id": "shop-parts",
+  "kind": "component",
+  "label": "The parts of the shop: the web shop needs the order service, which the back end offers through Orders.",
+  "components": [
+    { "id": "web", "name": "Web shop" },
+    { "id": "backend", "name": "Back end" },
+    { "id": "orders", "name": "Orders", "in": "backend" },
+    { "id": "stock", "name": "Stock", "in": "backend" },
+    { "id": "pay", "name": "Payments" }
+  ],
+  "interfaces": [
+    { "id": "order-api", "name": "OrderAPI", "provider": "backend", "users": ["web"], "port": "api" },
+    { "id": "stock-check", "name": "StockCheck", "provider": "stock", "users": ["orders"] },
+    { "id": "charge", "name": "Charge", "provider": "pay", "users": ["orders"] }
+  ],
+  "delegations": [{ "from": "backend", "to": "orders", "port": "api" }],
+  "dependencies": [{ "from": "web", "to": "pay" }]
+}

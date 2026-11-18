@@ -17,6 +17,7 @@ const END = {
   "hollow-filled": { len: 12, half: 7 }, // the filled triangle of an extension (a profile)
   diamond: { len: 16, half: 6 },
   "diamond-filled": { len: 16, half: 6 },
+  socket: { len: 4, half: 11 }, // a required interface: a half circle around the ball (r 7) at the tip, 4px clear of it
 };
 
 /** How far before the tip a line stops, so it never shows inside a hollow mark. An open or filled head covers the line's end. */
@@ -41,6 +42,10 @@ function end(kind, tip, prev) {
   const ux = (tip[0] - prev[0]) / len, uy = (tip[1] - prev[1]) / len;
   const at = (along, across) => [tip[0] - ux * along + -uy * across, tip[1] - uy * along + ux * across];
   const { len: l, half: h } = size;
+  if (kind === "socket") { // the cup's middle is 4px behind the tip; its center is the ball's center, 7px past the tip
+    const c = [tip[0] + ux * 7, tip[1] + uy * 7], a = [c[0] - uy * h, c[1] + ux * h], b = [c[0] + uy * h, c[1] - ux * h];
+    return `<path d="M${num(a[0])},${num(a[1])} A${h},${h} 0 0 1 ${num(b[0])},${num(b[1])}" class="u-ln"/>`;
+  }
   if (kind === "open") return `<polyline points="${pts([at(l, h), tip, at(l, -h)])}" class="u-ln"/>`;
   if (kind === "filled") return `<polygon points="${pts([at(l, h), at(l, -h), tip])}" class="u-ink"/>`;
   if (kind === "hollow" || kind === "hollow-filled") return `<polygon points="${pts([at(l, h), at(l, -h), tip])}" class="${kind === "hollow" ? "u-face" : "u-face u-ink"}"/>`;
@@ -114,7 +119,7 @@ const signs = {
   socket: (from, dir, stem = 20) => {
     const c = [from[0] + dir[0] * (stem + 11), from[1] + dir[1] * (stem + 11)], n = [-dir[1], dir[0]], r = 11;
     const a = [c[0] + n[0] * r, c[1] + n[1] * r], b = [c[0] - n[0] * r, c[1] - n[1] * r];
-    return `<line x1="${num(from[0])}" y1="${num(from[1])}" x2="${num(from[0] + dir[0] * stem)}" y2="${num(from[1] + dir[1] * stem)}" class="u-ln"/><path d="M${num(a[0])},${num(a[1])} A${r},${r} 0 0 0 ${num(b[0])},${num(b[1])}" class="u-ln"/>`;
+    return `<line x1="${num(from[0])}" y1="${num(from[1])}" x2="${num(from[0] + dir[0] * stem)}" y2="${num(from[1] + dir[1] * stem)}" class="u-ln"/><path d="M${num(a[0])},${num(a[1])} A${r},${r} 0 0 1 ${num(b[0])},${num(b[1])}" class="u-ln"/>`;
   },
 };
 

@@ -1,0 +1,145 @@
+<svg id="dg-shop-parts" class="dg dg-component dg-auto" xmlns="http://www.w3.org/2000/svg" width="696" height="1104" viewBox="0 0 696 1104" role="img" aria-label="The parts of the shop: the web shop needs the order service, which the back end offers through Orders.">
+<style>
+#dg-shop-parts{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-shop-parts .ground{fill:var(--fig,#f2f3f9)}
+#dg-shop-parts .band{fill:var(--bg,#fbfbfe)}
+#dg-shop-parts .track{stroke:var(--line,#d3d6e3)}
+#dg-shop-parts .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-shop-parts .head{fill:var(--text,#1c1f2e)}
+#dg-shop-parts .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-shop-parts .stop.end{fill:var(--text,#1c1f2e)}
+#dg-shop-parts .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-shop-parts .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-shop-parts .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-shop-parts .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-shop-parts .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-shop-parts .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-shop-parts .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-shop-parts .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-shop-parts .sub,#dg-shop-parts .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-shop-parts .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-shop-parts .u-ln{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-shop-parts .u-bold{stroke-width:2.5}
+#dg-shop-parts .u-dash{stroke-dasharray:6 4;stroke-linecap:butt}
+#dg-shop-parts .u-face{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linejoin:round}
+#dg-shop-parts .u-ink{fill:var(--text,#1c1f2e)}
+#dg-shop-parts .u-name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-shop-parts .leg .line{stroke-width:1.5}
+#dg-shop-parts .leg.is-reply .line{stroke-dasharray:6 4;stroke-linecap:butt}
+#dg-shop-parts .ohead{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.js #dg-shop-parts .leg.is-current .ohead{stroke:var(--primary,#2f3fd0)}
+#dg-shop-parts .u-bar{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-shop-parts .u-frame{fill:none;stroke:var(--muted,#575d75);stroke-width:1}
+#dg-shop-parts .u-frame.is-filled{fill:var(--bg,#fbfbfe)}
+#dg-shop-parts .u-div{stroke:var(--muted,#575d75);stroke-width:1;stroke-dasharray:6 4}
+#dg-shop-parts .u-op{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-shop-parts .u-mem{font-size:12px;fill:var(--text,#1c1f2e)}
+#dg-shop-parts .u-it{font-style:italic}
+#dg-shop-parts .u-ul{text-decoration:underline}
+@media (prefers-reduced-motion:reduce){#dg-shop-parts .pulse{animation:none!important}#dg-shop-parts .pulse{display:none!important}}
+@media print{#dg-shop-parts{max-width:100%;height:auto}#dg-shop-parts .pulse{display:none!important}}
+#dg-shop-parts-phone{display:none}
+</style>
+<rect width="696" height="1104" class="ground"/>
+<rect x="384" y="480" width="240" height="552" class="u-face"/><rect x="590" y="488" width="13" height="16" class="u-face"/><rect x="587" y="491" width="7" height="3" class="u-face"/><rect x="587" y="498" width="7" height="3" class="u-face"/>
+<text x="396" y="502" class="name" text-anchor="start">«component» Back end</text>
+<g class="leg" data-leg="1"><polyline points="156,133 156,301" class="u-ln"/><path d="M145,312 A11,11 0 0 1 167,312" class="u-ln"/></g>
+<g class="leg" data-leg="2"><polyline points="163,312 372,312 372,756 384,756" class="u-ln"/><rect x="379" y="751" width="10" height="10" class="u-face"/><text x="364" y="740" class="verb" text-anchor="end">api</text></g>
+<g class="leg" data-leg="3"><polyline points="492,589 492,757" class="u-ln"/><path d="M481,768 A11,11 0 0 1 503,768" class="u-ln"/></g>
+<g class="leg" data-leg="4"><polyline points="492,775 492,947" class="u-ln"/></g>
+<g class="leg" data-leg="5"><polyline points="416,564 156,564 156,757" class="u-ln"/><path d="M145,768 A11,11 0 0 1 167,768" class="u-ln"/></g>
+<g class="leg" data-leg="6"><polyline points="156,775 156,947" class="u-ln"/></g>
+<g class="leg" data-leg="7"><polyline points="80,108 36,108 36,972 80,972" class="u-ln u-dash"/><polyline points="72,976.5 80,972 72,967.5" class="u-ln"/></g>
+<g class="leg" data-leg="8"><polyline points="624,732 612,732 612,564 568,564" class="u-ln"/><polyline points="576,559.5 568,564 576,568.5" class="u-ln"/><rect x="619" y="727" width="10" height="10" class="u-face"/><text x="604" y="652" class="verb" text-anchor="end">«delegate»</text><text x="604" y="716" class="verb" text-anchor="end">api</text></g>
+<rect x="80" y="83" width="152" height="50" class="u-face"/><rect x="211" y="91" width="13" height="16" class="u-face"/><rect x="208" y="94" width="7" height="3" class="u-face"/><rect x="208" y="101" width="7" height="3" class="u-face"/><text x="156" y="101" class="u-mem" text-anchor="middle">«component»</text><text x="156" y="121" class="name" text-anchor="middle">Web shop</text>
+<rect x="416" y="539" width="152" height="50" class="u-face"/><rect x="547" y="547" width="13" height="16" class="u-face"/><rect x="544" y="550" width="7" height="3" class="u-face"/><rect x="544" y="557" width="7" height="3" class="u-face"/><text x="492" y="557" class="u-mem" text-anchor="middle">«component»</text><text x="492" y="577" class="name" text-anchor="middle">Orders</text>
+<rect x="416" y="947" width="152" height="50" class="u-face"/><rect x="547" y="955" width="13" height="16" class="u-face"/><rect x="544" y="958" width="7" height="3" class="u-face"/><rect x="544" y="965" width="7" height="3" class="u-face"/><text x="492" y="965" class="u-mem" text-anchor="middle">«component»</text><text x="492" y="985" class="name" text-anchor="middle">Stock</text>
+<rect x="80" y="947" width="152" height="50" class="u-face"/><rect x="211" y="955" width="13" height="16" class="u-face"/><rect x="208" y="958" width="7" height="3" class="u-face"/><rect x="208" y="965" width="7" height="3" class="u-face"/><text x="156" y="965" class="u-mem" text-anchor="middle">«component»</text><text x="156" y="985" class="name" text-anchor="middle">Payments</text>
+<circle cx="156" cy="312" r="7" class="u-face"/><text x="169" y="299" class="u-mem">OrderAPI</text>
+<circle cx="492" cy="768" r="7" class="u-face"/><text x="505" y="755" class="u-mem">StockCheck</text>
+<circle cx="156" cy="768" r="7" class="u-face"/><text x="169" y="755" class="u-mem">Charge</text>
+</svg>
+<svg id="dg-shop-parts-phone" class="dg dg-component dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="784" viewBox="0 0 264 784" role="img" aria-label="The parts of the shop: the web shop needs the order service, which the back end offers through Orders.">
+<style>
+#dg-shop-parts-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-shop-parts-phone .ground{fill:var(--fig,#f2f3f9)}
+#dg-shop-parts-phone .band{fill:var(--bg,#fbfbfe)}
+#dg-shop-parts-phone .track{stroke:var(--line,#d3d6e3)}
+#dg-shop-parts-phone .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-shop-parts-phone .head{fill:var(--text,#1c1f2e)}
+#dg-shop-parts-phone .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-shop-parts-phone .stop.end{fill:var(--text,#1c1f2e)}
+#dg-shop-parts-phone .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-shop-parts-phone .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-shop-parts-phone .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-shop-parts-phone .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-shop-parts-phone .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-shop-parts-phone .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-shop-parts-phone .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-shop-parts-phone .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-shop-parts-phone .sub,#dg-shop-parts-phone .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-shop-parts-phone .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-shop-parts-phone .u-ln{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-shop-parts-phone .u-bold{stroke-width:2.5}
+#dg-shop-parts-phone .u-dash{stroke-dasharray:6 4;stroke-linecap:butt}
+#dg-shop-parts-phone .u-face{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linejoin:round}
+#dg-shop-parts-phone .u-ink{fill:var(--text,#1c1f2e)}
+#dg-shop-parts-phone .u-name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-shop-parts-phone .leg .line{stroke-width:1.5}
+#dg-shop-parts-phone .leg.is-reply .line{stroke-dasharray:6 4;stroke-linecap:butt}
+#dg-shop-parts-phone .ohead{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.js #dg-shop-parts-phone .leg.is-current .ohead{stroke:var(--primary,#2f3fd0)}
+#dg-shop-parts-phone .u-bar{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-shop-parts-phone .u-frame{fill:none;stroke:var(--muted,#575d75);stroke-width:1}
+#dg-shop-parts-phone .u-frame.is-filled{fill:var(--bg,#fbfbfe)}
+#dg-shop-parts-phone .u-div{stroke:var(--muted,#575d75);stroke-width:1;stroke-dasharray:6 4}
+#dg-shop-parts-phone .u-op{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-shop-parts-phone .u-mem{font-size:12px;fill:var(--text,#1c1f2e)}
+#dg-shop-parts-phone .u-it{font-style:italic}
+#dg-shop-parts-phone .u-ul{text-decoration:underline}
+@media (prefers-reduced-motion:reduce){#dg-shop-parts-phone .pulse{animation:none!important}#dg-shop-parts-phone .pulse{display:none!important}}
+@media print{#dg-shop-parts-phone{max-width:100%;height:auto}#dg-shop-parts-phone .pulse{display:none!important}}
+@media (max-width:792px){#dg-shop-parts{display:none}#dg-shop-parts-phone{display:block}}
+@media print{#dg-shop-parts{display:block!important}#dg-shop-parts-phone{display:none!important}}
+</style>
+<rect width="264" height="784" class="ground"/>
+<rect x="8" y="336" width="248" height="326" rx="10" class="band"/>
+<text x="20" y="354" class="sub" text-anchor="start">«component» Back end</text>
+<rect x="32" y="8" width="152" height="50" class="u-face"/><rect x="163" y="16" width="13" height="16" class="u-face"/><rect x="160" y="19" width="7" height="3" class="u-face"/><rect x="160" y="26" width="7" height="3" class="u-face"/><text x="108" y="26" class="u-mem" text-anchor="middle">«component»</text><text x="108" y="46" class="name" text-anchor="middle">Web shop</text>
+<polyline points="32,77 76,77" class="u-ln"/><path d="M87,88 A11,11 0 0 1 87,66" class="u-ln"/>
+<text x="92" y="81" class="verb" text-anchor="start">needs</text>
+<text x="92" y="99" class="name" text-anchor="start">OrderAPI</text>
+<polyline points="32,119 80,119" class="u-ln u-dash"/><polyline points="72,123.5 80,119 72,114.5" class="u-ln"/>
+<text x="92" y="123" class="verb" text-anchor="start">depends on</text>
+<text x="92" y="141" class="name" text-anchor="start">Payments</text>
+<rect x="32" y="172" width="152" height="50" class="u-face"/><rect x="163" y="180" width="13" height="16" class="u-face"/><rect x="160" y="183" width="7" height="3" class="u-face"/><rect x="160" y="190" width="7" height="3" class="u-face"/><text x="108" y="190" class="u-mem" text-anchor="middle">«component»</text><text x="108" y="210" class="name" text-anchor="middle">Back end</text>
+<polyline points="32,241 80,241" class="u-ln"/>
+<text x="92" y="245" class="verb" text-anchor="start">offers, at the port api</text>
+<text x="92" y="263" class="name" text-anchor="start">OrderAPI</text>
+<polyline points="32,283 80,283" class="u-ln"/><polyline points="72,287.5 80,283 72,278.5" class="u-ln"/>
+<text x="92" y="287" class="verb" text-anchor="start">«delegate»</text>
+<text x="92" y="305" class="name" text-anchor="start">Orders</text>
+<rect x="32" y="368" width="152" height="50" class="u-face"/><rect x="163" y="376" width="13" height="16" class="u-face"/><rect x="160" y="379" width="7" height="3" class="u-face"/><rect x="160" y="386" width="7" height="3" class="u-face"/><text x="108" y="386" class="u-mem" text-anchor="middle">«component»</text><text x="108" y="406" class="name" text-anchor="middle">Orders</text>
+<polyline points="32,437 76,437" class="u-ln"/><path d="M87,448 A11,11 0 0 1 87,426" class="u-ln"/>
+<text x="92" y="441" class="verb" text-anchor="start">needs</text>
+<text x="92" y="459" class="name" text-anchor="start">StockCheck</text>
+<polyline points="32,479 76,479" class="u-ln"/><path d="M87,490 A11,11 0 0 1 87,468" class="u-ln"/>
+<text x="92" y="483" class="verb" text-anchor="start">needs</text>
+<text x="92" y="501" class="name" text-anchor="start">Charge</text>
+<rect x="32" y="532" width="152" height="50" class="u-face"/><rect x="163" y="540" width="13" height="16" class="u-face"/><rect x="160" y="543" width="7" height="3" class="u-face"/><rect x="160" y="550" width="7" height="3" class="u-face"/><text x="108" y="550" class="u-mem" text-anchor="middle">«component»</text><text x="108" y="570" class="name" text-anchor="middle">Stock</text>
+<polyline points="32,601 80,601" class="u-ln"/>
+<text x="92" y="605" class="verb" text-anchor="start">offers</text>
+<text x="92" y="623" class="name" text-anchor="start">StockCheck</text>
+<rect x="32" y="674" width="152" height="50" class="u-face"/><rect x="163" y="682" width="13" height="16" class="u-face"/><rect x="160" y="685" width="7" height="3" class="u-face"/><rect x="160" y="692" width="7" height="3" class="u-face"/><text x="108" y="692" class="u-mem" text-anchor="middle">«component»</text><text x="108" y="712" class="name" text-anchor="middle">Payments</text>
+<polyline points="32,743 80,743" class="u-ln"/>
+<text x="92" y="747" class="verb" text-anchor="start">offers</text>
+<text x="92" y="765" class="name" text-anchor="start">Charge</text>
+</svg>
+<details class="dg-words">
+<summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>The diagram in words</summary>
+<ul><li>The component Web shop.</li><li>The component Back end.</li><li>The component Orders, inside Back end.</li><li>The component Stock, inside Back end.</li><li>The component Payments.</li></ul>
+<ul><li>The interface OrderAPI: Back end offers it at the port api, and Web shop needs it.</li><li>The interface StockCheck: Stock offers it, and Orders needs it.</li><li>The interface Charge: Payments offers it, and Orders needs it.</li></ul>
+<ul><li>Web shop depends on Payments.</li><li>Back end hands its work at the port api to Orders, inside it.</li></ul>
+<p>Key to the marks:</p>
+<ul><li>A box marked «component», with the component icon: a part of the system that can be replaced as a whole.</li><li>A ball on a line: a service, an interface, that the component at the line's other end offers.</li><li>A half circle around a ball: the component at the line's other end needs that service.</li><li>A small square on a border: a port, the point where the thing connects to the outside.</li><li>A dashed line with an open arrowhead: the component at the line's start needs the one at the arrowhead.</li><li>A line marked «delegate»: the outer component hands the work to the part inside it.</li></ul>
+</details>
