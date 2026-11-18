@@ -1,0 +1,19 @@
+{
+  "id": "persistence-profile",
+  "kind": "profile",
+  "label": "The persistence profile adds two stereotypes. Entity extends Class and has a table name; Id extends Property. The shop model applies the profile.",
+  "profile": "Persistence",
+  "stereotypes": [
+    { "id": "entity", "name": "Entity", "attributes": ["table: String"] },
+    { "id": "idst", "name": "Id" }
+  ],
+  "metaclasses": [
+    { "id": "class", "name": "Class" },
+    { "id": "property", "name": "Property" }
+  ],
+  "extensions": [
+    { "from": "entity", "to": "class" },
+    { "from": "idst", "to": "property", "required": true }
+  ],
+  "appliedTo": ["Shop model"]
+}

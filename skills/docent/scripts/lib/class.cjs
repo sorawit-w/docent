@@ -291,4 +291,4 @@ const OWN = {
   note: "A box with a folded corner, joined by a dashed line: a note on that class.",
 };
 
-module.exports = { readClass, readObject, graphOf, columnOf, wordsOf, MOST };
+module.exports = { readClass, readObject, graphOf, columnOf, wordsOf, boxShape, MOST };

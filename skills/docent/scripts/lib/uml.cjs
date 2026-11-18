@@ -14,6 +14,7 @@ const END = {
   open: { len: 8, half: 4.5 },
   filled: { len: 8, half: 4.5 },
   hollow: { len: 12, half: 7 },
+  "hollow-filled": { len: 12, half: 7 }, // the filled triangle of an extension (a profile)
   diamond: { len: 16, half: 6 },
   "diamond-filled": { len: 16, half: 6 },
 };
@@ -42,7 +43,7 @@ function end(kind, tip, prev) {
   const { len: l, half: h } = size;
   if (kind === "open") return `<polyline points="${pts([at(l, h), tip, at(l, -h)])}" class="u-ln"/>`;
   if (kind === "filled") return `<polygon points="${pts([at(l, h), at(l, -h), tip])}" class="u-ink"/>`;
-  if (kind === "hollow") return `<polygon points="${pts([at(l, h), at(l, -h), tip])}" class="u-face"/>`;
+  if (kind === "hollow" || kind === "hollow-filled") return `<polygon points="${pts([at(l, h), at(l, -h), tip])}" class="${kind === "hollow" ? "u-face" : "u-face u-ink"}"/>`;
   return `<polygon points="${pts([tip, at(l / 2, h), at(l, 0), at(l / 2, -h)])}" class="${kind === "diamond" ? "u-face" : "u-face u-ink"}"/>`;
 }
 
@@ -81,7 +82,7 @@ const shapes = {
     `<polygon points="${pts([[x + w, y + d], [x + w + d, y], [x + w + d, y + h - d], [x + w, y + h]])}" class="u-face"/>` +
     box({ x, y: y + d, w, h: h - d }, 0),
   /** A package or a profile: a folder with a tab at its upper left. */
-  folder: ({ x, y, w, h }, tab = 64) => box({ x, y, w: tab, h: 16 }, 0) + box({ x, y: y + 16, w, h: h - 16 }, 0),
+  folder: ({ x, y, w, h }, tab = 64, th = 16) => box({ x, y, w: tab, h: th }, 0) + box({ x, y: y + th, w, h: h - th }, 0),
   /** A use case: an oval. */
   oval: ({ x, y, w, h }) => `<ellipse cx="${num(x + w / 2)}" cy="${num(y + h / 2)}" rx="${num(w / 2)}" ry="${num(h / 2)}" class="u-face"/>`,
   /** A note: a box with its upper right corner folded. */

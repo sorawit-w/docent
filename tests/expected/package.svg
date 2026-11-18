@@ -1,0 +1,121 @@
+<svg id="dg-shop-packages" class="dg dg-package dg-auto" xmlns="http://www.w3.org/2000/svg" width="672" height="528" viewBox="0 0 672 528" role="img" aria-label="The shop has three packages: ordering, catalog and billing. Ordering imports the catalog and uses billing; all of the shop imports the shared utilities.">
+<style>
+#dg-shop-packages{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-shop-packages .ground{fill:var(--fig,#f2f3f9)}
+#dg-shop-packages .band{fill:var(--bg,#fbfbfe)}
+#dg-shop-packages .track{stroke:var(--line,#d3d6e3)}
+#dg-shop-packages .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-shop-packages .head{fill:var(--text,#1c1f2e)}
+#dg-shop-packages .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-shop-packages .stop.end{fill:var(--text,#1c1f2e)}
+#dg-shop-packages .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-shop-packages .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-shop-packages .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-shop-packages .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-shop-packages .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-shop-packages .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-shop-packages .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-shop-packages .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-shop-packages .sub,#dg-shop-packages .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-shop-packages .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-shop-packages .u-ln{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-shop-packages .u-bold{stroke-width:2.5}
+#dg-shop-packages .u-dash{stroke-dasharray:6 4;stroke-linecap:butt}
+#dg-shop-packages .u-face{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linejoin:round}
+#dg-shop-packages .u-ink{fill:var(--text,#1c1f2e)}
+#dg-shop-packages .u-name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-shop-packages .leg .line{stroke-width:1.5}
+#dg-shop-packages .leg.is-reply .line{stroke-dasharray:6 4;stroke-linecap:butt}
+#dg-shop-packages .ohead{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.js #dg-shop-packages .leg.is-current .ohead{stroke:var(--primary,#2f3fd0)}
+#dg-shop-packages .u-bar{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-shop-packages .u-frame{fill:none;stroke:var(--muted,#575d75);stroke-width:1}
+#dg-shop-packages .u-frame.is-filled{fill:var(--bg,#fbfbfe)}
+#dg-shop-packages .u-div{stroke:var(--muted,#575d75);stroke-width:1;stroke-dasharray:6 4}
+#dg-shop-packages .u-op{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-shop-packages .u-mem{font-size:12px;fill:var(--text,#1c1f2e)}
+#dg-shop-packages .u-it{font-style:italic}
+#dg-shop-packages .u-ul{text-decoration:underline}
+@media (prefers-reduced-motion:reduce){#dg-shop-packages .pulse{animation:none!important}#dg-shop-packages .pulse{display:none!important}}
+@media print{#dg-shop-packages{max-width:100%;height:auto}#dg-shop-packages .pulse{display:none!important}}
+#dg-shop-packages-phone{display:none}
+</style>
+<rect width="672" height="528" class="ground"/>
+<rect x="36" y="36" width="61" height="22" class="u-face"/><rect x="36" y="58" width="360" height="290" class="u-face"/>
+<text x="48" y="52" class="name" text-anchor="start">Shop</text>
+<g class="leg" data-leg="1"><polyline points="252,132 120,132 120,253" class="u-ln u-dash"/><polyline points="115.5,245 120,253 124.5,245" class="u-ln"/><text x="186" y="149" class="verb" text-anchor="middle">«import»</text></g>
+<g class="leg" data-leg="2"><polyline points="312,176 312,253" class="u-ln u-dash"/><polyline points="307.5,245 312,253 316.5,245" class="u-ln"/><text x="320" y="218.5" class="verb" text-anchor="start">«access»</text></g>
+<g class="leg" data-leg="3"><polyline points="216,348 216,456 472.5,456" class="u-ln u-dash"/><polyline points="464.5,460.5 472.5,456 464.5,451.5" class="u-ln"/><text x="224" y="406" class="verb" text-anchor="start">«import»</text></g>
+<rect x="252" y="88" width="89" height="22" class="u-face"/><rect x="252" y="110" width="120" height="66" class="u-face"/><text x="264" y="104" class="name">Ordering</text><text x="264" y="132" class="u-mem">Order</text><text x="264" y="150" class="u-mem">OrderLine</text><text x="264" y="168" class="u-mem">Cart</text>
+<rect x="60" y="253" width="81" height="22" class="u-face"/><rect x="60" y="275" width="120" height="48" class="u-face"/><text x="72" y="269" class="name">Catalog</text><text x="72" y="297" class="u-mem">Product</text><text x="72" y="315" class="u-mem">Category</text>
+<rect x="252" y="253" width="71" height="22" class="u-face"/><rect x="252" y="275" width="120" height="48" class="u-face"/><text x="264" y="269" class="name">Billing</text><text x="264" y="297" class="u-mem">Invoice</text><text x="264" y="315" class="u-mem">Payment</text>
+<rect x="472.5" y="421" width="135" height="22" class="u-face"/><rect x="472.5" y="443" width="159" height="48" class="u-face"/><text x="484.5" y="437" class="name">Shared utilities</text><text x="484.5" y="465" class="u-mem">Money</text><text x="484.5" y="483" class="u-mem">Clock</text>
+</svg>
+<svg id="dg-shop-packages-phone" class="dg dg-package dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="580" viewBox="0 0 264 580" role="img" aria-label="The shop has three packages: ordering, catalog and billing. Ordering imports the catalog and uses billing; all of the shop imports the shared utilities.">
+<style>
+#dg-shop-packages-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-shop-packages-phone .ground{fill:var(--fig,#f2f3f9)}
+#dg-shop-packages-phone .band{fill:var(--bg,#fbfbfe)}
+#dg-shop-packages-phone .track{stroke:var(--line,#d3d6e3)}
+#dg-shop-packages-phone .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-shop-packages-phone .head{fill:var(--text,#1c1f2e)}
+#dg-shop-packages-phone .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-shop-packages-phone .stop.end{fill:var(--text,#1c1f2e)}
+#dg-shop-packages-phone .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-shop-packages-phone .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-shop-packages-phone .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-shop-packages-phone .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-shop-packages-phone .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-shop-packages-phone .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-shop-packages-phone .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-shop-packages-phone .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-shop-packages-phone .sub,#dg-shop-packages-phone .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-shop-packages-phone .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-shop-packages-phone .u-ln{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-shop-packages-phone .u-bold{stroke-width:2.5}
+#dg-shop-packages-phone .u-dash{stroke-dasharray:6 4;stroke-linecap:butt}
+#dg-shop-packages-phone .u-face{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linejoin:round}
+#dg-shop-packages-phone .u-ink{fill:var(--text,#1c1f2e)}
+#dg-shop-packages-phone .u-name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-shop-packages-phone .leg .line{stroke-width:1.5}
+#dg-shop-packages-phone .leg.is-reply .line{stroke-dasharray:6 4;stroke-linecap:butt}
+#dg-shop-packages-phone .ohead{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.js #dg-shop-packages-phone .leg.is-current .ohead{stroke:var(--primary,#2f3fd0)}
+#dg-shop-packages-phone .u-bar{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-shop-packages-phone .u-frame{fill:none;stroke:var(--muted,#575d75);stroke-width:1}
+#dg-shop-packages-phone .u-frame.is-filled{fill:var(--bg,#fbfbfe)}
+#dg-shop-packages-phone .u-div{stroke:var(--muted,#575d75);stroke-width:1;stroke-dasharray:6 4}
+#dg-shop-packages-phone .u-op{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-shop-packages-phone .u-mem{font-size:12px;fill:var(--text,#1c1f2e)}
+#dg-shop-packages-phone .u-it{font-style:italic}
+#dg-shop-packages-phone .u-ul{text-decoration:underline}
+@media (prefers-reduced-motion:reduce){#dg-shop-packages-phone .pulse{animation:none!important}#dg-shop-packages-phone .pulse{display:none!important}}
+@media print{#dg-shop-packages-phone{max-width:100%;height:auto}#dg-shop-packages-phone .pulse{display:none!important}}
+@media (max-width:768px){#dg-shop-packages{display:none}#dg-shop-packages-phone{display:block}}
+@media print{#dg-shop-packages{display:block!important}#dg-shop-packages-phone{display:none!important}}
+</style>
+<rect width="264" height="580" class="ground"/>
+<rect x="8" y="8" width="248" height="482" rx="10" class="band"/>
+<text x="20" y="26" class="sub" text-anchor="start">Shop</text>
+<rect x="51.5" y="40" width="89" height="22" class="u-face"/><rect x="51.5" y="62" width="120" height="66" class="u-face"/><text x="63.5" y="56" class="name">Ordering</text><text x="63.5" y="84" class="u-mem">Order</text><text x="63.5" y="102" class="u-mem">OrderLine</text><text x="63.5" y="120" class="u-mem">Cart</text>
+<polyline points="32,147 80,147" class="u-ln u-dash"/><polyline points="72,151.5 80,147 72,142.5" class="u-ln"/>
+<text x="92" y="151" class="verb" text-anchor="start">«import»</text>
+<text x="92" y="169" class="name" text-anchor="start">Shared utilities (all</text>
+<text x="92" y="187" class="name" text-anchor="start">of Shop)</text>
+<polyline points="32,207 80,207" class="u-ln u-dash"/><polyline points="72,211.5 80,207 72,202.5" class="u-ln"/>
+<text x="92" y="211" class="verb" text-anchor="start">«import»</text>
+<text x="92" y="229" class="name" text-anchor="start">Catalog</text>
+<polyline points="32,249 80,249" class="u-ln u-dash"/><polyline points="72,253.5 80,249 72,244.5" class="u-ln"/>
+<text x="92" y="253" class="verb" text-anchor="start">«access»</text>
+<text x="92" y="271" class="name" text-anchor="start">Billing</text>
+<rect x="51.5" y="302" width="81" height="22" class="u-face"/><rect x="51.5" y="324" width="120" height="48" class="u-face"/><text x="63.5" y="318" class="name">Catalog</text><text x="63.5" y="346" class="u-mem">Product</text><text x="63.5" y="364" class="u-mem">Category</text>
+<rect x="51.5" y="392" width="71" height="22" class="u-face"/><rect x="51.5" y="414" width="120" height="48" class="u-face"/><text x="63.5" y="408" class="name">Billing</text><text x="63.5" y="436" class="u-mem">Invoice</text><text x="63.5" y="454" class="u-mem">Payment</text>
+<rect x="32" y="502" width="135" height="22" class="u-face"/><rect x="32" y="524" width="159" height="48" class="u-face"/><text x="44" y="518" class="name">Shared utilities</text><text x="44" y="546" class="u-mem">Money</text><text x="44" y="564" class="u-mem">Clock</text>
+</svg>
+<details class="dg-words">
+<summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>The diagram in words</summary>
+<ul><li>The package Shop, holds the packages Ordering, Catalog, Billing.</li><li>The package Ordering, inside Shop, holds “Order”, “OrderLine”, “Cart”.</li><li>The package Catalog, inside Shop, holds “Product”, “Category”.</li><li>The package Billing, inside Shop, holds “Invoice”, “Payment”.</li><li>The package Shared utilities, holds “Money”, “Clock”.</li></ul>
+<ul><li>Ordering imports Catalog.</li><li>Ordering uses, without passing on, Billing.</li><li>Shop imports Shared utilities.</li></ul>
+<p>Key to the marks:</p>
+<ul><li>A folder: a package, its name in the tab, and what it holds in its body.</li><li>A dashed line with an open arrowhead: the package at the line's start needs the package at the arrowhead.</li><li>«import»: the first package uses the public names of the second as its own, and passes them on.</li><li>«access»: the first package uses the public names of the second, but does not pass them on.</li></ul>
+</details>
