@@ -693,6 +693,41 @@ A deployment diagram shows where the software runs: the machines and runtimes, t
 - The renderer draws each node as a 3D box marked with its type. A node at the top that holds nodes or artifacts is a frame around them; a node inside a node lists its artifacts by name, each with the page icon. An artifact inside a node shows that it is deployed there, so no «deploy» arrow is drawn.
 - Nothing moves in a component, composite structure or deployment diagram: there is no dot and no walkthrough.
 
+## Communication diagrams
+
+A communication diagram shows who is linked to whom, and the numbered messages they send over those links. Write it with `"kind": "communication"`; when the order of the messages matters more than the links, write a sequence diagram instead:
+
+```json
+{
+  "id": "checkout-talk",
+  "kind": "communication",
+  "label": "Checkout asks the cart to place the order; the cart reserves each item with stock, then asks payments to charge the card.",
+  "lifelines": [
+    { "id": "ui", "name": ": Checkout" },
+    { "id": "cart", "name": "c : Cart" },
+    { "id": "stock", "name": ": Stock" },
+    { "id": "pay", "name": ": Payments" }
+  ],
+  "messages": [
+    { "n": "1", "from": "ui", "to": "cart", "text": "placeOrder()" },
+    { "n": "1.1", "from": "cart", "to": "stock", "text": "reserve(item)", "repeat": "i=1..n" },
+    { "n": "1.2", "from": "cart", "to": "pay", "text": "charge(total)", "guard": "all reserved" },
+    { "n": "1.3", "from": "pay", "to": "cart", "text": "receipt" },
+    { "n": "2", "from": "cart", "to": "ui", "text": "showReceipt()" }
+  ]
+}
+```
+
+| Field | What it is |
+|---|---|
+| `lifelines` | 2 to 8, each with an `id` and a `name`, written as `role : Type` (at most 28 characters). |
+| `messages` | 1 to 20, in number order, each with a decimal number `n` (`"1"`, `"1.1"`, `"1.2"`, `"2"`), `from`, `to` and `text` (at most 40 characters). Message `1.1` happens inside message `1`, so `1` must be in the list. A message may have a `guard` (sent only when it holds) or a `repeat` (such as `"i=1..n"`), not both. |
+| `links` | Optional: links `from` one lifeline `to` another that send no message here. Every pair that sends a message is linked already. |
+
+- The renderer draws each lifeline as a box and each link as one solid line. Beside the line it writes each message as `1.1 *[i=1..n]: reserve(item)`, with a small arrow the way the message travels.
+- The numbers give the order, so nothing moves: there is no dot. The diagram in words lists the messages in number order.
+- On a phone the diagram becomes a list of lifelines, each with the messages it sends.
+
 ## Optional legs
 
 A leg with `"optional": true` is a path that only some readers take, or that happens only in some cases. It is drawn as a dashed arrow:
