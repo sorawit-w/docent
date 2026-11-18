@@ -224,7 +224,7 @@ test("the example in references/diagrams.md is drawn without a warning", () => {
   const blocks = [...guide.matchAll(/```json\n([\s\S]*?)```/g)].map((m) => m[1]);
   const own = JSON.parse(`{${blocks.find((b) => b.includes('"icons"'))}}`).icons.bug;
   assert.equal(iconProblem(own), null);
-  const part = JSON.parse(blocks.find((b) => b.includes('"state"')));
+  const part = JSON.parse(blocks.find((b) => /"state": "(ok|warn|err)"/.test(b)));
   assert.deepEqual([part.state, Boolean(part.note)], ["err", true], "the state example has a note that says the status");
 });
 
@@ -273,5 +273,5 @@ test("wrong side legs are refused with a plain reason", () => {
 test("the full examples in references/diagrams.md are drawn without an error", () => {
   const guide = fs.readFileSync(path.join(__dirname, "..", "skills", "docent", "references", "diagrams.md"), "utf8");
   const examples = [...guide.matchAll(/```json\n(\{\n  "id"[\s\S]*?)```/g)].map((m) => JSON.parse(m[1]));
-  assert.deepEqual(examples.map((d) => renderDiagram(d).form), ["sequence", "flow"]);
+  assert.deepEqual(examples.map((d) => renderDiagram(d).form), ["sequence", "flow", "activity", "state"]);
 });

@@ -195,6 +195,104 @@ A flowchart shows steps with decisions: a path that splits on a question, ends e
 - `render` also writes the steps in words, in a closed section under the drawing.
 - A flowchart sits in the text flow and has no `form`. When `render` says that there is "no free path" between two nodes, let the arrow back go to a nearer step, or split the flowchart in two.
 
+## Activity diagrams
+
+An activity diagram is a flowchart in UML notation: actions, decisions, paths that run at the same time, and who does each step. Write it with `"kind": "activity"` when the readers know UML or the document is a design; for other readers a flowchart (`"kind": "flow"`) says the same with fewer marks.
+
+```json
+{
+  "id": "order-flow",
+  "kind": "activity",
+  "label": "The shop takes an order and checks the stock. When the items are in stock, the warehouse packs them while the shop sends the invoice.",
+  "partitions": [{"id": "shop", "name": "Shop"}, {"id": "warehouse", "name": "Warehouse"}],
+  "nodes": [
+    {"id": "start", "type": "initial", "partition": "shop"},
+    {"id": "take", "name": "Take the order", "partition": "shop"},
+    {"id": "stock", "type": "decision", "partition": "shop"},
+    {"id": "split", "type": "fork", "partition": "warehouse"},
+    {"id": "pack", "name": "Pack the items", "partition": "warehouse"},
+    {"id": "invoice", "type": "send", "name": "Send the invoice", "partition": "shop"},
+    {"id": "both", "type": "join", "partition": "warehouse"},
+    {"id": "done", "type": "final", "partition": "warehouse"},
+    {"id": "tell", "name": "Tell the customer", "partition": "shop"},
+    {"id": "closed", "type": "flow-final", "partition": "shop"}
+  ],
+  "flows": [
+    {"from": "start", "to": "take"},
+    {"from": "take", "to": "stock"},
+    {"from": "stock", "to": "split", "guard": "in stock"},
+    {"from": "split", "to": "pack"},
+    {"from": "split", "to": "invoice"},
+    {"from": "pack", "to": "both"},
+    {"from": "invoice", "to": "both"},
+    {"from": "both", "to": "done"},
+    {"from": "stock", "to": "tell", "guard": "else"},
+    {"from": "tell", "to": "closed"}
+  ]
+}
+```
+
+| Field | What it is |
+|---|---|
+| `nodes` | 2 to 20, each with an `id` and a `type`. An `action` (the default type), an `object`, a `send` (a signal is sent) and an `accept` (the activity waits for an event) have a `name` of at most 32 characters; an object may have a `state` of at most 20 characters, drawn in brackets. An `initial`, `decision`, `merge`, `fork`, `join`, `final` or `flow-final` node has no name, as in UML. At most 4 forks. |
+| `flows` | 1 to 30, each `from` one node `to` another. Only a flow out of a decision has a `guard` (at most 24 characters, without brackets: the renderer adds them). |
+| `partitions` | Optional, at most 5, each with an `id` and a `name`. When a diagram has partitions, every node names one in `partition`, and each partition is a column. |
+
+- An initial node has one flow out and none in. A decision has one flow in and two or more out, each with a different guard; a merge has two or more in and one out. A fork has one in and two or more out; a join has two or more in and one out. An action, object, send or accept node has at most one flow out: to split the path, add a decision or a fork. A path ends at a `final` node (the activity ends) or a `flow-final` node (only this path ends).
+- Every node is reached from an initial node.
+- **The main path** is the first initial node, then each node's first flow, in the order you write the flows. One dot travels it; the other flows keep still.
+- The renderer puts the nodes in rows, routes each flow with right angles, and puts each guard beside its flow, near the decision. It draws each mark in UML notation: a filled dot, round-cornered actions, a hollow diamond, a thick bar, a ring around a dot, a ring with a cross. The lines are solid with an open arrowhead.
+- On a phone and on paper the diagram takes the column form: each node one under another, an arrow when a node's only flow goes to the next one, and else a row for each flow ("[else] to Tell the customer"). Partitions become bands.
+- `render` also writes the steps in words, in a closed section under the drawing, and a key to the marks the drawing uses.
+- When `render` says that there is "no free path" or "no room beside its line", make the diagram smaller: fewer flows back, or two diagrams.
+
+## State machine diagrams
+
+A state machine diagram shows the states that one thing can be in, and the events that move it from one state to the next. Write it with `"kind": "state"`:
+
+```json
+{
+  "id": "order-states",
+  "kind": "state",
+  "label": "An order is new until it is paid. A paid order is packed and labeled at the same time, then it is shipped.",
+  "states": [
+    {"id": "start", "type": "initial"},
+    {"id": "new", "name": "New", "entry": "reserve stock"},
+    {"id": "check", "type": "choice"},
+    {"id": "paid", "name": "Paid"},
+    {"id": "shipping", "type": "composite", "name": "Shipping", "regions": 2},
+    {"id": "s1", "type": "initial", "in": "shipping", "region": 1},
+    {"id": "packing", "name": "Packing", "in": "shipping", "region": 1},
+    {"id": "s2", "type": "initial", "in": "shipping", "region": 2},
+    {"id": "labeling", "name": "Labeling", "in": "shipping", "region": 2},
+    {"id": "out", "name": "Shipped"},
+    {"id": "end", "type": "final"}
+  ],
+  "transitions": [
+    {"from": "start", "to": "new"},
+    {"from": "new", "to": "check", "trigger": "pay"},
+    {"from": "check", "to": "paid", "guard": "card valid"},
+    {"from": "check", "to": "new", "guard": "else", "effect": "show error"},
+    {"from": "paid", "to": "shipping", "trigger": "pick"},
+    {"from": "s1", "to": "packing"},
+    {"from": "s2", "to": "labeling"},
+    {"from": "shipping", "to": "out", "trigger": "hand over"},
+    {"from": "out", "to": "end"}
+  ]
+}
+```
+
+| Field | What it is |
+|---|---|
+| `states` | 2 to 16, not counting composite states. A `state` (the default type) has a `name` of at most 28 characters, and may have `entry`, `do` and `exit` actions (each at most 28 characters). A `composite` state has a `name` and holds the states that name it in `in`; it has 1 or 2 `regions`, and each state inside names its `region`. The pseudostates `initial`, `final`, `choice`, `junction`, `history`, `deep-history`, `fork`, `join` and `terminate` have no name. |
+| `transitions` | 1 to 30, each `from` one state `to` another, or to itself. Each may have a `trigger` (the event), a `guard` (a condition, without brackets) and an `effect` (what is done, without the slash), each at most 24 characters. The label is drawn as `trigger [guard] / effect`. |
+
+- A state machine has one initial pseudostate outside every composite state; each region has at most one. A transition out of an initial pseudostate has no trigger and no guard. A choice has two or more transitions out, each with a guard. A final state and a terminate have no transition out. A history sits inside a composite state.
+- Composite states go one level deep. A transition may start or end on a composite state's frame; it never joins the frame to a state inside it.
+- **The main path** is the initial pseudostate, then each state's first transition, in the order you write them. One dot travels it.
+- The renderer draws each mark in UML notation: round-cornered states with their actions under a line, a rounded frame for a composite state with a dashed line between its regions, a hollow diamond for a choice, H or H* in a ring, a thick bar, a cross. A transition to itself is a loop at the right of its state.
+- On a phone and on paper the diagram takes the column form; a composite state's regions become bands. `render` also writes the states and transitions in words, with a key to the marks.
+
 ## Optional legs
 
 A leg with `"optional": true` is a path that only some readers take, or that happens only in some cases. It is drawn as a dashed arrow:

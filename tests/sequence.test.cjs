@@ -95,7 +95,7 @@ test("a sequence diagram has a script form for phones, and the steps in words wi
 
 test("wrong sequence data is refused with a plain reason", () => {
   const broken = (change, reason, base = fixture) => { const copy = base(); change(copy); assert.throws(() => renderDiagram(copy), reason); };
-  broken((d) => (d.kind = "timeline"), /"kind" must be "sequence" or "flow", or left out/);
+  broken((d) => (d.kind = "timeline"), /"kind" must be one of "sequence", "flow", .*or left out/);
   broken((d) => (d.participants.length = 1), /2 to 6 participants; this one has 1/);
   broken((d) => d.participants.push(...["e", "f", "g"].map((id) => ({ id, name: id.toUpperCase() }))), /2 to 6 participants; this one has 7/);
   broken((d) => (d.messages[0].to = "nobody"), /message 1 goes from "browser" to "nobody"/);

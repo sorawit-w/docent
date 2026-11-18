@@ -55,8 +55,8 @@ function checkDocument(html) {
       drawn.warnings.filter((w) => !drawn.icons.includes(w)).forEach((w) => warnings.push(`${label}: ${w}`));
       if (found.text !== block("diagram", found.json, drawn.svg)) errors.push(`${label}: the drawing does not match its data; run render`);
       // A document should not draw the same thing twice.
-      const shape = JSON.stringify([drawn.model.lanes.map((l) => l.name), drawn.model.parts.map((p) => [p.lane, p.name, p.note]), drawn.model.legs.map((l) => [l.from, l.to, l.verb])]);
-      if (shapes.has(shape)) warnings.push(`${label} shows the same lanes, parts and legs as diagram "${shapes.get(shape)}"; a document should not draw the same thing twice`);
+      const shape = drawn.model.legs ? JSON.stringify([drawn.model.lanes.map((l) => l.name), drawn.model.parts.map((p) => [p.lane, p.name, p.note]), drawn.model.legs.map((l) => [l.from, l.to, l.verb])]) : JSON.stringify({ ...data, id: null, label: null }); // a UML graph kind: its data without the id and label
+      if (shapes.has(shape)) warnings.push(`${label} shows the same ${drawn.model.legs ? "lanes, parts and legs" : "data"} as diagram "${shapes.get(shape)}"; a document should not draw the same thing twice`);
       else shapes.set(shape, drawn.model.id);
       if (drawn.model.place === "walk") walks.push({ label, legs: drawn.model.legs.length });
     } catch (error) {

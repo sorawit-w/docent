@@ -105,8 +105,6 @@
 #dg-page-phone .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
 #dg-page-phone .sub,#dg-page-phone .verb{font-size:12px;fill:var(--muted,#575d75)}
 #dg-page-phone .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
-.js #dg-page-phone .pulse{display:block;animation:1.2s linear 2 both}
-.js #dg-page-phone:not(.is-playing) .pulse{animation-play-state:paused}
 @media (prefers-reduced-motion:reduce){#dg-page-phone .pulse{animation:none!important}#dg-page-phone .pulse{display:none!important}}
 @media print{#dg-page-phone{max-width:100%;height:auto}#dg-page-phone .pulse{display:none!important}}
 @media (max-width:842px){#dg-page{display:none}#dg-page-phone{display:block}}
