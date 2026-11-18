@@ -167,7 +167,8 @@ Docent uses system fonts only, because every document is one file with nothing t
 - Nothing overlaps: no text on a line, no mark on an arrowhead, no dot on a mark. In Plates two legs may cross at a right angle; they never share a line.
 - In Plates one leg meets the side of a plate at the middle of that side. Two legs on one side sit 14px above and 14px below the middle, and a third leg takes the middle. The renderer leaves this rule only when another line is in the way. A leg that leaves the top or the bottom of a plate for another lane starts near the corner on the side of that lane, so that its path has one bend.
 - The moving dot passes under a numbered mark, never over it, so the number stays readable.
-- A leg that only some readers take is drawn as a dashed arrow. Its verb, or the text beside the figure, says who takes it.
+- A leg that only some readers take is drawn as a dashed arrow.
+- A side leg, beside a route in Route tall, goes straight across to an extra part in another lane, level with the part where it starts. It is dashed, it has no number, and no step lights it. It lets a walkthrough show one short branch and keep its route. Its verb, or the text beside the figure, says who takes it.
 
 **Size and motion.** A diagram is shown at its real size, so names are 14px and notes are 12px. It is never stretched to fill a wider space, and on a screen it never shrinks to fit a narrower one. The dot moves in every diagram, in one of two ways:
 

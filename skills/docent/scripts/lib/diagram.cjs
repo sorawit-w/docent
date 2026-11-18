@@ -8,7 +8,7 @@ const { textWidth } = require("./text.cjs");
 
 const FORMS = ["wide", "tall", "plates"];
 const STATES = ["ok", "warn", "err"]; // success, needs care, failure: the status colors of the page
-const MOST = { lanes: 5, parts: 12, legs: 16, name: 32, note: 40, verb: 24, lane: 28 };
+const MOST = { lanes: 5, parts: 12, legs: 16, side: 2, name: 32, note: 40, verb: 24, lane: 28 };
 const PAGE = 1104; // the widest drawing that fits a full-width well
 const WALK = 520; // the widest drawing that fits beside the walkthrough steps
 const PHONE = 264; // the widest drawing that fits a 320px screen
@@ -72,15 +72,36 @@ function readData(data) {
   }
   model.radius = model.parts[0].icon ? 13 : 8;
 
-  // A chain: each leg starts where the leg before it ended, and every part is visited once.
+  // Side legs: a short dashed path from a part of the route to an extra part beside it. It has no number and no step.
+  if (data.side != null && !Array.isArray(data.side)) fail(`"side" must be a list`);
+  model.side = (data.side || []).map((leg, i) => {
+    const what = `side leg ${i + 1}`;
+    const from = model.parts.findIndex((p) => p.id === leg?.from), to = model.parts.findIndex((p) => p.id === leg?.to);
+    if (from < 0 || to < 0) fail(`${what} goes from "${leg?.from}" to "${leg?.to}"; both must be ids of parts`);
+    if (model.legs.some((l) => l.from === to || l.to === to)) fail(`${what} goes to "${leg.to}", which a leg of the route also uses; the part at the end of a side leg is used by that side leg only`);
+    if (!model.legs.some((l) => l.from === from || l.to === from)) fail(`${what} starts at "${leg.from}", which is not on the route`);
+    if (model.parts[from].lane === model.parts[to].lane) fail(`${what} stays in one lane; the part at its end sits in another lane, beside the part where it starts`);
+    return { from, to, verb: words(leg.verb, `the verb of ${what}`, MOST.verb), optional: true };
+  });
+  if (model.side.length > MOST.side) fail(`a diagram has at most ${MOST.side} side legs; this one has ${model.side.length}`);
+  model.side.forEach((leg, i) => { if (model.side.findIndex((other) => other.to === leg.to) !== i) fail(`two side legs go to "${model.parts[leg.to].id}"; each side part has one side leg`); });
+  const sideParts = new Set(model.side.map((leg) => leg.to));
+
+  // A chain: each leg starts where the leg before it ended, and every part except the side parts is visited once.
   const chain = [model.legs[0].from, ...model.legs.map((leg) => leg.to)];
-  const isChain = model.legs.every((leg, i) => i === 0 || leg.from === model.legs[i - 1].to) && new Set(chain).size === chain.length && chain.length === model.parts.length;
+  const isChain = model.legs.every((leg, i) => i === 0 || leg.from === model.legs[i - 1].to) && new Set(chain).size === chain.length && chain.length === model.parts.length - sideParts.size;
   model.chain = isChain ? chain : null;
+  if (model.side.length && !model.chain) fail(`side legs need a route: each leg starts where the leg before it ended, and every part except the side parts is visited once`);
   return { model, warnings };
 }
 
 /** The forms to try, in order. The renderer picks from where the diagram sits and what it shows. */
 function formsFor(model) {
+  // Side legs are drawn in Route tall, which keeps them beside the route.
+  if (model.side.length) {
+    if (model.form !== "auto" && model.form !== "tall") fail(`a diagram with side legs is drawn as Route tall; "form" is "${model.form}"`);
+    return ["tall"];
+  }
   if (model.form !== "auto") return [model.form];
   if (!model.chain) return ["plates"];
   if (model.place === "walk") return ["tall", "plates"];
@@ -119,7 +140,7 @@ function renderDiagram(data) {
     // Data that is not a route is drawn as Plates. Then the cause is the extra path, not the texts, and the author must choose.
     const cause = model.chain
       ? `${lanes} The widest texts are ${widest.join(" and ")}; shorter names and notes make the drawing narrower`
-      : ` Its data is not a route (a path branches, or a leg does not start where the leg before it ended), so it is drawn as Plates, which needs more room. A walkthrough needs a route. Choose one: take the extra path out and keep the walkthrough, or keep the path, put the diagram in the text flow and write the steps as a numbered list`;
+      : ` Its data is not a route (a path branches, or a leg does not start where the leg before it ended), so it is drawn as Plates, which needs more room. A walkthrough needs a route. Choose one: when the extra path is one short branch to a part of its own, write it as a side leg ("side"); or take the extra path out; or put the diagram in the text flow and write the steps as a numbered list`;
     warnings.push(`the drawing is ${scene.w}px wide; beside the walkthrough steps there is room for ${WALK}px, so it will scroll sideways.${cause}`);
   }
   const id = `dg-${model.id}`, mode = model.place === "walk" ? "walk" : "auto";

@@ -154,3 +154,11 @@ test("a figure holds one drawing, or two for two separate chains", () => {
   assert.match(figure(block("one") + block("two") + block("three")), /Figure 9 holds 3 diagrams; a figure holds one, or two for two separate chains/);
   assert.match(figure(block("one", ' "place": "walk",') + block("two")), /Figure 9 holds 2 diagrams beside walkthrough steps; there it holds one/);
 });
+
+test("check counts the legs of the route for a walkthrough, not the side legs", () => {
+  const side = fs.readFileSync(path.join(__dirname, "fixtures", "side.json"), "utf8").replace('"id": "side"', '"id": "steps"');
+  const html = specimen.replace(/(<!-- docent:diagram\n)\{\n  "id": "steps"[\s\S]*?(\n-->)/, (all, open, close) => `${open}${side.trim()}${close}`);
+  assert.notEqual(html, specimen, "the walkthrough diagram of the sample page was replaced");
+  const { errors } = checkDocument(renderDocument(html).html);
+  assert.deepEqual(errors, [], "four steps for four legs; the side leg has no step");
+});

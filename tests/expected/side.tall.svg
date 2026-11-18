@@ -1,0 +1,160 @@
+<svg id="dg-side" class="dg dg-tall" xmlns="http://www.w3.org/2000/svg" width="468" height="568" viewBox="0 0 468 568" role="img" aria-label="A bug report in four steps beside the walkthrough. A side path: if the report is known, the maintainers close it as a duplicate.">
+<style>
+#dg-side{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-side .ground{fill:var(--fig,#f2f3f9)}
+#dg-side .band{fill:var(--bg,#fbfbfe)}
+#dg-side .track{stroke:var(--line,#d3d6e3)}
+#dg-side .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-side .head{fill:var(--text,#1c1f2e)}
+#dg-side .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-side .stop.end{fill:var(--text,#1c1f2e)}
+#dg-side .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-side .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-side .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-side .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-side .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-side .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-side .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-side .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-side .sub,#dg-side .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-side .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-side .side .line{stroke-dasharray:5 7}
+.js #dg-side .leg.is-current .line{stroke:var(--primary,#2f3fd0);stroke-width:2.5}
+.js #dg-side .leg.is-current .head,.js #dg-side .leg.is-current .num{fill:var(--primary,#2f3fd0)}
+.js #dg-side .leg.is-current .mark{stroke:var(--primary,#2f3fd0)}
+.js #dg-side .leg.is-current .pulse{display:block;animation:2.4s linear infinite}
+@keyframes dg-side-1{0%{transform:translate(157px,111px);opacity:0}8%{transform:translate(157px,111px);opacity:1}10.44%{transform:translate(157px,120px);opacity:1}58.25%{transform:translate(331px,150px);opacity:1}68%{transform:translate(331px,186px);opacity:1}88%{transform:translate(331px,186px);opacity:1}100%{transform:translate(331px,186px);opacity:0}}
+#dg-side .pulse-1{transform:translate(198.76px,127.2px)}
+.js #dg-side .leg.is-current .pulse-1{animation-name:dg-side-1}
+@keyframes dg-side-2{0%{transform:translate(331px,216px);opacity:0}8%{transform:translate(331px,216px);opacity:1}10.44%{transform:translate(331px,225px);opacity:1}58.25%{transform:translate(157px,255px);opacity:1}68%{transform:translate(157px,291px);opacity:1}88%{transform:translate(157px,291px);opacity:1}100%{transform:translate(157px,291px);opacity:0}}
+#dg-side .pulse-2{transform:translate(289.24px,232.2px)}
+.js #dg-side .leg.is-current .pulse-2{animation-name:dg-side-2}
+@keyframes dg-side-3{0%{transform:translate(157px,321px);opacity:0}8%{transform:translate(157px,321px);opacity:1}10.44%{transform:translate(157px,330px);opacity:1}58.25%{transform:translate(331px,360px);opacity:1}68%{transform:translate(331px,396px);opacity:1}88%{transform:translate(331px,396px);opacity:1}100%{transform:translate(331px,396px);opacity:0}}
+#dg-side .pulse-3{transform:translate(198.76px,337.2px)}
+.js #dg-side .leg.is-current .pulse-3{animation-name:dg-side-3}
+@keyframes dg-side-4{0%{transform:translate(331px,426px);opacity:0}8%{transform:translate(331px,426px);opacity:1}68%{transform:translate(331px,501px);opacity:1}88%{transform:translate(331px,501px);opacity:1}100%{transform:translate(331px,501px);opacity:0}}
+#dg-side .pulse-4{transform:translate(331px,435px)}
+.js #dg-side .leg.is-current .pulse-4{animation-name:dg-side-4}
+@media (prefers-reduced-motion:reduce){#dg-side .pulse{animation:none!important}}
+@media print{#dg-side{max-width:100%;height:auto}#dg-side .pulse{display:none!important}#dg-side .leg .line{stroke:var(--text,#1c1f2e)!important;stroke-width:2px!important}#dg-side .leg .head,#dg-side .leg .num{fill:var(--text,#1c1f2e)!important}#dg-side .leg .mark{stroke:var(--text,#1c1f2e)!important}}
+#dg-side-phone{display:none}
+</style>
+<rect width="468" height="568" class="ground"/>
+<rect x="8" y="12" width="224" height="544" rx="10" class="band"/>
+<rect x="256" y="12" width="204" height="544" rx="10" class="band"/>
+<line x1="157" y1="62" x2="157" y2="542" class="track"/>
+<line x1="331" y1="62" x2="331" y2="542" class="track"/>
+<g class="icon lane-icon" transform="translate(22,29)"><circle cx="8" cy="5" r="2.5"/><path d="M3 13.5c0-2.8 2.2-4.5 5-4.5s5 1.7 5 4.5"/></g>
+<text x="46" y="42" class="lane" text-anchor="start">Reporter</text>
+<g class="icon lane-icon" transform="translate(270,29)"><circle cx="6" cy="5.5" r="2.25"/><path d="M1.75 13c0-2.4 1.9-3.75 4.25-3.75s4.25 1.35 4.25 3.75M10.5 3.5a2.25 2.25 0 0 1 0 4.25M12 9.6c1.4.5 2.25 1.7 2.25 3.4"/></g>
+<text x="294" y="42" class="lane" text-anchor="start">Maintainers</text>
+<g class="leg" data-leg="1"><path d="M157,111 L157,120 L331,150 L331,180" class="line"/><polygon points="326.5,178 335.5,178 331,186" class="head"/><circle r="6" class="pulse pulse-1"/><circle cx="244" cy="135" r="10" class="mark"/><text x="244" y="139" class="num" text-anchor="middle">1</text><text x="244" y="118" class="verb" text-anchor="middle">file</text></g>
+<g class="leg" data-leg="2"><path d="M331,216 L331,225 L157,255 L157,285" class="line"/><polygon points="152.5,283 161.5,283 157,291" class="head"/><circle r="6" class="pulse pulse-2"/><circle cx="244" cy="240" r="10" class="mark"/><text x="244" y="244" class="num" text-anchor="middle">2</text><text x="244" y="223" class="verb" text-anchor="middle">ask for steps</text></g>
+<g class="leg" data-leg="3"><path d="M157,321 L157,330 L331,360 L331,390" class="line"/><polygon points="326.5,388 335.5,388 331,396" class="head"/><circle r="6" class="pulse pulse-3"/><circle cx="244" cy="345" r="10" class="mark"/><text x="244" y="349" class="num" text-anchor="middle">3</text><text x="244" y="328" class="verb" text-anchor="middle">send steps</text></g>
+<g class="leg" data-leg="4"><path d="M331,426 L331,495" class="line"/><polygon points="326.5,493 335.5,493 331,501" class="head"/><circle r="6" class="pulse pulse-4"/><circle cx="331" cy="459.5" r="10" class="mark"/><text x="331" y="463.5" class="num" text-anchor="middle">4</text><text x="352" y="463.5" class="verb" text-anchor="start">release</text></g>
+<g class="side"><path d="M172,96 L310,96" class="line"/><polygon points="308,100.5 308,91.5 316,96" class="head"/><text x="244" y="84" class="verb" text-anchor="middle">if it is known</text></g>
+<circle cx="157" cy="96" r="13" class="stop"/>
+<g class="icon" transform="translate(149,88)"><path d="M9.5 2.5h-5a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1v-7z"/><path d="M9.5 2.5v3h3M6 9h4M6 11.25h4"/></g>
+<text x="136" y="101" class="name" text-anchor="end">Bug report</text>
+<text x="136" y="118" class="sub" text-anchor="end">what went wrong</text>
+<circle cx="331" cy="201" r="13" class="stop"/>
+<g class="icon" transform="translate(323,193)"><circle cx="7" cy="7" r="4"/><path d="M10 10l3.5 3.5"/></g>
+<text x="352" y="206" class="name" text-anchor="start">Triage</text>
+<text x="352" y="223" class="sub" text-anchor="start">a first check</text>
+<circle cx="157" cy="306" r="13" class="stop"/>
+<g class="icon" transform="translate(149,298)"><path d="M2.5 4a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v6.5a1 1 0 0 1-1 1H7l-3 2.5v-2.5h-.5a1 1 0 0 1-1-1z"/><path d="M5.5 6.25h5M5.5 8.5h3"/></g>
+<text x="136" y="311" class="name" text-anchor="end">Steps to repeat</text>
+<text x="136" y="328" class="sub" text-anchor="end">a short, exact list</text>
+<circle cx="331" cy="411" r="13" class="stop"/>
+<g class="icon" transform="translate(323,403)"><circle cx="8" cy="8" r="5.5"/><path d="M5.5 8.2l1.8 1.8 3.2-3.6"/></g>
+<text x="352" y="416" class="name" text-anchor="start">Fix</text>
+<text x="352" y="433" class="sub" text-anchor="start">a tested change</text>
+<circle cx="331" cy="516" r="13" class="stop end"/>
+<g class="icon on-end" transform="translate(323,508)"><path d="M2.5 8.4V3.5a1 1 0 0 1 1-1h4.9l5.1 5.1a1 1 0 0 1 0 1.4l-4.5 4.5a1 1 0 0 1-1.4 0z"/><path d="M5.6 5.6h.01"/></g>
+<text x="352" y="521" class="name" text-anchor="start">New version</text>
+<text x="352" y="538" class="sub" text-anchor="start">ready to install</text>
+<circle cx="331" cy="96" r="13" class="stop end"/>
+<g class="icon on-end" transform="translate(323,88)"><circle cx="4.5" cy="3.5" r="1.5"/><circle cx="4.5" cy="12.5" r="1.5"/><circle cx="11.5" cy="8.5" r="1.5"/><path d="M4.5 5v6M4.5 5c0 2.8 2.6 3.5 5.5 3.5"/></g>
+<text x="352" y="101" class="name" text-anchor="start">Closed</text>
+<text x="352" y="118" class="sub" text-anchor="start">as a duplicate</text>
+</svg>
+<svg id="dg-side-phone" class="dg dg-track" xmlns="http://www.w3.org/2000/svg" width="264" height="560" viewBox="0 0 264 560" role="img" aria-label="A bug report in four steps beside the walkthrough. A side path: if the report is known, the maintainers close it as a duplicate.">
+<style>
+#dg-side-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-side-phone .ground{fill:var(--fig,#f2f3f9)}
+#dg-side-phone .band{fill:var(--bg,#fbfbfe)}
+#dg-side-phone .track{stroke:var(--line,#d3d6e3)}
+#dg-side-phone .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-side-phone .head{fill:var(--text,#1c1f2e)}
+#dg-side-phone .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-side-phone .stop.end{fill:var(--text,#1c1f2e)}
+#dg-side-phone .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-side-phone .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-side-phone .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-side-phone .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-side-phone .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-side-phone .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-side-phone .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-side-phone .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-side-phone .sub,#dg-side-phone .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-side-phone .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-side-phone .jump.is-optional .mark{stroke-dasharray:3 3}
+.js #dg-side-phone .leg.is-current .line{stroke:var(--primary,#2f3fd0);stroke-width:2.5}
+.js #dg-side-phone .leg.is-current .head,.js #dg-side-phone .leg.is-current .num{fill:var(--primary,#2f3fd0)}
+.js #dg-side-phone .leg.is-current .mark{stroke:var(--primary,#2f3fd0)}
+.js #dg-side-phone .leg.is-current .pulse{display:block;animation:2.4s linear infinite}
+@keyframes dg-side-phone-1{0%{transform:translate(30px,71px);opacity:0}8%{transform:translate(30px,71px);opacity:1}68%{transform:translate(30px,185px);opacity:1}88%{transform:translate(30px,185px);opacity:1}100%{transform:translate(30px,185px);opacity:0}}
+#dg-side-phone .pulse-1{transform:translate(30px,84.68px)}
+.js #dg-side-phone .leg.is-current .pulse-1{animation-name:dg-side-phone-1}
+@keyframes dg-side-phone-2{0%{transform:translate(30px,215px);opacity:0}8%{transform:translate(30px,215px);opacity:1}68%{transform:translate(30px,289px);opacity:1}88%{transform:translate(30px,289px);opacity:1}100%{transform:translate(30px,289px);opacity:0}}
+#dg-side-phone .pulse-2{transform:translate(30px,223.88px)}
+.js #dg-side-phone .leg.is-current .pulse-2{animation-name:dg-side-phone-2}
+@keyframes dg-side-phone-3{0%{transform:translate(30px,319px);opacity:0}8%{transform:translate(30px,319px);opacity:1}68%{transform:translate(30px,393px);opacity:1}88%{transform:translate(30px,393px);opacity:1}100%{transform:translate(30px,393px);opacity:0}}
+#dg-side-phone .pulse-3{transform:translate(30px,327.88px)}
+.js #dg-side-phone .leg.is-current .pulse-3{animation-name:dg-side-phone-3}
+@keyframes dg-side-phone-4{0%{transform:translate(30px,423px);opacity:0}8%{transform:translate(30px,423px);opacity:1}68%{transform:translate(30px,497px);opacity:1}88%{transform:translate(30px,497px);opacity:1}100%{transform:translate(30px,497px);opacity:0}}
+#dg-side-phone .pulse-4{transform:translate(30px,431.88px)}
+.js #dg-side-phone .leg.is-current .pulse-4{animation-name:dg-side-phone-4}
+@media (prefers-reduced-motion:reduce){#dg-side-phone .pulse{animation:none!important}}
+@media print{#dg-side-phone{max-width:100%;height:auto}#dg-side-phone .pulse{display:none!important}#dg-side-phone .leg .line{stroke:var(--text,#1c1f2e)!important;stroke-width:2px!important}#dg-side-phone .leg .head,#dg-side-phone .leg .num{fill:var(--text,#1c1f2e)!important}#dg-side-phone .leg .mark{stroke:var(--text,#1c1f2e)!important}}
+@media (max-width:564px){#dg-side{display:none}#dg-side-phone{display:block}}
+</style>
+<rect width="264" height="560" class="ground"/>
+<rect x="8" y="12" width="248" height="120" rx="10" class="band"/>
+<rect x="8" y="156" width="248" height="80" rx="10" class="band"/>
+<rect x="8" y="260" width="248" height="80" rx="10" class="band"/>
+<rect x="8" y="364" width="248" height="184" rx="10" class="band"/>
+<g class="icon lane-icon" transform="translate(153,19)"><circle cx="8" cy="5" r="2.5"/><path d="M3 13.5c0-2.8 2.2-4.5 5-4.5s5 1.7 5 4.5"/></g>
+<text x="240" y="32" class="lane" text-anchor="end">Reporter</text>
+<g class="icon lane-icon" transform="translate(131,163)"><circle cx="6" cy="5.5" r="2.25"/><path d="M1.75 13c0-2.4 1.9-3.75 4.25-3.75s4.25 1.35 4.25 3.75M10.5 3.5a2.25 2.25 0 0 1 0 4.25M12 9.6c1.4.5 2.25 1.7 2.25 3.4"/></g>
+<text x="240" y="176" class="lane" text-anchor="end">Maintainers</text>
+<g class="icon lane-icon" transform="translate(153,267)"><circle cx="8" cy="5" r="2.5"/><path d="M3 13.5c0-2.8 2.2-4.5 5-4.5s5 1.7 5 4.5"/></g>
+<text x="240" y="280" class="lane" text-anchor="end">Reporter</text>
+<g class="icon lane-icon" transform="translate(131,371)"><circle cx="6" cy="5.5" r="2.25"/><path d="M1.75 13c0-2.4 1.9-3.75 4.25-3.75s4.25 1.35 4.25 3.75M10.5 3.5a2.25 2.25 0 0 1 0 4.25M12 9.6c1.4.5 2.25 1.7 2.25 3.4"/></g>
+<text x="240" y="384" class="lane" text-anchor="end">Maintainers</text>
+<g class="leg" data-leg="1"><path d="M30,71 L30,179" class="line"/><polygon points="25.5,177 34.5,177 30,185" class="head"/><circle r="6" class="pulse pulse-1"/><circle cx="30" cy="144" r="10" class="mark"/><text x="30" y="148" class="num" text-anchor="middle">1</text><text x="51" y="148" class="verb" text-anchor="start">file</text></g>
+<g class="leg" data-leg="2"><path d="M30,215 L30,283" class="line"/><polygon points="25.5,281 34.5,281 30,289" class="head"/><circle r="6" class="pulse pulse-2"/><circle cx="30" cy="248" r="10" class="mark"/><text x="30" y="252" class="num" text-anchor="middle">2</text><text x="51" y="252" class="verb" text-anchor="start">ask for steps</text></g>
+<g class="leg" data-leg="3"><path d="M30,319 L30,387" class="line"/><polygon points="25.5,385 34.5,385 30,393" class="head"/><circle r="6" class="pulse pulse-3"/><circle cx="30" cy="352" r="10" class="mark"/><text x="30" y="356" class="num" text-anchor="middle">3</text><text x="51" y="356" class="verb" text-anchor="start">send steps</text></g>
+<g class="leg" data-leg="4"><path d="M30,423 L30,491" class="line"/><polygon points="25.5,489 34.5,489 30,497" class="head"/><circle r="6" class="pulse pulse-4"/><circle cx="30" cy="456" r="10" class="mark"/><text x="30" y="460" class="num" text-anchor="middle">4</text><text x="51" y="460" class="verb" text-anchor="start">release</text></g>
+<g class="jump is-optional"><circle cx="61" cy="102" r="10" class="mark"/><text x="77" y="106" class="verb" text-anchor="start">if it is known</text><text x="77" y="122" class="sub" text-anchor="start">to Closed</text></g>
+<circle cx="30" cy="56" r="13" class="stop"/>
+<g class="icon" transform="translate(22,48)"><path d="M9.5 2.5h-5a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1v-7z"/><path d="M9.5 2.5v3h3M6 9h4M6 11.25h4"/></g>
+<text x="51" y="61" class="name" text-anchor="start">Bug report</text>
+<text x="51" y="78" class="sub" text-anchor="start">what went wrong</text>
+<circle cx="30" cy="200" r="13" class="stop"/>
+<g class="icon" transform="translate(22,192)"><circle cx="7" cy="7" r="4"/><path d="M10 10l3.5 3.5"/></g>
+<text x="51" y="205" class="name" text-anchor="start">Triage</text>
+<text x="51" y="222" class="sub" text-anchor="start">a first check</text>
+<circle cx="30" cy="304" r="13" class="stop"/>
+<g class="icon" transform="translate(22,296)"><path d="M2.5 4a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v6.5a1 1 0 0 1-1 1H7l-3 2.5v-2.5h-.5a1 1 0 0 1-1-1z"/><path d="M5.5 6.25h5M5.5 8.5h3"/></g>
+<text x="51" y="309" class="name" text-anchor="start">Steps to repeat</text>
+<text x="51" y="326" class="sub" text-anchor="start">a short, exact list</text>
+<circle cx="30" cy="408" r="13" class="stop"/>
+<g class="icon" transform="translate(22,400)"><circle cx="8" cy="8" r="5.5"/><path d="M5.5 8.2l1.8 1.8 3.2-3.6"/></g>
+<text x="51" y="413" class="name" text-anchor="start">Fix</text>
+<text x="51" y="430" class="sub" text-anchor="start">a tested change</text>
+<circle cx="30" cy="512" r="13" class="stop end"/>
+<g class="icon on-end" transform="translate(22,504)"><path d="M2.5 8.4V3.5a1 1 0 0 1 1-1h4.9l5.1 5.1a1 1 0 0 1 0 1.4l-4.5 4.5a1 1 0 0 1-1.4 0z"/><path d="M5.6 5.6h.01"/></g>
+<text x="51" y="517" class="name" text-anchor="start">New version</text>
+<text x="51" y="534" class="sub" text-anchor="start">ready to install</text>
+</svg>

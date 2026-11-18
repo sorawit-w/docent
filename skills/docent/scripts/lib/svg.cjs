@@ -98,6 +98,7 @@ function styles(scene, id, mode, swap) {
   for (const state of new Set(scene.parts.map((part) => part.state).filter(Boolean))) css.push(`${s} .stop.is-${state},${s} .card.is-${state}{stroke:${v(state)};stroke-width:1.5}`, `${s} .flag.is-${state}{fill:${v(state)};stroke:${v("bg")};stroke-width:2}`);
   // An optional leg is dashed. A drawing with no optional leg carries no such rule.
   if (scene.legs.some((leg) => leg.optional)) css.push(`${s} .leg.is-optional .line{stroke-dasharray:5 7}`);
+  if ((scene.spurs || []).length) css.push(`${s} .side .line{stroke-dasharray:5 7}`);
   // A go-to row of the column form: its mark is dashed when the leg is optional, like the line it stands for.
   if ((scene.jumps || []).some((jump) => jump.optional)) css.push(`${s} .jump.is-optional .mark{stroke-dasharray:3 3}`);
   // On paper nothing scrolls: a drawing that is still wider than the page shrinks to fit it.
@@ -164,8 +165,11 @@ function toSvg(scene, { id, label, mode, swap }) {
         text(leg.verb) + `</g>`,
     );
   }
+  // A side leg: dashed, with its verb, and no number, no mark and no dot.
+  for (const spur of scene.spurs || []) out.push(`<g class="side"><path d="${linePath(spur)}" class="line"/>${head(spur)}${text(spur.verb)}</g>`);
   for (const jump of scene.jumps || []) {
-    out.push(`<g class="jump${jump.optional ? " is-optional" : ""}" data-leg="${jump.n}"><circle cx="${num(jump.mark[0])}" cy="${num(jump.mark[1])}" r="${MARK}" class="mark"/>` + text({ x: jump.mark[0], y: jump.mark[1] + 4, s: jump.n, cls: "num", anchor: "middle" }) + text(jump.verb) + text(jump.target) + `</g>`);
+    const n = jump.n == null ? "" : ` data-leg="${jump.n}"`; // a side leg in the single track has no number
+    out.push(`<g class="jump${jump.optional ? " is-optional" : ""}"${n}><circle cx="${num(jump.mark[0])}" cy="${num(jump.mark[1])}" r="${MARK}" class="mark"/>` + (jump.n == null ? "" : text({ x: jump.mark[0], y: jump.mark[1] + 4, s: jump.n, cls: "num", anchor: "middle" })) + text(jump.verb) + text(jump.target) + `</g>`);
   }
   for (const part of scene.parts) {
     const is = part.state ? ` is-${part.state}` : "";
