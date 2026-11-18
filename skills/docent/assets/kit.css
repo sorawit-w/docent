@@ -127,6 +127,11 @@ section > figure { margin-top: 24px; }
 /* A well may hold two drawings, for two separate chains: side by side when both fit, else one below the other. */
 /* A drawing that is wider than its well scrolls sideways. The page script shows this line under it, because the part that shows can look complete. */
 .fig-more { margin: 8px 0 0; max-width: none; font-size: 14px; line-height: 1.5; color: var(--muted); }
+/* The steps of a diagram in words: a closed section in the well, under the drawing. */
+.dg-words { flex-basis: 100%; max-width: var(--measure); margin: 0; padding: 0 8px 4px; }
+.dg-words ol { margin: 8px 0 0; padding-left: 28px; }
+.dg-words li + li { margin-top: 4px; }
+.dg-words p { margin: 12px 0 0; font-weight: 600; }
 figcaption { margin-top: 12px; font-size: 14px; line-height: 1.5; color: var(--muted); }
 figcaption strong { font-weight: 600; color: var(--text); margin-right: 8px; }
 

@@ -430,6 +430,27 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     ok("a side leg beside walkthrough steps: steps light legs 1 to 4, the side leg is dashed and never lit, and a phone shows it as a go-to row", lit.join(" ") === "1 2 3 4" && spur.dash === "5px, 7px" && spur.stroke === LIGHT.text && spur.current === 0 && row.shown > 0 && row.row === "if it is known|to Closed" && row.page === row.view, { lit, spur, row });
   }
 
+  // A sequence diagram: the desktop form on a desktop and on paper, the script on a phone, and the steps in words.
+  {
+    const seq = fs.readFileSync(path.join(root, "tests", "fixtures", "sequence.json"), "utf8");
+    const content = renderDocument(html.replace('<section id="report"', `<section id="seq" aria-labelledby="seq-h"><h2 id="seq-h">Sequence</h2><figure><div class="fig" role="region" aria-label="Figure 6, a page request" tabindex="0">\n<!-- docent:diagram\n${seq}\n-->\n<!-- /docent:diagram -->\n</div><figcaption><strong>Figure 6</strong>A page request.</figcaption></figure></section>\n<section id="report"`)).html;
+    const look = (page) => page.evaluate(() => ({ main: document.getElementById("dg-page").getBoundingClientRect().width, script: document.getElementById("dg-page-phone").getBoundingClientRect().width, words: document.querySelector("#seq .dg-words").open, items: [...document.querySelectorAll("#seq .dg-words li")].filter((li) => li.getBoundingClientRect().height).length, page: document.documentElement.scrollWidth, view: innerWidth }));
+    const results = {};
+    for (const [name, opts] of [["desk", { width: 1280 }], ["phone", { width: 390, height: 844 }], ["narrow", { width: 320, height: 700 }], ["paper", { width: 658, height: 1123, media: "print" }]]) {
+      const view = await open({ ...opts, content });
+      if (name === "paper") await view.page.evaluate(() => dispatchEvent(new Event("beforeprint")));
+      results[name] = await look(view.page);
+      if (name === "desk") {
+        await view.page.addScriptTag({ path: axePath });
+        results.axe = await view.page.evaluate(async () => (await window.axe.run(document.querySelector("#seq"), { runOnly: { type: "tag", values: ["wcag2a", "wcag2aa", "wcag21aa", "best-practice"] } })).violations.map((v) => v.id));
+        results.dots = await view.page.evaluate(() => document.querySelectorAll("#dg-page .pulse").length);
+      }
+      await view.context.close();
+    }
+    const { desk, phone, narrow, paper } = results;
+    ok("a sequence diagram shows its desktop form on a desktop and on paper, the script on a phone, and its steps in words on paper", desk.main > 600 && !desk.script && !desk.words && results.dots === 7 && !phone.main && phone.script === 264 && narrow.script === 264 && paper.main > 0 && !paper.script && paper.words && paper.items === 7 && [phone, narrow].every((r) => r.page === r.view) && results.axe.length === 0, results);
+  }
+
   // Two drawings in one figure: side by side when both fit, one below the other when they do not.
   {
     const block = (id, a, b) => `<!-- docent:diagram\n{"id": "${id}", "label": "${a} goes to ${b}.", "lanes": [{"id": "x", "name": "Team"}, {"id": "y", "name": "Service"}], "parts": [{"id": "p", "lane": "x", "name": "${a}"}, {"id": "q", "lane": "y", "name": "${b}"}], "legs": [{"from": "p", "to": "q", "verb": "send"}]}\n-->\n<!-- /docent:diagram -->\n`;

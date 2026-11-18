@@ -77,7 +77,7 @@ function check(scene) {
   for (const jump of scene.jumps || []) {
     const [mx, my] = jump.mark, part = `go-to ${jump.n}`;
     texts.push({ box: { x0: mx - MARK, y0: my - MARK, x1: mx + MARK, y1: my + MARK }, what: `the mark of go-to row ${jump.n}`, kind: "label", part });
-    for (const t of [jump.verb, jump.target]) if (t.s) texts.push({ box: textBox(t), what: `"${t.s}"`, kind: "label", part });
+    for (const t of [jump.verb, jump.target, ...(jump.more || [])]) if (t.s) texts.push({ box: textBox(t), what: `"${t.s}"`, kind: "label", part });
   }
 
   for (const leg of legs) {

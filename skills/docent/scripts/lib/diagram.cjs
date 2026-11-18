@@ -5,6 +5,22 @@ const { toSvg } = require("./svg.cjs");
 const { DataError, fail, words, id, findBlocks, block, replaceBlocks } = require("./blocks.cjs");
 const { renderWidget, fillPlaces } = require("./widget.cjs");
 const { textWidth } = require("./text.cjs");
+const { readSequence, layoutSequence } = require("./sequence.cjs");
+
+const ARROW = '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>';
+/** The steps of a drawing in words, in a closed section under it, for a screen reader, a phone and paper. */
+const inWords = (html) => `<details class="dg-words">\n<summary>${ARROW}The diagram in words</summary>\n${html}\n</details>`;
+
+/** A sequence diagram: the desktop form, the script for phones and paper, and the steps in words. */
+function renderSequence(data) {
+  const model = readSequence(data);
+  const { scene, phone, words: steps } = layoutSequence(model);
+  const id = `dg-${model.id}`;
+  const main = toSvg(scene, { id, label: model.label, mode: "auto", swap: { phone: `${id}-phone` } });
+  // On paper the desktop form prints, shrunk to the sheet, while it keeps at least 80% of its size; else the script prints.
+  const small = toSvg(phone, { id: `${id}-phone`, label: model.label, mode: "auto", swap: { main: id, below: scene.w + ROOM, printMain: scene.w * 0.8 <= SHEET } });
+  return { svg: `${main}\n${small}\n${inWords(steps)}`, form: "sequence", warnings: [], icons: [], model, scene };
+}
 
 const FORMS = ["wide", "tall", "plates"];
 const STATES = ["ok", "warn", "err"]; // success, needs care, failure: the status colors of the page
@@ -13,6 +29,7 @@ const PAGE = 1104; // the widest drawing that fits a full-width well
 const WALK = 520; // the widest drawing that fits beside the walkthrough steps
 const PHONE = 264; // the widest drawing that fits a 320px screen
 const ROOM = 96; // what the page takes beside a drawing: the page padding and the well padding
+const SHEET = 658; // the width of an A4 sheet inside the page margins
 
 /** Checks diagram data and returns the model that the layouts use, with a list of warnings. */
 function readData(data) {
@@ -117,6 +134,10 @@ function layout(model, form) {
 
 /** Draws one diagram. Returns { svg, form, warnings }. Throws when the data is wrong or no form keeps the rules. */
 function renderDiagram(data) {
+  if (data && data.kind != null) {
+    if (data.kind === "sequence") return renderSequence(data);
+    fail(`"kind" must be "sequence", or left out for a workflow diagram`);
+  }
   const { model, warnings } = readData(data);
   const icons = warnings.filter((w) => !w.startsWith("every part has the state") && !w.startsWith("no leg has a verb")); // these warnings are about icons; check reports them as errors
   const forms = formsFor(model);
