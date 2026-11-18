@@ -1,0 +1,130 @@
+<svg id="dg-shop-deploy" class="dg dg-deployment dg-auto" xmlns="http://www.w3.org/2000/svg" width="1116" height="672" viewBox="0 0 1116 672" role="img" aria-label="Where the shop runs: a phone talks to the app server over HTTPS, and the server talks to the database.">
+<style>
+#dg-shop-deploy{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-shop-deploy .ground{fill:var(--fig,#f2f3f9)}
+#dg-shop-deploy .band{fill:var(--bg,#fbfbfe)}
+#dg-shop-deploy .track{stroke:var(--line,#d3d6e3)}
+#dg-shop-deploy .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-shop-deploy .head{fill:var(--text,#1c1f2e)}
+#dg-shop-deploy .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-shop-deploy .stop.end{fill:var(--text,#1c1f2e)}
+#dg-shop-deploy .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-shop-deploy .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-shop-deploy .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-shop-deploy .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-shop-deploy .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-shop-deploy .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-shop-deploy .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-shop-deploy .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-shop-deploy .sub,#dg-shop-deploy .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-shop-deploy .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-shop-deploy .u-ln{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-shop-deploy .u-bold{stroke-width:2.5}
+#dg-shop-deploy .u-dash{stroke-dasharray:6 4;stroke-linecap:butt}
+#dg-shop-deploy .u-face{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linejoin:round}
+#dg-shop-deploy .u-ink{fill:var(--text,#1c1f2e)}
+#dg-shop-deploy .u-name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-shop-deploy .leg .line{stroke-width:1.5}
+#dg-shop-deploy .leg.is-reply .line{stroke-dasharray:6 4;stroke-linecap:butt}
+#dg-shop-deploy .ohead{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.js #dg-shop-deploy .leg.is-current .ohead{stroke:var(--primary,#2f3fd0)}
+#dg-shop-deploy .u-bar{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-shop-deploy .u-frame{fill:none;stroke:var(--muted,#575d75);stroke-width:1}
+#dg-shop-deploy .u-frame.is-filled{fill:var(--bg,#fbfbfe)}
+#dg-shop-deploy .u-div{stroke:var(--muted,#575d75);stroke-width:1;stroke-dasharray:6 4}
+#dg-shop-deploy .u-op{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-shop-deploy .u-mem{font-size:12px;fill:var(--text,#1c1f2e)}
+#dg-shop-deploy .u-it{font-style:italic}
+#dg-shop-deploy .u-ul{text-decoration:underline}
+@media (prefers-reduced-motion:reduce){#dg-shop-deploy .pulse{animation:none!important}#dg-shop-deploy .pulse{display:none!important}}
+@media print{#dg-shop-deploy{max-width:100%;height:auto}#dg-shop-deploy .pulse{display:none!important}}
+#dg-shop-deploy-phone{display:none}
+</style>
+<rect width="1116" height="672" class="ground"/>
+<polygon points="348,46 358,36 540,36 530,46" class="u-face"/><polygon points="530,46 540,36 540,170 530,180" class="u-face"/><rect x="348" y="46" width="182" height="134" class="u-face"/>
+<polygon points="36,262 46,252 276,252 266,262" class="u-face"/><polygon points="266,262 276,252 276,410 266,420" class="u-face"/><rect x="36" y="262" width="230" height="158" class="u-face"/>
+<polygon points="612,502 622,492 840,492 830,502" class="u-face"/><polygon points="830,502 840,492 840,626 830,636" class="u-face"/><rect x="612" y="502" width="218" height="134" class="u-face"/>
+<text x="360" y="66" class="name" text-anchor="start">«device» Phone</text>
+<text x="48" y="282" class="name" text-anchor="start">«device» App server</text>
+<text x="624" y="522" class="name" text-anchor="start">«device» Database server</text>
+<g class="leg" data-leg="1"><polyline points="444,180 444,336 276,336" class="u-ln"/><text x="436" y="262" class="verb" text-anchor="end">HTTPS</text></g>
+<g class="leg" data-leg="2"><polyline points="156,388 156,564 612,564" class="u-ln"/><text x="164" y="480" class="verb" text-anchor="start">JDBC</text></g>
+<g class="leg" data-leg="3"><polyline points="468,145 468,348 920,348" class="u-ln u-dash"/><polyline points="912,352.5 920,348 912,343.5" class="u-ln"/><text x="476" y="250.5" class="verb" text-anchor="start">«manifest»</text></g>
+<polygon points="64,318 74,308 248,308 238,318" class="u-face"/><polygon points="238,318 248,308 248,378 238,388" class="u-face"/><rect x="64" y="318" width="174" height="70" class="u-face"/><text x="151" y="336" class="u-mem" text-anchor="middle">«executionEnvironment»</text><text x="151" y="356" class="name" text-anchor="middle">JVM</text><path d="M76,367 L84,367 L88,371 L88,383 L76,383 Z M84,367 L84,371 L88,371" class="u-face"/><text x="96" y="379" class="u-mem">shop.jar</text>
+<rect x="378.5" y="95" width="131" height="50" class="u-face"/><path d="M487.5,103 L495.5,103 L499.5,107 L499.5,119 L487.5,119 Z M495.5,103 L495.5,107 L499.5,107" class="u-face"/><text x="444" y="113" class="u-mem" text-anchor="middle">«artifact»</text><text x="444" y="133" class="name" text-anchor="middle">shop.apk</text>
+<rect x="646.5" y="551" width="147" height="50" class="u-face"/><path d="M771.5,559 L779.5,559 L783.5,563 L783.5,575 L771.5,575 Z M779.5,559 L779.5,563 L783.5,563" class="u-face"/><text x="720" y="569" class="u-mem" text-anchor="middle">«artifact»</text><text x="720" y="589" class="name" text-anchor="middle">schema.sql</text>
+<rect x="920" y="323" width="152" height="50" class="u-face"/><rect x="1051" y="331" width="13" height="16" class="u-face"/><rect x="1048" y="334" width="7" height="3" class="u-face"/><rect x="1048" y="341" width="7" height="3" class="u-face"/><text x="996" y="341" class="u-mem" text-anchor="middle">«component»</text><text x="996" y="361" class="name" text-anchor="middle">Mobile app</text>
+</svg>
+<svg id="dg-shop-deploy-phone" class="dg dg-deployment dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="754" viewBox="0 0 264 754" role="img" aria-label="Where the shop runs: a phone talks to the app server over HTTPS, and the server talks to the database.">
+<style>
+#dg-shop-deploy-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-shop-deploy-phone .ground{fill:var(--fig,#f2f3f9)}
+#dg-shop-deploy-phone .band{fill:var(--bg,#fbfbfe)}
+#dg-shop-deploy-phone .track{stroke:var(--line,#d3d6e3)}
+#dg-shop-deploy-phone .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-shop-deploy-phone .head{fill:var(--text,#1c1f2e)}
+#dg-shop-deploy-phone .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-shop-deploy-phone .stop.end{fill:var(--text,#1c1f2e)}
+#dg-shop-deploy-phone .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-shop-deploy-phone .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-shop-deploy-phone .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-shop-deploy-phone .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-shop-deploy-phone .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-shop-deploy-phone .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-shop-deploy-phone .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-shop-deploy-phone .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-shop-deploy-phone .sub,#dg-shop-deploy-phone .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-shop-deploy-phone .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-shop-deploy-phone .u-ln{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-shop-deploy-phone .u-bold{stroke-width:2.5}
+#dg-shop-deploy-phone .u-dash{stroke-dasharray:6 4;stroke-linecap:butt}
+#dg-shop-deploy-phone .u-face{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linejoin:round}
+#dg-shop-deploy-phone .u-ink{fill:var(--text,#1c1f2e)}
+#dg-shop-deploy-phone .u-name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-shop-deploy-phone .leg .line{stroke-width:1.5}
+#dg-shop-deploy-phone .leg.is-reply .line{stroke-dasharray:6 4;stroke-linecap:butt}
+#dg-shop-deploy-phone .ohead{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.js #dg-shop-deploy-phone .leg.is-current .ohead{stroke:var(--primary,#2f3fd0)}
+#dg-shop-deploy-phone .u-bar{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-shop-deploy-phone .u-frame{fill:none;stroke:var(--muted,#575d75);stroke-width:1}
+#dg-shop-deploy-phone .u-frame.is-filled{fill:var(--bg,#fbfbfe)}
+#dg-shop-deploy-phone .u-div{stroke:var(--muted,#575d75);stroke-width:1;stroke-dasharray:6 4}
+#dg-shop-deploy-phone .u-op{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-shop-deploy-phone .u-mem{font-size:12px;fill:var(--text,#1c1f2e)}
+#dg-shop-deploy-phone .u-it{font-style:italic}
+#dg-shop-deploy-phone .u-ul{text-decoration:underline}
+@media (prefers-reduced-motion:reduce){#dg-shop-deploy-phone .pulse{animation:none!important}#dg-shop-deploy-phone .pulse{display:none!important}}
+@media print{#dg-shop-deploy-phone{max-width:100%;height:auto}#dg-shop-deploy-phone .pulse{display:none!important}}
+@media (max-width:1212px){#dg-shop-deploy{display:none}#dg-shop-deploy-phone{display:block}}
+</style>
+<rect width="264" height="754" class="ground"/>
+<rect x="8" y="288" width="248" height="192" rx="10" class="band"/>
+<text x="20" y="306" class="sub" text-anchor="start">inside App server</text>
+<polygon points="58,18 68,8 190,8 180,18" class="u-face"/><polygon points="180,18 190,8 190,78 180,88" class="u-face"/><rect x="58" y="18" width="122" height="70" class="u-face"/><text x="119" y="36" class="u-mem" text-anchor="middle">«device»</text><text x="119" y="56" class="name" text-anchor="middle">Phone</text><path d="M70,67 L78,67 L82,71 L82,83 L70,83 Z M78,67 L78,71 L82,71" class="u-face"/><text x="90" y="79" class="u-mem">shop.apk</text>
+<polyline points="32,107 80,107" class="u-ln"/>
+<text x="92" y="111" class="verb" text-anchor="start">HTTPS</text>
+<text x="92" y="129" class="name" text-anchor="start">App server</text>
+<polygon points="58,170 68,160 190,160 180,170" class="u-face"/><polygon points="180,170 190,160 190,206 180,216" class="u-face"/><rect x="58" y="170" width="122" height="46" class="u-face"/><text x="119" y="188" class="u-mem" text-anchor="middle">«device»</text><text x="119" y="208" class="name" text-anchor="middle">App server</text>
+<polyline points="32,235 80,235" class="u-ln"/>
+<text x="92" y="239" class="verb" text-anchor="start">HTTPS</text>
+<text x="92" y="257" class="name" text-anchor="start">Phone</text>
+<polygon points="32,330 42,320 216,320 206,330" class="u-face"/><polygon points="206,330 216,320 216,390 206,400" class="u-face"/><rect x="32" y="330" width="174" height="70" class="u-face"/><text x="119" y="348" class="u-mem" text-anchor="middle">«executionEnvironment»</text><text x="119" y="368" class="name" text-anchor="middle">JVM</text><path d="M44,379 L52,379 L56,383 L56,395 L44,395 Z M52,379 L52,383 L56,383" class="u-face"/><text x="64" y="391" class="u-mem">shop.jar</text>
+<polyline points="32,419 80,419" class="u-ln"/>
+<text x="92" y="423" class="verb" text-anchor="start">JDBC</text>
+<text x="92" y="441" class="name" text-anchor="start">Database server</text>
+<polygon points="47.5,502 57.5,492 200.5,492 190.5,502" class="u-face"/><polygon points="190.5,502 200.5,492 200.5,562 190.5,572" class="u-face"/><rect x="47.5" y="502" width="143" height="70" class="u-face"/><text x="119" y="520" class="u-mem" text-anchor="middle">«device»</text><text x="119" y="540" class="name" text-anchor="middle">Database server</text><path d="M59.5,551 L67.5,551 L71.5,555 L71.5,567 L59.5,567 Z M67.5,551 L67.5,555 L71.5,555" class="u-face"/><text x="79.5" y="563" class="u-mem">schema.sql</text>
+<polyline points="32,591 80,591" class="u-ln"/>
+<text x="92" y="595" class="verb" text-anchor="start">JDBC</text>
+<text x="92" y="613" class="name" text-anchor="start">JVM</text>
+<rect x="48" y="644" width="152" height="50" class="u-face"/><rect x="179" y="652" width="13" height="16" class="u-face"/><rect x="176" y="655" width="7" height="3" class="u-face"/><rect x="176" y="662" width="7" height="3" class="u-face"/><text x="124" y="662" class="u-mem" text-anchor="middle">«component»</text><text x="124" y="682" class="name" text-anchor="middle">Mobile app</text>
+<polyline points="32,713 80,713" class="u-ln u-dash"/><polyline points="72,717.5 80,713 72,708.5" class="u-ln"/>
+<text x="92" y="717" class="verb" text-anchor="start">made real by</text>
+<text x="92" y="735" class="name" text-anchor="start">shop.apk</text>
+</svg>
+<details class="dg-words">
+<summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>The diagram in words</summary>
+<ul><li>The device Phone, runs shop.apk.</li><li>The device App server.</li><li>The execution environment JVM, inside App server, runs shop.jar.</li><li>The device Database server, runs schema.sql.</li></ul>
+<ul><li>Phone talks to App server over HTTPS.</li><li>JVM talks to Database server over JDBC.</li><li>The artifact shop.apk makes the component Mobile app real.</li></ul>
+<p>Key to the marks:</p>
+<ul><li>A 3D box: a node, a computer or a runtime, marked «device» or «executionEnvironment».</li><li>A box marked «artifact», with the page icon: a file, such as a program, that runs on a node.</li><li>A solid line between nodes: a communication path, with its protocol when known.</li><li>A box marked «component», with the component icon: a part of the system that can be replaced as a whole.</li><li>A dashed line marked «manifest»: the artifact makes the component real.</li></ul>
+</details>

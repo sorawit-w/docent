@@ -19,10 +19,10 @@ function sheet() {
     out.push(line([c, d], { end: kind, dashed: true }) + end(kind, d, c));
   });
   // Row 2: the nodes.
-  const row = 184;
+  const row = 208;
   out.push(nodes.initial([24, row]), nodes.final([64, row]), nodes.flowFinal([104, row]), nodes.decision([152, row]), nodes.junction([192, row]), nodes.history([224, row]), nodes.history([260, row], true), nodes.bar([316, row], 48), nodes.bar([360, row], 32, true), nodes.cross([392, row]));
   // Row 3: the shapes.
-  const top = 220;
+  const top = 244;
   out.push(
     shapes.rounded({ x: 16, y: top, w: 72, h: 36 }),
     shapes.compartments({ x: 104, y: top, w: 72, h: 60 }, [top + 20, top + 40]),
@@ -36,7 +36,7 @@ function sheet() {
   );
   // Row 4: the signs.
   out.push(signs.actor(272, top + 72), signs.component(304, top + 76), signs.artifact(336, top + 76), signs.port([368, top + 92]), signs.lollipop([400, top + 92], [1, 0]), signs.socket([472, top + 92], [1, 0]));
-  const w = 576, h = 360;
+  const w = 576, h = 384;
   return `<svg id="${id}" xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" role="img" aria-label="Every UML mark">\n<style>\n${styles(id)}\n</style>\n<rect width="${w}" height="${h}" fill="var(--fig,#f2f3f9)"/>\n${out.join("\n")}\n</svg>\n`;
 }
 
@@ -62,6 +62,7 @@ test("a UML line stops where its end mark starts, so it never shows inside a hol
   assert.equal(at("filled"), 94, "a filled head covers the line's end");
   assert.equal(at("hollow"), 88, "the line stops at the base of a hollow triangle");
   assert.equal(at("diamond"), 84, "the line stops at the back corner of a diamond");
+  assert.equal(at("socket"), 96, "the line stops at the middle of a socket's cup");
   assert.match(uml.line([a, b], { dashed: true }), /class="u-ln u-dash"/);
   assert.match(uml.end("diamond-filled", b, a), /class="u-face u-ink"/, "a filled diamond keeps the outline of a hollow one");
 });
@@ -87,7 +88,7 @@ test("the key names only the marks a drawing uses, in plain sentences", () => {
 
 test("a UML drawing takes every color from the page tokens, and ultramarine only for the current message and the dot", () => {
   const { renderDiagram } = require("../skills/docent/scripts/lib/diagram.cjs");
-  for (const name of ["sequence", "sequence-uml", "activity", "state", "interaction-overview", "timing", "usecase", "class", "object", "package", "profile"]) {
+  for (const name of ["sequence", "sequence-uml", "activity", "state", "interaction-overview", "timing", "usecase", "class", "object", "package", "profile", "component", "composite", "deployment"]) {
     const data = JSON.parse(fs.readFileSync(path.join(__dirname, "fixtures", `${name}.json`), "utf8"));
     const svg = renderDiagram(data).svg;
     const bare = svg.replace(/var\(--[a-z]+,#[0-9a-f]{6}\)/g, "");

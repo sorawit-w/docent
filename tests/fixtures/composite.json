@@ -1,0 +1,17 @@
+{
+  "id": "car-inside",
+  "kind": "composite",
+  "label": "The inside of a car: the engine drives the rear axle, and the fuel port feeds the engine.",
+  "classifier": "Car",
+  "parts": [
+    { "id": "engine", "name": "e", "type": "Engine", "multiplicity": "1" },
+    { "id": "rear", "name": "rear", "type": "Axle", "multiplicity": "1" },
+    { "id": "wheels", "name": "w", "type": "Wheel", "multiplicity": "4" }
+  ],
+  "ports": [{ "id": "fuel", "name": "fuel" }],
+  "connectors": [
+    { "from": "engine", "to": "rear", "label": "drives" },
+    { "from": "rear", "to": "wheels" },
+    { "from": "fuel", "to": "engine" }
+  ]
+}

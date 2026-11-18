@@ -1,0 +1,56 @@
+<svg id="dg-car-inside" class="dg dg-composite dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="432" viewBox="0 0 264 432" role="img" aria-label="The inside of a car: the engine drives the rear axle, and the fuel port feeds the engine.">
+<style>
+#dg-car-inside{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-car-inside .ground{fill:var(--fig,#f2f3f9)}
+#dg-car-inside .band{fill:var(--bg,#fbfbfe)}
+#dg-car-inside .track{stroke:var(--line,#d3d6e3)}
+#dg-car-inside .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-car-inside .head{fill:var(--text,#1c1f2e)}
+#dg-car-inside .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-car-inside .stop.end{fill:var(--text,#1c1f2e)}
+#dg-car-inside .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-car-inside .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-car-inside .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-car-inside .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-car-inside .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-car-inside .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-car-inside .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-car-inside .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-car-inside .sub,#dg-car-inside .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-car-inside .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-car-inside .u-ln{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-car-inside .u-bold{stroke-width:2.5}
+#dg-car-inside .u-dash{stroke-dasharray:6 4;stroke-linecap:butt}
+#dg-car-inside .u-face{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linejoin:round}
+#dg-car-inside .u-ink{fill:var(--text,#1c1f2e)}
+#dg-car-inside .u-name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-car-inside .leg .line{stroke-width:1.5}
+#dg-car-inside .leg.is-reply .line{stroke-dasharray:6 4;stroke-linecap:butt}
+#dg-car-inside .ohead{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.js #dg-car-inside .leg.is-current .ohead{stroke:var(--primary,#2f3fd0)}
+#dg-car-inside .u-bar{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-car-inside .u-frame{fill:none;stroke:var(--muted,#575d75);stroke-width:1}
+#dg-car-inside .u-frame.is-filled{fill:var(--bg,#fbfbfe)}
+#dg-car-inside .u-div{stroke:var(--muted,#575d75);stroke-width:1;stroke-dasharray:6 4}
+#dg-car-inside .u-op{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e)}
+@media (prefers-reduced-motion:reduce){#dg-car-inside .pulse{animation:none!important}#dg-car-inside .pulse{display:none!important}}
+@media print{#dg-car-inside{max-width:100%;height:auto}#dg-car-inside .pulse{display:none!important}}
+</style>
+<rect width="264" height="432" class="ground"/>
+<rect x="36" y="36" width="192" height="360" class="u-face"/>
+<text x="48" y="58" class="name" text-anchor="start">Car</text>
+<g class="leg" data-leg="1"><polyline points="132,129 132,207" class="u-ln"/><text x="140" y="172" class="verb" text-anchor="start">drives</text></g>
+<g class="leg" data-leg="2"><polyline points="132,249 132,327" class="u-ln"/></g>
+<g class="leg" data-leg="3"><polyline points="132,36 132,87" class="u-ln"/><rect x="127" y="31" width="10" height="10" class="u-face"/><text x="140" y="60" class="verb" text-anchor="start">fuel</text></g>
+<rect x="66.5" y="87" width="131" height="42" class="u-face"/><text x="132" y="113" class="name" text-anchor="middle">e : Engine [1]</text>
+<rect x="64.5" y="207" width="135" height="42" class="u-face"/><text x="132" y="233" class="name" text-anchor="middle">rear : Axle [1]</text>
+<rect x="66.5" y="327" width="131" height="42" class="u-face"/><text x="132" y="353" class="name" text-anchor="middle">w : Wheel [4]</text>
+</svg>
+<details class="dg-words">
+<summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>The diagram in words</summary>
+<p>The inside of Car.</p>
+<ul><li>The part e, of type Engine, 1 of them.</li><li>The part rear, of type Axle, 1 of them.</li><li>The part w, of type Wheel, 4 of them.</li></ul>
+<ul><li>e connects to rear: drives.</li><li>rear connects to w.</li><li>The port fuel on Car connects to e.</li></ul>
+<p>Key to the marks:</p>
+<ul><li>The frame: the class whose inside the diagram shows.</li><li>A box named role : Type: a part, the role a thing of that type plays inside the class.</li><li>A small square on a border: a port, the point where the thing connects to the outside.</li><li>A solid line: the two connect, so they can talk to each other.</li></ul>
+</details>

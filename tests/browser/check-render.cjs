@@ -471,8 +471,9 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     ok("a flowchart shows two columns on a desktop, the column form on a phone and on paper, and its steps in words on paper", desk.main > 600 && !desk.column && desk.dots === 7 && !desk.words && !phone.main && phone.column === 264 && narrow.column === 264 && !paper.main && paper.column > 0 && paper.words && [phone, narrow].every((r) => r.page === r.view) && results.axe.length === 0, results);
   }
 
-  // The UML graph kinds: the drawing on a desktop, the column on a phone, and the words with the key on paper.
-  for (const name of ["activity", "state", "interaction-overview", "timing", "usecase", "class", "object", "package", "profile"]) {
+  // The UML graph kinds: the drawing on a desktop, the column on a phone (or the drawing itself, when it fits a phone),
+  // and the words with the key on paper.
+  for (const name of ["activity", "state", "interaction-overview", "timing", "usecase", "class", "object", "package", "profile", "component", "composite", "deployment"]) {
     const data = fs.readFileSync(path.join(root, "tests", "fixtures", `${name}.json`), "utf8");
     const did = `dg-${JSON.parse(data).id}`;
     const content = renderDocument(html.replace('<section id="report"', `<section id="uml" aria-labelledby="uml-h"><h2 id="uml-h">UML</h2><figure><div class="fig" role="region" aria-label="Figure 8, ${name}" tabindex="0">\n<!-- docent:diagram\n${data}\n-->\n<!-- /docent:diagram -->\n</div><figcaption><strong>Figure 8</strong>A UML ${name} diagram.</figcaption></figure></section>\n<section id="report"`)).html;
@@ -489,7 +490,7 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
       await view.context.close();
     }
     const { desk, phone, narrow, paper } = results;
-    ok(`a UML ${name} diagram shows its drawing on a desktop, its column on a phone, and its words with a key on paper, in both themes with no contrast problem`, desk.main > 264 && !desk.column && !desk.words && !phone.main && phone.column === 264 && narrow.column === 264 && paper.words && paper.key > 0 && [phone, narrow].every((r) => r.page === r.view) && results.deskAxe.length === 0 && results.darkAxe.length === 0, results);
+    ok(`a UML ${name} diagram shows its drawing on a desktop, its column on a phone, and its words with a key on paper, in both themes with no contrast problem`, desk.main > 0 && !desk.column && !desk.words && (desk.main <= 264 ? [phone, narrow].every((r) => r.main === desk.main && !r.column) : !phone.main && phone.column === 264 && narrow.column === 264) && paper.words && paper.key > 0 && [phone, narrow].every((r) => r.page === r.view) && results.deskAxe.length === 0 && results.darkAxe.length === 0, results);
   }
 
   // Two drawings in one figure: side by side when both fit, one below the other when they do not.

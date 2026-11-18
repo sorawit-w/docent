@@ -224,13 +224,13 @@ function draw(g, k) {
   const bus = new Map(); // bus name -> the lattice points of its lines so far, where a later line of the bus may branch off
 
   /** The ports of an end: on the lattice, on the border of the node's room (or of the group's frame). */
-  function ports(end, toward, isEnd, edge) {
+  function ports(end, toward, isEnd, edge, inner) {
     const out = [];
     const r = end.group != null ? rects[end.group] : placed[end.node];
     const node = end.group != null ? null : placed[end.node];
     const sides = node && node.ports === "tb" ? ["top", "bottom"] : node && node.ports === "lr" ? ["left", "right"] : ["top", "bottom", "left", "right"];
     for (const side of sides) {
-      const d = SIDE[side];
+      const d = inner ? (SIDE[side] + 2) % 4 : SIDE[side]; // a line to a node inside the frame leaves the frame inward
       const horiz = side === "top" || side === "bottom";
       const lo = horiz ? r.x0 : r.y0, hi = horiz ? r.x1 : r.y1, mid = node ? (horiz ? node.cx : node.cy) : (lo + hi) / 2;
       const offs = node && node.ports === "mid" ? [0] : [0, 1, -1, 2, -2, 3, -3, 4, -4, 5, -5, 6, -6].map((s) => s * 2 * U); // 24px apart, so two arrowheads never touch
@@ -242,12 +242,13 @@ function draw(g, k) {
         if (end.group != null && horiz && dividers[lead[end.group]].some((dx) => Math.abs(a - dx) < 2 * U)) continue; // never on a region's dashed line
         const pt = horiz ? [a, side === "top" ? r.y0 : r.y1] : [side === "left" ? r.x0 : r.x1, a];
         // A frame with a tab (a package) starts its body below the tab, so a line from above meets the body.
-        const vis = node ? hit(node, side, horiz ? a - node.cx : a - node.cy) : side === "top" && groups[end.group].tab ? [pt[0], pt[1] + groups[end.group].tab] : pt;
+        const vis = node ? hit(node, side, horiz ? a - node.cx : a - node.cy) : side === "top" && groups[end.group].tab && !inner ? [pt[0], pt[1] + groups[end.group].tab] : pt;
+        if (inner && side === "top" && groups[end.group].tab) continue; // inside, the top of a tabbed frame holds its name
         const gap = dist(pt, vis);
         const need = isEnd && edge.end ? uml.END[edge.end].len + 28 + 1 : 0;
         const L = Math.max(U, up(need - gap));
         // The side that faces the other end costs nothing; the sides across cost a little; the far side costs more.
-        const want = toward[d];
+        const want = inner ? Math.hypot(pt[0] - inner.cx, pt[1] - inner.cy) / 4 : toward[d];
         out.push({ side, d, pt, vis, L, pen: want + Math.abs(a - mid) * 1.2 });
       }
     }
@@ -281,7 +282,9 @@ function draw(g, k) {
 
   function route(e, isBack) {
     const A = endOf(e.a), B = endOf(e.b), ca = center(A), cb = center(B);
-    const starts = ports(A, facing(ca, cb, isBack), false, e).map((p) => ({ p, s: stem(p) })).filter((x) => x.s);
+    // A line between a frame and a node inside it stays inside the frame.
+    const within = (F, N) => F.group != null && N.node != null && nodes[N.node].group != null && lead[nodes[N.node].group] === lead[F.group];
+    const starts = ports(A, facing(ca, cb, isBack), false, e, within(A, B) && cb).map((p) => ({ p, s: stem(p) })).filter((x) => x.s);
     // A line of a bus may also start on a straight run of an earlier line of the same bus, at a right angle to it.
     for (const [i, j] of (e.bus && bus.get(e.bus)) || []) {
       const p = P(i, j), u = use[p];
@@ -289,7 +292,7 @@ function draw(g, k) {
       for (const d of [0, 2]) starts.push({ p: { d, pt: [i * U, j * U], vis: [i * U, j * U], L: 0, pen: 0, branch: true }, s: [[i, j]] });
     }
     const goals = new Map();
-    for (const p of ports(B, isBack ? facing(cb, ca, true) : facing(cb, ca, false), true, e)) {
+    for (const p of ports(B, isBack ? facing(cb, ca, true) : facing(cb, ca, false), true, e, within(B, A) && ca)) {
       const s = stem(p);
       if (!s) continue;
       const [i, j] = s[s.length - 1];
@@ -409,6 +412,7 @@ function draw(g, k) {
         const len = dist(a, b);
         if (len < 1) continue;
         const fr = lb.at === "end" ? [0.75, 0.5, 0.9, 0.3, 0.1] : lb.at === "start" ? [0.25, 0.5, 0.1, 0.7, 0.9] : [0.5, 0.3, 0.7, 0.15, 0.85];
+        if (lb.near && len > 40) fr.unshift(lb.at === "end" ? 1 - 20 / len : 20 / len); // a port's name: next to its square
         for (const f of fr) {
           const m = [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f];
           const tries = a[0] === b[0]
@@ -483,12 +487,14 @@ function checkGraph(out, edges) {
 /**
  * Lays out a graph and returns a scene that toSvg draws.
  * g.nodes: [{ id, w, h, group?, rank?, col?, ports?: "mid" | "tb" | "lr", round?, hit?, draw(cx, cy) -> { svg, texts } }]
- * g.edges: [{ from, to, end?, dashed?, labels?: [{ s, at?: "start" | "mid" | "end", cls? }], still?, len?, up?, first? }]
+ * g.edges: [{ from, to, end?, dashed?, labels?: [{ s, at?: "start" | "mid" | "end", cls?, near? }], still?, len?, up?, firsfirst?, port?: "start" | "end" | "both" }]
+ *   port: a small square where the line meets the border of its node or frame (a port of a component or a part).
  *   from and to are node ids, or group ids for a line to a whole frame. up: the line points up, so in the rows its
  *   end comes first (a generalization, a composition). first: route this line before the others (the main path).
  *   step: the place of a moving line on the main path, so the dot travels the lines in that order.
  *   bus: lines with the same bus name may branch off one another, as a comb (the associations of one actor).
- * g.groups: [{ id, name, kind: "lane" | "box" | "free", tab?, draw?(rect) -> { svg, texts } }]. A free group only owns its
+ * g.groups: [{ id, name, kind: "lane" | "box" | "free", tab?, nameExtra?, draw?(rect) -> { svg, texts } }]. nameExtra: room
+ *   after the name, in px, that no line crosses (for an icon). A free group only owns its
  *   columns. tab: the height of a tab at the top of a box frame (a package), where its body starts.
  * When every node has both rank and col, the nodes stay where they are given.
  */
@@ -496,7 +502,7 @@ function layoutGraph(g, form) {
   const idx = new Map(g.nodes.map((v, i) => [v.id, i]));
   const gidx = new Map((g.groups || []).map((gr, i) => [gr.id, i]));
   const at = (id) => (idx.has(id) ? idx.get(id) : gidx.has(id) ? -gidx.get(id) - 1 : -Infinity);
-  const groups = (g.groups || []).map((gr) => ({ ...gr, nameW: gr.name ? textBox({ x: 0, y: 0, s: gr.name, cls: gr.kind === "lane" ? "lane" : "name" }).x1 : 0 }));
+  const groups = (g.groups || []).map((gr) => ({ ...gr, nameW: (gr.name ? textBox({ x: 0, y: 0, s: gr.name, cls: gr.kind === "lane" ? "lane" : "name" }).x1 : 0) + (gr.nameExtra || 0) }));
   const nodes = g.nodes.map((v) => ({ ...v, group: v.group == null ? undefined : gidx.get(v.group) }));
   const edges = g.edges.map((e) => ({ ...e, labels: e.labels || [], a: at(e.from), b: at(e.to) }));
   // In the rows, a line to a group counts as a line to its first node; a line that points up counts the other way round.
@@ -561,7 +567,7 @@ function scene(out, nodes, edges, groups, form) {
   const order = edges.map((e, n) => n).sort((p, q) => (edges[p].still ? 1 : 0) - (edges[q].still ? 1 : 0) || (edges[p].step ?? p) - (edges[q].step ?? q) || p - q); // the moving lines in the order of the main path
   for (const n of order) {
     const e = edges[n];
-    s.legs.push({ n: n + 1, from: e.from, to: e.to, pts: out.legs[n], still: Boolean(e.still), u: { end: e.end || null, dashed: Boolean(e.dashed) }, texts: out.labels[n], verb: { s: "" }, mark: out.legs[n][0] });
+    s.legs.push({ n: n + 1, from: e.from, to: e.to, pts: out.legs[n], still: Boolean(e.still), u: { end: e.end || null, dashed: Boolean(e.dashed), ...(e.port ? { port: e.port } : {}) }, texts: out.labels[n], verb: { s: "" }, mark: out.legs[n][0] });
   }
   return s;
 }

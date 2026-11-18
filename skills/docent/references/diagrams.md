@@ -582,6 +582,117 @@ A profile diagram shows how a team extends UML for its own models: the stereotyp
 - The renderer draws the profile as a frame with stereotype boxes marked «stereotype», metaclass boxes marked «metaclass» above them, extensions as solid lines with a filled triangle, and «apply» as a dashed line from each package that uses the profile.
 - Nothing moves in a package or a profile diagram: there is no dot and no walkthrough.
 
+## Component diagrams
+
+A component diagram shows the replaceable parts of a system and the services, the interfaces, that they offer and need. Write it with `"kind": "component"`:
+
+```json
+{
+  "id": "shop-parts",
+  "kind": "component",
+  "label": "The parts of the shop: the web shop needs the order service, which the back end offers through Orders.",
+  "components": [
+    { "id": "web", "name": "Web shop" },
+    { "id": "backend", "name": "Back end" },
+    { "id": "orders", "name": "Orders", "in": "backend" },
+    { "id": "stock", "name": "Stock", "in": "backend" },
+    { "id": "pay", "name": "Payments" }
+  ],
+  "interfaces": [
+    { "id": "order-api", "name": "OrderAPI", "provider": "backend", "users": ["web"], "port": "api" },
+    { "id": "stock-check", "name": "StockCheck", "provider": "stock", "users": ["orders"] },
+    { "id": "charge", "name": "Charge", "provider": "pay", "users": ["orders"] }
+  ],
+  "delegations": [{ "from": "backend", "to": "orders", "port": "api" }],
+  "dependencies": [{ "from": "web", "to": "pay" }]
+}
+```
+
+| Field | What it is |
+|---|---|
+| `components` | 1 to 12, each with an `id` and a `name` (at most 28 characters). A component may sit `in` another one; components nest one level deep. |
+| `interfaces` | Optional, at most 16, each with an `id`, a `name`, the `provider` (the component that offers it) and the `users` (up to 3 components that need it). It needs at least one of the two. `port` names the port on the provider where the interface is offered. |
+| `delegations` | Optional: `from` an outer component `to` a component inside it, which does the outer component's work. `port` names the port on the outer component. |
+| `dependencies` | Optional: `from` one component `to` another that it needs, without a named interface. |
+
+- The renderer draws each component as a box marked «component», with the component icon. An interface is a ball on a line from its provider; each user holds the ball in a socket, a half circle, so a provider and a user meet as ball and socket. A port is a small square where its line meets the component. A component that holds components is a frame around them.
+- A dependency is a dashed line with an open arrowhead; a delegation is a line marked «delegate» from a port on the frame to the part inside.
+- On a phone the diagram becomes a list of components, with a row for each interface it offers or needs.
+
+## Composite structure diagrams
+
+A composite structure diagram shows the inside of one class: the parts it is made of, how they connect, and its ports to the outside. Write it with `"kind": "composite"`:
+
+```json
+{
+  "id": "car-inside",
+  "kind": "composite",
+  "label": "The inside of a car: the engine drives the rear axle, and the fuel port feeds the engine.",
+  "classifier": "Car",
+  "parts": [
+    { "id": "engine", "name": "e", "type": "Engine", "multiplicity": "1" },
+    { "id": "rear", "name": "rear", "type": "Axle", "multiplicity": "1" },
+    { "id": "wheels", "name": "w", "type": "Wheel", "multiplicity": "4" }
+  ],
+  "ports": [{ "id": "fuel", "name": "fuel" }],
+  "connectors": [
+    { "from": "engine", "to": "rear", "label": "drives" },
+    { "from": "rear", "to": "wheels" },
+    { "from": "fuel", "to": "engine" }
+  ]
+}
+```
+
+| Field | What it is |
+|---|---|
+| `classifier` | The name of the class whose inside the diagram shows. It is drawn as the frame. |
+| `parts` | 1 to 10, each with an `id`, a `name` (its role), a `type`, and an optional UML `multiplicity`, such as `"4"` or `"0..1"`. A part is drawn as a box named `role : Type [multiplicity]`. |
+| `ports` | Optional, at most 8, each with an `id` and a `name`. Each port needs a connector to a part. |
+| `connectors` | At most 24, each joining two parts, or a port and a part, with an optional `label`. |
+
+- The renderer draws a port as a small square on the frame, with its name beside it, and a connector as a solid line.
+- Collaborations, the dashed ovals, are not drawn.
+
+## Deployment diagrams
+
+A deployment diagram shows where the software runs: the machines and runtimes, the files deployed on them, and how they talk. Write it with `"kind": "deployment"`:
+
+```json
+{
+  "id": "shop-deploy",
+  "kind": "deployment",
+  "label": "Where the shop runs: a phone talks to the app server over HTTPS, and the server talks to the database.",
+  "nodes": [
+    { "id": "phone", "name": "Phone", "type": "device" },
+    { "id": "server", "name": "App server", "type": "device" },
+    { "id": "jvm", "name": "JVM", "type": "executionEnvironment", "in": "server" },
+    { "id": "db", "name": "Database server", "type": "device" }
+  ],
+  "artifacts": [
+    { "id": "app-apk", "name": "shop.apk", "in": "phone" },
+    { "id": "shop-jar", "name": "shop.jar", "in": "jvm" },
+    { "id": "schema", "name": "schema.sql", "in": "db" }
+  ],
+  "components": [{ "id": "mobile", "name": "Mobile app" }],
+  "manifests": [{ "artifact": "app-apk", "component": "mobile" }],
+  "paths": [
+    { "from": "phone", "to": "server", "protocol": "HTTPS" },
+    { "from": "jvm", "to": "db", "protocol": "JDBC" }
+  ]
+}
+```
+
+| Field | What it is |
+|---|---|
+| `nodes` | 1 to 10, each with an `id`, a `name` and a `type`: `device` (the default), `executionEnvironment` or `node`. A node may sit `in` another node, one level deep. |
+| `artifacts` | Optional, at most 16, each with an `id`, a `name` and the node it is deployed on (`in`). |
+| `components` | Optional: components that an artifact makes real. Each one needs a line in `manifests`. |
+| `manifests` | Each joins an `artifact` to a `component`, drawn as a dashed line marked «manifest». |
+| `paths` | Optional: communication paths `from` one node `to` another, with an optional `protocol`, such as `"HTTPS"`. |
+
+- The renderer draws each node as a 3D box marked with its type. A node at the top that holds nodes or artifacts is a frame around them; a node inside a node lists its artifacts by name, each with the page icon. An artifact inside a node shows that it is deployed there, so no «deploy» arrow is drawn.
+- Nothing moves in a component, composite structure or deployment diagram: there is no dot and no walkthrough.
+
 ## Optional legs
 
 A leg with `"optional": true` is a path that only some readers take, or that happens only in some cases. It is drawn as a dashed arrow:
