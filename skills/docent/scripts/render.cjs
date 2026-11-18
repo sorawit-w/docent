@@ -33,7 +33,7 @@ function main(args) {
   let failed = 0;
   for (const file of args) {
     const before = fs.readFileSync(file, "utf8");
-    const { html, results, widgets } = renderDocument(before);
+    const { html, results, widgets, places } = renderDocument(before);
     if (!results.length && !widgets.length) console.log(`render ${file}: no diagram blocks and no widget blocks`);
     for (const [list, what, made] of [[results, "diagram", "drawn"], [widgets, "widget", "built"]]) {
       list.forEach((r, i) => {
@@ -42,6 +42,9 @@ function main(args) {
         if (r.error) { failed += 1; console.error(`render ${file}: ${name}: ${r.error}`); } else console.log(`render ${file}: ${name} ${made} as ${r.form}`);
       });
     }
+    for (const key of places.clash) { failed += 1; console.error(`render ${file}: two value pickers have the key "${key}"; each key belongs to one value picker`); }
+    for (const key of places.unknown) { failed += 1; console.error(`render ${file}: a place <var data-v="${key}"> names a value that no value picker has; add "${key}" to the values of a value picker, or fix the key`); }
+    if (places.count) console.log(`render ${file}: ${places.count} place${places.count === 1 ? "" : "s"} filled with a value`);
     if (html !== before) fs.writeFileSync(file, html);
   }
   return failed ? 1 : 0;

@@ -3,12 +3,12 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
-const { renderWidget } = require("../skills/docent/scripts/lib/widget.cjs");
+const { renderWidget, fillPlaces } = require("../skills/docent/scripts/lib/widget.cjs");
 const { renderDocument } = require("../skills/docent/scripts/lib/diagram.cjs");
 
 const fixture = (name) => JSON.parse(fs.readFileSync(path.join(__dirname, "fixtures", `widget-${name}.json`), "utf8"));
 
-for (const kind of ["chooser", "checklist", "decision"]) {
+for (const kind of ["chooser", "checklist", "decision", "values"]) {
   test(`a ${kind} matches the stored markup`, () => {
     const built = renderWidget(fixture(kind));
     assert.equal(built.kind, kind);
@@ -48,7 +48,7 @@ test("a widget holds text only: every text is escaped, and `code` marks code", (
 
 test("wrong widget data is refused with a plain reason", () => {
   const broken = (name, change, reason) => { const copy = fixture(name); change(copy); assert.throws(() => renderWidget(copy), reason); };
-  broken("chooser", (d) => (d.kind = "slider"), /"kind" must be "chooser", "checklist" or "decision"/);
+  broken("chooser", (d) => (d.kind = "slider"), /"kind" must be "chooser", "checklist", "decision" or "values"/);
   broken("chooser", (d) => (d.id = "Bad Id"), /"id" must be a short id/);
   broken("chooser", (d) => delete d.label, /"label" is missing/);
   broken("chooser", (d) => (d.cases.length = 1), /"cases" must have 2 to 5 entries; it has 1/);
@@ -89,7 +89,35 @@ test("render builds every widget block of a document in place, and gives the sam
 test("the examples in references/widgets.md are built without an error", () => {
   const guide = fs.readFileSync(path.join(__dirname, "..", "skills", "docent", "references", "widgets.md"), "utf8");
   const pages = [...guide.matchAll(/```html\n([\s\S]*?)```/g)].map((m) => m[1]);
-  assert.equal(pages.length, 3, "one example for each kind");
-  const kinds = pages.map((page) => { const { widgets } = renderDocument(page); assert.deepEqual(widgets.map((w) => w.error), [null]); return widgets[0].form; });
-  assert.deepEqual(kinds, ["chooser", "checklist", "decision"]);
+  assert.equal(pages.length, 4, "one example for each kind");
+  const kinds = pages.map((page) => { const { widgets, places } = renderDocument(page); assert.deepEqual(widgets.map((w) => w.error), [null]); assert.deepEqual(places.unknown, []); return widgets[0].form; });
+  assert.deepEqual(kinds, ["chooser", "values", "checklist", "decision"]);
+});
+
+test("a value picker: the table of all values is its still form, and render fills every place with the first value", () => {
+  const built = renderWidget(fixture("values"));
+  assert.deepEqual(built.defaults, { host: "dev.example.test", port: "8080" });
+  assert.equal(built.key, "Development|Staging|Production", "pickers with the same options change together");
+  assert.match(built.html, /<tr data-v="host"><th scope="row">Host name<\/th><td><code>dev\.example\.test<\/code><\/td>/);
+  assert.match(built.html, /<tr data-v="port"><th scope="row">port<\/th>/, "without a name, the key is the row heading");
+  assert.match(built.html, /The text shows the values for <strong>Development<\/strong>\./);
+  const doc = '<p>Open <var data-v="host"></var> on port <var class="x" data-v="port">old</var>, or <var data-v="nope">?</var>.</p><pre><code>ssh <var data-v="host">a</var></code></pre>';
+  const { html, unknown, count } = fillPlaces(doc, built.defaults);
+  assert.equal(count, 3);
+  assert.deepEqual(unknown, ["nope"]);
+  assert.match(html, /Open <var data-v="host">dev\.example\.test<\/var> on port <var class="x" data-v="port">8080<\/var>, or <var data-v="nope">\?<\/var>/);
+  assert.match(html, /<pre><code>ssh <var data-v="host">dev\.example\.test<\/var><\/code><\/pre>/, "a place inside a code block is filled too");
+  assert.equal(fillPlaces(html, built.defaults).html, html, "filling again changes nothing");
+  assert.equal(fillPlaces('<!-- write <var data-v="key"></var> --><var data-v="host"></var>', built.defaults).html, '<!-- write <var data-v="key"></var> --><var data-v="host">dev.example.test</var>', "a place inside a comment is left alone");
+  assert.equal(fillPlaces('<var data-v="host"><b>x</b></var>', { host: "a<b" }).html, '<var data-v="host">a&lt;b</var>', "a value is text only");
+});
+
+test("wrong value picker data is refused with a plain reason", () => {
+  const broken = (change, reason) => { const copy = fixture("values"); change(copy); assert.throws(() => renderWidget(copy), reason); };
+  broken((d) => (d.options.length = 1), /"options" must have 2 to 5 entries; it has 1/);
+  broken((d) => (d.values[0].values.length = 2), /"values" of value 1 \("host"\) must have one value for each of the 3 options/);
+  broken((d) => (d.values[1].key = "host"), /two values have the key "host"/);
+  broken((d) => (d.values[0].key = "Host"), /the key of value 1 must be a short id/);
+  broken((d) => (d.values[0].values[2] = "x".repeat(121)), /121 characters long; the most is 120/);
+  broken((d) => (d.values[0].html = "<b>"), /value 1 has the field "html"/);
 });
