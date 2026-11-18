@@ -1,0 +1,165 @@
+<svg id="dg-job" class="dg dg-flow dg-auto" xmlns="http://www.w3.org/2000/svg" width="780" height="1228" viewBox="0 0 780 1228" role="img" aria-label="A job is read, set up and run. A bad input stops it. A bad result is run again while tries are left; when none are left, a failure is reported.">
+<style>
+#dg-job{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-job .ground{fill:var(--fig,#f2f3f9)}
+#dg-job .band{fill:var(--bg,#fbfbfe)}
+#dg-job .track{stroke:var(--line,#d3d6e3)}
+#dg-job .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-job .head{fill:var(--text,#1c1f2e)}
+#dg-job .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-job .stop.end{fill:var(--text,#1c1f2e)}
+#dg-job .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-job .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-job .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-job .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-job .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-job .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-job .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-job .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-job .sub,#dg-job .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-job .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-job .card.is-stop{stroke:var(--text,#1c1f2e);stroke-width:2}
+.js #dg-job .pulse{display:block;animation:12.4s linear 2 both}
+.js #dg-job:not(.is-playing) .pulse{animation-play-state:paused}
+@keyframes dg-job-1{0%{transform:translate(190px,76px);opacity:0}0.97%{transform:translate(190px,76px);opacity:1}10.89%{transform:translate(190px,148px);opacity:1}12.9%{transform:translate(190px,148px);opacity:0}100%{transform:translate(190px,148px);opacity:0}}
+.js #dg-job .pulse-1{animation-name:dg-job-1}
+@keyframes dg-job-2{0%{transform:translate(190px,202px);opacity:0}12.9%{transform:translate(190px,202px);opacity:0}13.87%{transform:translate(190px,202px);opacity:1}23.79%{transform:translate(190px,274px);opacity:1}25.81%{transform:translate(190px,274px);opacity:0}100%{transform:translate(190px,274px);opacity:0}}
+.js #dg-job .pulse-2{animation-name:dg-job-2}
+@keyframes dg-job-3{0%{transform:translate(190px,328px);opacity:0}25.81%{transform:translate(190px,328px);opacity:0}26.77%{transform:translate(190px,328px);opacity:1}36.69%{transform:translate(190px,458px);opacity:1}38.71%{transform:translate(190px,458px);opacity:0}100%{transform:translate(190px,458px);opacity:0}}
+.js #dg-job .pulse-3{animation-name:dg-job-3}
+@keyframes dg-job-4{0%{transform:translate(190px,512px);opacity:0}38.71%{transform:translate(190px,512px);opacity:0}39.68%{transform:translate(190px,512px);opacity:1}49.6%{transform:translate(190px,584px);opacity:1}51.61%{transform:translate(190px,584px);opacity:0}100%{transform:translate(190px,584px);opacity:0}}
+.js #dg-job .pulse-4{animation-name:dg-job-4}
+@keyframes dg-job-5{0%{transform:translate(190px,638px);opacity:0}51.61%{transform:translate(190px,638px);opacity:0}52.58%{transform:translate(190px,638px);opacity:1}62.5%{transform:translate(190px,710px);opacity:1}64.52%{transform:translate(190px,710px);opacity:0}100%{transform:translate(190px,710px);opacity:0}}
+.js #dg-job .pulse-5{animation-name:dg-job-5}
+@keyframes dg-job-6{0%{transform:translate(190px,764px);opacity:0}64.52%{transform:translate(190px,764px);opacity:0}65.48%{transform:translate(190px,764px);opacity:1}75.4%{transform:translate(190px,1020px);opacity:1}77.42%{transform:translate(190px,1020px);opacity:0}100%{transform:translate(190px,1020px);opacity:0}}
+.js #dg-job .pulse-6{animation-name:dg-job-6}
+@keyframes dg-job-7{0%{transform:translate(190px,1074px);opacity:0}77.42%{transform:translate(190px,1074px);opacity:0}78.39%{transform:translate(190px,1074px);opacity:1}88.31%{transform:translate(190px,1146px);opacity:1}90.32%{transform:translate(190px,1146px);opacity:0}100%{transform:translate(190px,1146px);opacity:0}}
+.js #dg-job .pulse-7{animation-name:dg-job-7}
+@media (prefers-reduced-motion:reduce){#dg-job .pulse{animation:none!important}#dg-job .pulse{display:none!important}}
+@media print{#dg-job{max-width:100%;height:auto}#dg-job .pulse{display:none!important}}
+#dg-job-phone{display:none}
+</style>
+<rect width="780" height="1228" class="ground"/>
+<rect x="12" y="12" width="356" height="1204" rx="10" class="band"/>
+<rect x="412" y="12" width="356" height="1204" rx="10" class="band"/>
+
+
+<g class="leg" data-leg="1"><path d="M190,76 L190,142" class="line"/><polygon points="185.5,140 194.5,140 190,148" class="head"/><circle r="6" class="pulse pulse-1"/></g>
+<g class="leg" data-leg="2"><path d="M190,202 L190,268" class="line"/><polygon points="185.5,266 194.5,266 190,274" class="head"/><circle r="6" class="pulse pulse-2"/></g>
+<g class="leg" data-leg="3"><path d="M190,328 L190,452" class="line"/><polygon points="185.5,450 194.5,450 190,458" class="head"/><circle r="6" class="pulse pulse-3"/><text x="206" y="393" class="verb" text-anchor="start">yes</text></g>
+<g class="leg" data-leg="4"><path d="M190,512 L190,578" class="line"/><polygon points="185.5,576 194.5,576 190,584" class="head"/><circle r="6" class="pulse pulse-4"/></g>
+<g class="leg" data-leg="5"><path d="M190,638 L190,704" class="line"/><polygon points="185.5,702 194.5,702 190,710" class="head"/><circle r="6" class="pulse pulse-5"/></g>
+<g class="leg" data-leg="6"><path d="M190,764 L190,1014" class="line"/><polygon points="185.5,1012 194.5,1012 190,1020" class="head"/><circle r="6" class="pulse pulse-6"/><text x="206" y="892" class="verb" text-anchor="start">yes</text></g>
+<g class="leg" data-leg="7"><path d="M190,1074 L190,1140" class="line"/><polygon points="185.5,1138 194.5,1138 190,1146" class="head"/><circle r="6" class="pulse pulse-7"/></g>
+<g class="leg" data-leg="8"><path d="M310,328 L310,386 Q310,394 318,394 L432,394" class="line"/><polygon points="430,398.5 430,389.5 438,394" class="head"/><text x="390" y="375" class="verb" text-anchor="middle">no</text></g>
+<g class="leg" data-leg="9"><path d="M310,764 L310,822 Q310,830 318,830 L432,830" class="line"/><polygon points="430,834.5 430,825.5 438,830" class="head"/><text x="390" y="811" class="verb" text-anchor="middle">no</text></g>
+<g class="leg" data-leg="10"><path d="M470,804 L470,620 Q470,612 462,612 L348,612" class="line"/><polygon points="350,607.5 350,616.5 342,612" class="head"/><text x="390" y="593" class="verb" text-anchor="middle">yes</text></g>
+<g class="leg" data-leg="11"><path d="M590,856 L590,922" class="line"/><polygon points="585.5,920 594.5,920 590,928" class="head"/><text x="606" y="892" class="verb" text-anchor="start">no</text></g>
+<rect x="40" y="24" width="300" height="52" rx="10" class="card"/>
+<text x="58" y="55" class="name" text-anchor="start">Get the job</text>
+<rect x="40" y="150" width="300" height="52" rx="10" class="card"/>
+<text x="58" y="181" class="name" text-anchor="start">Read the input</text>
+<path d="M48,276 L332,276 L340,302 L332,328 L48,328 L40,302 Z" class="card"/>
+<text x="58" y="307" class="name" text-anchor="start">Input valid?</text>
+<rect x="40" y="460" width="300" height="52" rx="10" class="card"/>
+<text x="58" y="491" class="name" text-anchor="start">Set up</text>
+<rect x="40" y="586" width="300" height="52" rx="10" class="card"/>
+<text x="58" y="617" class="name" text-anchor="start">Run the work</text>
+<path d="M48,712 L332,712 L340,738 L332,764 L48,764 L40,738 Z" class="card"/>
+<text x="58" y="743" class="name" text-anchor="start">Result good?</text>
+<rect x="40" y="1022" width="300" height="52" rx="10" class="card"/>
+<text x="58" y="1053" class="name" text-anchor="start">Save the result</text>
+<rect x="440" y="368" width="300" height="52" rx="10" class="card is-stop"/>
+<text x="458" y="399" class="name" text-anchor="start">Refuse the job</text>
+<path d="M448,804 L732,804 L740,830 L732,856 L448,856 L440,830 Z" class="card"/>
+<text x="458" y="835" class="name" text-anchor="start">Tries left?</text>
+<rect x="440" y="930" width="300" height="52" rx="10" class="card is-stop"/>
+<text x="458" y="961" class="name" text-anchor="start">Report a failure</text>
+<rect x="40" y="1148" width="300" height="52" rx="10" class="card"/>
+<text x="58" y="1179" class="name" text-anchor="start">Done</text>
+</svg>
+<svg id="dg-job-phone" class="dg dg-column dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="1264" viewBox="0 0 264 1264" role="img" aria-label="A job is read, set up and run. A bad input stops it. A bad result is run again while tries are left; when none are left, a failure is reported.">
+<style>
+#dg-job-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-job-phone .ground{fill:var(--fig,#f2f3f9)}
+#dg-job-phone .band{fill:var(--bg,#fbfbfe)}
+#dg-job-phone .track{stroke:var(--line,#d3d6e3)}
+#dg-job-phone .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-job-phone .head{fill:var(--text,#1c1f2e)}
+#dg-job-phone .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-job-phone .stop.end{fill:var(--text,#1c1f2e)}
+#dg-job-phone .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-job-phone .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-job-phone .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-job-phone .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-job-phone .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-job-phone .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-job-phone .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-job-phone .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-job-phone .sub,#dg-job-phone .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-job-phone .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+.js #dg-job-phone .pulse{display:block;animation:9.2s linear 2 both}
+.js #dg-job-phone:not(.is-playing) .pulse{animation-play-state:paused}
+@keyframes dg-job-phone-1{0%{transform:translate(30px,66px);opacity:0}1.3%{transform:translate(30px,66px);opacity:1}14.67%{transform:translate(30px,150px);opacity:1}17.39%{transform:translate(30px,150px);opacity:0}100%{transform:translate(30px,150px);opacity:0}}
+.js #dg-job-phone .pulse-1{animation-name:dg-job-phone-1}
+@keyframes dg-job-phone-2{0%{transform:translate(30px,170px);opacity:0}17.39%{transform:translate(30px,170px);opacity:0}18.7%{transform:translate(30px,170px);opacity:1}32.07%{transform:translate(30px,254px);opacity:1}34.78%{transform:translate(30px,254px);opacity:0}100%{transform:translate(30px,254px);opacity:0}}
+.js #dg-job-phone .pulse-2{animation-name:dg-job-phone-2}
+@keyframes dg-job-phone-4{0%{transform:translate(30px,522px);opacity:0}34.78%{transform:translate(30px,522px);opacity:0}36.09%{transform:translate(30px,522px);opacity:1}49.46%{transform:translate(30px,606px);opacity:1}52.17%{transform:translate(30px,606px);opacity:0}100%{transform:translate(30px,606px);opacity:0}}
+.js #dg-job-phone .pulse-4{animation-name:dg-job-phone-4}
+@keyframes dg-job-phone-5{0%{transform:translate(30px,626px);opacity:0}52.17%{transform:translate(30px,626px);opacity:0}53.48%{transform:translate(30px,626px);opacity:1}66.85%{transform:translate(30px,710px);opacity:1}69.57%{transform:translate(30px,710px);opacity:0}100%{transform:translate(30px,710px);opacity:0}}
+.js #dg-job-phone .pulse-5{animation-name:dg-job-phone-5}
+@keyframes dg-job-phone-7{0%{transform:translate(30px,1122px);opacity:0}69.57%{transform:translate(30px,1122px);opacity:0}70.87%{transform:translate(30px,1122px);opacity:1}84.24%{transform:translate(30px,1206px);opacity:1}86.96%{transform:translate(30px,1206px);opacity:0}100%{transform:translate(30px,1206px);opacity:0}}
+.js #dg-job-phone .pulse-7{animation-name:dg-job-phone-7}
+@media (prefers-reduced-motion:reduce){#dg-job-phone .pulse{animation:none!important}#dg-job-phone .pulse{display:none!important}}
+@media print{#dg-job-phone{max-width:100%;height:auto}#dg-job-phone .pulse{display:none!important}}
+@media (max-width:876px){#dg-job{display:none}#dg-job-phone{display:block}}
+</style>
+<rect width="264" height="1264" class="ground"/>
+<rect x="8" y="12" width="248" height="328" rx="10" class="band"/>
+<rect x="8" y="364" width="248" height="80" rx="10" class="band"/>
+<rect x="8" y="468" width="248" height="328" rx="10" class="band"/>
+<rect x="8" y="820" width="248" height="224" rx="10" class="band"/>
+<rect x="8" y="1068" width="248" height="184" rx="10" class="band"/>
+
+
+
+
+
+<g class="leg" data-leg="1"><path d="M30,66 L30,144" class="line"/><polygon points="25.5,142 34.5,142 30,150" class="head"/><circle r="6" class="pulse pulse-1"/></g>
+<g class="leg" data-leg="2"><path d="M30,170 L30,248" class="line"/><polygon points="25.5,246 34.5,246 30,254" class="head"/><circle r="6" class="pulse pulse-2"/></g>
+<g class="leg" data-leg="8"><path d="M30,274 L30,392" class="line"/><polygon points="25.5,390 34.5,390 30,398" class="head"/><text x="51" y="356" class="verb" text-anchor="start">no</text></g>
+<g class="leg" data-leg="4"><path d="M30,522 L30,600" class="line"/><polygon points="25.5,598 34.5,598 30,606" class="head"/><circle r="6" class="pulse pulse-4"/></g>
+<g class="leg" data-leg="5"><path d="M30,626 L30,704" class="line"/><polygon points="25.5,702 34.5,702 30,710" class="head"/><circle r="6" class="pulse pulse-5"/></g>
+<g class="leg" data-leg="9"><path d="M30,730 L30,848" class="line"/><polygon points="25.5,846 34.5,846 30,854" class="head"/><text x="51" y="812" class="verb" text-anchor="start">no</text></g>
+<g class="leg" data-leg="11"><path d="M30,874 L30,992" class="line"/><polygon points="25.5,990 34.5,990 30,998" class="head"/><text x="51" y="956" class="verb" text-anchor="start">no</text></g>
+<g class="leg" data-leg="7"><path d="M30,1122 L30,1200" class="line"/><polygon points="25.5,1198 34.5,1198 30,1206" class="head"/><circle r="6" class="pulse pulse-7"/></g>
+<g class="jump"><circle cx="61" cy="310" r="10" class="mark"/><text x="77" y="314" class="verb" text-anchor="start">yes</text><text x="77" y="330" class="sub" text-anchor="start">to Set up</text></g>
+<g class="jump"><circle cx="61" cy="766" r="10" class="mark"/><text x="77" y="770" class="verb" text-anchor="start">yes</text><text x="77" y="786" class="sub" text-anchor="start">to Save the result</text></g>
+<g class="jump"><circle cx="61" cy="910" r="10" class="mark"/><text x="77" y="914" class="verb" text-anchor="start">yes</text><text x="77" y="930" class="sub" text-anchor="start">back to Run the work</text></g>
+<circle cx="30" cy="56" r="8" class="stop"/>
+<text x="51" y="61" class="name" text-anchor="start">Get the job</text>
+<circle cx="30" cy="160" r="8" class="stop"/>
+<text x="51" y="165" class="name" text-anchor="start">Read the input</text>
+<circle cx="30" cy="264" r="8" class="stop"/>
+<text x="51" y="269" class="name" text-anchor="start">Input valid?</text>
+<circle cx="30" cy="408" r="8" class="stop end"/>
+<text x="51" y="413" class="name" text-anchor="start">Refuse the job</text>
+<circle cx="30" cy="512" r="8" class="stop"/>
+<text x="51" y="517" class="name" text-anchor="start">Set up</text>
+<circle cx="30" cy="616" r="8" class="stop"/>
+<text x="51" y="621" class="name" text-anchor="start">Run the work</text>
+<circle cx="30" cy="720" r="8" class="stop"/>
+<text x="51" y="725" class="name" text-anchor="start">Result good?</text>
+<circle cx="30" cy="864" r="8" class="stop"/>
+<text x="51" y="869" class="name" text-anchor="start">Tries left?</text>
+<circle cx="30" cy="1008" r="8" class="stop end"/>
+<text x="51" y="1013" class="name" text-anchor="start">Report a failure</text>
+<circle cx="30" cy="1112" r="8" class="stop"/>
+<text x="51" y="1117" class="name" text-anchor="start">Save the result</text>
+<circle cx="30" cy="1216" r="8" class="stop end"/>
+<text x="51" y="1221" class="name" text-anchor="start">Done</text>
+</svg>
+<details class="dg-words">
+<summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>The diagram in words</summary>
+<ol><li>Get the job.</li><li>Read the input.</li><li>Input valid? If yes: Set up. If no: Refuse the job.</li><li>Refuse the job. The path ends here.</li><li>Set up.</li><li>Run the work.</li><li>Result good? If yes: Save the result. If no: Tries left?</li><li>Tries left? If yes: Run the work. If no: Report a failure.</li><li>Report a failure. The path ends here.</li><li>Save the result.</li><li>Done.</li></ol>
+</details>

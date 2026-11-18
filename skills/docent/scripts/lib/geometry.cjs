@@ -70,7 +70,7 @@ function check(scene) {
   // A side leg is a line with a verb and no mark; it keeps every rule that does not concern a mark.
   const legs = [...scene.legs, ...(scene.spurs || [])], parts = scene.parts;
   const texts = [];
-  scene.lanes.forEach((lane, i) => texts.push({ box: textBox(lane.text), what: `the lane name "${lane.text.s}"`, kind: "lane", lane: i }));
+  scene.lanes.forEach((lane, i) => lane.text.s && texts.push({ box: textBox(lane.text), what: `the lane name "${lane.text.s}"`, kind: "lane", lane: i }));
   scene.lanes.forEach((lane, i) => lane.iconAt && texts.push({ box: { x0: lane.iconAt[0] - 8, y0: lane.iconAt[1] - 8, x1: lane.iconAt[0] + 8, y1: lane.iconAt[1] + 8 }, what: "a lane icon", kind: "lane", lane: i }));
   for (const part of parts) for (const t of part.texts) texts.push({ box: textBox(t), what: `"${t.s}"`, kind: "label", part: part.id });
   for (const leg of legs) if (leg.verb.s) texts.push({ box: textBox(leg.verb), what: `the verb "${leg.verb.s}"`, kind: "verb", leg: leg.n ?? `side ${leg.to}` });

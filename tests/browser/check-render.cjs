@@ -451,6 +451,26 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     ok("a sequence diagram shows its desktop form on a desktop and on paper, the script on a phone, and its steps in words on paper", desk.main > 600 && !desk.script && !desk.words && results.dots === 7 && !phone.main && phone.script === 264 && narrow.script === 264 && paper.main > 0 && !paper.script && paper.words && paper.items === 7 && [phone, narrow].every((r) => r.page === r.view) && results.axe.length === 0, results);
   }
 
+  // A flowchart: two columns on a desktop, the column form on a phone and on paper, and the steps in words on paper.
+  {
+    const flow = fs.readFileSync(path.join(root, "tests", "fixtures", "flow.json"), "utf8");
+    const content = renderDocument(html.replace('<section id="report"', `<section id="flow" aria-labelledby="flow-h"><h2 id="flow-h">Flow</h2><figure><div class="fig" role="region" aria-label="Figure 5, a job" tabindex="0">\n<!-- docent:diagram\n${flow}\n-->\n<!-- /docent:diagram -->\n</div><figcaption><strong>Figure 5</strong>A job.</figcaption></figure></section>\n<section id="report"`)).html;
+    const look = (page) => page.evaluate(() => ({ main: document.getElementById("dg-job").getBoundingClientRect().width, column: document.getElementById("dg-job-phone").getBoundingClientRect().width, words: document.querySelector("#flow .dg-words").open, dots: document.querySelectorAll("#dg-job .pulse").length, page: document.documentElement.scrollWidth, view: innerWidth }));
+    const results = {};
+    for (const [name, opts] of [["desk", { width: 1280 }], ["phone", { width: 390, height: 844 }], ["narrow", { width: 320, height: 700 }], ["paper", { width: 658, height: 1123, media: "print" }]]) {
+      const view = await open({ ...opts, content });
+      if (name === "paper") await view.page.evaluate(() => dispatchEvent(new Event("beforeprint")));
+      results[name] = await look(view.page);
+      if (name === "desk") {
+        await view.page.addScriptTag({ path: axePath });
+        results.axe = await view.page.evaluate(async () => (await window.axe.run(document.querySelector("#flow"), { runOnly: { type: "tag", values: ["wcag2a", "wcag2aa", "wcag21aa", "best-practice"] } })).violations.map((v) => v.id));
+      }
+      await view.context.close();
+    }
+    const { desk, phone, narrow, paper } = results;
+    ok("a flowchart shows two columns on a desktop, the column form on a phone and on paper, and its steps in words on paper", desk.main > 600 && !desk.column && desk.dots === 7 && !desk.words && !phone.main && phone.column === 264 && narrow.column === 264 && !paper.main && paper.column > 0 && paper.words && [phone, narrow].every((r) => r.page === r.view) && results.axe.length === 0, results);
+  }
+
   // Two drawings in one figure: side by side when both fit, one below the other when they do not.
   {
     const block = (id, a, b) => `<!-- docent:diagram\n{"id": "${id}", "label": "${a} goes to ${b}.", "lanes": [{"id": "x", "name": "Team"}, {"id": "y", "name": "Service"}], "parts": [{"id": "p", "lane": "x", "name": "${a}"}, {"id": "q", "lane": "y", "name": "${b}"}], "legs": [{"from": "p", "to": "q", "verb": "send"}]}\n-->\n<!-- /docent:diagram -->\n`;

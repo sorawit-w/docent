@@ -61,7 +61,7 @@ function draw(model, k) {
   const textX = hasIcons ? 46 : 18;
 
   // Rows: one part per row, in the order in which the legs first reach the parts.
-  const order = model.chain || [...new Set([...legs.flatMap((leg) => [leg.from, leg.to]), ...parts.map((p) => p.index)])];
+  const order = model.order || model.chain || [...new Set([...legs.flatMap((leg) => [leg.from, leg.to]), ...parts.map((p) => p.index)])];
   const rowOf = new Map(order.map((index, row) => [index, row]));
   const laneGap = GAP + k.laneGap;
   const cardW = Math.max(...parts.map((p) => textX + labelW(p) + 18), Math.min(300, Math.floor((PAGE - 24 - GAP * (count - 1)) / count) - 2 * MARGIN));
@@ -69,7 +69,7 @@ function draw(model, k) {
   const cardX = lanes.map((_, c) => 12 + c * (panelW + laneGap) + MARGIN);
 
   // A leg that joins two plates in one lane, one right below the other, runs straight: the gap holds a full leg.
-  const tops = [TOP];
+  const tops = [model.flat ? 24 : TOP]; // a flowchart has no lane names above its panels
   for (let row = 0; row + 1 < order.length; row++) {
     const a = order[row], b = order[row + 1];
     const straight = parts[a].lane === parts[b].lane && legs.some((leg) => (leg.from === a && leg.to === b) || (leg.from === b && leg.to === a));
@@ -221,12 +221,12 @@ function draw(model, k) {
   }
 
   const useGutter = () => scene.legs.some((leg) => leg.pts.some((p) => p[0] > cardX[count - 1] + cardW + CHANNEL + 1));
-  const scene = { form: "plates", w: 0, h: lastBottom + 28, bands: [], gaps: [], tracks: [], lanes: [], parts: [], legs: [] };
+  const scene = { form: model.kind === "flow" ? "flow" : "plates", w: 0, h: lastBottom + 28, bands: [], gaps: [], tracks: [], lanes: [], parts: [], legs: [], hideMarks: model.hideMarks };
   cards.forEach((card, n) => {
     const part = parts[n];
     const texts = [{ x: card.x0 + textX, y: card.y0 + (part.note ? 23 : 31), s: part.name, cls: "name", anchor: "start" }];
     if (part.note) texts.push({ x: card.x0 + textX, y: card.y0 + 40, s: part.note, cls: "sub", anchor: "start" });
-    scene.parts.push({ id: part.id, shape: "card", x: card.x0, y: card.y0, w: cardW, h: CARD_H, icon: part.icon, iconAt: [card.x0 + 24, card.cy], end: false, texts });
+    scene.parts.push({ id: part.id, shape: "card", x: card.x0, y: card.y0, w: cardW, h: CARD_H, icon: part.icon, iconAt: [card.x0 + 24, card.cy], end: false, texts, ask: part.ask, stop: part.stop });
   });
 
   const gapCenters = cardX.slice(1).map((x0) => x0 - MARGIN - laneGap / 2);
@@ -300,7 +300,7 @@ function draw(model, k) {
   const extra = useGutter() ? laneGap + MARGIN : 0;
   lanes.forEach((lane, c) => {
     const x = cardX[c] - MARGIN, w = panelW + (c === count - 1 ? extra : 0);
-    scene.bands.push({ x, y: 12, w, h: lastBottom + 16 - 12 });
+    scene.bands.push({ x, y: 12, w, h: lastBottom + 16 - 12 }); // a flowchart's first plate sits at 24, so its band starts 12px above it
     if (c) scene.gaps.push({ x: x - laneGap, y: 0, w: laneGap, h: scene.h });
     scene.lanes.push({ icon: lane.icon, iconAt: lane.icon ? [x + 36, 39] : null, text: { x: x + (lane.icon ? 52 : 28), y: 44, s: lane.name, cls: "lane", anchor: "start" } });
   });

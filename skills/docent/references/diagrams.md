@@ -147,6 +147,46 @@ A sequence diagram shows calls and replies between a few participants, in time o
 - `render` also writes the steps in words, in a closed section under the drawing ("The diagram in words"). A screen reader reaches it, and it prints. The `label` stays a one- or two-sentence summary.
 - A sequence diagram sits in the text flow. It has no `form`, no `lanes`, no `parts` and no `legs`. Six participants with long names need more than the page; then the script shows on a desktop too.
 
+## Flowcharts
+
+A flowchart shows steps with decisions: a path that splits on a question, ends early, or goes back to an earlier step. Write it with `"kind": "flow"`:
+
+```json
+{
+  "id": "job",
+  "kind": "flow",
+  "label": "A job is read, set up and run. A bad input stops it. A bad result is run again while tries are left.",
+  "nodes": [
+    {"id": "get", "name": "Get the job"},
+    {"id": "valid", "ask": "Input valid?"},
+    {"id": "run", "name": "Run the work"},
+    {"id": "good", "ask": "Result good?"},
+    {"id": "refuse", "name": "Refuse the job", "stop": true},
+    {"id": "done", "name": "Done"}
+  ],
+  "edges": [
+    {"from": "get", "to": "valid"},
+    {"from": "valid", "to": "run", "when": "yes"},
+    {"from": "valid", "to": "refuse", "when": "no"},
+    {"from": "run", "to": "good"},
+    {"from": "good", "to": "done", "when": "yes"},
+    {"from": "good", "to": "run", "when": "no, try again"}
+  ]
+}
+```
+
+| Field | What it is |
+|---|---|
+| `nodes` | 2 to 16. A **step** has an `id` and a `name` (at most 32 characters). A **decision** has an `id` and an `ask`, a question of at most 28 characters. A step with `"stop": true` ends a path. At most 4 decisions. |
+| `edges` | 1 to 24, each `from` one node `to` another. A step has one exit and no `when`. A decision has 2 or 3 exits, each with a `when` (at most 16 characters, such as "yes" or "more than 10"). |
+
+- **The main path** is the first node, then each node's first exit, in the order you write the edges. Write the exit that most readers take first.
+- Every node is reached from the first node. A path ends at a stop or at the last node of the list.
+- On a desktop the main path stands in the first column and every other node in the second. A decision is a plate with pointed ends, a stop has a thick outline, and the arrows have no numbers: the `when` of an exit sits beside its arrow. An arrow back runs between the columns. One dot travels the main path, twice.
+- On a phone and on paper the flowchart takes the column form: a side exit or an arrow back is a go-to row ("yes, back to Run the work").
+- `render` also writes the steps in words, in a closed section under the drawing.
+- A flowchart sits in the text flow and has no `form`. When `render` says that there is "no free path" between two nodes, let the arrow back go to a nearer step, or split the flowchart in two.
+
 ## Optional legs
 
 A leg with `"optional": true` is a path that only some readers take, or that happens only in some cases. It is drawn as a dashed arrow:

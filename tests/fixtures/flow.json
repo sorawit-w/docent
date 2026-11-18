@@ -1,0 +1,31 @@
+{
+  "id": "job",
+  "kind": "flow",
+  "label": "A job is read, set up and run. A bad input stops it. A bad result is run again while tries are left; when none are left, a failure is reported.",
+  "nodes": [
+    { "id": "get", "name": "Get the job" },
+    { "id": "read", "name": "Read the input" },
+    { "id": "valid", "ask": "Input valid?" },
+    { "id": "setup", "name": "Set up" },
+    { "id": "run", "name": "Run the work" },
+    { "id": "good", "ask": "Result good?" },
+    { "id": "save", "name": "Save the result" },
+    { "id": "refuse", "name": "Refuse the job", "stop": true },
+    { "id": "tries", "ask": "Tries left?" },
+    { "id": "fail", "name": "Report a failure", "stop": true },
+    { "id": "done", "name": "Done" }
+  ],
+  "edges": [
+    { "from": "get", "to": "read" },
+    { "from": "read", "to": "valid" },
+    { "from": "valid", "to": "setup", "when": "yes" },
+    { "from": "valid", "to": "refuse", "when": "no" },
+    { "from": "setup", "to": "run" },
+    { "from": "run", "to": "good" },
+    { "from": "good", "to": "save", "when": "yes" },
+    { "from": "good", "to": "tries", "when": "no" },
+    { "from": "tries", "to": "run", "when": "yes" },
+    { "from": "tries", "to": "fail", "when": "no" },
+    { "from": "save", "to": "done" }
+  ]
+}
