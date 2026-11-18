@@ -11,6 +11,9 @@ const { findBlocks, block } = require("./lib/blocks.cjs");
 const MOST_WIDGETS = 4; // more widgets than this in one document gives a warning
 
 const plain = (s) => s.replace(/<[^>]*>/g, "").replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#39;|&apos;/g, "'").replace(/\s+/g, " ").trim();
+const words = (s) => s.toLowerCase().match(/[\p{L}\p{N}]+/gu) || [];
+/** True when every word of a appears in b, in the same order. */
+const shorter = (a, b) => { const want = words(a), have = words(b); let at = 0; for (const w of have) if (w === want[at]) at += 1; return want.length > 0 && at === want.length; };
 const local = (value) => /^(#|data:)/i.test(value.trim()) || value.trim() === "";
 
 /** Returns { errors, warnings }: two lists of plain sentences. */
@@ -23,7 +26,7 @@ function checkDocument(html) {
     if (!found.length) errors.push(`the document has no kit ${kind}; run stamp`);
     else if (found.length > 1) errors.push(`the document has ${found.length} kit ${kind} blocks; it must have one`);
     else if (found[0].version !== VERSION) errors.push(`the kit ${kind} are version ${found[0].version}; this skill has ${VERSION}; run stamp`);
-    else if (found[0].text !== current) errors.push(`the kit ${kind} were changed by hand; run stamp, and keep your own styles outside the markers`);
+    else if (found[0].text !== current) errors.push(`the kit ${kind} were changed by hand or by a code formatter; run stamp, keep your own styles outside the markers, and keep the document out of the formatter (see SKILL.md)`);
   }
 
   // 2. Diagrams: each drawing must be the one that render makes from its data.
@@ -137,7 +140,8 @@ function checkDocument(html) {
     if (at < 1) errors.push(`the <title> is "${plain(title)}"; its format is "Document title — Host project"`);
     else {
       const [left, right] = [plain(title).slice(0, at), plain(title).slice(at + 3)];
-      if (h1.length === 1 && left !== plain(h1[0][1])) warnings.push(`the <title> starts with "${left}", but the <h1> is "${plain(h1[0][1])}"`);
+      // The window title may be a shorter form of the h1: its words appear in the h1, in the same order.
+      if (h1.length === 1 && !shorter(left, plain(h1[0][1]))) warnings.push(`the <title> starts with "${left}", but the <h1> is "${plain(h1[0][1])}"; the window title is the h1, or a shorter form of it made of the h1's own words in the same order`);
       if (host != null && right !== plain(host)) warnings.push(`the <title> ends with "${right}", but the host project in the top bar is "${plain(host)}"`);
       if (/docent/i.test(plain(title)) && !(host != null && /docent/i.test(plain(host)))) errors.push('the <title> names Docent; the title holds the document and the host project only');
     }
