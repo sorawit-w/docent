@@ -9,12 +9,13 @@ Use a widget only when the reader must do one of these three things:
 | The reader must | Use | Do not use it for |
 |---|---|---|
 | **Choose** one case of several, and read only that case | a chooser | Text that every reader needs. Write it as plain text. |
+| **Choose** one case of several, when the text is the same and only some values differ (a host name, a port, a folder) | a value picker | A value that is the same for every reader. |
 | **Track** what is done, line by line | a checklist | A list of facts. Nobody ticks a fact. |
 | **Decide** between answers, from one to three questions | a decision helper | A choice with one question and two short answers. Write one sentence. |
 
 When none of the three is true, write text, a table or a closed section. A widget that the reader does not need makes the page harder to read. `check` warns when a document has more than 4 widgets.
 
-Docent has these three widgets and no others. Do not write a widget of your own with a script.
+Docent has four widgets and no others: the chooser, the value picker, the checklist and the decision helper. Do not write a widget of your own with a script.
 
 ## The block
 
@@ -44,7 +45,7 @@ Every widget has three fields:
 | Field | What it is |
 |---|---|
 | `id` | A short id, unique among the widgets of the document: small letters, digits and `-`, starting with a letter. |
-| `kind` | `"chooser"`, `"checklist"` or `"decision"`. |
+| `kind` | `"chooser"`, `"values"`, `"checklist"` or `"decision"`. |
 | `label` | A short name that the reader sees beside or above the widget, at most 60 characters. A screen reader reads it as the name of the widget. |
 
 ## Text only
@@ -72,6 +73,40 @@ The reader picks one case, and the page shows only that case. Use it for text th
 Choosers with the same case names, in the same order, change together. When the reader picks `macOS` in one, every chooser with the cases `macOS`, `Windows`, `Linux` shows `macOS`. So use the same names in the same order each time, and write a chooser for each place where the text differs.
 
 Write every case in full. A reader on paper sees all cases, one below the other, each under its name.
+
+## Value picker
+
+The reader picks one option, such as an environment, and every place in the text and in the code that is marked for a value shows the value for that option. Use it when the text is the same for every reader and only small values differ. When whole paragraphs or steps differ, use a chooser.
+
+```html
+<!-- docent:widget
+{
+  "id": "env",
+  "kind": "values",
+  "label": "Your environment",
+  "options": ["Test", "Live"],
+  "values": [
+    {"key": "host", "name": "Host", "values": ["test.example.test", "example.test"]},
+    {"key": "port", "values": ["8443", "443"]}
+  ]
+}
+-->
+<!-- /docent:widget -->
+<p>Open <var data-v="host"></var> on port <var data-v="port"></var>.</p>
+<pre tabindex="0" role="region" aria-label="Command to connect"><code>connect <var data-v="host"></var>:<var data-v="port"></var></code></pre>
+```
+
+| Field | What it is |
+|---|---|
+| `options` | 2 to 5 options, each at most 24 characters. The first one is the value that the text shows with scripts off. |
+| `values` | 1 to 24 values. Each has a `key` (a short id), one value for each option (at most 120 characters each, text only) and, if you want, a `name` (at most 32 characters) for the table. Without a name, the key is shown. |
+
+**Mark each place** where a value shows with `<var data-v="key"></var>`, in a paragraph, a list, a table or a code block. You can leave it empty: `render` writes the value of the first option into each place, and `check` tests that each place holds it. A place inside an HTML comment is left alone.
+
+- A key belongs to one value picker. Put the picker above the first place, near the top of the document.
+- A place cannot sit inside a widget, a diagram, a link address or an attribute: those are not text of the page.
+- Value pickers with the same options, in the same order, change together, so the reader picks once.
+- With scripts off, the options are hidden, the text shows the values of the first option, and a line under the label says so. The table of all values is open. On paper the line and the table print.
 
 ## Checklist
 
@@ -141,12 +176,15 @@ The table of all cases is part of the widget. A reader with scripts off, and a r
 | Chooser | Shows the chosen case. Remembers the choice. | Shows the chosen case. | Every case, each under its name. |
 | Checklist | Ticks, a count, and a button that clears. Remembers the ticks for this document. | Ticks and the button. No count, no memory. | The lines with their boxes. |
 | Decision helper | Questions, the answer that fits, and the table in a closed block. | The table of all cases. | The table of all cases. |
+| Value picker | Options; every place shows the chosen value. Remembers the choice. The table in a closed block. | The values of the first option, a line that names it, and the open table. | The line and the table of all values. |
 
 The page remembers in the reader's own browser only. Nothing leaves the file.
 
 ## What the renderer says
 
 - `render doc.html: widget 1 ("system") built as chooser` — the markup is in the document.
+- `render doc.html: 12 places filled with a value` — every `<var data-v>` shows the value of its first option.
+- `render doc.html: a place <var data-v="hots"> names a value that no value picker has` — fix the key, or add the value to a picker. `render` ends with exit code 1.
 - `render doc.html: widget 2 ("kind"): no answer fits "No" and "No"; every mix of options needs one answer` — the data is wrong. Fix what the message names. The block stays as it was, and `render` ends with exit code 1.
 
 To see the markup of one widget without a document: `node scripts/render.cjs --data widget.json`. The markup goes to standard output.

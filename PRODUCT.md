@@ -17,7 +17,7 @@ Single self-contained HTML files. The skill's scripts are Node only, with no pac
 
 ## Product Purpose
 
-Docent is a design kit for documents: guides and reports written as single self-contained HTML files. It gives a document one calm look, a walkthrough that lights one step at a time, workflow diagrams where a dot travels the route, and three small widgets for the reader.
+Docent is a design kit for documents: guides and reports written as single self-contained HTML files. It gives a document one calm look, a walkthrough that lights one step at a time, workflow diagrams where a dot travels the route, card grids, and four small widgets for the reader.
 
 Success means two things. Every document made with Docent looks and behaves the same. A reader can follow a long document step by step.
 
@@ -37,10 +37,11 @@ Docent ships as an agent skill that carries scripts, not as written rules alone,
 - Every document is one self-contained HTML file with no network.
 - The page is flat: no gradients and no shadows. The accent is a mark and never a fill.
 - Three diagram forms (Route wide, Route tall, Plates) show the same data: lanes, parts, and numbered legs. A route also has a single-track form for phones.
-- Three widgets (a chooser, a checklist, a decision helper) are built from data. A widget is allowed only when the reader must choose, track or decide. Each one is readable with scripts off and on paper.
+- Four widgets (a chooser, a value picker, a checklist, a decision helper) are built from data. A widget is allowed only when the reader must choose, track or decide. Each one is readable with scripts off and on paper.
 - No text below 14px outside diagrams. Inside diagrams, names are 14px and notes are 12px, shown at real size.
 - The theme follows the reader's system, and a switch wins. Print is light.
 - The design rules live in [`DESIGN.md`](DESIGN.md), the single authority for the design.
+- A host project may set its accent, heading color and fonts through `--host-*` tokens, and may fix the theme. Nothing else of the look changes.
 - This repository names no other product.
 
 Decided on 2026-11-15:

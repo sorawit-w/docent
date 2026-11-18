@@ -179,7 +179,7 @@ Docent uses system fonts only, because every document is one file with nothing t
 
 **Code blocks.** A code block sits in a well. With JavaScript on, a small button in its upper right corner copies the code. The button is part of the well: it has the well's ground, and a thin line on its left and lower edge. Its word changes from "Copy" to "Copied" for two seconds. It does not move.
 
-**Widgets.** A widget is a part of the page that the reader uses. Docent has three: a chooser, a checklist and a decision helper (see Widgets). A widget sits in the text flow and has no box. Its text uses the text column; a code block inside a chooser uses the full width, like any code block.
+**Widgets.** A widget is a part of the page that the reader uses. Docent has four: a chooser, a value picker, a checklist and a decision helper (see Widgets). A widget sits in the text flow and has no box. Its text uses the text column; a code block inside a chooser uses the full width, like any code block.
 
 **Tables use the full width.** On a phone a figure, a table or a code block scrolls sideways inside itself; the page never scrolls sideways. Code in a table cell may break at any character, so a long path does not make the table wider. A closed section that holds a table, a code block or a figure takes the full width, like those blocks do outside it; its text keeps the text column.
 
@@ -197,14 +197,16 @@ Corners are soft and consistent. Controls use `sm` (6px). Code blocks use `md` (
 - Do use the dot to show where the reader is: the current section, the current step and the chosen option.
 - Do keep WCAG AA contrast (4.5:1 for text, 3:1 for large text and for the focus ring).
 - Do keep the page readable with JavaScript off and in print.
-- Do separate blocks with space. Lines are for three things only: the route under the top bar, the rules of a table, and the line above a margin label.
+- Do separate blocks with space. Lines are for four things only: the route under the top bar, the rules of a table, the line above a margin label, and the line above a card. A card is a label of the same kind as a margin note.
 - Do style the parts the browser draws: the text selection, the caret, the focus ring, the underline offset and the scrollbar of a scrolling block.
 - Don't draw a box around a block. A figure or code block sits in a well; a note sits in the margin; a warning is a dot and a word.
 - Don't fill an area with `primary`, `secondary` or `tertiary`. The mark's own tile is the one exception, because a favicon must stay clear on any background.
 - Don't use gradients, drop shadows or glass effects. The page is flat.
 - Don't use `tertiary` (lamp) for status, links or body text.
 - Don't use green, amber or red for anything except status. They mean the same thing inside the diagrams.
-- Don't add a host project's colors to these tokens. A project that needs its own accent overrides `primary` in one place.
+- Don't add a host project's colors to these tokens. A project that needs its own accent, heading color or fonts sets the `--host-*` tokens (see Host tokens). There is no token for the page, the text or the status colors.
+- Don't color a short code or a label. A code is `code`, in its small well; a status is a state, a dot and a word. A colored badge is a fill, and green, amber and red mean status only.
+- Don't color the words of code by kind. A code block has two colors: the text color, and the muted color for a comment line. More colors would add a palette that the page does not have.
 - Don't load fonts, scripts or images from the network.
 - Don't use more than two font weights per typeface: 400 and 700 for the serif, 400 and 600 for the sans-serif.
 
@@ -234,13 +236,14 @@ Animate `transform` and `opacity` only. Nothing animates when the page loads or 
 
 ## Widgets
 
-A widget lets the reader do one small thing on the page. Docent has three widgets and no others, and a script builds each one from data, so a widget looks and behaves the same in every document.
+A widget lets the reader do one small thing on the page. Docent has four widgets and no others, and a script builds each one from data, so a widget looks and behaves the same in every document.
 
 **When a widget is allowed.** Only when the reader must do one of three things. In every other case, text, a table or a closed section is better.
 
 | The reader must | Widget | What it looks like |
 |---|---|---|
 | Choose one case of several | **Chooser** | A short label, then one option for each case. Below them, the text of the chosen case only. |
+| Choose one case, where many small values in the text and the code differ | **Value picker** | A short label, then one option for each case, and a line that names the chosen case. Every place in the text that shows a value changes with the choice. The table of all values sits in a closed block. |
 | Track what is done | **Checklist** | A label, then one line for each thing, each with a box. Below the list, a count and a button that clears the ticks. |
 | Decide between answers | **Decision helper** | A label, then one to three questions with options. Below them, the one answer that fits. The table of all cases sits in a closed block. |
 
@@ -262,12 +265,34 @@ A document has few widgets. More than four is a sign that some are not needed.
 | Chooser | It works: the styles alone show the chosen case. | Every case prints, one below the other, each under its name. |
 | Checklist | The boxes can be ticked, and the button clears them. There is no count and no memory. | The lines print with their boxes. |
 | Decision helper | The table of all cases, open. | The table of all cases, at the width of the sheet. |
+| Value picker | The options are hidden. The text shows the values of the first case, a line names that case, and the table of all values is open. | The line that names the chosen case, and the table of all values. |
 
-**Memory.** A chooser remembers the choice, and a checklist remembers the ticks of this document. The page keeps both in the reader's own browser; nothing leaves the file. Choosers with the same cases change together, so the reader picks once.
+**Memory.** A chooser and a value picker remember the choice, and a checklist remembers the ticks of this document. The page keeps them in the reader's own browser; nothing leaves the file. Choosers with the same cases change together, so the reader picks once; the same holds for value pickers.
+
+**A place that shows a value.** A place is a `var` element. It keeps the font of its line, upright, with a dotted muted line under it, so the reader sees that it changes with the choice. Inside code it is code like the rest of the line, and the copy button copies the value that shows.
 
 **Keyboard.** Options are radio buttons and boxes are checkboxes, so the arrow keys, the space key and the Tab key work as in any form. The focus ring is the ultramarine ring of the page.
 
 **Text only.** A widget holds text: paragraphs, code, lists and short lines. It holds no markup of the author's own, and no script.
+
+## Card grid
+
+A card grid shows 3 to 8 short items side by side, when the reader should see them together: the parts of a good report, or three numbers that sum up a result. Each card is a heading (16px, weight 600) or a large number (30px serif, in ink), and one line of small muted text. A card has a line above it and no box, like a margin note. At most four cards stand in a row; on a phone two, and on the narrowest screen one. A card grid uses the full width. When the items need more than one line each, or the reader must compare facts across them, use a list or a table.
+
+## Host tokens
+
+A host project may set five things of its own, and nothing else: an accent, an accent for dark mode, a heading color, and the fonts. Each is a token that the kit reads and never sets, so a value set anywhere in the document holds in light, in dark and on paper.
+
+| Token | Takes the place of | Rule |
+|---|---|---|
+| `--host-accent` | `primary` (light and print), and the dot in light | Contrast 4.5:1 or more on the page and on the well. |
+| `--host-accent-dark` | `dark-primary` | Contrast 4.5:1 or more on the dark page and the dark well. |
+| `--host-ink` | `secondary`, the color of the title and section headings | Contrast 4.5:1 or more on the page. |
+| `--host-serif`, `--host-sans`, `--host-mono` | The three font stacks | Fonts in the file or on the reader's system only; nothing from the network. |
+
+A drawing keeps the system sans-serif, because the renderer estimates its text widths for that font. The lamp dot of dark mode stays.
+
+**A fixed theme.** A document that must stay light (or dark) writes `data-theme="light"` (or `"dark"`) on `<html>`. Then the switch is hidden, and neither the reader's system nor a saved choice changes the theme. Print stays light.
 
 ## Icons
 
