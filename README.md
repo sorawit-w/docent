@@ -2,19 +2,19 @@
 
 **A guide inside every document.**
 
-Docent is a design kit for documents: guides and reports written as single HTML files. It gives a document one calm look, a walkthrough that lights one step at a time, workflow diagrams where a dot travels the route, and three small widgets for the reader: a chooser, a checklist and a decision helper. A document opens in light or dark, prints cleanly, and stays readable without scripts.
+Docent is a design kit for documents: guides and reports written as single HTML files. It gives a document one calm look, a walkthrough that lights one step at a time, workflow diagrams where a dot travels the route, card grids, and four small widgets for the reader: a chooser, a value picker, a checklist and a decision helper. A document opens in light or dark, prints cleanly, and stays readable without scripts.
 
 Docent is packaged as an agent skill. An agent that writes a document loads the skill, follows its rules, and runs its scripts.
 
 ## Status
 
-Version 0.2.1. The design is settled, and the three scripts exist with tests.
+Version 0.3.0. The design is settled, and the three scripts exist with tests.
 
 | Part | State |
 |---|---|
 | Design rules ([`DESIGN.md`](skills/docent/references/DESIGN.md)) | Written |
 | `render`: draws diagrams from data | Built: Route wide, Route tall, Plates, and a single-track form for phones |
-| `render`: builds widgets from data | Built: chooser, checklist, decision helper. Each is readable with scripts off and on paper |
+| `render`: builds widgets from data | Built: chooser, value picker, checklist, decision helper. Each is readable with scripts off and on paper |
 | `stamp`: puts the styles and the page script into a document | Built |
 | `check`: tests a document against the rules | Built. It reads the source only; it does not open a browser |
 | Built-in icon set | 15 icons |
@@ -27,7 +27,8 @@ Known limits:
 - The renderer estimates text widths. The estimate was tested against the fonts of an Apple device only.
 - Paths that branch have no single-track form for phones.
 - A diagram has at most 4 lanes, 12 parts and 16 legs.
-- A widget holds text only. Docent has three widgets and no way to add one in a document.
+- A widget holds text only. Docent has four widgets and no way to add one in a document.
+- No colored badges and no syntax colors in code, by design (see `DESIGN.md`).
 
 ## Install
 

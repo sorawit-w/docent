@@ -189,9 +189,26 @@
 }
 -->
 <!-- /docent:widget -->
+    <!-- A value picker: the reader picks one option, and each place marked <var data-v="key"></var> shows its value, in the text and in code.
+         render writes the value of the first option into each place. Leave the place empty or as it is. -->
+    <p>A value picker changes values in the text and in code.</p>
+<!-- docent:widget
+{
+  "id": "where",
+  "kind": "values",
+  "label": "Your environment",
+  "options": ["Test", "Live"],
+  "values": [
+    {"key": "host", "name": "Host", "values": ["test.example.test", "example.test"]}
+  ]
+}
+-->
+<!-- /docent:widget -->
+    <p>The host is <var data-v="host"></var>.</p>
+<pre tabindex="0" role="region" aria-label="Example command with a value"><code>ping <var data-v="host"></var></code></pre>
   </section>
 
-  <!-- OTHER BLOCKS. A block heading, a small heading, lists, a definition list, a table, status notes, a code block, and a closed section.
+  <!-- OTHER BLOCKS. A block heading, a small heading, a card grid, lists, a definition list, a table, status notes, a code block, and a closed section.
        A block heading is a plain <h3> in the text flow. It names a part of a section; the kit gives it its space. A small heading (<h4>) names a part inside it.
        A list of points is a plain <ul>. Steps that one actor does are a plain <ol>: the walkthrough block needs a diagram.
        When such a step holds a code block, a table or a widget, write each step as <h3 class="step">, with its blocks below it. The kit writes the number.
@@ -200,6 +217,12 @@
     <h2 id="more-h">More blocks</h2>
     <h3>A block heading</h3>
     <h4>A small heading</h4>
+    <!-- A card grid: 3 to 8 short items, each an <h3> or a large number (<p class="big">) and one line. -->
+    <ul class="cards">
+      <li><h3>First item</h3><p>One line about it.</p></li>
+      <li><h3>Second item</h3><p>One line about it.</p></li>
+      <li><p class="big">3</p><p>days: a large number and what it counts.</p></li>
+    </ul>
     <p>A list holds short points:</p>
     <ul>
       <li>The first point.</li>

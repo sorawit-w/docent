@@ -1,6 +1,6 @@
 ---
 name: docent
-description: Design kit for self-contained HTML documents such as guides and reports. It gives a quiet page look, step-by-step walkthroughs, workflow diagrams with a moving dot, and three small widgets for the reader (a chooser, a checklist, a decision helper). It carries scripts that draw the diagrams and build the widgets from data, put the page styles into the document, and check the result. Use it when the user asks to write, restyle or check a document "with Docent" or "in the Docent style".
+description: Design kit for self-contained HTML documents such as guides and reports. It gives a quiet page look, step-by-step walkthroughs, workflow diagrams with a moving dot, card grids, and four small widgets for the reader (a chooser, a value picker, a checklist, a decision helper). It carries scripts that draw the diagrams and build the widgets from data, put the page styles into the document, and check the result. Use it when the user asks to write, restyle or check a document "with Docent" or "in the Docent style".
 ---
 
 # Docent
@@ -35,12 +35,12 @@ Do not use it for app screens, slide decks or marketing pages.
 ## How to work
 
 1. **Read the rules.** Read `references/DESIGN.md` in full before you write.
-2. **Start from the template.** Copy `assets/template.html` to the new file with a file copy, not by typing it again, and replace its content. A comment names each block: the top bar, the title block, a section with a margin note, a figure in the text flow, the walkthrough, the three widgets, a block heading, a small heading, lists, a definition list, a table, status notes, a code block and a closed section. Use the class names as they are, and remove the blocks that you do not need. Each diagram block and widget block in the template holds its data and nothing else: `render` writes the drawing or the markup after the data. The template has no page styles and no page script: `stamp` adds them between `docent:kit` markers. Do not edit anything between those markers. Your own styles, if you need any, go in a separate `<style>` after the kit. `stamp` puts the kit just before `</head>`, so add your `<style>` after `stamp` ran.
+2. **Start from the template.** Copy `assets/template.html` to the new file with a file copy, not by typing it again, and replace its content. A comment names each block: the top bar, the title block, a section with a margin note, a figure in the text flow, the walkthrough, the four widgets, a block heading, a small heading, a card grid, lists, a definition list, a table, status notes, a code block and a closed section. Use the class names as they are, and remove the blocks that you do not need. Each diagram block and widget block in the template holds its data and nothing else: `render` writes the drawing or the markup after the data. The template has no page styles and no page script: `stamp` adds them between `docent:kit` markers. Do not edit anything between those markers. Your own styles, if you need any, go in a separate `<style>` after the kit. `stamp` puts the kit just before `</head>`, so add your `<style>` after `stamp` ran. A host project's accent, heading color and fonts are the one exception: set them with the `--host-*` tokens (see "Host colors and fonts" below), which work anywhere in the document.
 3. **Keep one file.** No fonts, scripts, styles or images from the network.
 4. **Pick the block for steps.** When the steps have two or more actors (a person and a system, or two teams), use the walkthrough: its diagram shows who acts and what moves, and a list cannot show that. When one actor does every step, write a plain numbered list (`<ol>`); the walkthrough block needs a diagram, so it is not for these steps. When such a step holds a code block, a table or a widget, write each step as a numbered block heading (`<h3 class="step">`) with its blocks below it; the kit writes the number. When `render` warns that the drawing is too wide beside the steps, put one diagram in the text flow and write the steps as a numbered list below it. Points are a plain `<ul>`. The kit styles both lists; write no styles of your own for a list.
 5. **Write in the Docent voice.** Plain words, one idea per sentence. A step heading is one sentence of at most six words. The `<title>` is `Document title — Host project`. When the `<h1>` is long, the left part may be shorter, made of the `<h1>`'s own words in the same order: `<h1>How to report a bug and get a fix</h1>` can have `<title>Report a bug — Host project</title>`.
 6. **Write each diagram as data.** Read `references/diagrams.md`. Draw a diagram only when it shows something that words cannot, and never draw the same thing twice. Let the renderer pick the form. Give a part a `state` (`ok`, `warn` or `err`) only when the document reports how that part ended; there is no other way to color a diagram. Never write or edit the SVG by hand: change the data in the block, and `render` replaces the drawing.
-7. **Write each widget as data, and only when the reader needs one.** Read `references/widgets.md`. A widget is allowed only when the reader must choose one case of several, track what is done, or decide between answers. In every other case write text, a table or a closed section. Docent has three widgets: a chooser, a checklist and a decision helper. Never write the markup of a widget by hand, and never write a widget of your own with a script.
+7. **Write each widget as data, and only when the reader needs one.** Read `references/widgets.md`. A widget is allowed only when the reader must choose one case of several, track what is done, or decide between answers. In every other case write text, a table or a closed section. Docent has four widgets: a chooser, a value picker, a checklist and a decision helper. When the text is the same for every reader and only small values differ (an environment's host name, a port, a folder), use the value picker. Never write the markup of a widget by hand, and never write a widget of your own with a script.
 8. **Run the three scripts**, in this order. `SKILL` stands for the folder that holds this file:
 
    ```bash
@@ -65,7 +65,31 @@ When the user asks for something that a design rule forbids, follow the rule, sa
 - **Status notes** come in five kinds: `<span class="state ok">`, `warn` and `err` take the status colors; `info` (plain information, a muted dot) and `plan` (planned, or behind a feature flag, a muted ring) take none. Use a state in a status note, in a table cell, or in a line of text. A label may be long; it wraps.
 - **A definition list** (`<dl>`, `<dt>`, `<dd>`) holds terms and their meanings, such as a glossary or the fields of a form. Use a table when each term has more than one fact.
 - **A small heading** (`<h4>`) names a part inside the part of a block heading. Do not write a bold paragraph in its place.
+- **A card grid** (`<ul class="cards">`) shows 3 to 8 short items side by side: each `<li>` holds an `<h3>` or a large number (`<p class="big">`), and one `<p>` line. Use it for a few parallel items that the reader should see together. Use a list when the items are a sequence, and a table when the reader compares facts. `check` warns about fewer than 3 or more than 8 cards.
+- **Short codes and labels** are `<code>`, such as `<code>P1</code>` or `<code>GET</code>`. A status is a state: `<span class="state err">Blocked</span>`. Docent has no colored badge: a colored fill breaks the rule that the accent is a mark, and green, amber and red mean status only.
+- **Code blocks** have no colors by kind of word. Mark a comment line with `<span class="cm">`, as the starting page does; it takes the muted color. Docent has no syntax highlighting: more colors would add a palette that the page does not have.
 - **A table** may hold code in its cells: a long path or command breaks inside its cell. A closed section may hold a table, a code block or a figure; then it takes the full width.
+
+## Host colors and fonts
+
+A host project may set its accent, its heading color and its fonts, with these tokens in a `<style>` anywhere in the `<head>`, also before `stamp`:
+
+```html
+<style>
+:root {
+  --host-accent: #0b6e4f;       /* links, the dots and the focus ring in light mode and on paper */
+  --host-accent-dark: #6fd3a8;  /* the same in dark mode */
+  --host-ink: #0b3d2e;          /* the title and section headings in light mode */
+  --host-sans: "Inter", system-ui, sans-serif;  /* body text; also --host-serif and --host-mono */
+}
+</style>
+```
+
+- Set the accent for both themes. Each needs a contrast of 4.5:1 on its page: `check` tests a hex color and reports an error below that.
+- Do not set the kit's own tokens (`--primary`, `--bg`, and the others). The kit sets them in four places, so your value is lost in dark mode or in print; `check` warns.
+- There is no token for the page, the text or the status colors.
+- A font must be in the file or on the reader's system. Drawings keep the system font.
+- **To turn dark mode off**, write `<html lang="en" data-theme="light">`. The switch is hidden, and the page stays light. `data-theme="dark"` keeps it dark.
 
 ## Optional lines
 
@@ -107,6 +131,7 @@ Say what was tested and what was not. Use these words:
 - Paths that branch have no single-track form for phones. Their drawing scrolls sideways inside its well on a narrow screen. With scripts on, a line under the well tells the reader to scroll. `render` warns when a whole arrow is off the first phone screen; then say that path in the text too.
 - The styles count the steps of a numbered block heading and of a walkthrough. With scripts on, the page script writes each number as text, so a screen reader reads it. With scripts off, a screen reader in Chromium does not read the number.
 - With scripts on, each code block has a button that copies the code. With scripts off, the button and the line under a wide drawing do not show.
+- A value picker changes text only. A value cannot sit in a link address, an attribute, a drawing or another widget.
 - A widget holds text only: paragraphs, code, lists and short lines. It cannot hold a table, a diagram or a picture.
 - A chooser remembers the choice, and a checklist remembers the ticks, in the reader's own browser. With scripts off they still work, but they remember nothing.
 - `check` tests the rules that a source can show: the kit, each drawing and each widget against its data, no network, a flat page, text sizes, the title, and one step for each leg of a walkthrough. It does not test whether the accent is used as a fill, whether the text is in plain words, or whether the reader needs a widget. It warns when a document has more than 4 widgets.
