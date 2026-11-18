@@ -1,0 +1,657 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Proposed diagram kinds — Docent</title>
+<style>
+/* docent:kit 0.2.0 */
+/* Docent page styles. Tokens come from references/DESIGN.md. One file, no network. */
+:root {
+  color-scheme: light;
+  --bg: #fbfbfe; --panel: #f2f3f9; --fig: #f2f3f9;
+  --text: #1c1f2e; --muted: #575d75; --line: #d3d6e3;
+  --primary: #2f3fd0; --ink: #1b2260; --dot: #2f3fd0;
+  --ok: #1a7f37; --warn: #7d4e00; --err: #cf222e;
+  --serif: Charter, "Bitstream Charter", "Sitka Heading", "Sitka Text", Cambria, Georgia, serif;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --mono: ui-monospace, "SF Mono", "Cascadia Code", Consolas, Menlo, monospace;
+  --ease: cubic-bezier(0.23, 1, 0.32, 1);
+  --measure: 31rem; --margin-col: 220px; --gap: 48px;
+}
+/* Dark: the reader's system setting decides, unless the reader chose a theme with the switch. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #12141f; --panel: #0b0d15; --fig: #0b0d15;
+    --text: #e7e9f3; --muted: #959bb3; --line: #2d3146;
+    --primary: #8e9bff; --ink: #e7e9f3; --dot: #f2b824;
+    --ok: #3fb950; --warn: #d29922; --err: #f85149;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #12141f; --panel: #0b0d15; --fig: #0b0d15;
+  --text: #e7e9f3; --muted: #959bb3; --line: #2d3146;
+  --primary: #8e9bff; --ink: #e7e9f3; --dot: #f2b824;
+  --ok: #3fb950; --warn: #d29922; --err: #f85149;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-padding-top: 88px; -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 400 16px/1.65 var(--sans); caret-color: var(--primary); }
+::selection { background: color-mix(in srgb, var(--primary) 22%, transparent); }
+:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
+a { color: var(--primary); text-decoration-thickness: 1px; text-underline-offset: 0.2em; }
+a:hover { text-decoration-thickness: 2px; }
+.shell { max-width: 1200px; margin: 0 auto; padding: 0 40px; }
+
+/* Top bar. Its bottom line is the route; the dot marks the current section. */
+.topbar { position: sticky; top: 0; z-index: 2; background: var(--bg); border-bottom: 1px solid var(--line); }
+.topbar .shell { position: relative; display: flex; align-items: center; gap: 32px; height: 56px; }
+.host { font-weight: 600; font-size: 14px; white-space: nowrap; }
+.route { flex: 1; min-width: 0; }
+.route ol { display: flex; gap: 28px; margin: 0; padding: 0; list-style: none; }
+.route a { display: block; padding: 6px 0; font-size: 14px; color: var(--muted); text-decoration: none; white-space: nowrap; }
+.route a:hover, .route a[aria-current] { color: var(--text); }
+.route-dot { position: absolute; left: 0; bottom: -4px; width: 7px; height: 7px; border-radius: 50%; background: var(--dot); opacity: 0; transform: translateX(var(--x, 0px)); }
+.ready .route-dot, .ready .rail-dot { transition: transform 320ms var(--ease); }
+.js .route-dot { opacity: 1; }
+.theme, .wd-btn { display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px; border: 1px solid var(--line); border-radius: 6px; background: none; color: var(--text); font: 400 14px/1 var(--sans); cursor: pointer; }
+.theme:hover, .wd-btn:hover { border-color: var(--muted); }
+.theme:active, .wd-btn:active { transform: translateY(1px); }
+.theme svg { width: 15px; height: 15px; }
+html:not(.js) .theme { display: none; }
+.theme[data-next="dark"] .icon-sun, .theme[data-next="light"] .icon-moon { display: none; }
+
+/* Title block: the title leads; facts about the document sit below it. */
+.title { padding: 80px 0 8px; }
+.title .row { margin-top: 24px; }
+h1, h2 { font-family: var(--serif); font-weight: 700; color: var(--ink); text-wrap: balance; margin: 0; }
+h1 { font-size: 52px; line-height: 1.06; letter-spacing: -0.02em; }
+.standfirst { font: 400 21px/1.5 var(--serif); margin: 0; text-wrap: pretty; }
+.facts { margin: 0; padding-left: 0; list-style: none; font-variant-numeric: tabular-nums; }
+
+section { padding-top: 72px; }
+h2 { font-size: 30px; line-height: 1.2; margin-bottom: 16px; }
+h3 { font: 600 18px/1.35 var(--sans); margin: 0; text-wrap: balance; }
+p { margin: 0 0 16px; max-width: var(--measure); text-wrap: pretty; }
+.term { text-decoration: underline; text-decoration-color: var(--primary); text-decoration-thickness: 2px; text-underline-offset: 0.22em; }
+code { font: 14px/1.55 var(--mono); background: var(--panel); padding: 0.1em 0.38em; border-radius: 6px; }
+.standfirst code { font-size: 18px; }
+
+/* Lists in the text flow: points, or numbers for steps that one actor does. The rules are weak on purpose, so the lists of the kit's own blocks keep their styles. */
+:where(main) :where(ul, ol):not(.steps, .facts) { max-width: var(--measure); margin: 0 0 16px; padding-left: 24px; }
+:where(main) :where(ul, ol):not(.steps, .facts) > :where(li + li) { margin-top: 4px; }
+/* A block heading in the text flow has more space above it than below it. A step heading of a walkthrough has none. */
+:where(main) h3 { margin: 32px 0 8px; }
+h2 + h3 { margin-top: 0; }
+.steps h3 { margin: 0; }
+/* A numbered block heading: one of several steps that one actor does, where a step holds a code block, a table or a widget. The kit writes the number, and the count starts again in each section. */
+section { counter-reset: block-step; }
+h3.step { counter-increment: block-step; }
+h3.step::before { content: counter(block-step); font-weight: 400; color: var(--muted); margin-right: 10px; font-variant-numeric: tabular-nums; }
+/* A code block, a table, a closed section, a walkthrough, a status note and a figure bring no space below them. Text that follows brings it. */
+:is(pre, .code, .table-wrap, details, .walk, .status, figure) + :is(p, ul, ol) { margin-top: 24px; }
+
+/* Margin notes: the guide's remarks sit beside the text, like a wall label. */
+.row { display: grid; grid-template-columns: minmax(0, var(--measure)) var(--margin-col); column-gap: var(--gap); align-items: start; }
+.note { margin: 6px 0 16px; padding-top: 12px; border-top: 1px solid var(--line); font-size: 14px; line-height: 1.5; color: var(--muted); }
+.note strong { display: block; margin-bottom: 4px; font-weight: 600; color: var(--text); }
+
+/* Walkthrough: a rail with a node per step; one dot travels along it. */
+.walk { display: grid; grid-template-columns: minmax(0, 1fr) 536px; column-gap: 40px; align-items: start; margin-top: 24px; }
+.rail { position: relative; }
+.steps { position: relative; margin: 0; padding: 0; list-style: none; counter-reset: step; }
+.steps::before { content: ""; position: absolute; left: 4px; top: 10px; bottom: 10px; width: 1px; background: var(--line); }
+.steps li { position: relative; padding: 0 0 36px 32px; counter-increment: step; }
+.steps li:last-child { padding-bottom: 0; }
+.steps li::before { content: ""; position: absolute; left: 0; top: 8px; width: 9px; height: 9px; border-radius: 50%; border: 1px solid var(--muted); background: var(--bg); }
+.steps h3::before { content: counter(step); font-weight: 400; color: var(--muted); margin-right: 10px; font-variant-numeric: tabular-nums; }
+.steps p { margin: 6px 0 0; }
+.js .steps li:not(.is-current) h3, .js .steps li:not(.is-current) p { color: var(--muted); }
+.ready .steps h3, .ready .steps p { transition: color 120ms; }
+.rail-dot { position: absolute; left: 0; top: 8px; width: 9px; height: 9px; border-radius: 50%; background: var(--dot); opacity: 0; transform: translateY(var(--y, 0px)); }
+.js .rail-dot { opacity: 1; }
+.walk figure { position: sticky; top: 88px; }
+
+/* Figures: a well that holds a Docent diagram, with a plain caption. A diagram carries its own styles. */
+figure { margin: 0; }
+section > figure { margin-top: 24px; }
+.fig { background: var(--fig); border-radius: 12px; padding: 8px; overflow-x: auto; scrollbar-color: var(--line) transparent; }
+/* A drawing that is wider than its well scrolls sideways. The page script shows this line under it, because the part that shows can look complete. */
+.fig-more { margin: 8px 0 0; max-width: none; font-size: 14px; line-height: 1.5; color: var(--muted); }
+figcaption { margin-top: 12px; font-size: 14px; line-height: 1.5; color: var(--muted); }
+figcaption strong { font-weight: 600; color: var(--text); margin-right: 8px; }
+
+/* Tables: rules only, no boxes. */
+.table-wrap { overflow-x: auto; margin: 24px 0 0; scrollbar-color: var(--line) transparent; }
+table { width: 100%; min-width: 640px; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; vertical-align: top; padding: 12px 24px 12px 0; }
+thead th { border-bottom: 1px solid var(--text); padding-bottom: 10px; font-size: 14px; line-height: 1.5; font-weight: 600; color: var(--muted); }
+tbody th { font-weight: 600; white-space: nowrap; }
+tbody tr { border-bottom: 1px solid var(--line); }
+.state { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; font-weight: 600; }
+.state::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.state.ok { color: var(--ok); } .state.warn { color: var(--warn); } .state.err { color: var(--err); }
+
+/* Status note: a dot and a word carry the status. */
+.status { max-width: var(--measure); margin: 32px 0 0; }
+.status p { margin: 4px 0 0; }
+
+pre { margin: 20px 0 0; padding: 16px 20px; background: var(--panel); border-radius: 10px; overflow-x: auto; font: 14px/1.6 var(--mono); scrollbar-color: var(--line) transparent; }
+pre code { background: none; padding: 0; font-size: inherit; }
+/* With scripts on, a code block sits in a holder with a button that copies the code. The holder takes the place and the space of the code block. */
+.code { position: relative; margin: 20px 0 0; }
+.code > pre { margin: 0; }
+.copy { position: absolute; top: 0; right: 0; height: 30px; padding: 0 12px; border: solid var(--line); border-width: 0 0 1px 1px; border-radius: 0 10px 0 6px; background: var(--panel); color: var(--muted); font: 400 14px/1 var(--sans); cursor: pointer; }
+.copy:hover { color: var(--text); }
+/* A line of code that reaches the button would sit under it. Then the code starts below the button. */
+.code.is-long > pre { padding-top: 40px; }
+.cm { color: var(--muted); }
+
+details { max-width: var(--measure); margin: 24px 0 0; }
+summary { display: flex; align-items: center; gap: 10px; padding: 4px 0; font-weight: 600; cursor: pointer; list-style: none; }
+summary::-webkit-details-marker { display: none; }
+summary svg { width: 12px; height: 12px; color: var(--muted); transition: transform 150ms var(--ease); }
+details[open] summary svg { transform: rotate(90deg); }
+details > p { margin: 8px 0 0 22px; }
+
+/* Widgets: the reader chooses, ticks or decides. A widget is plain controls and text, with no box. render makes its markup from data. */
+.choose, .checks, .decide { position: relative; margin: 24px 0 0; }
+:is(.choose, .checks, .decide) + * { margin-top: 24px; }
+.choose > input, .checks input, .decide input { position: absolute; width: 1px; height: 1px; margin: 0; opacity: 0; pointer-events: none; }
+.wd-t { margin: 0; max-width: none; font-size: 14px; line-height: 1.5; font-weight: 600; color: var(--muted); }
+.opt { display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px; border: 1px solid var(--line); border-radius: 6px; font-size: 14px; line-height: 1; cursor: pointer; }
+.opt::before { content: ""; width: 9px; height: 9px; border-radius: 50%; border: 1px solid var(--muted); }
+.opt:hover { border-color: var(--muted); }
+input:checked + .opt { border-color: var(--text); }
+input:checked + .opt::before { border-color: var(--dot); background: var(--dot); }
+input:focus-visible + .opt, .checks input:focus-visible + label::before { outline: 2px solid var(--primary); outline-offset: 3px; }
+/* Chooser: radio buttons and one panel for each case. The styles alone show the chosen case, so it works with scripts off. */
+.choose { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.choose > .wd-t { margin-right: 4px; }
+.choose > .case { display: none; flex-basis: 100%; min-width: 0; margin-top: 8px; }
+.choose > input:nth-of-type(1):checked ~ div:nth-of-type(1), .choose > input:nth-of-type(2):checked ~ div:nth-of-type(2), .choose > input:nth-of-type(3):checked ~ div:nth-of-type(3), .choose > input:nth-of-type(4):checked ~ div:nth-of-type(4), .choose > input:nth-of-type(5):checked ~ div:nth-of-type(5) { display: block; }
+.case-t { display: none; margin: 0 0 4px; font-weight: 600; }
+.case > .case-t + * { margin-top: 0; }
+.case > :last-child { margin-bottom: 0; }
+/* Checklist: a box and a line of text. A ticked line takes the muted color. */
+.checks ul { max-width: var(--measure); margin: 0; padding: 0; list-style: none; }
+.checks li { position: relative; margin-top: 12px; }
+.checks label { display: block; position: relative; padding-left: 32px; cursor: pointer; }
+.checks label::before { content: ""; position: absolute; left: 0; top: 4px; width: 18px; height: 18px; border: 1.5px solid var(--muted); border-radius: 6px; }
+.checks label::after { content: ""; position: absolute; left: 6.5px; top: 7px; width: 5px; height: 9px; border: solid var(--text); border-width: 0 2px 2px 0; transform: rotate(45deg); opacity: 0; }
+.checks input:checked + label { color: var(--muted); }
+.checks input:checked + label::before { border-color: var(--text); }
+.checks input:checked + label::after { opacity: 1; }
+.checks .sub { display: block; font-size: 14px; line-height: 1.5; color: var(--muted); }
+.wd-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin: 16px 0 0; max-width: none; font-size: 14px; line-height: 1.5; color: var(--muted); font-variant-numeric: tabular-nums; }
+.wd-foot[hidden] { display: none; }
+/* Decision helper: questions, the one answer that fits, and the table of all cases. The table is the still form. */
+.decide fieldset { position: relative; display: flex; flex-wrap: wrap; gap: 8px; min-width: 0; margin: 16px 0 0; padding: 0; border: 0; }
+.decide legend { margin-bottom: 8px; padding: 0; font-weight: 600; }
+.decide-out { display: block; max-width: var(--measure); margin-top: 16px; }
+.decide-out:empty { display: none; }
+.decide-out strong { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+.decide-out strong::before { content: ""; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--dot); }
+.decide details { max-width: none; margin-top: 16px; }
+.decide .table-wrap { margin-top: 8px; }
+.decide td strong { display: block; font-weight: 600; }
+.decide tr.is-out { color: var(--muted); }
+html:not(.js) .decide-ask, html:not(.js) .wd-foot output { display: none; }
+
+footer { margin-top: 96px; border-top: 1px solid var(--line); }
+footer .shell { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding-top: 24px; padding-bottom: 40px; font-size: 14px; color: var(--muted); }
+.brand { display: inline-flex; align-items: center; gap: 10px; font: 700 16px/1 var(--serif); color: var(--text); }
+.brand svg { width: 24px; height: 24px; }
+
+@media (max-width: 1100px) {
+  .walk { grid-template-columns: minmax(0, 1fr); row-gap: 32px; }
+  .walk figure { position: static; order: -1; }
+}
+@media (max-width: 900px) {
+  .row { grid-template-columns: minmax(0, 1fr); }
+  .note { max-width: var(--measure); }
+  .title .note { margin-top: 28px; }
+}
+@media (max-width: 720px) {
+  .shell { padding: 0 20px; }
+  .topbar { position: static; }
+  .topbar .shell { flex-wrap: wrap; gap: 4px 16px; height: auto; padding-top: 10px; padding-bottom: 8px; }
+  .host { flex: 1; }
+  .route { flex: none; order: 3; width: 100%; }
+  .route ol { flex-wrap: wrap; gap: 0 20px; }
+  .route a[aria-current] { text-decoration: underline; text-decoration-color: var(--dot); text-decoration-thickness: 2px; text-underline-offset: 0.4em; }
+  .route-dot { display: none; }
+  .title { padding-top: 48px; }
+  h1 { font-size: 32px; } h2 { font-size: 26px; }
+  section { padding-top: 56px; }
+  footer .shell { flex-direction: column; align-items: flex-start; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; }
+}
+@media print {
+  html:root:not([data-never]) { color-scheme: light; --bg: #ffffff; --panel: #f2f3f9; --fig: #f2f3f9; --text: #1c1f2e; --muted: #575d75; --line: #d3d6e3; --primary: #2f3fd0; --ink: #1b2260; --dot: #2f3fd0; --ok: #1a7f37; --warn: #7d4e00; --err: #cf222e; }
+  .topbar, .rail-dot, .choose > .opt, .decide-ask, .wd-foot, .copy, .fig-more { display: none !important; }
+  .choose > .case { display: block !important; margin-top: 16px; } .case-t { display: block; }
+  .checks input:checked + label, .decide tr.is-out { color: var(--text) !important; }
+  .steps li h3, .steps li p { color: var(--text) !important; }
+  .walk { grid-template-columns: minmax(0, 1fr); row-gap: 32px; } .walk figure { position: static; order: -1; }
+  table { min-width: 0; } .table-wrap { overflow: visible; }
+  /* A browser leaves out backgrounds on paper. These carry meaning, so they print: status dots, the rail of the steps, and the ground of figures and code. */
+  .state::before, .steps::before, .fig, pre, code { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  figure, tr, .status, pre, .checks li { break-inside: avoid; }
+  h2, h3 { break-after: avoid; }
+  @page { margin: 18mm; }
+}
+/* /docent:kit */
+</style>
+<style>
+/* The hand-drawn drawings of this proposal. They use the page tokens, like a Docent drawing. Names 14px, notes and verbs 12px, as inside a diagram. */
+.mock { display: block; flex: none; margin-inline: auto; font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+.mock .ground { fill: var(--fig); }
+.mock .band { fill: var(--bg); }
+.mock .track { stroke: var(--line); }
+.mock .line { fill: none; stroke: var(--text); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.mock .reply { fill: none; stroke: var(--muted); stroke-width: 1.5; stroke-linecap: round; }
+.mock .ohead { fill: none; stroke: var(--muted); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.mock .side-line { fill: none; stroke: var(--muted); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.mock .head { fill: var(--text); }
+.mock .plate { fill: var(--bg); stroke: var(--line); }
+.mock .stop { fill: var(--bg); stroke: var(--text); stroke-width: 2; }
+.mock .mark, .mock .goto { fill: var(--bg); stroke: var(--text); stroke-width: 1.25; }
+.mock .num { font-size: 12px; font-weight: 600; fill: var(--text); }
+.mock .name { font-size: 14px; font-weight: 600; fill: var(--text); }
+.mock .lane { font-size: 14px; font-weight: 600; fill: var(--muted); }
+.mock .sub, .mock .verb { font-size: 12px; fill: var(--muted); }
+@media print { .mock { max-width: 100%; height: auto; } }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="shell">
+    <span class="host">Docent</span>
+    <nav class="route" aria-label="On this page">
+      <ol>
+        <li><a href="#short">Short version</a></li>
+        <li><a href="#sequence">Sequence</a></li>
+        <li><a href="#flow">Flowchart</a></li>
+        <li><a href="#side">Side legs</a></li>
+        <li><a href="#layers">Layers</a></li>
+        <li><a href="#rest">The rest</a></li>
+      </ol>
+    </nav>
+    <button class="theme" type="button">
+      <svg class="icon-moon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13.5 9.6A5.8 5.8 0 0 1 6.4 2.5a5.8 5.8 0 1 0 7.1 7.1Z"/></svg>
+      <svg class="icon-sun" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="8" cy="8" r="3"/><path d="M8 1.5v1.6M8 12.9v1.6M1.5 8h1.6M12.9 8h1.6M3.4 3.4l1.1 1.1M11.5 11.5l1.1 1.1M3.4 12.6l1.1-1.1M11.5 4.5l1.1-1.1"/></svg>
+      <span class="theme-text">Dark</span>
+    </button>
+    <span class="route-dot" aria-hidden="true"></span>
+  </div>
+</header>
+
+<main class="shell">
+  <div class="title">
+    <h1>Proposed diagram kinds</h1>
+    <div class="row">
+      <p class="standfirst">How the proposed diagram forms would look. Each drawing here is made by hand for this proposal, with neutral content. None of them is built.</p>
+      <div class="note" role="note" aria-label="About this page">
+        <strong>Proposal</strong>
+        <ul class="facts">
+          <li>Waiting for approval</li>
+          <li>Text: diagram-kinds.md</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <section id="short" aria-labelledby="short-h">
+    <h2 id="short-h">The short version</h2>
+    <p>Build one shared piece first: a one-column form for any diagram that is not a route. Then loosen two rules and allow five lanes. Then build the flowchart and the sequence diagram as new kinds. The commit graph waits.</p>
+    <div class="table-wrap" role="region" aria-label="The proposed order" tabindex="0">
+      <table>
+        <thead><tr><th scope="col">Order</th><th scope="col">Gap</th><th scope="col">Answer</th><th scope="col">Size</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">1</th><td>A branching drawing has no phone form</td><td>Build a one-column form for all data that is not a route</td><td>Medium</td></tr>
+          <tr><th scope="row">2</th><td>Every arrow needs a verb; a long note forces Plates</td><td>Make the verb optional; let the spacing rules decide</td><td>Small</td></tr>
+          <tr><th scope="row">3</th><td>At most 4 lanes</td><td>Allow 5 in the text flow</td><td>Small</td></tr>
+          <tr><th scope="row">4</th><td>Two separate chains</td><td>Two drawings in one figure</td><td>Small</td></tr>
+          <tr><th scope="row">5</th><td>A branch beside walkthrough steps</td><td>Side legs in Route tall</td><td>Medium</td></tr>
+          <tr><th scope="row">6</th><td>Layers with a skipping arrow</td><td>Already one-lane Plates; gets the one-column form</td><td>Small</td></tr>
+          <tr><th scope="row">7</th><td>Flowchart with decisions and loops</td><td>A new kind</td><td>Large</td></tr>
+          <tr><th scope="row">8</th><td>Sequence diagram</td><td>A new kind</td><td>Large</td></tr>
+          <tr><th scope="row">—</th><td>Commit graph</td><td>Declined for now: one document needed it</td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="sequence" aria-labelledby="sequence-h">
+    <h2 id="sequence-h">Sequence diagram</h2>
+    <p>Participants stand at the top, each with a track. Messages run from top to bottom. A reply is a thin muted line with an open arrowhead, because a dashed line already means "only some readers take it". A call to itself is a small loop. One group of alternatives is a set of bands, one band for each case.</p>
+    <figure>
+      <div class="fig" role="region" aria-label="Figure 1, a sequence diagram on a desktop" tabindex="0"><svg class="mock" width="640" height="448" viewBox="0 0 640 448" role="img" aria-label="A sequence: the browser asks the web app for a page; the web app checks the session; if the cache has the page, the web app reads it from the cache, if not, it queries the database; the web app sends the page to the browser."><rect width="640" height="448" class="ground"/><rect x="8" y="156" width="624" height="112" rx="10" class="band"/><rect x="8" y="276" width="624" height="112" rx="10" class="band"/><line x1="80" y1="52" x2="80" y2="440" class="track"/><line x1="240" y1="52" x2="240" y2="440" class="track"/><line x1="400" y1="52" x2="400" y2="440" class="track"/><line x1="560" y1="52" x2="560" y2="440" class="track"/><rect x="14" y="160" width="177" height="20" class="band"/><text x="20" y="174" class="sub" text-anchor="start">If the cache has the page</text><rect x="14" y="280" width="52" height="20" class="band"/><text x="20" y="294" class="sub" text-anchor="start">If not</text><path d="M80,84 L232,84" class="line"/><polygon points="230,79.5 230,88.5 238,84" class="head"/><circle cx="160.0" cy="84" r="10" class="mark"/><text x="160.0" y="88" class="num" text-anchor="middle">1</text><text x="160.0" y="68" class="verb" text-anchor="middle">ask for the page</text><path d="M240,114 L288,114 L288,144 L254,144" class="line"/><polygon points="254,139.5 254,148.5 246,144" class="head"/><circle cx="288" cy="129" r="10" class="mark"/><text x="288" y="133" class="num" text-anchor="middle">2</text><text x="306" y="133" class="verb" text-anchor="start">check the session</text><path d="M240,208 L392,208" class="line"/><polygon points="390,203.5 390,212.5 398,208" class="head"/><circle cx="320.0" cy="208" r="10" class="mark"/><text x="320.0" y="212" class="num" text-anchor="middle">3</text><text x="320.0" y="192" class="verb" text-anchor="middle">read</text><path d="M400,248 L248,248" class="reply"/><polyline points="250,243.5 242,248 250,252.5" class="ohead"/><circle cx="320.0" cy="248" r="10" class="mark"/><text x="320.0" y="252" class="num" text-anchor="middle">4</text><text x="320.0" y="232" class="verb" text-anchor="middle">page</text><path d="M240,328 L552,328" class="line"/><polygon points="550,323.5 550,332.5 558,328" class="head"/><circle cx="400.0" cy="328" r="10" class="mark"/><text x="400.0" y="332" class="num" text-anchor="middle">5</text><text x="400.0" y="312" class="verb" text-anchor="middle">query</text><path d="M560,368 L248,368" class="reply"/><polyline points="250,363.5 242,368 250,372.5" class="ohead"/><circle cx="400.0" cy="368" r="10" class="mark"/><text x="400.0" y="372" class="num" text-anchor="middle">6</text><text x="400.0" y="352" class="verb" text-anchor="middle">rows</text><path d="M240,424 L88,424" class="reply"/><polyline points="90,419.5 82,424 90,428.5" class="ohead"/><circle cx="160.0" cy="424" r="10" class="mark"/><text x="160.0" y="428" class="num" text-anchor="middle">7</text><text x="160.0" y="408" class="verb" text-anchor="middle">page</text><rect x="24" y="16" width="112" height="36" rx="10" class="plate"/><text x="80" y="39" class="name" text-anchor="middle">Browser</text><rect x="184" y="16" width="112" height="36" rx="10" class="plate"/><text x="240" y="39" class="name" text-anchor="middle">Web app</text><rect x="344" y="16" width="112" height="36" rx="10" class="plate"/><text x="400" y="39" class="name" text-anchor="middle">Cache</text><rect x="504" y="16" width="112" height="36" rx="10" class="plate"/><text x="560" y="39" class="name" text-anchor="middle">Database</text></svg></div>
+      <figcaption><strong>Figure 1</strong>Desktop: four participants, a call to itself, and one group with two cases.</figcaption>
+    </figure>
+    <p>On a phone the same data becomes a script: one row for each message, with its number, who sends it to whom, and the verb. The group stays a band.</p>
+    <figure>
+      <div class="fig" role="region" aria-label="Figure 2, the sequence as a script for a phone" tabindex="0"><svg class="mock" width="264" height="400" viewBox="0 0 264 400" role="img" aria-label="The same sequence as a script, one row for each message, for a phone."><rect width="264" height="400" class="ground"/><rect x="8" y="100" width="248" height="118" rx="10" class="band"/><rect x="8" y="226" width="248" height="118" rx="10" class="band"/><circle cx="32" cy="28" r="10" class="mark"/><text x="32" y="32" class="num" text-anchor="middle">1</text><text x="52" y="26" class="name" text-anchor="start">Browser → Web app</text><text x="52" y="43" class="verb" text-anchor="start">ask for the page</text><circle cx="32" cy="72" r="10" class="mark"/><text x="32" y="76" class="num" text-anchor="middle">2</text><text x="52" y="70" class="name" text-anchor="start">Web app → itself</text><text x="52" y="87" class="verb" text-anchor="start">check the session</text><text x="20" y="116" class="sub" text-anchor="start">If the cache has the page</text><circle cx="32" cy="142" r="10" class="mark"/><text x="32" y="146" class="num" text-anchor="middle">3</text><text x="52" y="140" class="name" text-anchor="start">Web app → Cache</text><text x="52" y="157" class="verb" text-anchor="start">read</text><circle cx="32" cy="186" r="10" class="mark"/><text x="32" y="190" class="num" text-anchor="middle">4</text><text x="52" y="184" class="name" text-anchor="start">Cache → Web app</text><text x="52" y="201" class="verb" text-anchor="start">reply: page</text><text x="20" y="242" class="sub" text-anchor="start">If not</text><circle cx="32" cy="268" r="10" class="mark"/><text x="32" y="272" class="num" text-anchor="middle">5</text><text x="52" y="266" class="name" text-anchor="start">Web app → Database</text><text x="52" y="283" class="verb" text-anchor="start">query</text><circle cx="32" cy="312" r="10" class="mark"/><text x="32" y="316" class="num" text-anchor="middle">6</text><text x="52" y="310" class="name" text-anchor="start">Database → Web app</text><text x="52" y="327" class="verb" text-anchor="start">reply: rows</text><circle cx="32" cy="368" r="10" class="mark"/><text x="32" y="372" class="num" text-anchor="middle">7</text><text x="52" y="366" class="name" text-anchor="start">Web app → Browser</text><text x="52" y="383" class="verb" text-anchor="start">reply: page</text></svg></div>
+      <figcaption><strong>Figure 2</strong>Phone: the script form, 264px wide. A screen reader gets the same steps as a list in words.</figcaption>
+    </figure>
+  </section>
+
+  <section id="flow" aria-labelledby="flow-h">
+    <h2 id="flow-h">Flowchart</h2>
+    <p>The main path runs down one column. A decision is a plate with pointed ends. Its first exit goes on down; the other exits go right, to a second column. A stop has a thick outline. The arrow back rises between the columns and never crosses the main path.</p>
+    <figure>
+      <div class="fig" role="region" aria-label="Figure 3, a flowchart on a desktop" tabindex="0"><svg class="mock" width="600" height="516" viewBox="0 0 600 516" role="img" aria-label="A flowchart: get the job, read the input. If the input is not valid, refuse the job and stop. Else set up and run the work. If the result is good, save it, and the job is done. If not, and tries are left, run the work again; if no tries are left, report a failure and stop."><rect width="600" height="516" class="ground"/><path d="M180,52 L180,74" class="line"/><polygon points="175.5,72 184.5,72 180,80" class="head"/><path d="M180,116 L180,138" class="line"/><polygon points="175.5,136 184.5,136 180,144" class="head"/><path d="M180,180 L180,202" class="line"/><polygon points="175.5,200 184.5,200 180,208" class="head"/><text x="190" y="198.0" class="verb" text-anchor="start">yes</text><path d="M180,244 L180,266" class="line"/><polygon points="175.5,264 184.5,264 180,272" class="head"/><path d="M180,308 L180,330" class="line"/><polygon points="175.5,328 184.5,328 180,336" class="head"/><path d="M180,372 L180,394" class="line"/><polygon points="175.5,392 184.5,392 180,400" class="head"/><text x="190" y="390.0" class="verb" text-anchor="start">yes</text><path d="M180,436 L180,458" class="line"/><polygon points="175.5,456 184.5,456 180,464" class="head"/><path d="M264,162 L384,162" class="line"/><polygon points="382,157.5 382,166.5 390,162" class="head"/><text x="326" y="154" class="verb" text-anchor="middle">no</text><path d="M264,354 L380,354" class="line"/><polygon points="378,349.5 378,358.5 386,354" class="head"/><text x="326" y="346" class="verb" text-anchor="middle">no</text><path d="M470,372 L470,394" class="line"/><polygon points="465.5,392 474.5,392 470,400" class="head"/><text x="480" y="390.0" class="verb" text-anchor="start">no</text><path d="M470,336 L470,302 Q470,290 458,290 L266,290" class="line"/><polygon points="268,285.5 268,294.5 260,290" class="head"/><text x="480" y="318" class="verb" text-anchor="start">yes: try again</text><rect x="100.0" y="16" width="160" height="36" rx="10" class="plate"/><text x="180" y="39" class="name" text-anchor="middle">Get the job</text><circle cx="78.0" cy="34" r="10" class="mark"/><text x="78.0" y="38" class="num" text-anchor="middle">1</text><rect x="100.0" y="80" width="160" height="36" rx="10" class="plate"/><text x="180" y="103" class="name" text-anchor="middle">Read the input</text><circle cx="78.0" cy="98" r="10" class="mark"/><text x="78.0" y="102" class="num" text-anchor="middle">2</text><path d="M110.0,144 L250.0,144 L264.0,162 L250.0,180 L110.0,180 L96.0,162 Z" class="plate"/><text x="180" y="167" class="name" text-anchor="middle">Input valid?</text><rect x="100.0" y="208" width="160" height="36" rx="10" class="plate"/><text x="180" y="231" class="name" text-anchor="middle">Set up</text><circle cx="78.0" cy="226" r="10" class="mark"/><text x="78.0" y="230" class="num" text-anchor="middle">3</text><rect x="100.0" y="272" width="160" height="36" rx="10" class="plate"/><text x="180" y="295" class="name" text-anchor="middle">Run the work</text><circle cx="78.0" cy="290" r="10" class="mark"/><text x="78.0" y="294" class="num" text-anchor="middle">4</text><path d="M110.0,336 L250.0,336 L264.0,354 L250.0,372 L110.0,372 L96.0,354 Z" class="plate"/><text x="180" y="359" class="name" text-anchor="middle">Result good?</text><rect x="100.0" y="400" width="160" height="36" rx="10" class="plate"/><text x="180" y="423" class="name" text-anchor="middle">Save the result</text><circle cx="78.0" cy="418" r="10" class="mark"/><text x="78.0" y="422" class="num" text-anchor="middle">5</text><rect x="100.0" y="464" width="160" height="36" rx="10" class="stop"/><text x="180" y="487" class="name" text-anchor="middle">Done</text><rect x="390.0" y="144" width="160" height="36" rx="10" class="stop"/><text x="470" y="167" class="name" text-anchor="middle">Refuse the job</text><path d="M400.0,336 L540.0,336 L554.0,354 L540.0,372 L400.0,372 L386.0,354 Z" class="plate"/><text x="470" y="359" class="name" text-anchor="middle">Tries left?</text><rect x="390.0" y="400" width="160" height="36" rx="10" class="stop"/><text x="470" y="423" class="name" text-anchor="middle">Report a failure</text></svg></div>
+      <figcaption><strong>Figure 3</strong>Desktop: two decisions on the main path, two stops, and one arrow back to step 4.</figcaption>
+    </figure>
+    <p>On a phone, and for any other data that is not a route, the drawing becomes one column. A side exit is a short line under its decision. A ring with a number says which step a path goes back to.</p>
+    <figure>
+      <div class="fig" role="region" aria-label="Figure 4, the flowchart in one column for a phone" tabindex="0"><svg class="mock" width="264" height="568" viewBox="0 0 264 568" role="img" aria-label="The same flowchart in one column, for a phone. Each other exit is a short line under its decision; a ring with a number says which step it goes back to."><rect width="264" height="568" class="ground"/><rect x="44" y="12" width="204" height="36" rx="10" class="plate"/><text x="146" y="35" class="name" text-anchor="middle">Get the job</text><circle cx="22" cy="30" r="10" class="mark"/><text x="22" y="34" class="num" text-anchor="middle">1</text><path d="M64,48 L64,66" class="line"/><polygon points="59.5,64 68.5,64 64,72" class="head"/><rect x="44" y="72" width="204" height="36" rx="10" class="plate"/><text x="146" y="95" class="name" text-anchor="middle">Read the input</text><circle cx="22" cy="90" r="10" class="mark"/><text x="22" y="94" class="num" text-anchor="middle">2</text><path d="M64,108 L64,126" class="line"/><polygon points="59.5,124 68.5,124 64,132" class="head"/><path d="M58,132 L234,132 L248,150 L234,168 L58,168 L44,150 Z" class="plate"/><text x="146" y="155" class="name" text-anchor="middle">Input valid?</text><path d="M76,184 L84,184" class="side-line"/><text x="90" y="188" class="verb" text-anchor="start">no: refuse the job, stop</text><text x="74" y="206" class="verb" text-anchor="start">yes</text><path d="M64,168 L64,220" class="line"/><polygon points="59.5,218 68.5,218 64,226" class="head"/><rect x="44" y="226" width="204" height="36" rx="10" class="plate"/><text x="146" y="249" class="name" text-anchor="middle">Set up</text><circle cx="22" cy="244" r="10" class="mark"/><text x="22" y="248" class="num" text-anchor="middle">3</text><path d="M64,262 L64,280" class="line"/><polygon points="59.5,278 68.5,278 64,286" class="head"/><rect x="44" y="286" width="204" height="36" rx="10" class="plate"/><text x="146" y="309" class="name" text-anchor="middle">Run the work</text><circle cx="22" cy="304" r="10" class="mark"/><text x="22" y="308" class="num" text-anchor="middle">4</text><path d="M64,322 L64,340" class="line"/><polygon points="59.5,338 68.5,338 64,346" class="head"/><path d="M58,346 L234,346 L248,364 L234,382 L58,382 L44,364 Z" class="plate"/><text x="146" y="369" class="name" text-anchor="middle">Result good?</text><path d="M76,398 L84,398" class="side-line"/><text x="90" y="402" class="verb" text-anchor="start">no, tries left: go to</text><circle cx="238" cy="398" r="10" class="goto"/><text x="238" y="402" class="num" text-anchor="middle">4</text><path d="M76,418 L84,418" class="side-line"/><text x="90" y="422" class="verb" text-anchor="start">no, none left: report, stop</text><text x="74" y="440" class="verb" text-anchor="start">yes</text><path d="M64,382 L64,454" class="line"/><polygon points="59.5,452 68.5,452 64,460" class="head"/><rect x="44" y="460" width="204" height="36" rx="10" class="plate"/><text x="146" y="483" class="name" text-anchor="middle">Save the result</text><circle cx="22" cy="478" r="10" class="mark"/><text x="22" y="482" class="num" text-anchor="middle">5</text><path d="M64,496 L64,514" class="line"/><polygon points="59.5,512 68.5,512 64,520" class="head"/><rect x="44" y="520" width="204" height="36" rx="10" class="stop"/><text x="146" y="543" class="name" text-anchor="middle">Done</text></svg></div>
+      <figcaption><strong>Figure 4</strong>Phone: the one-column form, 264px wide, with a go-to ring for the arrow back.</figcaption>
+    </figure>
+  </section>
+
+  <section id="side" aria-labelledby="side-h">
+    <h2 id="side-h">Side legs beside walkthrough steps</h2>
+    <p>The walkthrough keeps its route, so step n still lights leg n. One side leg goes from a part of the route to an extra part. It is dashed, it has no number, and no step lights it. This drawing is the renderer's real Route tall drawing, with the side leg added by hand.</p>
+    <figure>
+      <div class="fig" role="region" aria-label="Figure 5, Route tall with a side leg" tabindex="0"><svg id="dg-side" class="dg dg-tall" xmlns="http://www.w3.org/2000/svg" width="468" height="568" viewBox="0 0 468 568" role="img" aria-label="Route tall beside walkthrough steps, with one side leg: if the report is known, the maintainers close it as a duplicate. The side leg is dashed and has no number.">
+<style>
+#dg-side{display:block;flex:none;margin-inline:auto;font-family:var(--sans,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif)}
+#dg-side .ground{fill:var(--fig,#f2f3f9)}
+#dg-side .band{fill:var(--bg,#fbfbfe)}
+#dg-side .track{stroke:var(--line,#d3d6e3)}
+#dg-side .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-side .head{fill:var(--text,#1c1f2e)}
+#dg-side .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-side .stop.end{fill:var(--text,#1c1f2e)}
+#dg-side .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-side .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-side .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-side .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-side .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-side .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-side .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-side .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-side .sub,#dg-side .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-side .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+.js #dg-side .leg.is-current .line{stroke:var(--primary,#2f3fd0);stroke-width:2.5}
+.js #dg-side .leg.is-current .head,.js #dg-side .leg.is-current .num{fill:var(--primary,#2f3fd0)}
+.js #dg-side .leg.is-current .mark{stroke:var(--primary,#2f3fd0)}
+.js #dg-side .leg.is-current .pulse{display:block;animation:2.4s linear infinite}
+@keyframes dg-side-1{0%{transform:translate(157px,111px);opacity:0}8%{transform:translate(157px,111px);opacity:1}10.44%{transform:translate(157px,120px);opacity:1}58.25%{transform:translate(331px,150px);opacity:1}68%{transform:translate(331px,186px);opacity:1}88%{transform:translate(331px,186px);opacity:1}100%{transform:translate(331px,186px);opacity:0}}
+#dg-side .pulse-1{transform:translate(198.76px,127.2px)}
+.js #dg-side .leg.is-current .pulse-1{animation-name:dg-side-1}
+@keyframes dg-side-2{0%{transform:translate(331px,216px);opacity:0}8%{transform:translate(331px,216px);opacity:1}10.44%{transform:translate(331px,225px);opacity:1}58.25%{transform:translate(157px,255px);opacity:1}68%{transform:translate(157px,291px);opacity:1}88%{transform:translate(157px,291px);opacity:1}100%{transform:translate(157px,291px);opacity:0}}
+#dg-side .pulse-2{transform:translate(289.24px,232.2px)}
+.js #dg-side .leg.is-current .pulse-2{animation-name:dg-side-2}
+@keyframes dg-side-3{0%{transform:translate(157px,321px);opacity:0}8%{transform:translate(157px,321px);opacity:1}10.44%{transform:translate(157px,330px);opacity:1}58.25%{transform:translate(331px,360px);opacity:1}68%{transform:translate(331px,396px);opacity:1}88%{transform:translate(331px,396px);opacity:1}100%{transform:translate(331px,396px);opacity:0}}
+#dg-side .pulse-3{transform:translate(198.76px,337.2px)}
+.js #dg-side .leg.is-current .pulse-3{animation-name:dg-side-3}
+@keyframes dg-side-4{0%{transform:translate(331px,426px);opacity:0}8%{transform:translate(331px,426px);opacity:1}68%{transform:translate(331px,501px);opacity:1}88%{transform:translate(331px,501px);opacity:1}100%{transform:translate(331px,501px);opacity:0}}
+#dg-side .pulse-4{transform:translate(331px,435px)}
+.js #dg-side .leg.is-current .pulse-4{animation-name:dg-side-4}
+@media (prefers-reduced-motion:reduce){#dg-side .pulse{animation:none!important}}
+@media print{#dg-side{max-width:100%;height:auto}#dg-side .pulse{display:none!important}#dg-side .leg .line{stroke:var(--text,#1c1f2e)!important;stroke-width:2px!important}#dg-side .leg .head,#dg-side .leg .num{fill:var(--text,#1c1f2e)!important}#dg-side .leg .mark{stroke:var(--text,#1c1f2e)!important}}
+#dg-side-phone{display:none}
+</style>
+<rect width="468" height="568" class="ground"/>
+<rect x="8" y="12" width="224" height="544" rx="10" class="band"/>
+<rect x="256" y="12" width="204" height="544" rx="10" class="band"/>
+<line x1="157" y1="62" x2="157" y2="542" class="track"/>
+<line x1="331" y1="62" x2="331" y2="542" class="track"/>
+<g class="icon lane-icon" transform="translate(22,29)"><circle cx="8" cy="5" r="2.5"/><path d="M3 13.5c0-2.8 2.2-4.5 5-4.5s5 1.7 5 4.5"/></g>
+<text x="46" y="42" class="lane" text-anchor="start">Reporter</text>
+<g class="icon lane-icon" transform="translate(270,29)"><circle cx="6" cy="5.5" r="2.25"/><path d="M1.75 13c0-2.4 1.9-3.75 4.25-3.75s4.25 1.35 4.25 3.75M10.5 3.5a2.25 2.25 0 0 1 0 4.25M12 9.6c1.4.5 2.25 1.7 2.25 3.4"/></g>
+<text x="294" y="42" class="lane" text-anchor="start">Maintainers</text>
+<g class="leg" data-leg="1"><path d="M157,111 L157,120 L331,150 L331,180" class="line"/><polygon points="326.5,178 335.5,178 331,186" class="head"/><circle cx="244" cy="135" r="10" class="mark"/><text x="244" y="139" class="num" text-anchor="middle">1</text><text x="244" y="118" class="verb" text-anchor="middle">file</text><circle r="6" class="pulse pulse-1"/></g>
+<g class="leg" data-leg="2"><path d="M331,216 L331,225 L157,255 L157,285" class="line"/><polygon points="152.5,283 161.5,283 157,291" class="head"/><circle cx="244" cy="240" r="10" class="mark"/><text x="244" y="244" class="num" text-anchor="middle">2</text><text x="244" y="223" class="verb" text-anchor="middle">ask for steps</text><circle r="6" class="pulse pulse-2"/></g>
+<g class="leg" data-leg="3"><path d="M157,321 L157,330 L331,360 L331,390" class="line"/><polygon points="326.5,388 335.5,388 331,396" class="head"/><circle cx="244" cy="345" r="10" class="mark"/><text x="244" y="349" class="num" text-anchor="middle">3</text><text x="244" y="328" class="verb" text-anchor="middle">send steps</text><circle r="6" class="pulse pulse-3"/></g>
+<g class="leg" data-leg="4"><path d="M331,426 L331,495" class="line"/><polygon points="326.5,493 335.5,493 331,501" class="head"/><circle cx="331" cy="459.5" r="10" class="mark"/><text x="331" y="463.5" class="num" text-anchor="middle">4</text><text x="352" y="463.5" class="verb" text-anchor="start">release</text><circle r="6" class="pulse pulse-4"/></g>
+<circle cx="157" cy="96" r="13" class="stop"/>
+<g class="icon" transform="translate(149,88)"><path d="M9.5 2.5h-5a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1v-7z"/><path d="M9.5 2.5v3h3M6 9h4M6 11.25h4"/></g>
+<text x="136" y="101" class="name" text-anchor="end">Bug report</text>
+<text x="136" y="118" class="sub" text-anchor="end">what went wrong</text>
+<circle cx="331" cy="201" r="13" class="stop"/>
+<g class="icon" transform="translate(323,193)"><circle cx="7" cy="7" r="4"/><path d="M10 10l3.5 3.5"/></g>
+<text x="352" y="206" class="name" text-anchor="start">Triage</text>
+<text x="352" y="223" class="sub" text-anchor="start">a first check</text>
+<circle cx="157" cy="306" r="13" class="stop"/>
+<g class="icon" transform="translate(149,298)"><path d="M2.5 4a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v6.5a1 1 0 0 1-1 1H7l-3 2.5v-2.5h-.5a1 1 0 0 1-1-1z"/><path d="M5.5 6.25h5M5.5 8.5h3"/></g>
+<text x="136" y="311" class="name" text-anchor="end">Steps to repeat</text>
+<text x="136" y="328" class="sub" text-anchor="end">a short, exact list</text>
+<circle cx="331" cy="411" r="13" class="stop"/>
+<g class="icon" transform="translate(323,403)"><circle cx="8" cy="8" r="5.5"/><path d="M5.5 8.2l1.8 1.8 3.2-3.6"/></g>
+<text x="352" y="416" class="name" text-anchor="start">Fix</text>
+<text x="352" y="433" class="sub" text-anchor="start">a tested change</text>
+<circle cx="331" cy="516" r="13" class="stop end"/>
+<g class="icon on-end" transform="translate(323,508)"><path d="M2.5 8.4V3.5a1 1 0 0 1 1-1h4.9l5.1 5.1a1 1 0 0 1 0 1.4l-4.5 4.5a1 1 0 0 1-1.4 0z"/><path d="M5.6 5.6h.01"/></g>
+<text x="352" y="521" class="name" text-anchor="start">New version</text>
+<text x="352" y="538" class="sub" text-anchor="start">ready to install</text>
+<path d="M170,96 L312,96" class="line" stroke-dasharray="5 7"/><polygon points="310,100.5 310,91.5 318,96" class="head"/><text x="244" y="84" class="verb" text-anchor="middle">if it is known</text><circle cx="331" cy="96" r="13" class="stop"/><g class="icon" transform="translate(323,88)"><circle cx="4.5" cy="3.5" r="1.5"/><circle cx="4.5" cy="12.5" r="1.5"/><circle cx="11.5" cy="8.5" r="1.5"/><path d="M4.5 5v6M4.5 5c0 2.8 2.6 3.5 5.5 3.5"/></g><text x="352" y="101" class="name" text-anchor="start">Closed</text><text x="352" y="118" class="sub" text-anchor="start">as a duplicate</text>
+</svg></div>
+      <figcaption><strong>Figure 5</strong>Desktop: Route tall with one side leg, 468px wide, so it still fits the 520px beside the steps. On a phone the single-track form would show the side leg as a short spur; that form is not drawn here.</figcaption>
+    </figure>
+  </section>
+
+  <section id="layers" aria-labelledby="layers-h">
+    <h2 id="layers-h">Layers with a skipping arrow</h2>
+    <p>A stack of layers is already possible: one lane, one part for each layer, a leg from each layer to the next, and one more leg that skips. Today it is Plates, 540px wide, and it scrolls on a phone. The one-column form gives it a narrow form: the skipping leg becomes a go-to line.</p>
+    <figure>
+      <div class="fig" role="region" aria-label="Figure 6, five layers in one column" tabindex="0"><svg class="mock" width="264" height="432" viewBox="0 0 264 432" role="img" aria-label="Five layers in a column, each calls the next. The service may also call the workers directly, skipping the queue: a go-to line under the service names layer 4."><rect width="264" height="432" class="ground"/><rect x="44" y="12" width="172" height="48" rx="10" class="plate"/><text x="60" y="33" class="name" text-anchor="start">Screens</text><text x="60" y="50" class="sub" text-anchor="start">what the user sees</text><circle cx="22" cy="36" r="10" class="mark"/><text x="22" y="40" class="num" text-anchor="middle">1</text><path d="M130,60 L130,90" class="line"/><polygon points="125.5,88 134.5,88 130,96" class="head"/><rect x="44" y="96" width="172" height="48" rx="10" class="plate"/><text x="60" y="117" class="name" text-anchor="start">Service</text><text x="60" y="134" class="sub" text-anchor="start">rules of the work</text><circle cx="22" cy="120" r="10" class="mark"/><text x="22" y="124" class="num" text-anchor="middle">2</text><path d="M130,144 L130,174" class="line"/><polygon points="125.5,172 134.5,172 130,180" class="head"/><rect x="44" y="180" width="172" height="48" rx="10" class="plate"/><text x="60" y="201" class="name" text-anchor="start">Queue</text><text x="60" y="218" class="sub" text-anchor="start">jobs that wait</text><circle cx="22" cy="204" r="10" class="mark"/><text x="22" y="208" class="num" text-anchor="middle">3</text><path d="M130,228 L130,258" class="line"/><polygon points="125.5,256 134.5,256 130,264" class="head"/><rect x="44" y="264" width="172" height="48" rx="10" class="plate"/><text x="60" y="285" class="name" text-anchor="start">Workers</text><text x="60" y="302" class="sub" text-anchor="start">run each job</text><circle cx="22" cy="288" r="10" class="mark"/><text x="22" y="292" class="num" text-anchor="middle">4</text><path d="M130,312 L130,342" class="line"/><polygon points="125.5,340 134.5,340 130,348" class="head"/><rect x="44" y="348" width="172" height="48" rx="10" class="plate"/><text x="60" y="369" class="name" text-anchor="start">Store</text><text x="60" y="386" class="sub" text-anchor="start">keeps the data</text><circle cx="22" cy="372" r="10" class="mark"/><text x="22" y="376" class="num" text-anchor="middle">5</text><text x="144" y="166" class="verb" text-anchor="start">skip the queue →</text><circle cx="240" cy="162" r="10" class="goto"/><text x="240" y="166" class="num" text-anchor="middle">4</text></svg></div>
+      <figcaption><strong>Figure 6</strong>Phone: five layers, and a go-to line for the call that skips the queue.</figcaption>
+    </figure>
+  </section>
+
+  <section id="rest" aria-labelledby="rest-h">
+    <h2 id="rest-h">The rest, in words</h2>
+    <h3>Five lanes</h3>
+    <p>With only the limit changed, a five-lane route on the current renderer is 922px wide as Route wide, 1022px as Route tall and 1100px as Plates. All three keep the spacing rules and fit a full-width well of 1104px.</p>
+    <h3>Two chains in one figure</h3>
+    <p>One drawing numbers its legs in one order, so two unrelated chains in it show a false order. A figure may hold two drawings instead. They stand side by side when both fit, and one below the other when they do not.</p>
+    <h3>Looser rules</h3>
+    <p>A leg may have no verb; it keeps its number. A long note no longer forces Plates: the renderer tries the route forms, and the spacing rules decide.</p>
+    <h3>The commit graph</h3>
+    <p>Declined for now. It has its own look and rules, and one document needed it. Two small drawings in one figure can show a merge and a squash today.</p>
+  </section>
+</main>
+
+<footer>
+  <div class="shell">
+    <span class="brand">
+      <svg viewBox="0 0 64 64" role="img" aria-label="Docent"><rect width="64" height="64" rx="14" fill="#2f3fd0"/><path d="M20 37V18H30A14 14 0 0 1 30 46H29" fill="none" stroke="#ffffff" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="20" cy="46" r="4" fill="#f2b824"/></svg>
+      Docent
+    </span>
+    <span>A guide inside every document.</span>
+  </div>
+</footer>
+<script>
+// docent:kit 0.2.0
+(() => {
+  const root = document.documentElement;
+  root.classList.add('js');
+  // Theme: the page follows the reader's system setting. The switch sets a choice that wins over the system and is remembered.
+  const button = document.querySelector('.theme');
+  const system = matchMedia('(prefers-color-scheme: dark)');
+  const theme = () => root.dataset.theme || (system.matches ? 'dark' : 'light');
+  try {
+    const saved = localStorage.getItem('docent-theme');
+    if (saved === 'dark' || saved === 'light') root.dataset.theme = saved;
+  } catch { /* no saved choice can be read: follow the system */ }
+  if (button) {
+    const showSwitch = () => {
+      const next = theme() === 'dark' ? 'light' : 'dark';
+      button.dataset.next = next;
+      button.querySelector('.theme-text').textContent = next === 'dark' ? 'Dark' : 'Light';
+      button.setAttribute('aria-label', `Switch to the ${next} theme`);
+    };
+    showSwitch();
+    system.addEventListener('change', showSwitch);
+    button.addEventListener('click', () => {
+      root.dataset.theme = theme() === 'dark' ? 'light' : 'dark';
+      showSwitch();
+      try { localStorage.setItem('docent-theme', root.dataset.theme); } catch { /* private window: the choice lasts for this visit */ }
+    });
+  }
+  // A diagram outside a walkthrough runs its dot twice when it comes into view, then rests. Pointing at it runs it again.
+  const replay = (svg) => svg.querySelectorAll('.pulse').forEach((dot) => dot.getAnimations().forEach((run) => { run.cancel(); run.play(); }));
+  const seen = new IntersectionObserver((entries) => entries.forEach((entry) => {
+    if (!entry.isIntersecting) return;
+    entry.target.classList.add('is-playing');
+    seen.unobserve(entry.target);
+  }), { threshold: 0.6 });
+  document.querySelectorAll('svg.dg-auto').forEach((svg) => {
+    seen.observe(svg);
+    const well = svg.closest('.fig') || svg;
+    well.addEventListener('pointerenter', () => replay(svg));
+    well.addEventListener('focus', () => replay(svg));
+  });
+  // A drawing that is wider than its well scrolls sideways, and the part that shows can look complete. A line under the well says that more is to the side.
+  const wells = [...document.querySelectorAll('.fig')].map((well) => {
+    const note = document.createElement('p');
+    note.className = 'fig-more';
+    note.hidden = true;
+    note.textContent = 'The drawing is wider than the screen. Scroll it sideways to see all of it.';
+    well.after(note);
+    return { well, note };
+  });
+  // A code block gets a button that copies the code. The block moves into a holder, so the button stays in place when the code scrolls sideways.
+  const blocks = [...document.querySelectorAll('pre')].map((pre) => {
+    const holder = document.createElement('div'), button = document.createElement('button');
+    holder.className = 'code';
+    pre.before(holder);
+    holder.append(pre, button);
+    button.type = 'button';
+    button.className = 'copy';
+    button.textContent = 'Copy';
+    button.setAttribute('aria-live', 'polite');
+    button.addEventListener('click', async () => {
+      const text = (pre.querySelector('code') || pre).textContent;
+      let done = false;
+      try { await navigator.clipboard.writeText(text); done = true; } catch { /* no clipboard here: select the code and copy the selection */ }
+      if (!done) {
+        const range = document.createRange(), selection = getSelection();
+        range.selectNodeContents(pre);
+        selection.removeAllRanges();
+        selection.addRange(range);
+        try { done = document.execCommand('copy'); } catch { /* the code stays selected, so the reader can copy it by hand */ }
+        if (done) selection.removeAllRanges();
+      }
+      button.textContent = done ? 'Copied' : 'Select and copy';
+      setTimeout(() => (button.textContent = 'Copy'), 2000);
+    });
+    return { holder, pre, button };
+  });
+  const fit = () => {
+    wells.forEach(({ well, note }) => (note.hidden = well.scrollWidth <= well.clientWidth + 1));
+    // When the widest line of code reaches the button, the code starts below the button. A block that is hidden now has no size; it is measured when it shows.
+    blocks.forEach(({ holder, pre, button }) => {
+      if (!pre.clientWidth) return;
+      const code = pre.querySelector('code') || pre;
+      holder.classList.toggle('is-long', pre.scrollWidth > pre.clientWidth + 1 || code.getBoundingClientRect().right > button.getBoundingClientRect().left - 8);
+    });
+  };
+  // Measure again when a well or a code block changes its size: the window changes, a chooser shows another case, or a closed section opens.
+  if ('ResizeObserver' in window) {
+    const watch = new ResizeObserver(fit);
+    wells.forEach(({ well }) => watch.observe(well));
+    blocks.forEach(({ pre }) => watch.observe(pre));
+  }
+  addEventListener('resize', fit);
+  fit();
+  // Print: open every closed section so its text prints, then close it again.
+  let opened = [];
+  addEventListener('beforeprint', () => { opened = [...document.querySelectorAll('details:not([open])')]; opened.forEach((d) => (d.open = true)); });
+  addEventListener('afterprint', () => { opened.forEach((d) => (d.open = false)); opened = []; });
+  // The route dot marks the current section. In each walkthrough, the rail dot marks the current step and the diagram lights the leg with the same number.
+  const bar = document.querySelector('.topbar .shell');
+  const routeDot = document.querySelector('.route-dot');
+  const links = [...document.querySelectorAll('.route a[href^="#"]')].filter((a) => document.getElementById(a.getAttribute('href').slice(1)));
+  const sections = links.map((a) => document.getElementById(a.getAttribute('href').slice(1)));
+  const walks = [...document.querySelectorAll('.walk')].map((walk) => ({
+    steps: [...walk.querySelectorAll('.steps > li')],
+    legs: [...walk.querySelectorAll('svg.dg .leg')],
+    dot: walk.querySelector('.rail-dot'),
+  })).filter((walk) => walk.steps.length);
+  const nearest = (items, line) => items.reduce((best, el) => (el.getBoundingClientRect().top <= line ? el : best), items[0]);
+  const update = () => {
+    if (sections.length) {
+      const section = nearest(sections, innerHeight * 0.35);
+      links.forEach((a, i) => (sections[i] === section ? a.setAttribute('aria-current', 'true') : a.removeAttribute('aria-current')));
+      if (bar && routeDot) {
+        const link = links[sections.indexOf(section)].getBoundingClientRect();
+        routeDot.style.setProperty('--x', `${link.left + link.width / 2 - bar.getBoundingClientRect().left - 3.5}px`);
+      }
+    }
+    walks.forEach(({ steps, legs, dot }) => {
+      const step = nearest(steps, innerHeight * 0.5);
+      const number = steps.indexOf(step) + 1;
+      steps.forEach((li) => li.classList.toggle('is-current', li === step));
+      legs.forEach((leg) => leg.classList.toggle('is-current', Number(leg.dataset.leg) === number));
+      if (dot) dot.style.setProperty('--y', `${step.offsetTop}px`);
+    });
+  };
+  let queued = false;
+  const schedule = () => { if (!queued) { queued = true; requestAnimationFrame(() => { queued = false; update(); }); } };
+  addEventListener('scroll', schedule, { passive: true });
+  addEventListener('resize', schedule);
+  // Widgets. Each one is readable without this script. The script adds memory, the count of a checklist and the answer of a decision helper.
+  const load = (key) => { try { return JSON.parse(localStorage.getItem(key)); } catch { return null; } };
+  const save = (key, value) => { try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* private window: it lasts for this visit */ } };
+  // Chooser: the choice is remembered, and choosers with the same options change together.
+  const choosers = [...document.querySelectorAll('.choose')].map((el) => ({
+    inputs: [...el.querySelectorAll(':scope > input')],
+    key: `docent-choice:${[...el.querySelectorAll(':scope > .opt')].map((label) => label.textContent).join('|')}`,
+  }));
+  const choose = (key, n) => choosers.forEach((c) => { if (c.key === key && c.inputs[n]) c.inputs[n].checked = true; });
+  choosers.forEach((c) => {
+    choose(c.key, load(c.key));
+    c.inputs.forEach((input, n) => input.addEventListener('change', () => {
+      const top = input.getBoundingClientRect().top;
+      choose(c.key, n);
+      scrollBy(0, input.getBoundingClientRect().top - top); // a chooser higher on the page changed its height: keep this one in place
+      save(c.key, n);
+      schedule();
+    }));
+  });
+  // Checklist: the ticks are remembered for this document, and the line below the list counts them.
+  document.querySelectorAll('form.checks').forEach((form) => {
+    const boxes = [...form.querySelectorAll('input')], out = form.querySelector('output'), key = `docent-ticks:${location.pathname}#${form.id}`;
+    const saved = load(key);
+    if (Array.isArray(saved) && saved.length === boxes.length) boxes.forEach((box, i) => (box.checked = saved[i] === true));
+    const show = () => { out.textContent = `${boxes.filter((box) => box.checked).length} of ${boxes.length} done`; };
+    const keep = () => { show(); save(key, boxes.map((box) => box.checked)); schedule(); };
+    form.addEventListener('change', keep);
+    form.addEventListener('reset', () => setTimeout(keep));
+    show();
+  });
+  // Decision helper: a row that no longer fits the answers takes the muted color. When every question has an answer, the one row that fits is shown as the answer.
+  document.querySelectorAll('.decide').forEach((el) => {
+    const form = el.querySelector('form'), out = el.querySelector('output'), again = el.querySelector('.wd-foot'), groups = [...el.querySelectorAll('fieldset')], rows = [...el.querySelectorAll('tbody tr')];
+    el.querySelector('details').open = false;
+    const show = () => {
+      const picked = groups.map((group) => [...group.querySelectorAll('input')].findIndex((input) => input.checked) + 1);
+      const fits = rows.filter((row) => {
+        const fit = row.dataset.when.split(',').every((option, q) => option === '0' || !picked[q] || Number(option) === picked[q]);
+        row.classList.toggle('is-out', !fit);
+        return fit;
+      });
+      out.innerHTML = picked.every(Boolean) && fits.length === 1 ? fits[0].lastElementChild.innerHTML : '';
+      again.hidden = !picked.some(Boolean);
+      schedule();
+    };
+    form.addEventListener('change', show);
+    form.addEventListener('reset', () => setTimeout(show));
+    show();
+  });
+  update();
+  requestAnimationFrame(() => requestAnimationFrame(() => root.classList.add('ready')));
+})();
+// /docent:kit
+</script>
+</body>
+</html>
