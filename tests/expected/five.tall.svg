@@ -1,0 +1,147 @@
+<svg id="dg-five" class="dg dg-tall" xmlns="http://www.w3.org/2000/svg" width="1068" height="576" viewBox="0 0 1068 576" role="img" aria-label="A change passes five teams: the author writes it, a reviewer reads it, the build makes it, the testers try it, and the release team ships it.">
+<style>
+#dg-five{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-five .ground{fill:var(--fig,#f2f3f9)}
+#dg-five .band{fill:var(--bg,#fbfbfe)}
+#dg-five .track{stroke:var(--line,#d3d6e3)}
+#dg-five .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-five .head{fill:var(--text,#1c1f2e)}
+#dg-five .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-five .stop.end{fill:var(--text,#1c1f2e)}
+#dg-five .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-five .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-five .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-five .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-five .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-five .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-five .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-five .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-five .sub,#dg-five .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-five .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+.js #dg-five .leg.is-current .line{stroke:var(--primary,#2f3fd0);stroke-width:2.5}
+.js #dg-five .leg.is-current .head,.js #dg-five .leg.is-current .num{fill:var(--primary,#2f3fd0)}
+.js #dg-five .leg.is-current .mark{stroke:var(--primary,#2f3fd0)}
+.js #dg-five .leg.is-current .pulse{display:block;animation:2.4s linear infinite}
+@keyframes dg-five-1{0%{transform:translate(107px,106px);opacity:0}8%{transform:translate(107px,106px);opacity:1}10.44%{transform:translate(107px,115px);opacity:1}58.25%{transform:translate(281px,145px);opacity:1}68%{transform:translate(281px,181px);opacity:1}88%{transform:translate(281px,181px);opacity:1}100%{transform:translate(281px,181px);opacity:0}}
+#dg-five .pulse-1{transform:translate(148.76px,122.2px)}
+.js #dg-five .leg.is-current .pulse-1{animation-name:dg-five-1}
+@keyframes dg-five-2{0%{transform:translate(281px,201px);opacity:0}8%{transform:translate(281px,201px);opacity:1}15.46%{transform:translate(281px,234px);opacity:1}59.86%{transform:translate(475px,264px);opacity:1}68%{transform:translate(475px,300px);opacity:1}88%{transform:translate(475px,300px);opacity:1}100%{transform:translate(475px,300px);opacity:0}}
+#dg-five .pulse-2{transform:translate(281px,217.5px)}
+.js #dg-five .leg.is-current .pulse-2{animation-name:dg-five-2}
+@keyframes dg-five-3{0%{transform:translate(475px,320px);opacity:0}8%{transform:translate(475px,320px);opacity:1}12.24%{transform:translate(475px,341px);opacity:1}60.72%{transform:translate(713px,371px);opacity:1}68%{transform:translate(713px,407px);opacity:1}88%{transform:translate(713px,407px);opacity:1}100%{transform:translate(713px,407px);opacity:0}}
+#dg-five .pulse-3{transform:translate(532.12px,348.2px)}
+.js #dg-five .leg.is-current .pulse-3{animation-name:dg-five-3}
+@keyframes dg-five-4{0%{transform:translate(713px,427px);opacity:0}8%{transform:translate(713px,427px);opacity:1}12.24%{transform:translate(713px,448px);opacity:1}60.72%{transform:translate(951px,478px);opacity:1}68%{transform:translate(951px,514px);opacity:1}88%{transform:translate(951px,514px);opacity:1}100%{transform:translate(951px,514px);opacity:0}}
+#dg-five .pulse-4{transform:translate(770.12px,455.2px)}
+.js #dg-five .leg.is-current .pulse-4{animation-name:dg-five-4}
+@media (prefers-reduced-motion:reduce){#dg-five .pulse{animation:none!important}}
+@media print{#dg-five{max-width:100%;height:auto}#dg-five .pulse{display:none!important}#dg-five .leg .line{stroke:var(--text,#1c1f2e)!important;stroke-width:2px!important}#dg-five .leg .head,#dg-five .leg .num{fill:var(--text,#1c1f2e)!important}#dg-five .leg .mark{stroke:var(--text,#1c1f2e)!important}}
+#dg-five-phone{display:none}
+</style>
+<rect width="1068" height="576" class="ground"/>
+<rect x="8" y="12" width="174" height="552" rx="10" class="band"/>
+<rect x="206" y="12" width="170" height="552" rx="10" class="band"/>
+<rect x="400" y="12" width="214" height="552" rx="10" class="band"/>
+<rect x="638" y="12" width="214" height="552" rx="10" class="band"/>
+<rect x="876" y="12" width="184" height="552" rx="10" class="band"/>
+<line x1="107" y1="62" x2="107" y2="550" class="track"/>
+<line x1="281" y1="62" x2="281" y2="550" class="track"/>
+<line x1="475" y1="62" x2="475" y2="550" class="track"/>
+<line x1="713" y1="62" x2="713" y2="550" class="track"/>
+<line x1="951" y1="62" x2="951" y2="550" class="track"/>
+<text x="30" y="42" class="lane" text-anchor="start">Author</text>
+<text x="228" y="42" class="lane" text-anchor="start">Reviewer</text>
+<text x="422" y="42" class="lane" text-anchor="start">Build</text>
+<text x="660" y="42" class="lane" text-anchor="start">Testers</text>
+<text x="898" y="42" class="lane" text-anchor="start">Release</text>
+<g class="leg" data-leg="1"><path d="M107,106 L107,115 L281,145 L281,175" class="line"/><polygon points="276.5,173 285.5,173 281,181" class="head"/><circle r="6" class="pulse pulse-1"/><circle cx="194" cy="130" r="10" class="mark"/><text x="194" y="134" class="num" text-anchor="middle">1</text><text x="194" y="113" class="verb" text-anchor="middle">send</text></g>
+<g class="leg" data-leg="2"><path d="M281,201 L281,234 L475,264 L475,294" class="line"/><polygon points="470.5,292 479.5,292 475,300" class="head"/><circle r="6" class="pulse pulse-2"/><circle cx="388" cy="250.55" r="10" class="mark"/><text x="388" y="254.55" class="num" text-anchor="middle">2</text><text x="388" y="233.55" class="verb" text-anchor="middle">approve</text></g>
+<g class="leg" data-leg="3"><path d="M475,320 L475,341 L713,371 L713,401" class="line"/><polygon points="708.5,399 717.5,399 713,407" class="head"/><circle r="6" class="pulse pulse-3"/><circle cx="626" cy="360.03" r="10" class="mark"/><text x="626" y="364.03" class="num" text-anchor="middle">3</text><text x="626" y="343.03" class="verb" text-anchor="middle">install</text></g>
+<g class="leg" data-leg="4"><path d="M713,427 L713,448 L951,478 L951,508" class="line"/><polygon points="946.5,506 955.5,506 951,514" class="head"/><circle r="6" class="pulse pulse-4"/><circle cx="864" cy="467.03" r="10" class="mark"/><text x="864" y="471.03" class="num" text-anchor="middle">4</text></g>
+<circle cx="107" cy="96" r="8" class="stop"/>
+<text x="86" y="101" class="name" text-anchor="end">Change</text>
+<text x="86" y="118" class="sub" text-anchor="end">a short diff</text>
+<circle cx="281" cy="191" r="8" class="stop"/>
+<text x="302" y="196" class="name" text-anchor="start">Review</text>
+<text x="302" y="213" class="sub" text-anchor="start">read once</text>
+<circle cx="475" cy="310" r="8" class="stop"/>
+<text x="496" y="315" class="name" text-anchor="start">Build</text>
+<text x="496" y="332" class="sub" text-anchor="start">made and packed</text>
+<circle cx="713" cy="417" r="8" class="stop"/>
+<text x="734" y="422" class="name" text-anchor="start">Trial</text>
+<text x="734" y="439" class="sub" text-anchor="start">on a test machine</text>
+<circle cx="951" cy="524" r="8" class="stop end"/>
+<text x="972" y="529" class="name" text-anchor="start">Release</text>
+<text x="972" y="546" class="sub" text-anchor="start">for everyone</text>
+</svg>
+<svg id="dg-five-phone" class="dg dg-track" xmlns="http://www.w3.org/2000/svg" width="264" height="520" viewBox="0 0 264 520" role="img" aria-label="A change passes five teams: the author writes it, a reviewer reads it, the build makes it, the testers try it, and the release team ships it.">
+<style>
+#dg-five-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-five-phone .ground{fill:var(--fig,#f2f3f9)}
+#dg-five-phone .band{fill:var(--bg,#fbfbfe)}
+#dg-five-phone .track{stroke:var(--line,#d3d6e3)}
+#dg-five-phone .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-five-phone .head{fill:var(--text,#1c1f2e)}
+#dg-five-phone .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-five-phone .stop.end{fill:var(--text,#1c1f2e)}
+#dg-five-phone .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-five-phone .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-five-phone .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-five-phone .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-five-phone .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-five-phone .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-five-phone .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-five-phone .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-five-phone .sub,#dg-five-phone .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-five-phone .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+.js #dg-five-phone .leg.is-current .line{stroke:var(--primary,#2f3fd0);stroke-width:2.5}
+.js #dg-five-phone .leg.is-current .head,.js #dg-five-phone .leg.is-current .num{fill:var(--primary,#2f3fd0)}
+.js #dg-five-phone .leg.is-current .mark{stroke:var(--primary,#2f3fd0)}
+.js #dg-five-phone .leg.is-current .pulse{display:block;animation:2.4s linear infinite}
+@keyframes dg-five-phone-1{0%{transform:translate(30px,66px);opacity:0}8%{transform:translate(30px,66px);opacity:1}68%{transform:translate(30px,150px);opacity:1}88%{transform:translate(30px,150px);opacity:1}100%{transform:translate(30px,150px);opacity:0}}
+#dg-five-phone .pulse-1{transform:translate(30px,76.08px)}
+.js #dg-five-phone .leg.is-current .pulse-1{animation-name:dg-five-phone-1}
+@keyframes dg-five-phone-2{0%{transform:translate(30px,170px);opacity:0}8%{transform:translate(30px,170px);opacity:1}68%{transform:translate(30px,254px);opacity:1}88%{transform:translate(30px,254px);opacity:1}100%{transform:translate(30px,254px);opacity:0}}
+#dg-five-phone .pulse-2{transform:translate(30px,180.08px)}
+.js #dg-five-phone .leg.is-current .pulse-2{animation-name:dg-five-phone-2}
+@keyframes dg-five-phone-3{0%{transform:translate(30px,274px);opacity:0}8%{transform:translate(30px,274px);opacity:1}68%{transform:translate(30px,358px);opacity:1}88%{transform:translate(30px,358px);opacity:1}100%{transform:translate(30px,358px);opacity:0}}
+#dg-five-phone .pulse-3{transform:translate(30px,284.08px)}
+.js #dg-five-phone .leg.is-current .pulse-3{animation-name:dg-five-phone-3}
+@keyframes dg-five-phone-4{0%{transform:translate(30px,378px);opacity:0}8%{transform:translate(30px,378px);opacity:1}68%{transform:translate(30px,462px);opacity:1}88%{transform:translate(30px,462px);opacity:1}100%{transform:translate(30px,462px);opacity:0}}
+#dg-five-phone .pulse-4{transform:translate(30px,388.08px)}
+.js #dg-five-phone .leg.is-current .pulse-4{animation-name:dg-five-phone-4}
+@media (prefers-reduced-motion:reduce){#dg-five-phone .pulse{animation:none!important}}
+@media print{#dg-five-phone{max-width:100%;height:auto}#dg-five-phone .pulse{display:none!important}#dg-five-phone .leg .line{stroke:var(--text,#1c1f2e)!important;stroke-width:2px!important}#dg-five-phone .leg .head,#dg-five-phone .leg .num{fill:var(--text,#1c1f2e)!important}#dg-five-phone .leg .mark{stroke:var(--text,#1c1f2e)!important}}
+@media (max-width:1164px){#dg-five{display:none}#dg-five-phone{display:block}}
+</style>
+<rect width="264" height="520" class="ground"/>
+<rect x="8" y="12" width="248" height="80" rx="10" class="band"/>
+<rect x="8" y="116" width="248" height="80" rx="10" class="band"/>
+<rect x="8" y="220" width="248" height="80" rx="10" class="band"/>
+<rect x="8" y="324" width="248" height="80" rx="10" class="band"/>
+<rect x="8" y="428" width="248" height="80" rx="10" class="band"/>
+<text x="240" y="32" class="lane" text-anchor="end">Author</text>
+<text x="240" y="136" class="lane" text-anchor="end">Reviewer</text>
+<text x="240" y="240" class="lane" text-anchor="end">Build</text>
+<text x="240" y="344" class="lane" text-anchor="end">Testers</text>
+<text x="240" y="448" class="lane" text-anchor="end">Release</text>
+<g class="leg" data-leg="1"><path d="M30,66 L30,144" class="line"/><polygon points="25.5,142 34.5,142 30,150" class="head"/><circle r="6" class="pulse pulse-1"/><circle cx="30" cy="104" r="10" class="mark"/><text x="30" y="108" class="num" text-anchor="middle">1</text><text x="51" y="108" class="verb" text-anchor="start">send</text></g>
+<g class="leg" data-leg="2"><path d="M30,170 L30,248" class="line"/><polygon points="25.5,246 34.5,246 30,254" class="head"/><circle r="6" class="pulse pulse-2"/><circle cx="30" cy="208" r="10" class="mark"/><text x="30" y="212" class="num" text-anchor="middle">2</text><text x="51" y="212" class="verb" text-anchor="start">approve</text></g>
+<g class="leg" data-leg="3"><path d="M30,274 L30,352" class="line"/><polygon points="25.5,350 34.5,350 30,358" class="head"/><circle r="6" class="pulse pulse-3"/><circle cx="30" cy="312" r="10" class="mark"/><text x="30" y="316" class="num" text-anchor="middle">3</text><text x="51" y="316" class="verb" text-anchor="start">install</text></g>
+<g class="leg" data-leg="4"><path d="M30,378 L30,456" class="line"/><polygon points="25.5,454 34.5,454 30,462" class="head"/><circle r="6" class="pulse pulse-4"/><circle cx="30" cy="416" r="10" class="mark"/><text x="30" y="420" class="num" text-anchor="middle">4</text></g>
+<circle cx="30" cy="56" r="8" class="stop"/>
+<text x="51" y="61" class="name" text-anchor="start">Change</text>
+<text x="51" y="78" class="sub" text-anchor="start">a short diff</text>
+<circle cx="30" cy="160" r="8" class="stop"/>
+<text x="51" y="165" class="name" text-anchor="start">Review</text>
+<text x="51" y="182" class="sub" text-anchor="start">read once</text>
+<circle cx="30" cy="264" r="8" class="stop"/>
+<text x="51" y="269" class="name" text-anchor="start">Build</text>
+<text x="51" y="286" class="sub" text-anchor="start">made and packed</text>
+<circle cx="30" cy="368" r="8" class="stop"/>
+<text x="51" y="373" class="name" text-anchor="start">Trial</text>
+<text x="51" y="390" class="sub" text-anchor="start">on a test machine</text>
+<circle cx="30" cy="472" r="8" class="stop end"/>
+<text x="51" y="477" class="name" text-anchor="start">Release</text>
+<text x="51" y="494" class="sub" text-anchor="start">for everyone</text>
+</svg>

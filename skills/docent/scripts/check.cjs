@@ -63,6 +63,12 @@ function checkDocument(html) {
       errors.push(`${name}${data && data.id ? ` ("${data.id}")` : ""}: ${error.message}`);
     }
   });
+  // A well holds one drawing, or two for two separate chains. Beside walkthrough steps it holds one, because step n lights leg n.
+  for (const [, attrs, inner] of html.matchAll(/<div\b([^>]*\bclass="fig\b[^"]*"[^>]*)>([\s\S]*?)<\/div>/g)) {
+    const count = (inner.match(/<!-- docent:diagram\b/g) || []).length, name = (attrs.match(/aria-label="([^"]*)"/) || [])[1] || "a figure";
+    if (count > 2) errors.push(`${name} holds ${count} diagrams; a figure holds one, or two for two separate chains`);
+    if (count > 1 && /"place"\s*:\s*"walk"/.test(inner)) errors.push(`${name} holds ${count} diagrams beside walkthrough steps; there it holds one`);
+  }
   let rest = html;
   for (const found of [...diagrams].reverse()) rest = rest.slice(0, found.start) + rest.slice(found.end);
   if (/<svg\b[^>]*\bclass="[^"]*\bdg\b/.test(rest)) errors.push("a diagram sits outside a diagram block; put its data in a block and run render");

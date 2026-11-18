@@ -146,3 +146,11 @@ test("check tests the host tokens: contrast for a hex color, and a warning for a
   assert.match(errorsOf((h) => h.replace('<html lang="en">', '<html lang="en" data-theme="sepia">')), /a fixed theme is "light" or "dark"/);
   assert.equal(errorsOf((h) => h.replace('<html lang="en">', '<html lang="en" data-theme="light">')), "");
 });
+
+test("a figure holds one drawing, or two for two separate chains", () => {
+  const block = (id, extra = "") => `<!-- docent:diagram\n{"id": "${id}",${extra} "label": "Two steps.", "lanes": [{"id": "a", "name": "A"}], "parts": [{"id": "p", "lane": "a", "name": "P"}, {"id": "q", "lane": "a", "name": "Q"}], "legs": [{"from": "p", "to": "q", "verb": "go"}]}\n-->\n<!-- /docent:diagram -->\n`;
+  const figure = (blocks) => checkDocument(renderDocument(specimen.replace("</main>", `<figure><div class="fig" role="region" aria-label="Figure 9" tabindex="0">\n${blocks}</div></figure></main>`)).html).errors.join("\n");
+  assert.equal(figure(block("one") + block("two")), "");
+  assert.match(figure(block("one") + block("two") + block("three")), /Figure 9 holds 3 diagrams; a figure holds one, or two for two separate chains/);
+  assert.match(figure(block("one", ' "place": "walk",') + block("two")), /Figure 9 holds 2 diagrams beside walkthrough steps; there it holds one/);
+});

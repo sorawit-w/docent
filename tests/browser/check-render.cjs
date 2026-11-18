@@ -411,6 +411,15 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     ok("a drawing that is not a route shows Plates on a desktop and the column form on a phone, at 320px and on paper, with no sideways scroll", desk.main > 0 && !desk.column && !phone.main && phone.column === 264 && narrow.column === 264 && !paper.main && paper.column > 0 && [phone, narrow].every((r) => r.page === r.view) && results.axe.length === 0, results);
   }
 
+  // Two drawings in one figure: side by side when both fit, one below the other when they do not.
+  {
+    const block = (id, a, b) => `<!-- docent:diagram\n{"id": "${id}", "label": "${a} goes to ${b}.", "lanes": [{"id": "x", "name": "Team"}, {"id": "y", "name": "Service"}], "parts": [{"id": "p", "lane": "x", "name": "${a}"}, {"id": "q", "lane": "y", "name": "${b}"}], "legs": [{"from": "p", "to": "q", "verb": "send"}]}\n-->\n<!-- /docent:diagram -->\n`;
+    const content = renderDocument(html.replace('<section id="report"', `<section id="two" aria-labelledby="two-h"><h2 id="two-h">Two</h2><figure><div class="fig" role="region" aria-label="Figure 7, two chains" tabindex="0">\n${block("left", "Order", "Invoice")}${block("right", "Refund", "Credit")}</div><figcaption><strong>Figure 7</strong>Two chains.</figcaption></figure></section>\n<section id="report"`)).html;
+    const place = async (opts) => { const view = await open({ ...opts, content }); const r = await view.page.evaluate(() => { const [a, b] = ["dg-left", "dg-right"].map((id) => [id, `${id}-phone`].map((i) => document.getElementById(i)).filter(Boolean).map((el) => el.getBoundingClientRect()).find((r) => r.width)); return { sameRow: Math.round(a.top) === Math.round(b.top), page: document.documentElement.scrollWidth, view: innerWidth }; }); await view.context.close(); return r; };
+    const [desk, phone] = [await place({ width: 1280 }), await place({ width: 390, height: 844 })];
+    ok("two drawings in one figure stand side by side on a desktop and one below the other on a phone", desk.sameRow && !phone.sameRow && phone.page === phone.view, { desk, phone });
+  }
+
   // The value picker: a choice changes every place, in the text and in code. With scripts off, and on paper, the table of all values is there.
   {
     const { page, context } = await open({ width: 1280 });

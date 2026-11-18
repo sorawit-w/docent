@@ -25,7 +25,7 @@ Version 0.4.0. The design is settled, and the three scripts exist with tests.
 Known limits:
 
 - The renderer estimates text widths. The estimate was tested against the fonts of an Apple device only.
-- A diagram has at most 4 lanes, 12 parts and 16 legs.
+- A diagram has at most 5 lanes, 12 parts and 16 legs.
 - A widget holds text only. Docent has four widgets and no way to add one in a document.
 - No colored badges and no syntax colors in code, by design (see `DESIGN.md`).
 

@@ -132,7 +132,8 @@ h3.is-numbered::before { content: none !important; }
 /* Figures: a well that holds a Docent diagram, with a plain caption. A diagram carries its own styles. */
 figure { margin: 0; }
 section > figure { margin-top: 24px; }
-.fig { background: var(--fig); border-radius: 12px; padding: 8px; overflow-x: auto; scrollbar-color: var(--line) transparent; }
+.fig { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 16px 24px; background: var(--fig); border-radius: 12px; padding: 8px; overflow-x: auto; scrollbar-color: var(--line) transparent; }
+/* A well may hold two drawings, for two separate chains: side by side when both fit, else one below the other. */
 /* A drawing that is wider than its well scrolls sideways. The page script shows this line under it, because the part that shows can look complete. */
 .fig-more { margin: 8px 0 0; max-width: none; font-size: 14px; line-height: 1.5; color: var(--muted); }
 figcaption { margin-top: 12px; font-size: 14px; line-height: 1.5; color: var(--muted); }

@@ -13,6 +13,7 @@ const SANS = 'system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,s
 const CROSS = 1.6, PAUSE = 1.2; // seconds for one leg, and the rest before the run starts again
 
 function text(t) {
+  if (t.s === "") return ""; // a leg with no verb
   return `<text x="${num(t.x)}" y="${num(t.y)}" class="${t.cls}" text-anchor="${t.anchor || "start"}">${esc(t.s)}</text>`;
 }
 
