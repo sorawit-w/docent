@@ -63,10 +63,16 @@ test("check tests the frame of the document and the format of its title", () => 
   assert.match(errorsOf((h) => h.replace(/<title>.*<\/title>/, "<title>Report a bug and get a fix — Docent sample</title>")), /the <title> names Docent/);
   const warned = checkDocument(specimen.replace(/<title>.*<\/title>/, "<title>Another title — Example project</title>")).warnings.join("\n");
   assert.match(warned, /the <title> starts with "Another title", but the <h1> is "Report a bug and get a fix"/);
+  // A long h1 may have a shorter window title, made of the h1's own words in the same order.
+  const short = (title) => checkDocument(specimen.replace(/<title>.*<\/title>/, `<title>${title} — Example project</title>`)).warnings.filter((w) => w.includes("<title>"));
+  assert.deepEqual(short("Report a bug"), []);
+  assert.deepEqual(short("report a fix"), [], "case does not matter");
+  assert.equal(short("A fix for a bug").length, 1, "the same words in another order are not a shorter form");
+  assert.equal(short("Report a problem").length, 1, "a word that is not in the h1");
 });
 
 test("check finds a kit or a drawing that was changed by hand", () => {
-  assert.match(errorsOf((h) => h.replace("--primary: #2f3fd0;", "--primary: #ff0000;")), /the kit styles were changed by hand; run stamp/);
+  assert.match(errorsOf((h) => h.replace("--primary: #2f3fd0;", "--primary: #ff0000;")), /the kit styles were changed by hand or by a code formatter; run stamp/);
   assert.match(errorsOf((h) => h.replace(cssBlock(), "")), /the document has no kit styles; run stamp/);
   assert.match(errorsOf((h) => h.replace(`docent:kit ${VERSION} */`, "docent:kit 0.0.9 */")), /the kit styles are version 0\.0\.9/);
   assert.match(errorsOf((h) => h.replace(' r="13" class="stop"/>', ' r="15" class="stop"/>')), /diagram 1 \("path"\): the drawing does not match its data; run render/);
