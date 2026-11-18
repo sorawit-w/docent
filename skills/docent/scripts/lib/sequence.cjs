@@ -129,11 +129,16 @@ const levelAt = (bars, lane, i) => bars.filter((b) => b.lane === lane && b.start
 /** The desktop form: a track for each lifeline, one row for each message, a frame for each fragment and ref. */
 function desktop(model) {
   const { lanes, legs, bars } = model;
-  const headW = Math.max(96, ...lanes.map((p) => nameW(p.name) + 32));
+  // Every ref, so that its frame is wide enough for its name.
+  const refs = [];
+  const findRefs = (list) => list.forEach((it) => (it.t === "ref" ? refs.push(it) : it.t === "frag" && it.operands.forEach((o) => findRefs(o.items))));
+  findRefs(model.items);
+  const refNeed = (r) => nameW(r.name) + 32 - 16; // the frame is 8px wider than the heads on each side
+  const headW = Math.max(96, ...lanes.map((p) => nameW(p.name) + 32), ...refs.filter((r) => r.first === r.last).map(refNeed));
   // Two tracks are far enough apart for each verb to sit in its first gap, for a call to itself with its verb, and for
   // a message that creates a lifeline to keep its mark and verb clear of the new head.
   const gapNeed = legs.map((l) => (l.from === l.to ? (l.from < lanes.length - 1 ? LOOP.w + 30 + noteW(l.verb) + 16 : 0) : l.create ? noteW(l.verb) + 40 + headW / 2 + 40 : noteW(l.verb) + 40 + 2 * BAR.half + 4 * BAR.step));
-  const S = even(Math.max(headW + 24, 120, ...gapNeed));
+  const S = even(Math.max(headW + 24, 120, ...gapNeed, ...refs.filter((r) => r.last > r.first).map((r) => Math.ceil((refNeed(r) - headW) / (r.last - r.first)))));
   const x = lanes.map((_, i) => 16 + headW / 2 + i * S);
   const scene = { form: "sequence", uml: true, bands: [], gaps: [], tracks: [], lanes: [], parts: [], legs: [], notes: [], bars: [], frames: [], crosses: [] };
   const legY = [], top = lanes.map(() => HEADER.y), end = lanes.map(() => null);
@@ -254,10 +259,10 @@ function script(model) {
       } else {
         item.operands.forEach((o) => {
           const band = { y, depth, label: `${item.op} ${guard(o.when)}`.trim() };
+          bands.push(band); // before the bands inside it, so that it is painted under them
           y += 24;
           rows(o.items, depth + 1);
           band.h = y + 4 - band.y;
-          bands.push(band);
           y += 16;
           tail = 16;
         });

@@ -61,6 +61,16 @@ test("a sequence diagram draws async messages, create, destroy, every fragment a
   assert.match(svg, />ref<\/text>[^]*>Log in<\/text>/);
 });
 
+test("a ref frame is wide enough for its name, and a band is painted under the bands inside it", () => {
+  const { scene } = renderDiagram({ id: "auth", kind: "sequence", label: "The client logs in, then asks the server.", participants: [{ id: "client", name: "Client" }, { id: "server", name: "Server" }], messages: [{ ref: "Authenticate the current session", over: ["client"] }, { from: "client", to: "server", verb: "ask" }] });
+  const ref = scene.frames.find((f) => f.ref);
+  assert.ok(ref.x >= 0 && ref.x + ref.w <= scene.w, "the frame sits inside the drawing");
+  assert.ok(ref.w >= 32 + 230, `the frame holds its name: ${ref.w}px`);
+  const svg = renderDiagram(uml()).svg.split('class="dg dg-script')[1];
+  const loop = svg.indexOf(">loop [for each item]<"), opt = svg.indexOf(">opt [If the item is low]<");
+  assert.ok(loop > 0 && opt > loop, "the loop band comes before the opt band inside it");
+});
+
 test("a sequence diagram has a script form for phones, and the steps in words with a key to the marks", () => {
   const { svg } = renderDiagram(fixture());
   assert.match(svg, /<svg id="dg-page-phone" class="dg dg-script dg-auto"[^>]* width="264"/);
