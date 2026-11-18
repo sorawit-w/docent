@@ -1,6 +1,6 @@
 # Proposal: new diagram kinds and looser diagram rules
 
-Status: **a proposal, waiting for approval.** Nothing in it is built. The sample page [`diagram-kinds.html`](diagram-kinds.html) shows the proposed forms as drawings made by hand, with neutral content. Open it in a browser and switch the theme and the width.
+Status: **approved on 2026-11-18**, with one change: the sequence diagram comes before the flowchart, because four documents needed it. The commit graph is declined, and the text form is visible. The items are built in this order, each in its own pull request. The sample page [`diagram-kinds.html`](diagram-kinds.html) shows the proposed forms as drawings made by hand, with neutral content. Open it in a browser and switch the theme and the width.
 
 ## The answer first
 
@@ -14,11 +14,11 @@ Build one shared piece first: **a one-column form for any diagram that is not a 
 | 4 | Two separate chains | **Two drawings in one figure**, side by side when both fit | Small |
 | 5 | A branch beside walkthrough steps | **Build** "side legs" in Route tall | Medium |
 | 6 | Layered architecture with a skipping arrow | **Already possible** as one-lane Plates; the Column form gives it a phone form. An instruction fix | Small |
-| 7 | Flowchart with decisions and loops | **Build** a new kind, `"kind": "flow"` | Large |
-| 8 | Sequence diagram | **Build** a new kind, `"kind": "sequence"` | Large |
+| 7 | Sequence diagram | **Build** a new kind, `"kind": "sequence"` | Large |
+| 8 | Flowchart with decisions and loops | **Build** a new kind, `"kind": "flow"` | Large |
 | 9 | Commit graph: merge against squash | **Decline for now**; one document needed it | — |
 
-Recommended order: 1, 2, 3, 4, 5, 6 (with 1), 7, 8. Items 1 to 6 change the existing renderer and give every document something. Items 7 and 8 are new layouts; each is about as large as Plates was.
+Order: 1, 2, 3, 4, 5, 6 (with 1), 7, 8. Items 1 to 6 change the existing renderer and give every document something. Items 7 and 8 are new layouts; each is about as large as Plates was. The sequence diagram (7) comes first of the two, because more documents needed it.
 
 ## The obvious answer that would be wrong
 
@@ -114,7 +114,7 @@ Beside walkthrough steps the room is 520px, which holds two lanes. Five lanes th
 
 **Fix.** An instruction in `diagrams.md`: "A stack of layers is one lane with one part per layer." A drawn sample is on the sample page.
 
-## 7. Flowchart
+## 8. Flowchart
 
 **Build, as a new kind.** Decisions, loops and arrows back cannot be drawn as Plates in a way that reads: Plates puts every part on its own row in leg order, with no shape for a decision, and an arrow back crosses the drawing.
 
@@ -157,7 +157,7 @@ A node with `"ask"` is a decision; every edge out of a decision needs `"when"`. 
 
 **`check`.** Every node is reached from the first node. Every path ends in a stop or in the last node. Each decision has 2 or 3 labelled exits. The drawing and the text form match the data.
 
-## 8. Sequence diagram
+## 7. Sequence diagram
 
 **Build, as a new kind.** Four documents needed it and wrote a numbered list.
 
@@ -213,8 +213,8 @@ The dot travels the messages in order, twice, then rests.
 
 ---
 
-## What to decide
+## Decided
 
-1. Approve the order: Column form, looser rules, five lanes, two drawings in a figure, side legs, then flowchart, then sequence.
-2. Approve declining the commit graph.
-3. Approve the text form ("The diagram in words") for the flowchart and the sequence diagram. It adds a closed section under those figures.
+1. The order: Column form, looser rules, five lanes, two drawings in a figure, side legs, then the sequence diagram, then the flowchart.
+2. The commit graph is declined for now.
+3. The flowchart and the sequence diagram get a visible text form ("The diagram in words"), in a closed section under the figure.
