@@ -1,12 +1,12 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-profile="standard">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
 <title>Report a bug and get a fix — Example project</title>
 <style>
-/* docent:kit 0.4.0 */
+/* docent:kit 0.5.0 */
 /* Docent page styles. Tokens come from references/DESIGN.md. One file, no network. */
 :root {
   color-scheme: light;
@@ -19,8 +19,16 @@
   --sans: var(--host-sans, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif);
   --mono: var(--host-mono, ui-monospace, "SF Mono", "Cascadia Code", Consolas, Menlo, monospace);
   --ease: cubic-bezier(0.23, 1, 0.32, 1);
-  --measure: 31rem; --margin-col: 220px; --gap: 48px;
+  --measure: 31rem; --margin-col: 220px; --gap: 48px; --wide: 1120px;
+  /* The profile of a page sets these. Standard is the default: code and tables end at the right edge of the notes. */
+  --block: calc(var(--measure) + var(--gap) + var(--margin-col)); --section-space: 72px; --cell-y: 12px; --step-space: 36px;
 }
+/* Profiles: one attribute on <html> sets the width of code and tables, and the spacing. A profile never changes the text column. */
+html[data-profile="task"] { --section-space: 56px; --step-space: 28px; }
+html[data-profile="reference"] { --block: var(--wide); --section-space: 56px; --cell-y: 8px; }
+html[data-profile="brief"] { --block: var(--wide); --section-space: 64px; }
+/* A page for the public: every size is in rem, so the text and the text column grow together, on top of the reader's own setting. */
+html[data-text="large"] { font-size: 112.5%; }
 /* Dark: the reader's system setting decides, unless the reader chose a theme with the switch. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
@@ -40,25 +48,29 @@
 }
 *, *::before, *::after { box-sizing: border-box; }
 html { scroll-padding-top: 88px; -webkit-text-size-adjust: 100%; }
-body { margin: 0; background: var(--bg); color: var(--text); font: 400 16px/1.65 var(--sans); caret-color: var(--primary); }
+body { margin: 0; background: var(--bg); color: var(--text); font: 400 1rem/1.65 var(--sans); caret-color: var(--primary); }
 ::selection { background: color-mix(in srgb, var(--primary) 22%, transparent); }
 :focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
 a { color: var(--primary); text-decoration-thickness: 1px; text-underline-offset: 0.2em; }
 a:hover { text-decoration-thickness: 2px; }
-.shell { max-width: 1200px; margin: 0 auto; padding: 0 40px; }
+/* One left edge for the whole page. On a wide screen the text and its notes sit in the middle as a group; wide blocks start at the same edge and grow to the right, up to --wide. */
+.shell {
+  --left: max(40px, min((100% - var(--measure) - var(--gap) - var(--margin-col)) / 2, 100% - var(--wide) - 40px));
+  padding: 0 max(40px, 100% - var(--left) - var(--wide)) 0 var(--left);
+}
 
 /* Top bar. Its bottom line is the route; the dot marks the current section. */
 .topbar { position: sticky; top: 0; z-index: 2; background: var(--bg); border-bottom: 1px solid var(--line); }
 .topbar .shell { position: relative; display: flex; align-items: center; gap: 32px; height: 56px; }
-.host { font-weight: 600; font-size: 14px; white-space: nowrap; }
+.host { font-weight: 600; font-size: 0.875rem; white-space: nowrap; }
 .route { flex: 1; min-width: 0; }
 .route ol { display: flex; gap: 28px; margin: 0; padding: 0; list-style: none; }
-.route a { display: block; padding: 6px 0; font-size: 14px; color: var(--muted); text-decoration: none; white-space: nowrap; }
+.route a { display: block; padding: 6px 0; font-size: 0.875rem; color: var(--muted); text-decoration: none; white-space: nowrap; }
 .route a:hover, .route a[aria-current] { color: var(--text); }
 .route-dot { position: absolute; left: 0; bottom: -4px; width: 7px; height: 7px; border-radius: 50%; background: var(--dot); opacity: 0; transform: translateX(var(--x, 0px)); }
 .ready .route-dot, .ready .rail-dot { transition: transform 320ms var(--ease); }
 .js .route-dot { opacity: 1; }
-.theme, .wd-btn { display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px; border: 1px solid var(--line); border-radius: 6px; background: none; color: var(--text); font: 400 14px/1 var(--sans); cursor: pointer; }
+.theme, .wd-btn { display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px; border: 1px solid var(--line); border-radius: 6px; background: none; color: var(--text); font: 400 0.875rem/1 var(--sans); cursor: pointer; }
 .theme:hover, .wd-btn:hover { border-color: var(--muted); }
 .theme:active, .wd-btn:active { transform: translateY(1px); }
 .theme svg { width: 15px; height: 15px; }
@@ -69,15 +81,15 @@ html:not(.js) .theme, .theme[hidden] { display: none; }
 .title { padding: 80px 0 8px; }
 .title .row { margin-top: 24px; }
 h1, h2 { font-family: var(--serif); font-weight: 700; color: var(--ink); text-wrap: balance; margin: 0; }
-h1 { font-size: 52px; line-height: 1.06; letter-spacing: -0.02em; }
-.standfirst { font: 400 21px/1.5 var(--serif); margin: 0; text-wrap: pretty; }
+h1 { font-size: 3.25rem; line-height: 1.06; letter-spacing: -0.02em; }
+.standfirst { font: 400 1.3125rem/1.5 var(--serif); margin: 0; text-wrap: pretty; }
 .facts { margin: 0; padding-left: 0; list-style: none; font-variant-numeric: tabular-nums; }
 
-section { padding-top: 72px; }
-h2 { font-size: 30px; line-height: 1.2; margin-bottom: 16px; }
-h3 { font: 600 18px/1.35 var(--sans); margin: 0; text-wrap: balance; }
+section { padding-top: var(--section-space); }
+h2 { font-size: 1.875rem; line-height: 1.2; margin-bottom: 16px; }
+h3 { font: 600 1.125rem/1.35 var(--sans); margin: 0; text-wrap: balance; }
 /* A small heading inside a part of a section: body size, weight 600. */
-h4 { font: 600 16px/1.5 var(--sans); margin: 24px 0 4px; }
+h4 { font: 600 1rem/1.5 var(--sans); margin: 24px 0 4px; }
 /* A definition list: each term in weight 600, its meaning below it. */
 dl { max-width: var(--measure); margin: 0 0 16px; }
 dt { font-weight: 600; }
@@ -88,8 +100,8 @@ p { margin: 0 0 16px; max-width: var(--measure); text-wrap: pretty; }
 /* A place that shows a value of a value picker. A dotted line under it says that it changes with the choice. */
 var { font-style: normal; }
 var[data-v] { text-decoration: underline dotted var(--muted); text-decoration-thickness: 1px; text-underline-offset: 0.25em; }
-code { font: 14px/1.55 var(--mono); background: var(--panel); padding: 0.1em 0.38em; border-radius: 6px; }
-.standfirst code { font-size: 18px; }
+code { font: 0.875rem/1.55 var(--mono); background: var(--panel); padding: 0.1em 0.38em; border-radius: 6px; }
+.standfirst code { font-size: 1.125rem; }
 
 /* Lists in the text flow: points, or numbers for steps that one actor does. The rules are weak on purpose, so the lists of the kit's own blocks keep their styles. */
 :where(main) :where(ul, ol):not(.steps, .facts, .cards) { max-width: var(--measure); margin: 0 0 16px; padding-left: 24px; }
@@ -110,15 +122,18 @@ h3.is-numbered::before { content: none !important; }
 
 /* Margin notes: the guide's remarks sit beside the text, like a wall label. */
 .row { display: grid; grid-template-columns: minmax(0, var(--measure)) var(--margin-col); column-gap: var(--gap); align-items: start; }
-.note { margin: 6px 0 16px; padding-top: 12px; border-top: 1px solid var(--line); font-size: 14px; line-height: 1.5; color: var(--muted); }
+.note { margin: 6px 0 16px; padding-top: 12px; border-top: 1px solid var(--line); font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
 .note strong { display: block; margin-bottom: 4px; font-weight: 600; color: var(--text); }
+/* A heading may stand in the text column, with the facts about its item beside it. The row brings the space above the heading, so the note lines up with the heading. */
+.row:has(> h3:first-child) { margin-top: 32px; }
+.row > h3:first-child { margin-top: 0; }
 
 /* Walkthrough: a rail with a node per step; one dot travels along it. */
 .walk { display: grid; grid-template-columns: minmax(0, 1fr) 536px; column-gap: 40px; align-items: start; margin-top: 24px; }
 .rail { position: relative; }
 .steps { position: relative; margin: 0; padding: 0; list-style: none; counter-reset: step; }
 .steps::before { content: ""; position: absolute; left: 4px; top: 10px; bottom: 10px; width: 1px; background: var(--line); }
-.steps li { position: relative; padding: 0 0 36px 32px; counter-increment: step; }
+.steps li { position: relative; padding: 0 0 var(--step-space) 32px; counter-increment: step; }
 .steps li:last-child { padding-bottom: 0; }
 .steps li::before { content: ""; position: absolute; left: 0; top: 8px; width: 9px; height: 9px; border-radius: 50%; border: 1px solid var(--muted); background: var(--bg); }
 .steps h3::before { content: counter(step); font-weight: 400; color: var(--muted); margin-right: 10px; font-variant-numeric: tabular-nums; }
@@ -130,33 +145,37 @@ h3.is-numbered::before { content: none !important; }
 .walk figure { position: sticky; top: 88px; }
 
 /* Figures: a well that holds a Docent diagram, with a plain caption. A diagram carries its own styles. */
-figure { margin: 0; }
+/* A well is as wide as the profile's block. A wider drawing keeps its real size, and its well grows with it. */
+figure { margin: 0; min-width: min(100%, var(--block)); width: fit-content; max-width: 100%; }
 section > figure { margin-top: 24px; }
 .fig { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 16px 24px; background: var(--fig); border-radius: 12px; padding: 8px; overflow-x: auto; scrollbar-color: var(--line) transparent; }
 /* A well may hold two drawings, for two separate chains: side by side when both fit, else one below the other. */
 /* A drawing that is wider than its well scrolls sideways. The page script shows this line under it, because the part that shows can look complete. */
-.fig-more { margin: 8px 0 0; max-width: none; font-size: 14px; line-height: 1.5; color: var(--muted); }
+.fig-more { margin: 8px 0 0; max-width: none; font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
 /* The steps of a diagram in words: a closed section in the well, under the drawing. */
 .dg-words { flex-basis: 100%; max-width: var(--measure); margin: 0; padding: 0 8px 4px; }
 .dg-words ol { margin: 8px 0 0; padding-left: 28px; }
 .dg-words li + li { margin-top: 4px; }
 .dg-words p { margin: 12px 0 0; font-weight: 600; }
-figcaption { margin-top: 12px; font-size: 14px; line-height: 1.5; color: var(--muted); }
+figcaption { margin-top: 12px; font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
 figcaption strong { font-weight: 600; color: var(--text); margin-right: 8px; }
 
 /* Card grid: 3 to 8 short items side by side, each a heading or a large number and a line of text. A card is a label, like a margin note: a line above it, and no box. At most four in a row. */
 .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(max(160px, calc((100% - 72px) / 4)), 1fr)); gap: 24px; margin: 24px 0 0; padding: 0; list-style: none; }
 .cards > li { min-width: 0; padding-top: 12px; border-top: 1px solid var(--line); }
-.cards h3 { margin: 0 0 4px; font-size: 16px; line-height: 1.5; }
-.cards p { margin: 0; font-size: 14px; line-height: 1.5; color: var(--muted); }
-.cards .big { margin-bottom: 4px; font: 700 30px/1.2 var(--serif); color: var(--ink); font-variant-numeric: tabular-nums; }
+.cards h3 { margin: 0 0 4px; font-size: 1rem; line-height: 1.5; }
+.cards p { margin: 0; font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
+.cards .big { margin-bottom: 4px; font: 700 1.875rem/1.2 var(--serif); color: var(--ink); font-variant-numeric: tabular-nums; }
 .cards + :is(p, ul, ol, dl) { margin-top: 24px; }
+
+/* Code, tables and cards end at the profile's block width. */
+:is(pre, .code, .table-wrap, .cards) { max-width: var(--block); }
 
 /* Tables: rules only, no boxes. */
 .table-wrap { overflow-x: auto; margin: 24px 0 0; scrollbar-color: var(--line) transparent; }
 table { width: 100%; min-width: 640px; border-collapse: collapse; font-variant-numeric: tabular-nums; }
-th, td { text-align: left; vertical-align: top; padding: 12px 24px 12px 0; }
-thead th { border-bottom: 1px solid var(--text); padding-bottom: 10px; font-size: 14px; line-height: 1.5; font-weight: 600; color: var(--muted); }
+th, td { text-align: left; vertical-align: top; padding: var(--cell-y) 24px var(--cell-y) 0; }
+thead th { border-bottom: 1px solid var(--text); padding-bottom: 10px; font-size: 0.875rem; line-height: 1.5; font-weight: 600; color: var(--muted); }
 tbody th { font-weight: 600; white-space: nowrap; }
 tbody tr { border-bottom: 1px solid var(--line); }
 .state { display: inline-flex; align-items: baseline; gap: 8px; font-weight: 600; }
@@ -173,12 +192,12 @@ tbody tr { border-bottom: 1px solid var(--line); }
 .status { max-width: var(--measure); margin: 32px 0 0; }
 .status p { margin: 4px 0 0; }
 
-pre { margin: 20px 0 0; padding: 16px 20px; background: var(--panel); border-radius: 10px; overflow-x: auto; font: 14px/1.6 var(--mono); scrollbar-color: var(--line) transparent; }
+pre { margin: 20px 0 0; padding: 16px 20px; background: var(--panel); border-radius: 10px; overflow-x: auto; font: 0.875rem/1.6 var(--mono); scrollbar-color: var(--line) transparent; }
 pre code { background: none; padding: 0; font-size: inherit; }
 /* With scripts on, a code block sits in a holder with a button that copies the code. The holder takes the place and the space of the code block. */
 .code { position: relative; margin: 20px 0 0; }
 .code > pre { margin: 0; }
-.copy { position: absolute; top: 0; right: 0; height: 30px; padding: 0 12px; border: solid var(--line); border-width: 0 0 1px 1px; border-radius: 0 10px 0 6px; background: var(--panel); color: var(--muted); font: 400 14px/1 var(--sans); cursor: pointer; }
+.copy { position: absolute; top: 0; right: 0; height: 30px; padding: 0 12px; border: solid var(--line); border-width: 0 0 1px 1px; border-radius: 0 10px 0 6px; background: var(--panel); color: var(--muted); font: 400 0.875rem/1 var(--sans); cursor: pointer; }
 .copy:hover { color: var(--text); }
 /* A line of code that reaches the button would sit under it. Then the code starts below the button. */
 .code.is-long > pre { padding-top: 40px; }
@@ -197,8 +216,8 @@ details > p { margin: 8px 0 0 22px; }
 .choose, .checks, .decide, .values { position: relative; margin: 24px 0 0; }
 :is(.choose, .checks, .decide, .values) + * { margin-top: 24px; }
 .choose > input, .checks input, .decide input, .values > input { position: absolute; width: 1px; height: 1px; margin: 0; opacity: 0; pointer-events: none; }
-.wd-t { margin: 0; max-width: none; font-size: 14px; line-height: 1.5; font-weight: 600; color: var(--muted); }
-.opt { display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px; border: 1px solid var(--line); border-radius: 6px; font-size: 14px; line-height: 1; cursor: pointer; }
+.wd-t { margin: 0; max-width: none; font-size: 0.875rem; line-height: 1.5; font-weight: 600; color: var(--muted); }
+.opt { display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px; border: 1px solid var(--line); border-radius: 6px; font-size: 0.875rem; line-height: 1; cursor: pointer; }
 .opt::before { content: ""; width: 9px; height: 9px; border-radius: 50%; border: 1px solid var(--muted); }
 .opt:hover { border-color: var(--muted); }
 input:checked + .opt { border-color: var(--text); }
@@ -221,8 +240,8 @@ input:focus-visible + .opt, .checks input:focus-visible + label::before { outlin
 .checks input:checked + label { color: var(--muted); }
 .checks input:checked + label::before { border-color: var(--text); }
 .checks input:checked + label::after { opacity: 1; }
-.checks .sub { display: block; font-size: 14px; line-height: 1.5; color: var(--muted); }
-.wd-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin: 16px 0 0; max-width: none; font-size: 14px; line-height: 1.5; color: var(--muted); font-variant-numeric: tabular-nums; }
+.checks .sub { display: block; font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
+.wd-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin: 16px 0 0; max-width: none; font-size: 0.875rem; line-height: 1.5; color: var(--muted); font-variant-numeric: tabular-nums; }
 .wd-foot[hidden] { display: none; }
 /* Decision helper: questions, the one answer that fits, and the table of all cases. The table is the still form. */
 .decide fieldset { position: relative; display: flex; flex-wrap: wrap; gap: 8px; min-width: 0; margin: 16px 0 0; padding: 0; border: 0; }
@@ -239,15 +258,15 @@ html:not(.js) .decide-ask, html:not(.js) .wd-foot output { display: none; }
 /* Value picker: options like a chooser, a line that names the chosen option, and the table of all values. With scripts off the options do nothing, so they are hidden, and the text shows the values of the first option. */
 .values { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .values > .wd-t { margin-right: 4px; }
-.values-now { flex-basis: 100%; max-width: none; margin: 4px 0 0; font-size: 14px; line-height: 1.5; color: var(--muted); }
+.values-now { flex-basis: 100%; max-width: none; margin: 4px 0 0; font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
 .values-now strong { font-weight: 600; color: var(--text); }
 .values details { flex-basis: 100%; min-width: 0; max-width: none; margin-top: 8px; }
 .values .table-wrap { margin-top: 8px; }
 html:not(.js) .values > input + .opt { display: none; }
 
 footer { margin-top: 96px; border-top: 1px solid var(--line); }
-footer .shell { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding-top: 24px; padding-bottom: 40px; font-size: 14px; color: var(--muted); }
-.brand { display: inline-flex; align-items: center; gap: 10px; font: 700 16px/1 var(--serif); color: var(--text); }
+footer .shell { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding-top: 24px; padding-bottom: 40px; font-size: 0.875rem; color: var(--muted); }
+.brand { display: inline-flex; align-items: center; gap: 10px; font: 700 1rem/1 var(--serif); color: var(--text); }
 .brand svg { width: 24px; height: 24px; }
 
 @media (max-width: 1100px) {
@@ -269,7 +288,7 @@ footer .shell { display: flex; align-items: center; justify-content: space-betwe
   .route a[aria-current] { text-decoration: underline; text-decoration-color: var(--dot); text-decoration-thickness: 2px; text-underline-offset: 0.4em; }
   .route-dot { display: none; }
   .title { padding-top: 48px; }
-  h1 { font-size: 32px; } h2 { font-size: 26px; }
+  h1 { font-size: 2rem; } h2 { font-size: 1.625rem; }
   section { padding-top: 56px; }
   footer .shell { flex-direction: column; align-items: flex-start; }
 }
@@ -278,6 +297,16 @@ footer .shell { display: flex; align-items: center; justify-content: space-betwe
 }
 @media print {
   html:root:not([data-never]) { color-scheme: light; --bg: #ffffff; --panel: #f2f3f9; --fig: #f2f3f9; --text: #1c1f2e; --muted: #575d75; --line: #d3d6e3; --primary: var(--host-accent, #2f3fd0); --ink: var(--host-ink, #1b2260); --dot: var(--host-accent, #2f3fd0); --ok: #1a7f37; --warn: #7d4e00; --err: #cf222e; }
+  /* Paper: 11pt text, the page margin as the edge, and the notes beside the text again. An A4 page holds the text (112mm), a gap and the notes (50mm). */
+  html { font-size: 11pt; } html[data-text="large"] { font-size: 12pt; }
+  html:root:not([data-never]) { --measure: 112mm; --gap: 8mm; --margin-col: 50mm; --block: 100%; }
+  .shell { padding: 0; }
+  .row { grid-template-columns: minmax(0, var(--measure)) var(--margin-col); }
+  .title .note { margin-top: 6px; }
+  p, li { orphans: 2; widows: 2; }
+  /* A browser may leave out the ground of a code well on paper. A thin line keeps it a well. */
+  /* Paper cannot scroll: a long line of code wraps. */
+  pre { border: 1px solid var(--line); white-space: pre-wrap; overflow-wrap: anywhere; }
   .topbar, .rail-dot, .choose > .opt, .values > .opt, .decide-ask, .wd-foot, .copy, .fig-more { display: none !important; }
   .choose > .case { display: block !important; margin-top: 16px; } .case-t { display: block; }
   .checks input:checked + label, .decide tr.is-out { color: var(--text) !important; }
@@ -288,7 +317,8 @@ footer .shell { display: flex; align-items: center; justify-content: space-betwe
   .state::before, .steps::before, .fig, pre, code { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   figure, tr, .status, pre, .checks li, .cards > li { break-inside: avoid; }
   h2, h3 { break-after: avoid; }
-  @page { margin: 18mm; }
+  /* Page numbers: Chrome and Edge print them; other browsers print their own footer. */
+  @page { margin: 18mm; @bottom-right { content: counter(page) " / " counter(pages); font: 9pt system-ui, sans-serif; color: #575d75; } }
 }
 /* /docent:kit */
 </style>
@@ -1109,20 +1139,27 @@ grep -i password bug.log</code></pre>
 </footer>
 
 <script>
-// docent:kit 0.4.0
+// docent:kit 0.5.0
 (() => {
   const root = document.documentElement;
   root.classList.add('js');
+  // A page saved from the browser ("Save page as") keeps what this script added. Take it out, so that the script adds each part once.
+  document.querySelectorAll('.fig-more, .step-n, button.copy').forEach((el) => el.remove());
+  document.querySelectorAll('div.code').forEach((holder) => holder.replaceWith(...holder.childNodes));
+  document.querySelectorAll('.is-numbered').forEach((h) => h.classList.remove('is-numbered'));
+  // A theme that the reader chose carries data-theme-reader. A saved page keeps it, and it is not a fixed theme.
+  if (root.hasAttribute('data-theme-reader')) { delete root.dataset.theme; delete root.dataset.themeReader; }
   // Theme: the page follows the reader's system setting. The switch sets a choice that wins over the system and is remembered.
   const button = document.querySelector('.theme');
   const system = matchMedia('(prefers-color-scheme: dark)');
   const theme = () => root.dataset.theme || (system.matches ? 'dark' : 'light');
+  const chooseTheme = (value) => { root.dataset.theme = value; root.dataset.themeReader = ''; };
   // A theme written on <html> in the source is fixed: no saved choice and no switch.
   const fixed = root.dataset.theme === 'light' || root.dataset.theme === 'dark';
   if (fixed && button) button.hidden = true;
   if (!fixed) try {
     const saved = localStorage.getItem('docent-theme');
-    if (saved === 'dark' || saved === 'light') root.dataset.theme = saved;
+    if (saved === 'dark' || saved === 'light') chooseTheme(saved);
   } catch { /* no saved choice can be read: follow the system */ }
   if (button && !fixed) {
     const showSwitch = () => {
@@ -1134,7 +1171,7 @@ grep -i password bug.log</code></pre>
     showSwitch();
     system.addEventListener('change', showSwitch);
     button.addEventListener('click', () => {
-      root.dataset.theme = theme() === 'dark' ? 'light' : 'dark';
+      chooseTheme(theme() === 'dark' ? 'light' : 'dark');
       showSwitch();
       try { localStorage.setItem('docent-theme', root.dataset.theme); } catch { /* private window: the choice lasts for this visit */ }
     });

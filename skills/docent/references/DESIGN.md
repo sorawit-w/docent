@@ -26,49 +26,49 @@ colors:
 typography:
   h1:
     fontFamily: Charter, "Bitstream Charter", "Sitka Heading", "Sitka Text", Cambria, Georgia, serif
-    fontSize: 52px
+    fontSize: 3.25rem
     fontWeight: 700
     lineHeight: 1.06
     letterSpacing: -0.02em
   h2:
     fontFamily: Charter, "Bitstream Charter", "Sitka Heading", "Sitka Text", Cambria, Georgia, serif
-    fontSize: 30px
+    fontSize: 1.875rem
     fontWeight: 700
     lineHeight: 1.2
   h1-compact:                   # the title on a phone
     fontFamily: Charter, "Bitstream Charter", "Sitka Heading", "Sitka Text", Cambria, Georgia, serif
-    fontSize: 32px
+    fontSize: 2rem
     fontWeight: 700
     lineHeight: 1.06
     letterSpacing: -0.02em
   h2-compact:                   # a section heading on a phone
     fontFamily: Charter, "Bitstream Charter", "Sitka Heading", "Sitka Text", Cambria, Georgia, serif
-    fontSize: 26px
+    fontSize: 1.625rem
     fontWeight: 700
     lineHeight: 1.2
   h3:
     fontFamily: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif
-    fontSize: 18px
+    fontSize: 1.125rem
     fontWeight: 600
     lineHeight: 1.35
   body-lg:
     fontFamily: Charter, "Bitstream Charter", "Sitka Heading", "Sitka Text", Cambria, Georgia, serif
-    fontSize: 21px
+    fontSize: 1.3125rem
     fontWeight: 400
     lineHeight: 1.5
   body-md:
     fontFamily: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif
-    fontSize: 16px
+    fontSize: 1rem
     fontWeight: 400
     lineHeight: 1.65
   label-sm:
     fontFamily: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif
-    fontSize: 14px
+    fontSize: 0.875rem
     fontWeight: 400
     lineHeight: 1.5
   code:
     fontFamily: ui-monospace, "SF Mono", "Cascadia Code", Consolas, Menlo, monospace
-    fontSize: 14px
+    fontSize: 0.875rem
     fontWeight: 400
     lineHeight: 1.6
 rounded:
@@ -121,11 +121,11 @@ The palette is one ink, one light, and Docent's own grays. Every gray leans slig
 
 Docent uses system fonts only, because every document is one file with nothing to download. The identity comes from the pairing, not from a brand font.
 
-- **Six sizes, no more:** 52, 30, 21, 18, 16 and 14 pixels. On a phone the title is 32 and section headings are 26.
+- **Six sizes, no more:** 52, 30, 21, 18, 16 and 14 pixels at the browser's usual text size. On a phone the title is 32 and section headings are 26. The kit writes them in rem (52px is 3.25rem), as it writes the text column. A reader who sets a larger text size in the browser then gets larger text, and each line keeps its length in characters.
 - **Title and section headings (h1, h2):** A serif — Charter on Apple devices, Sitka on Windows, Cambria or Georgia elsewhere — at weight 700, in ink. A title is at most two lines.
 - **Opening paragraph (body-lg):** The same serif at 21px, regular weight. It says what the document is for.
 - **Step and block headings (h3) and body (body-md):** The system sans-serif. Body text is 16px with a line height of 1.65. The text column is 31rem wide, which gives about 65 to 70 characters in a line.
-- **Small text (label-sm):** 14px sans-serif, for notes, captions, table headings and the top bar. A label is written in sentence case. Docent uses no uppercase letter-spaced labels and no text below 14px. The one exception is inside a diagram, where notes and step numbers are 12px.
+- **Small text (label-sm):** 14px sans-serif, for notes, captions, table headings and the top bar. A label is written in sentence case. Docent uses no uppercase letter-spaced labels and no text below 14px on screen. The one exception is inside a diagram, where notes and step numbers are 12px. On paper the body is 11pt, so small text is about 9.6pt.
 - **Code (code):** Monospace, for code and commands only. Step numbers, captions and labels are never monospace.
 - **Numbers** in tables, step counters and dates use tabular figures.
 
@@ -135,9 +135,22 @@ Docent uses system fonts only, because every document is one file with nothing t
 
 **The window title.** The `<title>` of a document is `Document title — Host project`. It does not name Docent. When the title is long, the window title may be a shorter form of it, made of the title's own words in the same order: "Report a bug — Host project" for the title "How to report a bug and get a fix".
 
-**Two widths.** A block is either as wide as the text column (31rem) or as wide as the page. Text, notes in the flow and warnings use the text column. Wells and tables use the full width, so their edges line up down the page. A drawing sits in the middle of its well at its real size.
+**Two widths.** A block is either as wide as the text column (31rem) or as wide as the block width of the profile (see Profiles). Text, notes in the flow and warnings use the text column. Wells, tables and card grids use the block width, so their edges line up down the page. A drawing sits in the middle of its well at its real size. A drawing that is wider than the block keeps its size, and its well grows with it.
+
+**One left edge.** Every block starts at the same left edge, so the eye returns to one line down the page. On a wide screen the text column and its margin notes sit in the middle of the screen as a group, and a wide block grows to the right of them, up to the block width of the profile. On a narrower screen the page keeps 40px on each side, and 20px on a phone.
+
+**Profiles.** A page names its profile on `<html>` (`data-profile`), from what the reader does with it. The profile sets the block width and the space; it never changes the text column, the type or the colors.
+
+- **Standard** (the default): an explanation, a tutorial, a policy or a guide. The block ends at the right edge of the notes, so the page is balanced around the text.
+- **Task**: a how-to, a runbook or troubleshooting. The block ends at the right edge of the notes. Sections and steps are closer together.
+- **Reference**: commands, options, an API, settings, a log or a trace. The block is up to 1120px wide, and table rows are tighter, so more fits on a screen.
+- **Brief**: a report for managers, an incident report or release notes. The block is up to 1120px wide, for timeline tables.
+
+A page for the public or for older readers also has `data-text="large"`: the body is 18px, and every size grows with it.
 
 **Text column and margin column.** A margin column of 220px sits beside the text column. The margin holds the guide's remarks: a note, or the facts about the document. A margin label starts with one line above it and a short bold word. On narrow screens the margin label moves below its paragraph.
+
+**Facts about one item go in the margin.** When an item, such as an event in a log or a case in a report, has a few short facts (its time, its source, a reference), list them in a margin note beside the item, as a facts list (`<ul class="facts">`). The item's heading may stand in the text column of the row when the item has no text of its own. Do not join the facts into one line of text with `|` or `·`: that line fills the text column and leaves the margin empty.
 
 **The route.** The top bar holds the host project's name, the section links and the theme switch. Its bottom line is the route through the document. A dot sits on that line under the current section. On a phone the bar is not fixed, and the links wrap instead of scrolling.
 
@@ -195,13 +208,13 @@ Docent uses system fonts only, because every document is one file with nothing t
 
 **Code blocks.** A code block sits in a well. With JavaScript on, a small button in its upper right corner copies the code. The button is part of the well: it has the well's ground, and a thin line on its left and lower edge. Its word changes from "Copy" to "Copied" for two seconds. It does not move.
 
-**Widgets.** A widget is a part of the page that the reader uses. Docent has four: a chooser, a value picker, a checklist and a decision helper (see Widgets). A widget sits in the text flow and has no box. Its text uses the text column; a code block inside a chooser uses the full width, like any code block.
+**Widgets.** A widget is a part of the page that the reader uses. Docent has four: a chooser, a value picker, a checklist and a decision helper (see Widgets). A widget sits in the text flow and has no box. Its text uses the text column; a code block inside a chooser uses the block width, like any code block.
 
-**Tables use the full width.** On a phone a figure, a table or a code block scrolls sideways inside itself; the page never scrolls sideways. Code in a table cell may break at any character, so a long path does not make the table wider. A closed section that holds a table, a code block or a figure takes the full width, like those blocks do outside it; its text keeps the text column.
+**Tables use the block width.** On a phone a figure, a table or a code block scrolls sideways inside itself; the page never scrolls sideways. Code in a table cell may break at any character, so a long path does not make the table wider. A closed section that holds a table, a code block or a figure takes the block width, like those blocks do outside it; its text keeps the text column.
 
-**Spacing.** More space goes above a heading than below it: 72px above a section, 16px below its heading. Blocks inside a section are 24px to 32px apart, and two paragraphs are 16px apart. A block heading (h3) in the text flow has 32px above it and 8px below it. No block touches the block before it.
+**Spacing.** More space goes above a heading than below it: 72px above a section (less on Task, Reference and Brief pages), 16px below its heading. Blocks inside a section are 24px to 32px apart, and two paragraphs are 16px apart. A block heading (h3) in the text flow has 32px above it and 8px below it. No block touches the block before it.
 
-**Print** is a first-class layout. The page prints in light colors on white paper, without the top bar, and without any moving part. A closed section opens for printing, so its text is on the paper.
+**Print** is a first-class layout. The page prints in light colors on white paper, without the top bar, and without any moving part. A closed section opens for printing, so its text is on the paper. On paper the body text is 11pt, and the page margin (18mm) is the edge. Each margin note sits beside its text again: an A4 page holds a 112mm text column, an 8mm gap and a 50mm note column. Code and tables use the full width of the paper on every profile, and a long line of code wraps. The lines of a paragraph keep together across a page break. Chrome and Edge print page numbers; other browsers print their own footer. The page sets no paper size, so the reader's choice wins.
 
 ## Shapes
 
@@ -293,7 +306,7 @@ A document has few widgets. More than four is a sign that some are not needed.
 
 ## Card grid
 
-A card grid shows 3 to 8 short items side by side, when the reader should see them together: the parts of a good report, or three numbers that sum up a result. Each card is a heading (16px, weight 600) or a large number (30px serif, in ink), and one line of small muted text. A card has a line above it and no box, like a margin note. At most four cards stand in a row; on a phone two, and on the narrowest screen one. A card grid uses the full width. When the items need more than one line each, or the reader must compare facts across them, use a list or a table.
+A card grid shows 3 to 8 short items side by side, when the reader should see them together: the parts of a good report, or three numbers that sum up a result. Each card is a heading (16px, weight 600) or a large number (30px serif, in ink), and one line of small muted text. A card has a line above it and no box, like a margin note. At most four cards stand in a row; on a phone two, and on the narrowest screen one. A card grid uses the block width. When the items need more than one line each, or the reader must compare facts across them, use a list or a table.
 
 ## Host tokens
 

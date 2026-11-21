@@ -26,10 +26,35 @@ test("a table cell lets code break, and a closed section that holds a table take
   assert.match(rule("details:has(> .table-wrap, > pre, > .code, > figure)"), /max-width: none/);
 });
 
+test("text sizes are in rem, so a reader who sets a larger text size gets larger text, not longer lines", () => {
+  assert.deepEqual(css.match(/font(-size)?:[^;}]*\b\d+px/g), null);
+});
+
+test("on a wide screen the text and its notes sit in the middle, and wide blocks keep the same left edge", () => {
+  const shell = rule(".shell");
+  assert.match(shell, /--left: max\(40px, min\(\(100% - var\(--measure\) - var\(--gap\) - var\(--margin-col\)\) \/ 2, 100% - var\(--wide\) - 40px\)\)/);
+  assert.match(shell, /padding: 0 max\(40px, 100% - var\(--left\) - var\(--wide\)\) 0 var\(--left\)/);
+  assert.ok(!/max-width|margin: 0 auto/.test(shell), "no box in the middle of the screen: that leaves the right side empty");
+});
+
 test("h4 and definition lists have kit styles within the six sizes and two weights", () => {
-  assert.match(rule("h4"), /font: 600 16px\/1\.5 var\(--sans\)/);
+  assert.match(rule("h4"), /font: 600 1rem\/1\.5 var\(--sans\)/);
   assert.match(rule("dt"), /font-weight: 600/);
   assert.match(rule("dl"), /max-width: var\(--measure\)/);
+});
+
+test("the page script parses", () => {
+  assert.doesNotThrow(() => new Function(js), "a syntax error stops every part of the page script");
+});
+
+test("the page script takes out what a saved page kept, so it adds each part once", () => {
+  assert.match(js, /querySelectorAll\('\.fig-more, \.step-n, button\.copy'\)\.forEach\(\(el\) => el\.remove\(\)\)/);
+  assert.match(js, /hasAttribute\('data-theme-reader'\)/, "a theme the reader chose is not a fixed theme in a saved page");
+});
+
+test("a heading in the text column of a row lines up with its margin note", () => {
+  assert.match(rule(".row:has(> h3:first-child)"), /margin-top: 32px/, "the row brings the space above the heading");
+  assert.match(rule(".row > h3:first-child"), /margin-top: 0/);
 });
 
 test("the page script writes each step number as text, so a screen reader in Chromium reads it", () => {
@@ -55,4 +80,32 @@ test("a card grid has no box and at most four cards in a row", () => {
   assert.match(rule(".cards > li"), /border-top: 1px solid var\(--line\)/);
   assert.ok(!/background|box-shadow|border:/.test(rule(".cards > li")));
   assert.match(rule(".cards"), /calc\(\(100% - 72px\) \/ 4\)/);
+});
+
+test("a profile sets the block width and the spacing, never the text column", () => {
+  assert.match(css, /--block: calc\(var\(--measure\) \+ var\(--gap\) \+ var\(--margin-col\)\); --section-space: 72px; --cell-y: 12px; --step-space: 36px;/, "Standard: code and tables end at the right edge of the notes");
+  assert.match(rule('html[data-profile="task"]'), /--section-space: 56px; --step-space: 28px;/);
+  assert.match(rule('html[data-profile="reference"]'), /--block: var\(--wide\); --section-space: 56px; --cell-y: 8px;/);
+  assert.match(rule('html[data-profile="brief"]'), /--block: var\(--wide\); --section-space: 64px;/);
+  for (const p of ["task", "reference", "brief"]) assert.ok(!/--measure/.test(rule(`html[data-profile="${p}"]`)));
+  assert.match(rule(":is(pre, .code, .table-wrap, .cards)"), /max-width: var\(--block\)/);
+  assert.match(rule("figure"), /min-width: min\(100%, var\(--block\)\); width: fit-content; max-width: 100%/, "a wider drawing keeps its real size");
+  assert.match(rule("section"), /padding-top: var\(--section-space\)/);
+  assert.match(rule("th, td"), /padding: var\(--cell-y\) 24px var\(--cell-y\) 0/);
+});
+
+test("a page for the public has larger text: the root grows, so every rem size grows with it", () => {
+  assert.match(rule('html[data-text="large"]'), /font-size: 112\.5%/);
+});
+
+test("on paper: 11pt text, the notes beside the text, lines kept together, and page numbers", () => {
+  const print = css.slice(css.indexOf("@media print {"));
+  assert.match(print, /html \{ font-size: 11pt; \} html\[data-text="large"\] \{ font-size: 12pt; \}/);
+  assert.match(print, /html:root:not\(\[data-never\]\) \{ --measure: 112mm; --gap: 8mm; --margin-col: 50mm; --block: 100%; \}/, "the text, a gap and the notes fit an A4 page (174mm)");
+  assert.match(print, /\.shell \{ padding: 0; \}/, "the page margin is the edge");
+  assert.match(print, /\.row \{ grid-template-columns: minmax\(0, var\(--measure\)\) var\(--margin-col\); \}/);
+  assert.match(print, /p, li \{ orphans: 2; widows: 2; \}/);
+  assert.match(print, /pre \{ border: 1px solid var\(--line\); white-space: pre-wrap; overflow-wrap: anywhere; \}/, "paper cannot scroll, so a long line of code wraps");
+  assert.match(print, /@bottom-right \{ content: counter\(page\) " \/ " counter\(pages\);/);
+  assert.ok(!/size:\s*(A4|letter)/i.test(print), "the reader's paper size wins");
 });

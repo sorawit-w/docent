@@ -36,10 +36,11 @@ Do not use it for app screens, slide decks or marketing pages.
 
 1. **Read the rules.** Read `references/DESIGN.md` in full before you write.
 2. **Start from the template.** Copy `assets/template.html` to the new file with a file copy, not by typing it again, and replace its content. A comment names each block: the top bar, the title block, a section with a margin note, a figure in the text flow, the walkthrough, the four widgets, a block heading, a small heading, a card grid, lists, a definition list, a table, status notes, a code block and a closed section. Use the class names as they are, and remove the blocks that you do not need. Each diagram block and widget block in the template holds its data and nothing else: `render` writes the drawing or the markup after the data. The template has no page styles and no page script: `stamp` adds them between `docent:kit` markers. Do not edit anything between those markers. Your own styles, if you need any, go in a separate `<style>` after the kit. `stamp` puts the kit just before `</head>`, so add your `<style>` after `stamp` ran. A host project's accent, heading color and fonts are the one exception: set them with the `--host-*` tokens (see "Host colors and fonts" below), which work anywhere in the document.
-3. **Keep one file.** No fonts, scripts, styles or images from the network.
-4. **Pick the block for steps.** When the steps have two or more actors (a person and a system, or two teams), use the walkthrough: its diagram shows who acts and what moves, and a list cannot show that. When one actor does every step, write a plain numbered list (`<ol>`); the walkthrough block needs a diagram, so it is not for these steps. When such a step holds a code block, a table or a widget, write each step as a numbered block heading (`<h3 class="step">`) with its blocks below it; the kit writes the number. When the steps have one short branch beside them, such as "if the report is known, it is closed", give the diagram a side leg (see `references/diagrams.md`); it keeps the walkthrough. When `render` warns that the drawing is too wide beside the steps, put one diagram in the text flow and write the steps as a numbered list below it. Points are a plain `<ul>`. The kit styles both lists; write no styles of your own for a list.
-5. **Write in the Docent voice.** Plain words, one idea per sentence. A step heading is one sentence of at most six words. The `<title>` is `Document title — Host project`. When the `<h1>` is long, the left part may be shorter, made of the `<h1>`'s own words in the same order: `<h1>How to report a bug and get a fix</h1>` can have `<title>Report a bug — Host project</title>`.
-6. **Write each diagram as data.** Read `references/diagrams.md`. Draw a diagram only when it shows something that words cannot, and never draw the same thing twice. Pick the kind by what the reader needs to learn: find the reader's question in this table, and write what it says. Let the renderer pick the form.
+3. **Choose a profile.** Write it on `<html>`, as `data-profile`. See "Choose a profile" below.
+4. **Keep one file.** No fonts, scripts, styles or images from the network.
+5. **Pick the block for steps.** When the steps have two or more actors (a person and a system, or two teams), use the walkthrough: its diagram shows who acts and what moves, and a list cannot show that. When one actor does every step, write a plain numbered list (`<ol>`); the walkthrough block needs a diagram, so it is not for these steps. When such a step holds a code block, a table or a widget, write each step as a numbered block heading (`<h3 class="step">`) with its blocks below it; the kit writes the number. When the steps have one short branch beside them, such as "if the report is known, it is closed", give the diagram a side leg (see `references/diagrams.md`); it keeps the walkthrough. When `render` warns that the drawing is too wide beside the steps, put one diagram in the text flow and write the steps as a numbered list below it. Points are a plain `<ul>`. The kit styles both lists; write no styles of your own for a list.
+6. **Write in the Docent voice.** Plain words, one idea per sentence. A step heading is one sentence of at most six words. The `<title>` is `Document title — Host project`. When the `<h1>` is long, the left part may be shorter, made of the `<h1>`'s own words in the same order: `<h1>How to report a bug and get a fix</h1>` can have `<title>Report a bug — Host project</title>`.
+7. **Write each diagram as data.** Read `references/diagrams.md`. Draw a diagram only when it shows something that words cannot, and never draw the same thing twice. Pick the kind by what the reader needs to learn: find the reader's question in this table, and write what it says. Let the renderer pick the form.
 
    | The reader asks | Write |
    |---|---|
@@ -61,8 +62,8 @@ Do not use it for app screens, slide decks or marketing pages.
    | Who is linked to whom, and in which order do they talk? | A communication diagram (`"kind": "communication"`); a sequence diagram reads better when the order matters more than the links |
 
    When the data does not fit its kind, `render` and `check` say so in a warning, such as "no reply comes back; this reads as a workflow". Read it, and change the kind or keep it; a warning never changes the drawing. Give a part a `state` (`ok`, `warn` or `err`) only when the document reports how that part ended; there is no other way to color a diagram. Never write or edit the SVG by hand: change the data in the block, and `render` replaces the drawing.
-7. **Write each widget as data, and only when the reader needs one.** Read `references/widgets.md`. A widget is allowed only when the reader must choose one case of several, track what is done, or decide between answers. In every other case write text, a table or a closed section. Docent has four widgets: a chooser, a value picker, a checklist and a decision helper. When the text is the same for every reader and only small values differ (an environment's host name, a port, a folder), use the value picker. Never write the markup of a widget by hand, and never write a widget of your own with a script.
-8. **Run the three scripts**, in this order. `SKILL` stands for the folder that holds this file:
+8. **Write each widget as data, and only when the reader needs one.** Read `references/widgets.md`. A widget is allowed only when the reader must choose one case of several, track what is done, or decide between answers. In every other case write text, a table or a closed section. Docent has four widgets: a chooser, a value picker, a checklist and a decision helper. When the text is the same for every reader and only small values differ (an environment's host name, a port, a folder), use the value picker. Never write the markup of a widget by hand, and never write a widget of your own with a script.
+9. **Run the three scripts**, in this order. `SKILL` stands for the folder that holds this file:
 
    ```bash
    node SKILL/scripts/render.cjs document.html
@@ -77,7 +78,29 @@ Do not use it for app screens, slide decks or marketing pages.
    ```
 
    `render` makes every diagram and every widget that it can. When it refuses one, it says why, leaves that block as it was, and ends with exit code 1. Fix every error that `render` and `check` report, then run them again. Read every warning and decide.
-9. **Look at the result.** Open the document in a browser at desktop and phone width, in light and dark, and in print preview. Use each widget once. `check` cannot do this for you. If you have no browser, say so to the user.
+10. **Look at the result.** Open the document in a browser at desktop and phone width, in light and dark, and in print preview. Use each widget once. `check` cannot do this for you. If you have no browser, say so to the user.
+
+## Choose a profile
+
+A profile tells the kit how much space the page has and how wide code and tables are. It never changes the text column. Write it on `<html>`: `<html lang="en" data-profile="task">`. The starting page has `data-profile="standard"`.
+
+| Profile | For | Write first | On the page |
+|---|---|---|---|
+| `standard` | An explanation, a tutorial, a policy, a guide | What the reader will understand, then the parts, with figures | Code and tables end at the right edge of the notes |
+| `task` | A how-to, a runbook, troubleshooting | What the reader needs, then the numbered steps, then what to do when a step fails | Like Standard, with less space between steps and sections |
+| `reference` | Commands, options, an API, settings, a log or a trace | One section for each item, its facts in a margin note, and tables | Code and tables up to 1120px, and tighter table rows |
+| `brief` | A report for managers, an incident report, release notes | The outcome and its impact, then a timeline table and the actions | Code and tables up to 1120px |
+
+Choose in this order:
+
+1. The profile that the author names.
+2. The kind of document that the user asks for, or the readers that they name.
+3. The content. `check` names a profile when the page clearly looks like one: code blocks and tables that hold more text than the paragraphs, numbered steps, or many times of day.
+4. Standard.
+
+Choose on your own. Ask the author only when two profiles fit equally and the choice matters, such as a page that will be printed or read on phones. Code alone does not make a Reference page: a tutorial and a runbook hold code too, and they are Standard and Task.
+
+**A page for the public.** When the readers are the public or older readers, also write `data-text="large"`: `<html lang="en" data-profile="standard" data-text="large">`. The body text is then 18px on screen and 12pt on paper, and the text column grows with it.
 
 When the user asks for something that a design rule forbids, follow the rule, say which rule it is, and offer the user's way. Do it the user's way when the user confirms. This holds for design rules only. When the user asks for an app screen, a slide deck or a marketing page, say that Docent is not made for it, and write nothing with Docent.
 
@@ -89,7 +112,7 @@ When the user asks for something that a design rule forbids, follow the rule, sa
 - **A card grid** (`<ul class="cards">`) shows 3 to 8 short items side by side: each `<li>` holds an `<h3>` or a large number (`<p class="big">`), and one `<p>` line. Use it for a few parallel items that the reader should see together. Use a list when the items are a sequence, and a table when the reader compares facts. `check` warns about fewer than 3 or more than 8 cards.
 - **Short codes and labels** are `<code>`, such as `<code>P1</code>` or `<code>GET</code>`. A status is a state: `<span class="state err">Blocked</span>`. Docent has no colored badge: a colored fill breaks the rule that the accent is a mark, and green, amber and red mean status only.
 - **Code blocks** have no colors by kind of word. Mark a comment line with `<span class="cm">`, as the starting page does; it takes the muted color. Docent has no syntax highlighting: more colors would add a palette that the page does not have.
-- **A table** may hold code in its cells: a long path or command breaks inside its cell. A closed section may hold a table, a code block or a figure; then it takes the full width.
+- **A table** may hold code in its cells: a long path or command breaks inside its cell. A closed section may hold a table, a code block or a figure; then it takes the block width of the profile.
 
 ## Host colors and fonts
 
@@ -124,7 +147,7 @@ A host project may set its accent, its heading color and its fonts, with these t
 
 ## When a script cannot run
 
-- **The machine has no Node 18 or newer, and you write a document.** Write the document with its data blocks. Write no drawing, no widget markup and no page styles by hand. Give the user the three commands of step 8, and say that the document is not finished until they ran.
+- **The machine has no Node 18 or newer, and you write a document.** Write the document with its data blocks. Write no drawing, no widget markup and no page styles by hand. Give the user the three commands of step 9, and say that the document is not finished until they ran.
 - **The machine has no Node 18 or newer, and you check a document.** Read its source against `references/DESIGN.md` by hand. Say that this was a reading by hand, and that `check` did not run.
 - In both cases, report no result of a script that did not run.
 
@@ -144,6 +167,7 @@ Say what was tested and what was not. Use these words:
 - When `check` ends with 0 errors: "`check` reports 0 errors." Add the number of warnings and what they say.
 - `check` reads the source only. It does not open a browser. So do not say that the contrast, the phone layout, print or motion were checked, unless you looked yourself. Say which views you opened.
 - When `render` refused a diagram or a widget, say which one and why.
+- Name the profile you chose and one reason, in one sentence: "I used the Reference profile, because the page is mostly commands and option tables."
 
 ## Limits to know
 

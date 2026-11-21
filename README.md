@@ -109,6 +109,8 @@ The browser checks open the sample page and test accessibility, themes, motion, 
 DOCENT_NODE_MODULES=/path/to/node_modules node tests/browser/check-render.cjs
 ```
 
+Playwright needs a browser. To use the Chrome that is already installed, add `DOCENT_BROWSER_CHANNEL=chrome`. The checks also test the layout at 1280, 1440, 1920 and 2560px for the Standard, Task and Reference profiles, a page with larger text, and print.
+
 After a change to the kit or the renderer, make the sample page again and commit it:
 
 ```bash

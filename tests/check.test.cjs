@@ -58,7 +58,7 @@ test("check keeps the page flat and the text at 14px or more", () => {
 });
 
 test("check tests the frame of the document and the format of its title", () => {
-  assert.match(errorsOf((h) => h.replace('<html lang="en">', "<html>")), /<html> has no lang/);
+  assert.match(errorsOf((h) => h.replace('<html lang="en" data-profile="standard">', "<html>")), /<html> has no lang/);
   assert.match(errorsOf(add("</main>", "<h1>Second</h1>")), /2 <h1> headings/);
   assert.match(errorsOf((h) => h.replace(/<title>.*<\/title>/, "<title>Report a bug</title>")), /its format is "Document title — Host project"/);
   assert.match(errorsOf((h) => h.replace(/<title>.*<\/title>/, "<title>Report a bug and get a fix — Docent sample</title>")), /the <title> names Docent/);
@@ -136,6 +136,14 @@ test("check warns about a card grid with fewer than 3 or more than 8 cards", () 
   assert.match(grid(9).join(), /a card grid has 9 cards/);
 });
 
+test("check warns about facts joined into one line of text; they go in a margin note", () => {
+  const line = (p) => checkDocument(specimen.replace("</main>", `${p}</main>`)).warnings.filter((w) => w.includes("joins facts"));
+  assert.match(line("<p>10:42 UTC | Bug tracker | ref BUG-12</p>").join(), /the paragraph "10:42 UTC \| Bug tracker \| ref BUG-12" joins facts with "\|" or "·"; list them in a margin note/);
+  assert.equal(line("<p><time>10:42</time> UTC · Bug tracker · ref BUG-12</p>").length, 1, "tags between the facts do not hide them");
+  assert.deepEqual(line("<p>Two facts | one bar.</p>"), [], "two facts are a line of text, not a list");
+  assert.deepEqual(line("<p>Run <code>a | b | c</code> to filter.</p>"), [], "a | in code is not a separator");
+});
+
 test("check tests the host tokens: contrast for a hex color, and a warning for a kit token set by hand", () => {
   const style = (css) => checkDocument(specimen.replace("</head>", `<style>${css}</style></head>`));
   assert.deepEqual(style(":root { --host-accent: #0b6e4f; --host-accent-dark: #6fd3a8; --host-ink: #0b3d2e; }"), { errors: [], warnings: style("").warnings });
@@ -143,7 +151,7 @@ test("check tests the host tokens: contrast for a hex color, and a warning for a
   assert.match(style(":root { --host-accent-dark: #2f3fd0; }").errors.join(), /--host-accent-dark #2f3fd0 has a contrast of/);
   assert.match(style(":root { --host-accent: rebeccapurple; }").warnings.join(), /check tests the contrast of a hex color only/);
   assert.match(style(":root { --primary: #0b6e4f; }").warnings.join(), /a style sets --primary; the kit sets it in four places/);
-  assert.match(errorsOf((h) => h.replace('<html lang="en">', '<html lang="en" data-theme="sepia">')), /a fixed theme is "light" or "dark"/);
+  assert.match(errorsOf((h) => h.replace('<html lang="en" data-profile="standard">', '<html lang="en" data-profile="standard" data-theme="sepia">')), /a fixed theme is "light" or "dark"/);
   assert.equal(errorsOf((h) => h.replace('<html lang="en">', '<html lang="en" data-theme="light">')), "");
 });
 
@@ -161,4 +169,15 @@ test("check counts the legs of the route for a walkthrough, not the side legs", 
   assert.notEqual(html, specimen, "the walkthrough diagram of the sample page was replaced");
   const { errors } = checkDocument(renderDocument(html).html);
   assert.deepEqual(errors, [], "four steps for four legs; the side leg has no step");
+});
+
+test("check tests the profile: a known value, a warning when it is missing, and a warning when the page looks like another profile", () => {
+  const html = (attrs) => specimen.replace('<html lang="en" data-profile="standard">', `<html lang="en"${attrs}>`);
+  assert.match(checkDocument(html(' data-profile="dense"')).errors.join("\n"), /data-profile="dense"; a profile is "standard", "task", "reference", "brief"/);
+  assert.match(checkDocument(html(' data-profile="standard" data-text="huge"')).errors.join("\n"), /data-text="huge"; the only value is "large"/);
+  assert.equal(checkDocument(html(' data-profile="task" data-text="large"')).errors.length, 0);
+  assert.match(checkDocument(html("")).warnings.join("\n"), /no data-profile, so the page uses "standard"/);
+  const reference = stampHtml(renderDocument(fs.readFileSync(path.join(__dirname, "fixtures", "reference-page.html"), "utf8")).html).html;
+  assert.deepEqual(checkDocument(reference), { errors: [], warnings: [] }, "the reference sample passes check");
+  assert.match(checkDocument(reference.replace('data-profile="reference"', 'data-profile="task"')).warnings.join("\n"), /data-profile="task"; the page looks like "reference": 3 code blocks and 3 tables/);
 });
