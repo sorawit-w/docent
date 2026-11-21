@@ -30,6 +30,13 @@ test("text sizes are in rem, so a reader who sets a larger text size gets larger
   assert.deepEqual(css.match(/font(-size)?:[^;}]*\b\d+px/g), null);
 });
 
+test("on a wide screen the text and its notes sit in the middle, and wide blocks keep the same left edge", () => {
+  const shell = rule(".shell");
+  assert.match(shell, /--left: max\(40px, min\(\(100% - var\(--measure\) - var\(--gap\) - var\(--margin-col\)\) \/ 2, 100% - var\(--wide\) - 40px\)\)/);
+  assert.match(shell, /padding: 0 max\(40px, 100% - var\(--left\) - var\(--wide\)\) 0 var\(--left\)/);
+  assert.ok(!/max-width|margin: 0 auto/.test(shell), "no box in the middle of the screen: that leaves the right side empty");
+});
+
 test("h4 and definition lists have kit styles within the six sizes and two weights", () => {
   assert.match(rule("h4"), /font: 600 1rem\/1\.5 var\(--sans\)/);
   assert.match(rule("dt"), /font-weight: 600/);

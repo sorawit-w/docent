@@ -137,6 +137,8 @@ Docent uses system fonts only, because every document is one file with nothing t
 
 **Two widths.** A block is either as wide as the text column (31rem) or as wide as the page. Text, notes in the flow and warnings use the text column. Wells and tables use the full width, so their edges line up down the page. A drawing sits in the middle of its well at its real size.
 
+**One left edge.** Every block starts at the same left edge, so the eye returns to one line down the page. On a wide screen the text column and its margin notes sit in the middle of the screen as a group, and a wide block grows to the right of them, up to 1120px. On a narrower screen the page keeps 40px on each side, and 20px on a phone.
+
 **Text column and margin column.** A margin column of 220px sits beside the text column. The margin holds the guide's remarks: a note, or the facts about the document. A margin label starts with one line above it and a short bold word. On narrow screens the margin label moves below its paragraph.
 
 **Facts about one item go in the margin.** When an item, such as an event in a log or a case in a report, has a few short facts (its time, its source, a reference), list them in a margin note beside the item, as a facts list (`<ul class="facts">`). The item's heading may stand in the text column of the row when the item has no text of its own. Do not join the facts into one line of text with `|` or `·`: that line fills the text column and leaves the margin empty.

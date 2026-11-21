@@ -10,7 +10,7 @@
   --sans: var(--host-sans, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif);
   --mono: var(--host-mono, ui-monospace, "SF Mono", "Cascadia Code", Consolas, Menlo, monospace);
   --ease: cubic-bezier(0.23, 1, 0.32, 1);
-  --measure: 31rem; --margin-col: 220px; --gap: 48px;
+  --measure: 31rem; --margin-col: 220px; --gap: 48px; --wide: 1120px;
 }
 /* Dark: the reader's system setting decides, unless the reader chose a theme with the switch. */
 @media (prefers-color-scheme: dark) {
@@ -36,7 +36,11 @@ body { margin: 0; background: var(--bg); color: var(--text); font: 400 1rem/1.65
 :focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
 a { color: var(--primary); text-decoration-thickness: 1px; text-underline-offset: 0.2em; }
 a:hover { text-decoration-thickness: 2px; }
-.shell { max-width: 1200px; margin: 0 auto; padding: 0 40px; }
+/* One left edge for the whole page. On a wide screen the text and its notes sit in the middle as a group; wide blocks start at the same edge and grow to the right, up to --wide. */
+.shell {
+  --left: max(40px, min((100% - var(--measure) - var(--gap) - var(--margin-col)) / 2, 100% - var(--wide) - 40px));
+  padding: 0 max(40px, 100% - var(--left) - var(--wide)) 0 var(--left);
+}
 
 /* Top bar. Its bottom line is the route; the dot marks the current section. */
 .topbar { position: sticky; top: 0; z-index: 2; background: var(--bg); border-bottom: 1px solid var(--line); }
