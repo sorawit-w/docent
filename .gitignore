@@ -5,3 +5,6 @@ __pycache__/
 
 # kerby project-state pin (machine-local) — written by `kerby install`
 .kerby/rulebooks.lock
+
+# IntelliJ project files (personal)
+.idea/
