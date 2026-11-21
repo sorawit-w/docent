@@ -181,3 +181,14 @@ test("check tests the profile: a known value, a warning when it is missing, and 
   assert.deepEqual(checkDocument(reference), { errors: [], warnings: [] }, "the reference sample passes check");
   assert.match(checkDocument(reference.replace('data-profile="reference"', 'data-profile="task"')).warnings.join("\n"), /data-profile="task"; the page looks like "reference": 3 code blocks and 3 tables/);
 });
+
+test("check refuses a hand-drawn drawing in a figure well, and leaves icons outside wells alone", () => {
+  const well = (inner) => `<figure><div class="fig" role="region" aria-label="Figure 9, a chart" tabindex="0">${inner}</div><figcaption><strong>Figure 9</strong>A chart.</figcaption></figure>`;
+  const svg = '<svg class="gc" width="8" height="8" viewBox="0 0 8 8" role="img" aria-label="A chart"><rect width="8" height="8"/></svg>';
+  assert.match(errorsOf(add("</main>", well(svg))), /Figure 9, a chart holds a drawing that no diagram block made; write its data in a block and run render/);
+  assert.match(errorsOf(add("</main>", well(`<div class="inner"><p>A note.</p></div>${svg}`))), /Figure 9, a chart holds a drawing/, "a nested div before the drawing does not end the well");
+  assert.doesNotMatch(errorsOf(add("</main>", `<p>${svg.replace('role="img" aria-label="A chart"', 'aria-hidden="true"')}</p>`)), /holds a drawing/, "an icon outside a well is not a figure");
+  for (const file of ["docs/research/document-layout.html", "skills/docent/assets/specimen.html"]) {
+    assert.deepEqual(checkDocument(fs.readFileSync(path.join(__dirname, "..", file), "utf8")).errors, [], `${file} passes`);
+  }
+});
