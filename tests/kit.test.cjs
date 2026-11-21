@@ -26,8 +26,12 @@ test("a table cell lets code break, and a closed section that holds a table take
   assert.match(rule("details:has(> .table-wrap, > pre, > .code, > figure)"), /max-width: none/);
 });
 
+test("text sizes are in rem, so a reader who sets a larger text size gets larger text, not longer lines", () => {
+  assert.deepEqual(css.match(/font(-size)?:[^;}]*\b\d+px/g), null);
+});
+
 test("h4 and definition lists have kit styles within the six sizes and two weights", () => {
-  assert.match(rule("h4"), /font: 600 16px\/1\.5 var\(--sans\)/);
+  assert.match(rule("h4"), /font: 600 1rem\/1\.5 var\(--sans\)/);
   assert.match(rule("dt"), /font-weight: 600/);
   assert.match(rule("dl"), /max-width: var\(--measure\)/);
 });

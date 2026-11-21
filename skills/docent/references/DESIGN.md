@@ -26,49 +26,49 @@ colors:
 typography:
   h1:
     fontFamily: Charter, "Bitstream Charter", "Sitka Heading", "Sitka Text", Cambria, Georgia, serif
-    fontSize: 52px
+    fontSize: 3.25rem
     fontWeight: 700
     lineHeight: 1.06
     letterSpacing: -0.02em
   h2:
     fontFamily: Charter, "Bitstream Charter", "Sitka Heading", "Sitka Text", Cambria, Georgia, serif
-    fontSize: 30px
+    fontSize: 1.875rem
     fontWeight: 700
     lineHeight: 1.2
   h1-compact:                   # the title on a phone
     fontFamily: Charter, "Bitstream Charter", "Sitka Heading", "Sitka Text", Cambria, Georgia, serif
-    fontSize: 32px
+    fontSize: 2rem
     fontWeight: 700
     lineHeight: 1.06
     letterSpacing: -0.02em
   h2-compact:                   # a section heading on a phone
     fontFamily: Charter, "Bitstream Charter", "Sitka Heading", "Sitka Text", Cambria, Georgia, serif
-    fontSize: 26px
+    fontSize: 1.625rem
     fontWeight: 700
     lineHeight: 1.2
   h3:
     fontFamily: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif
-    fontSize: 18px
+    fontSize: 1.125rem
     fontWeight: 600
     lineHeight: 1.35
   body-lg:
     fontFamily: Charter, "Bitstream Charter", "Sitka Heading", "Sitka Text", Cambria, Georgia, serif
-    fontSize: 21px
+    fontSize: 1.3125rem
     fontWeight: 400
     lineHeight: 1.5
   body-md:
     fontFamily: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif
-    fontSize: 16px
+    fontSize: 1rem
     fontWeight: 400
     lineHeight: 1.65
   label-sm:
     fontFamily: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif
-    fontSize: 14px
+    fontSize: 0.875rem
     fontWeight: 400
     lineHeight: 1.5
   code:
     fontFamily: ui-monospace, "SF Mono", "Cascadia Code", Consolas, Menlo, monospace
-    fontSize: 14px
+    fontSize: 0.875rem
     fontWeight: 400
     lineHeight: 1.6
 rounded:
@@ -121,7 +121,7 @@ The palette is one ink, one light, and Docent's own grays. Every gray leans slig
 
 Docent uses system fonts only, because every document is one file with nothing to download. The identity comes from the pairing, not from a brand font.
 
-- **Six sizes, no more:** 52, 30, 21, 18, 16 and 14 pixels. On a phone the title is 32 and section headings are 26.
+- **Six sizes, no more:** 52, 30, 21, 18, 16 and 14 pixels at the browser's usual text size. On a phone the title is 32 and section headings are 26. The kit writes them in rem (52px is 3.25rem), as it writes the text column. A reader who sets a larger text size in the browser then gets larger text, and each line keeps its length in characters.
 - **Title and section headings (h1, h2):** A serif — Charter on Apple devices, Sitka on Windows, Cambria or Georgia elsewhere — at weight 700, in ink. A title is at most two lines.
 - **Opening paragraph (body-lg):** The same serif at 21px, regular weight. It says what the document is for.
 - **Step and block headings (h3) and body (body-md):** The system sans-serif. Body text is 16px with a line height of 1.65. The text column is 31rem wide, which gives about 65 to 70 characters in a line.
