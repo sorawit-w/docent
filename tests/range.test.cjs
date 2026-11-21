@@ -182,3 +182,102 @@ test("a range chart takes every color from the page tokens, uses no ultramarine,
   assert.doesNotMatch(svg, /gradient|filter|shadow|stroke-dasharray/i, "flat, and nothing dashed");
   for (const rule of svg.match(/[^{}\n]*\{[^{}]*var\(--(primary|dot),[^{}]*\}/g) || []) assert.match(rule, /pulse/, `ultramarine only for a dot, and a range chart draws none: ${rule}`);
 });
+
+test("every text stands inside the drawing: a long unit, a small first tick on a phone, and a heading with no spaces", () => {
+  const inside = (s) => s.notes.forEach((n) => { const b = box(n); assert.ok(b.x0 >= 0 && b.x1 <= s.w, `"${n.s}" runs from ${b.x0.toFixed(1)} to ${b.x1.toFixed(1)} in a ${s.w}px drawing`); });
+  const base = { id: "edge", kind: "range", label: "Edges of the drawing." };
+  const unit = renderDiagram({ ...base, scale: { from: 0, to: 100, step: 25, unit: "milliseconds" }, rows: [{ name: "A", from: 10, to: 40 }, { name: "B", at: 50 }, { name: "C", to: 80 }] });
+  const small = renderDiagram({ ...base, scale: { from: -0.0001, to: 0.0001, step: 0.0001 }, rows: [{ name: "A", at: 0 }, { name: "B", from: -0.0001, to: 0.00005 }] });
+  const heading = renderDiagram({ ...base, scale: { from: 0, to: 10, step: 5 }, groups: [{ id: "g", name: "用户体验研究与无障碍设计相关参考标准" }], rows: [{ name: "A", at: 2, group: "g" }, { name: "B", at: 6, group: "g" }] });
+  for (const r of [unit, small, heading]) for (const s of [r.scene, r.phone]) inside(s);
+});
+
+test("a tick on a scale with decimals shows its value without floating-point noise", () => {
+  const { scene } = renderDiagram({ id: "noise", kind: "range", label: "Ticks with decimals.", scale: { from: -0.35, to: 0.07, step: 0.07 }, rows: [{ name: "A", at: 0 }, { name: "B", at: -0.21 }] });
+  const labels = scene.notes.filter((n) => n.cls === "val" && !n.knock).map((n) => n.s);
+  assert.deepEqual(labels, ["−0.35", "−0.28", "−0.21", "−0.14", "−0.07", "0", "0.07"]);
+});
+
+test("a scale of very small values keeps one tick for each step", () => {
+  const { scene } = renderDiagram({ id: "tiny", kind: "range", label: "A tiny scale.", scale: { from: 0, to: 4e-21, step: 1e-21 }, rows: [{ name: "A", at: 1e-21 }, { name: "B", at: 3e-21 }] });
+  const ticks = scene.notes.filter((n) => n.cls === "val" && !n.knock);
+  assert.deepEqual(ticks.map((n) => n.s), ["0", "1e-21", "2e-21", "3e-21", "4e-21"]);
+  assert.equal(new Set(ticks.map((n) => Math.round(n.x))).size, 5, "the ticks stand apart");
+});
+
+test("a scale with a large offset keeps its ticks in place and writes each value in full", () => {
+  const { scene } = renderDiagram({ id: "offset", kind: "range", label: "A large offset.", scale: { from: 1700000000001, to: 1700000000005, step: 1 }, rows: [{ name: "A", at: 1700000000002 }, { name: "B", from: 1700000000003, to: 1700000000004 }] });
+  const ticks = scene.notes.filter((n) => n.cls === "val" && !n.knock);
+  assert.deepEqual(ticks.map((n) => n.s), ["1700000000001", "1700000000002", "1700000000003", "1700000000004", "1700000000005"]);
+  ticks.forEach((n, i) => { assert.ok(n.x > 0 && n.x < scene.w, `tick ${n.s} stands inside the drawing`); if (i) assert.ok(n.x > ticks[i - 1].x); });
+  assert.ok(scene.notes.some((n) => n.knock && n.s === "1700000000002"), "a row's value is written in full too");
+});
+
+test("edge cases from review: a long first label with no unit, a Thai name on a phone, and a scale past 100 decimals", () => {
+  const inside = (s) => s.notes.forEach((n) => { const b = box(n); assert.ok(b.x0 >= 0 && b.x1 <= s.w, `"${n.s}" runs from ${b.x0.toFixed(1)} to ${b.x1.toFixed(1)}`); });
+  const base = { id: "edge2", kind: "range", label: "Edge cases." };
+  // Labels of 16 characters fit the 640px form, but no two of them stand apart on the 264px phone form, so the chart is refused.
+  assert.throws(() => renderDiagram({ ...base, scale: { from: 1.00000000000001, to: 5.00000000000001, step: 1 }, rows: [{ name: "A", at: 2.00000000000001 }, { name: "B", at: 4.00000000000001 }] }), /no two tick labels stand apart/);
+  const thai = renderDiagram({ ...base, scale: { from: 0, to: 10, step: 5 }, rows: [{ name: "กิ".repeat(10), at: 2 }, { name: "B", at: 6 }] });
+  const lines = thai.phone.notes.filter((n) => n.cls === "row").map((n) => n.s);
+  assert.ok(lines.length > 2, "the long Thai name wraps");
+  for (const line of lines) assert.ok(!/^\p{M}/u.test(line), `a line starts with a vowel mark: "${line}"`);
+  const tiny = renderDiagram({ ...base, scale: { from: 0, to: 4e-101, step: 1e-101 }, rows: [{ name: "A", at: 1e-101 }, { name: "B", at: 3e-101 }] });
+  assert.deepEqual(tiny.scene.notes.filter((n) => n.cls === "val" && !n.knock).map((n) => n.s), ["0", "1e-101", "2e-101", "3e-101", "4e-101"]);
+});
+
+test("tick labels wider than the scale are refused with a plain reason, not drawn on top of each other", () => {
+  assert.throws(() => renderDiagram({ id: "wide-ticks", kind: "range", label: "Wide ticks.", scale: { from: 1.00000000000001, to: 5.00000000000001, step: 0.2 }, rows: [{ name: "A", at: 2.00000000000001 }, { name: "B", at: 4.00000000000001 }] }), /no two tick labels stand apart/);
+});
+
+test("the first and the last tick are the scale's own from and to, even when they are tiny", () => {
+  const { scene } = renderDiagram({ id: "ends", kind: "range", label: "Tiny ends.", scale: { from: 1e-120, to: 4e-101, step: 1e-101 }, rows: [{ name: "A", at: 1e-120 }, { name: "B", at: 3e-101 }] });
+  const ticks = scene.notes.filter((n) => n.cls === "val" && !n.knock).map((n) => n.s);
+  assert.equal(ticks[0], "1e-120"); assert.equal(ticks[ticks.length - 1], "4e-101");
+});
+
+const tickLabels = (scale) => makeScale(readScale(scale, { needStep: true }), 0, 2000).ticks.map((t) => t.label);
+test("a tick near 0 on a tiny scale keeps its real value", () => {
+  const ticks = tickLabels({ from: -2.0000000001e-101, to: 1.9999999999e-101, step: 1e-101 });
+  assert.ok(ticks.includes("−1e-111"), `the middle tick is about -1e-111, not 0: ${ticks.join(", ")}`);
+});
+
+test("tick spacing never skips past the last step, and a real offset near 0 keeps its value", () => {
+  const third = renderDiagram({ id: "third", kind: "range", label: "Thirds.", scale: { from: 0, to: 1, step: 1 / 3 }, rows: [{ name: "A", at: 0.5 }, { name: "B", at: 0.9 }] });
+  for (const s of [third.scene, third.phone]) assert.ok(s.notes.filter((n) => n.cls === "val" && !n.knock).length >= 2, "at least two ticks give the reader a scale");
+  const ticks = tickLabels({ from: -0.99999999999999, to: 1.00000000000001, step: 1 });
+  assert.ok(ticks.includes("1e-14"), `the middle tick is 1e-14, not 0: ${ticks.join(", ")}`);
+});
+
+test("only the kept tick labels are measured: short end labels fit even when the middle ones are long", () => {
+  const { phone } = renderDiagram({ id: "thirds-small", kind: "range", label: "Small thirds.", scale: { from: -0.00001, to: 0, step: 0.00001 / 3 }, rows: [{ name: "A", at: -0.000005 }, { name: "B", at: -0.000002 }] });
+  assert.deepEqual(phone.notes.filter((n) => n.cls === "val" && !n.knock).map((n) => n.s), ["−0.00001", "0"]);
+});
+
+test("every kept tick label stands inside the drawing, and a scale that is not a whole number of tiny steps is refused", () => {
+  const { scene, phone } = renderDiagram({ id: "long-middle", kind: "range", label: "Long middle labels.", scale: { from: -0.000009, to: -0.000008, step: 0.000001 / 11 }, rows: [{ name: "A", at: -0.0000085 }, { name: "B", at: -0.0000082 }] });
+  for (const s of [scene, phone]) s.notes.filter((n) => n.cls === "val" && !n.knock).forEach((n) => { const b = box(n); assert.ok(b.x0 >= 0 && b.x1 <= s.w, `"${n.s}" runs from ${b.x0.toFixed(1)} to ${b.x1.toFixed(1)}`); });
+  assert.throws(() => readScale({ from: 0, to: 2.4e-21, step: 1e-21 }, { needStep: true }), /a whole number of steps/);
+});
+
+test("a scale with rounded endpoints is a whole number of steps, and a scale near the largest number keeps its ticks", () => {
+  assert.doesNotThrow(() => readScale({ from: 2000000.1, to: 2000000.2, step: 0.1 }, { needStep: true }));
+  assert.deepEqual(tickLabels({ from: 0, to: 1.6e308, step: 4e307 }), ["0", "4e+307", "8e+307", "1.2e+308", "1.6e+308"]);
+});
+
+test("a step larger than the scale is refused, and a tick label never moves past the error of its arithmetic", () => {
+  assert.throws(() => readScale({ from: 0, to: 10, step: 1e12 }, { needStep: true }), /at least one step/);
+  const d = 2 ** -46;
+  const middle = tickLabels({ from: -1, to: 1 + 2 * d, step: 1 + d })[1];
+  assert.ok(Math.abs(Number(middle.replace("−", "-")) - (-1 + (1 + d))) <= 4 * 2 * Number.EPSILON, `the middle tick ${middle} stays within the error`);
+});
+
+test("each end of the scale leaves room for its own label, so a long first label does not shorten the other end", () => {
+  const { phone } = renderDiagram({ id: "long-first", kind: "range", label: "A long first label.", scale: { from: -0.0000100000000000001, to: 0, step: 0.0000100000000000001 }, rows: [{ name: "A", at: -0.000005 }, { name: "B", at: -0.000002 }] });
+  assert.equal(phone.notes.filter((n) => n.cls === "val" && !n.knock).length, 2);
+});
+
+test("endpoints whose rounding is more than 1% of a step are refused", () => {
+  assert.throws(() => readScale({ from: 99999999.999999, to: 100000000, step: 4.5e-7 }, { needStep: true }), /a whole number of steps/);
+  assert.doesNotThrow(() => readScale({ from: 2000000.1, to: 2000000.2, step: 0.1 }, { needStep: true }));
+});

@@ -13,6 +13,19 @@ const PHONE = 264; // the phone form: it fits a 320px screen
 const ROW = 32; // the height of one mark's strip
 const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 const num = (v) => String(Math.round(v * 100) / 100);
+// A name on a phone wraps at its spaces, and inside a word that is wider than the room alone, as in a language without
+// spaces. It breaks between whole characters as a reader sees them, so a Thai vowel mark stays with its consonant.
+const graphemes = new Intl.Segmenter(undefined, { granularity: "grapheme" });
+const wrapName = (str, room) => wrap(str, "name", room).flatMap((line) => {
+  if (textWidth(line, 14, 600) <= room) return [line];
+  const out = [""];
+  for (const { segment: ch } of graphemes.segment(line)) {
+    const next = out[out.length - 1] + ch;
+    if (out[out.length - 1] && textWidth(next, 14, 600) > room) out.push(ch);
+    else out[out.length - 1] = next;
+  }
+  return out;
+});
 
 /** Checks range data and returns the model. */
 function readRange(data) {
@@ -97,15 +110,21 @@ function layoutRange(model, phone = false) {
   const W = phone ? PHONE : WIDE;
   const where = phone ? "on a phone" : "on a desktop and on paper";
   const s = { form: "range", w: W, h: 0, bands: [], gaps: [], tracks: [], lanes: [], parts: [], legs: [], notes: [], under: [] };
+  // The first and the last tick label are centred on their ticks, so each end of the scale leaves room for half of its own
+  // label. The labels between them are checked against the edges when the ticks are chosen.
+  const firstHalf = valueWidth(fmt(scale.from)) / 2;
+  const lastHalf = valueWidth(fmt(scale.to)) / 2;
   let x0, x1, lo;
-  if (phone) [x0, x1, lo] = [20, W - 20 - 32, 12];
+  if (phone) [x0, x1, lo] = [Math.ceil(Math.max(20, 12 + firstHalf)), Math.floor(Math.min(W - 20 - 32, W - 12 - lastHalf)), 12];
   else {
     const nameW = Math.max(...rows.map((r) => textWidth(r.name, 14)), ...model.groups.map((g) => textWidth(g.name, 14, 600)));
-    [x0, x1] = [Math.ceil(20 + nameW + 24), W - 20 - 40];
+    // The unit stands left of the first tick label, so the scale also leaves room for the unit there.
+    const unitRoom = scale.unit ? 12 + textWidth(scale.unit, 12) + 10 + firstHalf : 0;
+    [x0, x1] = [Math.ceil(Math.max(20 + nameW + 24, unitRoom, 12 + firstHalf)), Math.floor(Math.min(W - 20 - 40, W - 12 - lastHalf))];
     lo = x0 - 12; // a value on the left of its mark stays clear of the row names
   }
   const hi = W - 12;
-  const sc = makeScale(scale, x0, x1);
+  const sc = makeScale(scale, x0, x1, { lo: 12, hi: W - 12 });
   const lineAt = (x) => scale.marks.some((m) => Math.abs(sc.x(m.at) - x) < 0.5);
 
   // The head: the names of the marks, then the tick labels; the unit at the left of the ticks, or on its own line on a phone.
@@ -131,9 +150,13 @@ function layoutRange(model, phone = false) {
   for (const g of groups) {
     const top = y;
     let yy = top + 8;
-    if (g.name) { s.notes.push({ x: 20, y: yy + 16, s: g.name, cls: "name", anchor: "start" }); yy += 24; }
+    if (g.name) {
+      const lines = phone ? wrapName(g.name, W - 40) : [g.name];
+      lines.forEach((line, i) => s.notes.push({ x: 20, y: yy + 16 + i * 18, s: line, cls: "name", anchor: "start" }));
+      yy += 24 + (lines.length - 1) * 18;
+    }
     for (const r of g.rows) {
-      if (phone) for (const line of wrap(r.name, "name", W - 40)) { s.notes.push({ x: 20, y: yy + 16, s: line, cls: "row", anchor: "start" }); yy += 18; }
+      if (phone) for (const line of wrapName(r.name, W - 40)) { s.notes.push({ x: 20, y: yy + 16, s: line, cls: "row", anchor: "start" }); yy += 18; }
       const { a, b, sides } = extent(r, sc, x0, x1, where);
       const tw = valueWidth(r.value);
       const place = placeLabel({ a, b, w: tw, lo, hi, sides });

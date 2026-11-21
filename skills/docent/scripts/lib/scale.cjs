@@ -13,8 +13,9 @@ const isNum = (v) => typeof v === "number" && Number.isFinite(v);
  * wider than the proportional digit in the text measure (Chrome on macOS: 7.55px at 12px). 0.66em keeps room to spare. */
 const valueWidth = (s, size = 12) => textWidth(String(s).replace(/\d/g, ""), size) + (String(s).match(/\d/g) || []).length * 0.66 * size;
 
-// A number as written: twelve significant digits keep the input's precision and drop float noise; a minus sign, not a hyphen.
-const fmt = (v) => String(Number(v.toPrecision(12))).replace(/^-/, "−");
+// A number as written: fifteen significant digits keep the input's precision (also 1700000000001) and drop float noise;
+// a minus sign, not a hyphen.
+const fmt = (v) => String(Number(v.toPrecision(15))).replace(/^-/, "−");
 
 /** Checks the scale: from, to, a step (needed or not), a unit and up to two named marks. */
 function readScale(scale, { needStep }) {
@@ -24,7 +25,12 @@ function readScale(scale, { needStep }) {
   if (scale.step != null || needStep) {
     if (!isNum(scale.step) || !(scale.step > 0)) fail(`"scale" needs a "step", a number more than 0, for its ticks`);
     count = Math.round((scale.to - scale.from) / scale.step);
-    if (Math.abs(count * scale.step - (scale.to - scale.from)) > 1e-9 * Math.max(1, Math.abs(scale.to - scale.from))) fail(`"scale": "to" minus "from" must be a whole number of steps`);
+    if (count < 1) fail(`"scale" needs at least one step: "step" must be no more than "to" minus "from"`);
+    // The error allowed is a billionth of a step, so a scale of tiny steps is checked as closely as a scale of large ones,
+    // or the rounding of the endpoints themselves (2000000.2 − 2000000.1 is not exactly 0.1), whichever is larger, but never
+    // more than 1% of a step: endpoints too large for their step cannot show a whole number of steps, and are refused.
+    const allowed = Math.min(0.01 * scale.step, Math.max(1e-9 * scale.step, 8 * Number.EPSILON * Math.max(Math.abs(scale.from), Math.abs(scale.to))));
+    if (Math.abs(count * scale.step - (scale.to - scale.from)) > allowed) fail(`"scale": "to" minus "from" must be a whole number of steps`);
     if (count > MOST.steps) fail(`the scale has ${count} steps; a scale chart has at most ${MOST.steps}. Use a larger "step"`);
   }
   const unit = words(scale.unit, `the unit of "scale"`, MOST.unit, false);
@@ -38,16 +44,40 @@ function readScale(scale, { needStep }) {
   return { from: scale.from, to: scale.to, step: count ? scale.step : null, count, unit, marks };
 }
 
-/** The scale laid on the pixels x0 to x1: x(value), and the ticks that keep their labels apart. */
-function makeScale(scale, x0, x1) {
+/** The scale laid on the pixels x0 to x1: x(value), and the ticks that keep their labels apart and between lo and hi. */
+function makeScale(scale, x0, x1, { lo = -Infinity, hi = Infinity } = {}) {
   const per = (x1 - x0) / (scale.to - scale.from);
   const x = (v) => x0 + (v - scale.from) * per;
   const ticks = [];
   if (scale.count) {
-    const label = (k) => fmt(scale.from + k * scale.step);
-    const widest = Math.max(...Array.from({ length: scale.count + 1 }, (_, k) => valueWidth(label(k))));
-    const keep = KEEP.find((k) => k * scale.step * per >= Math.max(GAP, widest + 16)) || scale.count;
-    for (let k = 0; k <= scale.count; k += keep) ticks.push({ v: scale.from + k * scale.step, x: x(scale.from + k * scale.step), label: label(k) });
+    // A tick stands at its exact value. Its label is the shortest number within the error of the arithmetic: from + k × step
+    // is off by at most about 4 × epsilon × (|from| + |k × step|). So noise goes (-0.35 + 5 × 0.07 is 5.55e-17, and the
+    // label is 0), and every digit that means something stays: tiny steps (1e-21), large offsets (1700000000001) and real
+    // offsets near 0 (1e-14). The first and the last tick are the author's own "from" and "to".
+    const raw = (k) => scale.from + k * scale.step;
+    const meant = (k) => {
+      // Each part is multiplied by epsilon first, so the error of a scale near the largest number does not overflow.
+      const v = raw(k), error = 4 * (Math.abs(scale.from) * Number.EPSILON + Math.abs(k * scale.step) * Number.EPSILON);
+      if (Math.abs(v) <= error) return 0;
+      for (let digits = 1; digits < 15; digits++) { const short = Number(v.toPrecision(digits)); if (Math.abs(short - v) <= error) return short; }
+      return Number(v.toPrecision(15));
+    };
+    const at = (k) => (k === 0 ? scale.from : k === scale.count ? scale.to : meant(k));
+    const label = (k) => fmt(at(k));
+    // A spacing keeps every n-th tick. It works when each two kept labels stand at least 48px apart, and far enough apart
+    // for half of each label and 16px between them. Only the labels that a spacing keeps are measured, and only spacings
+    // up to the number of steps count, so the last spacing keeps just the first and the last tick.
+    const width = Array.from({ length: scale.count + 1 }, (_, k) => valueWidth(label(k)));
+    const inside = (k) => x(raw(k)) - width[k] / 2 >= lo && x(raw(k)) + width[k] / 2 <= hi;
+    const fits = (n) => {
+      for (let k = 0; k <= scale.count; k += n) if (!inside(k)) return false;
+      for (let k = n; k <= scale.count; k += n) if (n * scale.step * per < Math.max(GAP, (width[k - n] + width[k]) / 2 + 16)) return false;
+      return true;
+    };
+    const keep = [...KEEP.filter((n) => n < scale.count), scale.count].find(fits);
+    // Not even the first and the last label stand apart: the labels are wider than the scale.
+    if (!keep) fail(`the first and the last tick labels are ${Math.ceil(width[0])}px and ${Math.ceil(width[scale.count])}px wide, and the scale is ${Math.round(x1 - x0)}px wide, so no two tick labels stand apart; use a larger "step", or values with fewer digits`);
+    for (let k = 0; k <= scale.count; k += keep) ticks.push({ v: at(k), x: x(k === 0 || k === scale.count ? at(k) : raw(k)), label: label(k) });
   }
   return { per, x, ticks };
 }
