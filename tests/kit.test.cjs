@@ -97,3 +97,15 @@ test("a profile sets the block width and the spacing, never the text column", ()
 test("a page for the public has larger text: the root grows, so every rem size grows with it", () => {
   assert.match(rule('html[data-text="large"]'), /font-size: 112\.5%/);
 });
+
+test("on paper: 11pt text, the notes beside the text, lines kept together, and page numbers", () => {
+  const print = css.slice(css.indexOf("@media print {"));
+  assert.match(print, /html \{ font-size: 11pt; \} html\[data-text="large"\] \{ font-size: 12pt; \}/);
+  assert.match(print, /html:root:not\(\[data-never\]\) \{ --measure: 112mm; --gap: 8mm; --margin-col: 50mm; --block: 100%; \}/, "the text, a gap and the notes fit an A4 page (174mm)");
+  assert.match(print, /\.shell \{ padding: 0; \}/, "the page margin is the edge");
+  assert.match(print, /\.row \{ grid-template-columns: minmax\(0, var\(--measure\)\) var\(--margin-col\); \}/);
+  assert.match(print, /p, li \{ orphans: 2; widows: 2; \}/);
+  assert.match(print, /pre \{ border: 1px solid var\(--line\); white-space: pre-wrap; overflow-wrap: anywhere; \}/, "paper cannot scroll, so a long line of code wraps");
+  assert.match(print, /@bottom-right \{ content: counter\(page\) " \/ " counter\(pages\);/);
+  assert.ok(!/size:\s*(A4|letter)/i.test(print), "the reader's paper size wins");
+});
