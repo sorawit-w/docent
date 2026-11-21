@@ -7,6 +7,7 @@ const { VERSION, cssBlock, jsBlock, findKit } = require("./lib/kit.cjs");
 const { renderDiagram } = require("./lib/diagram.cjs");
 const { renderWidget, PLACE, esc } = require("./lib/widget.cjs");
 const { findBlocks, block } = require("./lib/blocks.cjs");
+const { PROFILES, suggestProfile } = require("./lib/profile.cjs");
 
 const MOST_WIDGETS = 4; // more widgets than this in one document gives a warning
 const CARDS = [3, 8]; // a card grid holds 3 to 8 cards
@@ -198,6 +199,16 @@ function checkDocument(html) {
     const line = plain(inner.replace(/<code\b[^>]*>[\s\S]*?<\/code>/g, ""));
     if (line.split(/\s[|·]\s/).length >= 3) warnings.push(`the paragraph "${line.length > 60 ? `${line.slice(0, 60)}…` : line}" joins facts with "|" or "·"; list them in a margin note beside the item (see "Facts about one item go in the margin" in DESIGN.md)`);
   }
+
+  // 8. The profile of the page. The agent chooses it; check names a suggestion only when one rule wins clearly.
+  const profile = (markup.match(/<html\b[^>]*\bdata-profile="([^"]*)"/i) || [])[1];
+  const text = (markup.match(/<html\b[^>]*\bdata-text="([^"]*)"/i) || [])[1];
+  if (profile != null && !PROFILES.includes(profile)) errors.push(`<html> has data-profile="${profile}"; a profile is ${PROFILES.map((p) => `"${p}"`).join(", ")}`);
+  if (text != null && text !== "large") errors.push(`<html> has data-text="${text}"; the only value is "large", for a page for the public`);
+  const suggested = suggestProfile(markup);
+  const looks = suggested.sure && suggested.profile !== "standard" ? `; the page looks like "${suggested.profile}": ${suggested.reasons[0]}` : "";
+  if (profile == null) warnings.push(`<html> has no data-profile, so the page uses "standard"${looks}; write the profile on <html> (see "Choose a profile" in SKILL.md)`);
+  else if (PROFILES.includes(profile) && looks && suggested.profile !== profile) warnings.push(`<html> has data-profile="${profile}"${looks}; keep the profile only if the readers need it (see "Choose a profile" in SKILL.md)`);
   return { errors, warnings };
 }
 

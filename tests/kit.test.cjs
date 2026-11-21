@@ -81,3 +81,19 @@ test("a card grid has no box and at most four cards in a row", () => {
   assert.ok(!/background|box-shadow|border:/.test(rule(".cards > li")));
   assert.match(rule(".cards"), /calc\(\(100% - 72px\) \/ 4\)/);
 });
+
+test("a profile sets the block width and the spacing, never the text column", () => {
+  assert.match(css, /--block: calc\(var\(--measure\) \+ var\(--gap\) \+ var\(--margin-col\)\); --section-space: 72px; --cell-y: 12px; --step-space: 36px;/, "Standard: code and tables end at the right edge of the notes");
+  assert.match(rule('html[data-profile="task"]'), /--section-space: 56px; --step-space: 28px;/);
+  assert.match(rule('html[data-profile="reference"]'), /--block: var\(--wide\); --section-space: 56px; --cell-y: 8px;/);
+  assert.match(rule('html[data-profile="brief"]'), /--block: var\(--wide\); --section-space: 64px;/);
+  for (const p of ["task", "reference", "brief"]) assert.ok(!/--measure/.test(rule(`html[data-profile="${p}"]`)));
+  assert.match(rule(":is(pre, .code, .table-wrap, .cards)"), /max-width: var\(--block\)/);
+  assert.match(rule("figure"), /min-width: min\(100%, var\(--block\)\); width: min-content; max-width: 100%/, "a wider drawing keeps its real size");
+  assert.match(rule("section"), /padding-top: var\(--section-space\)/);
+  assert.match(rule("th, td"), /padding: var\(--cell-y\) 24px var\(--cell-y\) 0/);
+});
+
+test("a page for the public has larger text: the root grows, so every rem size grows with it", () => {
+  assert.match(rule('html[data-text="large"]'), /font-size: 112\.5%/);
+});

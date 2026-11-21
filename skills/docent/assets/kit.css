@@ -11,7 +11,15 @@
   --mono: var(--host-mono, ui-monospace, "SF Mono", "Cascadia Code", Consolas, Menlo, monospace);
   --ease: cubic-bezier(0.23, 1, 0.32, 1);
   --measure: 31rem; --margin-col: 220px; --gap: 48px; --wide: 1120px;
+  /* The profile of a page sets these. Standard is the default: code and tables end at the right edge of the notes. */
+  --block: calc(var(--measure) + var(--gap) + var(--margin-col)); --section-space: 72px; --cell-y: 12px; --step-space: 36px;
 }
+/* Profiles: one attribute on <html> sets the width of code and tables, and the spacing. A profile never changes the text column. */
+html[data-profile="task"] { --section-space: 56px; --step-space: 28px; }
+html[data-profile="reference"] { --block: var(--wide); --section-space: 56px; --cell-y: 8px; }
+html[data-profile="brief"] { --block: var(--wide); --section-space: 64px; }
+/* A page for the public: every size is in rem, so the text and the text column grow together, on top of the reader's own setting. */
+html[data-text="large"] { font-size: 112.5%; }
 /* Dark: the reader's system setting decides, unless the reader chose a theme with the switch. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
@@ -68,7 +76,7 @@ h1 { font-size: 3.25rem; line-height: 1.06; letter-spacing: -0.02em; }
 .standfirst { font: 400 1.3125rem/1.5 var(--serif); margin: 0; text-wrap: pretty; }
 .facts { margin: 0; padding-left: 0; list-style: none; font-variant-numeric: tabular-nums; }
 
-section { padding-top: 72px; }
+section { padding-top: var(--section-space); }
 h2 { font-size: 1.875rem; line-height: 1.2; margin-bottom: 16px; }
 h3 { font: 600 1.125rem/1.35 var(--sans); margin: 0; text-wrap: balance; }
 /* A small heading inside a part of a section: body size, weight 600. */
@@ -116,7 +124,7 @@ h3.is-numbered::before { content: none !important; }
 .rail { position: relative; }
 .steps { position: relative; margin: 0; padding: 0; list-style: none; counter-reset: step; }
 .steps::before { content: ""; position: absolute; left: 4px; top: 10px; bottom: 10px; width: 1px; background: var(--line); }
-.steps li { position: relative; padding: 0 0 36px 32px; counter-increment: step; }
+.steps li { position: relative; padding: 0 0 var(--step-space) 32px; counter-increment: step; }
 .steps li:last-child { padding-bottom: 0; }
 .steps li::before { content: ""; position: absolute; left: 0; top: 8px; width: 9px; height: 9px; border-radius: 50%; border: 1px solid var(--muted); background: var(--bg); }
 .steps h3::before { content: counter(step); font-weight: 400; color: var(--muted); margin-right: 10px; font-variant-numeric: tabular-nums; }
@@ -128,7 +136,8 @@ h3.is-numbered::before { content: none !important; }
 .walk figure { position: sticky; top: 88px; }
 
 /* Figures: a well that holds a Docent diagram, with a plain caption. A diagram carries its own styles. */
-figure { margin: 0; }
+/* A well is as wide as the profile's block. A wider drawing keeps its real size, and its well grows with it. */
+figure { margin: 0; min-width: min(100%, var(--block)); width: min-content; max-width: 100%; }
 section > figure { margin-top: 24px; }
 .fig { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 16px 24px; background: var(--fig); border-radius: 12px; padding: 8px; overflow-x: auto; scrollbar-color: var(--line) transparent; }
 /* A well may hold two drawings, for two separate chains: side by side when both fit, else one below the other. */
@@ -150,10 +159,13 @@ figcaption strong { font-weight: 600; color: var(--text); margin-right: 8px; }
 .cards .big { margin-bottom: 4px; font: 700 1.875rem/1.2 var(--serif); color: var(--ink); font-variant-numeric: tabular-nums; }
 .cards + :is(p, ul, ol, dl) { margin-top: 24px; }
 
+/* Code, tables and cards end at the profile's block width. */
+:is(pre, .code, .table-wrap, .cards) { max-width: var(--block); }
+
 /* Tables: rules only, no boxes. */
 .table-wrap { overflow-x: auto; margin: 24px 0 0; scrollbar-color: var(--line) transparent; }
 table { width: 100%; min-width: 640px; border-collapse: collapse; font-variant-numeric: tabular-nums; }
-th, td { text-align: left; vertical-align: top; padding: 12px 24px 12px 0; }
+th, td { text-align: left; vertical-align: top; padding: var(--cell-y) 24px var(--cell-y) 0; }
 thead th { border-bottom: 1px solid var(--text); padding-bottom: 10px; font-size: 0.875rem; line-height: 1.5; font-weight: 600; color: var(--muted); }
 tbody th { font-weight: 600; white-space: nowrap; }
 tbody tr { border-bottom: 1px solid var(--line); }
