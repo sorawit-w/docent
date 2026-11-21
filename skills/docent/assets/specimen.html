@@ -146,7 +146,7 @@ h3.is-numbered::before { content: none !important; }
 
 /* Figures: a well that holds a Docent diagram, with a plain caption. A diagram carries its own styles. */
 /* A well is as wide as the profile's block. A wider drawing keeps its real size, and its well grows with it. */
-figure { margin: 0; min-width: min(100%, var(--block)); width: min-content; max-width: 100%; }
+figure { margin: 0; min-width: min(100%, var(--block)); width: fit-content; max-width: 100%; }
 section > figure { margin-top: 24px; }
 .fig { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 16px 24px; background: var(--fig); border-radius: 12px; padding: 8px; overflow-x: auto; scrollbar-color: var(--line) transparent; }
 /* A well may hold two drawings, for two separate chains: side by side when both fit, else one below the other. */

@@ -89,7 +89,7 @@ test("a profile sets the block width and the spacing, never the text column", ()
   assert.match(rule('html[data-profile="brief"]'), /--block: var\(--wide\); --section-space: 64px;/);
   for (const p of ["task", "reference", "brief"]) assert.ok(!/--measure/.test(rule(`html[data-profile="${p}"]`)));
   assert.match(rule(":is(pre, .code, .table-wrap, .cards)"), /max-width: var\(--block\)/);
-  assert.match(rule("figure"), /min-width: min\(100%, var\(--block\)\); width: min-content; max-width: 100%/, "a wider drawing keeps its real size");
+  assert.match(rule("figure"), /min-width: min\(100%, var\(--block\)\); width: fit-content; max-width: 100%/, "a wider drawing keeps its real size");
   assert.match(rule("section"), /padding-top: var\(--section-space\)/);
   assert.match(rule("th, td"), /padding: var\(--cell-y\) 24px var\(--cell-y\) 0/);
 });
