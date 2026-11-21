@@ -275,3 +275,16 @@ test("the full examples in references/diagrams.md are drawn without an error", (
   const examples = [...guide.matchAll(/```json\n(\{\n  "id"[\s\S]*?)```/g)].map((m) => JSON.parse(m[1]));
   assert.deepEqual(examples.map((d) => renderDiagram(d).form), ["sequence", "flow", "activity", "state", "interaction-overview", "timing", "usecase", "class", "object", "package", "profile", "component", "composite", "deployment", "communication"]);
 });
+
+test("render --data draws a diagram of any kind, and builds a widget only from a widget kind", () => {
+  const { spawnSync } = require("node:child_process");
+  const run = (name) => spawnSync(process.execPath, [path.join(__dirname, "../skills/docent/scripts/render.cjs"), "--data", path.join(__dirname, "fixtures", `${name}.json`)], { encoding: "utf8" });
+  for (const name of ["bug-report", "sequence", "flow", "state", "class"]) {
+    const r = run(name);
+    assert.equal(r.status, 0, `${name}: ${r.stderr}`);
+    assert.match(r.stdout, /^<svg/, `${name} is drawn as a diagram`);
+  }
+  const w = run("widget-chooser");
+  assert.equal(w.status, 0, w.stderr);
+  assert.match(w.stderr, /built .* as chooser/);
+});
