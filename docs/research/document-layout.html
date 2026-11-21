@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Page layout for generated documents — Docent</title>
 <style>
-/* docent:kit 0.5.0 */
+/* docent:kit 0.6.0 */
 /* Docent page styles. Tokens come from references/DESIGN.md. One file, no network. */
 :root {
   color-scheme: light;
@@ -158,6 +158,12 @@ section > figure { margin-top: 24px; }
 .dg-words ol { margin: 8px 0 0; padding-left: 28px; }
 .dg-words li + li { margin-top: 4px; }
 .dg-words p { margin: 12px 0 0; font-weight: 600; }
+/* The rows of a range chart in words: a small table, as wide as its content, so it fits a phone. */
+.dg-words table { width: auto; min-width: 0; margin-top: 8px; }
+.dg-words :is(th, td) { padding-right: 16px; }
+/* A long name with no spaces breaks inside its cell, so the table never runs past a phone screen. */
+.dg-words tbody th { white-space: normal; }
+.dg-words :is(th, td) { overflow-wrap: anywhere; }
 figcaption { margin-top: 12px; font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
 figcaption strong { font-weight: 600; color: var(--text); margin-right: 8px; }
 
@@ -325,20 +331,6 @@ footer .shell { display: flex; align-items: center; justify-content: space-betwe
 }
 /* /docent:kit */
 </style>
-<style>
-/* The three charts that Docent cannot draw yet. They take the page tokens, so they follow dark mode and print. */
-.gc { display: block; font-family: var(--sans); }
-.gc text { font-size: 14px; fill: var(--text); }
-.gc .m { fill: var(--muted); } .gc .b { font-weight: 600; }
-.gc .axis { stroke: var(--line); } .gc .mid { stroke: var(--muted); stroke-dasharray: 4 4; }
-.gc .text-bar, .gc .range { fill: var(--bg); stroke: var(--text); }
-.gc .note-bar { fill: var(--bg); stroke: var(--muted); }
-.gc .list-bar, .gc .upper { fill: var(--bg); stroke: var(--muted); stroke-dasharray: 4 3; }
-.gc .wide-bar { fill: var(--line); }
-.gc .docent { fill: var(--bg); stroke: var(--primary); stroke-width: 2; }
-.gc .dot { fill: var(--dot); } .gc .pt { fill: var(--text); }
-.gc .page { fill: var(--bg); stroke: var(--muted); } .gc .txt { stroke: var(--text); stroke-width: 2; } .gc .txt.m { stroke: var(--muted); } .gc .rule { stroke: var(--line); }
-</style>
 </head>
 <body>
 <header class="topbar">
@@ -422,12 +414,215 @@ footer .shell { display: flex; align-items: center; justify-content: space-betwe
     <p>Studies of line length agree on what readers like, and disagree on speed. Longer lines were sometimes read faster, but readers rated them worse, and comprehension did not improve. Longer lines helped visual search, which weakly supports wider tables and code, not wider text. Most of these studies are old and small.</p>
     <figure>
       <div class="fig" role="region" aria-label="Figure 1, line lengths in the evidence" tabindex="0">
-<!-- GAP: Docent has no diagram kind for this chart. Drawn by hand, after diagram-design's range-bar layout. -->
-<svg class="gc" id="gc-lines" width="720" height="328" viewBox="0 0 720 328" role="img" aria-labelledby="gc-lines-title gc-lines-desc"><title id="gc-lines-title">Line lengths in the evidence</title><desc id="gc-lines-desc">Readers prefer 45 to 76 characters in a line. One study rated 55 easiest. Advice for dyslexia says 50 to 75, WCAG AAA allows up to 80, and print style allows 45 to 90. Docent's text column holds 63 to 70 on screen and about 52 to 64 on paper.</desc>
-<line class="axis" x1="200" y1="28" x2="200" y2="320"/><text class="m" x="200" y="18" text-anchor="middle">40</text><line class="axis" x1="280" y1="28" x2="280" y2="320"/><text class="m" x="280" y="18" text-anchor="middle">50</text><line class="axis" x1="360" y1="28" x2="360" y2="320"/><text class="m" x="360" y="18" text-anchor="middle">60</text><line class="axis" x1="440" y1="28" x2="440" y2="320"/><text class="m" x="440" y="18" text-anchor="middle">70</text><line class="axis" x1="520" y1="28" x2="520" y2="320"/><text class="m" x="520" y="18" text-anchor="middle">80</text><line class="axis" x1="600" y1="28" x2="600" y2="320"/><text class="m" x="600" y="18" text-anchor="middle">90</text><line class="axis" x1="680" y1="28" x2="680" y2="320"/><text class="m" x="680" y="18" text-anchor="middle">100</text><text x="0" y="55">Readers prefer</text><rect class="range" x="240" y="40" width="248" height="20" rx="4"/><text class="m" x="496" y="55">45–76</text><text x="0" y="91">Rated easiest, Dyson</text><circle class="pt" cx="320" cy="86" r="6"/><text class="m" x="334" y="91">55</text><text x="0" y="127">A literature review</text><rect class="upper" x="200" y="112" width="240" height="20" rx="4"/><text class="m" x="448" y="127">up to 70</text><text x="0" y="163">Advice for dyslexia</text><rect class="range" x="280" y="148" width="200" height="20" rx="4"/><text class="m" x="488" y="163">50–75</text><text x="0" y="199">WCAG 1.4.8, AAA</text><rect class="upper" x="200" y="184" width="320" height="20" rx="4"/><text class="m" x="528" y="199">up to 80</text><text x="0" y="235">Print, Butterick</text><rect class="range" x="240" y="220" width="360" height="20" rx="4"/><text class="m" x="608" y="235">45–90</text><text x="0" y="271">Docent on screen</text><rect class="docent" x="384" y="256" width="56" height="20" rx="4"/><text class="m" x="448" y="271">63–70</text><text x="0" y="307">Docent on paper</text><rect class="docent" x="296" y="292" width="96" height="20" rx="4"/><text class="m" x="400" y="307">52–64</text>
+<!-- docent:diagram
+{
+  "id": "line-lengths",
+  "kind": "range",
+  "label": "Readers prefer 45 to 76 characters in a line, and one study rated 55 easiest. Advice and standards set upper limits from 70 to 90. Docent holds 63 to 70 on screen and 52 to 64 on paper.",
+  "scale": {"from": 40, "to": 100, "step": 10, "unit": "characters"},
+  "groups": [
+    {"id": "evidence", "name": "The evidence"},
+    {"id": "docent", "name": "Docent"}
+  ],
+  "rows": [
+    {"name": "Readers prefer", "from": 45, "to": 76, "group": "evidence"},
+    {"name": "Rated easiest, Dyson", "at": 55, "group": "evidence"},
+    {"name": "A literature review", "to": 70, "group": "evidence"},
+    {"name": "Advice for dyslexia", "from": 50, "to": 75, "group": "evidence"},
+    {"name": "WCAG 1.4.8, AAA", "to": 80, "group": "evidence"},
+    {"name": "Print, Butterick", "from": 45, "to": 90, "group": "evidence"},
+    {"name": "Docent on screen", "from": 63, "to": 70, "group": "docent"},
+    {"name": "Docent on paper", "from": 52, "to": 64, "note": "computed", "group": "docent"}
+  ]
+}
+-->
+<svg id="dg-line-lengths" class="dg dg-range dg-auto" xmlns="http://www.w3.org/2000/svg" width="640" height="388" viewBox="0 0 640 388" role="img" aria-label="Readers prefer 45 to 76 characters in a line, and one study rated 55 easiest. Advice and standards set upper limits from 70 to 90. Docent holds 63 to 70 on screen and 52 to 64 on paper.">
+<style>
+#dg-line-lengths{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-line-lengths .ground{fill:var(--fig,#f2f3f9)}
+#dg-line-lengths .band{fill:var(--bg,#fbfbfe)}
+#dg-line-lengths .track{stroke:var(--line,#d3d6e3)}
+#dg-line-lengths .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-line-lengths .head{fill:var(--text,#1c1f2e)}
+#dg-line-lengths .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-line-lengths .stop.end{fill:var(--text,#1c1f2e)}
+#dg-line-lengths .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-line-lengths .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-line-lengths .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-line-lengths .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-line-lengths .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-line-lengths .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-line-lengths .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-line-lengths .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-line-lengths .sub,#dg-line-lengths .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-line-lengths .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-line-lengths .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-line-lengths .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-line-lengths .r-bar{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-line-lengths .r-pt{fill:var(--text,#1c1f2e)}
+#dg-line-lengths .r-lim{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2}
+#dg-line-lengths .r-ref{stroke:var(--muted,#575d75)}
+@media (prefers-reduced-motion:reduce){#dg-line-lengths .pulse{animation:none!important}#dg-line-lengths .pulse{display:none!important}}
+@media print{#dg-line-lengths{max-width:100%;height:auto}#dg-line-lengths .pulse{display:none!important}}
+#dg-line-lengths-phone{display:none}
+</style>
+<rect width="640" height="388" class="ground"/>
+<rect x="8" y="36" width="624" height="232" rx="10" class="band"/>
+<rect x="8" y="276" width="624" height="104" rx="10" class="band"/>
+<line x1="186" y1="36" x2="186" y2="268" class="track"/>
+<line x1="251.67" y1="36" x2="251.67" y2="268" class="track"/>
+<line x1="317.33" y1="36" x2="317.33" y2="268" class="track"/>
+<line x1="383" y1="36" x2="383" y2="268" class="track"/>
+<line x1="448.67" y1="36" x2="448.67" y2="268" class="track"/>
+<line x1="514.33" y1="36" x2="514.33" y2="268" class="track"/>
+<line x1="580" y1="36" x2="580" y2="268" class="track"/>
+<line x1="186" y1="276" x2="186" y2="380" class="track"/>
+<line x1="251.67" y1="276" x2="251.67" y2="380" class="track"/>
+<line x1="317.33" y1="276" x2="317.33" y2="380" class="track"/>
+<line x1="383" y1="276" x2="383" y2="380" class="track"/>
+<line x1="448.67" y1="276" x2="448.67" y2="380" class="track"/>
+<line x1="514.33" y1="276" x2="514.33" y2="380" class="track"/>
+<line x1="580" y1="276" x2="580" y2="380" class="track"/>
+<text x="186" y="24" class="val" text-anchor="middle">40</text>
+<text x="251.67" y="24" class="val" text-anchor="middle">50</text>
+<text x="317.33" y="24" class="val" text-anchor="middle">60</text>
+<text x="383" y="24" class="val" text-anchor="middle">70</text>
+<text x="448.67" y="24" class="val" text-anchor="middle">80</text>
+<text x="514.33" y="24" class="val" text-anchor="middle">90</text>
+<text x="580" y="24" class="val" text-anchor="middle">100</text>
+<text x="168.08" y="24" class="sub" text-anchor="end">characters</text>
+<text x="20" y="60" class="name" text-anchor="start">The evidence</text>
+<text x="20" y="89" class="row" text-anchor="start">Readers prefer</text>
+<rect x="426.4" y="76" width="51.68" height="16" class="band"/><text x="430.4" y="88" class="val" text-anchor="start">45–76</text>
+<text x="20" y="121" class="row" text-anchor="start">Rated easiest, Dyson</text>
+<rect x="293.5" y="108" width="23.84" height="16" class="band"/><text x="297.5" y="120" class="val" text-anchor="start">55</text>
+<text x="20" y="153" class="row" text-anchor="start">A literature review</text>
+<rect x="388" y="140" width="57.84" height="16" class="band"/><text x="392" y="152" class="val" text-anchor="start">up to 70</text>
+<text x="20" y="185" class="row" text-anchor="start">Advice for dyslexia</text>
+<rect x="419.83" y="172" width="51.68" height="16" class="band"/><text x="423.83" y="184" class="val" text-anchor="start">50–75</text>
+<text x="20" y="217" class="row" text-anchor="start">WCAG 1.4.8, AAA</text>
+<rect x="453.67" y="204" width="57.84" height="16" class="band"/><text x="457.67" y="216" class="val" text-anchor="start">up to 80</text>
+<text x="20" y="249" class="row" text-anchor="start">Print, Butterick</text>
+<rect x="518.33" y="236" width="51.68" height="16" class="band"/><text x="522.33" y="248" class="val" text-anchor="start">45–90</text>
+<text x="20" y="300" class="name" text-anchor="start">Docent</text>
+<text x="20" y="329" class="row" text-anchor="start">Docent on screen</text>
+<rect x="387" y="316" width="51.68" height="16" class="band"/><text x="391" y="328" class="val" text-anchor="start">63–70</text>
+<text x="20" y="361" class="row" text-anchor="start">Docent on paper</text>
+<rect x="347.6" y="348" width="116.68" height="16" class="band"/><text x="351.6" y="360" class="val" text-anchor="start">52–64, computed</text>
+<rect x="218.83" y="76" width="203.57" height="16" rx="4" class="r-bar"/>
+<circle cx="284.5" cy="116" r="5" class="r-pt"/>
+<path d="M186,148 H383 M383,140 V156" class="r-lim"/>
+<rect x="251.67" y="172" width="164.17" height="16" rx="4" class="r-bar"/>
+<path d="M186,212 H448.67 M448.67,204 V220" class="r-lim"/>
+<rect x="218.83" y="236" width="295.5" height="16" rx="4" class="r-bar"/>
+<rect x="337.03" y="316" width="45.97" height="16" rx="4" class="r-bar"/>
+<rect x="264.8" y="348" width="78.8" height="16" rx="4" class="r-bar"/>
 </svg>
+<svg id="dg-line-lengths-phone" class="dg dg-range dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="552" viewBox="0 0 264 552" role="img" aria-label="Readers prefer 45 to 76 characters in a line, and one study rated 55 easiest. Advice and standards set upper limits from 70 to 90. Docent holds 63 to 70 on screen and 52 to 64 on paper.">
+<style>
+#dg-line-lengths-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-line-lengths-phone .ground{fill:var(--fig,#f2f3f9)}
+#dg-line-lengths-phone .band{fill:var(--bg,#fbfbfe)}
+#dg-line-lengths-phone .track{stroke:var(--line,#d3d6e3)}
+#dg-line-lengths-phone .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-line-lengths-phone .head{fill:var(--text,#1c1f2e)}
+#dg-line-lengths-phone .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-line-lengths-phone .stop.end{fill:var(--text,#1c1f2e)}
+#dg-line-lengths-phone .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-line-lengths-phone .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-line-lengths-phone .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-line-lengths-phone .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-line-lengths-phone .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-line-lengths-phone .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-line-lengths-phone .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-line-lengths-phone .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-line-lengths-phone .sub,#dg-line-lengths-phone .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-line-lengths-phone .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-line-lengths-phone .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-line-lengths-phone .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-line-lengths-phone .r-bar{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-line-lengths-phone .r-pt{fill:var(--text,#1c1f2e)}
+#dg-line-lengths-phone .r-lim{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2}
+#dg-line-lengths-phone .r-ref{stroke:var(--muted,#575d75)}
+@media (prefers-reduced-motion:reduce){#dg-line-lengths-phone .pulse{animation:none!important}#dg-line-lengths-phone .pulse{display:none!important}}
+@media print{#dg-line-lengths-phone{max-width:100%;height:auto}#dg-line-lengths-phone .pulse{display:none!important}}
+@media (max-width:736px){#dg-line-lengths{display:none}#dg-line-lengths-phone{display:block}}
+@media print{#dg-line-lengths{display:block!important}#dg-line-lengths-phone{display:none!important}}
+</style>
+<rect width="264" height="552" class="ground"/>
+<rect x="8" y="56" width="248" height="340" rx="10" class="band"/>
+<rect x="8" y="404" width="248" height="140" rx="10" class="band"/>
+<line x1="20" y1="108" x2="20" y2="136" class="track"/>
+<line x1="84" y1="108" x2="84" y2="136" class="track"/>
+<line x1="148" y1="108" x2="148" y2="136" class="track"/>
+<line x1="212" y1="108" x2="212" y2="136" class="track"/>
+<line x1="20" y1="158" x2="20" y2="186" class="track"/>
+<line x1="84" y1="158" x2="84" y2="186" class="track"/>
+<line x1="148" y1="158" x2="148" y2="186" class="track"/>
+<line x1="212" y1="158" x2="212" y2="186" class="track"/>
+<line x1="20" y1="208" x2="20" y2="236" class="track"/>
+<line x1="84" y1="208" x2="84" y2="236" class="track"/>
+<line x1="148" y1="208" x2="148" y2="236" class="track"/>
+<line x1="212" y1="208" x2="212" y2="236" class="track"/>
+<line x1="20" y1="258" x2="20" y2="286" class="track"/>
+<line x1="84" y1="258" x2="84" y2="286" class="track"/>
+<line x1="148" y1="258" x2="148" y2="286" class="track"/>
+<line x1="212" y1="258" x2="212" y2="286" class="track"/>
+<line x1="20" y1="308" x2="20" y2="336" class="track"/>
+<line x1="84" y1="308" x2="84" y2="336" class="track"/>
+<line x1="148" y1="308" x2="148" y2="336" class="track"/>
+<line x1="212" y1="308" x2="212" y2="336" class="track"/>
+<line x1="20" y1="358" x2="20" y2="386" class="track"/>
+<line x1="84" y1="358" x2="84" y2="386" class="track"/>
+<line x1="148" y1="358" x2="148" y2="386" class="track"/>
+<line x1="212" y1="358" x2="212" y2="386" class="track"/>
+<line x1="20" y1="456" x2="20" y2="484" class="track"/>
+<line x1="84" y1="456" x2="84" y2="484" class="track"/>
+<line x1="148" y1="456" x2="148" y2="484" class="track"/>
+<line x1="212" y1="456" x2="212" y2="484" class="track"/>
+<line x1="20" y1="506" x2="20" y2="534" class="track"/>
+<line x1="84" y1="506" x2="84" y2="534" class="track"/>
+<line x1="148" y1="506" x2="148" y2="534" class="track"/>
+<line x1="212" y1="506" x2="212" y2="534" class="track"/>
+<text x="20" y="24" class="sub" text-anchor="start">characters</text>
+<text x="20" y="44" class="val" text-anchor="middle">40</text>
+<text x="84" y="44" class="val" text-anchor="middle">60</text>
+<text x="148" y="44" class="val" text-anchor="middle">80</text>
+<text x="212" y="44" class="val" text-anchor="middle">100</text>
+<text x="20" y="80" class="name" text-anchor="start">The evidence</text>
+<text x="20" y="104" class="row" text-anchor="start">Readers prefer</text>
+<rect x="139.2" y="114" width="51.68" height="16" class="band"/><text x="143.2" y="126" class="val" text-anchor="start">45–76</text>
+<text x="20" y="154" class="row" text-anchor="start">Rated easiest, Dyson</text>
+<rect x="77" y="164" width="23.84" height="16" class="band"/><text x="81" y="176" class="val" text-anchor="start">55</text>
+<text x="20" y="204" class="row" text-anchor="start">A literature review</text>
+<rect x="121" y="214" width="57.84" height="16" class="band"/><text x="125" y="226" class="val" text-anchor="start">up to 70</text>
+<text x="20" y="254" class="row" text-anchor="start">Advice for dyslexia</text>
+<rect x="136" y="264" width="51.68" height="16" class="band"/><text x="140" y="276" class="val" text-anchor="start">50–75</text>
+<text x="20" y="304" class="row" text-anchor="start">WCAG 1.4.8, AAA</text>
+<rect x="153" y="314" width="57.84" height="16" class="band"/><text x="157" y="326" class="val" text-anchor="start">up to 80</text>
+<text x="20" y="354" class="row" text-anchor="start">Print, Butterick</text>
+<rect x="184" y="364" width="51.68" height="16" class="band"/><text x="188" y="376" class="val" text-anchor="start">45–90</text>
+<text x="20" y="428" class="name" text-anchor="start">Docent</text>
+<text x="20" y="452" class="row" text-anchor="start">Docent on screen</text>
+<rect x="120" y="462" width="51.68" height="16" class="band"/><text x="124" y="474" class="val" text-anchor="start">63–70</text>
+<text x="20" y="502" class="row" text-anchor="start">Docent on paper</text>
+<rect x="100.8" y="512" width="116.68" height="16" class="band"/><text x="104.8" y="524" class="val" text-anchor="start">52–64, computed</text>
+<rect x="36" y="114" width="99.2" height="16" rx="4" class="r-bar"/>
+<circle cx="68" cy="172" r="5" class="r-pt"/>
+<path d="M20,222 H116 M116,214 V230" class="r-lim"/>
+<rect x="52" y="264" width="80" height="16" rx="4" class="r-bar"/>
+<path d="M20,322 H148 M148,314 V330" class="r-lim"/>
+<rect x="36" y="364" width="144" height="16" rx="4" class="r-bar"/>
+<rect x="93.6" y="462" width="22.4" height="16" rx="4" class="r-bar"/>
+<rect x="58.4" y="512" width="38.4" height="16" rx="4" class="r-bar"/>
+</svg>
+<details class="dg-words">
+<summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>The diagram in words</summary>
+<table><thead><tr><th scope="col">Row</th><th scope="col">Value, in characters</th><th scope="col">Group</th></tr></thead><tbody><tr><th scope="row">Readers prefer</th><td>45–76</td><td>The evidence</td></tr><tr><th scope="row">Rated easiest, Dyson</th><td>55</td><td>The evidence</td></tr><tr><th scope="row">A literature review</th><td>up to 70</td><td>The evidence</td></tr><tr><th scope="row">Advice for dyslexia</th><td>50–75</td><td>The evidence</td></tr><tr><th scope="row">WCAG 1.4.8, AAA</th><td>up to 80</td><td>The evidence</td></tr><tr><th scope="row">Print, Butterick</th><td>45–90</td><td>The evidence</td></tr><tr><th scope="row">Docent on screen</th><td>63–70</td><td>Docent</td></tr><tr><th scope="row">Docent on paper</th><td>52–64, computed</td><td>Docent</td></tr></tbody></table>
+</details>
+<!-- /docent:diagram -->
       </div>
-      <figcaption><strong>Figure 1</strong>Line lengths in characters, from the evidence and from Docent. A dashed bar has only an upper limit. The paper range is computed for 112mm at 11pt.</figcaption>
+      <figcaption><strong>Figure 1</strong>Line lengths in characters, from the evidence and from Docent. The paper range is computed for 112mm at 11pt.</figcaption>
     </figure>
     <p>For readers with dyslexia, the evidence is about text size, not line length: sizes up to 18pt read better than 12pt. Guidance for older adults asks for 19px text. So the strongest concern is text size, not width. Because Docent sets its sizes in rem, a reader who sets a larger text size gets larger letters at the same line length.</p>
 
@@ -508,12 +703,234 @@ footer .shell { display: flex; align-items: center; justify-content: space-betwe
     <p>The obvious choice would be to center everything, like most documentation sites. That is wrong for Docent if it keeps one left edge for every block, because a centered grid gives up that edge. The report compared four layouts. All positions are for a 1920px screen.</p>
     <figure>
       <div class="fig" role="region" aria-label="Figure 2, where the parts sit on a 1920px screen" tabindex="0">
-<!-- GAP: Docent has no diagram kind for this chart. Drawn by hand, after diagram-design's range-bar layout. -->
-<svg class="gc" id="gc-layouts" width="904" height="380" viewBox="0 0 904 380" role="img" aria-labelledby="gc-layouts-title gc-layouts-desc"><title id="gc-layouts-title">Where the parts sit on a 1920px screen</title><desc id="gc-layouts-desc">On a 1920px screen today, the text and its notes sit left of the middle. Layout A centers them and lets wide blocks grow to the right. Layout B centers the text and the wide blocks, so the left edge splits. Layout C adds a contents list on the left.</desc>
-<line class="axis" x1="120" y1="28" x2="120" y2="372"/><text class="m" x="120" y="18" text-anchor="start">0</text><line class="axis" x1="312" y1="28" x2="312" y2="372"/><text class="m" x="312" y="18" text-anchor="middle">480</text><line class="mid" x1="504" y1="28" x2="504" y2="372"/><text class="m" x="504" y="18" text-anchor="middle">960, the middle</text><line class="axis" x1="696" y1="28" x2="696" y2="372"/><text class="m" x="696" y="18" text-anchor="middle">1440</text><line class="axis" x1="888" y1="28" x2="888" y2="372"/><text class="m" x="888" y="18" text-anchor="end">1920</text><line class="axis" x1="120" y1="36" x2="888" y2="36"/><text class="b" x="14" y="61">Now</text><text class="m" x="14" y="85">a 1200px box</text><rect class="text-bar" x="280" y="44" width="198.4" height="24" rx="4"/><text x="288" y="61">Text</text><rect class="note-bar" x="497.6" y="44" width="88" height="24" rx="4"/><text x="505.6" y="61">Notes</text><rect class="wide-bar" x="280" y="76" width="448" height="24" rx="4"/><text x="288" y="93">Wide blocks</text><line class="axis" x1="120" y1="120" x2="888" y2="120"/><circle class="dot" cx="4" cy="140" r="4"/><text class="b" x="14" y="145">A</text><text class="m" x="14" y="169">Tufte</text><rect class="text-bar" x="351.2" y="128" width="198.4" height="24" rx="4"/><text x="359.2" y="145">Text</text><rect class="note-bar" x="568.8" y="128" width="88" height="24" rx="4"/><text x="576.8" y="145">Notes</text><rect class="wide-bar" x="351.2" y="160" width="448" height="24" rx="4"/><text x="359.2" y="177">Wide blocks</text><line class="axis" x1="120" y1="204" x2="888" y2="204"/><text class="b" x="14" y="229">B</text><text class="m" x="14" y="253">Distill</text><rect class="text-bar" x="404.8" y="212" width="198.4" height="24" rx="4"/><text x="412.8" y="229">Text</text><rect class="note-bar" x="622.4" y="212" width="88" height="24" rx="4"/><text x="630.4" y="229">Notes</text><rect class="wide-bar" x="280" y="244" width="448" height="24" rx="4"/><text x="288" y="261">Wide blocks</text><line class="axis" x1="120" y1="288" x2="888" y2="288"/><text class="b" x="14" y="313">C</text><text class="m" x="14" y="337">MDN</text><rect class="list-bar" x="301.6" y="296" width="80" height="24" rx="4"/><text x="309.6" y="313">Contents</text><rect class="text-bar" x="400.8" y="296" width="198.4" height="24" rx="4"/><text x="408.8" y="313">Text</text><rect class="note-bar" x="618.4" y="296" width="88" height="24" rx="4"/><text x="626.4" y="313">Notes</text>
+<!-- docent:diagram
+{
+  "id": "wide-layouts",
+  "kind": "layout",
+  "label": "On a 1920px screen today, the text and its notes sit left of the middle. Layout A centers them and lets wide blocks grow to the right. Layout B centers the text and the wide blocks, so the left edge splits. Layout C adds a contents list on the left.",
+  "scale": {"from": 0, "to": 1920, "step": 480, "unit": "px", "marks": [{"at": 960, "name": "the middle"}]},
+  "rows": [
+    {"name": "Now", "note": "a 1200px box", "boxes": [
+      {"name": "Text", "from": 400, "to": 896},
+      {"name": "Notes", "from": 944, "to": 1164},
+      {"name": "Wide blocks", "from": 400, "to": 1520, "track": 2}
+    ]},
+    {"name": "A", "note": "Tufte, chosen", "boxes": [
+      {"name": "Text", "from": 578, "to": 1074},
+      {"name": "Notes", "from": 1122, "to": 1342},
+      {"name": "Wide blocks", "from": 578, "to": 1698, "track": 2}
+    ]},
+    {"name": "B", "note": "Distill", "boxes": [
+      {"name": "Text", "from": 712, "to": 1208},
+      {"name": "Notes", "from": 1256, "to": 1476},
+      {"name": "Wide blocks", "from": 400, "to": 1520, "track": 2}
+    ]},
+    {"name": "C", "note": "MDN", "boxes": [
+      {"name": "Contents", "from": 454, "to": 654},
+      {"name": "Text", "from": 702, "to": 1198},
+      {"name": "Notes", "from": 1246, "to": 1466}
+    ]}
+  ]
+}
+-->
+<svg id="dg-wide-layouts" class="dg dg-layout dg-auto" xmlns="http://www.w3.org/2000/svg" width="640" height="368" viewBox="0 0 640 368" role="img" aria-label="On a 1920px screen today, the text and its notes sit left of the middle. Layout A centers them and lets wide blocks grow to the right. Layout B centers the text and the wide blocks, so the left edge splits. Layout C adds a contents list on the left.">
+<style>
+#dg-wide-layouts{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-wide-layouts .ground{fill:var(--fig,#f2f3f9)}
+#dg-wide-layouts .band{fill:var(--bg,#fbfbfe)}
+#dg-wide-layouts .track{stroke:var(--line,#d3d6e3)}
+#dg-wide-layouts .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-wide-layouts .head{fill:var(--text,#1c1f2e)}
+#dg-wide-layouts .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-wide-layouts .stop.end{fill:var(--text,#1c1f2e)}
+#dg-wide-layouts .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-wide-layouts .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-wide-layouts .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-wide-layouts .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-wide-layouts .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-wide-layouts .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-wide-layouts .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-wide-layouts .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-wide-layouts .sub,#dg-wide-layouts .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-wide-layouts .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-wide-layouts .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-wide-layouts .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-wide-layouts .box{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-wide-layouts .tick{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1}
+#dg-wide-layouts .r-ref{stroke:var(--muted,#575d75)}
+@media (prefers-reduced-motion:reduce){#dg-wide-layouts .pulse{animation:none!important}#dg-wide-layouts .pulse{display:none!important}}
+@media print{#dg-wide-layouts{max-width:100%;height:auto}#dg-wide-layouts .pulse{display:none!important}}
+#dg-wide-layouts-phone{display:none}
+</style>
+<rect width="640" height="368" class="ground"/>
+<rect x="8" y="56" width="624" height="72" rx="10" class="band"/>
+<rect x="8" y="136" width="624" height="72" rx="10" class="band"/>
+<rect x="8" y="216" width="624" height="72" rx="10" class="band"/>
+<rect x="8" y="296" width="624" height="64" rx="10" class="band"/>
+<line x1="367" y1="56" x2="367" y2="128" class="r-ref"/>
+<line x1="367" y1="136" x2="367" y2="208" class="r-ref"/>
+<line x1="367" y1="216" x2="367" y2="288" class="r-ref"/>
+<line x1="367" y1="296" x2="367" y2="360" class="r-ref"/>
+<line x1="122" y1="56" x2="122" y2="128" class="track"/>
+<line x1="244.5" y1="56" x2="244.5" y2="128" class="track"/>
+<line x1="489.5" y1="56" x2="489.5" y2="128" class="track"/>
+<line x1="612" y1="56" x2="612" y2="128" class="track"/>
+<line x1="122" y1="136" x2="122" y2="208" class="track"/>
+<line x1="244.5" y1="136" x2="244.5" y2="208" class="track"/>
+<line x1="489.5" y1="136" x2="489.5" y2="208" class="track"/>
+<line x1="612" y1="136" x2="612" y2="208" class="track"/>
+<line x1="122" y1="216" x2="122" y2="288" class="track"/>
+<line x1="244.5" y1="216" x2="244.5" y2="288" class="track"/>
+<line x1="489.5" y1="216" x2="489.5" y2="288" class="track"/>
+<line x1="612" y1="216" x2="612" y2="288" class="track"/>
+<line x1="122" y1="296" x2="122" y2="360" class="track"/>
+<line x1="244.5" y1="296" x2="244.5" y2="360" class="track"/>
+<line x1="489.5" y1="296" x2="489.5" y2="360" class="track"/>
+<line x1="612" y1="296" x2="612" y2="360" class="track"/>
+<text x="367" y="24" class="sub" text-anchor="middle">the middle</text>
+<text x="122" y="44" class="val" text-anchor="middle">0</text>
+<text x="244.5" y="44" class="val" text-anchor="middle">480</text>
+<text x="367" y="44" class="val" text-anchor="middle">960</text>
+<text x="489.5" y="44" class="val" text-anchor="middle">1440</text>
+<text x="612" y="44" class="val" text-anchor="middle">1920</text>
+<text x="108.04" y="44" class="sub" text-anchor="end">px</text>
+<text x="20" y="80" class="name" text-anchor="start">Now</text>
+<text x="20" y="98" class="sub" text-anchor="start">a 1200px box</text>
+<text x="20" y="160" class="name" text-anchor="start">A</text>
+<text x="20" y="178" class="sub" text-anchor="start">Tufte, chosen</text>
+<text x="20" y="240" class="name" text-anchor="start">B</text>
+<text x="20" y="258" class="sub" text-anchor="start">Distill</text>
+<text x="20" y="320" class="name" text-anchor="start">C</text>
+<text x="20" y="338" class="sub" text-anchor="start">MDN</text>
+<rect x="233.86" y="307" width="68" height="16" class="band"/><text x="237.86" y="319" class="row" text-anchor="start">Contents</text>
+<rect x="224.08" y="64" width="126.58" height="24" rx="4" class="box"/>
+<text x="232.08" y="81" class="row" text-anchor="start">Text</text>
+<rect x="362.92" y="64" width="56.15" height="24" rx="4" class="box"/>
+<text x="370.92" y="81" class="row" text-anchor="start">Notes</text>
+<rect x="224.08" y="96" width="285.83" height="24" rx="4" class="box"/>
+<text x="232.08" y="113" class="row" text-anchor="start">Wide blocks</text>
+<rect x="269.51" y="144" width="126.58" height="24" rx="4" class="box"/>
+<text x="277.51" y="161" class="row" text-anchor="start">Text</text>
+<rect x="408.34" y="144" width="56.15" height="24" rx="4" class="box"/>
+<text x="416.34" y="161" class="row" text-anchor="start">Notes</text>
+<rect x="269.51" y="176" width="285.83" height="24" rx="4" class="box"/>
+<text x="277.51" y="193" class="row" text-anchor="start">Wide blocks</text>
+<rect x="303.71" y="224" width="126.58" height="24" rx="4" class="box"/>
+<text x="311.71" y="241" class="row" text-anchor="start">Text</text>
+<rect x="442.54" y="224" width="56.15" height="24" rx="4" class="box"/>
+<text x="450.54" y="241" class="row" text-anchor="start">Notes</text>
+<rect x="224.08" y="256" width="285.83" height="24" rx="4" class="box"/>
+<text x="232.08" y="273" class="row" text-anchor="start">Wide blocks</text>
+<path d="M238.36,322 V328" class="tick"/><rect x="237.86" y="328" width="51.04" height="24" rx="4" class="box"/>
+<rect x="301.16" y="328" width="126.58" height="24" rx="4" class="box"/>
+<text x="309.16" y="345" class="row" text-anchor="start">Text</text>
+<rect x="439.99" y="328" width="56.15" height="24" rx="4" class="box"/>
+<text x="447.99" y="345" class="row" text-anchor="start">Notes</text>
 </svg>
+<svg id="dg-wide-layouts-phone" class="dg dg-layout dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="564" viewBox="0 0 264 564" role="img" aria-label="On a 1920px screen today, the text and its notes sit left of the middle. Layout A centers them and lets wide blocks grow to the right. Layout B centers the text and the wide blocks, so the left edge splits. Layout C adds a contents list on the left.">
+<style>
+#dg-wide-layouts-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-wide-layouts-phone .ground{fill:var(--fig,#f2f3f9)}
+#dg-wide-layouts-phone .band{fill:var(--bg,#fbfbfe)}
+#dg-wide-layouts-phone .track{stroke:var(--line,#d3d6e3)}
+#dg-wide-layouts-phone .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-wide-layouts-phone .head{fill:var(--text,#1c1f2e)}
+#dg-wide-layouts-phone .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-wide-layouts-phone .stop.end{fill:var(--text,#1c1f2e)}
+#dg-wide-layouts-phone .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-wide-layouts-phone .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-wide-layouts-phone .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-wide-layouts-phone .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-wide-layouts-phone .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-wide-layouts-phone .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-wide-layouts-phone .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-wide-layouts-phone .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-wide-layouts-phone .sub,#dg-wide-layouts-phone .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-wide-layouts-phone .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-wide-layouts-phone .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-wide-layouts-phone .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-wide-layouts-phone .box{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-wide-layouts-phone .tick{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1}
+#dg-wide-layouts-phone .r-ref{stroke:var(--muted,#575d75)}
+@media (prefers-reduced-motion:reduce){#dg-wide-layouts-phone .pulse{animation:none!important}#dg-wide-layouts-phone .pulse{display:none!important}}
+@media print{#dg-wide-layouts-phone{max-width:100%;height:auto}#dg-wide-layouts-phone .pulse{display:none!important}}
+@media (max-width:736px){#dg-wide-layouts{display:none}#dg-wide-layouts-phone{display:block}}
+@media print{#dg-wide-layouts{display:block!important}#dg-wide-layouts-phone{display:none!important}}
+</style>
+<rect width="264" height="564" class="ground"/>
+<rect x="8" y="76" width="248" height="122" rx="10" class="band"/>
+<rect x="8" y="206" width="248" height="122" rx="10" class="band"/>
+<rect x="8" y="336" width="248" height="122" rx="10" class="band"/>
+<rect x="8" y="466" width="248" height="90" rx="10" class="band"/>
+<line x1="128" y1="110" x2="128" y2="198" class="r-ref"/>
+<line x1="128" y1="240" x2="128" y2="328" class="r-ref"/>
+<line x1="128" y1="370" x2="128" y2="458" class="r-ref"/>
+<line x1="128" y1="500" x2="128" y2="556" class="r-ref"/>
+<line x1="20" y1="110" x2="20" y2="198" class="track"/>
+<line x1="74" y1="110" x2="74" y2="198" class="track"/>
+<line x1="182" y1="110" x2="182" y2="198" class="track"/>
+<line x1="236" y1="110" x2="236" y2="198" class="track"/>
+<line x1="20" y1="240" x2="20" y2="328" class="track"/>
+<line x1="74" y1="240" x2="74" y2="328" class="track"/>
+<line x1="182" y1="240" x2="182" y2="328" class="track"/>
+<line x1="236" y1="240" x2="236" y2="328" class="track"/>
+<line x1="20" y1="370" x2="20" y2="458" class="track"/>
+<line x1="74" y1="370" x2="74" y2="458" class="track"/>
+<line x1="182" y1="370" x2="182" y2="458" class="track"/>
+<line x1="236" y1="370" x2="236" y2="458" class="track"/>
+<line x1="20" y1="500" x2="20" y2="556" class="track"/>
+<line x1="74" y1="500" x2="74" y2="556" class="track"/>
+<line x1="182" y1="500" x2="182" y2="556" class="track"/>
+<line x1="236" y1="500" x2="236" y2="556" class="track"/>
+<text x="128" y="24" class="sub" text-anchor="middle">the middle</text>
+<text x="20" y="44" class="sub" text-anchor="start">px</text>
+<text x="20" y="64" class="val" text-anchor="middle">0</text>
+<text x="74" y="64" class="val" text-anchor="middle">480</text>
+<text x="128" y="64" class="val" text-anchor="middle">960</text>
+<text x="182" y="64" class="val" text-anchor="middle">1440</text>
+<text x="236" y="64" class="val" text-anchor="middle">1920</text>
+<text x="20" y="100" class="name" text-anchor="start">Now</text>
+<text x="61" y="100" class="sub" text-anchor="start">a 1200px box</text>
+<rect x="122.2" y="113" width="47" height="16" class="band"/><text x="126.2" y="125" class="row" text-anchor="start">Notes</text>
+<text x="20" y="230" class="name" text-anchor="start">A</text>
+<text x="39" y="230" class="sub" text-anchor="start">Tufte, chosen</text>
+<rect x="142.23" y="243" width="47" height="16" class="band"/><text x="146.23" y="255" class="row" text-anchor="start">Notes</text>
+<text x="20" y="360" class="name" text-anchor="start">B</text>
+<text x="39" y="360" class="sub" text-anchor="start">Distill</text>
+<rect x="157.3" y="373" width="47" height="16" class="band"/><text x="161.3" y="385" class="row" text-anchor="start">Notes</text>
+<text x="20" y="490" class="name" text-anchor="start">C</text>
+<text x="39" y="490" class="sub" text-anchor="start">MDN</text>
+<rect x="67.08" y="503" width="68" height="16" class="band"/><text x="71.08" y="515" class="row" text-anchor="start">Contents</text>
+<rect x="156.18" y="503" width="47" height="16" class="band"/><text x="160.18" y="515" class="row" text-anchor="start">Notes</text>
+<rect x="65" y="134" width="55.8" height="24" rx="4" class="box"/>
+<text x="73" y="151" class="row" text-anchor="start">Text</text>
+<path d="M126.7,128 V134" class="tick"/><rect x="126.2" y="134" width="24.75" height="24" rx="4" class="box"/>
+<rect x="65" y="166" width="126" height="24" rx="4" class="box"/>
+<text x="73" y="183" class="row" text-anchor="start">Wide blocks</text>
+<rect x="85.03" y="264" width="55.8" height="24" rx="4" class="box"/>
+<text x="93.03" y="281" class="row" text-anchor="start">Text</text>
+<path d="M146.73,258 V264" class="tick"/><rect x="146.23" y="264" width="24.75" height="24" rx="4" class="box"/>
+<rect x="85.03" y="296" width="126" height="24" rx="4" class="box"/>
+<text x="93.03" y="313" class="row" text-anchor="start">Wide blocks</text>
+<rect x="100.1" y="394" width="55.8" height="24" rx="4" class="box"/>
+<text x="108.1" y="411" class="row" text-anchor="start">Text</text>
+<path d="M161.8,388 V394" class="tick"/><rect x="161.3" y="394" width="24.75" height="24" rx="4" class="box"/>
+<rect x="65" y="426" width="126" height="24" rx="4" class="box"/>
+<text x="73" y="443" class="row" text-anchor="start">Wide blocks</text>
+<path d="M71.58,518 V524" class="tick"/><rect x="71.08" y="524" width="22.5" height="24" rx="4" class="box"/>
+<rect x="98.98" y="524" width="55.8" height="24" rx="4" class="box"/>
+<text x="106.98" y="541" class="row" text-anchor="start">Text</text>
+<path d="M160.68,518 V524" class="tick"/><rect x="160.18" y="524" width="24.75" height="24" rx="4" class="box"/>
+</svg>
+<details class="dg-words">
+<summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>The diagram in words</summary>
+<p>All numbers are in px.</p>
+<table><thead><tr><th scope="col">Row</th><th scope="col">Box</th><th scope="col">From</th><th scope="col">To</th><th scope="col">Width</th></tr></thead><tbody><tr><th scope="row">Now</th><td>Text</td><td>400</td><td>896</td><td>496</td></tr><tr><th scope="row">Now</th><td>Notes</td><td>944</td><td>1164</td><td>220</td></tr><tr><th scope="row">Now</th><td>Wide blocks</td><td>400</td><td>1520</td><td>1120</td></tr><tr><th scope="row">A</th><td>Text</td><td>578</td><td>1074</td><td>496</td></tr><tr><th scope="row">A</th><td>Notes</td><td>1122</td><td>1342</td><td>220</td></tr><tr><th scope="row">A</th><td>Wide blocks</td><td>578</td><td>1698</td><td>1120</td></tr><tr><th scope="row">B</th><td>Text</td><td>712</td><td>1208</td><td>496</td></tr><tr><th scope="row">B</th><td>Notes</td><td>1256</td><td>1476</td><td>220</td></tr><tr><th scope="row">B</th><td>Wide blocks</td><td>400</td><td>1520</td><td>1120</td></tr><tr><th scope="row">C</th><td>Contents</td><td>454</td><td>654</td><td>200</td></tr><tr><th scope="row">C</th><td>Text</td><td>702</td><td>1198</td><td>496</td></tr><tr><th scope="row">C</th><td>Notes</td><td>1246</td><td>1466</td><td>220</td></tr></tbody></table>
+<ul><li>A line at 960 px: the middle.</li></ul>
+</details>
+<!-- /docent:diagram -->
       </div>
-      <figcaption><strong>Figure 2</strong>Where the text, the notes and the wide blocks sit on a 1920px screen, today and in three layouts. The dashed line is the middle of the screen. The dot marks the layout that was chosen.</figcaption>
+      <figcaption><strong>Figure 2</strong>Where the text, the notes and the wide blocks sit on a 1920px screen, today and in three layouts.</figcaption>
     </figure>
     <div class="table-wrap" role="region" aria-label="The four layouts compared" tabindex="0">
       <table>
@@ -757,10 +1174,126 @@ footer .shell { display: flex; align-items: center; justify-content: space-betwe
     <p>Option 1 keeps each note under its paragraph, which is safe. Option 2 keeps the notes beside the text, in a 112mm text column, an 8mm gap and a 50mm note column. That fits an A4 page.</p>
     <figure>
       <div class="fig" role="region" aria-label="Figure 4, an A4 page with the notes beside the text" tabindex="0">
-<!-- GAP: Docent has no diagram kind for this chart. Drawn by hand, after diagram-design's range-bar layout. -->
-<svg class="gc" id="gc-a4" width="634" height="204" viewBox="0 0 634 204" role="img" aria-labelledby="gc-a4-title gc-a4-desc"><title id="gc-a4-title">An A4 page with the notes beside the text</title><desc id="gc-a4-desc">An A4 page is 210mm wide: an 18mm margin, a 112mm text column, an 8mm gap, a 50mm note column, 4mm left over, and an 18mm margin.</desc>
-<rect class="page" x="2" y="2" width="630" height="168" rx="4"/><line class="mid" x1="56" y1="2" x2="56" y2="170"/><line class="mid" x1="578" y1="2" x2="578" y2="170"/><line class="txt" x1="56" y1="28" x2="392" y2="28"/><line class="txt" x1="56" y1="48" x2="392" y2="48"/><line class="txt" x1="56" y1="68" x2="392" y2="68"/><line class="txt" x1="56" y1="88" x2="392" y2="88"/><line class="txt" x1="56" y1="108" x2="392" y2="108"/><line class="txt" x1="56" y1="128" x2="392" y2="128"/><line class="txt" x1="56" y1="148" x2="272" y2="148"/><line class="txt m" x1="416" y1="28" x2="566" y2="28"/><line class="txt m" x1="416" y1="48" x2="566" y2="48"/><line class="txt m" x1="416" y1="68" x2="506" y2="68"/><line class="rule" x1="416" y1="16" x2="566" y2="16"/><text class="m" x="29" y="196" text-anchor="middle">18</text><text class="m" x="224" y="196" text-anchor="middle">112mm, the text</text><text class="m" x="404" y="196" text-anchor="middle">8</text><text class="m" x="491" y="196" text-anchor="middle">50mm, notes</text><text class="m" x="572" y="196" text-anchor="middle">4</text><text class="m" x="605" y="196" text-anchor="middle">18</text>
+<!-- docent:diagram
+{
+  "id": "a4-notes",
+  "kind": "layout",
+  "label": "An A4 page is 210mm wide: an 18mm margin, a 112mm text column, an 8mm gap, a 50mm note column, 4mm left over, and an 18mm margin.",
+  "scale": {"from": 0, "to": 210, "unit": "mm"},
+  "rows": [
+    {"name": "A4 page", "measure": true, "boxes": [
+      {"name": "Margin", "from": 0, "to": 18},
+      {"name": "Text", "from": 18, "to": 130},
+      {"name": "Notes", "from": 138, "to": 188},
+      {"name": "Margin", "from": 192, "to": 210}
+    ]}
+  ]
+}
+-->
+<svg id="dg-a4-notes" class="dg dg-layout dg-auto" xmlns="http://www.w3.org/2000/svg" width="640" height="96" viewBox="0 0 640 96" role="img" aria-label="An A4 page is 210mm wide: an 18mm margin, a 112mm text column, an 8mm gap, a 50mm note column, 4mm left over, and an 18mm margin.">
+<style>
+#dg-a4-notes{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-a4-notes .ground{fill:var(--fig,#f2f3f9)}
+#dg-a4-notes .band{fill:var(--bg,#fbfbfe)}
+#dg-a4-notes .track{stroke:var(--line,#d3d6e3)}
+#dg-a4-notes .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-a4-notes .head{fill:var(--text,#1c1f2e)}
+#dg-a4-notes .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-a4-notes .stop.end{fill:var(--text,#1c1f2e)}
+#dg-a4-notes .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-a4-notes .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-a4-notes .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-a4-notes .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-a4-notes .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-a4-notes .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-a4-notes .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-a4-notes .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-a4-notes .sub,#dg-a4-notes .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-a4-notes .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-a4-notes .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-a4-notes .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-a4-notes .box{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-a4-notes .tick{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1}
+#dg-a4-notes .r-ref{stroke:var(--muted,#575d75)}
+@media (prefers-reduced-motion:reduce){#dg-a4-notes .pulse{animation:none!important}#dg-a4-notes .pulse{display:none!important}}
+@media print{#dg-a4-notes{max-width:100%;height:auto}#dg-a4-notes .pulse{display:none!important}}
+#dg-a4-notes-phone{display:none}
+</style>
+<rect width="640" height="96" class="ground"/>
+<rect x="8" y="8" width="624" height="80" rx="10" class="band"/>
+<text x="20" y="32" class="name" text-anchor="start">A4 page</text>
+<rect x="100" y="19" width="54" height="16" class="band"/><text x="104" y="31" class="row" text-anchor="start">Margin</text>
+<rect x="571.77" y="19" width="54" height="16" class="band"/><text x="575.77" y="31" class="row" text-anchor="start">Margin</text>
+<rect x="116.19" y="69" width="19.84" height="15" class="band"/><text x="126.11" y="80" class="val" text-anchor="middle">18</text>
+<rect x="271.95" y="69" width="27.76" height="15" class="band"/><text x="285.83" y="80" class="val" text-anchor="middle">112</text>
+<rect x="427.3" y="69" width="11.92" height="15" class="band"/><text x="433.26" y="80" class="val" text-anchor="middle">8</text>
+<rect x="494.59" y="69" width="19.84" height="15" class="band"/><text x="504.51" y="80" class="val" text-anchor="middle">50</text>
+<rect x="564.9" y="69" width="11.92" height="15" class="band"/><text x="570.86" y="80" class="val" text-anchor="middle">4</text>
+<rect x="587.97" y="69" width="19.84" height="15" class="band"/><text x="597.89" y="80" class="val" text-anchor="middle">18</text>
+<text x="94" y="80" class="sub" text-anchor="end">mm</text>
+<path d="M104.5,34 V40" class="tick"/><rect x="104" y="40" width="44.23" height="24" rx="4" class="box"/>
+<rect x="148.23" y="40" width="275.2" height="24" rx="4" class="box"/>
+<text x="156.23" y="57" class="row" text-anchor="start">Text</text>
+<rect x="443.09" y="40" width="122.86" height="24" rx="4" class="box"/>
+<text x="451.09" y="57" class="row" text-anchor="start">Notes</text>
+<path d="M576.27,34 V40" class="tick"/><rect x="575.77" y="40" width="44.23" height="24" rx="4" class="box"/>
 </svg>
+<svg id="dg-a4-notes-phone" class="dg dg-layout dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="156" viewBox="0 0 264 156" role="img" aria-label="An A4 page is 210mm wide: an 18mm margin, a 112mm text column, an 8mm gap, a 50mm note column, 4mm left over, and an 18mm margin.">
+<style>
+#dg-a4-notes-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-a4-notes-phone .ground{fill:var(--fig,#f2f3f9)}
+#dg-a4-notes-phone .band{fill:var(--bg,#fbfbfe)}
+#dg-a4-notes-phone .track{stroke:var(--line,#d3d6e3)}
+#dg-a4-notes-phone .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-a4-notes-phone .head{fill:var(--text,#1c1f2e)}
+#dg-a4-notes-phone .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-a4-notes-phone .stop.end{fill:var(--text,#1c1f2e)}
+#dg-a4-notes-phone .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-a4-notes-phone .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-a4-notes-phone .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-a4-notes-phone .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-a4-notes-phone .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-a4-notes-phone .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-a4-notes-phone .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-a4-notes-phone .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-a4-notes-phone .sub,#dg-a4-notes-phone .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-a4-notes-phone .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-a4-notes-phone .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-a4-notes-phone .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-a4-notes-phone .box{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-a4-notes-phone .tick{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1}
+#dg-a4-notes-phone .r-ref{stroke:var(--muted,#575d75)}
+@media (prefers-reduced-motion:reduce){#dg-a4-notes-phone .pulse{animation:none!important}#dg-a4-notes-phone .pulse{display:none!important}}
+@media print{#dg-a4-notes-phone{max-width:100%;height:auto}#dg-a4-notes-phone .pulse{display:none!important}}
+@media (max-width:736px){#dg-a4-notes{display:none}#dg-a4-notes-phone{display:block}}
+@media print{#dg-a4-notes{display:block!important}#dg-a4-notes-phone{display:none!important}}
+</style>
+<rect width="264" height="156" class="ground"/>
+<rect x="8" y="8" width="248" height="140" rx="10" class="band"/>
+<text x="20" y="32" class="name" text-anchor="start">A4 page</text>
+<text x="88" y="32" class="sub" text-anchor="start">in mm</text>
+<rect x="16" y="45" width="54" height="16" class="band"/><text x="20" y="57" class="row" text-anchor="start">Margin</text>
+<rect x="163.2" y="45" width="47" height="16" class="band"/><text x="167.2" y="57" class="row" text-anchor="start">Notes</text>
+<rect x="202" y="63" width="54" height="16" class="band"/><text x="206" y="75" class="row" text-anchor="start">Margin</text>
+<rect x="19.68" y="113" width="19.84" height="15" class="band"/><text x="29.6" y="124" class="val" text-anchor="middle">18</text>
+<rect x="85.05" y="113" width="27.76" height="15" class="band"/><text x="98.93" y="124" class="val" text-anchor="middle">112</text>
+<rect x="156.97" y="113" width="11.92" height="15" class="band"/><text x="162.93" y="124" class="val" text-anchor="middle">8</text>
+<rect x="183.95" y="113" width="19.84" height="15" class="band"/><text x="193.87" y="124" class="val" text-anchor="middle">50</text>
+<rect x="216.71" y="113" width="11.92" height="15" class="band"/><text x="222.67" y="124" class="val" text-anchor="middle">4</text>
+<rect x="224.48" y="129" width="19.84" height="15" class="band"/><text x="234.4" y="140" class="val" text-anchor="middle">18</text>
+<path d="M20.5,60 V84" class="tick"/><rect x="20" y="84" width="19.2" height="24" rx="4" class="box"/>
+<rect x="39.2" y="84" width="119.47" height="24" rx="4" class="box"/>
+<text x="47.2" y="101" class="row" text-anchor="start">Text</text>
+<path d="M167.7,60 V84" class="tick"/><rect x="167.2" y="84" width="53.33" height="24" rx="4" class="box"/>
+<path d="M225.3,78 V84" class="tick"/><rect x="224.8" y="84" width="19.2" height="24" rx="4" class="box"/>
+</svg>
+<details class="dg-words">
+<summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>The diagram in words</summary>
+<p>All numbers are in mm.</p>
+<table><thead><tr><th scope="col">Row</th><th scope="col">Box</th><th scope="col">From</th><th scope="col">To</th><th scope="col">Width</th></tr></thead><tbody><tr><th scope="row">A4 page</th><td>Margin</td><td>0</td><td>18</td><td>18</td></tr><tr><th scope="row">A4 page</th><td>Text</td><td>18</td><td>130</td><td>112</td></tr><tr><th scope="row">A4 page</th><td>Notes</td><td>138</td><td>188</td><td>50</td></tr><tr><th scope="row">A4 page</th><td>Margin</td><td>192</td><td>210</td><td>18</td></tr></tbody></table>
+<ul><li>A4 page, measured: 18, 112, 8, 50, 4 and 18 mm.</li></ul>
+</details>
+<!-- /docent:diagram -->
       </div>
       <figcaption><strong>Figure 4</strong>Option 2 on an A4 page, 210mm wide: the margins, the text column and the note column.</figcaption>
     </figure>
@@ -813,7 +1346,7 @@ footer .shell { display: flex; align-items: center; justify-content: space-betwe
   </div>
 </footer>
 <script>
-// docent:kit 0.5.0
+// docent:kit 0.6.0
 (() => {
   const root = document.documentElement;
   root.classList.add('js');
