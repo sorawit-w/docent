@@ -1,6 +1,7 @@
 // Browser checks for the Docent sample page. The page is built first (render, then stamp), so the starting page can be given too.
 // They need playwright-core and axe-core:
 //   DOCENT_NODE_MODULES=/path/to/node_modules node tests/browser/check-render.cjs
+// DOCENT_BROWSER_CHANNEL=chrome uses the Chrome that is installed, so Playwright needs no browser of its own.
 // The script prints one line for each check and exits with 1 when a check fails.
 const fs = require("node:fs");
 const path = require("node:path");
@@ -22,7 +23,7 @@ let failed = 0;
 const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`${pass ? "ok  " : "FAIL"} ${name}${pass || !detail ? "" : ` — ${typeof detail === "string" ? detail : JSON.stringify(detail)}`}`); };
 
 (async () => {
-  const browser = await chromium.launch();
+  const browser = await chromium.launch(process.env.DOCENT_BROWSER_CHANNEL ? { channel: process.env.DOCENT_BROWSER_CHANNEL } : {});
   const open = async ({ width, height = 900, theme = "light", media = "screen", reducedMotion = "no-preference", content = html }) => {
     const context = await browser.newContext({ viewport: { width, height }, colorScheme: theme, reducedMotion });
     const page = await context.newPage();
@@ -364,7 +365,8 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     await paper.context.close();
     ok("numbered block headings count up, an optional leg is dashed, and each code block has a copy button", onDesk.numbers === "1 First|none,2 Second|none" && onDesk.walk === "1,2,3,4" && onDesk.dashed === "5px, 7px" && onDesk.buttons === 2 && axe.length === 0, { onDesk, axe });
     ok("a drawing that is wider than its well gets a line under it on a phone, and no line when it fits", onPhone.hint && !onDesk.hint && onPhone.otherHints === 0 && onDesk.otherHints === 0, { phone: onPhone.hint, desk: onDesk.hint, others: [onPhone.otherHints, onDesk.otherHints] });
-    ok("code that reaches the copy button starts below it, and short code keeps its place", onDesk.long === "false,false" && onPhone.long === "false,true", { desk: onDesk.long, phone: onPhone.long });
+    // On a Standard page the code well ends at the right edge of the notes, so the long line reaches the button on a desktop too.
+    ok("code that reaches the copy button starts below it, and short code keeps its place", onDesk.long === "false,true" && onPhone.long === "false,true", { desk: onDesk.long, phone: onPhone.long });
     ok("on paper the copy button and the line under a drawing do not print", onPaper === 0, onPaper);
   }
 
@@ -387,7 +389,8 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     }
     const { phone, narrow, desk, paper } = results;
     ok("a long status label wraps, so the page does not scroll sideways at 390px or 320px", phone.page === phone.view && narrow.page === narrow.view && phone.label <= phone.main, { phone, narrow });
-    ok("a closed section that holds a table is as wide as a table outside it", desk.inner === desk.flow && desk.flow > 1000, desk);
+    // On a Standard page both end at the right edge of the notes: 764px.
+    ok("a closed section that holds a table is as wide as a table outside it", desk.inner === desk.flow && desk.flow === 764, desk);
     ok("on paper a table with long code in its cells stays inside the page", paper.page === paper.view && paper.wide.every((r) => r <= paper.view), paper);
   }
 
@@ -520,7 +523,7 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
   {
     // Opened from a file, so the page has storage: a saved choice of "dark" is stored first, then the page loads again.
     const file = path.join(require("node:os").tmpdir(), `docent-fixed-${process.pid}.html`);
-    fs.writeFileSync(file, html.replace('<html lang="en">', '<html lang="en" data-theme="light">'));
+    fs.writeFileSync(file, html.replace(/<html lang="en"/, '<html lang="en" data-theme="light"'));
     const context = await browser.newContext({ viewport: { width: 1280, height: 900 }, colorScheme: "dark" });
     const page = await context.newPage();
     await page.goto(`file://${file}`);
@@ -584,6 +587,44 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     const alone = await page.evaluate(() => ({ name: getComputedStyle(document.querySelector(".name")).fill, band: getComputedStyle(document.querySelector(".band")).fill, line: getComputedStyle(document.querySelector(".line")).stroke, width: Math.round(document.querySelector("svg").getBoundingClientRect().width), dots: [...new Set([...document.querySelectorAll(".pulse")].map((d) => getComputedStyle(d).display))].join() }));
     ok("a drawing copied out of the page keeps its colors and its size", alone.name === LIGHT.text && alone.band === LIGHT.bg && alone.line === LIGHT.text && alone.width === 858 && alone.dots === "none", alone);
     await context.close();
+  }
+
+  // Widths and profiles: one left edge, the text and its notes in the middle of a wide screen, and code and tables at the block width of the profile.
+  {
+    const build = (name, change = (h) => h) => stampHtml(renderDocument(change(fs.readFileSync(path.join(root, name), "utf8"))).html).html;
+    const asTask = (h) => h.replace('data-profile="standard"', 'data-profile="task"');
+    const pages = [["standard", build("skills/docent/assets/specimen.html")], ["task", build("skills/docent/assets/specimen.html", asTask)], ["reference", build("tests/fixtures/reference-page.html")]];
+    for (const [name, content] of pages) for (const width of [1280, 1440, 1920, 2560]) {
+      const { page, context } = await open({ width, content });
+      const m = await page.evaluate(() => {
+        const r = (el) => el.getBoundingClientRect(), vw = document.documentElement.clientWidth;
+        const p = r(document.querySelector("main section .row > div > p")), note = r(document.querySelector("main section .row .note"));
+        const blocks = [...document.querySelectorAll("main section > :is(.table-wrap, .code)")].map(r);
+        return { vw, side: document.documentElement.scrollWidth > vw, left: Math.round(p.left), mid: Math.round((p.left + note.right) / 2 - vw / 2), noteRight: Math.round(note.right), blocks: blocks.length, lefts: [...new Set(blocks.map((b) => Math.round(b.left)))], rights: [...new Set(blocks.map((b) => Math.round(b.right)))] };
+      });
+      const end = name === "reference" ? Math.min(m.left + 1120, m.vw - 40) : m.noteRight;
+      ok(`${name} at ${width}px: no sideways scroll, one left edge, ${width >= 1920 ? "the text and its notes in the middle, " : ""}code and tables end at ${name === "reference" ? "1120px" : "the right edge of the notes"}`, !m.side && m.blocks > 0 && m.lefts.every((x) => x === m.left) && (width < 1920 || Math.abs(m.mid) <= 2) && m.rights.every((x) => Math.abs(x - end) <= 1), m);
+      await context.close();
+    }
+
+    // A page for the public: 18px text, and a text column that grows with it.
+    const large = await open({ width: 1440, content: build("skills/docent/assets/specimen.html", (h) => h.replace('data-profile="standard"', 'data-profile="standard" data-text="large"')) });
+    const big = await large.page.evaluate(() => ({ body: getComputedStyle(document.body).fontSize, text: Math.round(document.querySelector("main section .row > div > p").getBoundingClientRect().width), side: document.documentElement.scrollWidth > document.documentElement.clientWidth }));
+    ok("a page for the public: 18px text and a 558px text column, with no sideways scroll", big.body === "18px" && big.text === 558 && !big.side, big);
+    await large.context.close();
+
+    // Paper: an A4 page is 174mm wide inside its margins. The text is 11pt, each note sits beside its text, and nothing is wider than the paper.
+    for (const [name, content] of [pages[0], pages[2]]) {
+      const { page, context } = await open({ width: 658, height: 1123, media: "print", content });
+      const sheet = await page.evaluate(() => {
+        const r = (el) => el.getBoundingClientRect(), vw = document.documentElement.clientWidth;
+        const rows = [...document.querySelectorAll("main .row")].filter((row) => row.querySelector(":scope > .note")).map((row) => [r(row.firstElementChild), r(row.querySelector(":scope > .note"))]);
+        return { body: getComputedStyle(document.body).fontSize, beside: rows.length > 0 && rows.every(([text, note]) => note.left >= text.right), widest: Math.round(Math.max(...[...document.querySelectorAll("main *")].map((e) => r(e).right))), vw };
+      });
+      const pdf = await page.pdf({ format: "A4" });
+      ok(`${name} on paper: 11pt text, each note beside its text, nothing wider than the paper, and a PDF`, sheet.body === "14.6667px" && sheet.beside && sheet.widest <= sheet.vw && pdf.length > 1000, sheet);
+      await context.close();
+    }
   }
 
   await browser.close();
