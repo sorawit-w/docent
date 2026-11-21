@@ -1,0 +1,123 @@
+<svg id="dg-persistence-profile" class="dg dg-profile dg-auto" xmlns="http://www.w3.org/2000/svg" width="648" height="384" viewBox="0 0 648 384" role="img" aria-label="The persistence profile adds two stereotypes. Entity extends Class and has a table name; Id extends Property. The shop model applies the profile.">
+<style>
+#dg-persistence-profile{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-persistence-profile .ground{fill:var(--fig,#f2f3f9)}
+#dg-persistence-profile .band{fill:var(--bg,#fbfbfe)}
+#dg-persistence-profile .track{stroke:var(--line,#d3d6e3)}
+#dg-persistence-profile .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-persistence-profile .head{fill:var(--text,#1c1f2e)}
+#dg-persistence-profile .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-persistence-profile .stop.end{fill:var(--text,#1c1f2e)}
+#dg-persistence-profile .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-persistence-profile .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-persistence-profile .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-persistence-profile .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-persistence-profile .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-persistence-profile .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-persistence-profile .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-persistence-profile .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-persistence-profile .sub,#dg-persistence-profile .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-persistence-profile .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-persistence-profile .u-ln{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-persistence-profile .u-bold{stroke-width:2.5}
+#dg-persistence-profile .u-dash{stroke-dasharray:6 4;stroke-linecap:butt}
+#dg-persistence-profile .u-face{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linejoin:round}
+#dg-persistence-profile .u-ink{fill:var(--text,#1c1f2e)}
+#dg-persistence-profile .u-name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-persistence-profile .leg .line{stroke-width:1.5}
+#dg-persistence-profile .leg.is-reply .line{stroke-dasharray:6 4;stroke-linecap:butt}
+#dg-persistence-profile .ohead{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.js #dg-persistence-profile .leg.is-current .ohead{stroke:var(--primary,#2f3fd0)}
+#dg-persistence-profile .u-bar{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-persistence-profile .u-frame{fill:none;stroke:var(--muted,#575d75);stroke-width:1}
+#dg-persistence-profile .u-frame.is-filled{fill:var(--bg,#fbfbfe)}
+#dg-persistence-profile .u-div{stroke:var(--muted,#575d75);stroke-width:1;stroke-dasharray:6 4}
+#dg-persistence-profile .u-op{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-persistence-profile .u-mem{font-size:12px;fill:var(--text,#1c1f2e)}
+#dg-persistence-profile .u-it{font-style:italic}
+#dg-persistence-profile .u-ul{text-decoration:underline}
+@media (prefers-reduced-motion:reduce){#dg-persistence-profile .pulse{animation:none!important}#dg-persistence-profile .pulse{display:none!important}}
+@media print{#dg-persistence-profile{max-width:100%;height:auto}#dg-persistence-profile .pulse{display:none!important}}
+#dg-persistence-profile-phone{display:none}
+</style>
+<rect width="648" height="384" class="ground"/>
+<rect x="36" y="36" width="191" height="22" class="u-face"/><rect x="36" y="58" width="360" height="290" class="u-face"/>
+<text x="48" y="52" class="name" text-anchor="start">«profile» Persistence</text>
+<g class="leg" data-leg="1"><polyline points="120,238 120,157" class="u-ln"/><polygon points="127,157 113,157 120,145" class="u-face u-ink"/></g>
+<g class="leg" data-leg="2"><polyline points="312,251 312,157" class="u-ln"/><polygon points="319,157 305,157 312,145" class="u-face u-ink"/><text x="320" y="202" class="verb" text-anchor="start">{required}</text></g>
+<g class="leg" data-leg="3"><polyline points="473,120 396,120" class="u-ln u-dash"/><polyline points="404,115.5 396,120 404,124.5" class="u-ln"/><text x="434.5" y="137" class="verb" text-anchor="middle">«apply»</text></g>
+<rect x="60" y="238" width="120" height="76" class="u-face"/><line x1="60" y1="288" x2="180" y2="288" class="u-ln"/><text x="120" y="256" class="u-mem" text-anchor="middle">«stereotype»</text><text x="120" y="276" class="name" text-anchor="middle">Entity</text><text x="72" y="306" class="u-mem">table: String</text>
+<rect x="252" y="251" width="120" height="50" class="u-face"/><text x="312" y="269" class="u-mem" text-anchor="middle">«stereotype»</text><text x="312" y="289" class="name" text-anchor="middle">Id</text>
+<rect x="60" y="95" width="120" height="50" class="u-face"/><text x="120" y="113" class="u-mem" text-anchor="middle">«metaclass»</text><text x="120" y="133" class="name" text-anchor="middle">Class</text>
+<rect x="252" y="95" width="120" height="50" class="u-face"/><text x="312" y="113" class="u-mem" text-anchor="middle">«metaclass»</text><text x="312" y="133" class="name" text-anchor="middle">Property</text>
+<rect x="473" y="91" width="110" height="22" class="u-face"/><rect x="473" y="113" width="134" height="36" class="u-face"/><text x="485" y="107" class="name">Shop model</text>
+</svg>
+<svg id="dg-persistence-profile-phone" class="dg dg-profile dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="606" viewBox="0 0 264 606" role="img" aria-label="The persistence profile adds two stereotypes. Entity extends Class and has a table name; Id extends Property. The shop model applies the profile.">
+<style>
+#dg-persistence-profile-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-persistence-profile-phone .ground{fill:var(--fig,#f2f3f9)}
+#dg-persistence-profile-phone .band{fill:var(--bg,#fbfbfe)}
+#dg-persistence-profile-phone .track{stroke:var(--line,#d3d6e3)}
+#dg-persistence-profile-phone .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-persistence-profile-phone .head{fill:var(--text,#1c1f2e)}
+#dg-persistence-profile-phone .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-persistence-profile-phone .stop.end{fill:var(--text,#1c1f2e)}
+#dg-persistence-profile-phone .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-persistence-profile-phone .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-persistence-profile-phone .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-persistence-profile-phone .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-persistence-profile-phone .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-persistence-profile-phone .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-persistence-profile-phone .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-persistence-profile-phone .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-persistence-profile-phone .sub,#dg-persistence-profile-phone .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-persistence-profile-phone .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-persistence-profile-phone .u-ln{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-persistence-profile-phone .u-bold{stroke-width:2.5}
+#dg-persistence-profile-phone .u-dash{stroke-dasharray:6 4;stroke-linecap:butt}
+#dg-persistence-profile-phone .u-face{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linejoin:round}
+#dg-persistence-profile-phone .u-ink{fill:var(--text,#1c1f2e)}
+#dg-persistence-profile-phone .u-name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-persistence-profile-phone .leg .line{stroke-width:1.5}
+#dg-persistence-profile-phone .leg.is-reply .line{stroke-dasharray:6 4;stroke-linecap:butt}
+#dg-persistence-profile-phone .ohead{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.js #dg-persistence-profile-phone .leg.is-current .ohead{stroke:var(--primary,#2f3fd0)}
+#dg-persistence-profile-phone .u-bar{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-persistence-profile-phone .u-frame{fill:none;stroke:var(--muted,#575d75);stroke-width:1}
+#dg-persistence-profile-phone .u-frame.is-filled{fill:var(--bg,#fbfbfe)}
+#dg-persistence-profile-phone .u-div{stroke:var(--muted,#575d75);stroke-width:1;stroke-dasharray:6 4}
+#dg-persistence-profile-phone .u-op{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-persistence-profile-phone .u-mem{font-size:12px;fill:var(--text,#1c1f2e)}
+#dg-persistence-profile-phone .u-it{font-style:italic}
+#dg-persistence-profile-phone .u-ul{text-decoration:underline}
+@media (prefers-reduced-motion:reduce){#dg-persistence-profile-phone .pulse{animation:none!important}#dg-persistence-profile-phone .pulse{display:none!important}}
+@media print{#dg-persistence-profile-phone{max-width:100%;height:auto}#dg-persistence-profile-phone .pulse{display:none!important}}
+@media (max-width:744px){#dg-persistence-profile{display:none}#dg-persistence-profile-phone{display:block}}
+@media print{#dg-persistence-profile{display:block!important}#dg-persistence-profile-phone{display:none!important}}
+</style>
+<rect width="264" height="606" class="ground"/>
+<rect x="8" y="8" width="248" height="450" rx="10" class="band"/>
+<text x="20" y="26" class="sub" text-anchor="start">«profile» Persistence</text>
+<rect x="39" y="40" width="120" height="76" class="u-face"/><line x1="39" y1="90" x2="159" y2="90" class="u-ln"/><text x="99" y="58" class="u-mem" text-anchor="middle">«stereotype»</text><text x="99" y="78" class="name" text-anchor="middle">Entity</text><text x="51" y="108" class="u-mem">table: String</text>
+<polyline points="32,135 68,135" class="u-ln"/><polygon points="68,142 68,128 80,135" class="u-face u-ink"/>
+<text x="92" y="139" class="verb" text-anchor="start">extends</text>
+<text x="92" y="157" class="name" text-anchor="start">Class</text>
+<rect x="39" y="188" width="120" height="50" class="u-face"/><text x="99" y="206" class="u-mem" text-anchor="middle">«stereotype»</text><text x="99" y="226" class="name" text-anchor="middle">Id</text>
+<polyline points="32,257 68,257" class="u-ln"/><polygon points="68,264 68,250 80,257" class="u-face u-ink"/>
+<text x="92" y="261" class="verb" text-anchor="start">extends, {required}</text>
+<text x="92" y="279" class="name" text-anchor="start">Property</text>
+<rect x="39" y="310" width="120" height="50" class="u-face"/><text x="99" y="328" class="u-mem" text-anchor="middle">«metaclass»</text><text x="99" y="348" class="name" text-anchor="middle">Class</text>
+<rect x="39" y="380" width="120" height="50" class="u-face"/><text x="99" y="398" class="u-mem" text-anchor="middle">«metaclass»</text><text x="99" y="418" class="name" text-anchor="middle">Property</text>
+<rect x="32" y="470" width="110" height="22" class="u-face"/><rect x="32" y="492" width="134" height="36" class="u-face"/><text x="44" y="486" class="name">Shop model</text>
+<polyline points="32,547 80,547" class="u-ln u-dash"/><polyline points="72,551.5 80,547 72,542.5" class="u-ln"/>
+<text x="92" y="551" class="verb" text-anchor="start">«apply»</text>
+<text x="92" y="569" class="name" text-anchor="start">the profile</text>
+<text x="92" y="587" class="name" text-anchor="start">Persistence</text>
+</svg>
+<details class="dg-words">
+<summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>The diagram in words</summary>
+<p>The profile Persistence.</p>
+<ul><li>The stereotype «Entity» extends the metaclass Class, and adds “table: String”.</li><li>The stereotype «Id» extends the metaclass Property (every Property must carry it).</li><li>The package Shop model applies the profile.</li></ul>
+<p>Key to the marks:</p>
+<ul><li>A folder: a package, its name in the tab, and what it holds in its body.</li><li>A box marked «stereotype»: a new kind of model element that the profile adds.</li><li>A box marked «metaclass»: a kind of element in UML itself, such as Class, that a stereotype extends.</li><li>A solid line with a filled triangle: the stereotype at the line's start extends the metaclass at the triangle.</li><li>A dashed line marked «apply»: the package uses the profile.</li></ul>
+</details>

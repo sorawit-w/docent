@@ -1,0 +1,37 @@
+{
+  "id": "order-states",
+  "kind": "state",
+  "label": "An order is new until it is paid. A paid order is shipped: it is packed and labeled at the same time, then it goes out. A new order that waits too long is cancelled.",
+  "states": [
+    { "id": "start", "type": "initial" },
+    { "id": "new", "name": "New", "entry": "reserve stock" },
+    { "id": "check", "type": "choice" },
+    { "id": "paid", "name": "Paid", "do": "notify the warehouse" },
+    { "id": "shipping", "type": "composite", "name": "Shipping", "regions": 2 },
+    { "id": "s1", "type": "initial", "in": "shipping", "region": 1 },
+    { "id": "packing", "name": "Packing", "in": "shipping", "region": 1 },
+    { "id": "packed", "type": "final", "in": "shipping", "region": 1 },
+    { "id": "s2", "type": "initial", "in": "shipping", "region": 2 },
+    { "id": "labeling", "name": "Labeling", "in": "shipping", "region": 2 },
+    { "id": "labeled", "type": "final", "in": "shipping", "region": 2 },
+    { "id": "out", "name": "Shipped", "exit": "send the tracking link" },
+    { "id": "cancelled", "name": "Cancelled" },
+    { "id": "end", "type": "final" }
+  ],
+  "transitions": [
+    { "from": "start", "to": "new" },
+    { "from": "new", "to": "check", "trigger": "pay" },
+    { "from": "check", "to": "paid", "guard": "card valid" },
+    { "from": "check", "to": "new", "guard": "else", "effect": "show error" },
+    { "from": "paid", "to": "shipping", "trigger": "pick" },
+    { "from": "s1", "to": "packing" },
+    { "from": "packing", "to": "packed", "trigger": "boxed" },
+    { "from": "s2", "to": "labeling" },
+    { "from": "labeling", "to": "labeled", "trigger": "printed" },
+    { "from": "shipping", "to": "out", "trigger": "hand over" },
+    { "from": "out", "to": "end" },
+    { "from": "new", "to": "cancelled", "trigger": "after 7 days" },
+    { "from": "new", "to": "new", "trigger": "edit" },
+    { "from": "cancelled", "to": "end" }
+  ]
+}

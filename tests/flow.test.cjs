@@ -42,7 +42,7 @@ test("a flowchart has the column form for phones, and the steps in words", () =>
 
 test("wrong flowchart data is refused with a plain reason", () => {
   const broken = (change, reason) => { const copy = fixture(); change(copy); assert.throws(() => renderDiagram(copy), reason); };
-  broken((d) => (d.kind = "tree"), /"kind" must be "sequence" or "flow"/);
+  broken((d) => (d.kind = "tree"), /"kind" must be one of "sequence", "flow"/);
   broken((d) => delete d.edges[2].when, /leaves the decision "valid" with no "when"/);
   broken((d) => (d.edges[0].when = "always"), /leaves the step "get" with a "when"/);
   broken((d) => d.edges.push({ from: "setup", to: "save" }), /the step "setup" has 2 exits/);

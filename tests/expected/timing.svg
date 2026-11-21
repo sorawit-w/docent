@@ -1,0 +1,190 @@
+<svg id="dg-door-timing" class="dg dg-timing dg-auto" xmlns="http://www.w3.org/2000/svg" width="694" height="352" viewBox="0 0 694 352" role="img" aria-label="A user presses the button at 1 second. The controller is busy for 2 seconds and opens the door at 3 seconds; the door must open within 3 seconds of the press. The door closes again at 8 seconds.">
+<style>
+#dg-door-timing{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-door-timing .ground{fill:var(--fig,#f2f3f9)}
+#dg-door-timing .band{fill:var(--bg,#fbfbfe)}
+#dg-door-timing .track{stroke:var(--line,#d3d6e3)}
+#dg-door-timing .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-door-timing .head{fill:var(--text,#1c1f2e)}
+#dg-door-timing .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-door-timing .stop.end{fill:var(--text,#1c1f2e)}
+#dg-door-timing .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-door-timing .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-door-timing .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-door-timing .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-door-timing .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-door-timing .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-door-timing .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-door-timing .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-door-timing .sub,#dg-door-timing .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-door-timing .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-door-timing .u-ln{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-door-timing .u-bold{stroke-width:2.5}
+#dg-door-timing .u-dash{stroke-dasharray:6 4;stroke-linecap:butt}
+#dg-door-timing .u-face{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linejoin:round}
+#dg-door-timing .u-ink{fill:var(--text,#1c1f2e)}
+#dg-door-timing .u-name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-door-timing .leg .line{stroke-width:1.5}
+#dg-door-timing .leg.is-reply .line{stroke-dasharray:6 4;stroke-linecap:butt}
+#dg-door-timing .ohead{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.js #dg-door-timing .leg.is-current .ohead{stroke:var(--primary,#2f3fd0)}
+#dg-door-timing .u-bar{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-door-timing .u-frame{fill:none;stroke:var(--muted,#575d75);stroke-width:1}
+#dg-door-timing .u-frame.is-filled{fill:var(--bg,#fbfbfe)}
+#dg-door-timing .u-div{stroke:var(--muted,#575d75);stroke-width:1;stroke-dasharray:6 4}
+#dg-door-timing .u-op{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e)}
+@media (prefers-reduced-motion:reduce){#dg-door-timing .pulse{animation:none!important}#dg-door-timing .pulse{display:none!important}}
+@media print{#dg-door-timing{max-width:100%;height:auto}#dg-door-timing .pulse{display:none!important}}
+#dg-door-timing-phone{display:none}
+</style>
+<rect width="694" height="352" class="ground"/>
+<rect x="8" y="16" width="669" height="84" class="u-frame is-filled"/>
+<rect x="8" y="100" width="669" height="84" class="u-frame is-filled"/>
+<rect x="8" y="184" width="669" height="128" class="u-frame is-filled"/>
+<path d="M229,209 L229,219 M229,214 L373,214 M373,209 L373,219" class="u-ln"/>
+<line x1="181" y1="320" x2="661" y2="320" class="u-ln"/><line x1="181" y1="320" x2="181" y2="325" class="u-ln"/><line x1="229" y1="320" x2="229" y2="325" class="u-ln"/><line x1="277" y1="320" x2="277" y2="325" class="u-ln"/><line x1="325" y1="320" x2="325" y2="325" class="u-ln"/><line x1="373" y1="320" x2="373" y2="325" class="u-ln"/><line x1="421" y1="320" x2="421" y2="325" class="u-ln"/><line x1="469" y1="320" x2="469" y2="325" class="u-ln"/><line x1="517" y1="320" x2="517" y2="325" class="u-ln"/><line x1="565" y1="320" x2="565" y2="325" class="u-ln"/><line x1="613" y1="320" x2="613" y2="325" class="u-ln"/><line x1="661" y1="320" x2="661" y2="325" class="u-ln"/>
+<line x1="181" y1="48" x2="661" y2="48" class="track"/>
+<line x1="181" y1="72" x2="661" y2="72" class="track"/>
+<line x1="181" y1="132" x2="661" y2="132" class="track"/>
+<line x1="181" y1="156" x2="661" y2="156" class="track"/>
+<line x1="181" y1="236" x2="661" y2="236" class="track"/>
+<line x1="181" y1="260" x2="661" y2="260" class="track"/>
+<line x1="181" y1="284" x2="661" y2="284" class="track"/>
+<text x="20" y="38" class="name" text-anchor="start">User</text>
+<text x="169" y="52" class="sub" text-anchor="end">Waiting</text>
+<text x="169" y="76" class="sub" text-anchor="end">Idle</text>
+<text x="20" y="122" class="name" text-anchor="start">Controller</text>
+<text x="169" y="136" class="sub" text-anchor="end">Busy</text>
+<text x="169" y="160" class="sub" text-anchor="end">Ready</text>
+<text x="20" y="206" class="name" text-anchor="start">Door</text>
+<text x="169" y="240" class="sub" text-anchor="end">Open</text>
+<text x="169" y="264" class="sub" text-anchor="end">Moving</text>
+<text x="169" y="288" class="sub" text-anchor="end">Closed</text>
+<text x="301" y="206" class="sub" text-anchor="middle">{≤ 3 s}</text>
+<rect x="238.4" y="76.8" width="40" height="18" class="band"/><text x="242.4" y="89.8" class="verb" text-anchor="start">press</text>
+<rect x="330.8" y="162.6" width="37" height="18" class="band"/><text x="334.8" y="175.6" class="verb" text-anchor="start">open</text>
+<text x="181" y="340" class="sub" text-anchor="middle">0</text>
+<text x="229" y="340" class="sub" text-anchor="middle">1</text>
+<text x="277" y="340" class="sub" text-anchor="middle">2</text>
+<text x="325" y="340" class="sub" text-anchor="middle">3</text>
+<text x="373" y="340" class="sub" text-anchor="middle">4</text>
+<text x="421" y="340" class="sub" text-anchor="middle">5</text>
+<text x="469" y="340" class="sub" text-anchor="middle">6</text>
+<text x="517" y="340" class="sub" text-anchor="middle">7</text>
+<text x="565" y="340" class="sub" text-anchor="middle">8</text>
+<text x="613" y="340" class="sub" text-anchor="middle">9</text>
+<text x="661" y="340" class="sub" text-anchor="middle">10</text>
+<text x="169" y="340" class="sub" text-anchor="end">time (s)</text>
+<g class="leg" data-leg="1"><polyline points="229,48 241,132" class="u-ln"/><polyline points="235.41,124.72 241,132 244.32,123.44" class="u-ln"/></g>
+<g class="leg" data-leg="2"><polyline points="325,156 337,260" class="u-ln"/><polyline points="331.61,252.57 337,260 340.55,251.54" class="u-ln"/></g>
+<polyline points="181,72 229,72 229,48 373,48 373,72 661,72" class="u-ln u-bold"/>
+<polyline points="181,156 229,156 229,132 325,132 325,156 661,156" class="u-ln u-bold"/>
+<polyline points="181,284 325,284 325,260 373,260 373,236 565,236 565,260 613,260 613,284 661,284" class="u-ln u-bold"/>
+</svg>
+<svg id="dg-door-timing-phone" class="dg dg-timing dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="462" viewBox="0 0 264 462" role="img" aria-label="A user presses the button at 1 second. The controller is busy for 2 seconds and opens the door at 3 seconds; the door must open within 3 seconds of the press. The door closes again at 8 seconds.">
+<style>
+#dg-door-timing-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-door-timing-phone .ground{fill:var(--fig,#f2f3f9)}
+#dg-door-timing-phone .band{fill:var(--bg,#fbfbfe)}
+#dg-door-timing-phone .track{stroke:var(--line,#d3d6e3)}
+#dg-door-timing-phone .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-door-timing-phone .head{fill:var(--text,#1c1f2e)}
+#dg-door-timing-phone .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-door-timing-phone .stop.end{fill:var(--text,#1c1f2e)}
+#dg-door-timing-phone .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-door-timing-phone .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-door-timing-phone .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-door-timing-phone .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-door-timing-phone .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-door-timing-phone .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-door-timing-phone .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-door-timing-phone .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-door-timing-phone .sub,#dg-door-timing-phone .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-door-timing-phone .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-door-timing-phone .u-ln{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-door-timing-phone .u-bold{stroke-width:2.5}
+#dg-door-timing-phone .u-dash{stroke-dasharray:6 4;stroke-linecap:butt}
+#dg-door-timing-phone .u-face{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linejoin:round}
+#dg-door-timing-phone .u-ink{fill:var(--text,#1c1f2e)}
+#dg-door-timing-phone .u-name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-door-timing-phone .leg .line{stroke-width:1.5}
+#dg-door-timing-phone .leg.is-reply .line{stroke-dasharray:6 4;stroke-linecap:butt}
+#dg-door-timing-phone .ohead{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.js #dg-door-timing-phone .leg.is-current .ohead{stroke:var(--primary,#2f3fd0)}
+#dg-door-timing-phone .u-bar{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-door-timing-phone .u-frame{fill:none;stroke:var(--muted,#575d75);stroke-width:1}
+#dg-door-timing-phone .u-frame.is-filled{fill:var(--bg,#fbfbfe)}
+#dg-door-timing-phone .u-div{stroke:var(--muted,#575d75);stroke-width:1;stroke-dasharray:6 4}
+#dg-door-timing-phone .u-op{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e)}
+@media (prefers-reduced-motion:reduce){#dg-door-timing-phone .pulse{animation:none!important}#dg-door-timing-phone .pulse{display:none!important}}
+@media print{#dg-door-timing-phone{max-width:100%;height:auto}#dg-door-timing-phone .pulse{display:none!important}}
+@media (max-width:790px){#dg-door-timing{display:none}#dg-door-timing-phone{display:block}}
+@media print{#dg-door-timing{display:block!important}#dg-door-timing-phone{display:none!important}}
+</style>
+<rect width="264" height="462" class="ground"/>
+<line x1="8" y1="28" x2="256" y2="28" class="track"/>
+<line x1="8" y1="58" x2="256" y2="58" class="track"/>
+<line x1="8" y1="88" x2="256" y2="88" class="track"/>
+<line x1="8" y1="118" x2="256" y2="118" class="track"/>
+<line x1="8" y1="166" x2="256" y2="166" class="track"/>
+<line x1="8" y1="196" x2="256" y2="196" class="track"/>
+<line x1="8" y1="226" x2="256" y2="226" class="track"/>
+<line x1="8" y1="274" x2="256" y2="274" class="track"/>
+<line x1="8" y1="304" x2="256" y2="304" class="track"/>
+<line x1="8" y1="334" x2="256" y2="334" class="track"/>
+<line x1="8" y1="364" x2="256" y2="364" class="track"/>
+<line x1="8" y1="394" x2="256" y2="394" class="track"/>
+<line x1="8" y1="424" x2="256" y2="424" class="track"/>
+<line x1="8" y1="454" x2="256" y2="454" class="track"/>
+<text x="12" y="20" class="sub" text-anchor="start">Time</text>
+<text x="76" y="20" class="sub" text-anchor="start">Lifeline</text>
+<text x="168" y="20" class="sub" text-anchor="start">State</text>
+<text x="12" y="48" class="sub" text-anchor="start">0 s</text>
+<text x="76" y="48" class="name" text-anchor="start">User</text>
+<text x="168" y="48" class="name" text-anchor="start">Idle</text>
+<text x="12" y="78" class="sub" text-anchor="start">0 s</text>
+<text x="76" y="78" class="name" text-anchor="start">Controller</text>
+<text x="168" y="78" class="name" text-anchor="start">Ready</text>
+<text x="12" y="108" class="sub" text-anchor="start">0 s</text>
+<text x="76" y="108" class="name" text-anchor="start">Door</text>
+<text x="168" y="108" class="name" text-anchor="start">Closed</text>
+<text x="12" y="138" class="sub" text-anchor="start">1 s</text>
+<text x="76" y="138" class="name" text-anchor="start">User →</text>
+<text x="76" y="156" class="name" text-anchor="start">Controller</text>
+<text x="168" y="138" class="verb" text-anchor="start">“press”</text>
+<text x="12" y="186" class="sub" text-anchor="start">1 s</text>
+<text x="76" y="186" class="name" text-anchor="start">User</text>
+<text x="168" y="186" class="name" text-anchor="start">Waiting</text>
+<text x="12" y="216" class="sub" text-anchor="start">1 s</text>
+<text x="76" y="216" class="name" text-anchor="start">Controller</text>
+<text x="168" y="216" class="name" text-anchor="start">Busy</text>
+<text x="12" y="246" class="sub" text-anchor="start">3 s</text>
+<text x="76" y="246" class="name" text-anchor="start">Controller</text>
+<text x="76" y="264" class="name" text-anchor="start">→ Door</text>
+<text x="168" y="246" class="verb" text-anchor="start">“open”</text>
+<text x="12" y="294" class="sub" text-anchor="start">3 s</text>
+<text x="76" y="294" class="name" text-anchor="start">Controller</text>
+<text x="168" y="294" class="name" text-anchor="start">Ready</text>
+<text x="12" y="324" class="sub" text-anchor="start">3 s</text>
+<text x="76" y="324" class="name" text-anchor="start">Door</text>
+<text x="168" y="324" class="name" text-anchor="start">Moving</text>
+<text x="12" y="354" class="sub" text-anchor="start">4 s</text>
+<text x="76" y="354" class="name" text-anchor="start">User</text>
+<text x="168" y="354" class="name" text-anchor="start">Idle</text>
+<text x="12" y="384" class="sub" text-anchor="start">4 s</text>
+<text x="76" y="384" class="name" text-anchor="start">Door</text>
+<text x="168" y="384" class="name" text-anchor="start">Open</text>
+<text x="12" y="414" class="sub" text-anchor="start">8 s</text>
+<text x="76" y="414" class="name" text-anchor="start">Door</text>
+<text x="168" y="414" class="name" text-anchor="start">Moving</text>
+<text x="12" y="444" class="sub" text-anchor="start">9 s</text>
+<text x="76" y="444" class="name" text-anchor="start">Door</text>
+<text x="168" y="444" class="name" text-anchor="start">Closed</text>
+</svg>
+<details class="dg-words">
+<summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>The diagram in words</summary>
+<ol><li>At 0 s: User is Idle. Controller is Ready. Door is Closed.</li><li>At 1 s: User sends “press” to Controller. User becomes Waiting. Controller becomes Busy.</li><li>At 3 s: Controller sends “open” to Door. Controller becomes Ready. Door becomes Moving.</li><li>At 4 s: User becomes Idle. Door becomes Open.</li><li>At 8 s: Door becomes Moving.</li><li>At 9 s: Door becomes Closed.</li></ol>
+<ul><li>From 1 s to 4 s, Door keeps the constraint {≤ 3 s}.</li></ul>
+<p>Key to the marks:</p>
+<ul><li>A thick line that steps up and down: the state of the lifeline over time, read against the state names at its left.</li><li>A line with an open arrowhead, from one state line to another: a message from one lifeline to another at that moment.</li><li>A line with a tick at each end and a constraint in braces: how long that stretch may take.</li></ul>
+</details>

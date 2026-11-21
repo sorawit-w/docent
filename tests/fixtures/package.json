@@ -1,0 +1,17 @@
+{
+  "id": "shop-packages",
+  "kind": "package",
+  "label": "The shop has three packages: ordering, catalog and billing. Ordering imports the catalog and uses billing; all of the shop imports the shared utilities.",
+  "packages": [
+    { "id": "shop", "name": "Shop" },
+    { "id": "ordering", "name": "Ordering", "in": "shop", "members": ["Order", "OrderLine", "Cart"] },
+    { "id": "catalog", "name": "Catalog", "in": "shop", "members": ["Product", "Category"] },
+    { "id": "billing", "name": "Billing", "in": "shop", "members": ["Invoice", "Payment"] },
+    { "id": "util", "name": "Shared utilities", "members": ["Money", "Clock"] }
+  ],
+  "dependencies": [
+    { "from": "ordering", "to": "catalog" },
+    { "from": "ordering", "to": "billing", "type": "access" },
+    { "from": "shop", "to": "util" }
+  ]
+}

@@ -1,0 +1,50 @@
+<svg id="uml-marks" xmlns="http://www.w3.org/2000/svg" width="576" height="384" viewBox="0 0 576 384" role="img" aria-label="Every UML mark">
+<style>
+#uml-marks .u-ln{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#uml-marks .u-bold{stroke-width:2.5}
+#uml-marks .u-dash{stroke-dasharray:6 4;stroke-linecap:butt}
+#uml-marks .u-face{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linejoin:round}
+#uml-marks .u-ink{fill:var(--text,#1c1f2e)}
+#uml-marks .u-name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+</style>
+<rect width="576" height="384" fill="var(--fig,#f2f3f9)"/>
+<polyline points="16,24 96,24" class="u-ln"/><polyline points="88,28.5 96,24 88,19.5" class="u-ln"/>
+<polyline points="128,24 208,24" class="u-ln u-dash"/><polyline points="200,28.5 208,24 200,19.5" class="u-ln"/>
+<polyline points="16,48 90,48" class="u-ln"/><polygon points="88,52.5 88,43.5 96,48" class="u-ink"/>
+<polyline points="128,48 202,48" class="u-ln u-dash"/><polygon points="200,52.5 200,43.5 208,48" class="u-ink"/>
+<polyline points="16,72 84,72" class="u-ln"/><polygon points="84,79 84,65 96,72" class="u-face"/>
+<polyline points="128,72 196,72" class="u-ln u-dash"/><polygon points="196,79 196,65 208,72" class="u-face"/>
+<polyline points="16,96 84,96" class="u-ln"/><polygon points="84,103 84,89 96,96" class="u-face u-ink"/>
+<polyline points="128,96 196,96" class="u-ln u-dash"/><polygon points="196,103 196,89 208,96" class="u-face u-ink"/>
+<polyline points="16,120 80,120" class="u-ln"/><polygon points="96,120 88,126 80,120 88,114" class="u-face"/>
+<polyline points="128,120 192,120" class="u-ln u-dash"/><polygon points="208,120 200,126 192,120 200,114" class="u-face"/>
+<polyline points="16,144 80,144" class="u-ln"/><polygon points="96,144 88,150 80,144 88,138" class="u-face u-ink"/>
+<polyline points="128,144 192,144" class="u-ln u-dash"/><polygon points="208,144 200,150 192,144 200,138" class="u-face u-ink"/>
+<polyline points="16,168 92,168" class="u-ln"/><path d="M103,179 A11,11 0 0 1 103,157" class="u-ln"/>
+<polyline points="128,168 204,168" class="u-ln u-dash"/><path d="M215,179 A11,11 0 0 1 215,157" class="u-ln"/>
+<circle cx="24" cy="208" r="8" class="u-ink"/>
+<circle cx="64" cy="208" r="10" class="u-face"/><circle cx="64" cy="208" r="6" class="u-ink"/>
+<circle cx="104" cy="208" r="10" class="u-face"/><path d="M96.93,200.93 L111.07,215.07 M111.07,200.93 L96.93,215.07" class="u-ln"/>
+<polygon points="152,196 168,208 152,220 136,208" class="u-face"/>
+<circle cx="192" cy="208" r="5" class="u-ink"/>
+<circle cx="224" cy="208" r="12" class="u-face"/><text x="224" y="212.5" class="u-name" text-anchor="middle">H</text>
+<circle cx="260" cy="208" r="12" class="u-face"/><text x="260" y="212.5" class="u-name" text-anchor="middle">H*</text>
+<rect x="292" y="205.5" width="48" height="5" class="u-ink"/>
+<rect x="357.5" y="192" width="5" height="32" class="u-ink"/>
+<path d="M384,200 L400,216 M400,200 L384,216" class="u-ln u-bold"/>
+<rect x="16" y="244" width="72" height="36" rx="10" class="u-face"/>
+<rect x="104" y="244" width="72" height="60" class="u-face"/><line x1="104" y1="264" x2="176" y2="264" class="u-ln"/><line x1="104" y1="284" x2="176" y2="284" class="u-ln"/>
+<polygon points="192,254 202,244 274,244 264,254" class="u-face"/><polygon points="264,254 274,244 274,294 264,304" class="u-face"/><rect x="192" y="254" width="72" height="50" class="u-face"/>
+<rect x="288" y="244" width="40" height="16" class="u-face"/><rect x="288" y="260" width="88" height="44" class="u-face"/>
+<ellipse cx="436" cy="262" rx="44" ry="18" class="u-face"/>
+<path d="M496,244 L550,244 L560,254 L560,284 L496,284 Z M550,244 L550,254 L560,254" class="u-face"/>
+<polygon points="16,320 76,320 88,336 76,352 16,352" class="u-face"/>
+<polygon points="104,320 176,320 176,352 104,352 116,336" class="u-face"/>
+<polygon points="192,320 232,320 232,332 224,340 192,340" class="u-face"/>
+<g class="u-ln"><circle cx="272" cy="322" r="6" class="u-face"/><path d="M272,328 L272,342 M262,333 L282,333 M272,342 L264,356 M272,342 L280,356"/></g>
+<rect x="307" y="320" width="13" height="16" class="u-face"/><rect x="304" y="323" width="7" height="3" class="u-face"/><rect x="304" y="330" width="7" height="3" class="u-face"/>
+<path d="M336,320 L344,320 L348,324 L348,336 L336,336 Z M344,320 L344,324 L348,324" class="u-face"/>
+<rect x="363" y="331" width="10" height="10" class="u-face"/>
+<line x1="400" y1="336" x2="420" y2="336" class="u-ln"/><circle cx="427" cy="336" r="7" class="u-face"/>
+<line x1="472" y1="336" x2="492" y2="336" class="u-ln"/><path d="M503,347 A11,11 0 0 1 503,325" class="u-ln"/>
+</svg>

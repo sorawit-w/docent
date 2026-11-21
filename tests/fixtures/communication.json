@@ -1,0 +1,18 @@
+{
+  "id": "checkout-talk",
+  "kind": "communication",
+  "label": "Checkout asks the cart to place the order; the cart reserves each item with stock, then asks payments to charge the card.",
+  "lifelines": [
+    { "id": "ui", "name": ": Checkout" },
+    { "id": "cart", "name": "c : Cart" },
+    { "id": "stock", "name": ": Stock" },
+    { "id": "pay", "name": ": Payments" }
+  ],
+  "messages": [
+    { "n": "1", "from": "ui", "to": "cart", "text": "placeOrder()" },
+    { "n": "1.1", "from": "cart", "to": "stock", "text": "reserve(item)", "repeat": "i=1..n" },
+    { "n": "1.2", "from": "cart", "to": "pay", "text": "charge(total)", "guard": "all reserved" },
+    { "n": "1.3", "from": "pay", "to": "cart", "text": "receipt" },
+    { "n": "2", "from": "cart", "to": "ui", "text": "showReceipt()" }
+  ]
+}

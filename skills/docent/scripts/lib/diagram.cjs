@@ -7,6 +7,7 @@ const { renderWidget, fillPlaces } = require("./widget.cjs");
 const { textWidth } = require("./text.cjs");
 const { readSequence, layoutSequence } = require("./sequence.cjs");
 const { readFlow, inWords: flowWords } = require("./flow.cjs");
+const { fitWarnings } = require("./fit.cjs");
 
 const ARROW = '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>';
 /** The steps of a drawing in words, in a closed section under it, for a screen reader, a phone and paper. */
@@ -20,7 +21,35 @@ function renderSequence(data) {
   const main = toSvg(scene, { id, label: model.label, mode: "auto", swap: { phone: `${id}-phone` } });
   // On paper the desktop form prints, shrunk to the sheet, while it keeps at least 80% of its size; else the script prints.
   const small = toSvg(phone, { id: `${id}-phone`, label: model.label, mode: "auto", swap: { main: id, below: scene.w + ROOM, printMain: scene.w * 0.8 <= SHEET } });
-  return { svg: `${main}\n${small}\n${inWords(steps)}`, form: "sequence", warnings: [], icons: [], model, scene };
+  return { svg: `${main}\n${small}\n${inWords(steps)}`, form: "sequence", warnings: fitWarnings("sequence", model), icons: [], model, scene };
+}
+
+/** A UML kind drawn by the graph layout: the drawing, a column for phones and paper, and the facts or steps in words. */
+const GRAPH_KINDS = { activity: ["./activity.cjs", "readActivity"], state: ["./state.cjs", "readState"], "interaction-overview": ["./activity.cjs", "readOverview"], usecase: ["./usecase.cjs", "readUsecase"], class: ["./class.cjs", "readClass"], object: ["./class.cjs", "readObject"], package: ["./package.cjs", "readPackage"], profile: ["./package.cjs", "readProfile"], component: ["./component.cjs", "readComponent"], composite: ["./component.cjs", "readComposite"], deployment: ["./component.cjs", "readDeployment"], communication: ["./communication.cjs", "readCommunication"] };
+function renderGraphKind(data) {
+  const { layoutGraph, layoutColumnGraph } = require("./graph.cjs");
+  const [file, reader] = GRAPH_KINDS[data.kind];
+  const kind = require(file);
+  const model = kind[reader](data);
+  const scene = layoutGraph(kind.graphOf(model), data.kind);
+  const id = `dg-${model.id}`;
+  const phone = scene.w > PHONE ? layoutColumnGraph(kind.columnOf(model), data.kind) : null;
+  const main = toSvg(scene, { id, label: model.label, mode: "auto", swap: phone && { phone: `${id}-phone` } });
+  // On paper the main form prints, shrunk to the sheet, while it keeps at least 80% of its size; else the column prints.
+  const small = phone ? `\n${toSvg(phone, { id: `${id}-phone`, label: model.label, mode: "auto", swap: { main: id, below: scene.w + ROOM, printMain: scene.w * 0.8 <= SHEET } })}` : "";
+  return { svg: `${main}${small}\n${inWords(kind.wordsOf(model))}`, form: data.kind, warnings: fitWarnings(data.kind, model), icons: [], model, scene, phone };
+}
+
+/** A timing diagram: rows of lifelines over a time axis, a table for phones and paper, and the changes in words. */
+function renderTiming(data) {
+  const { readTiming, layoutTiming, tableOf, wordsOf } = require("./timing.cjs");
+  const model = readTiming(data);
+  const scene = layoutTiming(model);
+  const id = `dg-${model.id}`;
+  const phone = scene.w > PHONE ? tableOf(model) : null;
+  const main = toSvg(scene, { id, label: model.label, mode: "auto", swap: phone && { phone: `${id}-phone` } });
+  const small = phone ? `\n${toSvg(phone, { id: `${id}-phone`, label: model.label, mode: "auto", swap: { main: id, below: scene.w + ROOM, printMain: scene.w * 0.8 <= SHEET } })}` : "";
+  return { svg: `${main}${small}\n${inWords(wordsOf(model))}`, form: "timing", warnings: [], icons: [], model, scene, phone };
 }
 
 const FORMS = ["wide", "tall", "plates"];
@@ -154,7 +183,9 @@ function renderDiagram(data) {
   if (data && data.kind != null) {
     if (data.kind === "sequence") return renderSequence(data);
     if (data.kind === "flow") return renderFlow(data);
-    fail(`"kind" must be "sequence" or "flow", or left out for a workflow diagram`);
+    if (Object.hasOwn(GRAPH_KINDS, data.kind)) return renderGraphKind(data);
+    if (data.kind === "timing") return renderTiming(data);
+    fail(`"kind" must be one of ${["sequence", "flow", ...Object.keys(GRAPH_KINDS), "timing"].map((k) => `"${k}"`).join(", ")}, or left out for a workflow diagram`);
   }
   const { model, warnings } = readData(data);
   const icons = warnings.filter((w) => !w.startsWith("every part has the state") && !w.startsWith("no leg has a verb")); // these warnings are about icons; check reports them as errors

@@ -1,0 +1,116 @@
+<svg id="dg-checkout-talk" class="dg dg-communication dg-auto" xmlns="http://www.w3.org/2000/svg" width="504" height="360" viewBox="0 0 504 360" role="img" aria-label="Checkout asks the cart to place the order; the cart reserves each item with stock, then asks payments to charge the card.">
+<style>
+#dg-checkout-talk{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-checkout-talk .ground{fill:var(--fig,#f2f3f9)}
+#dg-checkout-talk .band{fill:var(--bg,#fbfbfe)}
+#dg-checkout-talk .track{stroke:var(--line,#d3d6e3)}
+#dg-checkout-talk .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-checkout-talk .head{fill:var(--text,#1c1f2e)}
+#dg-checkout-talk .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-checkout-talk .stop.end{fill:var(--text,#1c1f2e)}
+#dg-checkout-talk .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-checkout-talk .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-checkout-talk .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-checkout-talk .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-checkout-talk .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-checkout-talk .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-checkout-talk .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-checkout-talk .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-checkout-talk .sub,#dg-checkout-talk .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-checkout-talk .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-checkout-talk .u-ln{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-checkout-talk .u-bold{stroke-width:2.5}
+#dg-checkout-talk .u-dash{stroke-dasharray:6 4;stroke-linecap:butt}
+#dg-checkout-talk .u-face{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linejoin:round}
+#dg-checkout-talk .u-ink{fill:var(--text,#1c1f2e)}
+#dg-checkout-talk .u-name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-checkout-talk .leg .line{stroke-width:1.5}
+#dg-checkout-talk .leg.is-reply .line{stroke-dasharray:6 4;stroke-linecap:butt}
+#dg-checkout-talk .ohead{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.js #dg-checkout-talk .leg.is-current .ohead{stroke:var(--primary,#2f3fd0)}
+#dg-checkout-talk .u-bar{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-checkout-talk .u-frame{fill:none;stroke:var(--muted,#575d75);stroke-width:1}
+#dg-checkout-talk .u-frame.is-filled{fill:var(--bg,#fbfbfe)}
+#dg-checkout-talk .u-div{stroke:var(--muted,#575d75);stroke-width:1;stroke-dasharray:6 4}
+#dg-checkout-talk .u-op{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e)}
+@media (prefers-reduced-motion:reduce){#dg-checkout-talk .pulse{animation:none!important}#dg-checkout-talk .pulse{display:none!important}}
+@media print{#dg-checkout-talk{max-width:100%;height:auto}#dg-checkout-talk .pulse{display:none!important}}
+#dg-checkout-talk-phone{display:none}
+</style>
+<rect width="504" height="360" class="ground"/>
+<g class="leg" data-leg="1"><polyline points="288,76 288,164" class="u-ln"/><text x="296" y="92" class="verb" text-anchor="start">1: placeOrder() ↓</text><text x="280" y="92" class="verb" text-anchor="end">2: showReceipt() ↑</text></g>
+<g class="leg" data-leg="2"><polyline points="228,180 96,180 96,284" class="u-ln"/><text x="104" y="220" class="verb" text-anchor="start">1.1 *[i=1..n]: reserve(item) ↓</text></g>
+<g class="leg" data-leg="3"><polyline points="288,196 288,284" class="u-ln"/><text x="296" y="212" class="verb" text-anchor="start">1.2 [all reserved]: charge(total) ↓</text><text x="296" y="236" class="verb" text-anchor="start">1.3: receipt ↑</text></g>
+<rect x="228" y="44" width="120" height="32" class="u-face"/><text x="288" y="64" class="name" text-anchor="middle">: Checkout</text>
+<rect x="228" y="164" width="120" height="32" class="u-face"/><text x="288" y="184" class="name" text-anchor="middle">c : Cart</text>
+<rect x="36" y="284" width="120" height="32" class="u-face"/><text x="96" y="304" class="name" text-anchor="middle">: Stock</text>
+<rect x="228" y="284" width="120" height="32" class="u-face"/><text x="288" y="304" class="name" text-anchor="middle">: Payments</text>
+</svg>
+<svg id="dg-checkout-talk-phone" class="dg dg-communication dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="478" viewBox="0 0 264 478" role="img" aria-label="Checkout asks the cart to place the order; the cart reserves each item with stock, then asks payments to charge the card.">
+<style>
+#dg-checkout-talk-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-checkout-talk-phone .ground{fill:var(--fig,#f2f3f9)}
+#dg-checkout-talk-phone .band{fill:var(--bg,#fbfbfe)}
+#dg-checkout-talk-phone .track{stroke:var(--line,#d3d6e3)}
+#dg-checkout-talk-phone .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-checkout-talk-phone .head{fill:var(--text,#1c1f2e)}
+#dg-checkout-talk-phone .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-checkout-talk-phone .stop.end{fill:var(--text,#1c1f2e)}
+#dg-checkout-talk-phone .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-checkout-talk-phone .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-checkout-talk-phone .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-checkout-talk-phone .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-checkout-talk-phone .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-checkout-talk-phone .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-checkout-talk-phone .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-checkout-talk-phone .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-checkout-talk-phone .sub,#dg-checkout-talk-phone .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-checkout-talk-phone .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-checkout-talk-phone .u-ln{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-checkout-talk-phone .u-bold{stroke-width:2.5}
+#dg-checkout-talk-phone .u-dash{stroke-dasharray:6 4;stroke-linecap:butt}
+#dg-checkout-talk-phone .u-face{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linejoin:round}
+#dg-checkout-talk-phone .u-ink{fill:var(--text,#1c1f2e)}
+#dg-checkout-talk-phone .u-name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-checkout-talk-phone .leg .line{stroke-width:1.5}
+#dg-checkout-talk-phone .leg.is-reply .line{stroke-dasharray:6 4;stroke-linecap:butt}
+#dg-checkout-talk-phone .ohead{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.js #dg-checkout-talk-phone .leg.is-current .ohead{stroke:var(--primary,#2f3fd0)}
+#dg-checkout-talk-phone .u-bar{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-checkout-talk-phone .u-frame{fill:none;stroke:var(--muted,#575d75);stroke-width:1}
+#dg-checkout-talk-phone .u-frame.is-filled{fill:var(--bg,#fbfbfe)}
+#dg-checkout-talk-phone .u-div{stroke:var(--muted,#575d75);stroke-width:1;stroke-dasharray:6 4}
+#dg-checkout-talk-phone .u-op{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e)}
+@media (prefers-reduced-motion:reduce){#dg-checkout-talk-phone .pulse{animation:none!important}#dg-checkout-talk-phone .pulse{display:none!important}}
+@media print{#dg-checkout-talk-phone{max-width:100%;height:auto}#dg-checkout-talk-phone .pulse{display:none!important}}
+@media (max-width:600px){#dg-checkout-talk{display:none}#dg-checkout-talk-phone{display:block}}
+@media print{#dg-checkout-talk{display:block!important}#dg-checkout-talk-phone{display:none!important}}
+</style>
+<rect width="264" height="478" class="ground"/>
+<rect x="20" y="16" width="120" height="32" class="u-face"/><text x="80" y="36" class="name" text-anchor="middle">: Checkout</text>
+<polyline points="20,67 68,67" class="u-ln"/><polyline points="60,71.5 68,67 60,62.5" class="u-ln"/>
+<text x="80" y="71" class="verb" text-anchor="start">1: placeOrder()</text>
+<text x="80" y="89" class="name" text-anchor="start">c : Cart</text>
+<rect x="20" y="120" width="120" height="32" class="u-face"/><text x="80" y="140" class="name" text-anchor="middle">c : Cart</text>
+<polyline points="20,171 68,171" class="u-ln"/><polyline points="60,175.5 68,171 60,166.5" class="u-ln"/>
+<text x="80" y="175" class="verb" text-anchor="start">1.1 *[i=1..n]: reserve(item)</text>
+<text x="80" y="193" class="name" text-anchor="start">: Stock</text>
+<polyline points="20,213 68,213" class="u-ln"/><polyline points="60,217.5 68,213 60,208.5" class="u-ln"/>
+<text x="80" y="217" class="verb" text-anchor="start">1.2 [all reserved]:</text>
+<text x="80" y="235" class="verb" text-anchor="start">charge(total)</text>
+<text x="80" y="253" class="name" text-anchor="start">: Payments</text>
+<polyline points="20,273 68,273" class="u-ln"/><polyline points="60,277.5 68,273 60,268.5" class="u-ln"/>
+<text x="80" y="277" class="verb" text-anchor="start">2: showReceipt()</text>
+<text x="80" y="295" class="name" text-anchor="start">: Checkout</text>
+<rect x="20" y="326" width="120" height="32" class="u-face"/><text x="80" y="346" class="name" text-anchor="middle">: Stock</text>
+<rect x="20" y="378" width="120" height="32" class="u-face"/><text x="80" y="398" class="name" text-anchor="middle">: Payments</text>
+<polyline points="20,429 68,429" class="u-ln"/><polyline points="60,433.5 68,429 60,424.5" class="u-ln"/>
+<text x="80" y="433" class="verb" text-anchor="start">1.3: receipt</text>
+<text x="80" y="451" class="name" text-anchor="start">c : Cart</text>
+</svg>
+<details class="dg-words">
+<summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>The diagram in words</summary>
+<ol><li>1. : Checkout sends placeOrder() to c : Cart.</li><li>1.1. c : Cart sends reserve(item) to : Stock, again and again: i=1..n.</li><li>1.2. c : Cart sends charge(total) to : Payments, only if all reserved.</li><li>1.3. : Payments sends receipt to c : Cart.</li><li>2. c : Cart sends showReceipt() to : Checkout.</li></ol>
+<p>Key to the marks:</p>
+<ul><li>A box: one participant, named role : Type.</li><li>A solid line: the two participants know each other, so they can send messages.</li><li>Text beside a line with a small arrow: a message, sent the way the arrow points.</li><li>The number before a message: its order. 1.1 and 1.2 happen inside message 1, before message 2.</li><li>[condition] after the number: the message is sent only when the condition holds.</li><li>*[…] after the number: the message is sent again and again, as the brackets say.</li></ul>
+</details>

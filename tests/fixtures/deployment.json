@@ -1,0 +1,22 @@
+{
+  "id": "shop-deploy",
+  "kind": "deployment",
+  "label": "Where the shop runs: a phone talks to the app server over HTTPS, and the server talks to the database.",
+  "nodes": [
+    { "id": "phone", "name": "Phone", "type": "device" },
+    { "id": "server", "name": "App server", "type": "device" },
+    { "id": "jvm", "name": "JVM", "type": "executionEnvironment", "in": "server" },
+    { "id": "db", "name": "Database server", "type": "device" }
+  ],
+  "artifacts": [
+    { "id": "app-apk", "name": "shop.apk", "in": "phone" },
+    { "id": "shop-jar", "name": "shop.jar", "in": "jvm" },
+    { "id": "schema", "name": "schema.sql", "in": "db" }
+  ],
+  "components": [{ "id": "mobile", "name": "Mobile app" }],
+  "manifests": [{ "artifact": "app-apk", "component": "mobile" }],
+  "paths": [
+    { "from": "phone", "to": "server", "protocol": "HTTPS" },
+    { "from": "jvm", "to": "db", "protocol": "JDBC" }
+  ]
+}

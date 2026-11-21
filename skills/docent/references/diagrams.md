@@ -104,7 +104,7 @@ A walkthrough needs a route, because step 1 lights leg 1, step 2 lights leg 2, a
 
 ## Sequence diagrams
 
-A sequence diagram shows calls and replies between a few participants, in time order: a browser asks a web app, the web app asks a database, the replies come back. Write it with `"kind": "sequence"`:
+A sequence diagram shows messages between a few participants, in time order: a browser asks a web app, the web app asks a database, the replies come back. It is drawn in UML notation. Write it with `"kind": "sequence"`:
 
 ```json
 {
@@ -138,13 +138,21 @@ A sequence diagram shows calls and replies between a few participants, in time o
 | Field | What it is |
 |---|---|
 | `participants` | 2 to 6. Each has an `id` and a `name` (at most 20 characters). |
-| `messages` | In time order, at most 24 in all. A message has `from`, `to` and a `verb` (at most 24 characters). `"reply": true` makes it a reply. A message from a participant to itself is a call to itself. |
-| `alt` | One group of alternatives, in place of a message: 2 or 3 cases, each with a `when` (at most 32 characters, such as "If not") and its own `messages`. A group cannot hold a group. |
+| `messages` | In time order, at most 30 messages in all. A message has `from`, `to` and a `verb` (at most 24 characters). A message from a participant to itself is a call to itself. |
+| `"reply": true` | The message answers a call: a dashed line with an open arrowhead. |
+| `"async": true` | The sender does not wait for an answer: a solid line with an open arrowhead. With neither, a message is a call that waits: a filled arrowhead. |
+| `"create": true` | The message creates its receiver. The receiver's box starts at this row, and no message may use the receiver before it. |
+| `"destroy": true` | The message ends its receiver. Its track stops at a cross, and no message may use the receiver after it. |
+| `alt`, `par` | A fragment with 2 or 3 cases, in place of a message: `{"alt": [{"when": "If not", "messages": [...]}, ...]}`. `alt`: one case happens. `par`: the cases happen at the same time. A `when` is at most 32 characters; it is needed for `alt` and may be left out for `par`. |
+| `opt`, `loop`, `break`, `critical` | A fragment with one case: `{"loop": {"when": "for each item", "messages": [...]}}`. `opt`: only when the condition holds. `loop`: repeated. `break`: when the condition holds, these messages happen and the rest is skipped. `critical`: one step that nothing can interrupt; its `when` may be left out. |
+| `ref` | A frame for steps drawn in another diagram, in place of a message: `{"ref": "Log in", "over": ["browser", "app"]}`. `over` names the participants it covers, and they must stand side by side. The name is at most 32 characters. |
 
-- On a desktop each participant is a plate at the top with a track below it, and each message is a level arrow with its number. A reply is a thin muted line with an open arrowhead. A call to itself is a small loop. Each case of the group is a band with its `when` as a label. One dot travels the messages in order, twice.
-- On a phone the drawing is a script: one row for each message, with its number, "From → To", and the verb.
+- A fragment may hold one more fragment, not more. Write the `when` as the condition, such as "If the cache has the page" or "for each item"; the drawing puts it in brackets.
+- The activation bars are worked out from the messages: a call starts a bar on its receiver, and the receiver's last reply to the caller ends it. A call with no reply gets a short bar.
+- On a desktop each participant is a plain box at the top with a track below it, and each message is a level arrow with its number. Each fragment is a frame with its operator in a tab and its guards in brackets. One dot travels the messages in order, twice.
+- On a phone the drawing is a script: one row for each message, with its number, "From → To", and the verb. A reply, a message that does not wait, a create and a destroy say so before the verb. Each case of a fragment is a band named by its operator and guard.
 - On paper the desktop form prints, shrunk to the sheet when it keeps at least 80% of its size; else the script prints.
-- `render` also writes the steps in words, in a closed section under the drawing ("The diagram in words"). A screen reader reaches it, and it prints. The `label` stays a one- or two-sentence summary.
+- `render` also writes the steps in words, in a closed section under the drawing ("The diagram in words"), and ends them with a key to the marks the drawing uses. A screen reader reaches it, and it prints. The `label` stays a one- or two-sentence summary.
 - A sequence diagram sits in the text flow. It has no `form`, no `lanes`, no `parts` and no `legs`. Six participants with long names need more than the page; then the script shows on a desktop too.
 
 ## Flowcharts
@@ -186,6 +194,539 @@ A flowchart shows steps with decisions: a path that splits on a question, ends e
 - On a phone and on paper the flowchart takes the column form: a side exit or an arrow back is a go-to row ("yes, back to Run the work").
 - `render` also writes the steps in words, in a closed section under the drawing.
 - A flowchart sits in the text flow and has no `form`. When `render` says that there is "no free path" between two nodes, let the arrow back go to a nearer step, or split the flowchart in two.
+
+## Activity diagrams
+
+An activity diagram is a flowchart in UML notation: actions, decisions, paths that run at the same time, and who does each step. Write it with `"kind": "activity"` when the readers know UML or the document is a design; for other readers a flowchart (`"kind": "flow"`) says the same with fewer marks.
+
+```json
+{
+  "id": "order-flow",
+  "kind": "activity",
+  "label": "The shop takes an order and checks the stock. When the items are in stock, the warehouse packs them while the shop sends the invoice.",
+  "partitions": [{"id": "shop", "name": "Shop"}, {"id": "warehouse", "name": "Warehouse"}],
+  "nodes": [
+    {"id": "start", "type": "initial", "partition": "shop"},
+    {"id": "take", "name": "Take the order", "partition": "shop"},
+    {"id": "stock", "type": "decision", "partition": "shop"},
+    {"id": "split", "type": "fork", "partition": "warehouse"},
+    {"id": "pack", "name": "Pack the items", "partition": "warehouse"},
+    {"id": "invoice", "type": "send", "name": "Send the invoice", "partition": "shop"},
+    {"id": "both", "type": "join", "partition": "warehouse"},
+    {"id": "done", "type": "final", "partition": "warehouse"},
+    {"id": "tell", "name": "Tell the customer", "partition": "shop"},
+    {"id": "closed", "type": "flow-final", "partition": "shop"}
+  ],
+  "flows": [
+    {"from": "start", "to": "take"},
+    {"from": "take", "to": "stock"},
+    {"from": "stock", "to": "split", "guard": "in stock"},
+    {"from": "split", "to": "pack"},
+    {"from": "split", "to": "invoice"},
+    {"from": "pack", "to": "both"},
+    {"from": "invoice", "to": "both"},
+    {"from": "both", "to": "done"},
+    {"from": "stock", "to": "tell", "guard": "else"},
+    {"from": "tell", "to": "closed"}
+  ]
+}
+```
+
+| Field | What it is |
+|---|---|
+| `nodes` | 2 to 20, each with an `id` and a `type`. An `action` (the default type), an `object`, a `send` (a signal is sent) and an `accept` (the activity waits for an event) have a `name` of at most 32 characters; an object may have a `state` of at most 20 characters, drawn in brackets. An `initial`, `decision`, `merge`, `fork`, `join`, `final` or `flow-final` node has no name, as in UML. At most 4 forks. |
+| `flows` | 1 to 30, each `from` one node `to` another. Only a flow out of a decision has a `guard` (at most 24 characters, without brackets: the renderer adds them). |
+| `partitions` | Optional, at most 5, each with an `id` and a `name`. When a diagram has partitions, every node names one in `partition`, and each partition is a column. |
+
+- An initial node has one flow out and none in. A decision has one flow in and two or more out, each with a different guard; a merge has two or more in and one out. A fork has one in and two or more out; a join has two or more in and one out. An action, object, send or accept node has at most one flow out: to split the path, add a decision or a fork. A path ends at a `final` node (the activity ends) or a `flow-final` node (only this path ends).
+- Every node is reached from an initial node.
+- **The main path** is the first initial node, then each node's first flow, in the order you write the flows. One dot travels it; the other flows keep still.
+- The renderer puts the nodes in rows, routes each flow with right angles, and puts each guard beside its flow, near the decision. It draws each mark in UML notation: a filled dot, round-cornered actions, a hollow diamond, a thick bar, a ring around a dot, a ring with a cross. The lines are solid with an open arrowhead.
+- On a phone and on paper the diagram takes the column form: each node one under another, an arrow when a node's only flow goes to the next one, and else a row for each flow ("[else] to Tell the customer"). Partitions become bands.
+- `render` also writes the steps in words, in a closed section under the drawing, and a key to the marks the drawing uses.
+- When `render` says that there is "no free path" or "no room beside its line", make the diagram smaller: fewer flows back, or two diagrams.
+
+## State machine diagrams
+
+A state machine diagram shows the states that one thing can be in, and the events that move it from one state to the next. Write it with `"kind": "state"`:
+
+```json
+{
+  "id": "order-states",
+  "kind": "state",
+  "label": "An order is new until it is paid. A paid order is packed and labeled at the same time, then it is shipped.",
+  "states": [
+    {"id": "start", "type": "initial"},
+    {"id": "new", "name": "New", "entry": "reserve stock"},
+    {"id": "check", "type": "choice"},
+    {"id": "paid", "name": "Paid"},
+    {"id": "shipping", "type": "composite", "name": "Shipping", "regions": 2},
+    {"id": "s1", "type": "initial", "in": "shipping", "region": 1},
+    {"id": "packing", "name": "Packing", "in": "shipping", "region": 1},
+    {"id": "s2", "type": "initial", "in": "shipping", "region": 2},
+    {"id": "labeling", "name": "Labeling", "in": "shipping", "region": 2},
+    {"id": "out", "name": "Shipped"},
+    {"id": "end", "type": "final"}
+  ],
+  "transitions": [
+    {"from": "start", "to": "new"},
+    {"from": "new", "to": "check", "trigger": "pay"},
+    {"from": "check", "to": "paid", "guard": "card valid"},
+    {"from": "check", "to": "new", "guard": "else", "effect": "show error"},
+    {"from": "paid", "to": "shipping", "trigger": "pick"},
+    {"from": "s1", "to": "packing"},
+    {"from": "s2", "to": "labeling"},
+    {"from": "shipping", "to": "out", "trigger": "hand over"},
+    {"from": "out", "to": "end"}
+  ]
+}
+```
+
+| Field | What it is |
+|---|---|
+| `states` | 2 to 16, not counting composite states. A `state` (the default type) has a `name` of at most 28 characters, and may have `entry`, `do` and `exit` actions (each at most 28 characters). A `composite` state has a `name` and holds the states that name it in `in`; it has 1 or 2 `regions`, and each state inside names its `region`. The pseudostates `initial`, `final`, `choice`, `junction`, `history`, `deep-history`, `fork`, `join` and `terminate` have no name. |
+| `transitions` | 1 to 30, each `from` one state `to` another, or to itself. Each may have a `trigger` (the event), a `guard` (a condition, without brackets) and an `effect` (what is done, without the slash), each at most 24 characters. The label is drawn as `trigger [guard] / effect`. |
+
+- A state machine has one initial pseudostate outside every composite state; each region has at most one. A transition out of an initial pseudostate has no trigger and no guard. A choice has two or more transitions out, each with a guard. A final state and a terminate have no transition out. A history sits inside a composite state.
+- Composite states go one level deep. A transition may start or end on a composite state's frame; it never joins the frame to a state inside it.
+- **The main path** is the initial pseudostate, then each state's first transition, in the order you write them. One dot travels it.
+- The renderer draws each mark in UML notation: round-cornered states with their actions under a line, a rounded frame for a composite state with a dashed line between its regions, a hollow diamond for a choice, H or H* in a ring, a thick bar, a cross. A transition to itself is a loop at the right of its state.
+- On a phone and on paper the diagram takes the column form; a composite state's regions become bands. `render` also writes the states and transitions in words, with a key to the marks.
+
+## Interaction overview diagrams
+
+An interaction overview diagram shows how several interactions follow one another: an activity diagram whose steps are ref frames, each standing for a sequence diagram. Write it with `"kind": "interaction-overview"` when a flow is made of several exchanges that each deserve their own sequence diagram:
+
+```json
+{
+  "id": "checkout-overview",
+  "kind": "interaction-overview",
+  "label": "A customer logs in, then pays. A failed payment is tried again; a paid order gets a receipt and the warehouse is told, at the same time.",
+  "nodes": [
+    { "id": "start", "type": "initial" },
+    { "id": "login", "ref": "Log in", "diagram": "login" },
+    { "id": "pay", "ref": "Pay for the order" },
+    { "id": "paid", "type": "decision" },
+    { "id": "split", "type": "fork" },
+    { "id": "receipt", "ref": "Send the receipt" },
+    { "id": "notify", "ref": "Tell the warehouse" },
+    { "id": "both", "type": "join" },
+    { "id": "end", "type": "final" }
+  ],
+  "flows": [
+    { "from": "start", "to": "login" },
+    { "from": "login", "to": "pay" },
+    { "from": "pay", "to": "paid" },
+    { "from": "paid", "to": "split", "guard": "paid" },
+    { "from": "split", "to": "receipt" },
+    { "from": "split", "to": "notify" },
+    { "from": "receipt", "to": "both" },
+    { "from": "notify", "to": "both" },
+    { "from": "both", "to": "end" },
+    { "from": "paid", "to": "pay", "guard": "failed" }
+  ]
+}
+```
+
+| Field | What it is |
+|---|---|
+| `nodes` | 2 to 20. An `interaction` (the default type) has a `ref`: the name of the interaction, at most 32 characters. It may name the sequence diagram that draws it in `diagram`: the `id` of that diagram, without `dg-`. The other types are `initial`, `decision`, `merge`, `fork`, `join`, `final` and `flow-final`, as in an activity diagram. At most 12 interactions. |
+| `flows` | As in an activity diagram. Only a flow out of a decision has a `guard`. |
+
+- It has no partitions: each interaction names its participants in its own sequence diagram.
+- The rules for flows, the main path and the dot are those of an activity diagram.
+- Each interaction is a frame with the tag `ref` and its name. The words under the drawing link each named interaction to its sequence diagram, and `check` reports a `diagram` that is not in the document.
+
+## Timing diagrams
+
+A timing diagram shows how the states of a few things change over time, read against a time axis: when each one changes, the messages between them at a moment, and how long a stretch may take. Write it with `"kind": "timing"` when the exact times matter, such as a timeout or a deadline; when only the order matters, a sequence diagram or a state machine says it more simply.
+
+```json
+{
+  "id": "door-timing",
+  "kind": "timing",
+  "label": "A user presses the button at 1 second. The controller is busy for 2 seconds and opens the door at 3 seconds; the door must open within 3 seconds of the press. The door closes again at 8 seconds.",
+  "time": { "from": 0, "to": 10, "step": 1, "unit": "s" },
+  "lifelines": [
+    { "id": "user", "name": "User", "states": ["Waiting", "Idle"] },
+    { "id": "ctrl", "name": "Controller", "states": ["Busy", "Ready"] },
+    { "id": "door", "name": "Door", "states": ["Open", "Moving", "Closed"] }
+  ],
+  "changes": [
+    { "lifeline": "user", "at": 0, "state": "Idle" },
+    { "lifeline": "user", "at": 1, "state": "Waiting" },
+    { "lifeline": "user", "at": 4, "state": "Idle" },
+    { "lifeline": "ctrl", "at": 0, "state": "Ready" },
+    { "lifeline": "ctrl", "at": 1, "state": "Busy" },
+    { "lifeline": "ctrl", "at": 3, "state": "Ready" },
+    { "lifeline": "door", "at": 0, "state": "Closed" },
+    { "lifeline": "door", "at": 3, "state": "Moving" },
+    { "lifeline": "door", "at": 4, "state": "Open" },
+    { "lifeline": "door", "at": 8, "state": "Moving" },
+    { "lifeline": "door", "at": 9, "state": "Closed" }
+  ],
+  "messages": [
+    { "from": "user", "to": "ctrl", "at": 1, "verb": "press" },
+    { "from": "ctrl", "to": "door", "at": 3, "verb": "open" }
+  ],
+  "constraints": [
+    { "lifeline": "door", "from": 1, "to": 4, "text": "{≤ 3 s}" }
+  ]
+}
+```
+
+| Field | What it is |
+|---|---|
+| `time` | The axis: `from`, `to` and `step` are numbers, and `unit` (at most 8 characters, such as `ms`) is optional. At most 24 steps. |
+| `lifelines` | 1 to 4, each with an `id`, a `name` (at most 20 characters) and 2 to 6 `states` (each at most 16 characters), listed from the top of its row down. |
+| `changes` | 1 to 20. Each sets one `lifeline` to one of its `state`s `at` a time on the axis. Every lifeline has a change at the start of the axis, and never changes to the state it is already in. |
+| `messages` | Optional, at most 10. Each goes `from` one lifeline `to` another, `at` a time, with a `verb` of at most 20 characters. |
+| `constraints` | Optional, at most 6. Each is on one `lifeline`, `from` one time `to` a later one, with a `text` in braces, such as `{≤ 3 s}`. |
+
+- Each lifeline is a row with its states at the left; a thick line steps from level to level at each change. A message is an arrow from the sender's line to the receiver's at its moment; a constraint is a line with a tick at each end, with its text above.
+- Nothing moves: a timing diagram has no dot.
+- On a phone the diagram becomes a table: one row for each change and each message, in time order. `render` also writes the moments in words, with a key to the marks.
+
+## Use case diagrams
+
+A use case diagram shows who uses a system and for what: the actors outside it, the use cases inside it, and how they are linked. Write it with `"kind": "usecase"`:
+
+```json
+{
+  "id": "shop-usecases",
+  "kind": "usecase",
+  "label": "Customers browse the catalog and place orders; placing an order always includes paying, and a coupon may be applied. Members are customers who can also track orders. The payment service takes part in paying.",
+  "system": "Online shop",
+  "actors": [
+    { "id": "customer", "name": "Customer" },
+    { "id": "member", "name": "Member" },
+    { "id": "bank", "name": "Payment service", "side": "right" }
+  ],
+  "usecases": [
+    { "id": "browse", "name": "Browse the catalog" },
+    { "id": "order", "name": "Place an order" },
+    { "id": "pay", "name": "Pay" },
+    { "id": "coupon", "name": "Apply a coupon" },
+    { "id": "track", "name": "Track an order" }
+  ],
+  "relations": [
+    { "from": "customer", "to": "browse" },
+    { "from": "customer", "to": "order" },
+    { "from": "member", "to": "track" },
+    { "from": "member", "to": "customer", "type": "generalization" },
+    { "from": "order", "to": "pay", "type": "include" },
+    { "from": "coupon", "to": "order", "type": "extend" },
+    { "from": "bank", "to": "pay" }
+  ]
+}
+```
+
+| Field | What it is |
+|---|---|
+| `system` | The name of the system, at most 32 characters, drawn on its boundary. A diagram has one boundary. |
+| `actors` | 1 to 6, each with an `id` and a `name` of at most 20 characters: a person or another system. An actor stands at the left of the boundary, or at the right with `"side": "right"` (use it for a system that serves this one, such as a payment service). |
+| `usecases` | 1 to 16, each with an `id` and a `name` of at most 32 characters: something an actor does with the system, said as a verb and an object. |
+| `relations` | 1 to 30, each `from` one `to` another, with a `type`. An `association` (the default) goes from an actor to a use case it takes part in. An `include` goes from a use case to one it always uses; an `extend` goes from a use case to one it may add to. A `generalization` goes from an actor to a more general actor, or from a use case to a more general use case. |
+
+- Every actor and every use case has a relation. A use case never includes itself, by a chain or at once.
+- The renderer places every node: the actors in a column at their side, the use cases in a column inside the boundary, and each included, extending or more special use case one column to the right of the one it serves. It draws each mark in UML notation: a stick figure, an oval, solid lines for associations, dashed lines with an open arrowhead for «include» and «extend», and a hollow triangle for a generalization.
+- Nothing moves: a use case diagram has no dot and no walkthrough.
+- On a phone the diagram becomes a list with a band for each actor: the use cases it takes part in, each with what it includes and what may extend it. `render` also writes the diagram in words, with a key to the marks.
+
+## Class diagrams
+
+A class diagram shows the classes of a design, what each one holds and does, and how they relate. Write it with `"kind": "class"`:
+
+```json
+{
+  "id": "order-classes",
+  "kind": "class",
+  "label": "A customer places orders. An order owns its lines, and each line names a product. Payment is an interface that card payment implements; an order uses a payment.",
+  "classes": [
+    { "id": "customer", "name": "Customer", "attributes": ["- id: UUID", "- email: String"], "operations": ["+ placeOrder(): Order"] },
+    { "id": "order", "name": "Order", "attributes": ["- total: Money", { "text": "- count: Integer", "static": true }], "operations": ["+ addLine(p: Product, n: Integer)", "+ pay(with: Payment)"] },
+    { "id": "line", "name": "OrderLine", "attributes": ["- quantity: Integer"] },
+    { "id": "product", "name": "Product", "attributes": ["- name: String", "- price: Money"] },
+    { "id": "payment", "name": "Payment", "stereotype": "interface", "operations": [{ "text": "+ charge(amount: Money): Boolean", "abstract": true }] },
+    { "id": "card", "name": "CardPayment", "attributes": ["- last4: String"], "operations": ["+ charge(amount: Money): Boolean"] }
+  ],
+  "relations": [
+    { "from": "customer", "to": "order", "name": "places", "multiplicity": ["1", "0..*"], "navigable": true },
+    { "from": "order", "to": "line", "type": "composition", "multiplicity": ["1", "1..*"], "roles": ["", "lines"] },
+    { "from": "line", "to": "product", "multiplicity": ["*", "1"], "navigable": true },
+    { "from": "card", "to": "payment", "type": "realization" },
+    { "from": "order", "to": "payment", "type": "dependency", "stereotype": "use" }
+  ],
+  "notes": [
+    { "id": "n1", "text": "{total = sum of the line prices}", "on": "order" }
+  ]
+}
+```
+
+| Field | What it is |
+|---|---|
+| `classes` | 1 to 16, each with an `id` and a `name` (at most 28 characters). Optional: a `stereotype` without guillemets, such as `interface` or `enumeration`; `"abstract": true`, drawn in italics; up to 8 `attributes` and 8 `operations`. A member is text of at most 40 characters, such as `"- total: Money"`, or an object with `text` and `"static": true` (underlined) or, for an operation, `"abstract": true` (italics). Start a member with its visibility: `+` public, `-` private, `#` protected, `~` package. |
+| `relations` | At most 24, each `from` one class `to` another, with a `type`: `association` (the default), `aggregation` and `composition` (from the whole to the part), `generalization` (from the child to the parent), `realization` (from a class to the interface it implements) and `dependency` (from the class that needs to the class it needs). |
+| `notes` | Optional, at most 4, each with an `id`, a `text` of at most 80 characters and the class it is `on`. A constraint is a note in braces. |
+
+- An association, an aggregation and a composition may have a `name`, `multiplicity` and `roles`: each a list of two, for the `from` end and the `to` end (`""` for none). A multiplicity is `1`, `0..1`, `*`, `1..*` and the like. An association with `"navigable": true` gets an open arrowhead at its `to` end. A dependency may have a `stereotype`, such as `use`.
+- A class is never a kind of itself, by a chain. A realization goes to a class with the stereotype `interface`.
+- The renderer puts a parent above its children and a whole above its parts, and draws each mark in UML notation: a box in parts, a hollow triangle (dashed for a realization), a hollow or filled diamond at the whole, a dashed line with an open arrowhead for a dependency, a note with a folded corner.
+- Not drawn: templates, qualified and n-ary associations, and association classes (draw the link as a class with two associations).
+- On a phone the diagram becomes a list of cards, one per class, with a row under it for each relation that starts there. `render` also writes the classes and relations in words, with a key to the marks.
+
+## Object diagrams
+
+An object diagram shows a moment in a running system: the objects that exist, their values, and the links between them. Write it with `"kind": "object"`, often next to the class diagram it is an example of:
+
+```json
+{
+  "id": "order-objects",
+  "kind": "object",
+  "label": "Ana has one order, number 1042, with two lines: two mugs and one teapot.",
+  "objects": [
+    { "id": "ana", "name": "ana", "class": "Customer", "slots": ["email = \"ana@example.test\""] },
+    { "id": "o1", "name": "o1042", "class": "Order", "slots": ["total = 46.00"] },
+    { "id": "l1", "class": "OrderLine", "slots": ["quantity = 2"] },
+    { "id": "l2", "class": "OrderLine", "slots": ["quantity = 1"] },
+    { "id": "mug", "name": "mug", "class": "Product", "slots": ["price = 12.00"] },
+    { "id": "pot", "name": "teapot", "class": "Product", "slots": ["price = 22.00"] }
+  ],
+  "links": [
+    { "from": "ana", "to": "o1", "name": "places" },
+    { "from": "o1", "to": "l1" },
+    { "from": "o1", "to": "l2" },
+    { "from": "l1", "to": "mug" },
+    { "from": "l2", "to": "pot" }
+  ]
+}
+```
+
+| Field | What it is |
+|---|---|
+| `objects` | 1 to 12, each with an `id`, its `class` and an optional `name` (each at most 28 characters), drawn underlined as `name : Class`, and up to 8 `slots` such as `"total = 46.00"`. |
+| `links` | At most 16, each `from` one object `to` another, with an optional `name`. |
+| `notes` | As in a class diagram. |
+
+- Nothing moves in a class or an object diagram: there is no dot and no walkthrough.
+
+## Package diagrams
+
+A package diagram shows how a system's code or model is grouped, and which group needs which. Write it with `"kind": "package"`:
+
+```json
+{
+  "id": "shop-packages",
+  "kind": "package",
+  "label": "The shop has three packages: ordering, catalog and billing. Ordering imports the catalog and uses billing; all of the shop imports the shared utilities.",
+  "packages": [
+    { "id": "shop", "name": "Shop" },
+    { "id": "ordering", "name": "Ordering", "in": "shop", "members": ["Order", "OrderLine", "Cart"] },
+    { "id": "catalog", "name": "Catalog", "in": "shop", "members": ["Product", "Category"] },
+    { "id": "billing", "name": "Billing", "in": "shop", "members": ["Invoice", "Payment"] },
+    { "id": "util", "name": "Shared utilities", "members": ["Money", "Clock"] }
+  ],
+  "dependencies": [
+    { "from": "ordering", "to": "catalog" },
+    { "from": "ordering", "to": "billing", "type": "access" },
+    { "from": "shop", "to": "util" }
+  ]
+}
+```
+
+| Field | What it is |
+|---|---|
+| `packages` | 1 to 12, each with an `id` and a `name` (at most 28 characters). A package may sit `in` another one; packages nest one level deep. A package that holds no packages may list up to 8 `members` (at most 32 characters each), such as its main classes. |
+| `dependencies` | Optional, at most 20, each `from` one package `to` another, with a `type`: `import` (the default), `access`, `merge`, or `use` for a plain dependency. A dependency may start or end on a package that holds packages. |
+
+- A package that holds packages lists no members of its own, and no dependency joins a package to the package around it.
+- The renderer draws each package as a folder: its name in the tab and its members in the body. A package that holds packages is a frame around them, its name in the tab. A dependency is a dashed line with an open arrowhead and its keyword, such as «import».
+- On a phone the diagram becomes a list of folders, with the packages of one frame in a band, and a row for each dependency.
+
+## Profile diagrams
+
+A profile diagram shows how a team extends UML for its own models: the stereotypes it adds, and the UML metaclass each one extends. Write it with `"kind": "profile"` only for readers who model in UML:
+
+```json
+{
+  "id": "persistence-profile",
+  "kind": "profile",
+  "label": "The persistence profile adds two stereotypes. Entity extends Class and has a table name; Id extends Property. The shop model applies the profile.",
+  "profile": "Persistence",
+  "stereotypes": [
+    { "id": "entity", "name": "Entity", "attributes": ["table: String"] },
+    { "id": "idst", "name": "Id" }
+  ],
+  "metaclasses": [
+    { "id": "class", "name": "Class" },
+    { "id": "property", "name": "Property" }
+  ],
+  "extensions": [
+    { "from": "entity", "to": "class" },
+    { "from": "idst", "to": "property", "required": true }
+  ],
+  "appliedTo": ["Shop model"]
+}
+```
+
+| Field | What it is |
+|---|---|
+| `profile` | The name of the profile, drawn in the tab of its frame after «profile». |
+| `stereotypes` | 1 or more, each with an `id`, a `name` and up to 8 `attributes` (its tag definitions, such as `"table: String"`). |
+| `metaclasses` | The UML metaclasses that the stereotypes extend, each with an `id` and a `name`, such as `Class` or `Property`. At most 12 stereotypes and metaclasses together. |
+| `extensions` | Each `from` a stereotype `to` a metaclass. `"required": true` means every element of that metaclass carries the stereotype. |
+| `generalizations` | Optional: a stereotype `from` that is a kind of another, `to`. |
+| `appliedTo` | Optional, at most 3: the names of packages that use the profile. |
+
+- Every stereotype extends a metaclass or is a kind of another stereotype, and every metaclass is extended.
+- The renderer draws the profile as a frame with stereotype boxes marked «stereotype», metaclass boxes marked «metaclass» above them, extensions as solid lines with a filled triangle, and «apply» as a dashed line from each package that uses the profile.
+- Nothing moves in a package or a profile diagram: there is no dot and no walkthrough.
+
+## Component diagrams
+
+A component diagram shows the replaceable parts of a system and the services, the interfaces, that they offer and need. Write it with `"kind": "component"`:
+
+```json
+{
+  "id": "shop-parts",
+  "kind": "component",
+  "label": "The parts of the shop: the web shop needs the order service, which the back end offers through Orders.",
+  "components": [
+    { "id": "web", "name": "Web shop" },
+    { "id": "backend", "name": "Back end" },
+    { "id": "orders", "name": "Orders", "in": "backend" },
+    { "id": "stock", "name": "Stock", "in": "backend" },
+    { "id": "pay", "name": "Payments" }
+  ],
+  "interfaces": [
+    { "id": "order-api", "name": "OrderAPI", "provider": "backend", "users": ["web"], "port": "api" },
+    { "id": "stock-check", "name": "StockCheck", "provider": "stock", "users": ["orders"] },
+    { "id": "charge", "name": "Charge", "provider": "pay", "users": ["orders"] }
+  ],
+  "delegations": [{ "from": "backend", "to": "orders", "port": "api" }],
+  "dependencies": [{ "from": "web", "to": "pay" }]
+}
+```
+
+| Field | What it is |
+|---|---|
+| `components` | 1 to 12, each with an `id` and a `name` (at most 28 characters). A component may sit `in` another one; components nest one level deep. |
+| `interfaces` | Optional, at most 16, each with an `id`, a `name`, the `provider` (the component that offers it) and the `users` (up to 3 components that need it). It needs at least one of the two. `port` names the port on the provider where the interface is offered. |
+| `delegations` | Optional: `from` an outer component `to` a component inside it, which does the outer component's work. `port` names the port on the outer component. |
+| `dependencies` | Optional: `from` one component `to` another that it needs, without a named interface. |
+
+- The renderer draws each component as a box marked «component», with the component icon. An interface is a ball on a line from its provider; each user holds the ball in a socket, a half circle, so a provider and a user meet as ball and socket. A port is a small square where its line meets the component. A component that holds components is a frame around them.
+- A dependency is a dashed line with an open arrowhead; a delegation is a line marked «delegate» from a port on the frame to the part inside.
+- On a phone the diagram becomes a list of components, with a row for each interface it offers or needs.
+
+## Composite structure diagrams
+
+A composite structure diagram shows the inside of one class: the parts it is made of, how they connect, and its ports to the outside. Write it with `"kind": "composite"`:
+
+```json
+{
+  "id": "car-inside",
+  "kind": "composite",
+  "label": "The inside of a car: the engine drives the rear axle, and the fuel port feeds the engine.",
+  "classifier": "Car",
+  "parts": [
+    { "id": "engine", "name": "e", "type": "Engine", "multiplicity": "1" },
+    { "id": "rear", "name": "rear", "type": "Axle", "multiplicity": "1" },
+    { "id": "wheels", "name": "w", "type": "Wheel", "multiplicity": "4" }
+  ],
+  "ports": [{ "id": "fuel", "name": "fuel" }],
+  "connectors": [
+    { "from": "engine", "to": "rear", "label": "drives" },
+    { "from": "rear", "to": "wheels" },
+    { "from": "fuel", "to": "engine" }
+  ]
+}
+```
+
+| Field | What it is |
+|---|---|
+| `classifier` | The name of the class whose inside the diagram shows. It is drawn as the frame. |
+| `parts` | 1 to 10, each with an `id`, a `name` (its role), a `type`, and an optional UML `multiplicity`, such as `"4"` or `"0..1"`. A part is drawn as a box named `role : Type [multiplicity]`. |
+| `ports` | Optional, at most 8, each with an `id` and a `name`. Each port needs a connector to a part. |
+| `connectors` | At most 24, each joining two parts, or a port and a part, with an optional `label`. |
+
+- The renderer draws a port as a small square on the frame, with its name beside it, and a connector as a solid line.
+- Collaborations, the dashed ovals, are not drawn.
+
+## Deployment diagrams
+
+A deployment diagram shows where the software runs: the machines and runtimes, the files deployed on them, and how they talk. Write it with `"kind": "deployment"`:
+
+```json
+{
+  "id": "shop-deploy",
+  "kind": "deployment",
+  "label": "Where the shop runs: a phone talks to the app server over HTTPS, and the server talks to the database.",
+  "nodes": [
+    { "id": "phone", "name": "Phone", "type": "device" },
+    { "id": "server", "name": "App server", "type": "device" },
+    { "id": "jvm", "name": "JVM", "type": "executionEnvironment", "in": "server" },
+    { "id": "db", "name": "Database server", "type": "device" }
+  ],
+  "artifacts": [
+    { "id": "app-apk", "name": "shop.apk", "in": "phone" },
+    { "id": "shop-jar", "name": "shop.jar", "in": "jvm" },
+    { "id": "schema", "name": "schema.sql", "in": "db" }
+  ],
+  "components": [{ "id": "mobile", "name": "Mobile app" }],
+  "manifests": [{ "artifact": "app-apk", "component": "mobile" }],
+  "paths": [
+    { "from": "phone", "to": "server", "protocol": "HTTPS" },
+    { "from": "jvm", "to": "db", "protocol": "JDBC" }
+  ]
+}
+```
+
+| Field | What it is |
+|---|---|
+| `nodes` | 1 to 10, each with an `id`, a `name` and a `type`: `device` (the default), `executionEnvironment` or `node`. A node may sit `in` another node, one level deep. |
+| `artifacts` | Optional, at most 16, each with an `id`, a `name` and the node it is deployed on (`in`). |
+| `components` | Optional: components that an artifact makes real. Each one needs a line in `manifests`. |
+| `manifests` | Each joins an `artifact` to a `component`, drawn as a dashed line marked «manifest». |
+| `paths` | Optional: communication paths `from` one node `to` another, with an optional `protocol`, such as `"HTTPS"`. |
+
+- The renderer draws each node as a 3D box marked with its type. A node at the top that holds nodes or artifacts is a frame around them; a node inside a node lists its artifacts by name, each with the page icon. An artifact inside a node shows that it is deployed there, so no «deploy» arrow is drawn.
+- Nothing moves in a component, composite structure or deployment diagram: there is no dot and no walkthrough.
+
+## Communication diagrams
+
+A communication diagram shows who is linked to whom, and the numbered messages they send over those links. Write it with `"kind": "communication"`; when the order of the messages matters more than the links, write a sequence diagram instead:
+
+```json
+{
+  "id": "checkout-talk",
+  "kind": "communication",
+  "label": "Checkout asks the cart to place the order; the cart reserves each item with stock, then asks payments to charge the card.",
+  "lifelines": [
+    { "id": "ui", "name": ": Checkout" },
+    { "id": "cart", "name": "c : Cart" },
+    { "id": "stock", "name": ": Stock" },
+    { "id": "pay", "name": ": Payments" }
+  ],
+  "messages": [
+    { "n": "1", "from": "ui", "to": "cart", "text": "placeOrder()" },
+    { "n": "1.1", "from": "cart", "to": "stock", "text": "reserve(item)", "repeat": "i=1..n" },
+    { "n": "1.2", "from": "cart", "to": "pay", "text": "charge(total)", "guard": "all reserved" },
+    { "n": "1.3", "from": "pay", "to": "cart", "text": "receipt" },
+    { "n": "2", "from": "cart", "to": "ui", "text": "showReceipt()" }
+  ]
+}
+```
+
+| Field | What it is |
+|---|---|
+| `lifelines` | 2 to 8, each with an `id` and a `name`, written as `role : Type` (at most 28 characters). |
+| `messages` | 1 to 20, in number order, each with a decimal number `n` (`"1"`, `"1.1"`, `"1.2"`, `"2"`), `from`, `to` and `text` (at most 40 characters). Message `1.1` happens inside message `1`, so `1` must be in the list. A message may have a `guard` (sent only when it holds) or a `repeat` (such as `"i=1..n"`), not both. |
+| `links` | Optional: links `from` one lifeline `to` another that send no message here. Every pair that sends a message is linked already. |
+
+- The renderer draws each lifeline as a box and each link as one solid line. Beside the line it writes each message as `1.1 *[i=1..n]: reserve(item)`, with a small arrow the way the message travels.
+- The numbers give the order, so nothing moves: there is no dot. The diagram in words lists the messages in number order.
+- On a phone the diagram becomes a list of lifelines, each with the messages it sends.
 
 ## Optional legs
 
@@ -242,6 +783,11 @@ An icon may hold only these shapes and attributes: `path` (`d`), `circle` (`cx`,
 
 - `... warning: no phone form: The column form cannot be drawn within the spacing rules: ...` — rare: the column form failed, so the drawing scrolls on a phone. Shorten the text that the message names.
 - `... warning: on a phone this drawing scrolls sideways, and leg 3 ("...") is not on the first screen: its two parts show there, but its arrow does not` — only after the warning above: the drawing has no phone form. On a phone the reader sees the left part first, and there this arrow is missing. Say the path in the text too. The warning stays after you did, because `render` cannot read the text; tell the user that this warning is handled. With scripts on, the page shows a line under the figure that tells the reader to scroll.
+- Fit warnings: the data's shape says that another kind, or no diagram, may serve the reader better. They never change the drawing. Read each one, and change the kind or keep it:
+  - `... warning: every message goes one way and no reply comes back; this reads as a workflow` — a sequence diagram with no answers is a chain of hand-offs. A workflow diagram (no `"kind"`) shows it better.
+  - `... warning: the activity has no decision, no fork and at most one partition; this is a numbered list` — the steps run in one line; write them as `<ol>`.
+  - `... warning: the class diagram has no relations; this is a table of the classes and their members` — the same for an object diagram with no links.
+  - `... warning: the links form one chain, so they add little; ... a sequence diagram reads better` — a communication diagram earns its place when its links branch.
 
 `render` draws every diagram that it can. When one is refused, the others are still drawn, and `render` ends with exit code 1.
 

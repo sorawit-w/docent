@@ -1,0 +1,128 @@
+<svg id="dg-order-objects" class="dg dg-object dg-auto" xmlns="http://www.w3.org/2000/svg" width="480" height="576" viewBox="0 0 480 576" role="img" aria-label="Ana has one order, number 1042, with two lines: two mugs and one teapot.">
+<style>
+#dg-order-objects{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-order-objects .ground{fill:var(--fig,#f2f3f9)}
+#dg-order-objects .band{fill:var(--bg,#fbfbfe)}
+#dg-order-objects .track{stroke:var(--line,#d3d6e3)}
+#dg-order-objects .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-order-objects .head{fill:var(--text,#1c1f2e)}
+#dg-order-objects .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-order-objects .stop.end{fill:var(--text,#1c1f2e)}
+#dg-order-objects .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-order-objects .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-order-objects .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-order-objects .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-order-objects .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-order-objects .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-order-objects .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-order-objects .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-order-objects .sub,#dg-order-objects .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-order-objects .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-order-objects .u-ln{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-order-objects .u-bold{stroke-width:2.5}
+#dg-order-objects .u-dash{stroke-dasharray:6 4;stroke-linecap:butt}
+#dg-order-objects .u-face{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linejoin:round}
+#dg-order-objects .u-ink{fill:var(--text,#1c1f2e)}
+#dg-order-objects .u-name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-order-objects .leg .line{stroke-width:1.5}
+#dg-order-objects .leg.is-reply .line{stroke-dasharray:6 4;stroke-linecap:butt}
+#dg-order-objects .ohead{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.js #dg-order-objects .leg.is-current .ohead{stroke:var(--primary,#2f3fd0)}
+#dg-order-objects .u-bar{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-order-objects .u-frame{fill:none;stroke:var(--muted,#575d75);stroke-width:1}
+#dg-order-objects .u-frame.is-filled{fill:var(--bg,#fbfbfe)}
+#dg-order-objects .u-div{stroke:var(--muted,#575d75);stroke-width:1;stroke-dasharray:6 4}
+#dg-order-objects .u-op{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-order-objects .u-mem{font-size:12px;fill:var(--text,#1c1f2e)}
+#dg-order-objects .u-it{font-style:italic}
+#dg-order-objects .u-ul{text-decoration:underline}
+@media (prefers-reduced-motion:reduce){#dg-order-objects .pulse{animation:none!important}#dg-order-objects .pulse{display:none!important}}
+@media print{#dg-order-objects{max-width:100%;height:auto}#dg-order-objects .pulse{display:none!important}}
+#dg-order-objects-phone{display:none}
+</style>
+<rect width="480" height="576" class="ground"/>
+<g class="leg" data-leg="1"><polyline points="348,101 348,187" class="u-ln"/><text x="356" y="148" class="verb" text-anchor="start">places</text></g>
+<g class="leg" data-leg="2"><polyline points="281.5,216 108,216 108,331" class="u-ln"/></g>
+<g class="leg" data-leg="3"><polyline points="348,245 348,331" class="u-ln"/></g>
+<g class="leg" data-leg="4"><polyline points="108,389 108,475" class="u-ln"/></g>
+<g class="leg" data-leg="5"><polyline points="348,389 348,475" class="u-ln"/></g>
+<rect x="254" y="43" width="188" height="58" class="u-face"/><line x1="254" y1="75" x2="442" y2="75" class="u-ln"/><text x="348" y="63" class="name u-ul" text-anchor="middle">ana : Customer</text><text x="266" y="93" class="u-mem">email = &quot;ana@example.test&quot;</text>
+<rect x="281.5" y="187" width="133" height="58" class="u-face"/><line x1="281.5" y1="219" x2="414.5" y2="219" class="u-ln"/><text x="348" y="207" class="name u-ul" text-anchor="middle">o1042 : Order</text><text x="293.5" y="237" class="u-mem">total = 46.00</text>
+<rect x="48" y="331" width="120" height="58" class="u-face"/><line x1="48" y1="363" x2="168" y2="363" class="u-ln"/><text x="108" y="351" class="name u-ul" text-anchor="middle">: OrderLine</text><text x="60" y="381" class="u-mem">quantity = 2</text>
+<rect x="288" y="331" width="120" height="58" class="u-face"/><line x1="288" y1="363" x2="408" y2="363" class="u-ln"/><text x="348" y="351" class="name u-ul" text-anchor="middle">: OrderLine</text><text x="300" y="381" class="u-mem">quantity = 1</text>
+<rect x="40" y="475" width="136" height="58" class="u-face"/><line x1="40" y1="507" x2="176" y2="507" class="u-ln"/><text x="108" y="495" class="name u-ul" text-anchor="middle">mug : Product</text><text x="52" y="525" class="u-mem">price = 12.00</text>
+<rect x="272.5" y="475" width="151" height="58" class="u-face"/><line x1="272.5" y1="507" x2="423.5" y2="507" class="u-ln"/><text x="348" y="495" class="name u-ul" text-anchor="middle">teapot : Product</text><text x="284.5" y="525" class="u-mem">price = 22.00</text>
+</svg>
+<svg id="dg-order-objects-phone" class="dg dg-object dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="730" viewBox="0 0 264 730" role="img" aria-label="Ana has one order, number 1042, with two lines: two mugs and one teapot.">
+<style>
+#dg-order-objects-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-order-objects-phone .ground{fill:var(--fig,#f2f3f9)}
+#dg-order-objects-phone .band{fill:var(--bg,#fbfbfe)}
+#dg-order-objects-phone .track{stroke:var(--line,#d3d6e3)}
+#dg-order-objects-phone .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-order-objects-phone .head{fill:var(--text,#1c1f2e)}
+#dg-order-objects-phone .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-order-objects-phone .stop.end{fill:var(--text,#1c1f2e)}
+#dg-order-objects-phone .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-order-objects-phone .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-order-objects-phone .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-order-objects-phone .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-order-objects-phone .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-order-objects-phone .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-order-objects-phone .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-order-objects-phone .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-order-objects-phone .sub,#dg-order-objects-phone .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-order-objects-phone .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-order-objects-phone .u-ln{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-order-objects-phone .u-bold{stroke-width:2.5}
+#dg-order-objects-phone .u-dash{stroke-dasharray:6 4;stroke-linecap:butt}
+#dg-order-objects-phone .u-face{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linejoin:round}
+#dg-order-objects-phone .u-ink{fill:var(--text,#1c1f2e)}
+#dg-order-objects-phone .u-name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-order-objects-phone .leg .line{stroke-width:1.5}
+#dg-order-objects-phone .leg.is-reply .line{stroke-dasharray:6 4;stroke-linecap:butt}
+#dg-order-objects-phone .ohead{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.js #dg-order-objects-phone .leg.is-current .ohead{stroke:var(--primary,#2f3fd0)}
+#dg-order-objects-phone .u-bar{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-order-objects-phone .u-frame{fill:none;stroke:var(--muted,#575d75);stroke-width:1}
+#dg-order-objects-phone .u-frame.is-filled{fill:var(--bg,#fbfbfe)}
+#dg-order-objects-phone .u-div{stroke:var(--muted,#575d75);stroke-width:1;stroke-dasharray:6 4}
+#dg-order-objects-phone .u-op{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-order-objects-phone .u-mem{font-size:12px;fill:var(--text,#1c1f2e)}
+#dg-order-objects-phone .u-it{font-style:italic}
+#dg-order-objects-phone .u-ul{text-decoration:underline}
+@media (prefers-reduced-motion:reduce){#dg-order-objects-phone .pulse{animation:none!important}#dg-order-objects-phone .pulse{display:none!important}}
+@media print{#dg-order-objects-phone{max-width:100%;height:auto}#dg-order-objects-phone .pulse{display:none!important}}
+@media (max-width:576px){#dg-order-objects{display:none}#dg-order-objects-phone{display:block}}
+@media print{#dg-order-objects{display:block!important}#dg-order-objects-phone{display:none!important}}
+</style>
+<rect width="264" height="730" class="ground"/>
+<rect x="20" y="16" width="188" height="58" class="u-face"/><line x1="20" y1="48" x2="208" y2="48" class="u-ln"/><text x="114" y="36" class="name u-ul" text-anchor="middle">ana : Customer</text><text x="32" y="66" class="u-mem">email = &quot;ana@example.test&quot;</text>
+<polyline points="20,93 68,93" class="u-ln"/>
+<text x="80" y="97" class="verb" text-anchor="start">places</text>
+<text x="80" y="115" class="name" text-anchor="start">o1042 : Order</text>
+<rect x="47.5" y="146" width="133" height="58" class="u-face"/><line x1="47.5" y1="178" x2="180.5" y2="178" class="u-ln"/><text x="114" y="166" class="name u-ul" text-anchor="middle">o1042 : Order</text><text x="59.5" y="196" class="u-mem">total = 46.00</text>
+<polyline points="20,223 68,223" class="u-ln"/>
+<text x="80" y="227" class="verb" text-anchor="start">linked to</text>
+<text x="80" y="245" class="name" text-anchor="start">: OrderLine</text>
+<polyline points="20,265 68,265" class="u-ln"/>
+<text x="80" y="269" class="verb" text-anchor="start">linked to</text>
+<text x="80" y="287" class="name" text-anchor="start">: OrderLine</text>
+<rect x="54" y="318" width="120" height="58" class="u-face"/><line x1="54" y1="350" x2="174" y2="350" class="u-ln"/><text x="114" y="338" class="name u-ul" text-anchor="middle">: OrderLine</text><text x="66" y="368" class="u-mem">quantity = 2</text>
+<polyline points="20,395 68,395" class="u-ln"/>
+<text x="80" y="399" class="verb" text-anchor="start">linked to</text>
+<text x="80" y="417" class="name" text-anchor="start">mug : Product</text>
+<rect x="54" y="448" width="120" height="58" class="u-face"/><line x1="54" y1="480" x2="174" y2="480" class="u-ln"/><text x="114" y="468" class="name u-ul" text-anchor="middle">: OrderLine</text><text x="66" y="498" class="u-mem">quantity = 1</text>
+<polyline points="20,525 68,525" class="u-ln"/>
+<text x="80" y="529" class="verb" text-anchor="start">linked to</text>
+<text x="80" y="547" class="name" text-anchor="start">teapot : Product</text>
+<rect x="46" y="578" width="136" height="58" class="u-face"/><line x1="46" y1="610" x2="182" y2="610" class="u-ln"/><text x="114" y="598" class="name u-ul" text-anchor="middle">mug : Product</text><text x="58" y="628" class="u-mem">price = 12.00</text>
+<rect x="38.5" y="656" width="151" height="58" class="u-face"/><line x1="38.5" y1="688" x2="189.5" y2="688" class="u-ln"/><text x="114" y="676" class="name u-ul" text-anchor="middle">teapot : Product</text><text x="50.5" y="706" class="u-mem">price = 22.00</text>
+</svg>
+<details class="dg-words">
+<summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>The diagram in words</summary>
+<ul><li>ana, a Customer, with “email = &quot;ana@example.test&quot;”.</li><li>o1042, an Order, with “total = 46.00”.</li><li>An OrderLine, with “quantity = 2”.</li><li>An OrderLine, with “quantity = 1”.</li><li>mug, a Product, with “price = 12.00”.</li><li>teapot, a Product, with “price = 22.00”.</li></ul>
+<ul><li>ana : Customer is linked to o1042 : Order, by “places”.</li><li>o1042 : Order is linked to : OrderLine.</li><li>o1042 : Order is linked to : OrderLine.</li><li>: OrderLine is linked to mug : Product.</li><li>: OrderLine is linked to teapot : Product.</li></ul>
+<p>Key to the marks:</p>
+<ul><li>A box with an underlined name: an object, written as its name, a colon and its class. Under the line are its values.</li><li>A solid line: the two objects are linked.</li></ul>
+</details>

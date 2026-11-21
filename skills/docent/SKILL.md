@@ -40,7 +40,28 @@ Do not use it for app screens, slide decks or marketing pages.
 4. **Keep one file.** No fonts, scripts, styles or images from the network.
 5. **Pick the block for steps.** When the steps have two or more actors (a person and a system, or two teams), use the walkthrough: its diagram shows who acts and what moves, and a list cannot show that. When one actor does every step, write a plain numbered list (`<ol>`); the walkthrough block needs a diagram, so it is not for these steps. When such a step holds a code block, a table or a widget, write each step as a numbered block heading (`<h3 class="step">`) with its blocks below it; the kit writes the number. When the steps have one short branch beside them, such as "if the report is known, it is closed", give the diagram a side leg (see `references/diagrams.md`); it keeps the walkthrough. When `render` warns that the drawing is too wide beside the steps, put one diagram in the text flow and write the steps as a numbered list below it. Points are a plain `<ul>`. The kit styles both lists; write no styles of your own for a list.
 6. **Write in the Docent voice.** Plain words, one idea per sentence. A step heading is one sentence of at most six words. The `<title>` is `Document title — Host project`. When the `<h1>` is long, the left part may be shorter, made of the `<h1>`'s own words in the same order: `<h1>How to report a bug and get a fix</h1>` can have `<title>Report a bug — Host project</title>`.
-7. **Write each diagram as data.** Read `references/diagrams.md`. Draw a diagram only when it shows something that words cannot, and never draw the same thing twice. Let the renderer pick the form. For calls and replies between a few participants in time order, write a sequence diagram (`"kind": "sequence"`), not a numbered list. For steps with decisions, paths that end early or arrows back, write a flowchart (`"kind": "flow"`). Give a part a `state` (`ok`, `warn` or `err`) only when the document reports how that part ended; there is no other way to color a diagram. Never write or edit the SVG by hand: change the data in the block, and `render` replaces the drawing.
+7. **Write each diagram as data.** Read `references/diagrams.md`. Draw a diagram only when it shows something that words cannot, and never draw the same thing twice. Pick the kind by what the reader needs to learn: find the reader's question in this table, and write what it says. Let the renderer pick the form.
+
+   | The reader asks | Write |
+   |---|---|
+   | What happens, in order, when one actor does every step? | A numbered list (`<ol>`), no diagram |
+   | Who does what, in order, across people and systems? | A workflow diagram (no `"kind"`), in the walkthrough |
+   | Who calls whom, and what comes back? | A sequence diagram (`"kind": "sequence"`) |
+   | Which path does a job take, with decisions and loops? | A flowchart (`"kind": "flow"`) for readers who do not know UML; an activity diagram (`"kind": "activity"`) when they do, or when the steps run at the same time or belong to different people |
+   | Which states can a thing be in, and what moves it? | A state machine diagram (`"kind": "state"`) |
+   | How do several exchanges fit together, each with its own sequence diagram? | An interaction overview diagram (`"kind": "interaction-overview"`) |
+   | When does each state change, against a clock, such as a timeout? | A timing diagram (`"kind": "timing"`) |
+   | Who uses the system, and for what? | A use case diagram (`"kind": "usecase"`) |
+   | Which things exist, and how do they relate? | A class diagram (`"kind": "class"`) |
+   | What does one example of that look like, with values? | An object diagram (`"kind": "object"`) |
+   | How is the code grouped, and what depends on what? | A package diagram (`"kind": "package"`) |
+   | Which stereotypes does our team add to UML? | A profile diagram (`"kind": "profile"`) |
+   | Which parts make up the system, and which services do they offer and need? | A component diagram (`"kind": "component"`) |
+   | What is inside one part, and how do its pieces connect? | A composite structure diagram (`"kind": "composite"`) |
+   | Where does each part run, and how do the machines talk? | A deployment diagram (`"kind": "deployment"`) |
+   | Who is linked to whom, and in which order do they talk? | A communication diagram (`"kind": "communication"`); a sequence diagram reads better when the order matters more than the links |
+
+   When the data does not fit its kind, `render` and `check` say so in a warning, such as "no reply comes back; this reads as a workflow". Read it, and change the kind or keep it; a warning never changes the drawing. Give a part a `state` (`ok`, `warn` or `err`) only when the document reports how that part ended; there is no other way to color a diagram. Never write or edit the SVG by hand: change the data in the block, and `render` replaces the drawing.
 8. **Write each widget as data, and only when the reader needs one.** Read `references/widgets.md`. A widget is allowed only when the reader must choose one case of several, track what is done, or decide between answers. In every other case write text, a table or a closed section. Docent has four widgets: a chooser, a value picker, a checklist and a decision helper. When the text is the same for every reader and only small values differ (an environment's host name, a port, a folder), use the value picker. Never write the markup of a widget by hand, and never write a widget of your own with a script.
 9. **Run the three scripts**, in this order. `SKILL` stands for the folder that holds this file:
 

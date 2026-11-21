@@ -1,0 +1,27 @@
+{
+  "id": "shop-usecases",
+  "kind": "usecase",
+  "label": "Customers browse the catalog and place orders; placing an order always includes paying, and a coupon may be applied. Members are customers who can also track orders. The payment service takes part in paying.",
+  "system": "Online shop",
+  "actors": [
+    { "id": "customer", "name": "Customer" },
+    { "id": "member", "name": "Member" },
+    { "id": "bank", "name": "Payment service", "side": "right" }
+  ],
+  "usecases": [
+    { "id": "browse", "name": "Browse the catalog" },
+    { "id": "order", "name": "Place an order" },
+    { "id": "pay", "name": "Pay" },
+    { "id": "coupon", "name": "Apply a coupon" },
+    { "id": "track", "name": "Track an order" }
+  ],
+  "relations": [
+    { "from": "customer", "to": "browse" },
+    { "from": "customer", "to": "order" },
+    { "from": "member", "to": "track" },
+    { "from": "member", "to": "customer", "type": "generalization" },
+    { "from": "order", "to": "pay", "type": "include" },
+    { "from": "coupon", "to": "order", "type": "extend" },
+    { "from": "bank", "to": "pay" }
+  ]
+}
