@@ -4,13 +4,14 @@
 //        node render.cjs --data <data.json>                prints one drawing or one widget
 const fs = require("node:fs");
 const { renderDiagram, renderDocument } = require("./lib/diagram.cjs");
-const { renderWidget } = require("./lib/widget.cjs");
+const { renderWidget, KINDS } = require("./lib/widget.cjs");
 
 function main(args) {
   if (args[0] === "--data" && args[1]) {
     try {
       const data = JSON.parse(fs.readFileSync(args[1], "utf8"));
-      if (data && data.kind) {
+      // Diagrams have a "kind" too (sequence, flow, ...), so only a widget kind goes to the widget builder.
+      if (data && KINDS.includes(data.kind)) {
         const { html, kind } = renderWidget(data);
         console.error(`render: built ${args[1]} as ${kind}`);
         console.log(html);
