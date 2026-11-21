@@ -496,6 +496,38 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     ok(`a UML ${name} diagram shows its drawing on a desktop, its column on a phone, and its words with a key on paper, in both themes with no contrast problem`, desk.main > 0 && !desk.column && !desk.words && (desk.main <= 264 ? [phone, narrow].every((r) => r.main === desk.main && !r.column) : !phone.main && phone.column === 264 && narrow.column === 264) && paper.words && paper.key > 0 && [phone, narrow].every((r) => r.page === r.view) && results.deskAxe.length === 0 && results.darkAxe.length === 0, results);
   }
 
+  // A range chart: the 640px form on a desktop and on paper (at its real size, no shrink), the 264px form on a phone,
+  // the rows as a table in words, text no wider than the renderer assumed, and no contrast problem in either theme.
+  {
+    const data = fs.readFileSync(path.join(root, "tests", "fixtures", "range.json"), "utf8");
+    const content = renderDocument(html.replace('<section id="report"', `<section id="rng" aria-labelledby="rng-h"><h2 id="rng-h">Range</h2><figure><div class="fig" role="region" aria-label="Figure 9, line lengths" tabindex="0">\n<!-- docent:diagram\n${data}\n-->\n<!-- /docent:diagram -->\n</div><figcaption><strong>Figure 9</strong>Line lengths.</figcaption></figure></section>\n<section id="report"`)).html;
+    const look = (page) => page.evaluate(() => {
+      const shown = (id) => { const svg = document.getElementById(id); return { w: Math.round(svg.getBoundingClientRect().width), real: svg.viewBox.baseVal.width }; };
+      const words = document.querySelector("#rng .dg-words"), table = words.querySelector("table");
+      return { main: shown("dg-line-lengths"), phone: shown("dg-line-lengths-phone"), words: words.open, rows: [...table.querySelectorAll("tbody tr")].filter((r) => r.getBoundingClientRect().height).length, table: Math.round(table.getBoundingClientRect().width), well: Math.round(document.querySelector("#rng .fig").getBoundingClientRect().width), page: document.documentElement.scrollWidth, view: innerWidth };
+    });
+    const results = {};
+    for (const [form, opts] of [["desk", { width: 1280 }], ["phone", { width: 390, height: 844 }], ["narrow", { width: 320, height: 700 }], ["paper", { width: 658, height: 1123, media: "print" }], ["dark", { width: 1280, theme: "dark" }]]) {
+      const view = await open({ ...opts, content });
+      if (form === "paper") await view.page.evaluate(() => dispatchEvent(new Event("beforeprint")));
+      results[form] = await look(view.page);
+      if (form === "desk" || form === "dark") {
+        await view.page.addScriptTag({ path: axePath });
+        results[`${form}Axe`] = await view.page.evaluate(async () => (await window.axe.run(document.querySelector("#rng"), { runOnly: { type: "tag", values: ["wcag2a", "wcag2aa", "wcag21aa", "best-practice"] } })).violations.map((v) => v.id));
+      }
+      if (form === "desk" || form === "phone") {
+        const texts = await view.page.evaluate(() => [...document.querySelectorAll("#rng svg.dg text")].filter((t) => t.getBoundingClientRect().width).map((t) => ({ s: t.textContent, cls: t.getAttribute("class"), px: t.getComputedTextLength() })));
+        const font = { row: [14, 400], name: [14, 600], val: [12, 400], sub: [12, 400] };
+        const { valueWidth } = require(path.join(root, "skills", "docent", "scripts", "lib", "scale.cjs"));
+        results[`${form}Wider`] = texts.filter((t) => t.px > (t.cls === "val" ? valueWidth(t.s) : textWidth(t.s, ...font[t.cls])) + 0.5).map((t) => `${t.s}: ${t.px.toFixed(1)}`);
+      }
+      await view.context.close();
+    }
+    const { desk, phone, narrow, paper } = results;
+    const real = (f) => f.w === f.real;
+    ok("a range chart shows its 640px form at real size on a desktop and on paper, its 264px form on a phone, its rows as a table in words, and its text fits the renderer's widths", desk.main.w === 640 && real(desk.main) && !desk.phone.w && !desk.words && !phone.main.w && phone.phone.w === 264 && narrow.phone.w === 264 && paper.main.w === 640 && !paper.phone.w && paper.words && paper.rows === 8 && [phone, narrow, paper].every((r) => r.table <= r.well - 16) && [phone, narrow].every((r) => r.page === r.view) && results.deskWider.length === 0 && results.phoneWider.length === 0 && results.deskAxe.length === 0 && results.darkAxe.length === 0, results);
+  }
+
   // Two drawings in one figure: side by side when both fit, one below the other when they do not.
   {
     const block = (id, a, b) => `<!-- docent:diagram\n{"id": "${id}", "label": "${a} goes to ${b}.", "lanes": [{"id": "x", "name": "Team"}, {"id": "y", "name": "Service"}], "parts": [{"id": "p", "lane": "x", "name": "${a}"}, {"id": "q", "lane": "y", "name": "${b}"}], "legs": [{"from": "p", "to": "q", "verb": "send"}]}\n-->\n<!-- /docent:diagram -->\n`;
