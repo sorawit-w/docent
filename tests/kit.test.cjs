@@ -22,7 +22,7 @@ test("status notes have five kinds: three with a status color, and two without o
 });
 
 test("a table cell lets code break, and a closed section that holds a table takes the full width", () => {
-  assert.match(rule(":is(td, th) code"), /overflow-wrap: anywhere/);
+  assert.match(rule(":is(td, th) :is(code, a)"), /overflow-wrap: anywhere/, "a long address in a cell breaks too");
   assert.match(rule("details:has(> .table-wrap, > pre, > .code, > figure)"), /max-width: none/);
 });
 
@@ -108,4 +108,10 @@ test("on paper: 11pt text, the notes beside the text, lines kept together, and p
   assert.match(print, /pre \{ border: 1px solid var\(--line\); white-space: pre-wrap; overflow-wrap: anywhere; \}/, "paper cannot scroll, so a long line of code wraps");
   assert.match(print, /@bottom-right \{ content: counter\(page\) " \/ " counter\(pages\);/);
   assert.ok(!/size:\s*(A4|letter)/i.test(print), "the reader's paper size wins");
+});
+
+test("a drawing in a well keeps its real size on screen, and one taller than a page shrinks to fit it on paper", () => {
+  assert.match(rule(".fig > svg"), /flex: none; margin-inline: auto;/, "a drawing that is not drawn by render keeps its size too");
+  const print = css.slice(css.indexOf("@media print {"));
+  assert.match(print, /\.fig > svg \{ width: auto; height: auto; max-width: 100%; max-height: 220mm; \}/);
 });

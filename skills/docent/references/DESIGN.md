@@ -197,7 +197,7 @@ A page for the public or for older readers also has `data-text="large"`: the bod
 - A leg that only some readers take is drawn as a dashed arrow. In a UML kind a dashed line follows UML instead (see UML diagrams).
 - A side leg, beside a route in Route tall, goes straight across to an extra part in another lane, level with the part where it starts. It is dashed, it has no number, and no step lights it. It lets a walkthrough show one short branch and keep its route. Its verb, or the text beside the figure, says who takes it.
 
-**Size and motion.** A diagram is shown at its real size, so names are 14px and notes are 12px. It is never stretched to fill a wider space, and on a screen it never shrinks to fit a narrower one. The dot moves in every diagram except a structural UML kind, in one of two ways:
+**Size and motion.** A diagram is shown at its real size, so names are 14px and notes are 12px. It is never stretched to fill a wider space, and on a screen it never shrinks to fit a narrower one. On paper, which cannot scroll, a drawing that is wider than the paper or taller than a page shrinks to fit. The dot moves in every diagram except a structural UML kind, in one of two ways:
 
 - **In a walkthrough,** the leg of the current step takes the ultramarine color and the dot travels along that leg.
 - **Anywhere else,** one dot travels the whole route by itself, leg by leg in the order of the numbers. Only one dot is in flight at a time, so the motion shows the order. The run plays twice and then rests, so the page is calm while the reader reads.

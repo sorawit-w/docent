@@ -148,6 +148,8 @@ h3.is-numbered::before { content: none !important; }
 /* A well is as wide as the profile's block. A wider drawing keeps its real size, and its well grows with it. */
 figure { margin: 0; min-width: min(100%, var(--block)); width: fit-content; max-width: 100%; }
 section > figure { margin-top: 24px; }
+/* Every drawing in a well keeps its real size and sits in the middle; a wider one scrolls inside the well. */
+.fig > svg { flex: none; margin-inline: auto; }
 .fig { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 16px 24px; background: var(--fig); border-radius: 12px; padding: 8px; overflow-x: auto; scrollbar-color: var(--line) transparent; }
 /* A well may hold two drawings, for two separate chains: side by side when both fit, else one below the other. */
 /* A drawing that is wider than its well scrolls sideways. The page script shows this line under it, because the part that shows can look complete. */
@@ -185,8 +187,8 @@ tbody tr { border-bottom: 1px solid var(--line); }
 .state.info, .state.plan { color: var(--text); }
 .state.info::before { background: var(--muted); }
 .state.plan::before { background: none; border: 1.5px solid var(--muted); }
-/* Code in a cell may break anywhere, so a long path or command does not make the table wider than its place. */
-:is(td, th) code { overflow-wrap: anywhere; }
+/* Code and links in a cell may break anywhere, so a long path, command or address does not make the table wider than its place. */
+:is(td, th) :is(code, a) { overflow-wrap: anywhere; }
 
 /* Status note: a dot and a word carry the status. */
 .status { max-width: var(--measure); margin: 32px 0 0; }
@@ -315,6 +317,8 @@ footer .shell { display: flex; align-items: center; justify-content: space-betwe
   table { min-width: 0; } .table-wrap { overflow: visible; }
   /* A browser leaves out backgrounds on paper. These carry meaning, so they print: status dots, the rail of the steps, and the ground of figures and code. */
   .state::before, .steps::before, .fig, pre, code { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  /* Paper cannot scroll, and a drawing cannot split across pages. So a drawing that is wider than the paper, or taller than a page, shrinks to fit, under its caption, on A4 and on Letter. */
+  .fig > svg { width: auto; height: auto; max-width: 100%; max-height: 220mm; }
   figure, tr, .status, pre, .checks li, .cards > li { break-inside: avoid; }
   h2, h3 { break-after: avoid; }
   /* Page numbers: Chrome and Edge print them; other browsers print their own footer. */
