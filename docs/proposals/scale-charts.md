@@ -15,7 +15,7 @@ Build two new kinds, `"kind": "range"` and `"kind": "layout"`, on one shared pie
 
 Order: 1, 2, 3, 4. The range chart comes first, because it is simpler, and it fixes the design of the scale. Item 4 comes last: if the `check` rule shipped before item 3, `check` would fail on the research page.
 
-A scale chart has one strength that the other kinds lack: **it can change its pixels per unit without changing its text size.** So it never shrinks and never scrolls. It is drawn again at each width, with text at its real size: 658px on a desktop and on paper, and 264px on a phone.
+A scale chart has one strength that the other kinds lack: **it can change its pixels per unit without changing its text size.** So it never shrinks and never scrolls. It is drawn again at each width, with text at its real size: 640px on a desktop and on paper, and 264px on a phone.
 
 ## The obvious answer that would be wrong
 
@@ -42,7 +42,7 @@ The three charts were drawn quickly, after another plugin's style. They break si
 - **Text at real size.** A row name and a group name are 14px. A group name is weight 600; a row name is weight 400, because a chart of 8 rows in bold is heavy. Values, ticks and measures are 12px, muted, with tabular figures.
 - **Colors.** Marks and their outlines are in the text color. Grid lines are in the outline color. A named mark on the scale (such as "the middle") is a solid line in the muted color, with its name above it. Nothing is dashed. No status color: a row has no `state`.
 - **No dot and no walkthrough.** A scale chart has no order, so nothing moves. `"place": "walk"` is refused.
-- **Three forms, one per width.** `render` writes a desktop form 658px wide. The same SVG prints on A4 at real size, with no shrink. `render` also writes a phone form 264px wide. The page shows one of them, as it does for the other kinds.
+- **Three forms, one per width.** `render` writes a desktop form 640px wide. The same SVG prints on A4 at real size, with no shrink: an A4 page is about 657.6px wide inside its 18mm margins, and the figure well takes 16px of padding, which leaves about 641.6px. `render` also writes a phone form 264px wide. The page shows one of them, as it does for the other kinds.
 - **The diagram in words is a table.** It goes in the closed section "The diagram in words" under the figure. A table is the plainest text form for numbers: a screen reader moves through it by row and column, and it prints. The `label` stays a one- or two-sentence summary.
 - **The scale.** `"scale": {"from": 40, "to": 100, "step": 10, "unit": "characters"}`. These are the same fields as `time` in a timing diagram. Every value in the data lies between `from` and `to`. Tick labels stand at least 48px apart, as in a timing diagram; when they would be closer, the renderer keeps every second tick, then every fifth.
 
@@ -112,7 +112,7 @@ The groups replace the ultramarine outline of the hand drawing. "Docent" is a ba
 
 | Where | Form |
 |---|---|
-| Desktop and paper (658px) | The row names in a column at the left, the scale on the right, ticks along the top. For the example: a name column of 166px, a scale of 444px (7.4px per character), and 48px at the right for the value text. |
+| Desktop and paper (640px) | The row names in a column at the left, the scale on the right, ticks along the top. For the example: a name column of 166px, a scale of 426px (7.1px per character), and 48px at the right for the value text. |
 | Phone (264px) | Each row name sits on its own line, and the mark sits under it, across the full width. For the example: 3.5px per character, so the ticks keep every 20 characters (40, 60, 80, 100). The narrowest bar, 63–70, is 24px wide. |
 | Screen reader | The `label`, and the table in words. |
 
@@ -139,7 +139,7 @@ The groups replace the ultramarine outline of the hand drawing. "Docent" is a ba
 
 - A **row** is one thing being compared: a layout, a page, a screen. It has a `name` (14px, weight 600) and an optional `note` (12px, muted) in the name column.
 - A **box** is one part, from `from` to `to`. All boxes look the same: page color inside, text color outline, 24px high. Its name sits inside it when the name fits. When it does not, the name sits above the box, joined to the box's left edge by a short tick. A row has one or two **tracks**, so a wide block can sit under the text it lines up with.
-- A **measure** row, under a row with `"measure": true`, writes the length of every stretch between box edges on track 1, from `scale.from` to `scale.to`, gaps included. This replaces the fake text lines of the A4 drawing: the reader sees 18, 112, 8, 50 and 18, and the unit once, at the left of the measure row.
+- A **measure** row, under a row with `"measure": true`, writes the length of every stretch between box edges on track 1, from `scale.from` to `scale.to`, gaps included. This replaces the fake text lines of the A4 drawing: the reader sees 18, 112, 8, 50, 4 and 18, and the unit once, at the left of the measure row.
 
 The chosen layout gets no dot. Its `note` says so: "Tufte, chosen".
 
@@ -184,12 +184,14 @@ The A4 page, with measures and no ticks:
 {
   "id": "a4-notes",
   "kind": "layout",
-  "label": "An A4 page is 210mm wide: an 18mm margin, a 112mm text column, an 8mm gap, a 50mm note column, and an 18mm margin.",
+  "label": "An A4 page is 210mm wide: an 18mm margin, a 112mm text column, an 8mm gap, a 50mm note column, 4mm left over, and an 18mm margin.",
   "scale": {"from": 0, "to": 210, "unit": "mm"},
   "rows": [
     {"name": "A4 page", "measure": true, "boxes": [
+      {"name": "Margin", "from": 0, "to": 18},
       {"name": "Text", "from": 18, "to": 130},
-      {"name": "Notes", "from": 138, "to": 188}
+      {"name": "Notes", "from": 138, "to": 188},
+      {"name": "Margin", "from": 192, "to": 210}
     ]}
   ]
 }
@@ -205,7 +207,7 @@ The A4 page, with measures and no ticks:
 
 | Where | Form |
 |---|---|
-| Desktop and paper (658px) | Row names in a column at the left, the scale on the right, ticks along the top. For the 1920px example: 0.28px per pixel. "Text" (139px) and "Wide blocks" (314px) hold their names; "Notes" (62px) holds its name with 7px to spare; "Contents" (56px) does not, so its name sits above it. |
+| Desktop and paper (640px) | Row names in a column at the left, the scale on the right, ticks along the top. For the 1920px example: 0.27px per pixel. "Text" (134px) and "Wide blocks" (303px) hold their names; "Notes" (60px) holds its name with 5px to spare; "Contents" (54px) does not, so its name sits above it. |
 | Phone (264px) | The row name and note sit on a line above the row, and the boxes use the full width. For the 1920px example: 0.13px per pixel. "Notes" (28px) and "Contents" (26px) put their names above, on a second line where two names would meet. For the A4 page: 1.18px per mm, and every measure fits under its stretch ("8" is 7px wide in a 9px gap). |
 | Screen reader | The `label`, and the table in words: row, box, from, to, and width. A measured row adds its stretches. |
 
@@ -256,7 +258,7 @@ A4 desktop: 3.00 px per mm; "18" 14px in 54px; "112mm, the text" 93px in 336px; 
 A4 phone: 1.18 px per mm; "18" 14px in 21px; "112mm, the text" 93px in 132px; "8" 7px in 9px; "50mm, notes" 74px in 59px; "18" 14px in 21px
 ```
 
-"Desktop" in these lines is the width of the hand drawing (480px and 768px of scale). The proposal uses the "paper" line for desktop too, because one 658px form serves both. A box name needs its text width plus 16px of room. The A4 lines measure the hand drawing's long labels; with measures, only the numbers remain ("112", "50"), and they fit at both widths.
+"Desktop" in these lines is the width of the hand drawing (480px and 768px of scale). The proposal uses the "paper" line for desktop too, because one 640px form serves both. A box name needs its text width plus 16px of room. The A4 lines measure the hand drawing's long labels; with measures, only the numbers remain ("112", "50"), and they fit at both widths.
 
 ---
 
@@ -265,7 +267,7 @@ A4 phone: 1.18 px per mm; "18" 14px in 21px; "112mm, the text" 93px in 132px; "8
 Approved on 2026-11-21, each with the recommended answer:
 
 1. **The name of the second kind.** `"layout"`, because authors see kinds and not file names. `DESIGN.md` also says "layout" for the graph layout code; `"plan"` was the other choice.
-2. **One 658px form for desktop and paper.** One form now, because it fits every profile and prints with no shrink. A wider desktop form comes only if a real page needs it. On a Reference or Brief page, the chart uses about half of the 1120px block.
+2. **One 640px form for desktop and paper.** One form now, because it fits every profile and prints with no shrink. (The review found that 658px, the first number, would shrink inside an A4 figure well; 640px fits.) A wider desktop form comes only if a real page needs it. On a Reference or Brief page, the chart uses about half of the 1120px block.
 3. **Row names in weight 400 in a range chart.** 400 for rows and 600 for groups, because 8 to 12 bold rows are heavy and the groups need to stand out. Other diagrams set names in weight 600.
 
 ## Not in this proposal
