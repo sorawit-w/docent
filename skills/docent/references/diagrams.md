@@ -769,6 +769,40 @@ A range chart shows values and ranges on one numeric scale, one row each, so the
 - `render` also writes the rows as a table, in a closed section under the drawing ("The diagram in words").
 - `render` refuses a range narrower than 4px in either form ("the range 63–64 is 3.2px wide on a phone; write it as a point"), and a value that has no free place beside its mark or above it. When a value does not fit on the right of its mark, it stands on the left, or on a line above.
 
+## Layouts to scale
+
+A layout to scale shows where each part sits along one measured width, how wide it is, and how big the gaps are: the text, the notes and the wide blocks on a 1920px screen, or the margins and columns of an A4 page. Write it with `"kind": "layout"` when the parts sit along one width and their positions are known numbers. It has one axis only: for a page with a header, two columns and a footer, write words or a table. For steps in order, use a workflow; for states over time, a timing diagram.
+
+```json
+{
+  "id": "a4-notes",
+  "kind": "layout",
+  "label": "An A4 page is 210mm wide: an 18mm margin, a 112mm text column, an 8mm gap, a 50mm note column, 4mm left over, and an 18mm margin.",
+  "scale": { "from": 0, "to": 210, "unit": "mm" },
+  "rows": [
+    { "name": "A4 page", "measure": true, "boxes": [
+      { "name": "Margin", "from": 0, "to": 18 },
+      { "name": "Text", "from": 18, "to": 130 },
+      { "name": "Notes", "from": 138, "to": 188 },
+      { "name": "Margin", "from": 192, "to": 210 }
+    ] }
+  ]
+}
+```
+
+| Field | What it is |
+|---|---|
+| `scale` | As in a range chart, but `step` is optional. With no `step` there are no ticks; then at least one row needs `"measure": true`, so the drawing has numbers. `marks` is optional: at most 2 named lines, such as `{"at": 960, "name": "the middle"}`. |
+| `rows` | 1 to 6, top to bottom. Each has a `name` (at most 16 characters), an optional `note` (at most 24 characters), `boxes`, and optional `"measure": true`. |
+| `boxes` | 1 to 6 in a row. Each has a `name` (at most 16 characters), `from` and `to` on the scale, and an optional `track`: 1 (the default) or 2. Track 2 sits under track 1, so a wide block can stand under the text it lines up with. Two boxes on one track may touch, but not overlap. |
+
+- Every box looks the same. Its name sits inside it when the name fits; when it does not, the name stands above the box, joined to its left edge by a short tick. When two names above would meet, the second goes to a second line. A third line is refused: shorten a name, or move a box to track 2.
+- A measured row writes the length of every stretch between box edges on track 1, from the start of the scale to its end, gaps included: 18, 112, 8, 50, 4 and 18. The unit stands once, at the left of the measures, or in the row's name line on a phone.
+- To mark a choice, say it in the row's `note` ("Tufte, chosen"). A layout has no dot, no `state`, and nothing in it is dashed.
+- The forms are those of a range chart: 640px on a desktop and on paper, with the row names in a column at the left, and 264px on a phone, with each row name on a line above its boxes. Nothing moves, so it sits in the text flow and has no `form`.
+- `render` also writes the boxes as a table (row, box, from, to and width) under the drawing, with a line for each measured row.
+- `render` refuses a box narrower than 4px in either form, with the box's name.
+
 ## Optional legs
 
 A leg with `"optional": true` is a path that only some readers take, or that happens only in some cases. It is drawn as a dashed arrow:
@@ -830,6 +864,7 @@ An icon may hold only these shapes and attributes: `path` (`d`), `circle` (`cx`,
   - `... warning: the class diagram has no relations; this is a table of the classes and their members` — the same for an object diagram with no links.
   - `... warning: the links form one chain, so they add little; ... a sequence diagram reads better` — a communication diagram earns its place when its links branch.
   - `... warning: the range chart has 2 rows; a sentence says this more simply` — two values read better in a sentence than on a scale.
+  - `... warning: every row has one box; a range chart says this more simply` — a layout earns its place when a row holds parts side by side.
 
 `render` draws every diagram that it can. When one is refused, the others are still drawn, and `render` ends with exit code 1.
 

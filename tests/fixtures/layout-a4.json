@@ -1,0 +1,14 @@
+{
+  "id": "a4-notes",
+  "kind": "layout",
+  "label": "An A4 page is 210mm wide: an 18mm margin, a 112mm text column, an 8mm gap, a 50mm note column, 4mm left over, and an 18mm margin.",
+  "scale": {"from": 0, "to": 210, "unit": "mm"},
+  "rows": [
+    {"name": "A4 page", "measure": true, "boxes": [
+      {"name": "Margin", "from": 0, "to": 18},
+      {"name": "Text", "from": 18, "to": 130},
+      {"name": "Notes", "from": 138, "to": 188},
+      {"name": "Margin", "from": 192, "to": 210}
+    ]}
+  ]
+}

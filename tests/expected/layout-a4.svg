@@ -1,0 +1,103 @@
+<svg id="dg-a4-notes" class="dg dg-layout dg-auto" xmlns="http://www.w3.org/2000/svg" width="640" height="96" viewBox="0 0 640 96" role="img" aria-label="An A4 page is 210mm wide: an 18mm margin, a 112mm text column, an 8mm gap, a 50mm note column, 4mm left over, and an 18mm margin.">
+<style>
+#dg-a4-notes{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-a4-notes .ground{fill:var(--fig,#f2f3f9)}
+#dg-a4-notes .band{fill:var(--bg,#fbfbfe)}
+#dg-a4-notes .track{stroke:var(--line,#d3d6e3)}
+#dg-a4-notes .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-a4-notes .head{fill:var(--text,#1c1f2e)}
+#dg-a4-notes .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-a4-notes .stop.end{fill:var(--text,#1c1f2e)}
+#dg-a4-notes .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-a4-notes .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-a4-notes .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-a4-notes .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-a4-notes .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-a4-notes .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-a4-notes .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-a4-notes .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-a4-notes .sub,#dg-a4-notes .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-a4-notes .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-a4-notes .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-a4-notes .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-a4-notes .box{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-a4-notes .tick{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1}
+#dg-a4-notes .r-ref{stroke:var(--muted,#575d75)}
+@media (prefers-reduced-motion:reduce){#dg-a4-notes .pulse{animation:none!important}#dg-a4-notes .pulse{display:none!important}}
+@media print{#dg-a4-notes{max-width:100%;height:auto}#dg-a4-notes .pulse{display:none!important}}
+#dg-a4-notes-phone{display:none}
+</style>
+<rect width="640" height="96" class="ground"/>
+<rect x="8" y="8" width="624" height="80" rx="10" class="band"/>
+<text x="20" y="32" class="name" text-anchor="start">A4 page</text>
+<rect x="100" y="19" width="54" height="16" class="band"/><text x="104" y="31" class="row" text-anchor="start">Margin</text>
+<rect x="571.77" y="19" width="54" height="16" class="band"/><text x="575.77" y="31" class="row" text-anchor="start">Margin</text>
+<rect x="116.19" y="69" width="19.84" height="15" class="band"/><text x="126.11" y="80" class="val" text-anchor="middle">18</text>
+<rect x="271.95" y="69" width="27.76" height="15" class="band"/><text x="285.83" y="80" class="val" text-anchor="middle">112</text>
+<rect x="427.3" y="69" width="11.92" height="15" class="band"/><text x="433.26" y="80" class="val" text-anchor="middle">8</text>
+<rect x="494.59" y="69" width="19.84" height="15" class="band"/><text x="504.51" y="80" class="val" text-anchor="middle">50</text>
+<rect x="564.9" y="69" width="11.92" height="15" class="band"/><text x="570.86" y="80" class="val" text-anchor="middle">4</text>
+<rect x="587.97" y="69" width="19.84" height="15" class="band"/><text x="597.89" y="80" class="val" text-anchor="middle">18</text>
+<text x="94" y="80" class="sub" text-anchor="end">mm</text>
+<path d="M104.5,34 V40" class="tick"/><rect x="104" y="40" width="44.23" height="24" rx="4" class="box"/>
+<rect x="148.23" y="40" width="275.2" height="24" rx="4" class="box"/>
+<text x="156.23" y="57" class="row" text-anchor="start">Text</text>
+<rect x="443.09" y="40" width="122.86" height="24" rx="4" class="box"/>
+<text x="451.09" y="57" class="row" text-anchor="start">Notes</text>
+<path d="M576.27,34 V40" class="tick"/><rect x="575.77" y="40" width="44.23" height="24" rx="4" class="box"/>
+</svg>
+<svg id="dg-a4-notes-phone" class="dg dg-layout dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="156" viewBox="0 0 264 156" role="img" aria-label="An A4 page is 210mm wide: an 18mm margin, a 112mm text column, an 8mm gap, a 50mm note column, 4mm left over, and an 18mm margin.">
+<style>
+#dg-a4-notes-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-a4-notes-phone .ground{fill:var(--fig,#f2f3f9)}
+#dg-a4-notes-phone .band{fill:var(--bg,#fbfbfe)}
+#dg-a4-notes-phone .track{stroke:var(--line,#d3d6e3)}
+#dg-a4-notes-phone .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-a4-notes-phone .head{fill:var(--text,#1c1f2e)}
+#dg-a4-notes-phone .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-a4-notes-phone .stop.end{fill:var(--text,#1c1f2e)}
+#dg-a4-notes-phone .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-a4-notes-phone .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-a4-notes-phone .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-a4-notes-phone .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-a4-notes-phone .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-a4-notes-phone .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-a4-notes-phone .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-a4-notes-phone .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-a4-notes-phone .sub,#dg-a4-notes-phone .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-a4-notes-phone .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-a4-notes-phone .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-a4-notes-phone .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-a4-notes-phone .box{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-a4-notes-phone .tick{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1}
+#dg-a4-notes-phone .r-ref{stroke:var(--muted,#575d75)}
+@media (prefers-reduced-motion:reduce){#dg-a4-notes-phone .pulse{animation:none!important}#dg-a4-notes-phone .pulse{display:none!important}}
+@media print{#dg-a4-notes-phone{max-width:100%;height:auto}#dg-a4-notes-phone .pulse{display:none!important}}
+@media (max-width:736px){#dg-a4-notes{display:none}#dg-a4-notes-phone{display:block}}
+@media print{#dg-a4-notes{display:block!important}#dg-a4-notes-phone{display:none!important}}
+</style>
+<rect width="264" height="156" class="ground"/>
+<rect x="8" y="8" width="248" height="140" rx="10" class="band"/>
+<text x="20" y="32" class="name" text-anchor="start">A4 page</text>
+<text x="88" y="32" class="sub" text-anchor="start">in mm</text>
+<rect x="16" y="45" width="54" height="16" class="band"/><text x="20" y="57" class="row" text-anchor="start">Margin</text>
+<rect x="163.2" y="45" width="47" height="16" class="band"/><text x="167.2" y="57" class="row" text-anchor="start">Notes</text>
+<rect x="202" y="63" width="54" height="16" class="band"/><text x="206" y="75" class="row" text-anchor="start">Margin</text>
+<rect x="19.68" y="113" width="19.84" height="15" class="band"/><text x="29.6" y="124" class="val" text-anchor="middle">18</text>
+<rect x="85.05" y="113" width="27.76" height="15" class="band"/><text x="98.93" y="124" class="val" text-anchor="middle">112</text>
+<rect x="156.97" y="113" width="11.92" height="15" class="band"/><text x="162.93" y="124" class="val" text-anchor="middle">8</text>
+<rect x="183.95" y="113" width="19.84" height="15" class="band"/><text x="193.87" y="124" class="val" text-anchor="middle">50</text>
+<rect x="216.71" y="113" width="11.92" height="15" class="band"/><text x="222.67" y="124" class="val" text-anchor="middle">4</text>
+<rect x="224.48" y="129" width="19.84" height="15" class="band"/><text x="234.4" y="140" class="val" text-anchor="middle">18</text>
+<path d="M20.5,60 V84" class="tick"/><rect x="20" y="84" width="19.2" height="24" rx="4" class="box"/>
+<rect x="39.2" y="84" width="119.47" height="24" rx="4" class="box"/>
+<text x="47.2" y="101" class="row" text-anchor="start">Text</text>
+<path d="M167.7,60 V84" class="tick"/><rect x="167.2" y="84" width="53.33" height="24" rx="4" class="box"/>
+<path d="M225.3,78 V84" class="tick"/><rect x="224.8" y="84" width="19.2" height="24" rx="4" class="box"/>
+</svg>
+<details class="dg-words">
+<summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>The diagram in words</summary>
+<p>All numbers are in mm.</p>
+<table><thead><tr><th scope="col">Row</th><th scope="col">Box</th><th scope="col">From</th><th scope="col">To</th><th scope="col">Width</th></tr></thead><tbody><tr><th scope="row">A4 page</th><td>Margin</td><td>0</td><td>18</td><td>18</td></tr><tr><th scope="row">A4 page</th><td>Text</td><td>18</td><td>130</td><td>112</td></tr><tr><th scope="row">A4 page</th><td>Notes</td><td>138</td><td>188</td><td>50</td></tr><tr><th scope="row">A4 page</th><td>Margin</td><td>192</td><td>210</td><td>18</td></tr></tbody></table>
+<ul><li>A4 page, measured: 18, 112, 8, 50, 4 and 18 mm.</li></ul>
+</details>

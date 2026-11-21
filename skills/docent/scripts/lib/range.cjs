@@ -5,14 +5,13 @@
 const { fail, words, id } = require("./blocks.cjs");
 const { textWidth } = require("./text.cjs");
 const { wrap } = require("./graph.cjs");
-const { readScale, makeScale, placeLabel, valueWidth, fmt, isNum } = require("./scale.cjs");
+const { readScale, makeScale, drawHead, drawGrid, placeLabel, valueWidth, fmt, isNum, num } = require("./scale.cjs");
 
 const MOST = { rows: 12, groups: 3, name: 28, note: 24, group: 20 };
 const WIDE = 640; // the desktop and paper form: it fits an A4 figure well (about 641.6px) with no shrink
 const PHONE = 264; // the phone form: it fits a 320px screen
 const ROW = 32; // the height of one mark's strip
 const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-const num = (v) => String(Math.round(v * 100) / 100);
 // A name on a phone wraps at its spaces, and inside a word that is wider than the room alone, as in a language without
 // spaces. It breaks between whole characters as a reader sees them, so a Thai vowel mark stays with its consonant.
 const graphemes = new Intl.Segmenter(undefined, { granularity: "grapheme" });
@@ -125,23 +124,7 @@ function layoutRange(model, phone = false) {
   }
   const hi = W - 12;
   const sc = makeScale(scale, x0, x1, { lo: 12, hi: W - 12 });
-  const lineAt = (x) => scale.marks.some((m) => Math.abs(sc.x(m.at) - x) < 0.5);
-
-  // The head: the names of the marks, then the tick labels; the unit at the left of the ticks, or on its own line on a phone.
-  let y = 12;
-  if (scale.marks.length) {
-    const boxes = scale.marks.map((m) => {
-      const w = textWidth(m.name, 12), cx = Math.min(Math.max(sc.x(m.at), 12 + w / 2), W - 12 - w / 2);
-      s.notes.push({ x: cx, y: y + 12, s: m.name, cls: "sub", anchor: "middle" });
-      return [cx - w / 2, cx + w / 2, m.name];
-    }).sort((a, b) => a[0] - b[0]);
-    if (boxes.length === 2 && boxes[1][0] - boxes[0][1] < 12) fail(`the names of the marks "${boxes[0][2]}" and "${boxes[1][2]}" meet ${where}; move a mark, or shorten its name`);
-    y += 20;
-  }
-  if (phone && scale.unit) { s.notes.push({ x: x0, y: y + 12, s: scale.unit, cls: "sub", anchor: "start" }); y += 20; }
-  for (const t of sc.ticks) s.notes.push({ x: t.x, y: y + 12, s: t.label, cls: "val", anchor: "middle" });
-  if (!phone && scale.unit) s.notes.push({ x: x0 - 10 - (sc.ticks.length ? valueWidth(sc.ticks[0].label) / 2 : 0), y: y + 12, s: scale.unit, cls: "sub", anchor: "end" });
-  y += 24;
+  let y = drawHead(s, scale, sc, { W, x0, phone, where });
 
   // One band for each group (or one band for all rows), with the rows in it. Grid lines run through the band on a
   // desktop, and through each row's strip on a phone, where the row names stand in the scale's room.
@@ -176,10 +159,7 @@ function layoutRange(model, phone = false) {
     if (!phone) spans.push([top, yy]);
     y = yy + 8;
   }
-  for (const [y0, y1] of spans) {
-    for (const t of sc.ticks) if (!lineAt(t.x)) s.tracks.push([t.x, y0, t.x, y1]);
-    for (const m of scale.marks) s.under.push(`<line x1="${num(sc.x(m.at))}" y1="${num(y0)}" x2="${num(sc.x(m.at))}" y2="${num(y1)}" class="r-ref"/>`);
-  }
+  drawGrid(s, scale, sc, spans);
   s.h = y;
   return s;
 }
@@ -194,4 +174,4 @@ function wordsOf(model) {
   return `<table><thead>${head}</thead><tbody>${body}</tbody></table>${marks ? `\n<ul>${marks}</ul>` : ""}`;
 }
 
-module.exports = { readRange, layoutRange, wordsOf, MOST, WIDE, PHONE };
+module.exports = { readRange, layoutRange, wordsOf, wrapName, MOST, WIDE, PHONE };

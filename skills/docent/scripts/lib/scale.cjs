@@ -86,6 +86,39 @@ function makeScale(scale, x0, x1, { lo = -Infinity, hi = Infinity } = {}) {
   return { per, x, ticks };
 }
 
+const num = (v) => String(Math.round(v * 100) / 100);
+
+/**
+ * The head of a scale chart, from the top y: the names of the marks, then the tick labels, with the unit at the left of the
+ * ticks (on its own line on a phone). A scale with no ticks shows no unit here; its measures carry it. Returns the y below.
+ */
+function drawHead(s, scale, sc, { W, x0, phone, where }) {
+  let y = 12;
+  if (scale.marks.length) {
+    const boxes = scale.marks.map((m) => {
+      const w = textWidth(m.name, 12), cx = Math.min(Math.max(sc.x(m.at), 12 + w / 2), W - 12 - w / 2);
+      s.notes.push({ x: cx, y: y + 12, s: m.name, cls: "sub", anchor: "middle" });
+      return [cx - w / 2, cx + w / 2, m.name];
+    }).sort((a, b) => a[0] - b[0]);
+    if (boxes.length === 2 && boxes[1][0] - boxes[0][1] < 12) fail(`the names of the marks "${boxes[0][2]}" and "${boxes[1][2]}" meet ${where}; move a mark, or shorten its name`);
+    y += 20;
+  }
+  if (!sc.ticks.length) return y;
+  if (phone && scale.unit) { s.notes.push({ x: x0, y: y + 12, s: scale.unit, cls: "sub", anchor: "start" }); y += 20; }
+  for (const t of sc.ticks) s.notes.push({ x: t.x, y: y + 12, s: t.label, cls: "val", anchor: "middle" });
+  if (!phone && scale.unit) s.notes.push({ x: x0 - 10 - valueWidth(sc.ticks[0].label) / 2, y: y + 12, s: scale.unit, cls: "sub", anchor: "end" });
+  return y + 24;
+}
+
+/** The grid: a line for each tick, and a line in the muted color for each named mark, through each span [y0, y1]. */
+function drawGrid(s, scale, sc, spans) {
+  const lineAt = (x) => scale.marks.some((m) => Math.abs(sc.x(m.at) - x) < 0.5);
+  for (const [y0, y1] of spans) {
+    for (const t of sc.ticks) if (!lineAt(t.x)) s.tracks.push([t.x, y0, t.x, y1]);
+    for (const m of scale.marks) s.under.push(`<line x1="${num(sc.x(m.at))}" y1="${num(y0)}" x2="${num(sc.x(m.at))}" y2="${num(y1)}" class="r-ref"/>`);
+  }
+}
+
 /**
  * A free place for a label of width w beside a mark from a to b (pixels), between lo and hi, trying the sides in order:
  * "inside" (centred in the mark), "right" or "left" (8px clear of the mark). It returns { x, anchor, side }, or the
@@ -101,4 +134,4 @@ function placeLabel({ a, b, w, lo, hi, sides }) {
   return { x: Math.min(Math.max(a, lo), hi - w), anchor: "start", side: "above" };
 }
 
-module.exports = { readScale, makeScale, placeLabel, valueWidth, fmt, isNum, MOST };
+module.exports = { readScale, makeScale, drawHead, drawGrid, placeLabel, valueWidth, fmt, isNum, num, MOST };

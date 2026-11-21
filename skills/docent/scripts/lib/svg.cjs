@@ -99,6 +99,8 @@ function styles(scene, id, mode, swap) {
   ];
   // A range chart: row names in weight 400, values and ticks with tabular figures, its marks in the text color, and a named line in the muted color.
   if (scene.form === "range") css.push(`${s} .row{font-size:14px;fill:${v("text")}}`, `${s} .val{font-size:12px;fill:${v("muted")};font-variant-numeric:tabular-nums}`, `${s} .r-bar{fill:${v("bg")};stroke:${v("text")};stroke-width:1.5}`, `${s} .r-pt{fill:${v("text")}}`, `${s} .r-lim{fill:none;stroke:${v("text")};stroke-width:2}`, `${s} .r-ref{stroke:${v("muted")}}`);
+  // A layout to scale: box names in weight 400 like the rows of a range chart, measures with tabular figures, its boxes and the ticks to their names in the text color.
+  if (scene.form === "layout") css.push(`${s} .row{font-size:14px;fill:${v("text")}}`, `${s} .val{font-size:12px;fill:${v("muted")};font-variant-numeric:tabular-nums}`, `${s} .box{fill:${v("bg")};stroke:${v("text")};stroke-width:1.5}`, `${s} .tick{fill:none;stroke:${v("text")};stroke-width:1}`, `${s} .r-ref{stroke:${v("muted")}}`);
   // A part with a state: its outline takes the status color, and a status dot sits on the outline. A drawing with no state carries none of these rules.
   for (const state of new Set(scene.parts.map((part) => part.state).filter(Boolean))) css.push(`${s} .stop.is-${state},${s} .card.is-${state}{stroke:${v(state)};stroke-width:1.5}`, `${s} .flag.is-${state}{fill:${v(state)};stroke:${v("bg")};stroke-width:2}`);
   if (scene.bands.some((b) => b.inner)) css.push(`${s} .band.is-inner{stroke:${v("muted")};stroke-width:1}`);
