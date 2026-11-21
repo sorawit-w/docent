@@ -21,6 +21,7 @@ function fitWarnings(kind, model) {
     const path = seen.size === model.lifelines.length && model.links.length === model.lifelines.length - 1 && model.lifelines.every((l) => degree(l) <= 2);
     if (path) out.push("the links form one chain, so they add little; when the order matters more than the links, a sequence diagram reads better");
   }
+  if (kind === "range" && model.rows.length < 3) out.push(`the range chart has ${model.rows.length} rows; a sentence says this more simply`);
   return out;
 }
 

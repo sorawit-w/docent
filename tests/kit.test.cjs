@@ -115,3 +115,8 @@ test("a drawing in a well keeps its real size on screen, and one taller than a p
   const print = css.slice(css.indexOf("@media print {"));
   assert.match(print, /\.fig > svg \{ width: auto; height: auto; max-width: 100%; max-height: 220mm; \}/);
 });
+
+test("a row name with no spaces breaks inside the table of a diagram in words, so the table fits a phone", () => {
+  assert.match(rule(".dg-words :is(th, td)"), /padding-right: 16px/);
+  assert.match(css, /\.dg-words :is\(th, td\) \{ overflow-wrap: anywhere; \}/);
+});

@@ -1,0 +1,20 @@
+{
+  "id": "line-lengths",
+  "kind": "range",
+  "label": "Readers prefer 45 to 76 characters in a line, and one study rated 55 easiest. Advice and standards set upper limits from 70 to 90. Docent holds 63 to 70 on screen and 52 to 64 on paper.",
+  "scale": {"from": 40, "to": 100, "step": 10, "unit": "characters"},
+  "groups": [
+    {"id": "evidence", "name": "The evidence"},
+    {"id": "docent", "name": "Docent"}
+  ],
+  "rows": [
+    {"name": "Readers prefer", "from": 45, "to": 76, "group": "evidence"},
+    {"name": "Rated easiest, Dyson", "at": 55, "group": "evidence"},
+    {"name": "A literature review", "to": 70, "group": "evidence"},
+    {"name": "Advice for dyslexia", "from": 50, "to": 75, "group": "evidence"},
+    {"name": "WCAG 1.4.8, AAA", "to": 80, "group": "evidence"},
+    {"name": "Print, Butterick", "from": 45, "to": 90, "group": "evidence"},
+    {"name": "Docent on screen", "from": 63, "to": 70, "group": "docent"},
+    {"name": "Docent on paper", "from": 52, "to": 64, "note": "computed", "group": "docent"}
+  ]
+}

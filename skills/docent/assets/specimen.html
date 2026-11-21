@@ -159,6 +159,12 @@ section > figure { margin-top: 24px; }
 .dg-words ol { margin: 8px 0 0; padding-left: 28px; }
 .dg-words li + li { margin-top: 4px; }
 .dg-words p { margin: 12px 0 0; font-weight: 600; }
+/* The rows of a range chart in words: a small table, as wide as its content, so it fits a phone. */
+.dg-words table { width: auto; min-width: 0; margin-top: 8px; }
+.dg-words :is(th, td) { padding-right: 16px; }
+/* A long name with no spaces breaks inside its cell, so the table never runs past a phone screen. */
+.dg-words tbody th { white-space: normal; }
+.dg-words :is(th, td) { overflow-wrap: anywhere; }
 figcaption { margin-top: 12px; font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
 figcaption strong { font-weight: 600; color: var(--text); margin-right: 8px; }
 
