@@ -192,6 +192,12 @@ function checkDocument(html) {
       if (/docent/i.test(plain(title)) && !(host != null && /docent/i.test(plain(host)))) errors.push('the <title> names Docent; the title holds the document and the host project only');
     }
   }
+
+  // 7. Facts about one item go in a margin note, not in one line of text joined by | or ·. Code may hold a | of its own.
+  for (const [, inner] of markup.matchAll(/<p\b[^>]*>([\s\S]*?)<\/p>/g)) {
+    const line = plain(inner.replace(/<code\b[^>]*>[\s\S]*?<\/code>/g, ""));
+    if (line.split(/\s[|·]\s/).length >= 3) warnings.push(`the paragraph "${line.length > 60 ? `${line.slice(0, 60)}…` : line}" joins facts with "|" or "·"; list them in a margin note beside the item (see "Facts about one item go in the margin" in DESIGN.md)`);
+  }
   return { errors, warnings };
 }
 

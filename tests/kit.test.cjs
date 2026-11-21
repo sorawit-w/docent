@@ -32,6 +32,11 @@ test("h4 and definition lists have kit styles within the six sizes and two weigh
   assert.match(rule("dl"), /max-width: var\(--measure\)/);
 });
 
+test("a heading in the text column of a row lines up with its margin note", () => {
+  assert.match(rule(".row:has(> h3:first-child)"), /margin-top: 32px/, "the row brings the space above the heading");
+  assert.match(rule(".row > h3:first-child"), /margin-top: 0/);
+});
+
 test("the page script writes each step number as text, so a screen reader in Chromium reads it", () => {
   assert.match(js, /querySelectorAll\('h3\.step'\)/);
   assert.match(js, /span\.className = 'step-n'/);

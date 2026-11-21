@@ -136,6 +136,14 @@ test("check warns about a card grid with fewer than 3 or more than 8 cards", () 
   assert.match(grid(9).join(), /a card grid has 9 cards/);
 });
 
+test("check warns about facts joined into one line of text; they go in a margin note", () => {
+  const line = (p) => checkDocument(specimen.replace("</main>", `${p}</main>`)).warnings.filter((w) => w.includes("joins facts"));
+  assert.match(line("<p>10:42 UTC | Bug tracker | ref BUG-12</p>").join(), /the paragraph "10:42 UTC \| Bug tracker \| ref BUG-12" joins facts with "\|" or "·"; list them in a margin note/);
+  assert.equal(line("<p><time>10:42</time> UTC · Bug tracker · ref BUG-12</p>").length, 1, "tags between the facts do not hide them");
+  assert.deepEqual(line("<p>Two facts | one bar.</p>"), [], "two facts are a line of text, not a list");
+  assert.deepEqual(line("<p>Run <code>a | b | c</code> to filter.</p>"), [], "a | in code is not a separator");
+});
+
 test("check tests the host tokens: contrast for a hex color, and a warning for a kit token set by hand", () => {
   const style = (css) => checkDocument(specimen.replace("</head>", `<style>${css}</style></head>`));
   assert.deepEqual(style(":root { --host-accent: #0b6e4f; --host-accent-dark: #6fd3a8; --host-ink: #0b3d2e; }"), { errors: [], warnings: style("").warnings });
