@@ -172,3 +172,10 @@ test("edge cases from review: the unit keeps clear of the row note, and the tabl
   assert.ok(!meet(note, unit), "the unit does not meet the note");
   assert.match(svg, /<th scope="row">Page \(custom layout\)<\/th>/);
 });
+
+test("a measure that would meet the unit moves to the second line", () => {
+  const d = { id: "near", kind: "layout", label: "A page with a narrow first gap.", scale: { from: 0, to: 100, unit: "mm" }, rows: [{ name: "Page", measure: true, boxes: [{ name: "A", from: 0.125, to: 40 }, { name: "B", from: 60, to: 100 }] }] };
+  const { scene } = renderDiagram(d);
+  const texts = scene.notes.filter((n) => n.cls === "val" || n.s === "mm").map(box);
+  texts.forEach((a, i) => texts.slice(i + 1).forEach((b) => assert.ok(!meet(a, b), `"${a.s}" meets "${b.s}"`)));
+});

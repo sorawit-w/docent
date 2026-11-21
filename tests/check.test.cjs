@@ -203,3 +203,7 @@ test("a <div> written in a diagram's data does not change where a figure well en
   const page = renderDocument(specimen.replace(/("label": ")/, "$1A <div> wrapper holds the page. ")).html;
   assert.doesNotMatch(checkDocument(page).errors.join("\n"), /holds \d diagrams|holds a drawing/);
 });
+
+test("an svg named only in a comment inside a figure well is not a drawing", () => {
+  assert.doesNotMatch(errorsOf((html) => html.replace(/(<div class="fig"[^>]*>)/, "$1<!-- Old <svg> removed; use diagram data below. -->")), /holds a drawing/);
+});

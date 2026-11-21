@@ -149,12 +149,15 @@ function drawLayout(model, phone = false) {
         const w = valueWidth(st.label), cx = sc.x((st.from + st.to) / 2);
         return { st, w, x: Math.min(Math.max(cx - w / 2, 12), hi - w) };
       });
-      const lines = onLines(marks, 4, (p, q) => `the measures ${p.st.label} and ${q.st.label} of the row "${row.name}" need a third line ${where}; widen the narrow stretches, or narrow the scale`);
+      // On a desktop the unit stands left of the measures, on the first line, so a measure that would meet it moves down.
+      const unit = !phone && scale.unit ? { st: { label: scale.unit }, w: textWidth(scale.unit, 12), x: 0 } : null;
+      if (unit) unit.x = x0 - 10 - unit.w;
+      const lines = onLines(unit ? [unit, ...marks] : marks, 4, (p, q) => `the measures ${p.st.label} and ${q.st.label} of the row "${row.name}" need a third line ${where}; widen the narrow stretches, or narrow the scale`);
       for (const m of marks) {
         const my = yy + 8 + m.line * 16;
         s.notes.push({ x: m.x + m.w / 2, y: my, s: m.st.label, cls: "val", anchor: "middle", knock: { x: m.x - 2, y: my - 11, w: m.w + 4, h: 15 } });
       }
-      if (!phone && scale.unit) s.notes.push({ x: x0 - 10, y: yy + 8, s: scale.unit, cls: "sub", anchor: "end" });
+      if (unit) s.notes.push({ x: x0 - 10, y: yy + 8 + unit.line * 16, s: scale.unit, cls: "sub", anchor: "end" });
       yy += lines * 16;
     }
     // On a desktop the name column sets the least height of a row.

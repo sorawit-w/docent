@@ -92,7 +92,7 @@ function checkDocument(html) {
   if (/<svg\b[^>]*\bclass="[^"]*\bdg\b/.test(rest)) errors.push("a diagram sits outside a diagram block; put its data in a block and run render");
   // Every drawing in a figure well comes from a diagram block: a hand-drawn SVG there cannot be drawn again or checked.
   for (const { attrs, inner } of wells(rest)) {
-    if (/<svg\b/i.test(inner)) errors.push(`${(attrs.match(/aria-label="([^"]*)"/) || [])[1] || "a figure"} holds a drawing that no diagram block made; write its data in a block and run render`);
+    if (/<svg\b/i.test(inner.replace(/<!--[\s\S]*?-->/g, ""))) errors.push(`${(attrs.match(/aria-label="([^"]*)"/) || [])[1] || "a figure"} holds a drawing that no diagram block made; write its data in a block and run render`);
   }
 
   // 2b. Widgets: each widget must be the one that render makes from its data.
