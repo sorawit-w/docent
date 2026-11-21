@@ -12,6 +12,15 @@
         ],
         "createdAt": "2026-11-15T17:35:23.730Z",
         "reason": "agent decided: the starting page is unbuilt on purpose and holds no styles; stamp adds the kit, which sets h1 52px, h2 30px and body 16px; tests check the built page"
+      },
+      {
+        "rule": "flat-type-hierarchy",
+        "value": "*",
+        "files": [
+          "tests/fixtures/reference-page.html"
+        ],
+        "createdAt": "2026-11-21T11:14:28.945Z",
+        "reason": "agent decided: unbuilt test fixture with no styles; tests stamp the kit in memory, whose scale is 52/30/21/18/16px"
       }
     ]
   }

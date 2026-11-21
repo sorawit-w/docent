@@ -1,0 +1,1041 @@
+<!doctype html>
+<html lang="en" data-profile="brief">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Page layout for generated documents — Docent</title>
+<style>
+/* docent:kit 0.5.0 */
+/* Docent page styles. Tokens come from references/DESIGN.md. One file, no network. */
+:root {
+  color-scheme: light;
+  --bg: #fbfbfe; --panel: #f2f3f9; --fig: #f2f3f9;
+  --text: #1c1f2e; --muted: #575d75; --line: #d3d6e3;
+  --primary: var(--host-accent, #2f3fd0); --ink: var(--host-ink, #1b2260); --dot: var(--host-accent, #2f3fd0);
+  --ok: #1a7f37; --warn: #7d4e00; --err: #cf222e;
+  /* A host project sets its own accent, heading color and fonts with the --host-* tokens. The kit never sets them, so they hold in every theme and in print. */
+  --serif: var(--host-serif, Charter, "Bitstream Charter", "Sitka Heading", "Sitka Text", Cambria, Georgia, serif);
+  --sans: var(--host-sans, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif);
+  --mono: var(--host-mono, ui-monospace, "SF Mono", "Cascadia Code", Consolas, Menlo, monospace);
+  --ease: cubic-bezier(0.23, 1, 0.32, 1);
+  --measure: 31rem; --margin-col: 220px; --gap: 48px; --wide: 1120px;
+  /* The profile of a page sets these. Standard is the default: code and tables end at the right edge of the notes. */
+  --block: calc(var(--measure) + var(--gap) + var(--margin-col)); --section-space: 72px; --cell-y: 12px; --step-space: 36px;
+}
+/* Profiles: one attribute on <html> sets the width of code and tables, and the spacing. A profile never changes the text column. */
+html[data-profile="task"] { --section-space: 56px; --step-space: 28px; }
+html[data-profile="reference"] { --block: var(--wide); --section-space: 56px; --cell-y: 8px; }
+html[data-profile="brief"] { --block: var(--wide); --section-space: 64px; }
+/* A page for the public: every size is in rem, so the text and the text column grow together, on top of the reader's own setting. */
+html[data-text="large"] { font-size: 112.5%; }
+/* Dark: the reader's system setting decides, unless the reader chose a theme with the switch. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #12141f; --panel: #0b0d15; --fig: #0b0d15;
+    --text: #e7e9f3; --muted: #959bb3; --line: #2d3146;
+    --primary: var(--host-accent-dark, #8e9bff); --ink: #e7e9f3; --dot: #f2b824;
+    --ok: #3fb950; --warn: #d29922; --err: #f85149;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #12141f; --panel: #0b0d15; --fig: #0b0d15;
+  --text: #e7e9f3; --muted: #959bb3; --line: #2d3146;
+  --primary: var(--host-accent-dark, #8e9bff); --ink: #e7e9f3; --dot: #f2b824;
+  --ok: #3fb950; --warn: #d29922; --err: #f85149;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-padding-top: 88px; -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 400 1rem/1.65 var(--sans); caret-color: var(--primary); }
+::selection { background: color-mix(in srgb, var(--primary) 22%, transparent); }
+:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
+a { color: var(--primary); text-decoration-thickness: 1px; text-underline-offset: 0.2em; }
+a:hover { text-decoration-thickness: 2px; }
+/* One left edge for the whole page. On a wide screen the text and its notes sit in the middle as a group; wide blocks start at the same edge and grow to the right, up to --wide. */
+.shell {
+  --left: max(40px, min((100% - var(--measure) - var(--gap) - var(--margin-col)) / 2, 100% - var(--wide) - 40px));
+  padding: 0 max(40px, 100% - var(--left) - var(--wide)) 0 var(--left);
+}
+
+/* Top bar. Its bottom line is the route; the dot marks the current section. */
+.topbar { position: sticky; top: 0; z-index: 2; background: var(--bg); border-bottom: 1px solid var(--line); }
+.topbar .shell { position: relative; display: flex; align-items: center; gap: 32px; height: 56px; }
+.host { font-weight: 600; font-size: 0.875rem; white-space: nowrap; }
+.route { flex: 1; min-width: 0; }
+.route ol { display: flex; gap: 28px; margin: 0; padding: 0; list-style: none; }
+.route a { display: block; padding: 6px 0; font-size: 0.875rem; color: var(--muted); text-decoration: none; white-space: nowrap; }
+.route a:hover, .route a[aria-current] { color: var(--text); }
+.route-dot { position: absolute; left: 0; bottom: -4px; width: 7px; height: 7px; border-radius: 50%; background: var(--dot); opacity: 0; transform: translateX(var(--x, 0px)); }
+.ready .route-dot, .ready .rail-dot { transition: transform 320ms var(--ease); }
+.js .route-dot { opacity: 1; }
+.theme, .wd-btn { display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px; border: 1px solid var(--line); border-radius: 6px; background: none; color: var(--text); font: 400 0.875rem/1 var(--sans); cursor: pointer; }
+.theme:hover, .wd-btn:hover { border-color: var(--muted); }
+.theme:active, .wd-btn:active { transform: translateY(1px); }
+.theme svg { width: 15px; height: 15px; }
+html:not(.js) .theme, .theme[hidden] { display: none; }
+.theme[data-next="dark"] .icon-sun, .theme[data-next="light"] .icon-moon { display: none; }
+
+/* Title block: the title leads; facts about the document sit below it. */
+.title { padding: 80px 0 8px; }
+.title .row { margin-top: 24px; }
+h1, h2 { font-family: var(--serif); font-weight: 700; color: var(--ink); text-wrap: balance; margin: 0; }
+h1 { font-size: 3.25rem; line-height: 1.06; letter-spacing: -0.02em; }
+.standfirst { font: 400 1.3125rem/1.5 var(--serif); margin: 0; text-wrap: pretty; }
+.facts { margin: 0; padding-left: 0; list-style: none; font-variant-numeric: tabular-nums; }
+
+section { padding-top: var(--section-space); }
+h2 { font-size: 1.875rem; line-height: 1.2; margin-bottom: 16px; }
+h3 { font: 600 1.125rem/1.35 var(--sans); margin: 0; text-wrap: balance; }
+/* A small heading inside a part of a section: body size, weight 600. */
+h4 { font: 600 1rem/1.5 var(--sans); margin: 24px 0 4px; }
+/* A definition list: each term in weight 600, its meaning below it. */
+dl { max-width: var(--measure); margin: 0 0 16px; }
+dt { font-weight: 600; }
+dd { margin: 0 0 12px; }
+dd:last-child { margin-bottom: 0; }
+p { margin: 0 0 16px; max-width: var(--measure); text-wrap: pretty; }
+.term { text-decoration: underline; text-decoration-color: var(--primary); text-decoration-thickness: 2px; text-underline-offset: 0.22em; }
+/* A place that shows a value of a value picker. A dotted line under it says that it changes with the choice. */
+var { font-style: normal; }
+var[data-v] { text-decoration: underline dotted var(--muted); text-decoration-thickness: 1px; text-underline-offset: 0.25em; }
+code { font: 0.875rem/1.55 var(--mono); background: var(--panel); padding: 0.1em 0.38em; border-radius: 6px; }
+.standfirst code { font-size: 1.125rem; }
+
+/* Lists in the text flow: points, or numbers for steps that one actor does. The rules are weak on purpose, so the lists of the kit's own blocks keep their styles. */
+:where(main) :where(ul, ol):not(.steps, .facts, .cards) { max-width: var(--measure); margin: 0 0 16px; padding-left: 24px; }
+:where(main) :where(ul, ol):not(.steps, .facts, .cards) > :where(li + li) { margin-top: 4px; }
+/* A block heading in the text flow has more space above it than below it. A step heading of a walkthrough has none. */
+:where(main) h3 { margin: 32px 0 8px; }
+h2 + h3, h3 + h4 { margin-top: 0; }
+.steps h3 { margin: 0; }
+/* A numbered block heading: one of several steps that one actor does, where a step holds a code block, a table or a widget. The kit writes the number, and the count starts again in each section. */
+section { counter-reset: block-step; }
+h3.step { counter-increment: block-step; }
+h3.step::before { content: counter(block-step); font-weight: 400; color: var(--muted); margin-right: 10px; font-variant-numeric: tabular-nums; }
+/* With scripts on, the page script writes the number as text, so that a screen reader reads it. It looks the same as the counted number. */
+h3.is-numbered::before { content: none !important; }
+.step-n { font-weight: 400; color: var(--muted); margin-right: 6px; font-variant-numeric: tabular-nums; }
+/* A code block, a table, a closed section, a walkthrough, a status note and a figure bring no space below them. Text that follows brings it. */
+:is(pre, .code, .table-wrap, details, .walk, .status, figure) + :is(p, ul, ol, dl) { margin-top: 24px; }
+
+/* Margin notes: the guide's remarks sit beside the text, like a wall label. */
+.row { display: grid; grid-template-columns: minmax(0, var(--measure)) var(--margin-col); column-gap: var(--gap); align-items: start; }
+.note { margin: 6px 0 16px; padding-top: 12px; border-top: 1px solid var(--line); font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
+.note strong { display: block; margin-bottom: 4px; font-weight: 600; color: var(--text); }
+/* A heading may stand in the text column, with the facts about its item beside it. The row brings the space above the heading, so the note lines up with the heading. */
+.row:has(> h3:first-child) { margin-top: 32px; }
+.row > h3:first-child { margin-top: 0; }
+
+/* Walkthrough: a rail with a node per step; one dot travels along it. */
+.walk { display: grid; grid-template-columns: minmax(0, 1fr) 536px; column-gap: 40px; align-items: start; margin-top: 24px; }
+.rail { position: relative; }
+.steps { position: relative; margin: 0; padding: 0; list-style: none; counter-reset: step; }
+.steps::before { content: ""; position: absolute; left: 4px; top: 10px; bottom: 10px; width: 1px; background: var(--line); }
+.steps li { position: relative; padding: 0 0 var(--step-space) 32px; counter-increment: step; }
+.steps li:last-child { padding-bottom: 0; }
+.steps li::before { content: ""; position: absolute; left: 0; top: 8px; width: 9px; height: 9px; border-radius: 50%; border: 1px solid var(--muted); background: var(--bg); }
+.steps h3::before { content: counter(step); font-weight: 400; color: var(--muted); margin-right: 10px; font-variant-numeric: tabular-nums; }
+.steps p { margin: 6px 0 0; }
+.js .steps li:not(.is-current) h3, .js .steps li:not(.is-current) p { color: var(--muted); }
+.ready .steps h3, .ready .steps p { transition: color 120ms; }
+.rail-dot { position: absolute; left: 0; top: 8px; width: 9px; height: 9px; border-radius: 50%; background: var(--dot); opacity: 0; transform: translateY(var(--y, 0px)); }
+.js .rail-dot { opacity: 1; }
+.walk figure { position: sticky; top: 88px; }
+
+/* Figures: a well that holds a Docent diagram, with a plain caption. A diagram carries its own styles. */
+/* A well is as wide as the profile's block. A wider drawing keeps its real size, and its well grows with it. */
+figure { margin: 0; min-width: min(100%, var(--block)); width: fit-content; max-width: 100%; }
+section > figure { margin-top: 24px; }
+/* Every drawing in a well keeps its real size and sits in the middle; a wider one scrolls inside the well. */
+.fig > svg { flex: none; margin-inline: auto; }
+.fig { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 16px 24px; background: var(--fig); border-radius: 12px; padding: 8px; overflow-x: auto; scrollbar-color: var(--line) transparent; }
+/* A well may hold two drawings, for two separate chains: side by side when both fit, else one below the other. */
+/* A drawing that is wider than its well scrolls sideways. The page script shows this line under it, because the part that shows can look complete. */
+.fig-more { margin: 8px 0 0; max-width: none; font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
+/* The steps of a diagram in words: a closed section in the well, under the drawing. */
+.dg-words { flex-basis: 100%; max-width: var(--measure); margin: 0; padding: 0 8px 4px; }
+.dg-words ol { margin: 8px 0 0; padding-left: 28px; }
+.dg-words li + li { margin-top: 4px; }
+.dg-words p { margin: 12px 0 0; font-weight: 600; }
+figcaption { margin-top: 12px; font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
+figcaption strong { font-weight: 600; color: var(--text); margin-right: 8px; }
+
+/* Card grid: 3 to 8 short items side by side, each a heading or a large number and a line of text. A card is a label, like a margin note: a line above it, and no box. At most four in a row. */
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(max(160px, calc((100% - 72px) / 4)), 1fr)); gap: 24px; margin: 24px 0 0; padding: 0; list-style: none; }
+.cards > li { min-width: 0; padding-top: 12px; border-top: 1px solid var(--line); }
+.cards h3 { margin: 0 0 4px; font-size: 1rem; line-height: 1.5; }
+.cards p { margin: 0; font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
+.cards .big { margin-bottom: 4px; font: 700 1.875rem/1.2 var(--serif); color: var(--ink); font-variant-numeric: tabular-nums; }
+.cards + :is(p, ul, ol, dl) { margin-top: 24px; }
+
+/* Code, tables and cards end at the profile's block width. */
+:is(pre, .code, .table-wrap, .cards) { max-width: var(--block); }
+
+/* Tables: rules only, no boxes. */
+.table-wrap { overflow-x: auto; margin: 24px 0 0; scrollbar-color: var(--line) transparent; }
+table { width: 100%; min-width: 640px; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; vertical-align: top; padding: var(--cell-y) 24px var(--cell-y) 0; }
+thead th { border-bottom: 1px solid var(--text); padding-bottom: 10px; font-size: 0.875rem; line-height: 1.5; font-weight: 600; color: var(--muted); }
+tbody th { font-weight: 600; white-space: nowrap; }
+tbody tr { border-bottom: 1px solid var(--line); }
+.state { display: inline-flex; align-items: baseline; gap: 8px; font-weight: 600; }
+.state::before { content: ""; flex: none; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.state.ok { color: var(--ok); } .state.warn { color: var(--warn); } .state.err { color: var(--err); }
+/* Two states with no status color: plain information takes a muted dot, and a thing that is planned or not on yet takes a muted ring. */
+.state.info, .state.plan { color: var(--text); }
+.state.info::before { background: var(--muted); }
+.state.plan::before { background: none; border: 1.5px solid var(--muted); }
+/* Code and links in a cell may break anywhere, so a long path, command or address does not make the table wider than its place. */
+:is(td, th) :is(code, a) { overflow-wrap: anywhere; }
+
+/* Status note: a dot and a word carry the status. */
+.status { max-width: var(--measure); margin: 32px 0 0; }
+.status p { margin: 4px 0 0; }
+
+pre { margin: 20px 0 0; padding: 16px 20px; background: var(--panel); border-radius: 10px; overflow-x: auto; font: 0.875rem/1.6 var(--mono); scrollbar-color: var(--line) transparent; }
+pre code { background: none; padding: 0; font-size: inherit; }
+/* With scripts on, a code block sits in a holder with a button that copies the code. The holder takes the place and the space of the code block. */
+.code { position: relative; margin: 20px 0 0; }
+.code > pre { margin: 0; }
+.copy { position: absolute; top: 0; right: 0; height: 30px; padding: 0 12px; border: solid var(--line); border-width: 0 0 1px 1px; border-radius: 0 10px 0 6px; background: var(--panel); color: var(--muted); font: 400 0.875rem/1 var(--sans); cursor: pointer; }
+.copy:hover { color: var(--text); }
+/* A line of code that reaches the button would sit under it. Then the code starts below the button. */
+.code.is-long > pre { padding-top: 40px; }
+.cm { color: var(--muted); }
+
+details { max-width: var(--measure); margin: 24px 0 0; }
+/* A closed section that holds a table, a code block or a figure takes the full width, like those blocks do outside it. Its text keeps the text column. */
+details:has(> .table-wrap, > pre, > .code, > figure) { max-width: none; }
+summary { display: flex; align-items: center; gap: 10px; padding: 4px 0; font-weight: 600; cursor: pointer; list-style: none; }
+summary::-webkit-details-marker { display: none; }
+summary svg { width: 12px; height: 12px; color: var(--muted); transition: transform 150ms var(--ease); }
+details[open] summary svg { transform: rotate(90deg); }
+details > p { margin: 8px 0 0 22px; }
+
+/* Widgets: the reader chooses, ticks or decides. A widget is plain controls and text, with no box. render makes its markup from data. */
+.choose, .checks, .decide, .values { position: relative; margin: 24px 0 0; }
+:is(.choose, .checks, .decide, .values) + * { margin-top: 24px; }
+.choose > input, .checks input, .decide input, .values > input { position: absolute; width: 1px; height: 1px; margin: 0; opacity: 0; pointer-events: none; }
+.wd-t { margin: 0; max-width: none; font-size: 0.875rem; line-height: 1.5; font-weight: 600; color: var(--muted); }
+.opt { display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px; border: 1px solid var(--line); border-radius: 6px; font-size: 0.875rem; line-height: 1; cursor: pointer; }
+.opt::before { content: ""; width: 9px; height: 9px; border-radius: 50%; border: 1px solid var(--muted); }
+.opt:hover { border-color: var(--muted); }
+input:checked + .opt { border-color: var(--text); }
+input:checked + .opt::before { border-color: var(--dot); background: var(--dot); }
+input:focus-visible + .opt, .checks input:focus-visible + label::before { outline: 2px solid var(--primary); outline-offset: 3px; }
+/* Chooser: radio buttons and one panel for each case. The styles alone show the chosen case, so it works with scripts off. */
+.choose { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.choose > .wd-t { margin-right: 4px; }
+.choose > .case { display: none; flex-basis: 100%; min-width: 0; margin-top: 8px; }
+.choose > input:nth-of-type(1):checked ~ div:nth-of-type(1), .choose > input:nth-of-type(2):checked ~ div:nth-of-type(2), .choose > input:nth-of-type(3):checked ~ div:nth-of-type(3), .choose > input:nth-of-type(4):checked ~ div:nth-of-type(4), .choose > input:nth-of-type(5):checked ~ div:nth-of-type(5) { display: block; }
+.case-t { display: none; margin: 0 0 4px; font-weight: 600; }
+.case > .case-t + * { margin-top: 0; }
+.case > :last-child { margin-bottom: 0; }
+/* Checklist: a box and a line of text. A ticked line takes the muted color. */
+.checks ul { max-width: var(--measure); margin: 0; padding: 0; list-style: none; }
+.checks li { position: relative; margin-top: 12px; }
+.checks label { display: block; position: relative; padding-left: 32px; cursor: pointer; }
+.checks label::before { content: ""; position: absolute; left: 0; top: 4px; width: 18px; height: 18px; border: 1.5px solid var(--muted); border-radius: 6px; }
+.checks label::after { content: ""; position: absolute; left: 6.5px; top: 7px; width: 5px; height: 9px; border: solid var(--text); border-width: 0 2px 2px 0; transform: rotate(45deg); opacity: 0; }
+.checks input:checked + label { color: var(--muted); }
+.checks input:checked + label::before { border-color: var(--text); }
+.checks input:checked + label::after { opacity: 1; }
+.checks .sub { display: block; font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
+.wd-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin: 16px 0 0; max-width: none; font-size: 0.875rem; line-height: 1.5; color: var(--muted); font-variant-numeric: tabular-nums; }
+.wd-foot[hidden] { display: none; }
+/* Decision helper: questions, the one answer that fits, and the table of all cases. The table is the still form. */
+.decide fieldset { position: relative; display: flex; flex-wrap: wrap; gap: 8px; min-width: 0; margin: 16px 0 0; padding: 0; border: 0; }
+.decide legend { margin-bottom: 8px; padding: 0; font-weight: 600; }
+.decide-out { display: block; max-width: var(--measure); margin-top: 16px; }
+.decide-out:empty { display: none; }
+.decide-out strong { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+.decide-out strong::before { content: ""; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--dot); }
+.decide details { max-width: none; margin-top: 16px; }
+.decide .table-wrap { margin-top: 8px; }
+.decide td strong { display: block; font-weight: 600; }
+.decide tr.is-out { color: var(--muted); }
+html:not(.js) .decide-ask, html:not(.js) .wd-foot output { display: none; }
+/* Value picker: options like a chooser, a line that names the chosen option, and the table of all values. With scripts off the options do nothing, so they are hidden, and the text shows the values of the first option. */
+.values { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.values > .wd-t { margin-right: 4px; }
+.values-now { flex-basis: 100%; max-width: none; margin: 4px 0 0; font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
+.values-now strong { font-weight: 600; color: var(--text); }
+.values details { flex-basis: 100%; min-width: 0; max-width: none; margin-top: 8px; }
+.values .table-wrap { margin-top: 8px; }
+html:not(.js) .values > input + .opt { display: none; }
+
+footer { margin-top: 96px; border-top: 1px solid var(--line); }
+footer .shell { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding-top: 24px; padding-bottom: 40px; font-size: 0.875rem; color: var(--muted); }
+.brand { display: inline-flex; align-items: center; gap: 10px; font: 700 1rem/1 var(--serif); color: var(--text); }
+.brand svg { width: 24px; height: 24px; }
+
+@media (max-width: 1100px) {
+  .walk { grid-template-columns: minmax(0, 1fr); row-gap: 32px; }
+  .walk figure { position: static; order: -1; }
+}
+@media (max-width: 900px) {
+  .row { grid-template-columns: minmax(0, 1fr); }
+  .note { max-width: var(--measure); }
+  .title .note { margin-top: 28px; }
+}
+@media (max-width: 720px) {
+  .shell { padding: 0 20px; }
+  .topbar { position: static; }
+  .topbar .shell { flex-wrap: wrap; gap: 4px 16px; height: auto; padding-top: 10px; padding-bottom: 8px; }
+  .host { flex: 1; }
+  .route { flex: none; order: 3; width: 100%; }
+  .route ol { flex-wrap: wrap; gap: 0 20px; }
+  .route a[aria-current] { text-decoration: underline; text-decoration-color: var(--dot); text-decoration-thickness: 2px; text-underline-offset: 0.4em; }
+  .route-dot { display: none; }
+  .title { padding-top: 48px; }
+  h1 { font-size: 2rem; } h2 { font-size: 1.625rem; }
+  section { padding-top: 56px; }
+  footer .shell { flex-direction: column; align-items: flex-start; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; }
+}
+@media print {
+  html:root:not([data-never]) { color-scheme: light; --bg: #ffffff; --panel: #f2f3f9; --fig: #f2f3f9; --text: #1c1f2e; --muted: #575d75; --line: #d3d6e3; --primary: var(--host-accent, #2f3fd0); --ink: var(--host-ink, #1b2260); --dot: var(--host-accent, #2f3fd0); --ok: #1a7f37; --warn: #7d4e00; --err: #cf222e; }
+  /* Paper: 11pt text, the page margin as the edge, and the notes beside the text again. An A4 page holds the text (112mm), a gap and the notes (50mm). */
+  html { font-size: 11pt; } html[data-text="large"] { font-size: 12pt; }
+  html:root:not([data-never]) { --measure: 112mm; --gap: 8mm; --margin-col: 50mm; --block: 100%; }
+  .shell { padding: 0; }
+  .row { grid-template-columns: minmax(0, var(--measure)) var(--margin-col); }
+  .title .note { margin-top: 6px; }
+  p, li { orphans: 2; widows: 2; }
+  /* A browser may leave out the ground of a code well on paper. A thin line keeps it a well. */
+  /* Paper cannot scroll: a long line of code wraps. */
+  pre { border: 1px solid var(--line); white-space: pre-wrap; overflow-wrap: anywhere; }
+  .topbar, .rail-dot, .choose > .opt, .values > .opt, .decide-ask, .wd-foot, .copy, .fig-more { display: none !important; }
+  .choose > .case { display: block !important; margin-top: 16px; } .case-t { display: block; }
+  .checks input:checked + label, .decide tr.is-out { color: var(--text) !important; }
+  .steps li h3, .steps li p { color: var(--text) !important; }
+  .walk { grid-template-columns: minmax(0, 1fr); row-gap: 32px; } .walk figure { position: static; order: -1; }
+  table { min-width: 0; } .table-wrap { overflow: visible; }
+  /* A browser leaves out backgrounds on paper. These carry meaning, so they print: status dots, the rail of the steps, and the ground of figures and code. */
+  .state::before, .steps::before, .fig, pre, code { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  /* Paper cannot scroll, and a drawing cannot split across pages. So a drawing that is wider than the paper, or taller than a page, shrinks to fit, under its caption, on A4 and on Letter. */
+  .fig > svg { width: auto; height: auto; max-width: 100%; max-height: 220mm; }
+  figure, tr, .status, pre, .checks li, .cards > li { break-inside: avoid; }
+  h2, h3 { break-after: avoid; }
+  /* Page numbers: Chrome and Edge print them; other browsers print their own footer. */
+  @page { margin: 18mm; @bottom-right { content: counter(page) " / " counter(pages); font: 9pt system-ui, sans-serif; color: #575d75; } }
+}
+/* /docent:kit */
+</style>
+<style>
+/* The three charts that Docent cannot draw yet. They take the page tokens, so they follow dark mode and print. */
+.gc { display: block; font-family: var(--sans); }
+.gc text { font-size: 14px; fill: var(--text); }
+.gc .m { fill: var(--muted); } .gc .b { font-weight: 600; }
+.gc .axis { stroke: var(--line); } .gc .mid { stroke: var(--muted); stroke-dasharray: 4 4; }
+.gc .text-bar, .gc .range { fill: var(--bg); stroke: var(--text); }
+.gc .note-bar { fill: var(--bg); stroke: var(--muted); }
+.gc .list-bar, .gc .upper { fill: var(--bg); stroke: var(--muted); stroke-dasharray: 4 3; }
+.gc .wide-bar { fill: var(--line); }
+.gc .docent { fill: var(--bg); stroke: var(--primary); stroke-width: 2; }
+.gc .dot { fill: var(--dot); } .gc .pt { fill: var(--text); }
+.gc .page { fill: var(--bg); stroke: var(--muted); } .gc .txt { stroke: var(--text); stroke-width: 2; } .gc .txt.m { stroke: var(--muted); } .gc .rule { stroke: var(--line); }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="shell">
+    <span class="host">Docent</span>
+    <nav class="route" aria-label="On this page">
+      <ol>
+        <li><a href="#summary">Summary</a></li>
+        <li><a href="#evidence">Evidence</a></li>
+        <li><a href="#wide">Wide screens</a></li>
+        <li><a href="#profiles">Profiles</a></li>
+        <li><a href="#print">Print</a></li>
+        <li><a href="#decisions">Decisions</a></li>
+      </ol>
+    </nav>
+    <button class="theme" type="button">
+      <svg class="icon-moon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13.5 9.6A5.8 5.8 0 0 1 6.4 2.5a5.8 5.8 0 1 0 7.1 7.1Z"/></svg>
+      <svg class="icon-sun" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="8" cy="8" r="3"/><path d="M8 1.5v1.6M8 12.9v1.6M1.5 8h1.6M12.9 8h1.6M3.4 3.4l1.1 1.1M11.5 11.5l1.1 1.1M3.4 12.6l1.1-1.1M11.5 4.5l1.1-1.1"/></svg>
+      <span class="theme-text">Dark</span>
+    </button>
+    <span class="route-dot" aria-hidden="true"></span>
+  </div>
+</header>
+
+<main class="shell">
+  <div class="title">
+    <h1>Page layout for generated documents</h1>
+    <div class="row">
+      <p class="standfirst">How wide should the text of a Docent page be, where should it sit on a wide screen, and how should it print? This report collects the evidence, compares four layouts, and says what was decided.</p>
+      <div class="note" role="note" aria-label="About this document">
+        <strong>Research report</strong>
+        <ul class="facts">
+          <li>Written 21 November 2026</li>
+          <li>45 sources</li>
+          <li>Owner: Docent</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <section id="summary" aria-labelledby="summary-h">
+    <h2 id="summary-h">Summary</h2>
+    <div class="row">
+      <div>
+        <p>Docent's text width is right. The 31rem column holds about 63 to 70 characters in a line. Readers prefer lines of about 45 to 76 characters, and no study found that this range hurts speed or comprehension.</p>
+        <p>The real problem was balance on wide screens. On a 1920px screen, the text and its notes sat 178px left of the middle. The fix is to center the text and its notes as a group, and let wide blocks grow to the right.</p>
+        <p>The kind of document and its readers should change the spacing, the width of code and tables, and navigation. They should not change the text width. Four profiles cover the common cases.</p>
+        <p>On paper, Docent should leave the paper size to the reader, set the text near 11pt, and keep a narrow text column.</p>
+      </div>
+      <div class="note" role="note">
+        <strong>How strong is it?</strong>
+        The evidence for the text width is good. The evidence for where the text sits on a wide screen is weak: no study compares the options on modern screens.
+      </div>
+    </div>
+    <ul class="cards">
+      <li><p class="big">63–70</p><p>characters in a line of the 31rem text column</p></li>
+      <li><p class="big">178px</p><p>left of the middle, at 1920px, before the fix</p></li>
+      <li><p class="big">4</p><p>profiles, chosen from the kind of document</p></li>
+      <li><p class="big">11pt</p><p>body text on paper; today's 16px prints at 12pt</p></li>
+    </ul>
+  </section>
+
+  <section id="evidence" aria-labelledby="evidence-h">
+    <h2 id="evidence-h">What the evidence says</h2>
+    <p>Each source has a kind. A study measured something. A standard is a specification, such as WCAG. A convention is practice or expert advice without its own data. Data is a usage or support statistic.</p>
+
+    <h3>Screens and readers</h3>
+    <div class="row">
+      <div>
+        <p>Most desktop screens are wide enough for the text and its notes side by side. The layout needs about 844px, and every common desktop width is 1280px or more. Scaling makes the real window smaller: a 1920 screen at 125% gives a browser about 1408 to 1521px.</p>
+        <p>The public reads mostly on phones: 61% of visits to GOV.UK came from phones in 2025. For public documents, the single column is the main layout, not a fallback.</p>
+        <p>No recent data exists for developer documents, for on-call staff, or for managers. Screens wider than 1600px are probably at most 13% of page views on the general web.</p>
+      </div>
+      <div class="note" role="note">
+        <strong>An estimate</strong>
+        The 13% is 0.385 desktop share times about 0.33 of screens that are 1920px or wider. No public data confirms it.
+      </div>
+    </div>
+
+    <h3>Line length</h3>
+    <p>Studies of line length agree on what readers like, and disagree on speed. Longer lines were sometimes read faster, but readers rated them worse, and comprehension did not improve. Longer lines helped visual search, which weakly supports wider tables and code, not wider text. Most of these studies are old and small.</p>
+    <figure>
+      <div class="fig" role="region" aria-label="Figure 1, line lengths in the evidence" tabindex="0">
+<!-- GAP: Docent has no diagram kind for this chart. Drawn by hand, after diagram-design's range-bar layout. -->
+<svg class="gc" id="gc-lines" width="720" height="328" viewBox="0 0 720 328" role="img" aria-labelledby="gc-lines-title gc-lines-desc"><title id="gc-lines-title">Line lengths in the evidence</title><desc id="gc-lines-desc">Readers prefer 45 to 76 characters in a line. One study rated 55 easiest. Advice for dyslexia says 50 to 75, WCAG AAA allows up to 80, and print style allows 45 to 90. Docent's text column holds 63 to 70 on screen and about 52 to 64 on paper.</desc>
+<line class="axis" x1="200" y1="28" x2="200" y2="320"/><text class="m" x="200" y="18" text-anchor="middle">40</text><line class="axis" x1="280" y1="28" x2="280" y2="320"/><text class="m" x="280" y="18" text-anchor="middle">50</text><line class="axis" x1="360" y1="28" x2="360" y2="320"/><text class="m" x="360" y="18" text-anchor="middle">60</text><line class="axis" x1="440" y1="28" x2="440" y2="320"/><text class="m" x="440" y="18" text-anchor="middle">70</text><line class="axis" x1="520" y1="28" x2="520" y2="320"/><text class="m" x="520" y="18" text-anchor="middle">80</text><line class="axis" x1="600" y1="28" x2="600" y2="320"/><text class="m" x="600" y="18" text-anchor="middle">90</text><line class="axis" x1="680" y1="28" x2="680" y2="320"/><text class="m" x="680" y="18" text-anchor="middle">100</text><text x="0" y="55">Readers prefer</text><rect class="range" x="240" y="40" width="248" height="20" rx="4"/><text class="m" x="496" y="55">45–76</text><text x="0" y="91">Rated easiest, Dyson</text><circle class="pt" cx="320" cy="86" r="6"/><text class="m" x="334" y="91">55</text><text x="0" y="127">A literature review</text><rect class="upper" x="200" y="112" width="240" height="20" rx="4"/><text class="m" x="448" y="127">up to 70</text><text x="0" y="163">Advice for dyslexia</text><rect class="range" x="280" y="148" width="200" height="20" rx="4"/><text class="m" x="488" y="163">50–75</text><text x="0" y="199">WCAG 1.4.8, AAA</text><rect class="upper" x="200" y="184" width="320" height="20" rx="4"/><text class="m" x="528" y="199">up to 80</text><text x="0" y="235">Print, Butterick</text><rect class="range" x="240" y="220" width="360" height="20" rx="4"/><text class="m" x="608" y="235">45–90</text><text x="0" y="271">Docent on screen</text><rect class="docent" x="384" y="256" width="56" height="20" rx="4"/><text class="m" x="448" y="271">63–70</text><text x="0" y="307">Docent on paper</text><rect class="docent" x="296" y="292" width="96" height="20" rx="4"/><text class="m" x="400" y="307">52–64</text>
+</svg>
+      </div>
+      <figcaption><strong>Figure 1</strong>Line lengths in characters, from the evidence and from Docent. A dashed bar has only an upper limit. The paper range is computed for 112mm at 11pt.</figcaption>
+    </figure>
+    <p>For readers with dyslexia, the evidence is about text size, not line length: sizes up to 18pt read better than 12pt. Guidance for older adults asks for 19px text. So the strongest concern is text size, not width. Because Docent sets its sizes in rem, a reader who sets a larger text size gets larger letters at the same line length.</p>
+
+    <h3>Wide screens on other sites</h3>
+    <p>Most documentation sites center a page of about 1440px, with navigation on the left and an "On this page" list on the right. Sites with no side columns center the text itself. The sites that keep one left edge for text and wide blocks always put something in the space on the right: Tufte CSS shifts the page, Observable shows a contents list, and GOV.UK shows related links.</p>
+    <div class="status">
+      <span class="state warn">No study</span>
+      <p>No study tests one left edge for text and code. No study compares centered and left-aligned text on modern wide screens. One eye-tracking study found that 80% of looks at 1920px fall on the left half.</p>
+    </div>
+
+    <h3>Kinds of documents</h3>
+    <p>Diataxis splits documents into study (tutorials and explanations) and work (how-to guides and reference). Reference is consulted, not read, and a how-to is a sequence of actions. Diataxis gives no layout numbers, so every layout below is an inference. Readers scan headings when the headings are clear, and that helps every kind more than any width does.</p>
+
+    <h3>Fluid type and zoom</h3>
+    <p>No study shows that text which grows with the screen helps reading. It has a known risk: the part of the size that follows the screen width does not grow with browser zoom, so text can fail WCAG 1.4.4. Docent keeps its body at 1rem, which has no such risk.</p>
+
+    <details>
+      <summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>All 45 sources</summary>
+      <div class="table-wrap" role="region" aria-label="All sources of the report" tabindex="0">
+        <table>
+          <thead>
+            <tr><th scope="col">Claim</th><th scope="col">Source</th><th scope="col">Kind</th><th scope="col">Confidence</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>1920x1080 is about 28% of desktop screens; 2560x1440 is under 4% (Oct 2026)</td><td><a href="https://gs.statcounter.com/screen-resolution-stats/desktop/worldwide">gs.statcounter.com</a></td><td>data</td><td>high</td></tr>
+            <tr><td>Worldwide page views: mobile 59.9%, desktop 38.5%; US desktop 52.4% (Oct 2026)</td><td><a href="https://gs.statcounter.com/platform-market-share/desktop-mobile-tablet">gs.statcounter.com</a></td><td>data</td><td>high</td></tr>
+            <tr><td>GOV.UK, Dec 2025: 61% mobile, 38% desktop, 1% tablet</td><td><a href="https://insidegovuk.blog.gov.uk/2026/01/28/how-people-used-gov-uk-in-2025/">insidegovuk.blog.gov.uk</a></td><td>data</td><td>high</td></tr>
+            <tr><td>Steam users, Oct 2026: 2560x1440 21.8%, 3840x2160 5.1% (gamer sample)</td><td><a href="https://store.steampowered.com/hwsurvey/">store.steampowered.com</a></td><td>data</td><td>medium</td></tr>
+            <tr><td>A 1920 screen at 125% scaling reports 1536x864; browser width was 1408</td><td><a href="https://experienceleaguecommunities.adobe.com/t5/adobe-analytics-questions/monitor-resolution-and-browser-width-are-affected-by-windows/td-p/592122">experienceleaguecommunities.adobe.com</a></td><td>data</td><td>medium</td></tr>
+            <tr><td>On-call apps let staff triage alerts on a phone (vendor claim; no runbook device data)</td><td><a href="https://www.pagerduty.com/blog/mobile-incident-management/">pagerduty.com</a></td><td>convention</td><td>low</td></tr>
+            <tr><td>91.3% of screen reader users use one on mobile</td><td><a href="https://webaim.org/projects/screenreadersurvey10/">webaim.org</a></td><td>data</td><td>high</td></tr>
+            <tr><td>95 cpl read fastest; no reliable preference [secondary]</td><td><a href="https://webarchive.library.unt.edu/eot2008/20090113170816/http:/usability.gov/pubs/082006news.html">webarchive.library.unt.edu</a></td><td>study</td><td>medium</td></tr>
+            <tr><td>45/76/132 cpl: no speed difference; adults preferred medium; none chose full width [secondary]</td><td><a href="https://journals.sagepub.com/doi/10.1177/154193120304701112">journals.sagepub.com</a></td><td>study</td><td>medium</td></tr>
+            <tr><td>55 cpl rated easiest; long lines rated least easy [secondary]</td><td><a href="https://journals.uc.edu/index.php/vl/article/view/5671">journals.uc.edu</a></td><td>study</td><td>medium</td></tr>
+            <tr><td>Longer lines helped visual search; shorter lines got better ratings [secondary]</td><td><a href="https://research.tees.ac.uk/en/publications/the-influence-of-font-type-and-line-length-on-visual-search-and-i/">research.tees.ac.uk</a></td><td>study</td><td>medium</td></tr>
+            <tr><td>Literature review: keep lines under about 70 cpl</td><td><a href="https://journals.uc.edu/index.php/vl/article/view/5765">journals.uc.edu</a></td><td>study</td><td>medium</td></tr>
+            <tr><td>Reading preference does not predict reading speed (fonts)</td><td><a href="https://jeffhuang.com/papers/Readability_TOCHI22.pdf">jeffhuang.com</a></td><td>study</td><td>high</td></tr>
+            <tr><td>ESL adults (N=459): font width and spacing changes had little effect; line length not tested</td><td><a href="https://stars.library.ucf.edu/etd2024/62">stars.library.ucf.edu</a></td><td>study</td><td>medium</td></tr>
+            <tr><td>Dyslexia and general readers: sizes up to 18pt read better; 12pt was slower [secondary]</td><td><a href="https://de.slideshare.net/mpielot/make-it-big-the-effect-of-font-size-and-line-spacing-on-online-readability-62004998">de.slideshare.net</a></td><td>study</td><td>medium</td></tr>
+            <tr><td>Dyslexia line length 50-75 cpl (no study cited)</td><td><a href="https://dyslexiascotland.org.uk/dyslexia-friendly-typed-formats">dyslexiascotland.org.uk</a></td><td>convention</td><td>low</td></tr>
+            <tr><td>Older adults: 19px / 14pt body text</td><td><a href="https://health.gov/healthliteracyonline/display/full">health.gov</a></td><td>convention</td><td>medium</td></tr>
+            <tr><td>WCAG 1.4.10: reflow at 320 CSS px; side columns stack</td><td><a href="https://www.w3.org/WAI/WCAG22/Understanding/reflow.html">w3.org</a></td><td>standard</td><td>high</td></tr>
+            <tr><td>WCAG 1.4.4: text resizes to 200%; vw parts do not grow with zoom; max ≤ 2.5× min passes</td><td><a href="https://smashingmagazine.com/2023/11/addressing-accessibility-concerns-fluid-type">smashingmagazine.com</a></td><td>standard + convention</td><td>medium</td></tr>
+            <tr><td>Root size <code>100%</code>; never set max font below 2× base</td><td><a href="https://adrianroselli.com/2019/12/responsive-type-and-zoom.html">adrianroselli.com</a></td><td>convention</td><td>medium</td></tr>
+            <tr><td>80% of fixations on the left half at 1920px; peak near 600px from the left</td><td><a href="https://www.nngroup.com/articles/horizontal-attention-leans-left/">nngroup.com</a></td><td>study</td><td>high</td></tr>
+            <tr><td>Centered, left-fixed and fluid layouts: no performance difference (2001, old screens)</td><td><a href="https://www.humanfactors.com/newsletters/web_site_layout.asp">humanfactors.com</a></td><td>study</td><td>low</td></tr>
+            <tr><td>Right-rail contents lists: "caution advised" (qualitative)</td><td><a href="https://www.nngroup.com/articles/table-of-contents/">nngroup.com</a></td><td>convention</td><td>medium</td></tr>
+            <tr><td>MDN centers a 1440px page: nav left, contents right, content 31-48rem</td><td><a href="https://developer.mozilla.org/en-US/docs/Web/CSS/grid-template-columns">developer.mozilla.org</a></td><td>convention</td><td>high</td></tr>
+            <tr><td>Tufte CSS: shared left edge, notes right, wide blocks grow right, body shifted to balance</td><td><a href="https://edwardtufte.github.io/tufte-css/tufte.css">edwardtufte.github.io</a></td><td>convention</td><td>high</td></tr>
+            <tr><td>Observable: prose 640px, code 960px, same left edge, contents list right</td><td><a href="https://github.com/observablehq/framework/blob/main/src/style/global.css">github.com</a></td><td>convention</td><td>high</td></tr>
+            <tr><td>Distill: text centered, symmetric wide tracks, notes gutter right</td><td><a href="https://distill.pub/template.v2.js">distill.pub</a></td><td>convention</td><td>high</td></tr>
+            <tr><td>Sidenotes should be visible by default; narrow fallbacks vary</td><td><a href="https://gwern.net/sidenote">gwern.net</a></td><td>convention</td><td>medium</td></tr>
+            <tr><td>Reference is consulted, not read; a how-to is a sequence</td><td><a href="https://diataxis.fr/reference/">diataxis.fr</a></td><td>standard</td><td>high</td></tr>
+            <tr><td>Users read at most 28% of words on a page (2008)</td><td><a href="https://www.nngroup.com/articles/how-little-do-users-read/">nngroup.com</a></td><td>study</td><td>medium</td></tr>
+            <tr><td>Readers scan headings when headings are distinct</td><td><a href="https://www.nngroup.com/articles/layer-cake-pattern-scanning/">nngroup.com</a></td><td>study</td><td>medium</td></tr>
+            <tr><td>Hard text on phones: about 30 ms/word slower, same comprehension</td><td><a href="https://www.nngroup.com/articles/mobile-content/">nngroup.com</a></td><td>study</td><td>medium</td></tr>
+            <tr><td>Surface cues detect genre about as well as deep features</td><td><a href="https://aclanthology.org/P97-1005/">aclanthology.org</a></td><td>study</td><td>medium</td></tr>
+            <tr><td>Zero-shot LLMs often match trained models on web genre</td><td><a href="https://arxiv.org/html/2511.07989v2">arxiv.org</a></td><td>study</td><td>medium</td></tr>
+            <tr><td>Diataxis classifier: rules first, LLM only when unsure, LLM capped at medium</td><td><a href="https://rolfedh.github.io/doc-utils/tools/classify-guides">rolfedh.github.io</a></td><td>convention</td><td>medium</td></tr>
+            <tr><td>Readability formulas can only warn; remove headings and lists first</td><td><a href="https://www.ahrq.gov/talkingquality/resources/writing/tip6.html">ahrq.gov</a></td><td>standard</td><td>medium</td></tr>
+            <tr><td>Print body 10-12pt; 45-90 characters per line</td><td><a href="https://practicaltypography.com/point-size.html">practicaltypography.com</a></td><td>convention</td><td>high</td></tr>
+            <tr><td>1in = 96px = 72pt, so 16px = 12pt</td><td><a href="https://www.w3.org/TR/css-values-4/#absolute-lengths">w3.org</a></td><td>standard</td><td>high</td></tr>
+            <tr><td><code>@page</code> size and margin work in Chrome, Firefox and Safari 18.2+ (Dec 2024)</td><td><a href="https://raw.githubusercontent.com/mdn/browser-compat-data/main/css/at-rules/page.json">raw.githubusercontent.com</a></td><td>data</td><td>high</td></tr>
+            <tr><td>Margin boxes and <code>counter(page)</code>: Chrome 131+ only; Firefox and Safari no (2026-11-21)</td><td><a href="https://developer.chrome.com/blog/print-margins">developer.chrome.com</a></td><td>data</td><td>high</td></tr>
+            <tr><td><code>orphans</code>/<code>widows</code>: Chrome and Safari; never Firefox</td><td><a href="https://caniuse.com/css-widows-orphans">caniuse.com</a></td><td>data</td><td>high</td></tr>
+            <tr><td><code>print-color-adjust</code> is advisory; the user's setting wins</td><td><a href="https://developer.mozilla.org/en-US/docs/Web/CSS/print-color-adjust">developer.mozilla.org</a></td><td>standard</td><td>high</td></tr>
+            <tr><td>Closed <code>&lt;details&gt;</code> prints with only the summary</td><td><a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1825244">bugzilla.mozilla.org</a></td><td>data</td><td>medium</td></tr>
+            <tr><td>Break rules are hints; grid and flex split poorly across pages</td><td><a href="https://www.smashingmagazine.com/2018/05/print-stylesheets-in-2018/">smashingmagazine.com</a></td><td>convention</td><td>medium</td></tr>
+            <tr><td>A4 print width: margin notes drop below their paragraph, nothing overflows (viewport emulation, not a real PDF)</td><td>Coordinator check, headless Chrome, 2026-11-21</td><td>test</td><td>medium</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </details>
+  </section>
+
+  <section id="wide" aria-labelledby="wide-h">
+    <h2 id="wide-h">Four layouts for wide screens</h2>
+    <p>The obvious choice would be to center everything, like most documentation sites. That is wrong for Docent if it keeps one left edge for every block, because a centered grid gives up that edge. The report compared four layouts. All positions are for a 1920px screen.</p>
+    <figure>
+      <div class="fig" role="region" aria-label="Figure 2, where the parts sit on a 1920px screen" tabindex="0">
+<!-- GAP: Docent has no diagram kind for this chart. Drawn by hand, after diagram-design's range-bar layout. -->
+<svg class="gc" id="gc-layouts" width="904" height="380" viewBox="0 0 904 380" role="img" aria-labelledby="gc-layouts-title gc-layouts-desc"><title id="gc-layouts-title">Where the parts sit on a 1920px screen</title><desc id="gc-layouts-desc">On a 1920px screen today, the text and its notes sit left of the middle. Layout A centers them and lets wide blocks grow to the right. Layout B centers the text and the wide blocks, so the left edge splits. Layout C adds a contents list on the left.</desc>
+<line class="axis" x1="120" y1="28" x2="120" y2="372"/><text class="m" x="120" y="18" text-anchor="start">0</text><line class="axis" x1="312" y1="28" x2="312" y2="372"/><text class="m" x="312" y="18" text-anchor="middle">480</text><line class="mid" x1="504" y1="28" x2="504" y2="372"/><text class="m" x="504" y="18" text-anchor="middle">960, the middle</text><line class="axis" x1="696" y1="28" x2="696" y2="372"/><text class="m" x="696" y="18" text-anchor="middle">1440</text><line class="axis" x1="888" y1="28" x2="888" y2="372"/><text class="m" x="888" y="18" text-anchor="end">1920</text><line class="axis" x1="120" y1="36" x2="888" y2="36"/><text class="b" x="14" y="61">Now</text><text class="m" x="14" y="85">a 1200px box</text><rect class="text-bar" x="280" y="44" width="198.4" height="24" rx="4"/><text x="288" y="61">Text</text><rect class="note-bar" x="497.6" y="44" width="88" height="24" rx="4"/><text x="505.6" y="61">Notes</text><rect class="wide-bar" x="280" y="76" width="448" height="24" rx="4"/><text x="288" y="93">Wide blocks</text><line class="axis" x1="120" y1="120" x2="888" y2="120"/><circle class="dot" cx="4" cy="140" r="4"/><text class="b" x="14" y="145">A</text><text class="m" x="14" y="169">Tufte</text><rect class="text-bar" x="351.2" y="128" width="198.4" height="24" rx="4"/><text x="359.2" y="145">Text</text><rect class="note-bar" x="568.8" y="128" width="88" height="24" rx="4"/><text x="576.8" y="145">Notes</text><rect class="wide-bar" x="351.2" y="160" width="448" height="24" rx="4"/><text x="359.2" y="177">Wide blocks</text><line class="axis" x1="120" y1="204" x2="888" y2="204"/><text class="b" x="14" y="229">B</text><text class="m" x="14" y="253">Distill</text><rect class="text-bar" x="404.8" y="212" width="198.4" height="24" rx="4"/><text x="412.8" y="229">Text</text><rect class="note-bar" x="622.4" y="212" width="88" height="24" rx="4"/><text x="630.4" y="229">Notes</text><rect class="wide-bar" x="280" y="244" width="448" height="24" rx="4"/><text x="288" y="261">Wide blocks</text><line class="axis" x1="120" y1="288" x2="888" y2="288"/><text class="b" x="14" y="313">C</text><text class="m" x="14" y="337">MDN</text><rect class="list-bar" x="301.6" y="296" width="80" height="24" rx="4"/><text x="309.6" y="313">Contents</text><rect class="text-bar" x="400.8" y="296" width="198.4" height="24" rx="4"/><text x="408.8" y="313">Text</text><rect class="note-bar" x="618.4" y="296" width="88" height="24" rx="4"/><text x="626.4" y="313">Notes</text>
+</svg>
+      </div>
+      <figcaption><strong>Figure 2</strong>Where the text, the notes and the wide blocks sit on a 1920px screen, today and in three layouts. The dashed line is the middle of the screen. The dot marks the layout that was chosen.</figcaption>
+    </figure>
+    <div class="table-wrap" role="region" aria-label="The four layouts compared" tabindex="0">
+      <table>
+        <thead>
+          <tr><th scope="col">Layout</th><th scope="col">What it does</th><th scope="col">For</th><th scope="col">Against</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">A, Tufte</th><td>Centers the text and its notes as a group. Wide blocks start at the same left edge and grow to the right.</td><td>The smallest change. Keeps one left edge. Text starts near where readers look most.</td><td>Wide blocks sit right of the middle, by 178px at 1920px.</td></tr>
+          <tr><th scope="row">B, Distill</th><td>Centers the text. Notes hang to the right. Wide blocks are centered on the same line.</td><td>The most common pattern. Every wide block is balanced.</td><td>Code starts 312px left of the text, so the left edge splits.</td></tr>
+          <tr><th scope="row">C, MDN</th><td>Adds a contents list on the left, with the notes on the right.</td><td>Fills both sides with useful content. Helps long reference pages.</td><td>More structure for short pages. The list repeats the top bar.</td></tr>
+          <tr><th scope="row">D, wider text</th><td>Lets the text grow toward 80 to 95 characters in a line.</td><td>Uses the space. Long lines are sometimes read faster.</td><td>Readers rate long lines worse. WCAG 1.4.8 caps lines at 80 characters.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="status">
+      <span class="state ok">Recommended: A</span>
+      <p>A keeps the current rule and fixes the imbalance with a small change. The evidence for A over B is weak: it rests on convention, on one eye-tracking study, and on arithmetic.</p>
+    </div>
+  </section>
+
+  <section id="profiles" aria-labelledby="profiles-h">
+    <h2 id="profiles-h">Profiles by kind of document</h2>
+    <p>A profile changes the spacing, the width of code and tables, and navigation. All four keep the 31rem text column, because no evidence supports a different width for each kind.</p>
+    <div class="table-wrap" role="region" aria-label="The four profiles" tabindex="0">
+      <table>
+        <thead>
+          <tr><th scope="col">Profile</th><th scope="col">Used for</th><th scope="col">Spacing</th><th scope="col">Code and tables</th><th scope="col">Navigation</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">Standard</th><td>Explanations, tutorials, policies, public guides, and unclear cases</td><td>Relaxed</td><td>Up to the right edge of the notes</td><td>A contents list at the top when the page is long</td></tr>
+          <tr><th scope="row">Task</th><td>How-to guides, runbooks, troubleshooting</td><td>Closer between steps</td><td>Up to the right edge of the notes, each command in its own block</td><td>A short list of steps at the top; the first screen works at 360px</td></tr>
+          <tr><th scope="row">Reference</th><td>APIs, settings, lists of options</td><td>Dense rows, never smaller text</td><td>Full width, up to 1120px</td><td>A contents list, and maybe a side list on wide screens</td></tr>
+          <tr><th scope="row">Brief</th><td>Reports for managers, incident reports, release notes</td><td>Medium</td><td>Timeline tables full width</td><td>The summary and impact first</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h3>Signals in the content</h3>
+    <div class="row">
+      <div>
+        <ul>
+          <li>Numbered steps, and sentences that start with a verb, point to Task.</li>
+          <li>An alert name, a severity, "rollback", and many commands point to a runbook, which is Task.</li>
+          <li>Many times of day, with "impact", "root cause" or "actions", point to Brief.</li>
+          <li>Many tables, option names, and little text point to Reference.</li>
+          <li>Long paragraphs, "how X works", diagrams and few commands point to Standard.</li>
+        </ul>
+      </div>
+      <div class="note" role="note">
+        <strong>Not tested</strong>
+        These signals are a synthesis of other tools and templates. No source tests them.
+      </div>
+    </div>
+    <p>The report proposes this order for choosing a profile.</p>
+    <figure>
+      <div class="fig" role="region" aria-label="Figure 3, how a profile is chosen" tabindex="0">
+<!-- docent:diagram
+{
+  "id": "choose",
+  "kind": "flow",
+  "label": "How a profile is chosen: the author's choice first, then a clear content rule, then the language model. When all are unsure, a choice that is hard to undo goes to the author, and every other page uses Standard.",
+  "nodes": [
+    {"id": "author", "ask": "Author names a type?"},
+    {"id": "rule", "ask": "One rule clearly wins?"},
+    {"id": "model", "ask": "The model names one?"},
+    {"id": "undo", "ask": "Hard to undo?"},
+    {"id": "standard", "name": "Use Standard", "stop": true},
+    {"id": "own", "name": "Use the author's type", "stop": true},
+    {"id": "rules", "name": "Use the rule's profile", "stop": true},
+    {"id": "guess", "name": "Use it, as a medium guess", "stop": true},
+    {"id": "ask", "name": "Ask the author", "stop": true}
+  ],
+  "edges": [
+    {"from": "author", "to": "rule", "when": "no"},
+    {"from": "author", "to": "own", "when": "yes"},
+    {"from": "rule", "to": "model", "when": "no"},
+    {"from": "rule", "to": "rules", "when": "yes"},
+    {"from": "model", "to": "undo", "when": "no"},
+    {"from": "model", "to": "guess", "when": "yes"},
+    {"from": "undo", "to": "standard", "when": "no"},
+    {"from": "undo", "to": "ask", "when": "yes"}
+  ]
+}
+-->
+<svg id="dg-choose" class="dg dg-flow dg-auto" xmlns="http://www.w3.org/2000/svg" width="780" height="840" viewBox="0 0 780 840" role="img" aria-label="How a profile is chosen: the author's choice first, then a clear content rule, then the language model. When all are unsure, a choice that is hard to undo goes to the author, and every other page uses Standard.">
+<style>
+#dg-choose{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-choose .ground{fill:var(--fig,#f2f3f9)}
+#dg-choose .band{fill:var(--bg,#fbfbfe)}
+#dg-choose .track{stroke:var(--line,#d3d6e3)}
+#dg-choose .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-choose .head{fill:var(--text,#1c1f2e)}
+#dg-choose .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-choose .stop.end{fill:var(--text,#1c1f2e)}
+#dg-choose .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-choose .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-choose .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-choose .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-choose .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-choose .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-choose .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-choose .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-choose .sub,#dg-choose .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-choose .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-choose .card.is-stop{stroke:var(--text,#1c1f2e);stroke-width:2}
+.js #dg-choose .pulse{display:block;animation:7.6s linear 2 both}
+.js #dg-choose:not(.is-playing) .pulse{animation-play-state:paused}
+@keyframes dg-choose-1{0%{transform:translate(190px,76px);opacity:0}1.58%{transform:translate(190px,76px);opacity:1}17.76%{transform:translate(190px,206px);opacity:1}21.05%{transform:translate(190px,206px);opacity:0}100%{transform:translate(190px,206px);opacity:0}}
+.js #dg-choose .pulse-1{animation-name:dg-choose-1}
+@keyframes dg-choose-2{0%{transform:translate(190px,260px);opacity:0}21.05%{transform:translate(190px,260px);opacity:0}22.63%{transform:translate(190px,260px);opacity:1}38.82%{transform:translate(190px,390px);opacity:1}42.11%{transform:translate(190px,390px);opacity:0}100%{transform:translate(190px,390px);opacity:0}}
+.js #dg-choose .pulse-2{animation-name:dg-choose-2}
+@keyframes dg-choose-3{0%{transform:translate(190px,444px);opacity:0}42.11%{transform:translate(190px,444px);opacity:0}43.68%{transform:translate(190px,444px);opacity:1}59.87%{transform:translate(190px,574px);opacity:1}63.16%{transform:translate(190px,574px);opacity:0}100%{transform:translate(190px,574px);opacity:0}}
+.js #dg-choose .pulse-3{animation-name:dg-choose-3}
+@keyframes dg-choose-4{0%{transform:translate(190px,628px);opacity:0}63.16%{transform:translate(190px,628px);opacity:0}64.74%{transform:translate(190px,628px);opacity:1}80.92%{transform:translate(190px,758px);opacity:1}84.21%{transform:translate(190px,758px);opacity:0}100%{transform:translate(190px,758px);opacity:0}}
+.js #dg-choose .pulse-4{animation-name:dg-choose-4}
+@media (prefers-reduced-motion:reduce){#dg-choose .pulse{animation:none!important}#dg-choose .pulse{display:none!important}}
+@media print{#dg-choose{max-width:100%;height:auto}#dg-choose .pulse{display:none!important}}
+#dg-choose-phone{display:none}
+</style>
+<rect width="780" height="840" class="ground"/>
+<rect x="12" y="12" width="356" height="816" rx="10" class="band"/>
+<rect x="412" y="12" width="356" height="816" rx="10" class="band"/>
+
+
+<g class="leg" data-leg="1"><path d="M190,76 L190,200" class="line"/><polygon points="185.5,198 194.5,198 190,206" class="head"/><circle r="6" class="pulse pulse-1"/><text x="206" y="141" class="verb" text-anchor="start">no</text></g>
+<g class="leg" data-leg="2"><path d="M190,260 L190,384" class="line"/><polygon points="185.5,382 194.5,382 190,390" class="head"/><circle r="6" class="pulse pulse-2"/><text x="206" y="325" class="verb" text-anchor="start">no</text></g>
+<g class="leg" data-leg="3"><path d="M190,444 L190,568" class="line"/><polygon points="185.5,566 194.5,566 190,574" class="head"/><circle r="6" class="pulse pulse-3"/><text x="206" y="509" class="verb" text-anchor="start">no</text></g>
+<g class="leg" data-leg="4"><path d="M190,628 L190,752" class="line"/><polygon points="185.5,750 194.5,750 190,758" class="head"/><circle r="6" class="pulse pulse-4"/><text x="206" y="693" class="verb" text-anchor="start">no</text></g>
+<g class="leg" data-leg="5"><path d="M310,76 L310,134 Q310,142 318,142 L432,142" class="line"/><polygon points="430,146.5 430,137.5 438,142" class="head"/><text x="390" y="123" class="verb" text-anchor="middle">yes</text></g>
+<g class="leg" data-leg="6"><path d="M310,260 L310,318 Q310,326 318,326 L432,326" class="line"/><polygon points="430,330.5 430,321.5 438,326" class="head"/><text x="390" y="307" class="verb" text-anchor="middle">yes</text></g>
+<g class="leg" data-leg="7"><path d="M310,444 L310,502 Q310,510 318,510 L432,510" class="line"/><polygon points="430,514.5 430,505.5 438,510" class="head"/><text x="390" y="491" class="verb" text-anchor="middle">yes</text></g>
+<g class="leg" data-leg="8"><path d="M310,628 L310,686 Q310,694 318,694 L432,694" class="line"/><polygon points="430,698.5 430,689.5 438,694" class="head"/><text x="390" y="675" class="verb" text-anchor="middle">yes</text></g>
+<path d="M48,24 L332,24 L340,50 L332,76 L48,76 L40,50 Z" class="card"/>
+<text x="58" y="55" class="name" text-anchor="start">Author names a type?</text>
+<path d="M48,208 L332,208 L340,234 L332,260 L48,260 L40,234 Z" class="card"/>
+<text x="58" y="239" class="name" text-anchor="start">One rule clearly wins?</text>
+<path d="M48,392 L332,392 L340,418 L332,444 L48,444 L40,418 Z" class="card"/>
+<text x="58" y="423" class="name" text-anchor="start">The model names one?</text>
+<path d="M48,576 L332,576 L340,602 L332,628 L48,628 L40,602 Z" class="card"/>
+<text x="58" y="607" class="name" text-anchor="start">Hard to undo?</text>
+<rect x="40" y="760" width="300" height="52" rx="10" class="card is-stop"/>
+<text x="58" y="791" class="name" text-anchor="start">Use Standard</text>
+<rect x="440" y="116" width="300" height="52" rx="10" class="card is-stop"/>
+<text x="458" y="147" class="name" text-anchor="start">Use the author's type</text>
+<rect x="440" y="300" width="300" height="52" rx="10" class="card is-stop"/>
+<text x="458" y="331" class="name" text-anchor="start">Use the rule's profile</text>
+<rect x="440" y="484" width="300" height="52" rx="10" class="card is-stop"/>
+<text x="458" y="515" class="name" text-anchor="start">Use it, as a medium guess</text>
+<rect x="440" y="668" width="300" height="52" rx="10" class="card is-stop"/>
+<text x="458" y="699" class="name" text-anchor="start">Ask the author</text>
+</svg>
+<svg id="dg-choose-phone" class="dg dg-column dg-auto" xmlns="http://www.w3.org/2000/svg" width="268" height="1096" viewBox="0 0 268 1096" role="img" aria-label="How a profile is chosen: the author's choice first, then a clear content rule, then the language model. When all are unsure, a choice that is hard to undo goes to the author, and every other page uses Standard.">
+<style>
+#dg-choose-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-choose-phone .ground{fill:var(--fig,#f2f3f9)}
+#dg-choose-phone .band{fill:var(--bg,#fbfbfe)}
+#dg-choose-phone .track{stroke:var(--line,#d3d6e3)}
+#dg-choose-phone .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-choose-phone .head{fill:var(--text,#1c1f2e)}
+#dg-choose-phone .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-choose-phone .stop.end{fill:var(--text,#1c1f2e)}
+#dg-choose-phone .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-choose-phone .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-choose-phone .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-choose-phone .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-choose-phone .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-choose-phone .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-choose-phone .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-choose-phone .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-choose-phone .sub,#dg-choose-phone .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-choose-phone .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+@media (prefers-reduced-motion:reduce){#dg-choose-phone .pulse{animation:none!important}#dg-choose-phone .pulse{display:none!important}}
+@media print{#dg-choose-phone{max-width:100%;height:auto}#dg-choose-phone .pulse{display:none!important}}
+@media (max-width:876px){#dg-choose{display:none}#dg-choose-phone{display:block}}
+</style>
+<rect width="268" height="1096" class="ground"/>
+<rect x="8" y="12" width="252" height="120" rx="10" class="band"/>
+<rect x="8" y="156" width="252" height="80" rx="10" class="band"/>
+<rect x="8" y="260" width="252" height="120" rx="10" class="band"/>
+<rect x="8" y="404" width="252" height="80" rx="10" class="band"/>
+<rect x="8" y="508" width="252" height="120" rx="10" class="band"/>
+<rect x="8" y="652" width="252" height="80" rx="10" class="band"/>
+<rect x="8" y="756" width="252" height="120" rx="10" class="band"/>
+<rect x="8" y="900" width="252" height="80" rx="10" class="band"/>
+<rect x="8" y="1004" width="252" height="80" rx="10" class="band"/>
+
+
+
+
+
+
+
+
+
+<g class="leg" data-leg="5"><path d="M30,66 L30,184" class="line"/><polygon points="25.5,182 34.5,182 30,190" class="head"/><text x="51" y="148" class="verb" text-anchor="start">yes</text></g>
+<g class="leg" data-leg="6"><path d="M30,314 L30,432" class="line"/><polygon points="25.5,430 34.5,430 30,438" class="head"/><text x="51" y="396" class="verb" text-anchor="start">yes</text></g>
+<g class="leg" data-leg="7"><path d="M30,562 L30,680" class="line"/><polygon points="25.5,678 34.5,678 30,686" class="head"/><text x="51" y="644" class="verb" text-anchor="start">yes</text></g>
+<g class="leg" data-leg="8"><path d="M30,810 L30,928" class="line"/><polygon points="25.5,926 34.5,926 30,934" class="head"/><text x="51" y="892" class="verb" text-anchor="start">yes</text></g>
+<g class="jump"><circle cx="61" cy="102" r="10" class="mark"/><text x="77" y="106" class="verb" text-anchor="start">no</text><text x="77" y="122" class="sub" text-anchor="start">to One rule clearly wins?</text></g>
+<g class="jump"><circle cx="61" cy="350" r="10" class="mark"/><text x="77" y="354" class="verb" text-anchor="start">no</text><text x="77" y="370" class="sub" text-anchor="start">to The model names one?</text></g>
+<g class="jump"><circle cx="61" cy="598" r="10" class="mark"/><text x="77" y="602" class="verb" text-anchor="start">no</text><text x="77" y="618" class="sub" text-anchor="start">to Hard to undo?</text></g>
+<g class="jump"><circle cx="61" cy="846" r="10" class="mark"/><text x="77" y="850" class="verb" text-anchor="start">no</text><text x="77" y="866" class="sub" text-anchor="start">to Use Standard</text></g>
+<circle cx="30" cy="56" r="8" class="stop"/>
+<text x="51" y="61" class="name" text-anchor="start">Author names a type?</text>
+<circle cx="30" cy="200" r="8" class="stop end"/>
+<text x="51" y="205" class="name" text-anchor="start">Use the author's type</text>
+<circle cx="30" cy="304" r="8" class="stop"/>
+<text x="51" y="309" class="name" text-anchor="start">One rule clearly wins?</text>
+<circle cx="30" cy="448" r="8" class="stop end"/>
+<text x="51" y="453" class="name" text-anchor="start">Use the rule's profile</text>
+<circle cx="30" cy="552" r="8" class="stop"/>
+<text x="51" y="557" class="name" text-anchor="start">The model names one?</text>
+<circle cx="30" cy="696" r="8" class="stop end"/>
+<text x="51" y="701" class="name" text-anchor="start">Use it, as a medium guess</text>
+<circle cx="30" cy="800" r="8" class="stop"/>
+<text x="51" y="805" class="name" text-anchor="start">Hard to undo?</text>
+<circle cx="30" cy="944" r="8" class="stop end"/>
+<text x="51" y="949" class="name" text-anchor="start">Ask the author</text>
+<circle cx="30" cy="1048" r="8" class="stop end"/>
+<text x="51" y="1053" class="name" text-anchor="start">Use Standard</text>
+</svg>
+<details class="dg-words">
+<summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>The diagram in words</summary>
+<ol><li>Author names a type? If no: One rule clearly wins? If yes: Use the author's type.</li><li>Use the author's type. The path ends here.</li><li>One rule clearly wins? If no: The model names one? If yes: Use the rule's profile.</li><li>Use the rule's profile. The path ends here.</li><li>The model names one? If no: Hard to undo? If yes: Use it, as a medium guess.</li><li>Use it, as a medium guess. The path ends here.</li><li>Hard to undo? If no: Use Standard. If yes: Ask the author.</li><li>Ask the author. The path ends here.</li><li>Use Standard. The path ends here.</li></ol>
+</details>
+<!-- /docent:diagram -->
+      </div>
+      <figcaption><strong>Figure 3</strong>How a profile is chosen. The model's answer counts as a medium guess at most. Whatever the path, the agent names the profile it used, so the author can change it.</figcaption>
+    </figure>
+    <div class="status">
+      <span class="state warn">The wrong default</span>
+      <p>"The page has code, so use a dense, wide layout" is wrong. Tutorials and runbooks hold code too, and they need a plain single column.</p>
+    </div>
+  </section>
+
+  <section id="print" aria-labelledby="print-h">
+    <h2 id="print-h">Print</h2>
+    <h3>Paper size and text</h3>
+    <p>The page sets no paper size, so the reader's choice wins. The page margin stays at 18mm, which works in all three browser engines. Print norms are 10 to 12pt, and today's 16px prints at exactly 12pt. So the body should be 11pt on paper.</p>
+    <p>A column as wide as the paper would hold 82 to 103 characters at 11pt, which is too long. So the text keeps a narrow column on paper, and only tables and code use the full width.</p>
+    <h3>Margin notes</h3>
+    <p>Option 1 keeps each note under its paragraph, which is safe. Option 2 keeps the notes beside the text, in a 112mm text column, an 8mm gap and a 50mm note column. That fits an A4 page.</p>
+    <figure>
+      <div class="fig" role="region" aria-label="Figure 4, an A4 page with the notes beside the text" tabindex="0">
+<!-- GAP: Docent has no diagram kind for this chart. Drawn by hand, after diagram-design's range-bar layout. -->
+<svg class="gc" id="gc-a4" width="634" height="204" viewBox="0 0 634 204" role="img" aria-labelledby="gc-a4-title gc-a4-desc"><title id="gc-a4-title">An A4 page with the notes beside the text</title><desc id="gc-a4-desc">An A4 page is 210mm wide: an 18mm margin, a 112mm text column, an 8mm gap, a 50mm note column, 4mm left over, and an 18mm margin.</desc>
+<rect class="page" x="2" y="2" width="630" height="168" rx="4"/><line class="mid" x1="56" y1="2" x2="56" y2="170"/><line class="mid" x1="578" y1="2" x2="578" y2="170"/><line class="txt" x1="56" y1="28" x2="392" y2="28"/><line class="txt" x1="56" y1="48" x2="392" y2="48"/><line class="txt" x1="56" y1="68" x2="392" y2="68"/><line class="txt" x1="56" y1="88" x2="392" y2="88"/><line class="txt" x1="56" y1="108" x2="392" y2="108"/><line class="txt" x1="56" y1="128" x2="392" y2="128"/><line class="txt" x1="56" y1="148" x2="272" y2="148"/><line class="txt m" x1="416" y1="28" x2="566" y2="28"/><line class="txt m" x1="416" y1="48" x2="566" y2="48"/><line class="txt m" x1="416" y1="68" x2="506" y2="68"/><line class="rule" x1="416" y1="16" x2="566" y2="16"/><text class="m" x="29" y="196" text-anchor="middle">18</text><text class="m" x="224" y="196" text-anchor="middle">112mm, the text</text><text class="m" x="404" y="196" text-anchor="middle">8</text><text class="m" x="491" y="196" text-anchor="middle">50mm, notes</text><text class="m" x="572" y="196" text-anchor="middle">4</text><text class="m" x="605" y="196" text-anchor="middle">18</text>
+</svg>
+      </div>
+      <figcaption><strong>Figure 4</strong>Option 2 on an A4 page, 210mm wide: the margins, the text column and the note column.</figcaption>
+    </figure>
+    <h3>Breaks, page numbers and closed sections</h3>
+    <ul>
+      <li>Keep a figure, a table and a code block on one page when they fit. Browsers treat these rules as hints.</li>
+      <li>Keep two lines of a paragraph together at a page break. Chrome and Safari do this; Firefox does not.</li>
+      <li>Page numbers work only in Chrome and Edge, so they are an extra. Other browsers print their own footer.</li>
+      <li>A closed section prints closed in browsers. The kit's page script opens it before printing.</li>
+      <li>Colors carry meaning only in status dots. The reader's setting can still drop backgrounds, so a code well needs a thin line.</li>
+    </ul>
+  </section>
+
+  <section id="decisions" aria-labelledby="decisions-h">
+    <h2 id="decisions-h">What was decided</h2>
+    <div class="row">
+      <p>The report ended with seven open questions. The owner answered each one, and kit 0.5.0 builds the answers.</p>
+      <div class="note" role="note">
+        <strong>Built</strong>
+        In kit 0.5.0, merged on 21 November 2026.
+      </div>
+    </div>
+    <div class="table-wrap" role="region" aria-label="The open questions and their decisions" tabindex="0">
+      <table>
+        <thead>
+          <tr><th scope="col">Question</th><th scope="col">Decision</th><th scope="col">State</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">Keep one left edge?</th><td>Yes. Layout A on every page.</td><td><span class="state ok">Built</span></td></tr>
+          <tr><th scope="row">Notes on paper</th><td>Beside the text, in a 50mm column.</td><td><span class="state ok">Built</span></td></tr>
+          <tr><th scope="row">Larger text for the public?</th><td>Yes. A page for the public has 18px text, and 12pt on paper.</td><td><span class="state ok">Built</span></td></tr>
+          <tr><th scope="row">Who chooses the profile?</th><td>The agent, on its own. It asks only when it cannot decide, and it follows a profile that the author names.</td><td><span class="state ok">Built</span></td></tr>
+          <tr><th scope="row">A side contents list?</th><td>Not now. The top bar already lists the sections.</td><td><span class="state plan">Later</span></td></tr>
+          <tr><th scope="row">Print at 11pt or 12pt?</th><td>11pt.</td><td><span class="state ok">Built</span></td></tr>
+          <tr><th scope="row">Page numbers in Chrome only?</th><td>Yes, as an extra.</td><td><span class="state ok">Built</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Two choices went past the report. Standard and Task pages end code and tables at the right edge of the notes, and Reference and Brief pages keep 1120px. A log or a trace uses Reference.</p>
+  </section>
+</main>
+
+<footer>
+  <div class="shell">
+    <span class="brand">
+      <svg viewBox="0 0 64 64" role="img" aria-label="Docent"><rect width="64" height="64" rx="14" fill="#2f3fd0"/><path d="M20 37V18H30A14 14 0 0 1 30 46H29" fill="none" stroke="#ffffff" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="20" cy="46" r="4" fill="#f2b824"/></svg>
+      Docent
+    </span>
+    <span>A guide inside every document.</span>
+  </div>
+</footer>
+<script>
+// docent:kit 0.5.0
+(() => {
+  const root = document.documentElement;
+  root.classList.add('js');
+  // A page saved from the browser ("Save page as") keeps what this script added. Take it out, so that the script adds each part once.
+  document.querySelectorAll('.fig-more, .step-n, button.copy').forEach((el) => el.remove());
+  document.querySelectorAll('div.code').forEach((holder) => holder.replaceWith(...holder.childNodes));
+  document.querySelectorAll('.is-numbered').forEach((h) => h.classList.remove('is-numbered'));
+  // A theme that the reader chose carries data-theme-reader. A saved page keeps it, and it is not a fixed theme.
+  if (root.hasAttribute('data-theme-reader')) { delete root.dataset.theme; delete root.dataset.themeReader; }
+  // Theme: the page follows the reader's system setting. The switch sets a choice that wins over the system and is remembered.
+  const button = document.querySelector('.theme');
+  const system = matchMedia('(prefers-color-scheme: dark)');
+  const theme = () => root.dataset.theme || (system.matches ? 'dark' : 'light');
+  const chooseTheme = (value) => { root.dataset.theme = value; root.dataset.themeReader = ''; };
+  // A theme written on <html> in the source is fixed: no saved choice and no switch.
+  const fixed = root.dataset.theme === 'light' || root.dataset.theme === 'dark';
+  if (fixed && button) button.hidden = true;
+  if (!fixed) try {
+    const saved = localStorage.getItem('docent-theme');
+    if (saved === 'dark' || saved === 'light') chooseTheme(saved);
+  } catch { /* no saved choice can be read: follow the system */ }
+  if (button && !fixed) {
+    const showSwitch = () => {
+      const next = theme() === 'dark' ? 'light' : 'dark';
+      button.dataset.next = next;
+      button.querySelector('.theme-text').textContent = next === 'dark' ? 'Dark' : 'Light';
+      button.setAttribute('aria-label', `Switch to the ${next} theme`);
+    };
+    showSwitch();
+    system.addEventListener('change', showSwitch);
+    button.addEventListener('click', () => {
+      chooseTheme(theme() === 'dark' ? 'light' : 'dark');
+      showSwitch();
+      try { localStorage.setItem('docent-theme', root.dataset.theme); } catch { /* private window: the choice lasts for this visit */ }
+    });
+  }
+  // Step numbers. The styles count the steps, but a screen reader in Chromium does not read a number that the styles count. So the script writes each number as text, in place of the counted one.
+  const number = (heading, n) => {
+    const span = document.createElement('span');
+    span.className = 'step-n';
+    span.textContent = `${n} `;
+    heading.prepend(span);
+    heading.classList.add('is-numbered');
+  };
+  const groups = new Map();
+  document.querySelectorAll('h3.step').forEach((h) => { const s = h.closest('section'); groups.set(s, [...(groups.get(s) || []), h]); });
+  groups.forEach((list) => list.forEach((h, i) => number(h, i + 1)));
+  document.querySelectorAll('.steps').forEach((ol) => [...ol.children].forEach((li, i) => { const h = li.querySelector('h3'); if (h) number(h, i + 1); }));
+  // A diagram outside a walkthrough runs its dot twice when it comes into view, then rests. Pointing at it runs it again.
+  const replay = (svg) => svg.querySelectorAll('.pulse').forEach((dot) => dot.getAnimations().forEach((run) => { run.cancel(); run.play(); }));
+  const seen = new IntersectionObserver((entries) => entries.forEach((entry) => {
+    if (!entry.isIntersecting) return;
+    entry.target.classList.add('is-playing');
+    seen.unobserve(entry.target);
+  }), { threshold: 0.6 });
+  document.querySelectorAll('svg.dg-auto').forEach((svg) => {
+    seen.observe(svg);
+    const well = svg.closest('.fig') || svg;
+    well.addEventListener('pointerenter', () => replay(svg));
+    well.addEventListener('focus', () => replay(svg));
+  });
+  // A drawing that is wider than its well scrolls sideways, and the part that shows can look complete. A line under the well says that more is to the side.
+  const wells = [...document.querySelectorAll('.fig')].map((well) => {
+    const note = document.createElement('p');
+    note.className = 'fig-more';
+    note.hidden = true;
+    note.textContent = 'The drawing is wider than the screen. Scroll it sideways to see all of it.';
+    well.after(note);
+    return { well, note };
+  });
+  // A code block gets a button that copies the code. The block moves into a holder, so the button stays in place when the code scrolls sideways.
+  const blocks = [...document.querySelectorAll('pre')].map((pre) => {
+    const holder = document.createElement('div'), button = document.createElement('button');
+    holder.className = 'code';
+    pre.before(holder);
+    holder.append(pre, button);
+    button.type = 'button';
+    button.className = 'copy';
+    button.textContent = 'Copy';
+    button.setAttribute('aria-live', 'polite');
+    button.addEventListener('click', async () => {
+      const text = (pre.querySelector('code') || pre).textContent;
+      let done = false;
+      try { await navigator.clipboard.writeText(text); done = true; } catch { /* no clipboard here: select the code and copy the selection */ }
+      if (!done) {
+        const range = document.createRange(), selection = getSelection();
+        range.selectNodeContents(pre);
+        selection.removeAllRanges();
+        selection.addRange(range);
+        try { done = document.execCommand('copy'); } catch { /* the code stays selected, so the reader can copy it by hand */ }
+        if (done) selection.removeAllRanges();
+      }
+      button.textContent = done ? 'Copied' : 'Select and copy';
+      setTimeout(() => (button.textContent = 'Copy'), 2000);
+    });
+    return { holder, pre, button };
+  });
+  const fit = () => {
+    wells.forEach(({ well, note }) => (note.hidden = well.scrollWidth <= well.clientWidth + 1));
+    // When the widest line of code reaches the button, the code starts below the button. A block that is hidden now has no size; it is measured when it shows.
+    blocks.forEach(({ holder, pre, button }) => {
+      if (!pre.clientWidth) return;
+      const code = pre.querySelector('code') || pre;
+      holder.classList.toggle('is-long', pre.scrollWidth > pre.clientWidth + 1 || code.getBoundingClientRect().right > button.getBoundingClientRect().left - 8);
+    });
+  };
+  // Measure again when a well or a code block changes its size: the window changes, a chooser shows another case, or a closed section opens.
+  if ('ResizeObserver' in window) {
+    const watch = new ResizeObserver(fit);
+    wells.forEach(({ well }) => watch.observe(well));
+    blocks.forEach(({ pre }) => watch.observe(pre));
+  }
+  addEventListener('resize', fit);
+  fit();
+  // Print: open every closed section so its text prints, then close it again.
+  let opened = [];
+  addEventListener('beforeprint', () => { opened = [...document.querySelectorAll('details:not([open])')]; opened.forEach((d) => (d.open = true)); });
+  addEventListener('afterprint', () => { opened.forEach((d) => (d.open = false)); opened = []; });
+  // The route dot marks the current section. In each walkthrough, the rail dot marks the current step and the diagram lights the leg with the same number.
+  const bar = document.querySelector('.topbar .shell');
+  const routeDot = document.querySelector('.route-dot');
+  const links = [...document.querySelectorAll('.route a[href^="#"]')].filter((a) => document.getElementById(a.getAttribute('href').slice(1)));
+  const sections = links.map((a) => document.getElementById(a.getAttribute('href').slice(1)));
+  const walks = [...document.querySelectorAll('.walk')].map((walk) => ({
+    steps: [...walk.querySelectorAll('.steps > li')],
+    legs: [...walk.querySelectorAll('svg.dg .leg')],
+    dot: walk.querySelector('.rail-dot'),
+  })).filter((walk) => walk.steps.length);
+  const nearest = (items, line) => items.reduce((best, el) => (el.getBoundingClientRect().top <= line ? el : best), items[0]);
+  const update = () => {
+    if (sections.length) {
+      const section = nearest(sections, innerHeight * 0.35);
+      links.forEach((a, i) => (sections[i] === section ? a.setAttribute('aria-current', 'true') : a.removeAttribute('aria-current')));
+      if (bar && routeDot) {
+        const link = links[sections.indexOf(section)].getBoundingClientRect();
+        routeDot.style.setProperty('--x', `${link.left + link.width / 2 - bar.getBoundingClientRect().left - 3.5}px`);
+      }
+    }
+    walks.forEach(({ steps, legs, dot }) => {
+      const step = nearest(steps, innerHeight * 0.5);
+      const number = steps.indexOf(step) + 1;
+      steps.forEach((li) => li.classList.toggle('is-current', li === step));
+      legs.forEach((leg) => leg.classList.toggle('is-current', Number(leg.dataset.leg) === number));
+      if (dot) dot.style.setProperty('--y', `${step.offsetTop}px`);
+    });
+  };
+  let queued = false;
+  const schedule = () => { if (!queued) { queued = true; requestAnimationFrame(() => { queued = false; update(); }); } };
+  addEventListener('scroll', schedule, { passive: true });
+  addEventListener('resize', schedule);
+  // Widgets. Each one is readable without this script. The script adds memory, the count of a checklist and the answer of a decision helper.
+  const load = (key) => { try { return JSON.parse(localStorage.getItem(key)); } catch { return null; } };
+  const save = (key, value) => { try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* private window: it lasts for this visit */ } };
+  // Chooser: the choice is remembered, and choosers with the same options change together.
+  const choosers = [...document.querySelectorAll('.choose')].map((el) => ({
+    inputs: [...el.querySelectorAll(':scope > input')],
+    key: `docent-choice:${[...el.querySelectorAll(':scope > .opt')].map((label) => label.textContent).join('|')}`,
+  }));
+  const choose = (key, n) => choosers.forEach((c) => { if (c.key === key && c.inputs[n]) c.inputs[n].checked = true; });
+  choosers.forEach((c) => {
+    choose(c.key, load(c.key));
+    c.inputs.forEach((input, n) => input.addEventListener('change', () => {
+      const top = input.getBoundingClientRect().top;
+      choose(c.key, n);
+      scrollBy(0, input.getBoundingClientRect().top - top); // a chooser higher on the page changed its height: keep this one in place
+      save(c.key, n);
+      schedule();
+    }));
+  });
+  // Value picker: every place <var data-v="key"> shows the value of the chosen option. The values come from the table of all values. Pickers with the same options change together, and the choice is remembered.
+  const pickers = [...document.querySelectorAll('.values')].map((el) => ({
+    el,
+    inputs: [...el.querySelectorAll(':scope > input')],
+    names: [...el.querySelectorAll(':scope > .opt')].map((label) => label.textContent),
+    rows: [...el.querySelectorAll('tbody tr[data-v]')].map((tr) => ({ key: tr.dataset.v, cells: [...tr.querySelectorAll('td')].map((td) => td.textContent) })),
+  }));
+  const pick = (names, n) => pickers.forEach((p) => {
+    if (p.names.join('|') !== names || !p.inputs[n]) return;
+    p.inputs[n].checked = true;
+    p.el.querySelector('.values-now strong').textContent = p.names[n];
+    p.rows.forEach(({ key, cells }) => document.querySelectorAll(`var[data-v="${CSS.escape(key)}"]`).forEach((v) => (v.textContent = cells[n])));
+  });
+  pickers.forEach((p) => {
+    const key = `docent-values:${p.names.join('|')}`, saved = load(key);
+    if (Number.isInteger(saved)) pick(p.names.join('|'), saved);
+    p.inputs.forEach((input, n) => input.addEventListener('change', () => { pick(p.names.join('|'), n); save(key, n); }));
+    p.el.querySelector('details').open = false;
+  });
+  // Checklist: the ticks are remembered for this document, and the line below the list counts them.
+  document.querySelectorAll('form.checks').forEach((form) => {
+    const boxes = [...form.querySelectorAll('input')], out = form.querySelector('output'), key = `docent-ticks:${location.pathname}#${form.id}`;
+    const saved = load(key);
+    if (Array.isArray(saved) && saved.length === boxes.length) boxes.forEach((box, i) => (box.checked = saved[i] === true));
+    const show = () => { out.textContent = `${boxes.filter((box) => box.checked).length} of ${boxes.length} done`; };
+    const keep = () => { show(); save(key, boxes.map((box) => box.checked)); schedule(); };
+    form.addEventListener('change', keep);
+    form.addEventListener('reset', () => setTimeout(keep));
+    show();
+  });
+  // Decision helper: a row that no longer fits the answers takes the muted color. When every question has an answer, the one row that fits is shown as the answer.
+  document.querySelectorAll('.decide').forEach((el) => {
+    const form = el.querySelector('form'), out = el.querySelector('output'), again = el.querySelector('.wd-foot'), groups = [...el.querySelectorAll('fieldset')], rows = [...el.querySelectorAll('tbody tr')];
+    el.querySelector('details').open = false;
+    const show = () => {
+      const picked = groups.map((group) => [...group.querySelectorAll('input')].findIndex((input) => input.checked) + 1);
+      const fits = rows.filter((row) => {
+        const fit = row.dataset.when.split(',').every((option, q) => option === '0' || !picked[q] || Number(option) === picked[q]);
+        row.classList.toggle('is-out', !fit);
+        return fit;
+      });
+      out.innerHTML = picked.every(Boolean) && fits.length === 1 ? fits[0].lastElementChild.innerHTML : '';
+      again.hidden = !picked.some(Boolean);
+      schedule();
+    };
+    form.addEventListener('change', show);
+    form.addEventListener('reset', () => setTimeout(show));
+    show();
+  });
+  update();
+  requestAnimationFrame(() => requestAnimationFrame(() => root.classList.add('ready')));
+})();
+// /docent:kit
+</script>
+</body>
+</html>
