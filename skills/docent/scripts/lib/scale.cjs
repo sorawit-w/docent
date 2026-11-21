@@ -26,12 +26,16 @@ function readScale(scale, { needStep }) {
     if (!isNum(scale.step) || !(scale.step > 0)) fail(`"scale" needs a "step", a number more than 0, for its ticks`);
     count = Math.round((scale.to - scale.from) / scale.step);
     if (count < 1) fail(`"scale" needs at least one step: "step" must be no more than "to" minus "from"`);
+    // The step limit comes before any work for each tick, so a step that is far too small is refused at once.
+    if (count > MOST.steps) fail(`the scale has ${count} steps; a scale chart has at most ${MOST.steps}. Use a larger "step"`);
+    // A label shows 15 significant digits, so a step much smaller than the numbers can give two ticks the same label.
+    const written = Array.from({ length: count + 1 }, (_, k) => fmt(k === count ? scale.to : scale.from + k * scale.step));
+    if (new Set(written).size < written.length) fail(`"step" is too small for numbers this large: the labels cannot tell the ticks apart. Write the values from a nearer start, such as an offset in a smaller unit`);
     // The error allowed is a billionth of a step, so a scale of tiny steps is checked as closely as a scale of large ones,
     // or the rounding of the endpoints themselves (2000000.2 − 2000000.1 is not exactly 0.1), whichever is larger, but never
     // more than 1% of a step: endpoints too large for their step cannot show a whole number of steps, and are refused.
     const allowed = Math.min(0.01 * scale.step, Math.max(1e-9 * scale.step, 8 * Number.EPSILON * Math.max(Math.abs(scale.from), Math.abs(scale.to))));
     if (Math.abs(count * scale.step - (scale.to - scale.from)) > allowed) fail(`"scale": "to" minus "from" must be a whole number of steps`);
-    if (count > MOST.steps) fail(`the scale has ${count} steps; a scale chart has at most ${MOST.steps}. Use a larger "step"`);
   }
   const unit = words(scale.unit, `the unit of "scale"`, MOST.unit, false);
   if (scale.marks != null && !Array.isArray(scale.marks)) fail(`"marks" in "scale" must be a list`);

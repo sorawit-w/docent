@@ -278,6 +278,19 @@ test("each end of the scale leaves room for its own label, so a long first label
 });
 
 test("endpoints whose rounding is more than 1% of a step are refused", () => {
-  assert.throws(() => readScale({ from: 99999999.999999, to: 100000000, step: 4.5e-7 }, { needStep: true }), /a whole number of steps/);
+  // Refused either as too small a step for its numbers, or as not a whole number of steps.
+  assert.throws(() => readScale({ from: 99999999.999999, to: 100000000, step: 4.5e-7 }, { needStep: true }), /too small for numbers this large|a whole number of steps/);
   assert.doesNotThrow(() => readScale({ from: 2000000.1, to: 2000000.2, step: 0.1 }, { needStep: true }));
+});
+
+test("a step too small for the size of its numbers is refused, because the labels could not tell the ticks apart", () => {
+  assert.throws(() => readScale({ from: 1e21, to: 1e21 + 1048576, step: 262144 }, { needStep: true }), /too small for numbers this large/);
+});
+
+test("a large offset is refused only when two tick labels would be the same", () => {
+  assert.doesNotThrow(() => readScale({ from: 10000000000000, to: 10000000000004, step: 1 }, { needStep: true }));
+});
+
+test("a scale with far too many steps is refused at once by the step limit", () => {
+  assert.throws(() => readScale({ from: 0, to: 4294967296, step: 1 }, { needStep: true }), /at most 20/);
 });
