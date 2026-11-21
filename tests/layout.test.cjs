@@ -179,3 +179,10 @@ test("a measure that would meet the unit moves to the second line", () => {
   const texts = scene.notes.filter((n) => n.cls === "val" || n.s === "mm").map(box);
   texts.forEach((a, i) => texts.slice(i + 1).forEach((b) => assert.ok(!meet(a, b), `"${a.s}" meets "${b.s}"`)));
 });
+
+test("measures keep clear of the row note also when the scale has no unit", () => {
+  const d = { id: "plain", kind: "layout", label: "A strip with a narrow first gap.", scale: { from: 0, to: 1 }, rows: [{ name: "Strip", note: "custom layout", measure: true, boxes: [{ name: "A", from: 0.000125, to: 0.4 }, { name: "B", from: 0.6, to: 1 }] }] };
+  const { scene } = renderDiagram(d);
+  const note = box(scene.notes.find((n) => n.s === "custom layout"));
+  for (const m of measures(scene).map(box)) assert.ok(!meet(note, m), `"${m.s}" meets the note`);
+});

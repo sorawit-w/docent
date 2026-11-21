@@ -143,8 +143,8 @@ function drawLayout(model, phone = false) {
       yy = boxTop + BOX + 8;
     }
     if (row.measure) {
-      // On a desktop the unit stands in the name column, so the measures start below the note.
-      if (!phone && row.note && scale.unit) yy = Math.max(yy, top + 8 + 34 + 8);
+      // On a desktop the unit and a wide first measure can reach into the name column, so the measures start below the note.
+      if (!phone && row.note) yy = Math.max(yy, top + 8 + 34 + 8);
       const marks = stretchesOf(row, scale).map((st) => {
         const w = valueWidth(st.label), cx = sc.x((st.from + st.to) / 2);
         return { st, w, x: Math.min(Math.max(cx - w / 2, 12), hi - w) };
