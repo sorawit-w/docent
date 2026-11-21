@@ -29,7 +29,7 @@ const shorter = (a, b) => { const want = words(a), have = words(b); let at = 0; 
 const local = (value) => /^(#|data:)/i.test(value.trim()) || value.trim() === "";
 /** Each figure well (a div with the class fig) and all that is inside it, counting nested divs so the whole well is read. */
 function wells(html) {
-  const out = [], open = /<div\b([^>]*\bclass="fig\b[^"]*"[^>]*)>/g;
+  const out = [], open = /<div\b([^>]*\bclass="(?:[^"]*\s)?fig(?:\s[^"]*)?"[^>]*)>/g;
   for (let m; (m = open.exec(html)); ) {
     const tag = /<(\/?)div\b[^>]*>/gi;
     tag.lastIndex = open.lastIndex;
@@ -80,7 +80,7 @@ function checkDocument(html) {
   // An interaction overview links each ref frame to a sequence diagram in the same document.
   for (const { label, ref } of refs) if (!ids.has(ref)) errors.push(`${label}: a ref frame links to the diagram "${ref}", which is not in this document`);
   // A well holds one drawing, or two for two separate chains. Beside walkthrough steps it holds one, because step n lights leg n.
-  for (const [, attrs, inner] of html.matchAll(/<div\b([^>]*\bclass="fig\b[^"]*"[^>]*)>([\s\S]*?)<\/div>/g)) {
+  for (const { attrs, inner } of wells(html)) {
     const count = (inner.match(/<!-- docent:diagram\b/g) || []).length, name = (attrs.match(/aria-label="([^"]*)"/) || [])[1] || "a figure";
     if (count > 2) errors.push(`${name} holds ${count} diagrams; a figure holds one, or two for two separate chains`);
     if (count > 1 && /"place"\s*:\s*"walk"/.test(inner)) errors.push(`${name} holds ${count} diagrams beside walkthrough steps; there it holds one`);

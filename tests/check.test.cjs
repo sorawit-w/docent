@@ -192,3 +192,9 @@ test("check refuses a hand-drawn drawing in a figure well, and leaves icons outs
     assert.deepEqual(checkDocument(fs.readFileSync(path.join(__dirname, "..", file), "utf8")).errors, [], `${file} passes`);
   }
 });
+
+test("a figure well is found by its class word in any place, and a class that only starts with fig is not a well", () => {
+  const svg = '<svg width="8" height="8" viewBox="0 0 8 8" role="img" aria-label="A chart"><rect width="8" height="8"/></svg>';
+  assert.match(errorsOf(add("</main>", `<div class="extra fig" role="region" aria-label="Figure 9, a chart" tabindex="0">${svg}</div>`)), /Figure 9, a chart holds a drawing/);
+  assert.doesNotMatch(errorsOf(add("</main>", `<div class="fig-icon">${svg}</div>`)), /holds a drawing/);
+});

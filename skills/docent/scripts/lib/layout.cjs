@@ -5,7 +5,7 @@
 const { fail, words, id } = require("./blocks.cjs");
 const { textWidth } = require("./text.cjs");
 const { wrapName } = require("./range.cjs");
-const { readScale, makeScale, drawHead, drawGrid, valueWidth, fmt, isNum, num } = require("./scale.cjs");
+const { readScale, makeScale, drawHead, drawGrid, valueWidth, fmt, isNum, num, diff } = require("./scale.cjs");
 
 const MOST = { rows: 6, boxes: 6, name: 16, note: 24 };
 const WIDE = 640, PHONE = 264; // as for a range chart: a desktop and A4 paper, and a 320px screen
@@ -49,7 +49,7 @@ function readLayout(data) {
 /** The stretches of a measured row: from the start of the scale to its end, between every edge of a box on track 1. */
 function stretchesOf(row, scale) {
   const edges = [...new Set([scale.from, scale.to, ...row.tracks[0].flatMap((b) => [b.from, b.to])])].sort((a, b) => a - b);
-  return edges.slice(1).map((to, k) => ({ from: edges[k], to, label: fmt(to - edges[k]) }));
+  return edges.slice(1).map((to, k) => ({ from: edges[k], to, label: fmt(diff(edges[k], to)) }));
 }
 
 /**
@@ -108,7 +108,7 @@ function drawLayout(model, phone = false) {
       if (note) {
         const after = 20 + textWidth(lines[lines.length - 1], 14, 600) + 8;
         if (after + textWidth(note, 12) <= W - 20) s.notes.push({ x: after, y: base, s: note, cls: "sub", anchor: "start" });
-        else { s.notes.push({ x: 20, y: yy + 14, s: note, cls: "sub", anchor: "start" }); yy += LINE; }
+        else for (const line of wrapName(note, W - 40)) { s.notes.push({ x: 20, y: yy + 14, s: line, cls: "sub", anchor: "start" }); yy += LINE; }
       }
     } else {
       s.notes.push({ x: 20, y: yy + 16, s: row.name, cls: "name", anchor: "start" });
@@ -125,6 +125,8 @@ function drawLayout(model, phone = false) {
       // A name that does not fit in its box stands above it, from its left edge, and moves left only at the right edge.
       const above = boxes.filter((b) => !b.inside).map((b) => ({ box: b, x: Math.min(b.a, hi - b.w), w: b.w }));
       const lines = onLines(above, 12, (p, q) => `the names above the boxes "${p.box.name}" and "${q.box.name}" of the row "${row.name}" need a third line ${where}; shorten a name, or move a box to track 2`);
+      // The tick of a name on the upper line runs down past the lower line, so no name there may stand across it.
+      for (const n of above) for (const m of above) if (m.line > n.line && n.box.a >= m.x - 4 && n.box.a <= m.x + m.w + 4) fail(`the tick of the name "${n.box.name}" would cross the name "${m.box.name}" above the boxes of the row "${row.name}" ${where}; shorten a name, or move a box to track 2`);
       const boxTop = yy + (lines ? lines * LINE + 6 : 0);
       for (const n of above) {
         const by = boxTop - 9 - (lines - 1 - n.line) * LINE;
@@ -169,7 +171,7 @@ function wordsOf(model) {
   const { scale, rows } = model;
   const unit = scale.unit ? ` ${scale.unit}` : "";
   const head = '<tr><th scope="col">Row</th><th scope="col">Box</th><th scope="col">From</th><th scope="col">To</th><th scope="col">Width</th></tr>';
-  const body = rows.flatMap((r) => r.boxes.map((b) => `<tr><th scope="row">${esc(r.name)}</th><td>${esc(b.name)}</td><td>${fmt(b.from)}</td><td>${fmt(b.to)}</td><td>${fmt(b.to - b.from)}</td></tr>`)).join("");
+  const body = rows.flatMap((r) => r.boxes.map((b) => `<tr><th scope="row">${esc(r.name)}</th><td>${esc(b.name)}</td><td>${fmt(b.from)}</td><td>${fmt(b.to)}</td><td>${fmt(diff(b.from, b.to))}</td></tr>`)).join("");
   const and = (list) => (list.length > 1 ? `${list.slice(0, -1).join(", ")} and ${list[list.length - 1]}` : list[0]);
   const lines = [
     ...rows.filter((r) => r.measure).map((r) => `<li>${esc(r.name)}, measured: ${esc(and(stretchesOf(r, scale).map((st) => st.label)))}${esc(unit)}.</li>`),

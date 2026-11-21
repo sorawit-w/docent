@@ -147,3 +147,20 @@ test("a layout takes every color from the page tokens, uses no ultramarine, and 
   assert.doesNotMatch(svg, /gradient|filter|shadow|stroke-dasharray/i, "flat, and nothing dashed");
   for (const rule of svg.match(/[^{}\n]*\{[^{}]*var\(--(primary|dot),[^{}]*\}/g) || []) assert.match(rule, /pulse/, `ultramarine only for a dot, and a layout draws none: ${rule}`);
 });
+
+test("edge cases from review: decimal measures without noise, a long phone note that wraps, and a tick that would cross a name", () => {
+  // Measures and widths on a decimal scale with an offset keep only the digits that mean something.
+  const dec = { id: "dec", kind: "layout", label: "Two small parts.", scale: { from: 100, to: 101, unit: "mm" }, rows: [{ name: "Strip", measure: true, boxes: [{ name: "A", from: 100.1, to: 100.2 }, { name: "B", from: 100.3, to: 100.4 }] }] };
+  const drawn = renderDiagram(dec);
+  assert.deepEqual(measures(drawn.scene).map((n) => n.s), ["0.1", "0.1", "0.1", "0.1", "0.6"]);
+  assert.match(drawn.svg, /<td>100\.1<\/td><td>100\.2<\/td><td>0\.1<\/td>/);
+  // A note that does not fit beside the row name wraps inside the phone form, also with the unit added.
+  const long = fixture("layout-a4");
+  long.rows[0].name = "一二三四五六七八九十一二三四五六";
+  long.rows[0].note = "一二三四五六七八九十一二三四五六七八九十一二三";
+  const { phone } = renderDiagram(long);
+  for (const t of [...phone.notes, ...phone.parts.flatMap((p) => p.texts)].map(box)) assert.ok(t.x1 <= phone.w, `"${t.s}" runs past the phone form`);
+  // The tick of a name on the upper line may not cross a name on the lower line.
+  const crowd = { id: "crowd", kind: "layout", label: "Two narrow parts at the right edge.", scale: { from: 0, to: 100, step: 20 }, rows: [{ name: "Edge", boxes: [{ name: "Wide", from: 0, to: 80 }, { name: "Contents", from: 90, to: 95 }, { name: "Notes", from: 95, to: 100 }] }] };
+  assert.throws(() => renderDiagram(crowd), /the tick of the name "Contents" would cross the name "Notes" above the boxes of the row "Edge" on a phone; shorten a name, or move a box to track 2/);
+});

@@ -88,6 +88,13 @@ function makeScale(scale, x0, x1, { lo = -Infinity, hi = Infinity } = {}) {
 
 const num = (v) => String(Math.round(v * 100) / 100);
 
+/** b minus a without the noise of the subtraction: the shortest number within its rounding error (100.2 − 100.1 is 0.1). */
+function diff(a, b) {
+  const v = b - a, error = 2 * (Math.abs(a) * Number.EPSILON + Math.abs(b) * Number.EPSILON);
+  for (let digits = 1; digits < 15; digits++) { const short = Number(v.toPrecision(digits)); if (Math.abs(short - v) <= error) return short; }
+  return Number(v.toPrecision(15));
+}
+
 /**
  * The head of a scale chart, from the top y: the names of the marks, then the tick labels, with the unit at the left of the
  * ticks (on its own line on a phone). A scale with no ticks shows no unit here; its measures carry it. Returns the y below.
@@ -134,4 +141,4 @@ function placeLabel({ a, b, w, lo, hi, sides }) {
   return { x: Math.min(Math.max(a, lo), hi - w), anchor: "start", side: "above" };
 }
 
-module.exports = { readScale, makeScale, drawHead, drawGrid, placeLabel, valueWidth, fmt, isNum, num, MOST };
+module.exports = { readScale, makeScale, drawHead, drawGrid, placeLabel, valueWidth, fmt, isNum, num, diff, MOST };
