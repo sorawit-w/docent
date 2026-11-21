@@ -728,6 +728,47 @@ A communication diagram shows who is linked to whom, and the numbered messages t
 - The numbers give the order, so nothing moves: there is no dot. The diagram in words lists the messages in number order.
 - On a phone the diagram becomes a list of lifelines, each with the messages it sends.
 
+## Range charts
+
+A range chart shows values and ranges on one numeric scale, one row each, so the reader sees where each one falls and whether one range sits inside another: line lengths that studies recommend, and the line length of a page. Write it with `"kind": "range"` when there are 3 to 12 values in one unit. For one or two values, write a sentence. For values over time, use a timing diagram or a table. For amounts compared by size from zero, use a table; Docent has no bar chart.
+
+```json
+{
+  "id": "line-lengths",
+  "kind": "range",
+  "label": "Readers prefer 45 to 76 characters in a line, and one study rated 55 easiest. Advice and standards set upper limits from 70 to 90. Docent holds 63 to 70 on screen and 52 to 64 on paper.",
+  "scale": { "from": 40, "to": 100, "step": 10, "unit": "characters" },
+  "groups": [
+    { "id": "evidence", "name": "The evidence" },
+    { "id": "docent", "name": "Docent" }
+  ],
+  "rows": [
+    { "name": "Readers prefer", "from": 45, "to": 76, "group": "evidence" },
+    { "name": "Rated easiest, Dyson", "at": 55, "group": "evidence" },
+    { "name": "A literature review", "to": 70, "group": "evidence" },
+    { "name": "Advice for dyslexia", "from": 50, "to": 75, "group": "evidence" },
+    { "name": "WCAG 1.4.8, AAA", "to": 80, "group": "evidence" },
+    { "name": "Print, Butterick", "from": 45, "to": 90, "group": "evidence" },
+    { "name": "Docent on screen", "from": 63, "to": 70, "group": "docent" },
+    { "name": "Docent on paper", "from": 52, "to": 64, "note": "computed", "group": "docent" }
+  ]
+}
+```
+
+| Field | What it is |
+|---|---|
+| `scale` | `from`, `to` and `step` are numbers; `to` minus `from` is a whole number of steps, at most 20. `unit` is optional, at most 12 characters, such as `px`. `marks` is optional: at most 2 named lines, each with `at` and a `name` of at most 20 characters, such as `{"at": 66, "name": "our aim"}`. |
+| `groups` | Optional, at most 3, each with an `id` and a `name` (at most 20 characters), written like lanes. When there are groups, every row names one in `group`, and the rows of one group stand one after another. Each group is a band. |
+| `rows` | 2 to 12, top to bottom. Each has a `name` (at most 28 characters) and one mark: `from` and `to` for a **range**, `at` for a **point**, `to` alone for an **upper limit** ("up to 80"), or `from` alone for a **lower limit** ("at least 45"). Every number lies on the scale. A `note` is optional, at most 24 characters, and is written after the value: "52–64, computed". |
+
+- A range is a bar with a small round corner, a point is a filled circle, and a limit is a line from the edge of the scale to a cap at the limit. The line has no cap at the edge, so it claims no other limit. `render` writes each value from the numbers, beside its mark.
+- Use groups, not color, to set your own rows apart from the others. A range chart has no `state`, and nothing in it is dashed.
+- A named line (`marks`) is a thin muted line through the bands, with its name over the ticks.
+- On a desktop and on paper the chart is 640px wide: the row names in a column at the left, the scale at the right. It prints at that size, with no shrink. On a phone it is 264px wide, and each row name stands on its own line above its mark. The tick labels keep 48px apart, so a phone may show every second or every fifth tick.
+- Nothing moves: a range chart has no dot and no walkthrough. It sits in the text flow and has no `form`.
+- `render` also writes the rows as a table, in a closed section under the drawing ("The diagram in words").
+- `render` refuses a range narrower than 4px in either form ("the range 63–64 is 3.2px wide on a phone; write it as a point"), and a value that has no free place beside its mark or above it. When a value does not fit on the right of its mark, it stands on the left, or on a line above.
+
 ## Optional legs
 
 A leg with `"optional": true` is a path that only some readers take, or that happens only in some cases. It is drawn as a dashed arrow:
@@ -788,6 +829,7 @@ An icon may hold only these shapes and attributes: `path` (`d`), `circle` (`cx`,
   - `... warning: the activity has no decision, no fork and at most one partition; this is a numbered list` — the steps run in one line; write them as `<ol>`.
   - `... warning: the class diagram has no relations; this is a table of the classes and their members` — the same for an object diagram with no links.
   - `... warning: the links form one chain, so they add little; ... a sequence diagram reads better` — a communication diagram earns its place when its links branch.
+  - `... warning: the range chart has 2 rows; a sentence says this more simply` — two values read better in a sentence than on a scale.
 
 `render` draws every diagram that it can. When one is refused, the others are still drawn, and `render` ends with exit code 1.
 

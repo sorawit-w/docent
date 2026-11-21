@@ -52,6 +52,18 @@ function renderTiming(data) {
   return { svg: `${main}${small}\n${inWords(wordsOf(model))}`, form: "timing", warnings: [], icons: [], model, scene, phone };
 }
 
+/** A range chart: one form 640px wide for a desktop and for paper, one 264px wide for a phone, and the rows as a table in words. */
+function renderRange(data) {
+  const { readRange, layoutRange, wordsOf } = require("./range.cjs");
+  const model = readRange(data);
+  const scene = layoutRange(model), phone = layoutRange(model, true);
+  const id = `dg-${model.id}`;
+  const main = toSvg(scene, { id, label: model.label, mode: "auto", swap: { phone: `${id}-phone` } });
+  // On paper the 640px form prints at its real size, because it fits the sheet; the phone form is for narrow screens only.
+  const small = toSvg(phone, { id: `${id}-phone`, label: model.label, mode: "auto", swap: { main: id, below: scene.w + ROOM, printMain: true } });
+  return { svg: `${main}\n${small}\n${inWords(wordsOf(model))}`, form: "range", warnings: fitWarnings("range", model), icons: [], model, scene, phone };
+}
+
 const FORMS = ["wide", "tall", "plates"];
 const STATES = ["ok", "warn", "err"]; // success, needs care, failure: the status colors of the page
 const MOST = { lanes: 5, parts: 12, legs: 16, side: 2, name: 32, note: 40, verb: 24, lane: 28 };
@@ -185,7 +197,8 @@ function renderDiagram(data) {
     if (data.kind === "flow") return renderFlow(data);
     if (Object.hasOwn(GRAPH_KINDS, data.kind)) return renderGraphKind(data);
     if (data.kind === "timing") return renderTiming(data);
-    fail(`"kind" must be one of ${["sequence", "flow", ...Object.keys(GRAPH_KINDS), "timing"].map((k) => `"${k}"`).join(", ")}, or left out for a workflow diagram`);
+    if (data.kind === "range") return renderRange(data);
+    fail(`"kind" must be one of ${["sequence", "flow", ...Object.keys(GRAPH_KINDS), "timing", "range"].map((k) => `"${k}"`).join(", ")}, or left out for a workflow diagram`);
   }
   const { model, warnings } = readData(data);
   const icons = warnings.filter((w) => !w.startsWith("every part has the state") && !w.startsWith("no leg has a verb")); // these warnings are about icons; check reports them as errors
