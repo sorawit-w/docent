@@ -29,12 +29,14 @@ const shorter = (a, b) => { const want = words(a), have = words(b); let at = 0; 
 const local = (value) => /^(#|data:)/i.test(value.trim()) || value.trim() === "";
 /** Each figure well (a div with the class fig) and all that is inside it, counting nested divs so the whole well is read. */
 function wells(html) {
+  // Tags are read with every comment blanked out, so a <div> written in a diagram's data does not count.
+  const bare = html.replace(/<!--[\s\S]*?-->/g, (c) => " ".repeat(c.length));
   const out = [], open = /<div\b([^>]*\bclass="(?:[^"]*\s)?fig(?:\s[^"]*)?"[^>]*)>/g;
-  for (let m; (m = open.exec(html)); ) {
+  for (let m; (m = open.exec(bare)); ) {
     const tag = /<(\/?)div\b[^>]*>/gi;
     tag.lastIndex = open.lastIndex;
     let depth = 1, t;
-    while (depth && (t = tag.exec(html))) depth += t[1] ? -1 : 1;
+    while (depth && (t = tag.exec(bare))) depth += t[1] ? -1 : 1;
     out.push({ attrs: m[1], inner: html.slice(open.lastIndex, t ? t.index : html.length) });
   }
   return out;

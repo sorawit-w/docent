@@ -143,6 +143,8 @@ function drawLayout(model, phone = false) {
       yy = boxTop + BOX + 8;
     }
     if (row.measure) {
+      // On a desktop the unit stands in the name column, so the measures start below the note.
+      if (!phone && row.note && scale.unit) yy = Math.max(yy, top + 8 + 34 + 8);
       const marks = stretchesOf(row, scale).map((st) => {
         const w = valueWidth(st.label), cx = sc.x((st.from + st.to) / 2);
         return { st, w, x: Math.min(Math.max(cx - w / 2, 12), hi - w) };
@@ -171,7 +173,7 @@ function wordsOf(model) {
   const { scale, rows } = model;
   const unit = scale.unit ? ` ${scale.unit}` : "";
   const head = '<tr><th scope="col">Row</th><th scope="col">Box</th><th scope="col">From</th><th scope="col">To</th><th scope="col">Width</th></tr>';
-  const body = rows.flatMap((r) => r.boxes.map((b) => `<tr><th scope="row">${esc(r.name)}</th><td>${esc(b.name)}</td><td>${fmt(b.from)}</td><td>${fmt(b.to)}</td><td>${fmt(diff(b.from, b.to))}</td></tr>`)).join("");
+  const body = rows.flatMap((r) => r.boxes.map((b) => `<tr><th scope="row">${esc(r.note ? `${r.name} (${r.note})` : r.name)}</th><td>${esc(b.name)}</td><td>${fmt(b.from)}</td><td>${fmt(b.to)}</td><td>${fmt(diff(b.from, b.to))}</td></tr>`)).join("");
   const and = (list) => (list.length > 1 ? `${list.slice(0, -1).join(", ")} and ${list[list.length - 1]}` : list[0]);
   const lines = [
     ...rows.filter((r) => r.measure).map((r) => `<li>${esc(r.name)}, measured: ${esc(and(stretchesOf(r, scale).map((st) => st.label)))}${esc(unit)}.</li>`),

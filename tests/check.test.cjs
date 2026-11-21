@@ -198,3 +198,8 @@ test("a figure well is found by its class word in any place, and a class that on
   assert.match(errorsOf(add("</main>", `<div class="extra fig" role="region" aria-label="Figure 9, a chart" tabindex="0">${svg}</div>`)), /Figure 9, a chart holds a drawing/);
   assert.doesNotMatch(errorsOf(add("</main>", `<div class="fig-icon">${svg}</div>`)), /holds a drawing/);
 });
+
+test("a <div> written in a diagram's data does not change where a figure well ends", () => {
+  const page = renderDocument(specimen.replace(/("label": ")/, "$1A <div> wrapper holds the page. ")).html;
+  assert.doesNotMatch(checkDocument(page).errors.join("\n"), /holds \d diagrams|holds a drawing/);
+});

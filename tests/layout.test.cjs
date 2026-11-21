@@ -44,7 +44,7 @@ test("a layout has a 640px form and a 264px phone form, one band per row, no dot
   assert.equal(scene.bands.length, 4);
   assert.doesNotMatch(svg, /class="pulse|data-leg/, "nothing moves");
   assert.match(svg, /<th scope="col">Row<\/th><th scope="col">Box<\/th><th scope="col">From<\/th><th scope="col">To<\/th><th scope="col">Width<\/th>/);
-  assert.match(svg, /<tr><th scope="row">A<\/th><td>Wide blocks<\/td><td>578<\/td><td>1698<\/td><td>1120<\/td><\/tr>/);
+  assert.match(svg, /<tr><th scope="row">A \(Tufte, chosen\)<\/th><td>Wide blocks<\/td><td>578<\/td><td>1698<\/td><td>1120<\/td><\/tr>/);
   assert.match(svg, /<p>All numbers are in px\.<\/p>/);
   assert.match(svg, /<li>A line at 960 px: the middle\.<\/li>/);
 });
@@ -163,4 +163,12 @@ test("edge cases from review: decimal measures without noise, a long phone note 
   // The tick of a name on the upper line may not cross a name on the lower line.
   const crowd = { id: "crowd", kind: "layout", label: "Two narrow parts at the right edge.", scale: { from: 0, to: 100, step: 20 }, rows: [{ name: "Edge", boxes: [{ name: "Wide", from: 0, to: 80 }, { name: "Contents", from: 90, to: 95 }, { name: "Notes", from: 95, to: 100 }] }] };
   assert.throws(() => renderDiagram(crowd), /the tick of the name "Contents" would cross the name "Notes" above the boxes of the row "Edge" on a phone; shorten a name, or move a box to track 2/);
+});
+
+test("edge cases from review: the unit keeps clear of the row note, and the table in words keeps the notes", () => {
+  const d = { id: "page", kind: "layout", label: "A page in two parts.", scale: { from: 0, to: 100, unit: "mm" }, rows: [{ name: "Page", note: "custom layout", measure: true, boxes: [{ name: "A", from: 0, to: 40 }, { name: "B", from: 60, to: 100 }] }] };
+  const { scene, svg } = renderDiagram(d);
+  const [note, unit] = ["custom layout", "mm"].map((s) => box(scene.notes.find((n) => n.s === s)));
+  assert.ok(!meet(note, unit), "the unit does not meet the note");
+  assert.match(svg, /<th scope="row">Page \(custom layout\)<\/th>/);
 });
