@@ -1,16 +1,23 @@
 (() => {
   const root = document.documentElement;
   root.classList.add('js');
+  // A page saved from the browser ("Save page as") keeps what this script added. Take it out, so that the script adds each part once.
+  document.querySelectorAll('.fig-more, .step-n, button.copy').forEach((el) => el.remove());
+  document.querySelectorAll('div.code').forEach((holder) => holder.replaceWith(...holder.childNodes));
+  document.querySelectorAll('.is-numbered').forEach((h) => h.classList.remove('is-numbered'));
+  // A theme that the reader chose carries data-theme-reader. A saved page keeps it, and it is not a fixed theme.
+  if (root.hasAttribute('data-theme-reader')) { delete root.dataset.theme; delete root.dataset.themeReader; }
   // Theme: the page follows the reader's system setting. The switch sets a choice that wins over the system and is remembered.
   const button = document.querySelector('.theme');
   const system = matchMedia('(prefers-color-scheme: dark)');
   const theme = () => root.dataset.theme || (system.matches ? 'dark' : 'light');
+  const chooseTheme = (value) => { root.dataset.theme = value; root.dataset.themeReader = ''; };
   // A theme written on <html> in the source is fixed: no saved choice and no switch.
   const fixed = root.dataset.theme === 'light' || root.dataset.theme === 'dark';
   if (fixed && button) button.hidden = true;
   if (!fixed) try {
     const saved = localStorage.getItem('docent-theme');
-    if (saved === 'dark' || saved === 'light') root.dataset.theme = saved;
+    if (saved === 'dark' || saved === 'light') chooseTheme(saved);
   } catch { /* no saved choice can be read: follow the system */ }
   if (button && !fixed) {
     const showSwitch = () => {
@@ -22,7 +29,7 @@
     showSwitch();
     system.addEventListener('change', showSwitch);
     button.addEventListener('click', () => {
-      root.dataset.theme = theme() === 'dark' ? 'light' : 'dark';
+      chooseTheme(theme() === 'dark' ? 'light' : 'dark');
       showSwitch();
       try { localStorage.setItem('docent-theme', root.dataset.theme); } catch { /* private window: the choice lasts for this visit */ }
     });

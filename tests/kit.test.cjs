@@ -36,6 +36,15 @@ test("h4 and definition lists have kit styles within the six sizes and two weigh
   assert.match(rule("dl"), /max-width: var\(--measure\)/);
 });
 
+test("the page script parses", () => {
+  assert.doesNotThrow(() => new Function(js), "a syntax error stops every part of the page script");
+});
+
+test("the page script takes out what a saved page kept, so it adds each part once", () => {
+  assert.match(js, /querySelectorAll\('\.fig-more, \.step-n, button\.copy'\)\.forEach\(\(el\) => el\.remove\(\)\)/);
+  assert.match(js, /hasAttribute\('data-theme-reader'\)/, "a theme the reader chose is not a fixed theme in a saved page");
+});
+
 test("a heading in the text column of a row lines up with its margin note", () => {
   assert.match(rule(".row:has(> h3:first-child)"), /margin-top: 32px/, "the row brings the space above the heading");
   assert.match(rule(".row > h3:first-child"), /margin-top: 0/);
