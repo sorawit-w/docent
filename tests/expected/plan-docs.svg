@@ -1,0 +1,97 @@
+<svg id="dg-docs-page" class="dg dg-plan dg-auto" xmlns="http://www.w3.org/2000/svg" width="640" height="208" viewBox="0 0 640 208" role="img" aria-label="A documentation page 1440px wide. A header runs across the top and a footer across the bottom. Between them, the navigation is on the left, the text in the middle, and an 'On this page' list on the right.">
+<style>
+#dg-docs-page{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-docs-page .ground{fill:var(--fig,#f2f3f9)}
+#dg-docs-page .band{fill:var(--bg,#fbfbfe)}
+#dg-docs-page .track{stroke:var(--line,#d3d6e3)}
+#dg-docs-page .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-docs-page .head{fill:var(--text,#1c1f2e)}
+#dg-docs-page .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-docs-page .stop.end{fill:var(--text,#1c1f2e)}
+#dg-docs-page .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-docs-page .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-docs-page .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-docs-page .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-docs-page .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-docs-page .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-docs-page .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-docs-page .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-docs-page .sub,#dg-docs-page .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-docs-page .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-docs-page .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-docs-page .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-docs-page .box{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+@media (prefers-reduced-motion:reduce){#dg-docs-page .pulse{animation:none!important}#dg-docs-page .pulse{display:none!important}}
+@media print{#dg-docs-page{max-width:100%;height:auto}#dg-docs-page .pulse{display:none!important}}
+#dg-docs-page-phone{display:none}
+</style>
+<rect width="640" height="208" class="ground"/>
+<rect x="8" y="52" width="624" height="144" rx="10" class="band"/>
+<text x="12" y="24" class="sub" text-anchor="start">Widths in px</text>
+<text x="63.33" y="44" class="val" text-anchor="middle">240</text>
+<text x="320" y="44" class="val" text-anchor="middle">960</text>
+<text x="576.67" y="44" class="val" text-anchor="middle">240</text>
+<rect x="14" y="58" width="612" height="36" rx="4" class="box"/>
+<text x="22" y="80" class="row" text-anchor="start">Header</text>
+<rect x="14" y="98" width="98.67" height="52" rx="4" class="box"/>
+<text x="22" y="120" class="row" text-anchor="start">Navigation</text>
+<rect x="116.67" y="98" width="406.67" height="52" rx="4" class="box"/>
+<text x="124.67" y="120" class="row" text-anchor="start">Text</text>
+<rect x="527.33" y="98" width="98.67" height="52" rx="4" class="box"/>
+<text x="535.33" y="120" class="row" text-anchor="start">On this</text>
+<text x="535.33" y="138" class="row" text-anchor="start">page</text>
+<rect x="14" y="154" width="612" height="36" rx="4" class="box"/>
+<text x="22" y="176" class="row" text-anchor="start">Footer</text>
+</svg>
+<svg id="dg-docs-page-phone" class="dg dg-plan dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="226" viewBox="0 0 264 226" role="img" aria-label="A documentation page 1440px wide. A header runs across the top and a footer across the bottom. Between them, the navigation is on the left, the text in the middle, and an 'On this page' list on the right.">
+<style>
+#dg-docs-page-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-docs-page-phone .ground{fill:var(--fig,#f2f3f9)}
+#dg-docs-page-phone .band{fill:var(--bg,#fbfbfe)}
+#dg-docs-page-phone .track{stroke:var(--line,#d3d6e3)}
+#dg-docs-page-phone .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-docs-page-phone .head{fill:var(--text,#1c1f2e)}
+#dg-docs-page-phone .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-docs-page-phone .stop.end{fill:var(--text,#1c1f2e)}
+#dg-docs-page-phone .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-docs-page-phone .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-docs-page-phone .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-docs-page-phone .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-docs-page-phone .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-docs-page-phone .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-docs-page-phone .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-docs-page-phone .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-docs-page-phone .sub,#dg-docs-page-phone .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-docs-page-phone .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-docs-page-phone .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-docs-page-phone .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-docs-page-phone .box{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+@media (prefers-reduced-motion:reduce){#dg-docs-page-phone .pulse{animation:none!important}#dg-docs-page-phone .pulse{display:none!important}}
+@media print{#dg-docs-page-phone{max-width:100%;height:auto}#dg-docs-page-phone .pulse{display:none!important}}
+@media (max-width:736px){#dg-docs-page{display:none}#dg-docs-page-phone{display:block}}
+@media print{#dg-docs-page{display:block!important}#dg-docs-page-phone{display:none!important}}
+</style>
+<rect width="264" height="226" class="ground"/>
+<rect x="8" y="52" width="248" height="162" rx="10" class="band"/>
+<text x="12" y="24" class="sub" text-anchor="start">Widths in px, not to scale</text>
+<text x="57" y="44" class="val" text-anchor="middle">240</text>
+<text x="150.5" y="44" class="val" text-anchor="middle">960</text>
+<text x="225.5" y="44" class="val" text-anchor="middle">240</text>
+<rect x="14" y="58" width="236" height="36" rx="4" class="box"/>
+<text x="22" y="80" class="row" text-anchor="start">Header</text>
+<rect x="14" y="98" width="86" height="70" rx="4" class="box"/>
+<text x="22" y="120" class="row" text-anchor="start">Navigation</text>
+<rect x="104" y="98" width="93" height="70" rx="4" class="box"/>
+<text x="112" y="120" class="row" text-anchor="start">Text</text>
+<rect x="201" y="98" width="49" height="70" rx="4" class="box"/>
+<text x="209" y="120" class="row" text-anchor="start">On</text>
+<text x="209" y="138" class="row" text-anchor="start">this</text>
+<text x="209" y="156" class="row" text-anchor="start">page</text>
+<rect x="14" y="172" width="236" height="36" rx="4" class="box"/>
+<text x="22" y="194" class="row" text-anchor="start">Footer</text>
+</svg>
+<details class="dg-words">
+<summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>The diagram in words</summary>
+<table><thead><tr><th scope="col">Box</th><th scope="col">Row</th><th scope="col">Column</th><th scope="col">Width</th></tr></thead><tbody><tr><th scope="row">Header</th><td>top</td><td>full width</td><td>1440</td></tr><tr><th scope="row">Navigation</th><td>middle</td><td>left</td><td>240</td></tr><tr><th scope="row">Text</th><td>middle</td><td>middle</td><td>960</td></tr><tr><th scope="row">On this page</th><td>middle</td><td>right</td><td>240</td></tr><tr><th scope="row">Footer</th><td>bottom</td><td>full width</td><td>1440</td></tr></tbody></table>
+<p>Widths are in px. The rows are not drawn to scale. On a phone the columns are not drawn to scale either.</p>
+</details>

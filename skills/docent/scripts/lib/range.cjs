@@ -14,17 +14,27 @@ const ROW = 32; // the height of one mark's strip
 const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 // A name on a phone wraps at its spaces, and inside a word that is wider than the room alone, as in a language without
 // spaces. It breaks between whole characters as a reader sees them, so a Thai vowel mark stays with its consonant.
+// With every: false (a plan), only a word of a script written without spaces breaks; any other word stays whole.
 const graphemes = new Intl.Segmenter(undefined, { granularity: "grapheme" });
-const wrapName = (str, room) => wrap(str, "name", room).flatMap((line) => {
-  if (textWidth(line, 14, 600) <= room) return [line];
-  const out = [""];
-  for (const { segment: ch } of graphemes.segment(line)) {
-    const next = out[out.length - 1] + ch;
-    if (out[out.length - 1] && textWidth(next, 14, 600) > room) out.push(ch);
-    else out[out.length - 1] = next;
-  }
-  return out;
-});
+const NO_SPACES = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Thai}\p{Script=Lao}\p{Script=Khmer}\p{Script=Myanmar}]/u;
+const wrapName = (str, room, { size = 14, weight = 600, every = true } = {}) => {
+  const width = (s) => textWidth(s, size, weight);
+  const lines = size === 14 && weight === 600 ? wrap(str, "name", room) : String(str).split(" ").reduce((out, word) => {
+    const last = out.length ? `${out[out.length - 1]} ${word}` : word;
+    if (out.length && width(last) <= room) out[out.length - 1] = last; else out.push(word);
+    return out;
+  }, []);
+  return lines.flatMap((line) => {
+    if (width(line) <= room || (!every && !NO_SPACES.test(line))) return [line];
+    const out = [""];
+    for (const { segment: ch } of graphemes.segment(line)) {
+      const next = out[out.length - 1] + ch;
+      if (out[out.length - 1] && width(next) > room) out.push(ch);
+      else out[out.length - 1] = next;
+    }
+    return out;
+  });
+};
 
 /** Checks range data and returns the model. */
 function readRange(data) {
@@ -174,4 +184,4 @@ function wordsOf(model) {
   return `<table><thead>${head}</thead><tbody>${body}</tbody></table>${marks ? `\n<ul>${marks}</ul>` : ""}`;
 }
 
-module.exports = { readRange, layoutRange, wordsOf, wrapName, MOST, WIDE, PHONE };
+module.exports = { readRange, layoutRange, wordsOf, wrapName, graphemes, NO_SPACES, MOST, WIDE, PHONE };

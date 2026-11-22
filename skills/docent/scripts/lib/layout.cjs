@@ -186,4 +186,4 @@ function wordsOf(model) {
   return `${units}<table><thead>${head}</thead><tbody>${body}</tbody></table>${lines ? `\n<ul>${lines}</ul>` : ""}`;
 }
 
-module.exports = { readLayout, drawLayout, wordsOf, stretchesOf, MOST, WIDE, PHONE };
+module.exports = { readLayout, drawLayout, wordsOf, stretchesOf, onLines, MOST, WIDE, PHONE };
