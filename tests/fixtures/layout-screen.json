@@ -1,0 +1,28 @@
+{
+  "id": "wide-layouts",
+  "kind": "layout",
+  "label": "On a 1920px screen today, the text and its notes sit left of the middle. Layout A centers them and lets wide blocks grow to the right. Layout B centers the text and the wide blocks, so the left edge splits. Layout C adds a contents list on the left.",
+  "scale": {"from": 0, "to": 1920, "step": 480, "unit": "px", "marks": [{"at": 960, "name": "the middle"}]},
+  "rows": [
+    {"name": "Now", "note": "a 1200px box", "boxes": [
+      {"name": "Text", "from": 400, "to": 896},
+      {"name": "Notes", "from": 944, "to": 1164},
+      {"name": "Wide blocks", "from": 400, "to": 1520, "track": 2}
+    ]},
+    {"name": "A", "note": "Tufte, chosen", "boxes": [
+      {"name": "Text", "from": 578, "to": 1074},
+      {"name": "Notes", "from": 1122, "to": 1342},
+      {"name": "Wide blocks", "from": 578, "to": 1698, "track": 2}
+    ]},
+    {"name": "B", "note": "Distill", "boxes": [
+      {"name": "Text", "from": 712, "to": 1208},
+      {"name": "Notes", "from": 1256, "to": 1476},
+      {"name": "Wide blocks", "from": 400, "to": 1520, "track": 2}
+    ]},
+    {"name": "C", "note": "MDN", "boxes": [
+      {"name": "Contents", "from": 454, "to": 654},
+      {"name": "Text", "from": 702, "to": 1198},
+      {"name": "Notes", "from": 1246, "to": 1466}
+    ]}
+  ]
+}

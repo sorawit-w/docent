@@ -27,6 +27,20 @@ const words = (s) => s.toLowerCase().match(/[\p{L}\p{N}]+/gu) || [];
 /** True when every word of a appears in b, in the same order. */
 const shorter = (a, b) => { const want = words(a), have = words(b); let at = 0; for (const w of have) if (w === want[at]) at += 1; return want.length > 0 && at === want.length; };
 const local = (value) => /^(#|data:)/i.test(value.trim()) || value.trim() === "";
+/** Each figure well (a div with the class fig) and all that is inside it, counting nested divs so the whole well is read. */
+function wells(html) {
+  // Tags are read with every comment blanked out, so a <div> written in a diagram's data does not count.
+  const bare = html.replace(/<!--[\s\S]*?-->/g, (c) => " ".repeat(c.length));
+  const out = [], open = /<div\b([^>]*\bclass="(?:[^"]*\s)?fig(?:\s[^"]*)?"[^>]*)>/g;
+  for (let m; (m = open.exec(bare)); ) {
+    const tag = /<(\/?)div\b[^>]*>/gi;
+    tag.lastIndex = open.lastIndex;
+    let depth = 1, t;
+    while (depth && (t = tag.exec(bare))) depth += t[1] ? -1 : 1;
+    out.push({ attrs: m[1], inner: html.slice(open.lastIndex, t ? t.index : html.length) });
+  }
+  return out;
+}
 
 /** Returns { errors, warnings }: two lists of plain sentences. */
 function checkDocument(html) {
@@ -68,7 +82,7 @@ function checkDocument(html) {
   // An interaction overview links each ref frame to a sequence diagram in the same document.
   for (const { label, ref } of refs) if (!ids.has(ref)) errors.push(`${label}: a ref frame links to the diagram "${ref}", which is not in this document`);
   // A well holds one drawing, or two for two separate chains. Beside walkthrough steps it holds one, because step n lights leg n.
-  for (const [, attrs, inner] of html.matchAll(/<div\b([^>]*\bclass="fig\b[^"]*"[^>]*)>([\s\S]*?)<\/div>/g)) {
+  for (const { attrs, inner } of wells(html)) {
     const count = (inner.match(/<!-- docent:diagram\b/g) || []).length, name = (attrs.match(/aria-label="([^"]*)"/) || [])[1] || "a figure";
     if (count > 2) errors.push(`${name} holds ${count} diagrams; a figure holds one, or two for two separate chains`);
     if (count > 1 && /"place"\s*:\s*"walk"/.test(inner)) errors.push(`${name} holds ${count} diagrams beside walkthrough steps; there it holds one`);
@@ -76,6 +90,10 @@ function checkDocument(html) {
   let rest = html;
   for (const found of [...diagrams].reverse()) rest = rest.slice(0, found.start) + rest.slice(found.end);
   if (/<svg\b[^>]*\bclass="[^"]*\bdg\b/.test(rest)) errors.push("a diagram sits outside a diagram block; put its data in a block and run render");
+  // Every drawing in a figure well comes from a diagram block: a hand-drawn SVG there cannot be drawn again or checked.
+  for (const { attrs, inner } of wells(rest)) {
+    if (/<svg\b/i.test(inner.replace(/<!--[\s\S]*?-->/g, ""))) errors.push(`${(attrs.match(/aria-label="([^"]*)"/) || [])[1] || "a figure"} holds a drawing that no diagram block made; write its data in a block and run render`);
+  }
 
   // 2b. Widgets: each widget must be the one that render makes from its data.
   const widgets = findBlocks(rest, "widget"), widgetIds = new Set(), kinds = new Set(), defaults = {};
