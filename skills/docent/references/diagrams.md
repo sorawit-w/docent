@@ -841,7 +841,8 @@ A plan shows where the parts of a page or a screen sit, and what is next to what
 - Row heights are not data: a row is as tall as its names need, and the words say the rows are not drawn to scale. When a height matters, write it in a note ("64px high") and in the `label`.
 - A plan has no box inside a box, no lines between boxes, no ticks, no `state`, no icons and no dot. To show what is inside a box, write a second plan.
 - The forms: 640px on a desktop and on paper, and 264px on a phone. A plan cannot become one strip, so the phone form is the same grid, drawn again: a narrow column grows until its names fit, the line above the plan then says "not to scale", and the real widths stay above the columns. `render` says which forms are not to scale, such as `drawn as plan; not to scale on a phone`.
-- When the names cannot fit, `render` refuses the plan and names the widest names and their columns: shorten them, or use fewer columns. With four columns, a phone has about 40px for the longest word of each.
+- When the grid cannot fit a phone, the phone gets a stack instead: each box on a band of its own, in the order of `areas`, with its name, its note and its width, and a small map of the whole plan beside it where its box is filled. The map is to scale across, but no column in it is narrower than 3px; when one had to grow, the line above says "maps not to scale". `render` says `drawn as plan; stacked on a phone`. With four columns, the grid fits a phone only when the longest word of each column is about 40px.
+- When the names cannot fit a desktop, `render` refuses the plan and names the widest names and their columns: shorten them, or use fewer columns.
 - To show one page on a desktop and on a phone, write two plans in two figures.
 - `render` also writes the boxes as a table under the drawing: each box's row and column in words (`top`, `left`, `full width`, `rows 2 to 3`), its width, and its note.
 

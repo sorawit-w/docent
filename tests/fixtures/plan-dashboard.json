@@ -1,0 +1,18 @@
+{
+  "id": "dashboard",
+  "kind": "plan",
+  "label": "A dashboard 1440px wide. A header runs across the top. Under it, four columns of the same width hold the navigation, revenue, sign-ups and open tickets.",
+  "unit": "px",
+  "columns": [360, 360, 360, 360],
+  "areas": [
+    "head head    head    head",
+    "nav  revenue signups tickets"
+  ],
+  "boxes": [
+    {"id": "head", "name": "Header"},
+    {"id": "nav", "name": "Navigation"},
+    {"id": "revenue", "name": "Revenue"},
+    {"id": "signups", "name": "Sign-ups"},
+    {"id": "tickets", "name": "Open tickets", "note": "the five oldest"}
+  ]
+}

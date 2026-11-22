@@ -499,7 +499,7 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
   // The scale charts (a range chart, two layouts to scale and two plans): the 640px form on a desktop and on paper (at its real size,
   // no shrink), the 264px form on a phone, the rows as a table in words, text no wider than the renderer assumed, and no
   // contrast problem in either theme.
-  for (const [file, id, rows, what] of [["range", "line-lengths", 8, "a range chart"], ["layout-screen", "wide-layouts", 12, "a layout to scale with two tracks"], ["layout-a4", "a4-notes", 4, "a measured layout to scale"], ["plan-docs", "docs-page", 5, "a plan that grows a column on a phone"], ["plan-editor", "editor-screen", 5, "a plan with a box across two rows"]]) {
+  for (const [file, id, rows, what] of [["range", "line-lengths", 8, "a range chart"], ["layout-screen", "wide-layouts", 12, "a layout to scale with two tracks"], ["layout-a4", "a4-notes", 4, "a measured layout to scale"], ["plan-docs", "docs-page", 5, "a plan that grows a column on a phone"], ["plan-editor", "editor-screen", 5, "a plan with a box across two rows"], ["plan-dashboard", "dashboard", 5, "a plan stacked on a phone"]]) {
     const data = fs.readFileSync(path.join(root, "tests", "fixtures", `${file}.json`), "utf8");
     const content = renderDocument(html.replace('<section id="report"', `<section id="rng" aria-labelledby="rng-h"><h2 id="rng-h">Range</h2><figure><div class="fig" role="region" aria-label="Figure 9, line lengths" tabindex="0">\n<!-- docent:diagram\n${data}\n-->\n<!-- /docent:diagram -->\n</div><figcaption><strong>Figure 9</strong>Line lengths.</figcaption></figure></section>\n<section id="report"`)).html;
     const look = (page) => page.evaluate((id) => {

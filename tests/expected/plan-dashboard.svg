@@ -1,0 +1,105 @@
+<svg id="dg-dashboard" class="dg dg-plan dg-auto" xmlns="http://www.w3.org/2000/svg" width="640" height="168" viewBox="0 0 640 168" role="img" aria-label="A dashboard 1440px wide. A header runs across the top. Under it, four columns of the same width hold the navigation, revenue, sign-ups and open tickets.">
+<style>
+#dg-dashboard{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-dashboard .ground{fill:var(--fig,#f2f3f9)}
+#dg-dashboard .band{fill:var(--bg,#fbfbfe)}
+#dg-dashboard .track{stroke:var(--line,#d3d6e3)}
+#dg-dashboard .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-dashboard .head{fill:var(--text,#1c1f2e)}
+#dg-dashboard .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-dashboard .stop.end{fill:var(--text,#1c1f2e)}
+#dg-dashboard .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-dashboard .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-dashboard .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-dashboard .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-dashboard .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-dashboard .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-dashboard .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-dashboard .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-dashboard .sub,#dg-dashboard .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-dashboard .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-dashboard .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-dashboard .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-dashboard .box{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+@media (prefers-reduced-motion:reduce){#dg-dashboard .pulse{animation:none!important}#dg-dashboard .pulse{display:none!important}}
+@media print{#dg-dashboard{max-width:100%;height:auto}#dg-dashboard .pulse{display:none!important}}
+#dg-dashboard-phone{display:none}
+</style>
+<rect width="640" height="168" class="ground"/>
+<rect x="8" y="52" width="624" height="104" rx="10" class="band"/>
+<text x="12" y="24" class="sub" text-anchor="start">Widths in px</text>
+<text x="89" y="44" class="val" text-anchor="middle">360</text>
+<text x="243" y="44" class="val" text-anchor="middle">360</text>
+<text x="397" y="44" class="val" text-anchor="middle">360</text>
+<text x="551" y="44" class="val" text-anchor="middle">360</text>
+<rect x="14" y="58" width="612" height="36" rx="4" class="box"/>
+<text x="22" y="80" class="row" text-anchor="start">Header</text>
+<rect x="14" y="98" width="150" height="52" rx="4" class="box"/>
+<text x="22" y="120" class="row" text-anchor="start">Navigation</text>
+<rect x="168" y="98" width="150" height="52" rx="4" class="box"/>
+<text x="176" y="120" class="row" text-anchor="start">Revenue</text>
+<rect x="322" y="98" width="150" height="52" rx="4" class="box"/>
+<text x="330" y="120" class="row" text-anchor="start">Sign-ups</text>
+<rect x="476" y="98" width="150" height="52" rx="4" class="box"/>
+<text x="484" y="120" class="row" text-anchor="start">Open tickets</text>
+<text x="484" y="138" class="sub" text-anchor="start">the five oldest</text>
+</svg>
+<svg id="dg-dashboard-phone" class="dg dg-plan dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="372" viewBox="0 0 264 372" role="img" aria-label="A dashboard 1440px wide. A header runs across the top. Under it, four columns of the same width hold the navigation, revenue, sign-ups and open tickets.">
+<style>
+#dg-dashboard-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-dashboard-phone .ground{fill:var(--fig,#f2f3f9)}
+#dg-dashboard-phone .band{fill:var(--bg,#fbfbfe)}
+#dg-dashboard-phone .track{stroke:var(--line,#d3d6e3)}
+#dg-dashboard-phone .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-dashboard-phone .head{fill:var(--text,#1c1f2e)}
+#dg-dashboard-phone .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-dashboard-phone .stop.end{fill:var(--text,#1c1f2e)}
+#dg-dashboard-phone .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-dashboard-phone .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-dashboard-phone .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-dashboard-phone .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-dashboard-phone .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-dashboard-phone .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-dashboard-phone .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-dashboard-phone .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-dashboard-phone .sub,#dg-dashboard-phone .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-dashboard-phone .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-dashboard-phone .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-dashboard-phone .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-dashboard-phone .box{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-dashboard-phone .m-box{fill:var(--bg,#fbfbfe);stroke:var(--muted,#575d75);stroke-width:1}
+#dg-dashboard-phone .m-on{fill:var(--text,#1c1f2e);stroke:var(--text,#1c1f2e);stroke-width:1}
+@media (prefers-reduced-motion:reduce){#dg-dashboard-phone .pulse{animation:none!important}#dg-dashboard-phone .pulse{display:none!important}}
+@media print{#dg-dashboard-phone{max-width:100%;height:auto}#dg-dashboard-phone .pulse{display:none!important}}
+@media (max-width:736px){#dg-dashboard{display:none}#dg-dashboard-phone{display:block}}
+@media print{#dg-dashboard{display:block!important}#dg-dashboard-phone{display:none!important}}
+</style>
+<rect width="264" height="372" class="ground"/>
+<rect x="8" y="32" width="248" height="56" rx="10" class="band"/>
+<rect x="8" y="96" width="248" height="56" rx="10" class="band"/>
+<rect x="8" y="160" width="248" height="56" rx="10" class="band"/>
+<rect x="8" y="224" width="248" height="56" rx="10" class="band"/>
+<rect x="8" y="288" width="248" height="72" rx="10" class="band"/>
+<text x="12" y="24" class="sub" text-anchor="start">Widths in px</text>
+<rect x="16.5" y="50.5" width="9" height="7" class="m-box"/><rect x="26.5" y="50.5" width="9" height="7" class="m-box"/><rect x="36.5" y="50.5" width="9" height="7" class="m-box"/><rect x="46.5" y="50.5" width="9" height="7" class="m-box"/><rect x="16.5" y="42.5" width="39" height="7" class="m-on"/>
+<text x="68" y="56" class="name" text-anchor="start">Header</text>
+<text x="68" y="74" class="sub" text-anchor="start">1440 px wide</text>
+<rect x="16.5" y="106.5" width="39" height="7" class="m-box"/><rect x="26.5" y="114.5" width="9" height="7" class="m-box"/><rect x="36.5" y="114.5" width="9" height="7" class="m-box"/><rect x="46.5" y="114.5" width="9" height="7" class="m-box"/><rect x="16.5" y="114.5" width="9" height="7" class="m-on"/>
+<text x="68" y="120" class="name" text-anchor="start">Navigation</text>
+<text x="68" y="138" class="sub" text-anchor="start">360 px wide</text>
+<rect x="16.5" y="170.5" width="39" height="7" class="m-box"/><rect x="16.5" y="178.5" width="9" height="7" class="m-box"/><rect x="36.5" y="178.5" width="9" height="7" class="m-box"/><rect x="46.5" y="178.5" width="9" height="7" class="m-box"/><rect x="26.5" y="178.5" width="9" height="7" class="m-on"/>
+<text x="68" y="184" class="name" text-anchor="start">Revenue</text>
+<text x="68" y="202" class="sub" text-anchor="start">360 px wide</text>
+<rect x="16.5" y="234.5" width="39" height="7" class="m-box"/><rect x="16.5" y="242.5" width="9" height="7" class="m-box"/><rect x="26.5" y="242.5" width="9" height="7" class="m-box"/><rect x="46.5" y="242.5" width="9" height="7" class="m-box"/><rect x="36.5" y="242.5" width="9" height="7" class="m-on"/>
+<text x="68" y="248" class="name" text-anchor="start">Sign-ups</text>
+<text x="68" y="266" class="sub" text-anchor="start">360 px wide</text>
+<rect x="16.5" y="298.5" width="39" height="7" class="m-box"/><rect x="16.5" y="306.5" width="9" height="7" class="m-box"/><rect x="26.5" y="306.5" width="9" height="7" class="m-box"/><rect x="36.5" y="306.5" width="9" height="7" class="m-box"/><rect x="46.5" y="306.5" width="9" height="7" class="m-on"/>
+<text x="68" y="312" class="name" text-anchor="start">Open tickets</text>
+<text x="68" y="330" class="sub" text-anchor="start">the five oldest</text>
+<text x="68" y="346" class="sub" text-anchor="start">360 px wide</text>
+</svg>
+<details class="dg-words">
+<summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>The diagram in words</summary>
+<table><thead><tr><th scope="col">Box</th><th scope="col">Row</th><th scope="col">Column</th><th scope="col">Width</th><th scope="col">Note</th></tr></thead><tbody><tr><th scope="row">Header</th><td>top</td><td>full width</td><td>1440</td><td></td></tr><tr><th scope="row">Navigation</th><td>bottom</td><td>left</td><td>360</td><td></td></tr><tr><th scope="row">Revenue</th><td>bottom</td><td>column 2</td><td>360</td><td></td></tr><tr><th scope="row">Sign-ups</th><td>bottom</td><td>column 3</td><td>360</td><td></td></tr><tr><th scope="row">Open tickets</th><td>bottom</td><td>right</td><td>360</td><td>the five oldest</td></tr></tbody></table>
+<p>Widths are in px. The rows are not drawn to scale. On a phone each box stands on its own, beside a small map of the plan.</p>
+</details>
