@@ -60,6 +60,26 @@ test("small times keep their precision in the axis and in the words", () => {
   assert.match(svg, /From 0\.001 s to 0\.003 s/);
 });
 
+test("long times keep every digit, and a tick still drops the noise of its sum", () => {
+  const long = (from, step, n, to = from + n * step) => {
+    const d = fixture();
+    d.time = { from, to, step, unit: "ms" };
+    d.changes = [{ lifeline: "user", at: from, state: "Idle" }, { lifeline: "user", at: from + step, state: "Waiting" }, { lifeline: "ctrl", at: from, state: "Ready" }, { lifeline: "door", at: from, state: "Closed" }];
+    d.messages = [];
+    d.constraints = [];
+    return renderDiagram(d);
+  };
+  for (const from of [1000000000010, 1000000000000010]) {
+    const { svg, scene } = long(from, 1, 3);
+    const ticks = scene.notes.filter((n) => /^\d+$/.test(n.s)).map((n) => n.s);
+    assert.deepEqual(ticks, [0, 1, 2, 3].map((k) => String(from + k)), `the ticks of a scale from ${from}`);
+    assert.match(svg, new RegExp(`At ${from + 1} ms: User becomes Waiting\\.`), "the words keep every digit");
+  }
+  const ticks = long(0, 0.1, 3, 0.3).scene.notes.filter((n) => /^[\d.]+$/.test(n.s)).map((n) => n.s);
+  assert.deepEqual(ticks.filter((t) => t !== "0"), ["0.1", "0.2", "0.3"], "0.1 + 0.2 shows as 0.3");
+  assert.throws(() => long(1e21, 262144, 4), /too small for times this large/, "a step too small to tell the ticks apart");
+});
+
 test("overlapping constraints on one lifeline take separate slots", () => {
   const d = fixture();
   d.constraints.push({ lifeline: "door", from: 0, to: 5, text: "{≤ 5 s}" });

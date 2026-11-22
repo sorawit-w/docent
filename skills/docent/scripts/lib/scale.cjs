@@ -149,4 +149,4 @@ function placeLabel({ a, b, w, lo, hi, sides }) {
   return { x: Math.min(Math.max(a, lo), hi - w), anchor: "start", side: "above" };
 }
 
-module.exports = { readScale, makeScale, drawHead, drawGrid, placeLabel, valueWidth, fmt, isNum, num, diff, MOST };
+module.exports = { readScale, makeScale, tickAt, drawHead, drawGrid, placeLabel, valueWidth, fmt, isNum, num, diff, MOST };
