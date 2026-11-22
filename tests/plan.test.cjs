@@ -9,7 +9,7 @@ const { valueWidth } = require("../skills/docent/scripts/lib/scale.cjs");
 const { textWidth } = require("../skills/docent/scripts/lib/text.cjs");
 
 const fixture = (name) => JSON.parse(fs.readFileSync(path.join(__dirname, "fixtures", `${name}.json`), "utf8"));
-const FONT = { row: [14, 400], val: [12, 400], sub: [12, 400] };
+const FONT = { row: [14, 400], name: [14, 600], val: [12, 400], sub: [12, 400] };
 const box = (n) => {
   const [size, weight] = FONT[n.cls];
   const w = n.cls === "val" ? valueWidth(n.s) : textWidth(n.s, size, weight), x0 = n.anchor === "middle" ? n.x - w / 2 : n.anchor === "end" ? n.x - w : n.x;
@@ -27,7 +27,7 @@ const head = (s) => s.notes.find((n) => n.cls === "sub").s;
 const lines = (s, id) => s.parts.find((p) => p.id === id).texts.filter((t) => t.cls === "row").map((t) => t.s);
 const bad = (change, reason, name = "plan-docs") => { const d = fixture(name); change(d); assert.throws(() => renderDiagram(d), reason); };
 
-for (const name of ["plan-docs", "plan-editor", "plan-none"]) {
+for (const name of ["plan-docs", "plan-editor", "plan-none", "plan-dashboard"]) {
   test(`${name} matches the stored drawing`, () => {
     const { svg, form, warnings } = renderDiagram(fixture(name));
     assert.equal(form, "plan");
@@ -173,13 +173,55 @@ test("wrong plan data is refused with the reason and what to change", () => {
   bad((d) => (d.place = "walk"), /a plan sits in the text flow; "place" must be "flow"/);
 });
 
-test("a plan whose columns cannot fit is refused, and the message names the widest names and their columns", () => {
-  const dashboard = {
-    id: "dashboard", kind: "plan", label: "A dashboard with four columns under a header.", unit: "px", columns: [360, 360, 360, 360],
-    areas: ["head head head head", "nav revenue signups tickets"],
-    boxes: [{ id: "head", name: "Header" }, { id: "nav", name: "Navigation" }, { id: "revenue", name: "Revenue" }, { id: "signups", name: "Sign-ups" }, { id: "tickets", name: "Open tickets" }],
-  };
-  assert.throws(() => renderDiagram(dashboard), /the plan does not fit a phone: its columns need 311px, and a phone has 240px\. The widest names are "Navigation" \(column 1\) and "Sign-ups" \(column 3\)\. Shorten them, or use fewer columns/);
+test("a plan that does not fit a desktop is refused, and the message names the widest names and their columns", () => {
+  const d = fixture("plan-dashboard");
+  d.boxes[1].name = "W".repeat(20);
+  d.boxes[2].name = "M" + "m".repeat(19);
+  assert.throws(() => renderDiagram(d), /the plan does not fit a desktop and paper: its columns need \d+px, and the drawing has 616px\. The widest names are "W{20}" \(column 1\) and "Mm{19}" \(column 2\)\. Shorten them, or use fewer columns/);
+});
+
+test("a plan whose grid does not fit a phone is stacked there: one band per box, with a map where its box is filled", () => {
+  const { scene, phone, note } = renderDiagram(fixture("plan-dashboard"));
+  assert.equal(scene.stack, undefined);
+  assert.equal(phone.stack, true);
+  assert.equal(note, "stacked on a phone");
+  assert.deepEqual(phone.parts.map((p) => p.id), ["head", "nav", "revenue", "signups", "tickets"]);
+  assert.equal(phone.bands.length, 5);
+  assert.equal(head(phone), "Widths in px");
+  const texts = (id) => phone.parts.find((p) => p.id === id).texts.map((t) => t.s);
+  assert.deepEqual(texts("head"), ["Header", "1440 px wide"]);
+  assert.deepEqual(texts("tickets"), ["Open tickets", "the five oldest", "360 px wide"]);
+  // Each map holds every box; only the band's own box is filled, and it stands where the box stands in the plan.
+  for (const p of phone.parts) {
+    assert.equal((p.svg.match(/<rect /g) || []).length, 5);
+    assert.equal((p.svg.match(/class="m-on"/g) || []).length, 1);
+  }
+  const on = (id) => rectOf(phone.parts.find((p) => p.id === id).svg.match(/<rect [^>]*class="m-on"\/>/)[0]);
+  assert.deepEqual([on("head").x0, Math.round(on("head").x1 - on("head").x0)], [16.5, 39]);
+  assert.deepEqual([on("signups").x0, Math.round(on("signups").x1 - on("signups").x0)], [36.5, 9]);
+  assert.ok(on("nav").y0 > on("head").y0 - 1e-9 && on("nav").y0 - phone.bands[1].y === on("head").y0 - phone.bands[0].y + 8, "the second row sits 8px under the first in the map");
+  // No text meets another; each text and each map stays inside its band, and the text keeps to the right of the map.
+  const all = [...phone.notes, ...phone.parts.flatMap((p) => p.texts)].map(box);
+  all.forEach((a, i) => all.slice(i + 1).forEach((b) => assert.ok(!meet(a, b), `"${a.s}" meets "${b.s}"`)));
+  phone.parts.forEach((p, i) => {
+    const band = phone.bands[i], inBand = (r) => r.x0 >= band.x && r.x1 <= band.x + band.w && r.y0 >= band.y && r.y1 <= band.y + band.h;
+    for (const t of p.texts.map(box)) assert.ok(inBand(t) && t.x0 >= 16 + 40 + 12 - 0.01 && t.x1 <= phone.w - 16 + 0.01, `"${t.s}" stays in its band, right of the map`);
+    for (const m of p.svg.match(/<rect [^>]*\/>/g)) assert.ok(inBand(rectOf(m)), `the map of "${p.id}" stays in its band`);
+  });
+  const { svg } = renderDiagram(fixture("plan-dashboard"));
+  assert.match(svg, /\.m-box\{fill:var\(--bg[^}]*stroke:var\(--muted/);
+  assert.match(svg, /On a phone each box stands on its own, beside a small map of the plan\./);
+});
+
+test("in a map no column is narrower than 3px, and then the maps say they are not to scale", () => {
+  const d = fixture("plan-dashboard");
+  d.columns = [10, 2000, 2000, 2000];
+  const { phone, note } = renderDiagram(d);
+  assert.equal(phone.stack, true);
+  assert.equal(head(phone), "Widths in px, maps not to scale");
+  assert.equal(note, "not to scale; stacked on a phone");
+  const nav = rectOf(phone.parts.find((p) => p.id === "nav").svg.match(/<rect [^>]*class="m-on"\/>/)[0]);
+  assert.equal(Math.round(nav.x1 - nav.x0 + 1), 3);
 });
 
 test("a name or a note that needs too many lines in its box is refused, and the message names the box", () => {
@@ -187,13 +229,17 @@ test("a name or a note that needs too many lines in its box is refused, and the 
   bad((d) => { d.columns = [1, 10000]; d.boxes.find((b) => b.id === "files").note = "abcde abcde abcde"; }, /the note of the box "files" needs 3 lines in its \d+px box on a desktop and on paper; a note has at most 2\. Shorten it/, "plan-editor");
 });
 
-test("widths that would need a third line on a phone are refused, and the message names the two widths", () => {
+test("widths that would need a third line are refused on a desktop, and stack the plan on a phone", () => {
   const d = {
     id: "narrow", kind: "plan", label: "Four narrow columns.", unit: "mm",
     columns: [1.000000000000001, 1.000000000000002, 1.000000000000003, 1.000000000000004],
     areas: ["a b c d"], boxes: ["a", "b", "c", "d"].map((x) => ({ id: x, name: x.toUpperCase() })),
   };
-  assert.throws(() => renderDiagram(d), /the widths 1\.000000000000002 and 1\.000000000000003 above columns 2 and 3 need a third line on a phone; widen the narrow column, or write the gap in a note/);
+  const { phone } = renderDiagram(d);
+  assert.equal(phone.stack, true);
+  assert.deepEqual(phone.parts[1].texts.map((t) => t.s), ["B", "1.000000000000002 mm wide"]);
+  d.columns[3] = 1000;
+  assert.throws(() => renderDiagram(d), /the widths 1\.000000000000002 and 1\.000000000000003 above columns 2 and 3 need a third line on a desktop and on paper; widen the narrow column, or write the gap in a note/);
 });
 
 test("a plan with one row, one column or two boxes gets a fit warning", () => {

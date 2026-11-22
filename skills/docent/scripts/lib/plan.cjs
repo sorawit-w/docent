@@ -3,7 +3,7 @@
 // with text at its real size: 640px wide for a desktop and for paper, and 264px wide for a phone, where the same grid is
 // drawn again and a narrow column grows until its names fit. Its boxes are also written as a table, in words.
 // The rules come from docs/proposals/two-dimensional-layouts.md.
-const { fail, words, id } = require("./blocks.cjs");
+const { DataError, fail, words, id } = require("./blocks.cjs");
 const { textWidth } = require("./text.cjs");
 const { wrapName, graphemes, NO_SPACES } = require("./range.cjs");
 const { onLines } = require("./layout.cjs");
@@ -119,20 +119,35 @@ function sizeColumns(model, room, where) {
     const widest = [...model.boxes].sort((p, q) => needOf(q) - needOf(p)).slice(0, 2).map((b) => `"${b.name}" (${span("column", b.c0, b.c1)})`);
     fail(`the plan does not fit ${where}: its columns need ${Math.ceil(sum(least))}px, and ${where === "a phone" ? "a phone has" : "the drawing has"} ${room}px. The widest name${widest.length > 1 ? "s are" : " is"} ${and(widest)}. Shorten ${widest.length > 1 ? "them" : "it"}, or use fewer columns`);
   }
-  const fixed = Array(C).fill(false);
-  let widths;
-  for (;;) {
-    const free = room - sum(least.filter((_, c) => fixed[c])), weight = sum(weights.filter((_, c) => !fixed[c]));
-    widths = least.map((l, c) => (fixed[c] ? l : (free * weights[c]) / weight));
-    const low = widths.map((w, c) => !fixed[c] && w < least[c] - 1e-9);
-    if (!low.some(Boolean)) break;
-    low.forEach((on, c) => { if (on) fixed[c] = true; });
-  }
+  const { widths, fixed } = share(least, weights, room);
   return { widths, toScale: !!model.columns && !fixed.some(Boolean) };
 }
 
-/** The drawing: the grid of boxes on one band, the line that says how to read it, and the widths above the columns. */
+/** Each column's share of `room` by weight; a column below its least width is set to that width, and the others share what is left. */
+function share(least, weights, room) {
+  const fixed = least.map(() => false);
+  for (;;) {
+    const free = room - sum(least.filter((_, c) => fixed[c])), weight = sum(weights.filter((_, c) => !fixed[c]));
+    const widths = least.map((l, c) => (fixed[c] ? l : (free * weights[c]) / weight));
+    const low = widths.map((w, c) => !fixed[c] && w < least[c] - 1e-9);
+    if (!low.some(Boolean)) return { widths, fixed };
+    low.forEach((on, c) => { if (on) fixed[c] = true; });
+  }
+}
+
+/** The drawing at 640px, and at 264px for a phone; a phone whose grid cannot fit gets the stack form instead. */
 function drawPlan(model, phone = false) {
+  if (!phone) return gridForm(model, false);
+  try {
+    return gridForm(model, true);
+  } catch (e) {
+    if (!(e instanceof DataError)) throw e;
+    return stackForm(model);
+  }
+}
+
+/** The grid form: the grid of boxes on one band, the line that says how to read it, and the widths above the columns. */
+function gridForm(model, phone) {
   const W = phone ? PHONE : WIDE, room = W - 2 * SIDE;
   const where = phone ? "on a phone" : "on a desktop and on paper";
   const { widths, toScale } = sizeColumns(model, room, phone ? "a phone" : "a desktop and paper");
@@ -191,6 +206,43 @@ function drawPlan(model, phone = false) {
   return s;
 }
 
+/**
+ * The stack form, for a phone whose grid cannot fit: each box on a band of its own, in the order of "areas". At the left
+ * of the band, a map of the whole plan, 40px wide, with this band's box filled; at the right, the box's name, its note and
+ * its width, wrapped in 180px. The map is to scale across when the data has widths, but no column is narrower than 3px.
+ */
+function stackForm(model) {
+  const W = PHONE, MAP = 40, CELL = 8, LEFT = 16, TEXT = LEFT + MAP + 12, room = W - 8 - TEXT;
+  const { widths, fixed } = share(Array(model.cols).fill(3), model.columns || Array(model.cols).fill(1), MAP);
+  const toScale = !!model.columns && !fixed.some(Boolean);
+  const xs = [0];
+  for (const w of widths) xs.push(xs[xs.length - 1] + w);
+  const s = { form: "plan", stack: true, toScale, w: W, h: 0, bands: [], gaps: [], tracks: [], lanes: [], parts: [], legs: [], notes: [], under: [] };
+  let y = 12;
+  const head = wrapName(!model.columns ? "Not to scale" : `Widths in ${model.unit}${toScale ? "" : ", maps not to scale"}`, W - 2 * SIDE, { size: 12, weight: 400, every: false });
+  head.forEach((line, k) => s.notes.push({ x: SIDE, y: y + 12 + k * NOTE, s: line, cls: "sub", anchor: "start" }));
+  y += 20 + (head.length - 1) * NOTE;
+  const small = { size: 12, weight: 400 };
+  for (const b of model.boxes) {
+    const top = y, name = wrapName(b.name, room), subs = b.note ? wrapName(b.note, room, small) : [];
+    if (model.columns) subs.push(...wrapName(`${fmt(model.columns.slice(b.c0, b.c1 + 1).reduce(add))} ${model.unit} wide`, room, small));
+    const texts = name.map((line, k) => ({ x: TEXT, y: top + 24 + k * NAME, s: line, cls: "name", anchor: "start" }));
+    const subTop = top + 10 + name.length * NAME + 2;
+    subs.forEach((line, k) => texts.push({ x: TEXT, y: subTop + 12 + k * NOTE, s: line, cls: "sub", anchor: "start" }));
+    // This band's box is drawn last, so the outlines of its neighbours do not cut into its fill.
+    const map = [...model.boxes.filter((o) => o !== b), b].map((o) => {
+      const x = LEFT + xs[o.c0] + 0.5, my = top + 10 + o.r0 * CELL + 0.5;
+      return `<rect x="${num(x)}" y="${num(my)}" width="${num(xs[o.c1 + 1] - xs[o.c0] - 1)}" height="${num((o.r1 - o.r0 + 1) * CELL - 1)}" class="${o === b ? "m-on" : "m-box"}"/>`;
+    }).join("");
+    const h = 20 + Math.max(model.rows * CELL, name.length * NAME + (subs.length ? 2 + subs.length * NOTE : 0));
+    s.bands.push({ x: 8, y: top, w: W - 16, h });
+    s.parts.push({ id: b.id, svg: map, texts });
+    y = top + h + 8;
+  }
+  s.h = y + 4;
+  return s;
+}
+
 /** The words for where a box sits: top, middle, bottom or "row 2"; full height; "rows 2 to 3". The same for columns. */
 function placeOf(a, b, count, [first, last, all, word]) {
   if (a === 0 && b === count - 1) return all;
@@ -213,14 +265,16 @@ function wordsOf(model, scene, phone) {
   let scale;
   if (!model.columns) scale = "The plan is not drawn to scale.";
   else if (scene && !scene.toScale) scale = `Widths are in ${esc(model.unit)}. The rows and the columns are not drawn to scale.`;
-  else scale = `Widths are in ${esc(model.unit)}. The rows are not drawn to scale.${phone && !phone.toScale ? " On a phone the columns are not drawn to scale either." : ""}`;
+  else scale = `Widths are in ${esc(model.unit)}. The rows are not drawn to scale.${phone && !phone.stack && !phone.toScale ? " On a phone the columns are not drawn to scale either." : ""}`;
+  if (phone && phone.stack) scale += " On a phone each box stands on its own, beside a small map of the plan.";
   return `<table><thead>${head}</thead><tbody>${body}</tbody></table>\n<p>${scale}</p>`;
 }
 
 /** What render adds after the form: which forms are not to scale. */
 function scaleNote(model, scene, phone) {
-  if (!model.columns || !scene.toScale) return "not to scale";
-  return phone.toScale ? "" : "not to scale on a phone";
+  const desk = !model.columns || !scene.toScale ? "not to scale" : "";
+  if (phone.stack) return desk ? `${desk}; stacked on a phone` : "stacked on a phone";
+  return desk || (phone.toScale ? "" : "not to scale on a phone");
 }
 
 module.exports = { readPlan, drawPlan, wordsOf, scaleNote, sizeColumns, MOST, WIDE, PHONE };

@@ -102,6 +102,8 @@ function styles(scene, id, mode, swap) {
   // A layout to scale: box names in weight 400 like the rows of a range chart, measures with tabular figures, its boxes and the ticks to their names in the text color.
   // A plan: the box names, widths and boxes of a layout to scale, with no ticks and no named lines.
   if (scene.form === "plan") css.push(`${s} .row{font-size:14px;fill:${v("text")}}`, `${s} .val{font-size:12px;fill:${v("muted")};font-variant-numeric:tabular-nums}`, `${s} .box{fill:${v("bg")};stroke:${v("text")};stroke-width:1.5}`);
+  // A plan stacked on a phone: a small map beside each box, its boxes in thin muted outlines, the band's own box filled in the text color.
+  if (scene.stack) css.push(`${s} .m-box{fill:${v("bg")};stroke:${v("muted")};stroke-width:1}`, `${s} .m-on{fill:${v("text")};stroke:${v("text")};stroke-width:1}`);
   if (scene.form === "layout") css.push(`${s} .row{font-size:14px;fill:${v("text")}}`, `${s} .val{font-size:12px;fill:${v("muted")};font-variant-numeric:tabular-nums}`, `${s} .box{fill:${v("bg")};stroke:${v("text")};stroke-width:1.5}`, `${s} .tick{fill:none;stroke:${v("text")};stroke-width:1}`, `${s} .r-ref{stroke:${v("muted")}}`);
   // A part with a state: its outline takes the status color, and a status dot sits on the outline. A drawing with no state carries none of these rules.
   for (const state of new Set(scene.parts.map((part) => part.state).filter(Boolean))) css.push(`${s} .stop.is-${state},${s} .card.is-${state}{stroke:${v(state)};stroke-width:1.5}`, `${s} .flag.is-${state}{fill:${v(state)};stroke:${v("bg")};stroke-width:2}`);
