@@ -71,14 +71,14 @@
 <rect x="387" y="316" width="51.68" height="16" class="band"/><text x="391" y="328" class="val" text-anchor="start">63–70</text>
 <text x="20" y="361" class="row" text-anchor="start">Docent on paper</text>
 <rect x="347.6" y="348" width="116.68" height="16" class="band"/><text x="351.6" y="360" class="val" text-anchor="start">52–64, computed</text>
-<rect x="218.83" y="76" width="203.57" height="16" rx="4" class="r-bar"/>
+<rect x="218.83" y="76" width="203.57" height="16" rx="4" class="r-bar"/><line x1="251.67" y1="76.75" x2="251.67" y2="91.25" class="track"/><line x1="317.33" y1="76.75" x2="317.33" y2="91.25" class="track"/><line x1="383" y1="76.75" x2="383" y2="91.25" class="track"/>
 <circle cx="284.5" cy="116" r="5" class="r-pt"/>
 <path d="M186,148 H383 M383,140 V156" class="r-lim"/>
-<rect x="251.67" y="172" width="164.17" height="16" rx="4" class="r-bar"/>
+<rect x="251.67" y="172" width="164.17" height="16" rx="4" class="r-bar"/><line x1="317.33" y1="172.75" x2="317.33" y2="187.25" class="track"/><line x1="383" y1="172.75" x2="383" y2="187.25" class="track"/>
 <path d="M186,212 H448.67 M448.67,204 V220" class="r-lim"/>
-<rect x="218.83" y="236" width="295.5" height="16" rx="4" class="r-bar"/>
+<rect x="218.83" y="236" width="295.5" height="16" rx="4" class="r-bar"/><line x1="251.67" y1="236.75" x2="251.67" y2="251.25" class="track"/><line x1="317.33" y1="236.75" x2="317.33" y2="251.25" class="track"/><line x1="383" y1="236.75" x2="383" y2="251.25" class="track"/><line x1="448.67" y1="236.75" x2="448.67" y2="251.25" class="track"/>
 <rect x="337.03" y="316" width="45.97" height="16" rx="4" class="r-bar"/>
-<rect x="264.8" y="348" width="78.8" height="16" rx="4" class="r-bar"/>
+<rect x="264.8" y="348" width="78.8" height="16" rx="4" class="r-bar"/><line x1="317.33" y1="348.75" x2="317.33" y2="363.25" class="track"/>
 </svg>
 <svg id="dg-line-lengths-phone" class="dg dg-range dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="552" viewBox="0 0 264 552" role="img" aria-label="Readers prefer 45 to 76 characters in a line, and one study rated 55 easiest. Advice and standards set upper limits from 70 to 90. Docent holds 63 to 70 on screen and 52 to 64 on paper.">
 <style>
@@ -169,14 +169,14 @@
 <rect x="120" y="462" width="51.68" height="16" class="band"/><text x="124" y="474" class="val" text-anchor="start">63–70</text>
 <text x="20" y="502" class="row" text-anchor="start">Docent on paper</text>
 <rect x="100.8" y="512" width="116.68" height="16" class="band"/><text x="104.8" y="524" class="val" text-anchor="start">52–64, computed</text>
-<rect x="36" y="114" width="99.2" height="16" rx="4" class="r-bar"/>
+<rect x="36" y="114" width="99.2" height="16" rx="4" class="r-bar"/><line x1="84" y1="114.75" x2="84" y2="129.25" class="track"/>
 <circle cx="68" cy="172" r="5" class="r-pt"/>
 <path d="M20,222 H116 M116,214 V230" class="r-lim"/>
-<rect x="52" y="264" width="80" height="16" rx="4" class="r-bar"/>
+<rect x="52" y="264" width="80" height="16" rx="4" class="r-bar"/><line x1="84" y1="264.75" x2="84" y2="279.25" class="track"/>
 <path d="M20,322 H148 M148,314 V330" class="r-lim"/>
-<rect x="36" y="364" width="144" height="16" rx="4" class="r-bar"/>
+<rect x="36" y="364" width="144" height="16" rx="4" class="r-bar"/><line x1="84" y1="364.75" x2="84" y2="379.25" class="track"/><line x1="148" y1="364.75" x2="148" y2="379.25" class="track"/>
 <rect x="93.6" y="462" width="22.4" height="16" rx="4" class="r-bar"/>
-<rect x="58.4" y="512" width="38.4" height="16" rx="4" class="r-bar"/>
+<rect x="58.4" y="512" width="38.4" height="16" rx="4" class="r-bar"/><line x1="84" y1="512.75" x2="84" y2="527.25" class="track"/>
 </svg>
 <details class="dg-words">
 <summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>The diagram in words</summary>

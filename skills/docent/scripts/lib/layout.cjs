@@ -5,7 +5,7 @@
 const { fail, words, id } = require("./blocks.cjs");
 const { textWidth } = require("./text.cjs");
 const { wrapName } = require("./range.cjs");
-const { readScale, makeScale, drawHead, drawGrid, valueWidth, fmt, isNum, num, diff } = require("./scale.cjs");
+const { readScale, makeScale, drawHead, drawGrid, linesIn, valueWidth, fmt, isNum, num, diff } = require("./scale.cjs");
 
 const MOST = { rows: 6, boxes: 6, name: 16, note: 24 };
 const WIDE = 640, PHONE = 264; // as for a range chart: a desktop and A4 paper, and a 320px screen
@@ -136,7 +136,7 @@ function drawLayout(model, phone = false) {
       for (const b of boxes) {
         s.parts.push({
           id: b.name,
-          svg: `${b.tick || ""}<rect x="${num(b.a)}" y="${num(boxTop)}" width="${num(b.z - b.a)}" height="${BOX}" rx="4" class="box"/>`,
+          svg: `${b.tick || ""}<rect x="${num(b.a)}" y="${num(boxTop)}" width="${num(b.z - b.a)}" height="${BOX}" rx="4" class="box"/>${linesIn(scale, sc, b.a, boxTop, b.z - b.a, BOX, b.inside ? [[b.a + 8, b.a + 8 + b.w]] : [])}`,
           texts: b.inside ? [{ x: b.a + 8, y: boxTop + 17, s: b.name, cls: "row", anchor: "start" }] : [],
         });
       }

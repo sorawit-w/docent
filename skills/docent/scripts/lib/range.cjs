@@ -5,7 +5,7 @@
 const { fail, words, id } = require("./blocks.cjs");
 const { textWidth } = require("./text.cjs");
 const { wrap } = require("./graph.cjs");
-const { readScale, makeScale, drawHead, drawGrid, placeLabel, valueWidth, fmt, isNum, num } = require("./scale.cjs");
+const { readScale, makeScale, drawHead, drawGrid, linesIn, placeLabel, valueWidth, fmt, isNum, num } = require("./scale.cjs");
 
 const MOST = { rows: 12, groups: 3, name: 28, note: 24, group: 20 };
 const WIDE = 640; // the desktop and paper form: it fits an A4 figure well (about 641.6px) with no shrink
@@ -160,7 +160,8 @@ function layoutRange(model, phone = false) {
       const ty = place.side === "above" ? cy - 14 : cy + 4;
       const left = place.anchor === "end" ? place.x - tw : place.anchor === "middle" ? place.x - tw / 2 : place.x;
       s.notes.push({ x: place.x, y: ty, s: r.value, cls: "val", anchor: place.anchor, knock: { x: left - 4, y: ty - 12, w: tw + 8, h: 16 } });
-      s.parts.push({ id: r.name, svg: markSvg(r, sc, x0, x1, cy), texts: [] });
+      const through = r.type === "range" ? linesIn(scale, sc, sc.x(r.from), cy - 8, sc.x(r.to) - sc.x(r.from), 16) : "";
+      s.parts.push({ id: r.name, svg: markSvg(r, sc, x0, x1, cy) + through, texts: [] });
       if (phone) spans.push([cy - 14, cy + 14]);
       yy += ROW;
     }

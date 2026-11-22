@@ -66,7 +66,7 @@ test("each kind of row has its own mark, and a limit has no cap at the edge of t
   d.rows.push({ name: "At least", from: 80, group: "docent" });
   const { scene } = renderDiagram(d);
   const svgs = scene.parts.map((p) => p.svg);
-  assert.match(svgs[0], /^<rect [^>]*height="16" rx="4" class="r-bar"\/>$/, "a range is a bar");
+  assert.match(svgs[0], /^<rect [^>]*height="16" rx="4" class="r-bar"\/>(<line [^>]*class="track"\/>)*$/, "a range is a bar, with the grid lines that pass through it");
   assert.match(svgs[1], /^<circle [^>]*r="5" class="r-pt"\/>$/, "a point is a filled circle");
   const [, x0, xt] = svgs[2].match(/^<path d="M([\d.]+),[\d.]+ H([\d.]+) M\2,[\d.]+ V[\d.]+" class="r-lim"\/>$/) || [];
   assert.ok(x0 && xt, `an upper limit is a line from the start of the scale and a cap at the limit: ${svgs[2]}`);

@@ -65,6 +65,23 @@ test("a track-2 box sits under track 1 in its row", () => {
   assert.ok(wide.y0 >= text.y1 + 8, "track 2 starts 8px under track 1");
 });
 
+test("the grid lines that pass through a box are drawn over it, except where they would cross its name", () => {
+  for (const s of Object.values((({ scene, phone }) => ({ scene, phone }))(renderDiagram(fixture("layout-screen"))))) {
+    const grid = [...s.tracks.map(([x]) => x), ...s.under.map((u) => +u.match(/x1="([\d.]+)"/)[1])];
+    const middle = +s.under[0].match(/x1="([\d.]+)"/)[1];
+    let across = 0;
+    for (const p of s.parts) {
+      const r = rectOf(p.svg), name = p.texts.map(box)[0];
+      const drawn = [...p.svg.matchAll(/<line x1="([\d.]+)" y1="([\d.]+)" x2="[\d.]+" y2="([\d.]+)" class="track"\/>/g)].map((m) => [+m[1], +m[2], +m[3]]);
+      for (const [x, y0, y1] of drawn) assert.ok(x > r.x0 && x < r.x1 && y0 > r.y0 && y1 < r.y1, `a line through "${p.id}" stays inside it (${s.w}px)`);
+      const want = grid.filter((x) => x > r.x0 + 1 && x < r.x1 - 1 && !(name && x >= name.x0 - 4 && x <= name.x1 + 4));
+      assert.deepEqual(drawn.map(([x]) => x).sort((a, b) => a - b), [...new Set(want)].sort((a, b) => a - b), `the lines through "${p.id}" (${s.w}px)`);
+      if (drawn.some(([x]) => x === middle)) across++;
+    }
+    assert.equal(across, s.w === 640 ? 6 : 2, `the middle line shows through the boxes that cross it, where no name stands on it (${s.w}px)`);
+  }
+});
+
 test("a measured row writes every stretch between box edges, and on a phone a crowded measure takes a second line", () => {
   const { scene, phone, svg } = renderDiagram(fixture("layout-a4"));
   assert.deepEqual(measures(scene).map((n) => n.s), ["18", "112", "8", "50", "4", "18"]);
