@@ -186,3 +186,13 @@ test("measures keep clear of the row note also when the scale has no unit", () =
   const note = box(scene.notes.find((n) => n.s === "custom layout"));
   for (const m of measures(scene).map(box)) assert.ok(!meet(note, m), `"${m.s}" meets the note`);
 });
+
+test("a width with 16 digits keeps its last digit, and the noise of a subtraction still goes", () => {
+  const { diff } = require("../skills/docent/scripts/lib/scale.cjs");
+  const { readLayout, wordsOf } = require("../skills/docent/scripts/lib/layout.cjs");
+  assert.equal(diff(0, 1000000000000011), 1000000000000011);
+  assert.equal(diff(100.1, 100.2), 0.1);
+  const model = readLayout({ id: "long", kind: "layout", label: "Sixteen digits.", scale: { from: 0, to: 1000000000000020 }, rows: [{ name: "Page", measure: true, boxes: [{ name: "Text", from: 0, to: 1000000000000011 }] }] });
+  assert.match(wordsOf(model), /<td>1000000000000011<\/td><\/tr>/, "the Width column of the table");
+  assert.match(wordsOf(model), /1000000000000011 and 9/, "the measured line");
+});

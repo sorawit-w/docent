@@ -98,8 +98,9 @@ const num = (v) => String(Math.round(v * 100) / 100);
 /** b minus a without the noise of the subtraction: the shortest number within its rounding error (100.2 − 100.1 is 0.1). */
 function diff(a, b) {
   const v = b - a, error = 2 * (Math.abs(a) * Number.EPSILON + Math.abs(b) * Number.EPSILON);
-  for (let digits = 1; digits < 15; digits++) { const short = Number(v.toPrecision(digits)); if (Math.abs(short - v) <= error) return short; }
-  return Number(v.toPrecision(15));
+  // 17 digits always give back the same number, so the loop always returns.
+  for (let digits = 1; digits <= 17; digits++) { const short = Number(v.toPrecision(digits)); if (Math.abs(short - v) <= error) return short; }
+  return v;
 }
 
 /**
