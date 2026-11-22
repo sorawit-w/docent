@@ -149,4 +149,12 @@ function placeLabel({ a, b, w, lo, hi, sides }) {
   return { x: Math.min(Math.max(a, lo), hi - w), anchor: "start", side: "above" };
 }
 
-module.exports = { readScale, makeScale, tickAt, drawHead, drawGrid, placeLabel, valueWidth, fmt, isNum, num, diff, MOST };
+/** The grid lines that pass through a box, drawn over it in the line color, so the reader sees where the box meets each
+ * line. A line that would cross a name inside the box ([x from, x to] in names) is left out of that box. */
+function linesIn(scale, sc, x, y, w, h, names = []) {
+  const xs = [...new Set([...sc.ticks.map((t) => t.x), ...scale.marks.map((m) => sc.x(m.at))].map(num))].map(Number);
+  return xs.filter((lx) => lx > x + 1 && lx < x + w - 1 && !names.some(([a, b]) => lx >= a - 4 && lx <= b + 4))
+    .map((lx) => `<line x1="${num(lx)}" y1="${num(y + 0.75)}" x2="${num(lx)}" y2="${num(y + h - 0.75)}" class="track"/>`).join("");
+}
+
+module.exports = { readScale, makeScale, tickAt, drawHead, drawGrid, linesIn, placeLabel, valueWidth, fmt, isNum, num, diff, MOST };
