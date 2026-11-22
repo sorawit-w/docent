@@ -1,0 +1,94 @@
+<svg id="dg-editor-screen" class="dg dg-plan dg-auto" xmlns="http://www.w3.org/2000/svg" width="640" height="248" viewBox="0 0 640 248" role="img" aria-label="An editor screen 1440px wide. A toolbar runs across the top and a status bar across the bottom. The list of files fills the left side between them. The editor is on the right, with the output under it.">
+<style>
+#dg-editor-screen{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-editor-screen .ground{fill:var(--fig,#f2f3f9)}
+#dg-editor-screen .band{fill:var(--bg,#fbfbfe)}
+#dg-editor-screen .track{stroke:var(--line,#d3d6e3)}
+#dg-editor-screen .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-editor-screen .head{fill:var(--text,#1c1f2e)}
+#dg-editor-screen .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-editor-screen .stop.end{fill:var(--text,#1c1f2e)}
+#dg-editor-screen .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-editor-screen .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-editor-screen .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-editor-screen .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-editor-screen .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-editor-screen .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-editor-screen .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-editor-screen .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-editor-screen .sub,#dg-editor-screen .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-editor-screen .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-editor-screen .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-editor-screen .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-editor-screen .box{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+@media (prefers-reduced-motion:reduce){#dg-editor-screen .pulse{animation:none!important}#dg-editor-screen .pulse{display:none!important}}
+@media print{#dg-editor-screen{max-width:100%;height:auto}#dg-editor-screen .pulse{display:none!important}}
+#dg-editor-screen-phone{display:none}
+</style>
+<rect width="640" height="248" class="ground"/>
+<rect x="8" y="52" width="624" height="184" rx="10" class="band"/>
+<text x="12" y="24" class="sub" text-anchor="start">Widths in px</text>
+<text x="80.44" y="44" class="val" text-anchor="middle">320</text>
+<text x="388.44" y="44" class="val" text-anchor="middle">1120</text>
+<rect x="14" y="58" width="612" height="36" rx="4" class="box"/>
+<text x="22" y="80" class="row" text-anchor="start">Toolbar</text>
+<rect x="14" y="98" width="132.89" height="92" rx="4" class="box"/>
+<text x="22" y="120" class="row" text-anchor="start">Files</text>
+<rect x="150.89" y="98" width="475.11" height="36" rx="4" class="box"/>
+<text x="158.89" y="120" class="row" text-anchor="start">Editor</text>
+<rect x="150.89" y="138" width="475.11" height="52" rx="4" class="box"/>
+<text x="158.89" y="160" class="row" text-anchor="start">Output</text>
+<text x="158.89" y="178" class="sub" text-anchor="start">can be closed</text>
+<rect x="14" y="194" width="612" height="36" rx="4" class="box"/>
+<text x="22" y="216" class="row" text-anchor="start">Status bar</text>
+</svg>
+<svg id="dg-editor-screen-phone" class="dg dg-plan dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="248" viewBox="0 0 264 248" role="img" aria-label="An editor screen 1440px wide. A toolbar runs across the top and a status bar across the bottom. The list of files fills the left side between them. The editor is on the right, with the output under it.">
+<style>
+#dg-editor-screen-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-editor-screen-phone .ground{fill:var(--fig,#f2f3f9)}
+#dg-editor-screen-phone .band{fill:var(--bg,#fbfbfe)}
+#dg-editor-screen-phone .track{stroke:var(--line,#d3d6e3)}
+#dg-editor-screen-phone .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-editor-screen-phone .head{fill:var(--text,#1c1f2e)}
+#dg-editor-screen-phone .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-editor-screen-phone .stop.end{fill:var(--text,#1c1f2e)}
+#dg-editor-screen-phone .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-editor-screen-phone .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-editor-screen-phone .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-editor-screen-phone .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-editor-screen-phone .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-editor-screen-phone .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-editor-screen-phone .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-editor-screen-phone .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-editor-screen-phone .sub,#dg-editor-screen-phone .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-editor-screen-phone .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-editor-screen-phone .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-editor-screen-phone .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-editor-screen-phone .box{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+@media (prefers-reduced-motion:reduce){#dg-editor-screen-phone .pulse{animation:none!important}#dg-editor-screen-phone .pulse{display:none!important}}
+@media print{#dg-editor-screen-phone{max-width:100%;height:auto}#dg-editor-screen-phone .pulse{display:none!important}}
+@media (max-width:736px){#dg-editor-screen{display:none}#dg-editor-screen-phone{display:block}}
+@media print{#dg-editor-screen{display:block!important}#dg-editor-screen-phone{display:none!important}}
+</style>
+<rect width="264" height="248" class="ground"/>
+<rect x="8" y="52" width="248" height="184" rx="10" class="band"/>
+<text x="12" y="24" class="sub" text-anchor="start">Widths in px</text>
+<text x="38.67" y="44" class="val" text-anchor="middle">320</text>
+<text x="158.67" y="44" class="val" text-anchor="middle">1120</text>
+<rect x="14" y="58" width="236" height="36" rx="4" class="box"/>
+<text x="22" y="80" class="row" text-anchor="start">Toolbar</text>
+<rect x="14" y="98" width="49.33" height="92" rx="4" class="box"/>
+<text x="22" y="120" class="row" text-anchor="start">Files</text>
+<rect x="67.33" y="98" width="182.67" height="36" rx="4" class="box"/>
+<text x="75.33" y="120" class="row" text-anchor="start">Editor</text>
+<rect x="67.33" y="138" width="182.67" height="52" rx="4" class="box"/>
+<text x="75.33" y="160" class="row" text-anchor="start">Output</text>
+<text x="75.33" y="178" class="sub" text-anchor="start">can be closed</text>
+<rect x="14" y="194" width="236" height="36" rx="4" class="box"/>
+<text x="22" y="216" class="row" text-anchor="start">Status bar</text>
+</svg>
+<details class="dg-words">
+<summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>The diagram in words</summary>
+<table><thead><tr><th scope="col">Box</th><th scope="col">Row</th><th scope="col">Column</th><th scope="col">Width</th><th scope="col">Note</th></tr></thead><tbody><tr><th scope="row">Toolbar</th><td>top</td><td>full width</td><td>1440</td><td></td></tr><tr><th scope="row">Files</th><td>rows 2 to 3</td><td>left</td><td>320</td><td></td></tr><tr><th scope="row">Editor</th><td>row 2</td><td>right</td><td>1120</td><td></td></tr><tr><th scope="row">Output</th><td>row 3</td><td>right</td><td>1120</td><td>can be closed</td></tr><tr><th scope="row">Status bar</th><td>bottom</td><td>full width</td><td>1440</td><td></td></tr></tbody></table>
+<p>Widths are in px. The rows are not drawn to scale.</p>
+</details>

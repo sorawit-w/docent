@@ -22,6 +22,11 @@ function fitWarnings(kind, model) {
     if (path) out.push("the links form one chain, so they add little; when the order matters more than the links, a sequence diagram reads better");
   }
   if (kind === "layout" && model.rows.every((r) => r.boxes.length === 1)) out.push("every row has one box; a range chart says this more simply");
+  if (kind === "plan") {
+    if (model.rows === 1) out.push("the plan has one row; a layout to scale says this more simply");
+    if (model.cols === 1) out.push("the plan has one column, so its boxes stand one above another; a list says this more simply");
+    if (model.boxes.length === 2) out.push("the plan has 2 boxes; a sentence says where they sit");
+  }
   if (kind === "range" && model.rows.length < 3) out.push(`the range chart has ${model.rows.length} rows; a sentence says this more simply`);
   return out;
 }

@@ -771,7 +771,7 @@ A range chart shows values and ranges on one numeric scale, one row each, so the
 
 ## Layouts to scale
 
-A layout to scale shows where each part sits along one measured width, how wide it is, and how big the gaps are: the text, the notes and the wide blocks on a 1920px screen, or the margins and columns of an A4 page. Write it with `"kind": "layout"` when the parts sit along one width and their positions are known numbers. It has one axis only: for a page with a header, two columns and a footer, write words or a table. For steps in order, use a workflow; for states over time, a timing diagram.
+A layout to scale shows where each part sits along one measured width, how wide it is, and how big the gaps are: the text, the notes and the wide blocks on a 1920px screen, or the margins and columns of an A4 page. Write it with `"kind": "layout"` when the parts sit along one width and their positions are known numbers. It has one axis only: for a page with a header, two columns and a footer, write a plan (below). For steps in order, use a workflow; for states over time, a timing diagram.
 
 ```json
 {
@@ -802,6 +802,48 @@ A layout to scale shows where each part sits along one measured width, how wide 
 - The forms are those of a range chart: 640px on a desktop and on paper, with the row names in a column at the left, and 264px on a phone, with each row name on a line above its boxes. Nothing moves, so it sits in the text flow and has no `form`.
 - `render` also writes the boxes as a table (row, box, from, to and width) under the drawing, with a line for each measured row.
 - `render` refuses a box narrower than 4px in either form, with the box's name.
+
+## Plans
+
+A plan shows where the parts of a page or a screen sit, and what is next to what: the navigation on the left, the text in the middle, and an "On this page" list on the right. Write it with `"kind": "plan"` when a page or screen has 2 to 8 parts in rows and columns, and the reader needs the picture to find them. For parts along one width, or exact positions and gaps, use a layout to scale. For several facts about each part, or more than 8 parts, use a table. For two parts, write a sentence.
+
+```json
+{
+  "id": "editor-screen",
+  "kind": "plan",
+  "label": "An editor screen 1440px wide. A toolbar runs across the top and a status bar across the bottom. The list of files fills the left side between them. The editor is on the right, with the output under it.",
+  "unit": "px",
+  "columns": [320, 1120],
+  "areas": [
+    "toolbar toolbar",
+    "files   editor",
+    "files   output",
+    "status  status"
+  ],
+  "boxes": [
+    {"id": "toolbar", "name": "Toolbar"},
+    {"id": "files", "name": "Files"},
+    {"id": "editor", "name": "Editor"},
+    {"id": "output", "name": "Output", "note": "can be closed"},
+    {"id": "status", "name": "Status bar"}
+  ]
+}
+```
+
+| Field | What it is |
+|---|---|
+| `areas` | 1 to 5 strings, one for each row, top to bottom, as CSS writes `grid-template-areas`. Each string has 1 to 4 cells, split by spaces; extra spaces may line up the columns. A cell is a box `id`, or `.` for an empty cell. Every row has the same number of cells, and the cells of one box form one rectangle. A row or a column of empty cells only is refused. |
+| `boxes` | 2 to 8. Each has an `id` that appears in `areas`, a `name` (at most 20 characters) and an optional `note` (at most 24 characters). The order of the list does not matter: the drawing and the words follow `areas`, row by row, left to right. |
+| `columns` | Optional: one width for each column, numbers more than 0. Each width is written above its column, and the plan is drawn to scale across when the names allow it. With no widths, the columns are sized by their names, and the drawing says "Not to scale". |
+| `unit` | The unit of the widths, at most 12 characters, such as `px`. `columns` and `unit` go together. |
+
+- Every box looks the same: the page color inside and a text-color outline. Two boxes that touch stand 4px apart. A name sits at the upper left of its box, at 14px, and wraps at its spaces onto at most 3 lines; a note sits under it, on at most 2 lines. A word never breaks. A name written without spaces, as in Thai or Chinese, breaks between characters.
+- Row heights are not data: a row is as tall as its names need, and the words say the rows are not drawn to scale. When a height matters, write it in a note ("64px high") and in the `label`.
+- A plan has no box inside a box, no lines between boxes, no ticks, no `state`, no icons and no dot. To show what is inside a box, write a second plan.
+- The forms: 640px on a desktop and on paper, and 264px on a phone. A plan cannot become one strip, so the phone form is the same grid, drawn again: a narrow column grows until its names fit, the line above the plan then says "not to scale", and the real widths stay above the columns. `render` says which forms are not to scale, such as `drawn as plan; not to scale on a phone`.
+- When the names cannot fit, `render` refuses the plan and names the widest names and their columns: shorten them, or use fewer columns. With four columns, a phone has about 40px for the longest word of each.
+- To show one page on a desktop and on a phone, write two plans in two figures.
+- `render` also writes the boxes as a table under the drawing: each box's row and column in words (`top`, `left`, `full width`, `rows 2 to 3`), its width, and its note.
 
 ## Optional legs
 

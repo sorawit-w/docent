@@ -1,0 +1,19 @@
+{
+  "id": "docs-page",
+  "kind": "plan",
+  "label": "A documentation page 1440px wide. A header runs across the top and a footer across the bottom. Between them, the navigation is on the left, the text in the middle, and an 'On this page' list on the right.",
+  "unit": "px",
+  "columns": [240, 960, 240],
+  "areas": [
+    "header header  header",
+    "nav    text    toc",
+    "footer footer  footer"
+  ],
+  "boxes": [
+    {"id": "header", "name": "Header"},
+    {"id": "nav", "name": "Navigation"},
+    {"id": "text", "name": "Text"},
+    {"id": "toc", "name": "On this page"},
+    {"id": "footer", "name": "Footer"}
+  ]
+}

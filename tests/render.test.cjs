@@ -273,7 +273,7 @@ test("wrong side legs are refused with a plain reason", () => {
 test("the full examples in references/diagrams.md are drawn without an error", () => {
   const guide = fs.readFileSync(path.join(__dirname, "..", "skills", "docent", "references", "diagrams.md"), "utf8");
   const examples = [...guide.matchAll(/```json\n(\{\n  "id"[\s\S]*?)```/g)].map((m) => JSON.parse(m[1]));
-  assert.deepEqual(examples.map((d) => renderDiagram(d).form), ["sequence", "flow", "activity", "state", "interaction-overview", "timing", "usecase", "class", "object", "package", "profile", "component", "composite", "deployment", "communication", "range", "layout"]);
+  assert.deepEqual(examples.map((d) => renderDiagram(d).form), ["sequence", "flow", "activity", "state", "interaction-overview", "timing", "usecase", "class", "object", "package", "profile", "component", "composite", "deployment", "communication", "range", "layout", "plan"]);
 });
 
 test("render --data draws a diagram of any kind, and builds a widget only from a widget kind", () => {

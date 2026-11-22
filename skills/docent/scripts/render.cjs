@@ -17,9 +17,9 @@ function main(args) {
         console.log(html);
         return 0;
       }
-      const { svg, form, warnings } = renderDiagram(data);
+      const { svg, form, note, warnings } = renderDiagram(data);
       warnings.forEach((w) => console.error(`render: warning: ${w}`));
-      console.error(`render: drew ${args[1]} as ${form}`);
+      console.error(`render: drew ${args[1]} as ${form}${note ? `; ${note}` : ""}`);
       console.log(svg);
       return 0;
     } catch (error) {

@@ -1,0 +1,20 @@
+{
+  "id": "editor-screen",
+  "kind": "plan",
+  "label": "An editor screen 1440px wide. A toolbar runs across the top and a status bar across the bottom. The list of files fills the left side between them. The editor is on the right, with the output under it.",
+  "unit": "px",
+  "columns": [320, 1120],
+  "areas": [
+    "toolbar toolbar",
+    "files   editor",
+    "files   output",
+    "status  status"
+  ],
+  "boxes": [
+    {"id": "toolbar", "name": "Toolbar"},
+    {"id": "files", "name": "Files"},
+    {"id": "editor", "name": "Editor"},
+    {"id": "output", "name": "Output", "note": "can be closed"},
+    {"id": "status", "name": "Status bar"}
+  ]
+}

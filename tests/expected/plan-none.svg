@@ -1,0 +1,89 @@
+<svg id="dg-no-widths" class="dg dg-plan dg-auto" xmlns="http://www.w3.org/2000/svg" width="640" height="172" viewBox="0 0 640 172" role="img" aria-label="A documentation page 1440px wide. A header runs across the top and a footer across the bottom. Between them, the navigation is on the left, the text in the middle, and an 'On this page' list on the right.">
+<style>
+#dg-no-widths{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-no-widths .ground{fill:var(--fig,#f2f3f9)}
+#dg-no-widths .band{fill:var(--bg,#fbfbfe)}
+#dg-no-widths .track{stroke:var(--line,#d3d6e3)}
+#dg-no-widths .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-no-widths .head{fill:var(--text,#1c1f2e)}
+#dg-no-widths .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-no-widths .stop.end{fill:var(--text,#1c1f2e)}
+#dg-no-widths .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-no-widths .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-no-widths .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-no-widths .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-no-widths .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-no-widths .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-no-widths .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-no-widths .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-no-widths .sub,#dg-no-widths .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-no-widths .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-no-widths .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-no-widths .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-no-widths .box{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+@media (prefers-reduced-motion:reduce){#dg-no-widths .pulse{animation:none!important}#dg-no-widths .pulse{display:none!important}}
+@media print{#dg-no-widths{max-width:100%;height:auto}#dg-no-widths .pulse{display:none!important}}
+#dg-no-widths-phone{display:none}
+</style>
+<rect width="640" height="172" class="ground"/>
+<rect x="8" y="32" width="624" height="128" rx="10" class="band"/>
+<text x="12" y="24" class="sub" text-anchor="start">Not to scale</text>
+<rect x="14" y="38" width="612" height="36" rx="4" class="box"/>
+<text x="22" y="60" class="row" text-anchor="start">Header</text>
+<rect x="14" y="78" width="201.33" height="36" rx="4" class="box"/>
+<text x="22" y="100" class="row" text-anchor="start">Navigation</text>
+<rect x="219.33" y="78" width="201.33" height="36" rx="4" class="box"/>
+<text x="227.33" y="100" class="row" text-anchor="start">Text</text>
+<rect x="424.67" y="78" width="201.33" height="36" rx="4" class="box"/>
+<text x="432.67" y="100" class="row" text-anchor="start">On this page</text>
+<rect x="14" y="118" width="612" height="36" rx="4" class="box"/>
+<text x="22" y="140" class="row" text-anchor="start">Footer</text>
+</svg>
+<svg id="dg-no-widths-phone" class="dg dg-plan dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="188" viewBox="0 0 264 188" role="img" aria-label="A documentation page 1440px wide. A header runs across the top and a footer across the bottom. Between them, the navigation is on the left, the text in the middle, and an 'On this page' list on the right.">
+<style>
+#dg-no-widths-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-no-widths-phone .ground{fill:var(--fig,#f2f3f9)}
+#dg-no-widths-phone .band{fill:var(--bg,#fbfbfe)}
+#dg-no-widths-phone .track{stroke:var(--line,#d3d6e3)}
+#dg-no-widths-phone .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-no-widths-phone .head{fill:var(--text,#1c1f2e)}
+#dg-no-widths-phone .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-no-widths-phone .stop.end{fill:var(--text,#1c1f2e)}
+#dg-no-widths-phone .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-no-widths-phone .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-no-widths-phone .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-no-widths-phone .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-no-widths-phone .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-no-widths-phone .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-no-widths-phone .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-no-widths-phone .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-no-widths-phone .sub,#dg-no-widths-phone .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-no-widths-phone .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-no-widths-phone .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-no-widths-phone .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-no-widths-phone .box{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+@media (prefers-reduced-motion:reduce){#dg-no-widths-phone .pulse{animation:none!important}#dg-no-widths-phone .pulse{display:none!important}}
+@media print{#dg-no-widths-phone{max-width:100%;height:auto}#dg-no-widths-phone .pulse{display:none!important}}
+@media (max-width:736px){#dg-no-widths{display:none}#dg-no-widths-phone{display:block}}
+@media print{#dg-no-widths{display:block!important}#dg-no-widths-phone{display:none!important}}
+</style>
+<rect width="264" height="188" class="ground"/>
+<rect x="8" y="32" width="248" height="144" rx="10" class="band"/>
+<text x="12" y="24" class="sub" text-anchor="start">Not to scale</text>
+<rect x="14" y="38" width="236" height="36" rx="4" class="box"/>
+<text x="22" y="60" class="row" text-anchor="start">Header</text>
+<rect x="14" y="78" width="86" height="52" rx="4" class="box"/>
+<text x="22" y="100" class="row" text-anchor="start">Navigation</text>
+<rect x="104" y="78" width="71" height="52" rx="4" class="box"/>
+<text x="112" y="100" class="row" text-anchor="start">Text</text>
+<rect x="179" y="78" width="71" height="52" rx="4" class="box"/>
+<text x="187" y="100" class="row" text-anchor="start">On this</text>
+<text x="187" y="118" class="row" text-anchor="start">page</text>
+<rect x="14" y="134" width="236" height="36" rx="4" class="box"/>
+<text x="22" y="156" class="row" text-anchor="start">Footer</text>
+</svg>
+<details class="dg-words">
+<summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>The diagram in words</summary>
+<table><thead><tr><th scope="col">Box</th><th scope="col">Row</th><th scope="col">Column</th></tr></thead><tbody><tr><th scope="row">Header</th><td>top</td><td>full width</td></tr><tr><th scope="row">Navigation</th><td>middle</td><td>left</td></tr><tr><th scope="row">Text</th><td>middle</td><td>middle</td></tr><tr><th scope="row">On this page</th><td>middle</td><td>right</td></tr><tr><th scope="row">Footer</th><td>bottom</td><td>full width</td></tr></tbody></table>
+<p>The plan is not drawn to scale.</p>
+</details>
