@@ -8,7 +8,7 @@ Build one new kind, `"kind": "heatmap"`. A heat map shows one number for each pa
 
 The color rule must change for this, and the change is small: the heat steps are five more of Docent's own grays, and they fill the cells of a heat map and nothing else. A heat map has no ultramarine, no lamp, and no green, amber or red. Section 2 compares this with three other options and gives the exact words for `DESIGN.md`.
 
-The phone form keeps the grid. Each row name moves to its own line above its row of cells, as a range chart does on a phone, and the columns still line up. With 24 columns, each column is 9.3px wide on a phone. Within the limits, every heat map fits, so the phone form never refuses.
+The phone form keeps the grid. Each row name moves to its own line above its row of cells, as a range chart does on a phone, and the columns still line up. With 24 columns, each column is 9.3px wide on a phone. The grid itself fits every heat map within the limits. Only a column label or a legend that is too wide can be refused, and the message names it.
 
 The page heat map (counts for each area of a page) comes later, as its **own kind on the plan's code**, so the plan keeps its rule that every box looks the same. Raw click points do not belong in the renderer: the author counts them into cells first, and writes a grid heat map.
 
@@ -158,7 +158,7 @@ and after `dark-error`:
 
 **In Layout,** a new paragraph after **Plans**:
 
-> **Heat maps.** A heat map shows one number for each pair of a row and a column, such as sign-ups by weekday and hour, as a grid of cells on one band. Each cell is filled with the heat step of its number: 3 to 5 steps of equal size on one scale. A legend above the grid shows each step, with the numbers at its edges and the unit. Cells are 2px apart (1px when they are narrower than 16px), with corners of 2px. A cell with no data has no fill: it shows the band inside a 1px outline in the muted color, so a hollow cell never looks like the palest step. When every number fits inside its cell, each cell shows its number at 12px with tabular figures; when one does not fit, no cell shows one. Row names are 14px at weight 400 in a column at the left. Column labels are 12px, muted, above the grid; when they do not all fit, every second, third, fourth, sixth or twelfth label stands. Nothing moves, and nothing is dashed. It has the two forms of a range chart: 640px on a desktop and on paper, and 264px on a phone, where each row name stands on its own line above its row of cells and the columns still line up. Its numbers are also written as a table under the drawing.
+> **Heat maps.** A heat map shows one number for each pair of a row and a column, such as sign-ups by weekday and hour, as a grid of cells on one band. Each cell is filled with the heat step of its number: 3 to 5 steps of equal size on one scale. A legend above the grid shows each step, with the numbers at its edges and the unit. Cells are 2px apart (1px when they are narrower than 16px), with corners of 2px. A cell with no data has no fill: it shows the band inside a 1px outline in the muted color, so a hollow cell never looks like the palest step. When every number fits inside its cell, each cell shows its number at 12px with tabular figures; when one does not fit, no cell shows one. Row names are 14px at weight 400 in a column at the left. Column labels are 12px, muted, above the grid, and stay 12px inside the drawing. When they do not all fit on one line, they take two lines; when two lines are not enough, every second, third, fourth, sixth or twelfth label stands, and never fewer than three. Nothing moves, and nothing is dashed. It has the two forms of a range chart: 640px on a desktop and on paper, and 264px on a phone, where each row name stands on its own line above its row of cells and the columns still line up. Its numbers are also written as a table under the drawing.
 
 **In Do's and Don'ts,** after "Don't use green, amber or red for anything except status.":
 
@@ -221,7 +221,13 @@ The numbers are made up for this proposal.
 - **Cells.** Each cell is a solid rectangle in its heat step, with corners of 2px. Cells are 2px apart, or 1px when they are narrower than 16px, so the band shows between them. A cell with no data has no fill: the band shows, inside a 1px outline in the muted color. A hollow cell is a different shape from a filled one, so the reader never takes "no data" for "the least", even in an 8.3px phone cell or on a poor printer. The muted outline stands at 6.30:1 against the page (6.65:1 in dark, 6.51:1 on paper), and at about 5:1 against a cell in step 1. The pale line color would be only 1.40:1 against the page, close to step 1 at 1.25:1, so the two would merge. Nothing is dashed, and the cell shows no number.
 - **The number in a cell.** When every number fits inside its cell (its width at 12px with tabular figures, plus 4px on each side), each cell shows its number in the middle, in the text color on steps 1 to 3 and in the page color on steps 4 and 5. When one number does not fit, no cell shows one. A mix would make a reader think that the cells without a number are empty.
 - **The legend,** above the grid, at the left: one swatch for each step, 12px high and 32px wide (wider when an edge number needs it: its width plus 8px), with the edge numbers under the edges at 12px, muted, with tabular figures, and the unit at the right of the swatches. When a cell has no data, the legend adds a swatch drawn the same way, hollow with a muted outline, and the words "no data". When the legend does not fit in one line, the "no data" key goes to a second line.
-- **Column labels** are 12px, muted, above the middle of each column. A label needs its width plus 4px. When every label fits its column, every column has its label. When they do not, the renderer keeps every second, third, fourth, sixth or twelfth label, the first that fits, always from the first column. These numbers divide 24 and 12, so hours and months keep their round labels.
+- **Column labels** are 12px, muted, above the middle of each column. A label near an edge moves inward, so it stays 12px inside the drawing. Two labels on one line stand at least 4px apart, at their final places. The renderer tries four rules in order, and takes the first that works:
+  1. Every label, on one line.
+  2. Every label, on two lines: a label goes to the first line where it keeps 4px from the label before it, as the widths above a plan do (`onLines` in `layout.cjs`).
+  3. Every second, third, fourth, sixth or twelfth label, on one line, always from the first column, and never fewer than three labels. These numbers divide 24 and 12, so hours and months keep their round labels. One or two labels would tell the reader nothing, so a spacing that keeps fewer than three is not tried.
+  4. A refusal that names the widest label (section 6).
+
+  Labels of up to 43px (about seven characters, such as "Wed 12" or "23:00") always fit a phone, at any number of columns. Fewer columns allow longer labels, such as "Wednesday" (67px) over 4 columns, on two lines. On a desktop, with row names of ordinary length, every label allowed (at most 117px) fits.
 - **Text at real size.** Row names are 14px, weight 400, in the text color, as in a range chart.
 - **No dot, no walkthrough, no state, nothing dashed, no icons, no grid lines.** A heat map has no order of steps, so nothing moves.
 
@@ -231,7 +237,7 @@ The band runs from 8px to 632px. The row names stand in a column at the left, fr
 
 For the sign-ups example the widest name, "Wednesday", is 78px. The grid runs from 114px to 620px: 506px for 24 columns, so 21.1px for each column and cells 19.1px wide and 22px high. The widest number, "224", needs 23.8 + 8 = 31.8px, so no cell shows its number. The widest label, "23", needs 15.8 + 4 = 19.8px, and every column has its label. The legend is 5 swatches of 32px, then the unit: 217px. The drawing is about 262px high.
 
-Within the limits the desktop form always fits. The widest row name possible, 20 characters of the widest letter, is 273px, and it still leaves 13px for each of 24 columns. A real name of 20 characters, such as "Image upload service", is 143px.
+Within the limits the desktop grid always fits. The widest row name possible, 20 characters of the widest letter, is 273px, and it still leaves 13px for each of 24 columns. A real name of 20 characters, such as "Image upload service", is 143px.
 
 ### The phone (264px)
 
@@ -245,12 +251,12 @@ The grid has 24 columns at most, and 240px of room. Three honest options:
 
 - It keeps the picture and its orientation, so the phone shows the same grid as the desktop.
 - It costs height: 18px for each name line. For 7 rows of 24 columns the grid is 7 × (18 + 16 + 6) = 280px.
-- It fits every heat map within the limits: 24 columns give 9.3px, above the least of 8px. So the phone form never refuses for room, and needs no fallback.
+- Its grid fits every heat map within the limits: 24 columns give 9.3px, above the least of 8px. So the grid never needs a fallback. Long column labels can still be refused, by the rule above, and the message says which label to shorten.
 - A long row name wraps onto a second line, at its spaces, as on a range chart. A name of 20 characters needs at most two lines.
 
-**Recommendation: P3.** It is the only option that fits every heat map within the limits, it keeps the grid as the reader saw it on a desktop, and it is the phone form that Docent's other scale charts already use.
+**Recommendation: P3.** It is the only option whose grid fits every heat map within the limits, it keeps the grid as the reader saw it on a desktop, and it is the phone form that Docent's other scale charts already use.
 
-For the sign-ups example on a phone: 24 columns of 9.3px. The labels need 19.8px, so two columns (18.7px) are too narrow and three (28px) are enough: every third label stands, 0, 3, 6 and so on to 21. No cell shows its number. The legend is 217px, so it fits 240px in one line. The drawing is about 368px high.
+For the sign-ups example on a phone: 24 columns of 9.3px. The labels need 19.8px, so two columns (18.7px) are too narrow, also for two lines, and three (28px) are enough: every third label stands, 0, 3, 6 and so on to 21. No cell shows its number. The legend is 217px, so it fits 240px in one line. The drawing is about 368px high.
 
 ---
 
@@ -279,6 +285,7 @@ The `label` stays a one- or two-sentence summary. It should say the pattern in w
 - `render doc.html: diagram 3 ("signups-by-hour") drawn as heatmap; every 3rd column label on a phone`
 - `render doc.html: diagram 4 ("errors-by-day") drawn as heatmap; numbers in the cells`
 - When the desktop shows numbers and the phone does not: `numbers in the cells on a desktop only`.
+- When the labels take two lines: `column labels on two lines on a phone`.
 
 **The refusals.** Each message names the field and says what to change:
 
@@ -302,10 +309,11 @@ The `label` stays a one- or two-sentence summary. It should say the pattern in w
 - `the scale of a heat map has no "marks"; say a value that matters in the label or the text`
 - `every cell has no data; a heat map needs at least one number`
 - `the legend needs 320px on a phone, and a phone has 240px; its widest number is "1000000". Write the values in a larger unit, such as thousands`
+- `the column labels do not fit on a phone, even on two lines or with every 12th label; the widest is "WWWWWWWWWW", 117px. Shorten the labels to about 7 characters, or use fewer columns`
 
 `readScale` gives its own messages for `from`, `to`, `step`, and a scale that is not a whole number of steps.
 
-The legend is the only part that can be too wide. The phone has the least room, so the phone form refuses first: five swatches of 64px for numbers of seven digits come to 320px. Every other part fits within the limits, as section 4 shows.
+Two parts can be too wide: the legend and the column labels. The phone has the least room, so the phone form refuses first. Five swatches of 64px for numbers of seven digits come to 320px. Labels of 10 wide letters (117px) cannot stand over 24 phone columns, even on two lines or with every twelfth label. The grid itself always fits, as section 4 shows.
 
 **`check`** tests what it tests for every kind:
 
@@ -556,6 +564,15 @@ highest 224 [ 'Thursday 11' ] | lowest 5 [
 sign-ups cells per step: 69, 44, 34, 17, 4
 errors highest 38 [ 'Checkout Wed' ] | lowest 0 3 cells
 errors cells per step: 29, 8, 2, 2
+== the widest label allowed, "WWWWWWWWWW": 117px
+phone, grid from 20: the widest label is refused at 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24 columns
+   widest label that fits, by column count: 3:118 4:96 5:77 6:64 7:77 8:68 9:77 10:69 11:63 12:58 13:77 14:72 15:67 16:63 17:59 18:56 19:53 20:51 21:48 22:46 23:44 24:43
+desktop, grid from 65: the widest label is refused at no column count
+   widest label that fits, by column count: 3:306 4:233 5:187 6:181 7:187 8:194 9:187 10:199 11:184 12:171 13:187 14:200 15:193 16:182 17:174 18:166 19:129 20:141 21:147 22:141 23:137 24:132
+desktop, grid from 309: the widest label is refused at 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 16, 17, 18, 19, 20, 21, 22, 23, 24 columns
+   widest label that fits, by column count: 3:175 4:132 5:106 6:99 7:106 8:112 9:106 10:116 11:109 12:99 13:106 14:113 15:120 16:112 17:105 18:99 19:73 20:80 21:84 22:80 23:77 24:73
+== the examples: sign-ups phone "every 3", sign-ups desktop "every label", errors phone "every label", errors desktop "every label"
+== "Wednesday" (67px) over 7 columns on a phone: every 3; over 4 columns: two lines
 ```
 
 The heights ("about 262px") follow the layout in section 4: the legend and its numbers take the top 42px, the column labels the next 16px, and the band starts at 66px. They are estimates until item 1 draws the forms.
@@ -568,12 +585,13 @@ Decided on 2026-11-23, so that the work can go on while the user is away. Each c
 
 1. **The color: A2, the heat steps.** It is the only option that still reads in an 8px phone cell, keeps a number readable inside a cell, keeps one order in light, dark and on paper, and leaves the accent and the status colors to their own meanings. The other real choice was B, squares by size. B needs no change to the color rule, but small values shrink to 1px on a phone and no number fits in a cell, so the reader loses the most.
 2. **The name: `"heatmap"`.** It is the word that readers and authors already use, written as one word like `"usecase"`. `"heat"` is unclear alone, and `"matrix"` says nothing about the shades.
-3. **The phone form: P3, each row name above its row of cells.** It fits every heat map within the limits, so a phone reader always gets the picture, and it keeps the grid the way the desktop shows it. P2, turned on its side, gives wider cells, but the reader must turn the picture in their head: "later" runs to the right on a desktop and down on a phone.
+3. **The phone form: P3, each row name above its row of cells.** Its grid fits every heat map within the limits, so a phone reader always gets the picture, and it keeps the grid the way the desktop shows it. P2, turned on its side, gives wider cells, but the reader must turn the picture in their head: "later" runs to the right on a desktop and down on a phone.
 4. **The scale: needed in the data.** The reader of two weekly reports sees the same steps in both, because the author fixed the edges. A scale that the renderer computes could move the edges from week to week. `readScale` already checks every rule. A computed scale can come later without breaking any data.
 5. **Values above the scale: refused.** Every step is then exact, and the legend has no open end, so the reader can trust it. The cost is that one spike can press every other cell into step 1; the fit warning on the lowest step tells the author, who can say the spike in the text. An open top step ("200 and more") comes when a real report needs it, and adding it breaks no data.
 6. **The page heat map: its own kind, `"heatplan"`, on the plan's code, after item 2.** One reader's question gets one kind, as for the range chart and the layout to scale. The plan keeps its approved rule that every box looks the same, so a reader who knows plans is never misled by a filled box.
 7. **Raw points: not in the renderer.** The author counts the points into cells with the rules in section 9, and says the cell size in the label. A `points` field would put thousands of numbers in a one-file page, and it would hide the choice of cell size, which changes the picture.
 8. **A cell with no data: hollow, with a muted outline.** In a report, "no data" and "the least" mean different things, such as "the service was down" and "almost no errors". The first draft gave the empty cell an outline in the line color, 1.40:1 against the page, which a reader could not tell from the pale step 1 (1.25:1) in a phone cell or on a poor printer. The muted outline (6.30:1) makes the empty cell a hollow square beside filled ones, a difference of shape that holds at any size and in gray print. A mark in the middle of the cell was not needed: the outline alone reads at 8.3px, and the table in words says "no data" for each such cell.
+9. **Column labels: two lines before fewer labels, and never fewer than three.** The review found that a label of the full 10 characters could stand outside a phone drawing, and that the first draft promised every label would fit. Now a label moves inward at an edge, and the renderer tries every label on one line, then on two lines, then every second to twelfth label, and refuses only after that. Two lines keep every name for the reader, as the widths above a plan do. Three labels or more keep a thinned row of labels useful. Labels of up to 43px fit a phone at any column count, and the refusal says which label to shorten.
 
 ## Not in this proposal
 
