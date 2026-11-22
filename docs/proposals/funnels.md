@@ -174,7 +174,7 @@ Each step is one row of 32px: the name at the left, then the two columns of numb
 
 The sizing rule:
 
-1. The name column starts at x = 20. Its width is the widest name at 14px, up to 200px. A wider name wraps at its spaces onto a second line, and its row grows by 18px. A name written without spaces, as in Thai or Chinese, breaks between characters. A name of 28 Chinese characters is 392px, so it takes 2 lines.
+1. The name column starts at x = 20. Its width is the widest name at 14px, up to 200px. A wider name wraps at its spaces, and its row grows by 18px for each line after the first, from the real number of lines that `wrapName` gives. A name written without spaces, as in Thai or Chinese, breaks between characters. A name of 28 Chinese characters is 392px, so it takes 2 lines. A name of wide letters can take 3: `WWWWWWWWW WWWWWWWWW WWWWWWWW` has three words of 123px, 123px and 109px, and no two fit on one line. No name within the limits needs 4 lines. Four lines would need two separate pairs of words, each pair wider than 200px minus a space, so more than 390px of text. Twenty-eight characters with at least three spaces hold at most 25 other characters, which is 350px even at 14px each.
 2. The count column ends 16px after the name column, plus the widest count. The share column ends 12px after that, plus the widest share.
 3. The bars start 16px after the share column, at x0, and end at x1 = 620. The first count fills x0 to x1.
 
@@ -219,7 +219,7 @@ A funnel is one column of rows, so it keeps its picture on a phone. Only the pla
 
 The first drop text would start at 167.9 and end at 257.9, past the edge (252), so it moves left to 162. The drawing is about 364px tall.
 
-**The worst case.** With the count `999,999,999`, the numbers take 79 + 8 + 37 = 124px, and a name has 88px beside them. A long name may then need more than 2 lines there, so its numbers go to their own line, and the name gets the full 224px. The row grows by 18px. A name of 28 Chinese characters takes 2 lines in 224px. Nothing within the limits is refused.
+**The worst case.** With the count `999,999,999`, the numbers take 79 + 8 + 37 = 124px, and a name has 88px beside them. A long name may then need more than 2 lines there, so its numbers go to their own line, and the name gets the full 224px. The row grows by 18px for the numbers' line, and by 18px for each name line after the first. In 224px a name takes at most 3 lines, for the same reason as on a desktop: `WWWWWWWWW WWWWWWWWW WWWWWWWW` takes 3, and a name of 28 Chinese characters takes 2. Nothing within the limits is refused.
 
 **The smallest bars.** A funnel from 12,480 to 62 people (0.5%) gives a last bar of 1.1px on a phone. It is drawn 2px wide, so it shows, and `62` and `0.5%` stand beside the name. The bar is about 1px too long. This is the one place where the drawing is not exactly to scale, and the numbers next to it are exact.
 
@@ -315,7 +315,7 @@ Under "What the renderer says", the three fit warnings join the list.
 
 ## 9. Phases, and what is out of scope
 
-1. **The funnel kind.** `scripts/lib/funnel.cjs`; the dispatch in `diagram.cjs`; the styles in `svg.cjs`; the fit warnings; the docs in section 8. Tests: the worked example as a fixture, with its expected SVG in both forms; one test for each error message; and tests for equal counts, a count of 0 at the end, a bar narrower than 2px, a drop text that must move left, a name that pushes its numbers to their own line on a phone, a name without spaces, each rounding exception (`0.4%`, `under 0.1%`, `99.6%`), the three lines under the table when the two largest drops fall on the same pair and when they do not, and `check` on a drawing that was edited by hand. Medium.
+1. **The funnel kind.** `scripts/lib/funnel.cjs`; the dispatch in `diagram.cjs`; the styles in `svg.cjs`; the fit warnings; the docs in section 8. Tests: the worked example as a fixture, with its expected SVG in both forms; one test for each error message; and tests for equal counts, a count of 0 at the end, a bar narrower than 2px, a drop text that must move left, a name that pushes its numbers to their own line on a phone, a name that takes 3 lines in both forms (`WWWWWWWWW WWWWWWWWW WWWWWWWW`), a name without spaces, each rounding exception (`0.4%`, `under 0.1%`, `99.6%`), the three lines under the table when the two largest drops fall on the same pair and when they do not, and `check` on a drawing that was edited by hand. Medium.
 2. **One funnel on the sample page.** The sample page is about reporting a bug. A funnel of bug reports tests the kind in a real document, with real neighbours: reported, then reproduced, then fixed, then released. The sample content stays generic. Small.
 
 **Out of scope, and why:**
