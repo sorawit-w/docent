@@ -13,9 +13,26 @@ const isNum = (v) => typeof v === "number" && Number.isFinite(v);
  * wider than the proportional digit in the text measure (Chrome on macOS: 7.55px at 12px). 0.66em keeps room to spare. */
 const valueWidth = (s, size = 12) => textWidth(String(s).replace(/\d/g, ""), size) + (String(s).match(/\d/g) || []).length * 0.66 * size;
 
-// A number as written: fifteen significant digits keep the input's precision (also 1700000000001) and drop float noise;
-// a minus sign, not a hyphen.
-const fmt = (v) => String(Number(v.toPrecision(15))).replace(/^-/, "−");
+// A number as written: the shortest digits that give back the same number, so every digit of the author's value stays
+// (also 1000000000000011); a minus sign, not a hyphen. A computed value is cleaned first, as tickAt does.
+const fmt = (v) => String(v).replace(/^-/, "−");
+
+/**
+ * The value of tick k. The first and the last tick are the author's own "from" and "to". Any other tick is the shortest
+ * number within the error of the arithmetic: from + k × step is off by at most about 4 × epsilon × (|from| + |k × step|).
+ * So noise goes (-0.35 + 5 × 0.07 is 5.55e-17, and the value is 0), and every digit that means something stays: tiny steps
+ * (1e-21), large offsets (1700000000001, 1000000000000011) and real offsets near 0 (1e-14).
+ */
+function tickAt({ from, to, step }, count, k) {
+  if (k === 0) return from;
+  if (k === count) return to;
+  // Each part is multiplied by epsilon first, so the error of a scale near the largest number does not overflow.
+  const v = from + k * step, error = 4 * (Math.abs(from) * Number.EPSILON + Math.abs(k * step) * Number.EPSILON);
+  if (Math.abs(v) <= error) return 0;
+  // 17 digits always give back the same number, so the loop always returns.
+  for (let digits = 1; digits <= 17; digits++) { const short = Number(v.toPrecision(digits)); if (Math.abs(short - v) <= error) return short; }
+  return v;
+}
 
 /** Checks the scale: from, to, a step (needed or not), a unit and up to two named marks. */
 function readScale(scale, { needStep }) {
@@ -28,8 +45,8 @@ function readScale(scale, { needStep }) {
     if (count < 1) fail(`"scale" needs at least one step: "step" must be no more than "to" minus "from"`);
     // The step limit comes before any work for each tick, so a step that is far too small is refused at once.
     if (count > MOST.steps) fail(`the scale has ${count} steps; a scale chart has at most ${MOST.steps}. Use a larger "step"`);
-    // A label shows 15 significant digits, so a step much smaller than the numbers can give two ticks the same label.
-    const written = Array.from({ length: count + 1 }, (_, k) => fmt(k === count ? scale.to : scale.from + k * scale.step));
+    // A label drops the digits lost in the arithmetic, so a step much smaller than the numbers can give two ticks the same label.
+    const written = Array.from({ length: count + 1 }, (_, k) => fmt(tickAt(scale, count, k)));
     if (new Set(written).size < written.length) fail(`"step" is too small for numbers this large: the labels cannot tell the ticks apart. Write the values from a nearer start, such as an offset in a smaller unit`);
     // The error allowed is a billionth of a step, so a scale of tiny steps is checked as closely as a scale of large ones,
     // or the rounding of the endpoints themselves (2000000.2 − 2000000.1 is not exactly 0.1), whichever is larger, but never
@@ -54,19 +71,9 @@ function makeScale(scale, x0, x1, { lo = -Infinity, hi = Infinity } = {}) {
   const x = (v) => x0 + (v - scale.from) * per;
   const ticks = [];
   if (scale.count) {
-    // A tick stands at its exact value. Its label is the shortest number within the error of the arithmetic: from + k × step
-    // is off by at most about 4 × epsilon × (|from| + |k × step|). So noise goes (-0.35 + 5 × 0.07 is 5.55e-17, and the
-    // label is 0), and every digit that means something stays: tiny steps (1e-21), large offsets (1700000000001) and real
-    // offsets near 0 (1e-14). The first and the last tick are the author's own "from" and "to".
+    // A tick stands at its exact value, and its label is the cleaned value (tickAt).
     const raw = (k) => scale.from + k * scale.step;
-    const meant = (k) => {
-      // Each part is multiplied by epsilon first, so the error of a scale near the largest number does not overflow.
-      const v = raw(k), error = 4 * (Math.abs(scale.from) * Number.EPSILON + Math.abs(k * scale.step) * Number.EPSILON);
-      if (Math.abs(v) <= error) return 0;
-      for (let digits = 1; digits < 15; digits++) { const short = Number(v.toPrecision(digits)); if (Math.abs(short - v) <= error) return short; }
-      return Number(v.toPrecision(15));
-    };
-    const at = (k) => (k === 0 ? scale.from : k === scale.count ? scale.to : meant(k));
+    const at = (k) => tickAt(scale, scale.count, k);
     const label = (k) => fmt(at(k));
     // A spacing keeps every n-th tick. It works when each two kept labels stand at least 48px apart, and far enough apart
     // for half of each label and 16px between them. Only the labels that a spacing keeps are measured, and only spacings

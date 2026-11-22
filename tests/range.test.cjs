@@ -126,7 +126,8 @@ test("the scale maps numbers to pixels, keeps ticks apart, and finds a free plac
   assert.deepEqual(sc.ticks.map((t) => t.label), ["0", "480", "960", "1440", "1920"]);
   assert.deepEqual(makeScale(readScale({ from: 0, to: 20, step: 1 }, { needStep: true }), 0, 200).ticks.map((t) => t.label), ["0", "5", "10", "15", "20"], "every fifth tick when every second is still too close");
   assert.deepEqual(readScale({ from: 0, to: 210, unit: "mm" }, { needStep: false }).count, 0, "a scale may have no step, and then no ticks");
-  assert.equal(fmt(0.1 + 0.2), "0.3");
+  assert.equal(fmt(1000000000000011), "1000000000000011", "every digit of the author's value stays");
+  assert.deepEqual(makeScale(readScale({ from: 0, to: 0.3, step: 0.1 }, { needStep: true }), 0, 600).ticks.map((t) => t.label), ["0", "0.1", "0.2", "0.3"], "a tick drops the noise of the sum (0.1 + 0.2)");
   assert.equal(fmt(-5), "−5", "a minus sign, not a hyphen");
   assert.deepEqual(placeLabel({ a: 10, b: 100, w: 40, lo: 0, hi: 200, sides: ["inside", "right"] }), { x: 55, anchor: "middle", side: "inside" });
   assert.deepEqual(placeLabel({ a: 60, b: 180, w: 40, lo: 0, hi: 200, sides: ["right", "left"] }), { x: 52, anchor: "end", side: "left" });
@@ -211,6 +212,18 @@ test("a scale with a large offset keeps its ticks in place and writes each value
   assert.deepEqual(ticks.map((n) => n.s), ["1700000000001", "1700000000002", "1700000000003", "1700000000004", "1700000000005"]);
   ticks.forEach((n, i) => { assert.ok(n.x > 0 && n.x < scene.w, `tick ${n.s} stands inside the drawing`); if (i) assert.ok(n.x > ticks[i - 1].x); });
   assert.ok(scene.notes.some((n) => n.knock && n.s === "1700000000002"), "a row's value is written in full too");
+});
+
+test("a 16-digit value keeps its last digit in the ticks, the labels and the table", () => {
+  const { readRange, layoutRange, wordsOf } = require("../skills/docent/scripts/lib/range.cjs");
+  const scale = readScale({ from: 1000000000000010, to: 1000000000000014, step: 1 }, { needStep: true });
+  assert.deepEqual(makeScale(scale, 0, 2000).ticks.map((t) => t.label), ["1000000000000010", "1000000000000011", "1000000000000012", "1000000000000013", "1000000000000014"]);
+  // A phone has no room for 16-digit tick labels, so only the desktop form is drawn here.
+  const model = readRange({ id: "long", kind: "range", label: "Sixteen digits.", scale: { from: 1000000000000010, to: 1000000000000014, step: 1 }, rows: [{ name: "A", at: 1000000000000011 }, { name: "B", from: 1000000000000012, to: 1000000000000013 }] });
+  assert.ok(layoutRange(model).notes.some((n) => n.knock && n.s === "1000000000000011"), "the row's label");
+  const words = wordsOf(model);
+  assert.match(words, /1000000000000011/, "the table in words");
+  assert.match(words, /1000000000000013/);
 });
 
 test("edge cases from review: a long first label with no unit, a Thai name on a phone, and a scale past 100 decimals", () => {
