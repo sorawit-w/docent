@@ -5,6 +5,7 @@ const { fail, words, id } = require("./blocks.cjs");
 const { textWidth } = require("./text.cjs");
 const uml = require("./uml.cjs");
 const { wrap } = require("./graph.cjs");
+const { fmt, tickAt } = require("./scale.cjs");
 
 const MOST = { lifelines: 4, states: 6, changes: 20, messages: 10, constraints: 6, ticks: 24, name: 20, state: 16, verb: 20, unit: 8, text: 16 };
 const ROW = 24; // the height of one state level
@@ -23,6 +24,9 @@ function readTiming(data) {
   const count = Math.round((time.to - time.from) / time.step);
   if (Math.abs(count * time.step - (time.to - time.from)) > 1e-9) fail(`"time": "to" minus "from" must be a whole number of steps`);
   if (count > MOST.ticks) fail(`the time axis has ${count} steps; a timing diagram has at most ${MOST.ticks}. Use a larger "step"`);
+  // A tick label drops the digits lost in the arithmetic, so a step much smaller than the times can give two ticks one label.
+  const written = Array.from({ length: count + 1 }, (_, k) => fmt(tickAt(time, count, k)));
+  if (new Set(written).size < written.length) fail(`"step" is too small for times this large: the labels cannot tell the ticks apart. Write the times from a nearer start, such as an offset in a smaller unit`);
   const unit = words(time.unit, `the unit of "time"`, MOST.unit, false);
   if (data.lifelines.length < 1 || data.lifelines.length > MOST.lifelines) fail(`a timing diagram has 1 to ${MOST.lifelines} lifelines; this one has ${data.lifelines.length}`);
   const lifelines = data.lifelines.map((l, i) => {
@@ -73,7 +77,6 @@ function readTiming(data) {
 }
 
 // A time as written: twelve significant digits keep the input's precision and drop float noise such as 0.30000000000000004.
-const fmt = (t) => String(Number(t.toPrecision(12)));
 const at = (t, unit) => `${fmt(t)}${unit ? ` ${unit}` : ""}`;
 
 /** The drawing: rows of lifelines, time from left to right. */
@@ -81,7 +84,7 @@ function layoutTiming(model) {
   const { time, lifelines, messages, constraints } = model;
   const nameW = Math.max(...lifelines.map((l) => textWidth(l.name, 14, 600))) + 24;
   const stateW = Math.max(...lifelines.flatMap((l) => l.states.map((s) => textWidth(s, 12)))) + 16;
-  const tickLabel = (k) => fmt(time.from + k * time.step);
+  const tickLabel = (k) => fmt(tickAt(time, time.count, k));
   const step = Math.max(48, ...Array.from({ length: time.count + 1 }, (_, k) => textWidth(tickLabel(k), 12) + 16), ...messages.map((m) => textWidth(m.verb, 12) / 2 + 24));
   const x0 = 16 + nameW + stateW + 8, x = (t) => x0 + ((t - time.from) / time.step) * step;
   const xEnd = x(time.to);
