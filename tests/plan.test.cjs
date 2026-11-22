@@ -99,8 +99,9 @@ test("render says which forms are not to scale", () => {
 });
 
 test("no text meets another text or a box it does not belong to, and every text stays inside its box and the drawing", () => {
-  for (const name of ["plan-docs", "plan-editor", "plan-none"]) {
-    const { scene, phone } = renderDiagram(fixture(name));
+  const longUnit = { ...fixture("plan-docs"), unit: "デバイス非依存ピクセル" };
+  for (const [name, data] of [["plan-docs", fixture("plan-docs")], ["plan-editor", fixture("plan-editor")], ["plan-none", fixture("plan-none")], ["a long unit", longUnit]]) {
+    const { scene, phone } = renderDiagram(data);
     for (const s of [scene, phone]) {
       const texts = [...s.notes, ...s.parts.flatMap((p) => p.texts)].map(box);
       for (const t of texts) assert.ok(t.x0 >= 12 - 0.01 && t.x1 <= s.w - 12 + 0.01, `"${t.s}" runs past the drawing (${name}, ${s.w}px)`);
@@ -114,6 +115,16 @@ test("no text meets another text or a box it does not belong to, and every text 
       rects.forEach(([a, ra], i) => rects.slice(i + 1).forEach(([b, rb]) => assert.ok(!meet(ra, rb), `the boxes "${a}" and "${b}" meet (${name}, ${s.w}px)`)));
     }
   }
+});
+
+test("the line on the scale wraps on a phone when a long unit meets \"not to scale\", and the widths move down a line", () => {
+  const plain = renderDiagram(fixture("plan-docs")).phone;
+  const { scene, phone } = renderDiagram({ ...fixture("plan-docs"), unit: "デバイス非依存ピクセル" });
+  const heads = (s) => s.notes.filter((n) => n.cls === "sub").map((n) => n.s);
+  assert.deepEqual(heads(scene), ["Widths in デバイス非依存ピクセル"]);
+  assert.deepEqual(heads(phone), ["Widths in デバイス非依存ピクセル,", "not to scale"]);
+  const valY = (s) => s.notes.find((n) => n.cls === "val").y;
+  assert.equal(valY(phone) - valY(plain), 16);
 });
 
 test("a name wraps at its spaces onto at most three lines, and its row grows", () => {

@@ -158,11 +158,13 @@ function drawPlan(model, phone = false) {
     if (short > 0) heights[b.r1] += short;
   });
 
-  // The line that says how to read the plan, then the widths above the columns.
+  // The line that says how to read the plan (it wraps when a long unit meets "not to scale" on a phone), then the widths above the columns.
   let y = 12;
-  const head = !model.columns ? "Not to scale" : `Widths in ${model.unit}${toScale ? "" : ", not to scale"}`;
-  s.notes.push({ x: SIDE, y: y + 12, s: head, cls: "sub", anchor: "start" });
-  y += 20;
+  const full = !model.columns ? "Not to scale" : `Widths in ${model.unit}${toScale ? "" : ", not to scale"}`;
+  const head = textWidth(full, 12, 400) <= room || toScale || !model.columns ? wrapName(full, room, { size: 12, weight: 400, every: false })
+    : [...wrapName(`Widths in ${model.unit},`, room, { size: 12, weight: 400, every: false }), "not to scale"];
+  head.forEach((line, k) => s.notes.push({ x: SIDE, y: y + 12 + k * NOTE, s: line, cls: "sub", anchor: "start" }));
+  y += 20 + (head.length - 1) * NOTE;
   if (model.columns) {
     const labels = model.columns.map((w, c) => {
       const label = fmt(w), lw = valueWidth(label), cx = (xs[c] + xs[c + 1]) / 2;
