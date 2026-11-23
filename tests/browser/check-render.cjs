@@ -128,12 +128,12 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     await light.context.close();
     ok("the theme follows a light system", systemLight.bg === LIGHT.bg && systemLight.attr === "", systemLight);
     const paper = await open({ width: 794, height: 1123, theme: "dark", media: "print" });
-    const print = await paper.page.evaluate(() => ({ bg: getComputedStyle(document.body).backgroundColor, text: getComputedStyle(document.body).color, topbar: getComputedStyle(document.querySelector(".topbar")).display, dots: [...new Set([...document.querySelectorAll("svg.dg .pulse")].map((p) => getComputedStyle(p).display))].join(), lines: [...new Set([...document.querySelectorAll("svg.dg .line")].map((l) => getComputedStyle(l).stroke))].join() }));
+    const print = await paper.page.evaluate(() => ({ bg: getComputedStyle(document.body).backgroundColor, text: getComputedStyle(document.body).color, topbar: [".route", ".theme", ".route-dot"].map((sel) => getComputedStyle(document.querySelector(sel)).display).join(), dots: [...new Set([...document.querySelectorAll("svg.dg .pulse")].map((p) => getComputedStyle(p).display))].join(), lines: [...new Set([...document.querySelectorAll("svg.dg .line")].map((l) => getComputedStyle(l).stroke))].join() }));
     const cut = await paper.page.evaluate(() => [...document.querySelectorAll("svg.dg")].filter((s) => s.getBoundingClientRect().width).map((s) => ({ id: s.id, over: Math.round(s.getBoundingClientRect().right - s.closest(".fig").getBoundingClientRect().right) })));
     ok("on paper no drawing is cut off", cut.length === 5 && cut.every((d) => d.over <= 0), cut);
     await paper.page.screenshot({ path: `${out}/print.png`, fullPage: true });
     await paper.context.close();
-    ok("print is light on a dark system, without the top bar, without dots or a colored leg", print.bg === "rgb(255, 255, 255)" && print.text === LIGHT.text && print.topbar === "none" && print.dots === "none" && print.lines === LIGHT.text, print);
+    ok("print is light on a dark system, without the links and the switch of the top bar, without dots or a colored leg", print.bg === "rgb(255, 255, 255)" && print.text === LIGHT.text && print.topbar === "none,none,none" && print.dots === "none" && print.lines === LIGHT.text, print);
   }
 
   // A diagram outside the walkthrough: it waits until it is in view, runs twice, and runs again on pointer.
@@ -593,6 +593,39 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     const look = async (opts) => { const view = await open({ ...opts, content: host }); const r = await view.page.evaluate(() => ({ link: getComputedStyle(document.querySelector("main a")).color, body: getComputedStyle(document.body).fontFamily.split(",")[0], drawing: getComputedStyle(document.querySelector("svg.dg")).fontFamily.split(",")[0] })); await view.context.close(); return r; };
     const [light, dark, paper] = [await look({ width: 1280 }), await look({ width: 1280, theme: "dark" }), await look({ width: 794, media: "print", theme: "dark" })];
     ok("host tokens set before stamp win in light, in dark and on paper, and a drawing keeps the system font", light.link === "rgb(11, 110, 79)" && dark.link === "rgb(111, 211, 168)" && paper.link === "rgb(11, 110, 79)" && light.body === "Georgia" && light.drawing === "system-ui", { light, dark, paper });
+  }
+
+  // The host's logo and the footer, on a page built from the starting page: each version of the logo shows in its own theme
+  // (light, dark by the system, dark by the switch, and paper), a logo for one theme stands on a tile in the other, the slot keeps
+  // its size, paper prints the logo and the name once above the title, and the credit stands at the right, or below the tagline on a phone.
+  {
+    const start = stampHtml(renderDocument(fs.readFileSync(path.join(root, "skills", "docent", "assets", "template.html"), "utf8")).html).html;
+    const sym = (extra, a, b) => `<svg class="logo" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"${extra}><circle cx="9" cy="12" r="7" fill="${a}"/><circle cx="15" cy="12" r="7" fill="none" stroke="${b}" stroke-width="2.5"/></svg>`;
+    const brand = (logo) => start.replace('<span class="host">', `<span class="host">${logo}`);
+    const pair = brand(sym(' data-for="light"', "#0d3550", "#0a5f8a") + sym(' data-for="dark"', "#72c2ee", "#dcecf1"));
+    const alone = brand(sym(' data-for="light"', "#0d3550", "#0a5f8a"));
+    const shown = () => [...document.querySelectorAll(".host .logo")].filter((l) => l.getBoundingClientRect().width).map((l) => { const r = l.getBoundingClientRect(), s = getComputedStyle(l); return { for: l.dataset.for, w: Math.round(r.width), h: Math.round(r.height), tile: s.backgroundColor, outline: s.outlineWidth, left: Math.round(r.left), shell: Math.round(l.closest(".shell").getBoundingClientRect().left + parseFloat(getComputedStyle(l.closest(".shell")).paddingLeft)) }; });
+    const at = async (opts, content, before) => { const v = await open({ ...opts, content }); if (before) await before(v.page); const r = await v.page.evaluate(shown); await v.context.close(); return r; };
+    const light = await at({ width: 1280 }, pair), dark = await at({ width: 1280, theme: "dark" }, pair), switched = await at({ width: 1280 }, pair, (p) => p.click("button.theme")), paper = await at({ width: 658, media: "print", theme: "dark" }, pair);
+    const one = (r, theme) => r.length === 1 && r[0].for === theme && r[0].w === 24 && r[0].h === 24 && r[0].tile === "rgba(0, 0, 0, 0)" && r[0].left === r[0].shell;
+    ok("a logo with a version for each theme: the light one in light and on paper (also on a dark system), the dark one in dark by the system and by the switch; 24px, at the left edge, on no tile", one(light, "light") && one(dark, "dark") && one(switched, "dark") && one(paper, "light"), { light, dark, switched, paper });
+    const tiled = await at({ width: 1280, theme: "dark" }, alone), untiled = await at({ width: 1280 }, alone);
+    ok("a logo for the light theme only stands on a tile in the light page color in dark mode, and on none in light", tiled.length === 1 && tiled[0].tile === LIGHT.bg && tiled[0].outline === "4px" && tiled[0].w === 24 && untiled[0].tile === "rgba(0, 0, 0, 0)", { tiled, untiled });
+    const sheet = await open({ width: 658, media: "print", content: pair });
+    const printed = await sheet.page.evaluate(() => ({ bar: getComputedStyle(document.querySelector(".topbar")).display, links: getComputedStyle(document.querySelector(".route")).display, button: getComputedStyle(document.querySelector(".theme")).display, name: document.querySelector(".host").getBoundingClientRect().bottom < document.querySelector("h1").getBoundingClientRect().top, credit: getComputedStyle(document.querySelector(".credit a")).color === getComputedStyle(document.querySelector(".credit")).color }));
+    await sheet.context.close();
+    ok("on paper the logo and the name print once above the title, with no links and no switch, and the credit prints as text", printed.bar === "block" && printed.links === "none" && printed.button === "none" && printed.name && printed.credit, printed);
+    const foot = async (width, theme = "light") => { const v = await open({ width, theme, content: pair }); const r = await v.page.evaluate(() => { const g = (s) => document.querySelector(s).getBoundingClientRect(), shell = document.querySelector("footer .shell"), right = shell.getBoundingClientRect().right - parseFloat(getComputedStyle(shell).paddingRight); return { tagline: g(".tagline"), credit: g(".credit"), right, mark: getComputedStyle(document.querySelector(".credit svg")).color, muted: getComputedStyle(document.querySelector(".credit")).color, side: document.documentElement.scrollWidth > document.documentElement.clientWidth }; }); await v.context.close(); return r; };
+    const [wide, phone] = [await foot(1280, "dark"), await foot(375)];
+    ok("the footer: the tagline at the left and the credit at the right on a desktop, the credit below the tagline on a phone, and the mark in the muted color of its words", Math.abs(wide.credit.right - wide.right) <= 1 && Math.abs(wide.credit.top - wide.tagline.top) <= 2 && phone.credit.top >= phone.tagline.bottom && Math.abs(phone.credit.left - phone.tagline.left) <= 1 && !phone.side && wide.mark === wide.muted, { wide, phone });
+    for (const [name, opts] of [["logo light", { width: 1280 }], ["logo dark", { width: 1280, theme: "dark" }], ["logo phone", { width: 375, height: 812 }]]) {
+      const { page, context } = await open({ ...opts, content: name === "logo dark" ? alone : pair });
+      await page.addScriptTag({ path: axePath });
+      const result = await page.evaluate(async () => await window.axe.run(document, { runOnly: { type: "tag", values: ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa", "best-practice"] } }));
+      ok(`${name}: 0 axe violations on a page with a logo, a tagline and the credit`, result.violations.length === 0, result.violations.map((v) => `${v.id}(${v.nodes.length}) ${v.nodes[0].target.join(" ")}`));
+      await page.screenshot({ path: `${out}/${name.replace(" ", "-")}.png`, clip: { x: 0, y: 0, width: opts.width, height: 240 } });
+      await context.close();
+    }
   }
 
   // A theme written on <html> is fixed: a dark system and a saved dark choice do not change it, and the switch is hidden.

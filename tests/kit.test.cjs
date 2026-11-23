@@ -120,3 +120,13 @@ test("a row name with no spaces breaks inside the table of a diagram in words, s
   assert.match(rule(".dg-words :is(th, td)"), /padding-right: 16px/);
   assert.match(css, /\.dg-words :is\(th, td\) \{ overflow-wrap: anywhere; \}/);
 });
+
+test("the logo: each version shows in its own theme, in all four places that set tokens, and a logo for one theme only stands on a tile", () => {
+  assert.equal((css.match(/--logo-light: block; --logo-dark: none; --tile-light: transparent; --tile-dark: #12141f;/g) || []).length, 2, "light and print");
+  assert.equal((css.match(/--logo-light: none; --logo-dark: block; --tile-light: #fbfbfe; --tile-dark: transparent;/g) || []).length, 2, "dark by the system and dark by the switch");
+  assert.match(rule('.host:has(> .logo[data-for="dark"]) > .logo[data-for="light"]'), /display: var\(--logo-light\)/);
+  assert.match(rule('.host:not(:has(> .logo[data-for="dark"])) > .logo[data-for="light"]'), /background: var\(--tile-light\); outline: 4px solid var\(--tile-light\); border-radius: 2px/, "the tile has corners of 6px and 4px around the logo, and moves nothing");
+  assert.match(rule(".logo"), /box-sizing: content-box/, "the width and height written on the logo are the size of the logo itself");
+  assert.match(css, /\.topbar \{ position: static; border-bottom: 0; \}/, "on paper the logo and the name print once above the title");
+  assert.match(css, /\.route, \.theme, \.route-dot, \.rail-dot/, "with no links and no switch");
+});

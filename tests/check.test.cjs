@@ -207,3 +207,20 @@ test("a <div> written in a diagram's data does not change where a figure well en
 test("an svg named only in a comment inside a figure well is not a drawing", () => {
   assert.doesNotMatch(errorsOf((html) => html.replace(/(<div class="fig"[^>]*>)/, "$1<!-- Old <svg> removed; use diagram data below. -->")), /holds a drawing/);
 });
+
+test("the logo, the tagline and the credit: a logo may hold a gradient, the title follows a wordmark, and the credit and the tagline are tested", () => {
+  const template = fs.readFileSync(path.join(__dirname, "..", "skills", "docent", "assets", "template.html"), "utf8");
+  const built = stampHtml(renderDocument(template).html).html;
+  const result = (change) => checkDocument(change(built));
+  const shaded = '<svg class="logo" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><defs><linearGradient id="host-g"><stop offset="0" stop-color="#0a5f8a"/><stop offset="1" stop-color="#72c2ee"/></linearGradient></defs><path d="M2 2h20v20H2z" fill="url(#host-g)"/></svg>';
+  assert.deepEqual(result((h) => h.replace('<span class="host">', `<span class="host">${shaded}`)), { errors: [], warnings: [] }, "a host's logo is the one place where a gradient is allowed");
+  assert.match(result((h) => h.replace("</main>", `<p>${shaded}</p></main>`)).errors.join("\n"), /a logo stands outside the top bar[\s\S]*<linearGradient> is used; the page is flat/);
+  const word = '<svg class="logo" viewBox="0 0 96 24" width="96" height="24" role="img" aria-label="Example project"><path d="M0 0h96v24H0z" fill="currentColor"/></svg>';
+  assert.deepEqual(result((h) => h.replace('<span class="host">Host project</span>', `<span class="host">${word}</span>`).replace("<title>Document title — Host project", "<title>Document title — Example project")), { errors: [], warnings: [] }, "the title ends with the name the wordmark carries");
+  assert.match(result((h) => h.replace('<span class="host">Host project</span>', `<span class="host">${word}</span>`)).warnings.join(), /the <title> ends with "Host project", but the host project in the top bar is "Example project"/);
+  assert.match(result((h) => h.replace(/<p class="credit">[\s\S]*?<\/p>/, "")).warnings.join(), /the footer has no "Made with Docent"/);
+  assert.deepEqual(result((h) => h.replace('Made with <a href="https://github.com/sorawit-w/docent">Docent</a>', "Made with Docent")).warnings, [], "plain text is the host's choice");
+  assert.deepEqual(result((h) => h.replace(/<p class="credit">[\s\S]*?<\/p>/, "").replace(/Host project/g, "Docent")).warnings, [], "Docent's own pages carry the mark's tile, not the credit");
+  assert.match(result((h) => h.replace("The host's tagline, in its own words.", "x".repeat(91))).warnings.join(), /the tagline has 91 characters; it is one line of at most 90/);
+  assert.match(result((h) => h.replace("in its own words.", '<a href="#short">in its own words</a>.')).warnings.join(), /the tagline holds markup or a link/);
+});

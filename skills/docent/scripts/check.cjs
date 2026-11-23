@@ -8,9 +8,11 @@ const { renderDiagram } = require("./lib/diagram.cjs");
 const { renderWidget, PLACE, esc } = require("./lib/widget.cjs");
 const { findBlocks, block } = require("./lib/blocks.cjs");
 const { PROFILES, suggestProfile } = require("./lib/profile.cjs");
+const { checkLogos } = require("./lib/logo.cjs");
 
 const MOST_WIDGETS = 4; // more widgets than this in one document gives a warning
 const CARDS = [3, 8]; // a card grid holds 3 to 8 cards
+const TAGLINE = 90; // characters: the tagline is one line
 // The pages that the kit draws on, light and dark: a host color must read on both the page and the well.
 const GROUNDS = { light: ["#fbfbfe", "#f2f3f9"], dark: ["#12141f", "#0b0d15"] };
 const HOST = { "host-accent": "light", "host-accent-dark": "dark", "host-ink": "light" };
@@ -179,10 +181,17 @@ function checkDocument(html) {
     if (/\b(fetch|XMLHttpRequest|WebSocket|EventSource|sendBeacon|importScripts)\b|\bimport\s*\(/.test(scripts)) errors.push("a script outside the kit can use the network; a document is one file with no network");
   }
 
+  // 3b. The host's logo in the top bar: plain shapes only, inside the file, in its slot, and readable in both themes.
+  const logo = checkLogos(markup);
+  errors.push(...logo.errors);
+  warnings.push(...logo.warnings);
+  let unbranded = markup; // the page without its logo: a logo is the host's own mark, so it may hold a gradient
+  for (const l of [...logo.logos].reverse()) unbranded = unbranded.slice(0, l.start) + unbranded.slice(l.end);
+
   // 4. Flat: no gradients, shadows or filters, and no pattern on a ground.
   const flat = [[/gradient\s*\(/i, "a gradient"], [/\b(box|text)-shadow\s*:/i, "a shadow"], [/drop-shadow\s*\(/i, "a shadow"], [/(^|[;{\s])(backdrop-)?filter\s*:/i, "a filter"]];
   for (const [pattern, what] of flat) if (pattern.test(css)) errors.push(`a style uses ${what}; the page is flat`);
-  for (const [, tag] of markup.matchAll(/<(linearGradient|radialGradient|filter|pattern)\b/g)) errors.push(`<${tag}> is used; the page is flat, with no gradient, shadow or pattern`);
+  for (const [, tag] of unbranded.matchAll(/<(linearGradient|radialGradient|filter|pattern)\b/g)) errors.push(`<${tag}> is used; the page is flat, with no gradient, shadow or pattern${/Gradient/.test(tag) ? " (only a host's logo in the top bar may hold a gradient)" : ""}`);
   if (/text-transform\s*:\s*uppercase/i.test(css)) errors.push("a style sets text in uppercase; a label is written in sentence case");
   if (/background(-color)?\s*:\s*(#fff(fff)?\b|white\b|#000(000)?\b|black\b)/i.test(css)) errors.push("a style sets a pure white or pure black background; use the page tokens");
 
@@ -201,7 +210,7 @@ function checkDocument(html) {
   const h1 = [...markup.matchAll(/<h1\b[^>]*>([\s\S]*?)<\/h1>/gi)];
   if (h1.length !== 1) errors.push(`the document has ${h1.length} <h1> headings; it must have one`);
   const title = (markup.match(/<title\b[^>]*>([\s\S]*?)<\/title>/i) || [])[1];
-  const host = (markup.match(/<[a-z]+\b[^>]*\bclass="[^"]*\bhost\b[^"]*"[^>]*>([\s\S]*?)<\//i) || [])[1];
+  const host = logo.name; // the host's name in the top bar, or the name that a wordmark carries
   if (title == null || !plain(title)) errors.push("the document has no <title>");
   else {
     const at = plain(title).lastIndexOf(" — ");
@@ -210,9 +219,17 @@ function checkDocument(html) {
       const [left, right] = [plain(title).slice(0, at), plain(title).slice(at + 3)];
       // The window title may be a shorter form of the h1: its words appear in the h1, in the same order.
       if (h1.length === 1 && !shorter(left, plain(h1[0][1]))) warnings.push(`the <title> starts with "${left}", but the <h1> is "${plain(h1[0][1])}"; the window title is the h1, or a shorter form of it made of the h1's own words in the same order`);
-      if (host != null && right !== plain(host)) warnings.push(`the <title> ends with "${right}", but the host project in the top bar is "${plain(host)}"`);
-      if (/docent/i.test(plain(title)) && !(host != null && /docent/i.test(plain(host)))) errors.push('the <title> names Docent; the title holds the document and the host project only');
+      if (host != null && right !== host) warnings.push(`the <title> ends with "${right}", but the host project in the top bar is "${host}"`);
+      if (/docent/i.test(plain(title)) && !(host != null && /docent/i.test(host))) errors.push('the <title> names Docent; the title holds the document and the host project only');
     }
+  }
+
+  // 6b. The footer: the host's tagline, in its own words, and the credit. Docent is MIT-licensed, so a missing credit is a warning, to make sure it is a choice.
+  const footer = (markup.match(/<footer\b[^>]*>([\s\S]*?)<\/footer>/i) || [])[1];
+  if (!(host != null && /docent/i.test(host)) && !(footer != null && /Made with Docent/.test(plain(footer)))) warnings.push('the footer has no "Made with Docent"; keep the credit unless the host chose to remove it (see "Logo, tagline and credit" in SKILL.md)');
+  for (const [, inner] of (footer || "").matchAll(/<[a-z]+\b[^>]*\bclass="(?:[^"]*\s)?tagline(?:\s[^"]*)?"[^>]*>([\s\S]*?)<\/[a-z]+>/gi)) {
+    if (/<[a-z]/i.test(inner)) warnings.push("the tagline holds markup or a link; it is one line of plain text");
+    if (plain(inner).length > TAGLINE) warnings.push(`the tagline has ${plain(inner).length} characters; it is one line of at most ${TAGLINE}`);
   }
 
   // 7. Facts about one item go in a margin note, not in one line of text joined by | or ·. Code may hold a | of its own.
