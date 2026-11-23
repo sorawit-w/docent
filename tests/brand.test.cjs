@@ -15,6 +15,7 @@ test("the front matter reader takes plain keys, quotes and comments, and only wh
   const data = frontMatter('---\nname: "A: b"\ncolors:\n  primary: "#2f3fd0"   # a comment\n  "on-surface": \'#111111\'\ntypography:\n  h1:\n    fontFamily: "Brand Serif", Georgia, serif\n---\ncolors:\n  primary: "#000000"\n');
   assert.deepEqual(data, { name: "A: b", colors: { primary: "#2f3fd0", "on-surface": "#111111" }, typography: { h1: { fontFamily: '"Brand Serif", Georgia, serif' } } });
   assert.equal(frontMatter("# A DESIGN.md with no front matter\n"), null);
+  assert.deepEqual(frontMatter("---\ncolors:\n  primary: #2f3fd0   # no quotes\n  secondary: #abc\ntypography:\n  code:\n    fontFamily: [Brand Mono, monospace]\n---\n"), { colors: { primary: "#2f3fd0", secondary: "#abc" }, typography: { code: { fontFamily: "Brand Mono, monospace" } } }, "a hex color with no quotes, and a font list in brackets");
 });
 
 test("each host token comes from its own key, and every other key is named as not used", () => {

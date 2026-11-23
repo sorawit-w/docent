@@ -18,6 +18,9 @@ const GENERIC = new Set(["serif", "sans-serif", "monospace", "cursive", "fantasy
 
 /** The value of a YAML line without its comment and quotes. */
 function scalar(raw) {
+  // Many hand-written files write a color with no quotes, such as "primary: #2f3fd0". Strict YAML reads that as a comment; brand reads the color.
+  const bare = raw.match(/^\s*(#[0-9a-fA-F]{3}|#[0-9a-fA-F]{6})(\s+#.*)?\s*$/);
+  if (bare) return bare[1];
   let out = "", quote = null;
   for (const ch of raw) {
     if (quote) { if (ch === quote) quote = null; out += ch; continue; }
@@ -26,6 +29,7 @@ function scalar(raw) {
     out += ch;
   }
   out = out.trim();
+  if (/^\[.*\]$/.test(out)) return out.slice(1, -1).trim(); // a flow list, such as [Inter, sans-serif]
   return /^(["']).*\1$/.test(out) && !/^(["']).*\1\s*,/.test(out) ? out.slice(1, -1) : out;
 }
 
