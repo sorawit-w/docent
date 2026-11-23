@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Page layout for generated documents — Docent</title>
 <style>
-/* docent:kit 0.7.0 */
+/* docent:kit 0.8.0 */
 /* Docent page styles. Tokens come from references/DESIGN.md. One file, no network. */
 :root {
   color-scheme: light;
@@ -13,7 +13,7 @@
   --text: #1c1f2e; --muted: #575d75; --line: #d3d6e3;
   --primary: var(--host-accent, #2f3fd0); --ink: var(--host-ink, #1b2260); --dot: var(--host-accent, #2f3fd0);
   --ok: #1a7f37; --warn: #7d4e00; --err: #cf222e;
-  /* The heat steps fill the cells of a heat map and nothing else: from the least (1) to the most (5). */
+  /* The heat steps fill the cells of a heat map and the boxes of a heat plan, and nothing else: from the least (1) to the most (5). */
   --heat-1: #dee2f0; --heat-2: #babecb; --heat-3: #9498a5; --heat-4: #616571; --heat-5: #3e424d;
   /* A host project sets its own accent, heading color and fonts with the --host-* tokens. The kit never sets them, so they hold in every theme and in print. */
   --serif: var(--host-serif, Charter, "Bitstream Charter", "Sitka Heading", "Sitka Text", Cambria, Georgia, serif);
@@ -157,8 +157,9 @@ section > figure { margin-top: 24px; }
 /* A well may hold two drawings, for two separate chains: side by side when both fit, else one below the other. */
 /* A drawing that is wider than its well scrolls sideways. The page script shows this line under it, because the part that shows can look complete. */
 .fig-more { margin: 8px 0 0; max-width: none; font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
-/* The steps of a diagram in words: a closed section in the well, under the drawing. */
-.dg-words { flex-basis: 100%; max-width: var(--measure); margin: 0; padding: 0 8px 4px; }
+/* The steps of a diagram in words: a closed section in the well, under the drawing. It takes the width of the well, so a table
+   of several columns, such as the boxes of a heat plan, keeps its words whole; its sentences and lists keep the width of the text. */
+.dg-words { flex-basis: 100%; max-width: none; margin: 0; padding: 0 8px 4px; }
 .dg-words ol { margin: 8px 0 0; padding-left: 28px; }
 .dg-words li + li { margin-top: 4px; }
 .dg-words p { margin: 12px 0 0; font-weight: 600; }
@@ -173,8 +174,10 @@ section > figure { margin-top: 24px; }
 .dg-words > .table-wrap { margin-top: 8px; max-width: none; }
 .dg-words > .table-wrap :is(th, td) { white-space: nowrap; overflow-wrap: normal; padding-right: 12px; }
 .dg-words > .table-wrap :is(td, thead th) { text-align: right; font-variant-numeric: tabular-nums; }
+/* A wide table of words, such as the boxes of a heat plan: its cells wrap at spaces but never inside a word, and keep to the left. */
+.dg-words > .table-wrap.is-text :is(th, td) { white-space: normal; }
+.dg-words > .table-wrap.is-text :is(td, thead th) { text-align: left; }
 .dg-words:has(> .table-wrap) { min-width: 0; } /* a flex item: without this it grows to the table, and the wrapper never scrolls */
-.dg-words:has(> .table-wrap) > ul { max-width: var(--measure); }
 figcaption { margin-top: 12px; font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
 figcaption strong { font-weight: 600; color: var(--text); margin-right: 8px; }
 
@@ -1483,7 +1486,7 @@ footer .shell { display: flex; align-items: center; justify-content: space-betwe
   </div>
 </footer>
 <script>
-// docent:kit 0.7.0
+// docent:kit 0.8.0
 (() => {
   const root = document.documentElement;
   root.classList.add('js');

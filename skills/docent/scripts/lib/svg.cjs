@@ -103,7 +103,17 @@ function styles(scene, id, mode, swap) {
   // A plan: the box names, widths and boxes of a layout to scale, with no ticks and no named lines.
   if (scene.form === "plan") css.push(`${s} .row{font-size:14px;fill:${v("text")}}`, `${s} .val{font-size:12px;fill:${v("muted")};font-variant-numeric:tabular-nums}`, `${s} .box{fill:${v("bg")};stroke:${v("text")};stroke-width:1.5}`);
   // A plan stacked on a phone: a small map beside each box, its boxes in thin muted outlines, the band's own box filled in the text color.
-  if (scene.stack) css.push(`${s} .m-box{fill:${v("bg")};stroke:${v("muted")};stroke-width:1}`, `${s} .m-on{fill:${v("text")};stroke:${v("text")};stroke-width:1}`);
+  if (scene.stack && scene.form === "plan") css.push(`${s} .m-box{fill:${v("bg")};stroke:${v("muted")};stroke-width:1}`, `${s} .m-on{fill:${v("text")};stroke:${v("text")};stroke-width:1}`);
+  // A heat plan: the plan's look, and each box with a number filled with its heat step after the plan's box rule, so the step wins.
+  // On a step its name, its value and its note take the text color, or the page color on steps 4 and 5; a box with no data keeps
+  // the plan's look. Stacked on a phone, each map shows every box in its step, and the band's own box has a 2px outline in the text
+  // color with a 1px line in the page color inside it, so the outline shows on every step, in both themes.
+  if (scene.form === "heatplan") {
+    css.push(`${s} .row{font-size:14px;fill:${v("text")}}`, `${s} .val{font-size:12px;fill:${v("muted")};font-variant-numeric:tabular-nums}`, `${s} .box{fill:${v("bg")};stroke:${v("text")};stroke-width:1.5}`);
+    if (scene.stack) css.push(`${s} .m-box{fill:${v("bg")};stroke:${v("muted")};stroke-width:1}`);
+    css.push(...[1, 2, 3, 4, 5].map((k) => `${s} .h${k}{fill:${v(`heat-${k}`)}}`), `${s} .hv{font-size:12px;fill:${v("text")};font-variant-numeric:tabular-nums}`, `${s} .hn{font-size:12px;fill:${v("text")}}`, `${s} .row.hi,${s} .hv.hi,${s} .hn.hi{fill:${v("bg")}}`);
+    if (scene.stack) css.push(`${s} .m-box.m-at{stroke:${v("text")};stroke-width:2}`, `${s} .m-in{fill:none;stroke:${v("bg")};stroke-width:1}`);
+  }
   // A funnel: step names in weight 400, numbers with tabular figures, a kept bar as the bar of a range chart, and the lost part filled in the line color,
   // with no outline: a thin outline at that contrast almost disappears in dark mode, and an area does not.
   if (scene.form === "funnel") css.push(`${s} .row{font-size:14px;fill:${v("text")}}`, `${s} .val{font-size:12px;fill:${v("muted")};font-variant-numeric:tabular-nums}`, `${s} .r-bar{fill:${v("bg")};stroke:${v("text")};stroke-width:1.5}`, `${s} .f-lost{fill:${v("line")}}`);

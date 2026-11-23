@@ -162,7 +162,7 @@ test("wrong heat map data is refused with a plain reason", () => {
   broken((d) => (d.place = "page"), /a heat map sits in the text flow; "place" must be "flow"/);
   broken((d) => (d.form = "wide"), /a heat map has no "form"; the renderer draws it 640px wide, and 264px wide on a phone/);
   broken((d) => (d.groups = []), /a heat map has no "groups"; each row is one row of cells/);
-  broken((d) => (d.areas = []), /a heat map has no "areas"; for the areas of a page, write a plan, and its counts in a table/);
+  broken((d) => (d.areas = []), /a heat map has no "areas"; for the areas of a page, write a heat plan, "kind": "heatplan"/);
   broken((d) => (d.rows = "x"), /"rows" must be a list of 2 to 12 rows, top to bottom, each with a "name" and its "values"/);
   broken((d) => (d.rows = Array.from({ length: 14 }, (_, i) => ({ name: `R${i}`, values: d.rows[0].values }))), /a heat map has 2 to 12 rows; this one has 14/);
   broken((d) => (d.columns = "x"), /"columns" must be a list of 3 to 24 labels, one for each column/);

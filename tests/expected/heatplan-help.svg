@@ -1,0 +1,147 @@
+<svg id="dg-help-clicks" class="dg dg-heatplan dg-auto" xmlns="http://www.w3.org/2000/svg" width="640" height="274" viewBox="0 0 640 274" role="img" aria-label="Clicks on each area of a help page in one week. Search got the most, 460, and the question 'Was this helpful?' the next most, 320. Links inside the article got the fewest, 90.">
+<style>
+#dg-help-clicks{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-help-clicks .ground{fill:var(--fig,#f2f3f9)}
+#dg-help-clicks .band{fill:var(--bg,#fbfbfe)}
+#dg-help-clicks .track{stroke:var(--line,#d3d6e3)}
+#dg-help-clicks .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-help-clicks .head{fill:var(--text,#1c1f2e)}
+#dg-help-clicks .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-help-clicks .stop.end{fill:var(--text,#1c1f2e)}
+#dg-help-clicks .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-help-clicks .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-help-clicks .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-help-clicks .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-help-clicks .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-help-clicks .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-help-clicks .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-help-clicks .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-help-clicks .sub,#dg-help-clicks .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-help-clicks .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-help-clicks .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-help-clicks .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-help-clicks .box{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-help-clicks .h1{fill:var(--heat-1,#dee2f0)}
+#dg-help-clicks .h2{fill:var(--heat-2,#babecb)}
+#dg-help-clicks .h3{fill:var(--heat-3,#9498a5)}
+#dg-help-clicks .h4{fill:var(--heat-4,#616571)}
+#dg-help-clicks .h5{fill:var(--heat-5,#3e424d)}
+#dg-help-clicks .hv{font-size:12px;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-help-clicks .hn{font-size:12px;fill:var(--text,#1c1f2e)}
+#dg-help-clicks .row.hi,#dg-help-clicks .hv.hi,#dg-help-clicks .hn.hi{fill:var(--bg,#fbfbfe)}
+@media (prefers-reduced-motion:reduce){#dg-help-clicks .pulse{animation:none!important}#dg-help-clicks .pulse{display:none!important}}
+@media print{#dg-help-clicks{max-width:100%;height:auto}#dg-help-clicks .pulse{display:none!important}}
+#dg-help-clicks-phone{display:none}
+</style>
+<rect width="640" height="274" class="ground"/>
+<rect x="8" y="70" width="624" height="192" rx="10" class="band"/>
+<text x="16" y="38" class="val" text-anchor="middle">0</text>
+<text x="49" y="38" class="val" text-anchor="middle">100</text>
+<text x="83" y="38" class="val" text-anchor="middle">200</text>
+<text x="117" y="38" class="val" text-anchor="middle">300</text>
+<text x="151" y="38" class="val" text-anchor="middle">400</text>
+<text x="184" y="38" class="val" text-anchor="middle">500</text>
+<text x="192" y="22" class="sub" text-anchor="start">clicks</text>
+<text x="12" y="62" class="sub" text-anchor="start">Not to scale</text>
+<rect x="16" y="12" width="32" height="12" rx="2" class="h1"/><rect x="50" y="12" width="32" height="12" rx="2" class="h2"/><rect x="84" y="12" width="32" height="12" rx="2" class="h3"/><rect x="118" y="12" width="32" height="12" rx="2" class="h4"/><rect x="152" y="12" width="32" height="12" rx="2" class="h5"/>
+<rect x="14" y="76" width="612" height="52" rx="4" class="box h5"/>
+<text x="22" y="98" class="row hi" text-anchor="start">Search</text>
+<text x="22" y="116" class="hv hi" text-anchor="start">460</text>
+<rect x="14" y="132" width="150" height="124" rx="4" class="box h3"/>
+<text x="22" y="154" class="row" text-anchor="start">Topics</text>
+<text x="22" y="172" class="hv" text-anchor="start">210</text>
+<rect x="168" y="132" width="304" height="68" rx="4" class="box h1"/>
+<text x="176" y="154" class="row" text-anchor="start">Article</text>
+<text x="176" y="172" class="hv" text-anchor="start">90</text>
+<text x="176" y="188" class="hn" text-anchor="start">links in the text</text>
+<rect x="476" y="132" width="150" height="124" rx="4" class="box h2"/>
+<text x="484" y="154" class="row" text-anchor="start">Related articles</text>
+<text x="484" y="172" class="hv" text-anchor="start">130</text>
+<rect x="168" y="204" width="150" height="52" rx="4" class="box h4"/>
+<text x="176" y="226" class="row hi" text-anchor="start">Was this helpful?</text>
+<text x="176" y="244" class="hv hi" text-anchor="start">320</text>
+<rect x="322" y="204" width="150" height="52" rx="4" class="box h2"/>
+<text x="330" y="226" class="row" text-anchor="start">Contact support</text>
+<text x="330" y="244" class="hv" text-anchor="start">180</text>
+</svg>
+<svg id="dg-help-clicks-phone" class="dg dg-heatplan dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="474" viewBox="0 0 264 474" role="img" aria-label="Clicks on each area of a help page in one week. Search got the most, 460, and the question 'Was this helpful?' the next most, 320. Links inside the article got the fewest, 90.">
+<style>
+#dg-help-clicks-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-help-clicks-phone .ground{fill:var(--fig,#f2f3f9)}
+#dg-help-clicks-phone .band{fill:var(--bg,#fbfbfe)}
+#dg-help-clicks-phone .track{stroke:var(--line,#d3d6e3)}
+#dg-help-clicks-phone .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-help-clicks-phone .head{fill:var(--text,#1c1f2e)}
+#dg-help-clicks-phone .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-help-clicks-phone .stop.end{fill:var(--text,#1c1f2e)}
+#dg-help-clicks-phone .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-help-clicks-phone .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-help-clicks-phone .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-help-clicks-phone .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-help-clicks-phone .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-help-clicks-phone .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-help-clicks-phone .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-help-clicks-phone .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-help-clicks-phone .sub,#dg-help-clicks-phone .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-help-clicks-phone .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-help-clicks-phone .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-help-clicks-phone .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-help-clicks-phone .box{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-help-clicks-phone .m-box{fill:var(--bg,#fbfbfe);stroke:var(--muted,#575d75);stroke-width:1}
+#dg-help-clicks-phone .h1{fill:var(--heat-1,#dee2f0)}
+#dg-help-clicks-phone .h2{fill:var(--heat-2,#babecb)}
+#dg-help-clicks-phone .h3{fill:var(--heat-3,#9498a5)}
+#dg-help-clicks-phone .h4{fill:var(--heat-4,#616571)}
+#dg-help-clicks-phone .h5{fill:var(--heat-5,#3e424d)}
+#dg-help-clicks-phone .hv{font-size:12px;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-help-clicks-phone .hn{font-size:12px;fill:var(--text,#1c1f2e)}
+#dg-help-clicks-phone .row.hi,#dg-help-clicks-phone .hv.hi,#dg-help-clicks-phone .hn.hi{fill:var(--bg,#fbfbfe)}
+#dg-help-clicks-phone .m-box.m-at{stroke:var(--text,#1c1f2e);stroke-width:2}
+#dg-help-clicks-phone .m-in{fill:none;stroke:var(--bg,#fbfbfe);stroke-width:1}
+@media (prefers-reduced-motion:reduce){#dg-help-clicks-phone .pulse{animation:none!important}#dg-help-clicks-phone .pulse{display:none!important}}
+@media print{#dg-help-clicks-phone{max-width:100%;height:auto}#dg-help-clicks-phone .pulse{display:none!important}}
+@media (max-width:736px){#dg-help-clicks{display:none}#dg-help-clicks-phone{display:block}}
+@media print{#dg-help-clicks{display:block!important}#dg-help-clicks-phone{display:none!important}}
+</style>
+<rect width="264" height="474" class="ground"/>
+<rect x="8" y="70" width="248" height="56" rx="10" class="band"/>
+<rect x="8" y="134" width="248" height="56" rx="10" class="band"/>
+<rect x="8" y="198" width="248" height="72" rx="10" class="band"/>
+<rect x="8" y="278" width="248" height="56" rx="10" class="band"/>
+<rect x="8" y="342" width="248" height="56" rx="10" class="band"/>
+<rect x="8" y="406" width="248" height="56" rx="10" class="band"/>
+<text x="16" y="38" class="val" text-anchor="middle">0</text>
+<text x="49" y="38" class="val" text-anchor="middle">100</text>
+<text x="83" y="38" class="val" text-anchor="middle">200</text>
+<text x="117" y="38" class="val" text-anchor="middle">300</text>
+<text x="151" y="38" class="val" text-anchor="middle">400</text>
+<text x="184" y="38" class="val" text-anchor="middle">500</text>
+<text x="192" y="22" class="sub" text-anchor="start">clicks</text>
+<text x="12" y="62" class="sub" text-anchor="start">Not to scale</text>
+<rect x="16" y="12" width="32" height="12" rx="2" class="h1"/><rect x="50" y="12" width="32" height="12" rx="2" class="h2"/><rect x="84" y="12" width="32" height="12" rx="2" class="h3"/><rect x="118" y="12" width="32" height="12" rx="2" class="h4"/><rect x="152" y="12" width="32" height="12" rx="2" class="h5"/>
+<rect x="16.5" y="88.5" width="9" height="15" class="m-box h3"/><rect x="26.5" y="88.5" width="19" height="7" class="m-box h1"/><rect x="46.5" y="88.5" width="9" height="15" class="m-box h2"/><rect x="26.5" y="96.5" width="9" height="7" class="m-box h4"/><rect x="36.5" y="96.5" width="9" height="7" class="m-box h2"/><rect x="16.5" y="80.5" width="39" height="7" class="m-box h5 m-at"/><rect x="18" y="82" width="36" height="4" class="m-in"/>
+<text x="68" y="94" class="name" text-anchor="start">Search</text>
+<text x="68" y="112" class="hv" text-anchor="start">460 clicks</text>
+<rect x="16.5" y="144.5" width="39" height="7" class="m-box h5"/><rect x="26.5" y="152.5" width="19" height="7" class="m-box h1"/><rect x="46.5" y="152.5" width="9" height="15" class="m-box h2"/><rect x="26.5" y="160.5" width="9" height="7" class="m-box h4"/><rect x="36.5" y="160.5" width="9" height="7" class="m-box h2"/><rect x="16.5" y="152.5" width="9" height="15" class="m-box h3 m-at"/><rect x="18" y="154" width="6" height="12" class="m-in"/>
+<text x="68" y="158" class="name" text-anchor="start">Topics</text>
+<text x="68" y="176" class="hv" text-anchor="start">210 clicks</text>
+<rect x="16.5" y="208.5" width="39" height="7" class="m-box h5"/><rect x="16.5" y="216.5" width="9" height="15" class="m-box h3"/><rect x="46.5" y="216.5" width="9" height="15" class="m-box h2"/><rect x="26.5" y="224.5" width="9" height="7" class="m-box h4"/><rect x="36.5" y="224.5" width="9" height="7" class="m-box h2"/><rect x="26.5" y="216.5" width="19" height="7" class="m-box h1 m-at"/><rect x="28" y="218" width="16" height="4" class="m-in"/>
+<text x="68" y="222" class="name" text-anchor="start">Article</text>
+<text x="68" y="240" class="hv" text-anchor="start">90 clicks</text>
+<text x="68" y="256" class="sub" text-anchor="start">links in the text</text>
+<rect x="16.5" y="288.5" width="39" height="7" class="m-box h5"/><rect x="16.5" y="296.5" width="9" height="15" class="m-box h3"/><rect x="26.5" y="296.5" width="19" height="7" class="m-box h1"/><rect x="26.5" y="304.5" width="9" height="7" class="m-box h4"/><rect x="36.5" y="304.5" width="9" height="7" class="m-box h2"/><rect x="46.5" y="296.5" width="9" height="15" class="m-box h2 m-at"/><rect x="48" y="298" width="6" height="12" class="m-in"/>
+<text x="68" y="302" class="name" text-anchor="start">Related articles</text>
+<text x="68" y="320" class="hv" text-anchor="start">130 clicks</text>
+<rect x="16.5" y="352.5" width="39" height="7" class="m-box h5"/><rect x="16.5" y="360.5" width="9" height="15" class="m-box h3"/><rect x="26.5" y="360.5" width="19" height="7" class="m-box h1"/><rect x="46.5" y="360.5" width="9" height="15" class="m-box h2"/><rect x="36.5" y="368.5" width="9" height="7" class="m-box h2"/><rect x="26.5" y="368.5" width="9" height="7" class="m-box h4 m-at"/><rect x="28" y="370" width="6" height="4" class="m-in"/>
+<text x="68" y="366" class="name" text-anchor="start">Was this helpful?</text>
+<text x="68" y="384" class="hv" text-anchor="start">320 clicks</text>
+<rect x="16.5" y="416.5" width="39" height="7" class="m-box h5"/><rect x="16.5" y="424.5" width="9" height="15" class="m-box h3"/><rect x="26.5" y="424.5" width="19" height="7" class="m-box h1"/><rect x="46.5" y="424.5" width="9" height="15" class="m-box h2"/><rect x="26.5" y="432.5" width="9" height="7" class="m-box h4"/><rect x="36.5" y="432.5" width="9" height="7" class="m-box h2 m-at"/><rect x="38" y="434" width="6" height="4" class="m-in"/>
+<text x="68" y="430" class="name" text-anchor="start">Contact support</text>
+<text x="68" y="448" class="hv" text-anchor="start">180 clicks</text>
+</svg>
+<details class="dg-words">
+<summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>The diagram in words</summary>
+<div class="table-wrap is-text" role="region" aria-label="The boxes of the heat plan" tabindex="0"><table><thead><tr><th scope="col">Box</th><th scope="col">Value</th><th scope="col">Row</th><th scope="col">Column</th><th scope="col">Note</th></tr></thead><tbody><tr><th scope="row">Search</th><td>460</td><td>top</td><td>full width</td><td></td></tr><tr><th scope="row">Topics</th><td>210</td><td>rows 2 to 3</td><td>left</td><td></td></tr><tr><th scope="row">Article</th><td>90</td><td>middle</td><td>columns 2 to 3</td><td>links in the text</td></tr><tr><th scope="row">Related articles</th><td>130</td><td>rows 2 to 3</td><td>right</td><td></td></tr><tr><th scope="row">Was this helpful?</th><td>320</td><td>bottom</td><td>column 2</td><td></td></tr><tr><th scope="row">Contact support</th><td>180</td><td>bottom</td><td>column 3</td><td></td></tr></tbody></table></div>
+<p>The plan is not drawn to scale. On a phone each box stands on its own, beside a small map of the plan.</p>
+<ul><li>Each box is shaded by its number, in 5 steps of 100 clicks from 0 to 500. A number on the edge of two steps takes the higher step.</li><li>The highest number is 460 (Search). The lowest is 90 (Article).</li></ul>
+</details>
