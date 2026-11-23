@@ -1,0 +1,25 @@
+{
+  "id": "nightly-builds",
+  "kind": "statusgrid",
+  "label": "Nightly builds of four projects in the week of 16 November. The mobile app failed on Tuesday and Wednesday; every other build passed.",
+  "names": {"ok": "Passed", "err": "Failed"},
+  "columns": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+  "rows": [
+    {
+      "name": "Server",
+      "values": ["ok", "ok", "ok", "ok", "ok", "ok", "ok"]
+    },
+    {
+      "name": "Web app",
+      "values": ["ok", "ok", "ok", "ok", "ok", "ok", "ok"]
+    },
+    {
+      "name": "Mobile app",
+      "values": ["ok", "err", "err", "ok", "ok", "ok", "ok"]
+    },
+    {
+      "name": "Docs",
+      "values": ["ok", "ok", "ok", "ok", "ok", "ok", null]
+    }
+  ]
+}

@@ -121,6 +121,21 @@ test("a row name with no spaces breaks inside the table of a diagram in words, s
   assert.match(css, /\.dg-words :is\(th, td\) \{ overflow-wrap: anywhere; \}/);
 });
 
+test("with the reader's high contrast mode the kit gives its tokens system colors, and leaves the heat steps and the status colors alone", () => {
+  const forced = css.slice(css.indexOf("@media (forced-colors: active)"), css.indexOf("@media print"));
+  assert.match(forced, /html:root:not\(\[data-never\]\) \{ --bg: Canvas; --fig: Canvas; --text: CanvasText; --muted: CanvasText; --line: CanvasText; --primary: Highlight; --dot: Highlight; \}/, "as specific as the print block, so it wins over the dark switch");
+  assert.doesNotMatch(forced, /--(heat-[1-5]|heat-text|heat-page|ok|warn|err):/, "the color is the content there");
+  assert.match(forced, /\.state::before \{ background: CanvasText; \}/, "a dot in currentColor would turn into the page color");
+});
+
+test("with more contrast the line takes the muted value and muted text the text value, on screen and not with forced colors", () => {
+  const more = css.slice(css.indexOf("@media screen and (prefers-contrast: more)"), css.indexOf("@media (forced-colors: active)"));
+  assert.ok(more.length > 0, "the block comes before the forced colors block");
+  assert.equal((more.match(/@media screen and \(prefers-contrast: more\) and \(forced-colors: none\)/g) || []).length, 2, "paper keeps the print block, and forced colors keep the system colors");
+  assert.match(more, /html:root:not\(\[data-never\]\) \{ --line: #575d75; --muted: #1c1f2e; \}/);
+  assert.equal((more.match(/--line: #959bb3; --muted: #e7e9f3;/g) || []).length, 2, "dark by the switch and dark by the system");
+});
+
 test("the logo: each version shows in its own theme, in all four places that set tokens, and a logo for one theme only stands on a tile", () => {
   assert.equal((css.match(/--logo-light: block; --logo-dark: none; --tile-light: transparent; --tile-dark: #12141f;/g) || []).length, 2, "light and print");
   assert.equal((css.match(/--logo-light: none; --logo-dark: block; --tile-light: #fbfbfe; --tile-dark: transparent;/g) || []).length, 2, "dark by the system and dark by the switch");

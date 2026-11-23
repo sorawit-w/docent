@@ -1,6 +1,6 @@
 # Proposal: status grids — the state of each cell, set by thresholds
 
-Status: **proposed on 2026-11-23, with each open question decided** (see "Decisions" at the end). Decision 1 was changed on 2026-11-23, because Docent pages are read mainly online: look A on screen, look D on paper. The user accepted decision 6 for now, with one change, and will confirm both on the built result. No code is written yet. An earlier talk settled the direction: data such as server uptime is a status question ("when was it down?"), not an amount, so it needs its own kind and not a green-to-red heat map. The author sets thresholds, each cell takes a state, and each state has a sign that is not color.
+Status: **item 1 is built** (PR 48): the kind, with look A on screen, look D on paper, and `"calendar": true`. It was proposed on 2026-11-23, with each open question decided (see "Decisions" at the end). Decision 1 was changed on 2026-11-23, because Docent pages are read mainly online: look A on screen, look D on paper. The user accepted decision 6 for now, with one change, and will confirm both on the built result. An earlier talk settled the direction: data such as server uptime is a status question ("when was it down?"), not an amount, so it needs its own kind and not a green-to-red heat map. The author sets thresholds, each cell takes a state, and each state has a sign that is not color.
 
 ## The answer first
 

@@ -43,11 +43,11 @@ test("each box is filled with the heat step of its value, and its texts take the
   for (const s of [scene, phone]) {
     assert.deepEqual(["header", "gallery", "details", "cart", "reviews", "related", "footer"].map((id) => classOf(s, id)), ["box h3", "box h4", "box h2", "box h5", "box h3", "box h1", "box h1"], "5 steps of 200: 420 and 430 on step 3, 610 on 4, 870 on 5, 150 and 60 on 1");
     // The value stands under the name; a note on a step is not muted.
-    assert.deepEqual(texts(s, "header").slice(-2), ["420:hv", "search and menu:hn"]);
+    assert.deepEqual(texts(s, "header").slice(-2), ["420:hv hs", "search and menu:hn hs"]);
     assert.ok(texts(s, "cart").every((t) => t.endsWith(" hi")), "on step 5 the name, the value and the note take the page color");
     assert.ok(texts(s, "details").every((t) => !t.endsWith(" hi")), "on step 2 they take the text color");
   }
-  assert.deepEqual(texts(scene, "cart"), ["Add to cart:row hi", "870:hv hi", "price and size:hn hi"]);
+  assert.deepEqual(texts(scene, "cart"), ["Add to cart:row hs hi", "870:hv hs hi", "price and size:hn hs hi"]);
 });
 
 test("a box with no data keeps the plan's look and says so under its name, and the legend has no no-data key", () => {
@@ -123,7 +123,10 @@ test("a heat plan whose grid does not fit a phone is stacked: each map shows eve
     assert.ok(rects.indexOf(rects.find((r) => /m-in/.test(r))) === rects.length - 1, "the ring is drawn last, over its neighbours");
   }
   assert.match(part(phone, "search").svg, /class="m-box h5 m-at"/, "Search, on step 5, is the box with the ring in its own band");
+  // The value sits on the band, not on a step, so it has no "hs" and takes the text color: with the reader's high contrast mode, the system text color.
   assert.deepEqual(texts(phone, "article"), ["Article:name", "90 clicks:hv", "links in the text:sub"], "the value with its unit, under the name");
+  assert.match(svg, /\.hv\{font-size:12px;fill:var\(--text,#1c1f2e\);font-variant-numeric:tabular-nums\}/);
+  // The ring works because its two lines contrast with each other, as the text and page colors do in every theme and in forced colors.
   assert.match(svg, /\.m-box\.m-at\{stroke:var\(--text,#1c1f2e\);stroke-width:2\}/);
   assert.match(svg, /\.m-in\{fill:none;stroke:var\(--bg,#fbfbfe\);stroke-width:1\}/);
   assert.doesNotMatch(svg, /\.m-on\{/, "the plan's filled map box is not used");
@@ -197,8 +200,7 @@ test("a heat plan takes every color from the page tokens, and has no state, no d
     assert.doesNotMatch(svg, /is-(ok|warn|err)|class="pulse|dasharray|--primary/);
   }
   const { svg } = renderDiagram(fixture());
-  assert.match(svg, /\.row\.hi,#dg-product-clicks \.hv\.hi,#dg-product-clicks \.hn\.hi\{fill:var\(--bg,#fbfbfe\)\}/);
-  assert.match(svg, /\.hn\{font-size:12px;fill:var\(--text,#1c1f2e\)\}/, "a note on a step takes the text color, not the muted one");
+  assert.match(svg, /#dg-product-clicks \.hs\{fill:var\(--heat-text,#1c1f2e\)\}\n#dg-product-clicks \.hs\.hi\{fill:var\(--heat-page,#fbfbfe\)\}/, "text on a step (a name, a value, a note) takes the kit's own text color, not the muted one, or its page color on steps 4 and 5");
 });
 
 test("render reports the form, and check accepts a heat plan that render drew and reports one changed by hand", () => {

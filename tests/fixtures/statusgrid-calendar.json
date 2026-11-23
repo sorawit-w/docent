@@ -1,0 +1,38 @@
+{
+  "id": "website-13-weeks",
+  "kind": "statusgrid",
+  "label": "Uptime of the bug tracker's website over the 13 weeks from 24 August to 22 November. It was down on Friday 4 September and on Tuesday 13 October, and slow on three other days. Weekends were always OK.",
+  "thresholds": {"better": "higher", "ok": 99.9, "warn": 99, "unit": "%"},
+  "columns": ["24 Aug", "31 Aug", "7 Sep", "14 Sep", "21 Sep", "28 Sep", "5 Oct", "12 Oct", "19 Oct", "26 Oct", "2 Nov", "9 Nov", "16 Nov"],
+  "rows": [
+    {
+      "name": "Monday",
+      "values": [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 99.3]
+    },
+    {
+      "name": "Tuesday",
+      "values": [100, 100, 100, 100, 100, 100, 100, 98.2, 100, 100, 100, 100, 100]
+    },
+    {
+      "name": "Wednesday",
+      "values": [100, 100, 100, 99.5, 100, 100, 100, 100, 100, 100, 100, 100, 100]
+    },
+    {
+      "name": "Thursday",
+      "values": [100, 100, 100, 100, 100, 100, 100, 99.8, 100, 100, 100, 100, 100]
+    },
+    {
+      "name": "Friday",
+      "values": [100, 97.4, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100]
+    },
+    {
+      "name": "Saturday",
+      "values": [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100]
+    },
+    {
+      "name": "Sunday",
+      "values": [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100]
+    }
+  ],
+  "calendar": true
+}

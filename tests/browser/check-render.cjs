@@ -24,13 +24,13 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
 
 (async () => {
   const browser = await chromium.launch(process.env.DOCENT_BROWSER_CHANNEL ? { channel: process.env.DOCENT_BROWSER_CHANNEL } : {});
-  const open = async ({ width, height = 900, theme = "light", media = "screen", reducedMotion = "no-preference", content = html }) => {
+  const open = async ({ width, height = 900, theme = "light", media = "screen", reducedMotion = "no-preference", forcedColors = "none", contrast = "no-preference", content = html }) => {
     const context = await browser.newContext({ viewport: { width, height }, colorScheme: theme, reducedMotion });
     const page = await context.newPage();
     const errors = [];
     page.on("console", (m) => m.type() === "error" && errors.push(m.text()));
     page.on("pageerror", (e) => errors.push(String(e)));
-    await page.emulateMedia({ media, colorScheme: theme, reducedMotion });
+    await page.emulateMedia({ media, colorScheme: theme, reducedMotion, forcedColors, contrast });
     await page.setContent(content, { waitUntil: "load" });
     await page.waitForTimeout(400);
     return { page, context, errors };
@@ -134,6 +134,90 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     await paper.page.screenshot({ path: `${out}/print.png`, fullPage: true });
     await paper.context.close();
     ok("print is light on a dark system, without the links and the switch of the top bar, without dots or a colored leg", print.bg === "rgb(255, 255, 255)" && print.text === LIGHT.text && print.topbar === "none,none,none" && print.dots === "none" && print.lines === LIGHT.text, print);
+  }
+
+  // The reader's high contrast mode (emulated forced colors, light and dark): the marks that are backgrounds show in system colors,
+  // a drawing's lines, text and ground take the system colors, and the heat steps keep theirs, with the kit's own text on them.
+  // This is Chrome's emulation with its default system colors; real Windows themes are not tested here.
+  {
+    const fixture = (name) => fs.readFileSync(path.join(root, "tests", "fixtures", `${name}.json`), "utf8");
+    const figure = (id, name) => `<figure><div class="fig" role="region" aria-label="Figure, ${id}" tabindex="0">\n<!-- docent:diagram\n${fixture(name)}\n-->\n<!-- /docent:diagram -->\n</div><figcaption><strong>Figure</strong>${id}.</figcaption></figure>`;
+    const content = renderDocument(html.replace('<section id="report"', `<section id="heat" aria-labelledby="heat-h"><h2 id="heat-h">Heat</h2>${figure("errors", "heatmap-errors")}${figure("clicks", "heatplan-product")}${figure("help", "heatplan-help")}</section>\n<section id="report"`)).html;
+    const KIT = { light: { text: LIGHT.text, page: LIGHT.bg, steps: ["#c6e9ef", "#86c9d5", "#3da6b6", "#00707e", "#004a53"] }, dark: { text: DARK.text, page: DARK.bg, steps: ["#093339", "#054e58", "#006b78", "#36a0b1", "#80cad7"] } };
+    const rgb = (hex) => `rgb(${[1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)).join(", ")})`;
+    for (const theme of ["light", "dark"]) {
+      const { page, context } = await open({ width: 1280, theme, forcedColors: "active", content });
+      await page.evaluate(() => { const li = document.querySelectorAll(".steps > li")[2]; window.scrollTo(0, li.getBoundingClientRect().top + scrollY - innerHeight * 0.5 + 4); });
+      await page.waitForTimeout(300);
+      const seen = await page.evaluate(() => {
+        // The system colors as this browser gives them, read from a probe.
+        const probe = document.body.appendChild(document.createElement("div"));
+        probe.style.cssText = "color: CanvasText; background-color: Canvas; border: 1px solid Highlight";
+        const sys = { canvas: getComputedStyle(probe).backgroundColor, text: getComputedStyle(probe).color, hi: getComputedStyle(probe).borderTopColor };
+        probe.remove();
+        const css = (el, pseudo) => getComputedStyle(el, pseudo);
+        const all = (sel, f) => [...new Set([...document.querySelectorAll(sel)].filter((e) => e.getBoundingClientRect().width).map(f))];
+        const shown = (sel) => [...document.querySelectorAll(sel)].filter((e) => e.getBoundingClientRect().width);
+        const pick = (sel) => shown(sel)[0];
+        return {
+          sys,
+          dots: all(".state:is(.ok, .warn, .err, .info)", (e) => css(e, "::before").backgroundColor),
+          ring: [css(pick(".state.plan"), "::before").borderTopColor, css(pick(".state.plan"), "::before").backgroundColor],
+          rail: css(pick(".steps"), "::before").backgroundColor,
+          railDot: css(document.querySelector(".rail-dot")).backgroundColor,
+          routeDot: css(document.querySelector(".route-dot")).backgroundColor,
+          leg: all(".walk svg.dg .leg.is-current .line", (e) => css(e).stroke),
+          lines: all("svg.dg:not(.dg-heatmap):not(.dg-heatplan) :is(.track, .card:not([class*=is-]), .leg:not(.is-current) .line)", (e) => css(e).stroke),
+          words: all("svg.dg:not(.dg-heatmap):not(.dg-heatplan) :is(.name, .lane, .sub, .verb), #heat svg.dg .val", (e) => css(e).fill),
+          grounds: all("svg.dg :is(.ground, .band)", (e) => css(e).fill),
+          steps: [1, 2, 3, 4, 5].map((k) => all(`#heat svg.dg .h${k}`, (e) => css(e).fill).join()),
+          onStep: all("#dg-errors-by-day .hv:not(.hi), #dg-product-clicks .hs:not(.hi)", (e) => css(e).fill),
+          onDark: all("#heat svg.dg .hi", (e) => css(e).fill),
+          noData: [...new Set([...all("#dg-errors-by-day .h0", (e) => css(e).stroke), ...all("#dg-product-clicks .row:not(.hs)", (e) => css(e).fill)])],
+          chosen: css(document.querySelector(".choose > input:checked + .opt")).borderTopColor,
+        };
+      });
+      const { sys } = seen, kit = KIT[theme];
+      ok(`forced colors, ${theme}: every status dot and the info dot take the text color, and the planned ring keeps its shape`, seen.dots.length === 1 && seen.dots[0] === sys.text && seen.ring[0] === sys.text && /, 0\)$|transparent/.test(seen.ring[1]), seen);
+      ok(`forced colors, ${theme}: the rail shows in the text color, and the current step, the route dot and the current leg in the highlight color`, seen.rail === sys.text && seen.railDot === sys.hi && seen.routeDot === sys.hi && seen.leg.join() === sys.hi, seen);
+      ok(`forced colors, ${theme}: a drawing's tracks, outlines, lines and words take the text color, and its ground and bands the page color`, seen.lines.join() === sys.text && seen.words.join() === sys.text && seen.grounds.join() === sys.canvas, seen);
+      ok(`forced colors, ${theme}: the heat steps keep their own colors, the text on them keeps the kit's text and page colors, and a cell or box with no data takes the system colors`, seen.steps.join("|") === kit.steps.map(rgb).join("|") && seen.onStep.join() === kit.text && seen.onDark.join() === kit.page && seen.noData.join() === sys.text, seen);
+      ok(`forced colors, ${theme}: the chosen option takes the highlight color`, seen.chosen === sys.hi, seen);
+      // A heat plan stacked on a phone: the value beside each map sits on the band, so it takes the system text color, and so does the ring.
+      await page.setViewportSize({ width: 390, height: 844 });
+      const stack = await page.evaluate(() => ({ values: [...new Set([...document.querySelectorAll("#dg-help-clicks-phone .hv")].map((e) => getComputedStyle(e).fill))], ring: getComputedStyle(document.querySelector("#dg-help-clicks-phone .m-at")).stroke, shown: document.getElementById("dg-help-clicks-phone").getBoundingClientRect().width }));
+      ok(`forced colors, ${theme}: a stacked heat plan's values beside the maps, and its ring, take the system text color`, stack.shown > 0 && stack.values.join() === sys.text && stack.ring === sys.text, { sys, stack });
+      await page.screenshot({ path: `${out}/forced-${theme}.png`, fullPage: true });
+      await context.close();
+    }
+  }
+
+  // More contrast (emulated prefers-contrast: more): outlines, tracks and rules take the muted color, and muted text the text color,
+  // in light, in dark by the system and in dark by the switch. Forced colors and paper keep their own colors.
+  {
+    const MORE = { light: { line: "rgb(87, 93, 117)", muted: LIGHT.text }, dark: { line: "rgb(149, 155, 179)", muted: DARK.text } };
+    const look = (page) => page.evaluate(() => {
+      const css = (sel, pseudo) => getComputedStyle([...document.querySelectorAll(sel)].find((e) => e.getBoundingClientRect().width) || document.querySelector(sel), pseudo);
+      return { note: css(".note").color, sub: css("svg.dg .sub").fill, rule: css("tbody tr").borderBottomColor, card: css(".cards > li").borderTopColor, track: css("svg.dg .track").stroke, topbar: css(".topbar").borderBottomColor };
+    });
+    const same = (got, want) => got.note === want.muted && got.sub === want.muted && [got.rule, got.card, got.track, got.topbar].every((c) => c === want.line);
+    for (const [name, opts, setup, want] of [["light", { theme: "light" }, null, MORE.light], ["dark by the system", { theme: "dark" }, null, MORE.dark], ["dark by the switch", { theme: "light" }, "dark", MORE.dark], ["light by the switch on a dark system", { theme: "dark" }, "light", MORE.light]]) {
+      const { page, context } = await open({ width: 1280, contrast: "more", ...opts });
+      if (setup) await page.evaluate((t) => { document.documentElement.dataset.theme = t; }, setup);
+      const got = await look(page);
+      ok(`more contrast, ${name}: outlines, tracks and rules take the muted color, and muted text the text color`, same(got, want), got);
+      if (name === "light") await page.screenshot({ path: `${out}/contrast-more.png`, fullPage: true });
+      await context.close();
+    }
+    const forced = await open({ width: 1280, theme: "dark", contrast: "more", forcedColors: "active" });
+    const sysText = await forced.page.evaluate(() => { const p = document.body.appendChild(document.createElement("i")); p.style.color = "CanvasText"; const c = getComputedStyle(p).color; p.remove(); return c; });
+    const withForced = await look(forced.page);
+    await forced.context.close();
+    ok("more contrast with forced colors: the reader's system colors still decide", withForced.track === sysText && withForced.sub === sysText, { sysText, withForced });
+    const paper = await open({ width: 794, height: 1123, theme: "dark", contrast: "more", media: "print" });
+    const onPaper = await look(paper.page);
+    await paper.context.close();
+    ok("more contrast on paper: the print colors hold", onPaper.track === "rgb(211, 214, 227)" && onPaper.note === "rgb(87, 93, 117)", onPaper);
   }
 
   // A diagram outside the walkthrough: it waits until it is in view, runs twice, and runs again on pointer.
@@ -498,10 +582,10 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     ok(`a UML ${name} diagram shows its drawing on a desktop, its column on a phone, and its words with a key on paper, in both themes with no contrast problem`, desk.main > 0 && !desk.column && !desk.words && (desk.main <= 264 ? [phone, narrow].every((r) => r.main === desk.main && !r.column) : !phone.main && phone.column === 264 && narrow.column === 264) && paper.words && paper.key > 0 && [phone, narrow].every((r) => r.page === r.view) && results.deskAxe.length === 0 && results.darkAxe.length === 0, results);
   }
 
-  // The scale charts (a range chart, two layouts to scale, three plans, a funnel, two heat maps and two heat plans): the 640px form on a desktop and on paper (at its real size,
+  // The scale charts (a range chart, two layouts to scale, three plans, a funnel, two heat maps, two heat plans and three status grids): the 640px form on a desktop and on paper (at its real size,
   // no shrink), the 264px form on a phone, the rows as a table in words, text no wider than the renderer assumed, and no
   // contrast problem in either theme.
-  for (const [file, id, rows, what] of [["range", "line-lengths", 8, "a range chart"], ["layout-screen", "wide-layouts", 12, "a layout to scale with two tracks"], ["layout-a4", "a4-notes", 4, "a measured layout to scale"], ["plan-docs", "docs-page", 5, "a plan that grows a column on a phone"], ["plan-editor", "editor-screen", 5, "a plan with a box across two rows"], ["plan-dashboard", "dashboard", 5, "a plan stacked on a phone"], ["funnel", "signup-may", 5, "a funnel"], ["heatmap-signups", "signups-by-hour", 7, "a heat map of 24 columns"], ["heatmap-errors", "errors-by-day", 6, "a heat map with numbers and a cell with no data"], ["heatplan-product", "product-clicks", 8, "a heat plan with a box with no data"], ["heatplan-help", "help-clicks", 6, "a heat plan stacked on a phone"]]) {
+  for (const [file, id, rows, what] of [["range", "line-lengths", 8, "a range chart"], ["layout-screen", "wide-layouts", 12, "a layout to scale with two tracks"], ["layout-a4", "a4-notes", 4, "a measured layout to scale"], ["plan-docs", "docs-page", 5, "a plan that grows a column on a phone"], ["plan-editor", "editor-screen", 5, "a plan with a box across two rows"], ["plan-dashboard", "dashboard", 5, "a plan stacked on a phone"], ["funnel", "signup-may", 5, "a funnel"], ["heatmap-signups", "signups-by-hour", 7, "a heat map of 24 columns"], ["heatmap-errors", "errors-by-day", 6, "a heat map with numbers and a cell with no data"], ["heatplan-product", "product-clicks", 8, "a heat plan with a box with no data"], ["heatplan-help", "help-clicks", 6, "a heat plan stacked on a phone"], ["statusgrid-uptime", "tracker-uptime", 5, "a status grid with a cell with no data"], ["statusgrid-calendar", "website-13-weeks", 7, "a status grid written as a calendar"], ["statusgrid-builds", "nightly-builds", 4, "a status grid with states written directly"]]) {
     const data = fs.readFileSync(path.join(root, "tests", "fixtures", `${file}.json`), "utf8");
     const content = renderDocument(html.replace('<section id="report"', `<section id="rng" aria-labelledby="rng-h"><h2 id="rng-h">Range</h2><figure><div class="fig" role="region" aria-label="Figure 9, line lengths" tabindex="0">\n<!-- docent:diagram\n${data}\n-->\n<!-- /docent:diagram -->\n</div><figcaption><strong>Figure 9</strong>Line lengths.</figcaption></figure></section>\n<section id="report"`)).html;
     const look = (page) => page.evaluate((id) => {
@@ -548,6 +632,43 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     const { desk, phone, narrow, paper } = results;
     const real = (f) => f.w === f.real;
     ok(`${what} shows its 640px form at real size on a desktop and on paper, its 264px form on a phone, its rows as a table in words with no word split across lines, and its text fits the renderer's widths`, [desk, phone, narrow, paper].every((r) => r.broken.length === 0) && desk.main.w === 640 && real(desk.main) && !desk.phone.w && !desk.words && !phone.main.w && phone.phone.w === 264 && narrow.phone.w === 264 && paper.main.w === 640 && !paper.phone.w && paper.words && paper.rows === rows && [phone, narrow].every((r) => r.box <= r.well - 16) && paper.table <= paper.well - 16 && [phone, narrow].every((r) => r.page === r.view) && results.deskWider.length === 0 && results.phoneWider.length === 0 && results.deskAxe.length === 0 && results.darkAxe.length === 0, results);
+  }
+
+  // A status grid as readers with red-green color blindness see it (deuteranopia and protanopia, Machado, Oliveira and Fernandes
+  // 2009 at full strength, in linear RGB), in light, in dark and on paper. Color is never the only sign: every cell that is not OK
+  // has its mark (a slash for Warning, a cross for Error), and the mark stands at 3:1 or more on its own cell as each reader sees
+  // it, so a later change cannot quietly lose the marks. The same holds in the reader's high contrast mode, which keeps the status
+  // fills and the kit's own page color of the marks. The shots show the drawing through the same simulation.
+  {
+    const SIM = { deutan: [[0.367322, 0.860646, -0.227968], [0.280085, 0.672501, 0.047413], [-0.01182, 0.04294, 0.968881]], protan: [[0.152286, 1.052583, -0.204868], [0.114503, 0.786281, 0.099216], [-0.003882, -0.048116, 1.051998]] };
+    const lin = (c) => (c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
+    const rgb = (css) => css.match(/\d+(\.\d+)?/g).slice(0, 3).map((v) => lin(+v / 255));
+    const seen = (css, kind) => { const v = rgb(css); return kind === "normal" ? v : SIM[kind].map((row) => Math.min(1, Math.max(0, row[0] * v[0] + row[1] * v[1] + row[2] * v[2]))); };
+    const lum = ([r, g, b]) => 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    const ratio = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p); return (x + 0.05) / (y + 0.05); };
+    const data = fs.readFileSync(path.join(root, "tests", "fixtures", "statusgrid-uptime.json"), "utf8");
+    const content = renderDocument(html.replace('<section id="report"', `<section id="sg" aria-labelledby="sg-h"><h2 id="sg-h">Status</h2><figure><div class="fig" role="region" aria-label="Figure 9, uptime" tabindex="0">\n<!-- docent:diagram\n${data}\n-->\n<!-- /docent:diagram -->\n</div><figcaption><strong>Figure 9</strong>Uptime.</figcaption></figure></section>\n<section id="report"`)).html;
+    const filters = `<svg width="0" height="0" style="position:absolute">${Object.entries(SIM).map(([k, m]) => `<filter id="sim-${k}" color-interpolation-filters="linearRGB"><feColorMatrix type="matrix" values="${m.map((r) => `${r.join(" ")} 0 0`).join(" ")} 0 0 0 1 0"/></filter>`).join("")}</svg>`;
+    const results = {};
+    for (const [look, opts] of [["light", { width: 1280 }], ["dark", { width: 1280, theme: "dark" }], ["paper", { width: 658, height: 1123, media: "print" }], ["forced-light", { width: 1280, forcedColors: "active" }], ["forced-dark", { width: 1280, theme: "dark", forcedColors: "active" }]]) {
+      const view = await open({ ...opts, content });
+      // Each cell of the grid with its fill and, when it has one, the number of strokes of its mark and the mark's color.
+      const cells = await view.page.evaluate(() => [...document.querySelectorAll("#dg-tracker-uptime rect[class^='s-']")].filter((r) => r.getAttribute("height") !== "12").map((r) => { // a legend key is 12px high
+        const mark = r.nextElementSibling && r.nextElementSibling.matches("path.sm") ? r.nextElementSibling : null;
+        return { state: r.getAttribute("class").slice(2), fill: getComputedStyle(r).fill, strokes: mark ? mark.getAttribute("d").split("M").length - 1 : 0, mark: mark && getComputedStyle(mark).stroke, width: mark && getComputedStyle(mark).strokeWidth };
+      }));
+      const r = { cells: cells.length, wrong: cells.filter((c) => c.strokes !== { ok: 0, warn: 1, err: 2 }[c.state]).length, weakest: {} };
+      for (const kind of ["normal", "deutan", "protan"]) r.weakest[kind] = Math.min(...cells.filter((c) => c.mark).map((c) => ratio(seen(c.mark, kind), seen(c.fill, kind)))).toFixed(2);
+      r.width = [...new Set(cells.filter((c) => c.mark).map((c) => c.width))].join();
+      results[look] = r;
+      await view.page.evaluate((f) => document.body.insertAdjacentHTML("beforeend", f), filters);
+      for (const kind of ["normal", "deutan", "protan"]) {
+        await view.page.evaluate((k) => { document.getElementById("dg-tracker-uptime").style.filter = k === "normal" ? "" : `url(#sim-${k})`; }, kind);
+        await view.page.locator("#dg-tracker-uptime").screenshot({ path: `${out}/statusgrid-${look}-${kind}.png` });
+      }
+      await view.context.close();
+    }
+    ok("a status grid keeps a mark in every Warning and Error cell, at 3:1 or more on its cell with deuteranopia and protanopia, in light, dark, on paper and in the reader's high contrast mode", Object.values(results).every((r) => r.cells === 69 && r.wrong === 0 && r.width === "1.5px" && Object.values(r.weakest).every((w) => +w >= 3)), results);
   }
 
   // Two drawings in one figure: side by side when both fit, one below the other when they do not.
