@@ -269,5 +269,7 @@ test("check accepts a status grid that render drew, and reports one that was cha
   const specimen = fs.readFileSync(path.join(__dirname, "..", "skills", "docent", "assets", "specimen.html"), "utf8");
   const page = renderDocument(specimen.replace("</main>", `${block}</main>`)).html;
   assert.deepEqual(checkDocument(page).errors, []);
-  assert.match(checkDocument(page.replace('class="s-err"/>', 'class="s-ok"/>')).errors.join("\n"), /\("tracker-uptime"\): the drawing does not match its data; run render/);
+  const at = page.lastIndexOf('class="s-err"/>'); // an Error cell of the grid added here, not of the sample page's own grid
+  const edited = `${page.slice(0, at)}class="s-ok"/>${page.slice(at + 'class="s-err"/>'.length)}`;
+  assert.deepEqual(checkDocument(edited).errors, ['diagram 7 ("tracker-uptime"): the drawing does not match its data; run render']);
 });
