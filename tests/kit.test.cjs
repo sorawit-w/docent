@@ -120,3 +120,10 @@ test("a row name with no spaces breaks inside the table of a diagram in words, s
   assert.match(rule(".dg-words :is(th, td)"), /padding-right: 16px/);
   assert.match(css, /\.dg-words :is\(th, td\) \{ overflow-wrap: anywhere; \}/);
 });
+
+test("with the reader's high contrast mode the kit gives its tokens system colors, and leaves the heat steps and the status colors alone", () => {
+  const forced = css.slice(css.indexOf("@media (forced-colors: active)"), css.indexOf("@media print"));
+  assert.match(forced, /html:root:not\(\[data-never\]\) \{ --bg: Canvas; --fig: Canvas; --text: CanvasText; --muted: CanvasText; --line: CanvasText; --primary: Highlight; --dot: Highlight; \}/, "as specific as the print block, so it wins over the dark switch");
+  assert.doesNotMatch(forced, /--(heat-[1-5]|heat-text|heat-page|ok|warn|err):/, "the color is the content there");
+  assert.match(forced, /\.state::before \{ background: CanvasText; \}/, "a dot in currentColor would turn into the page color");
+});

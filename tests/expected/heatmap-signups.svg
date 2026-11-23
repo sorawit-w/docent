@@ -26,8 +26,8 @@
 #dg-signups-by-hour .h4{fill:var(--heat-4,#00707e)}
 #dg-signups-by-hour .h5{fill:var(--heat-5,#004a53)}
 #dg-signups-by-hour .h0{fill:var(--bg,#fbfbfe);stroke:var(--muted,#575d75);stroke-width:1}
-#dg-signups-by-hour .hv{font-size:12px;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
-#dg-signups-by-hour .hv.hi{fill:var(--bg,#fbfbfe)}
+#dg-signups-by-hour .hv{font-size:12px;fill:var(--heat-text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-signups-by-hour .hv.hi{fill:var(--heat-page,#fbfbfe)}
 @media (prefers-reduced-motion:reduce){#dg-signups-by-hour .pulse{animation:none!important}#dg-signups-by-hour .pulse{display:none!important}}
 @media print{#dg-signups-by-hour{max-width:100%;height:auto}#dg-signups-by-hour .pulse{display:none!important}}
 #dg-signups-by-hour-phone{display:none}
@@ -109,8 +109,8 @@
 #dg-signups-by-hour-phone .h4{fill:var(--heat-4,#00707e)}
 #dg-signups-by-hour-phone .h5{fill:var(--heat-5,#004a53)}
 #dg-signups-by-hour-phone .h0{fill:var(--bg,#fbfbfe);stroke:var(--muted,#575d75);stroke-width:1}
-#dg-signups-by-hour-phone .hv{font-size:12px;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
-#dg-signups-by-hour-phone .hv.hi{fill:var(--bg,#fbfbfe)}
+#dg-signups-by-hour-phone .hv{font-size:12px;fill:var(--heat-text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-signups-by-hour-phone .hv.hi{fill:var(--heat-page,#fbfbfe)}
 @media (prefers-reduced-motion:reduce){#dg-signups-by-hour-phone .pulse{animation:none!important}#dg-signups-by-hour-phone .pulse{display:none!important}}
 @media print{#dg-signups-by-hour-phone{max-width:100%;height:auto}#dg-signups-by-hour-phone .pulse{display:none!important}}
 @media (max-width:736px){#dg-signups-by-hour{display:none}#dg-signups-by-hour-phone{display:block}}

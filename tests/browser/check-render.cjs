@@ -24,13 +24,13 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
 
 (async () => {
   const browser = await chromium.launch(process.env.DOCENT_BROWSER_CHANNEL ? { channel: process.env.DOCENT_BROWSER_CHANNEL } : {});
-  const open = async ({ width, height = 900, theme = "light", media = "screen", reducedMotion = "no-preference", content = html }) => {
+  const open = async ({ width, height = 900, theme = "light", media = "screen", reducedMotion = "no-preference", forcedColors = "none", content = html }) => {
     const context = await browser.newContext({ viewport: { width, height }, colorScheme: theme, reducedMotion });
     const page = await context.newPage();
     const errors = [];
     page.on("console", (m) => m.type() === "error" && errors.push(m.text()));
     page.on("pageerror", (e) => errors.push(String(e)));
-    await page.emulateMedia({ media, colorScheme: theme, reducedMotion });
+    await page.emulateMedia({ media, colorScheme: theme, reducedMotion, forcedColors });
     await page.setContent(content, { waitUntil: "load" });
     await page.waitForTimeout(400);
     return { page, context, errors };
@@ -134,6 +134,62 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     await paper.page.screenshot({ path: `${out}/print.png`, fullPage: true });
     await paper.context.close();
     ok("print is light on a dark system, without the top bar, without dots or a colored leg", print.bg === "rgb(255, 255, 255)" && print.text === LIGHT.text && print.topbar === "none" && print.dots === "none" && print.lines === LIGHT.text, print);
+  }
+
+  // The reader's high contrast mode (emulated forced colors, light and dark): the marks that are backgrounds show in system colors,
+  // a drawing's lines, text and ground take the system colors, and the heat steps keep theirs, with the kit's own text on them.
+  // This is Chrome's emulation with its default system colors; real Windows themes are not tested here.
+  {
+    const fixture = (name) => fs.readFileSync(path.join(root, "tests", "fixtures", `${name}.json`), "utf8");
+    const figure = (id, name) => `<figure><div class="fig" role="region" aria-label="Figure, ${id}" tabindex="0">\n<!-- docent:diagram\n${fixture(name)}\n-->\n<!-- /docent:diagram -->\n</div><figcaption><strong>Figure</strong>${id}.</figcaption></figure>`;
+    const content = renderDocument(html.replace('<section id="report"', `<section id="heat" aria-labelledby="heat-h"><h2 id="heat-h">Heat</h2>${figure("errors", "heatmap-errors")}${figure("clicks", "heatplan-product")}${figure("help", "heatplan-help")}</section>\n<section id="report"`)).html;
+    const KIT = { light: { text: LIGHT.text, page: LIGHT.bg, steps: ["#c6e9ef", "#86c9d5", "#3da6b6", "#00707e", "#004a53"] }, dark: { text: DARK.text, page: DARK.bg, steps: ["#093339", "#054e58", "#006b78", "#36a0b1", "#80cad7"] } };
+    const rgb = (hex) => `rgb(${[1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)).join(", ")})`;
+    for (const theme of ["light", "dark"]) {
+      const { page, context } = await open({ width: 1280, theme, forcedColors: "active", content });
+      await page.evaluate(() => { const li = document.querySelectorAll(".steps > li")[2]; window.scrollTo(0, li.getBoundingClientRect().top + scrollY - innerHeight * 0.5 + 4); });
+      await page.waitForTimeout(300);
+      const seen = await page.evaluate(() => {
+        // The system colors as this browser gives them, read from a probe.
+        const probe = document.body.appendChild(document.createElement("div"));
+        probe.style.cssText = "color: CanvasText; background-color: Canvas; border: 1px solid Highlight";
+        const sys = { canvas: getComputedStyle(probe).backgroundColor, text: getComputedStyle(probe).color, hi: getComputedStyle(probe).borderTopColor };
+        probe.remove();
+        const css = (el, pseudo) => getComputedStyle(el, pseudo);
+        const all = (sel, f) => [...new Set([...document.querySelectorAll(sel)].filter((e) => e.getBoundingClientRect().width).map(f))];
+        const shown = (sel) => [...document.querySelectorAll(sel)].filter((e) => e.getBoundingClientRect().width);
+        const pick = (sel) => shown(sel)[0];
+        return {
+          sys,
+          dots: all(".state:is(.ok, .warn, .err, .info)", (e) => css(e, "::before").backgroundColor),
+          ring: [css(pick(".state.plan"), "::before").borderTopColor, css(pick(".state.plan"), "::before").backgroundColor],
+          rail: css(pick(".steps"), "::before").backgroundColor,
+          railDot: css(document.querySelector(".rail-dot")).backgroundColor,
+          routeDot: css(document.querySelector(".route-dot")).backgroundColor,
+          leg: all(".walk svg.dg .leg.is-current .line", (e) => css(e).stroke),
+          lines: all("svg.dg:not(.dg-heatmap):not(.dg-heatplan) :is(.track, .card:not([class*=is-]), .leg:not(.is-current) .line)", (e) => css(e).stroke),
+          words: all("svg.dg:not(.dg-heatmap):not(.dg-heatplan) :is(.name, .lane, .sub, .verb), #heat svg.dg .val", (e) => css(e).fill),
+          grounds: all("svg.dg :is(.ground, .band)", (e) => css(e).fill),
+          steps: [1, 2, 3, 4, 5].map((k) => all(`#heat svg.dg .h${k}`, (e) => css(e).fill).join()),
+          onStep: all("#dg-errors-by-day .hv:not(.hi), #dg-product-clicks .hs:not(.hi)", (e) => css(e).fill),
+          onDark: all("#heat svg.dg .hi", (e) => css(e).fill),
+          noData: [...new Set([...all("#dg-errors-by-day .h0", (e) => css(e).stroke), ...all("#dg-product-clicks .row:not(.hs)", (e) => css(e).fill)])],
+          chosen: css(document.querySelector(".choose > input:checked + .opt")).borderTopColor,
+        };
+      });
+      const { sys } = seen, kit = KIT[theme];
+      ok(`forced colors, ${theme}: every status dot and the info dot take the text color, and the planned ring keeps its shape`, seen.dots.length === 1 && seen.dots[0] === sys.text && seen.ring[0] === sys.text && /, 0\)$|transparent/.test(seen.ring[1]), seen);
+      ok(`forced colors, ${theme}: the rail shows in the text color, and the current step, the route dot and the current leg in the highlight color`, seen.rail === sys.text && seen.railDot === sys.hi && seen.routeDot === sys.hi && seen.leg.join() === sys.hi, seen);
+      ok(`forced colors, ${theme}: a drawing's tracks, outlines, lines and words take the text color, and its ground and bands the page color`, seen.lines.join() === sys.text && seen.words.join() === sys.text && seen.grounds.join() === sys.canvas, seen);
+      ok(`forced colors, ${theme}: the heat steps keep their own colors, the text on them keeps the kit's text and page colors, and a cell or box with no data takes the system colors`, seen.steps.join("|") === kit.steps.map(rgb).join("|") && seen.onStep.join() === kit.text && seen.onDark.join() === kit.page && seen.noData.join() === sys.text, seen);
+      ok(`forced colors, ${theme}: the chosen option takes the highlight color`, seen.chosen === sys.hi, seen);
+      // A heat plan stacked on a phone: the value beside each map sits on the band, so it takes the system text color, and so does the ring.
+      await page.setViewportSize({ width: 390, height: 844 });
+      const stack = await page.evaluate(() => ({ values: [...new Set([...document.querySelectorAll("#dg-help-clicks-phone .hv")].map((e) => getComputedStyle(e).fill))], ring: getComputedStyle(document.querySelector("#dg-help-clicks-phone .m-at")).stroke, shown: document.getElementById("dg-help-clicks-phone").getBoundingClientRect().width }));
+      ok(`forced colors, ${theme}: a stacked heat plan's values beside the maps, and its ring, take the system text color`, stack.shown > 0 && stack.values.join() === sys.text && stack.ring === sys.text, { sys, stack });
+      await page.screenshot({ path: `${out}/forced-${theme}.png`, fullPage: true });
+      await context.close();
+    }
   }
 
   // A diagram outside the walkthrough: it waits until it is in view, runs twice, and runs again on pointer.

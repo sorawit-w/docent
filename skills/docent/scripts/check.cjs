@@ -165,7 +165,7 @@ function checkDocument(html) {
     }
   }
   // Host colors and fonts go through the --host-* tokens. The kit sets its own tokens in four places (light, dark by the system, dark by the switch, print), so an author's value for one of them is lost in some of them.
-  for (const [, name] of css.matchAll(/(?:^|[;{\s])--(bg|panel|fig|text|muted|line|primary|ink|dot|ok|warn|err|heat-[1-5]|serif|sans|mono)\s*:/g)) warnings.push(`a style sets --${name}; the kit sets it in four places, so your value is lost in dark mode or in print. Use the --host-* tokens (see SKILL.md)`);
+  for (const [, name] of css.matchAll(/(?:^|[;{\s])--(bg|panel|fig|text|muted|line|primary|ink|dot|ok|warn|err|heat-[1-5]|heat-text|heat-page|serif|sans|mono)\s*:/g)) warnings.push(`a style sets --${name}; the kit sets it in four places, so your value is lost in dark mode or in print. Use the --host-* tokens (see SKILL.md)`);
   for (const [, name, value] of css.matchAll(/--(host-accent-dark|host-accent|host-ink)\s*:\s*([^;}]+)/g)) {
     const color = value.trim();
     if (!/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(color)) { warnings.push(`--${name} is "${color}"; check tests the contrast of a hex color only, such as #2f3fd0`); continue; }
