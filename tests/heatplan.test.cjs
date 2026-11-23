@@ -147,7 +147,9 @@ test("the diagram in words is the plan's table with a Value column, and the line
   assert.match(words(two), /The lowest is 60, in 2 boxes\.<\/li><li>2 boxes have no data\.<\/li>/);
   assert.match(words(fixture("help")), /<p>The plan is not drawn to scale\. On a phone each box stands on its own, beside a small map of the plan\.<\/p>\n<ul>/);
   // A plain plan keeps its table as it was: no Value column and no wrapper.
-  assert.doesNotMatch(renderDiagram(JSON.parse(fs.readFileSync(path.join(__dirname, "fixtures", "plan-docs.json"), "utf8"))).svg, /Value<\/th>|table-wrap/);
+  const plain = renderDiagram(JSON.parse(fs.readFileSync(path.join(__dirname, "fixtures", "plan-docs.json"), "utf8"))).svg;
+  assert.doesNotMatch(plain, /Value<\/th>/, "a plain plan has no Value column");
+  assert.match(plain, /<div class="table-wrap is-text" role="region" aria-label="The boxes of the plan" tabindex="0"><table>/, "a plain plan's table scrolls in the same wrapper, so its words stay whole on a phone");
 });
 
 test("a value on an edge takes the higher step, and 3 steps take heat steps 1, 3 and 5", () => {

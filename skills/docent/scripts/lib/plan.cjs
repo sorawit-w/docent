@@ -283,9 +283,9 @@ function wordsOf(model, scene, phone) {
   else scale = `Widths are in ${esc(model.unit)}. The rows are not drawn to scale.${phone && !phone.stack && !phone.toScale ? " On a phone the columns are not drawn to scale either." : ""}`;
   if (phone && phone.stack) scale += " On a phone each box stands on its own, beside a small map of the plan.";
   const table = `<table><thead>${head}</thead><tbody>${body}</tbody></table>`;
-  // A heat plan's table has a column more, so on a phone it scrolls inside a wrapper, as a heat map's numbers do, instead of
-  // breaking its words inside.
-  return `${value ? `<div class="table-wrap is-text" role="region" aria-label="The boxes of the heat plan" tabindex="0">${table}</div>` : table}\n<p>${scale}</p>`;
+  // With 4 columns or more the table is wider than a phone, so it scrolls inside a wrapper, as a heat map's numbers do, instead
+  // of breaking its words inside.
+  return `<div class="table-wrap is-text" role="region" aria-label="The boxes of the ${value ? "heat plan" : "plan"}" tabindex="0">${table}</div>\n<p>${scale}</p>`;
 }
 
 /** What render adds after the form: which forms are not to scale. */

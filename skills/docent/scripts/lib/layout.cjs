@@ -183,7 +183,7 @@ function wordsOf(model) {
     ...scale.marks.map((m) => `<li>A line at ${esc(fmt(m.at))}${esc(unit)}: ${esc(m.name)}.</li>`),
   ].join("");
   const units = scale.unit ? `<p>All numbers are in ${esc(scale.unit)}.</p>\n` : "";
-  return `${units}<table><thead>${head}</thead><tbody>${body}</tbody></table>${lines ? `\n<ul>${lines}</ul>` : ""}`;
+  return `${units}<div class="table-wrap is-text" role="region" aria-label="The boxes of the layout" tabindex="0"><table><thead>${head}</thead><tbody>${body}</tbody></table></div>${lines ? `\n<ul>${lines}</ul>` : ""}`;
 }
 
 module.exports = { readLayout, drawLayout, wordsOf, stretchesOf, onLines, MOST, WIDE, PHONE };

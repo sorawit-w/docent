@@ -291,7 +291,7 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
   {
     const { page, context } = await open({ width: 658, height: 1123, media: "print" });
     const tables = await page.evaluate(() => { dispatchEvent(new Event("beforeprint")); return [...document.querySelectorAll(".table-wrap")].map((wrap) => ({ over: Math.round(wrap.querySelector("table").getBoundingClientRect().right - wrap.getBoundingClientRect().right), shown: wrap.getBoundingClientRect().height > 0 })); });
-    ok("on paper no table is cut off", tables.length === 4 && tables.every((t) => t.shown && t.over <= 0), tables);
+    ok("on paper no table is cut off", tables.length === 5 && tables.every((t) => t.shown && t.over <= 0), tables);
     // A browser prints no background unless the style asks for it. The status dots, the rail of the steps and the grounds carry meaning.
     const grounds = await page.evaluate(() => { const exact = (sel, pseudo) => { const style = getComputedStyle(document.querySelector(sel), pseudo); return (style.printColorAdjust || style.webkitPrintColorAdjust) === "exact"; }; return { dot: exact(".state", "::before"), rail: exact(".steps", "::before"), well: exact(".fig"), block: exact("pre"), code: exact("p code") }; });
     ok("on paper the status dots, the rail and the grounds of figures and code are printed", Object.values(grounds).every(Boolean), grounds);
@@ -507,8 +507,24 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     const look = (page) => page.evaluate((id) => {
       const shown = (id) => { const svg = document.getElementById(id); return { w: Math.round(svg.getBoundingClientRect().width), real: svg.viewBox.baseVal.width }; };
       const words = document.querySelector("#rng .dg-words"), table = words.querySelector("table"), box = table.closest(".table-wrap") || table;
+      const open = words.open;
+      // A closed section lays out nothing, so it is opened while the table is measured, and closed again after.
+      words.open = true;
+      // Every word of the table that the browser splits across two lines: a table must scroll or wrap at spaces, never inside a word.
+      const broken = [];
+      for (const cell of table.querySelectorAll("th, td")) {
+        const walker = document.createTreeWalker(cell, NodeFilter.SHOW_TEXT);
+        for (let n; (n = walker.nextNode()); ) for (const m of n.textContent.matchAll(/\S+/g)) {
+          const range = document.createRange();
+          range.setStart(n, m.index);
+          range.setEnd(n, m.index + m[0].length);
+          if (new Set([...range.getClientRects()].map((r) => Math.round(r.top))).size > 1) broken.push(m[0]);
+        }
+      }
       // On a screen a wide grid in words scrolls inside its wrapper, so the wrapper must fit; on paper the table itself must.
-      return { main: shown(`dg-${id}`), phone: shown(`dg-${id}-phone`), words: words.open, rows: [...table.querySelectorAll("tbody tr")].filter((r) => r.getBoundingClientRect().height).length, table: Math.round(table.getBoundingClientRect().width), box: Math.round(box.getBoundingClientRect().width), well: Math.round(document.querySelector("#rng .fig").getBoundingClientRect().width), page: document.documentElement.scrollWidth, view: innerWidth };
+      const sizes = { rows: [...table.querySelectorAll("tbody tr")].filter((r) => r.getBoundingClientRect().height).length, table: Math.round(table.getBoundingClientRect().width), box: Math.round(box.getBoundingClientRect().width), broken };
+      words.open = open;
+      return { main: shown(`dg-${id}`), phone: shown(`dg-${id}-phone`), words: open, ...sizes, well: Math.round(document.querySelector("#rng .fig").getBoundingClientRect().width), page: document.documentElement.scrollWidth, view: innerWidth };
     }, id);
     const results = {};
     for (const [form, opts] of [["desk", { width: 1280 }], ["phone", { width: 390, height: 844 }], ["narrow", { width: 320, height: 700 }], ["paper", { width: 658, height: 1123, media: "print" }], ["dark", { width: 1280, theme: "dark" }]]) {
@@ -531,7 +547,7 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     }
     const { desk, phone, narrow, paper } = results;
     const real = (f) => f.w === f.real;
-    ok(`${what} shows its 640px form at real size on a desktop and on paper, its 264px form on a phone, its rows as a table in words, and its text fits the renderer's widths`, desk.main.w === 640 && real(desk.main) && !desk.phone.w && !desk.words && !phone.main.w && phone.phone.w === 264 && narrow.phone.w === 264 && paper.main.w === 640 && !paper.phone.w && paper.words && paper.rows === rows && [phone, narrow].every((r) => r.box <= r.well - 16) && paper.table <= paper.well - 16 && [phone, narrow].every((r) => r.page === r.view) && results.deskWider.length === 0 && results.phoneWider.length === 0 && results.deskAxe.length === 0 && results.darkAxe.length === 0, results);
+    ok(`${what} shows its 640px form at real size on a desktop and on paper, its 264px form on a phone, its rows as a table in words with no word split across lines, and its text fits the renderer's widths`, [desk, phone, narrow, paper].every((r) => r.broken.length === 0) && desk.main.w === 640 && real(desk.main) && !desk.phone.w && !desk.words && !phone.main.w && phone.phone.w === 264 && narrow.phone.w === 264 && paper.main.w === 640 && !paper.phone.w && paper.words && paper.rows === rows && [phone, narrow].every((r) => r.box <= r.well - 16) && paper.table <= paper.well - 16 && [phone, narrow].every((r) => r.page === r.view) && results.deskWider.length === 0 && results.phoneWider.length === 0 && results.deskAxe.length === 0 && results.darkAxe.length === 0, results);
   }
 
   // Two drawings in one figure: side by side when both fit, one below the other when they do not.
