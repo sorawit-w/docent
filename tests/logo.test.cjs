@@ -181,3 +181,9 @@ test("a logo in the top bar has the class logo, because the kit's rules for its 
   assert.match(checkLogos(bar(img(png(288, 72)).replace(' class="logo"', ""))).errors.join(), /the <img> in the top bar has no class="logo"/);
   assert.deepEqual(checkLogos(bar(svg('<path d="M0 0h1" fill="currentColor"/>').replace('class="logo"', 'class="brand-mark logo"'))).errors, [], "other classes may stand beside it");
 });
+
+test("a wordmark that stands alone is never hidden from a screen reader, because it is the only place that names the host", () => {
+  const word = svg('<path d="M0 0h1" fill="currentColor"/>', 'width="24" height="24" role="img" aria-label="Example project" aria-hidden="true"');
+  assert.match(checkLogos(bar(word, "")).errors.join(), /stands alone, so it is the only place that names the host; take out aria-hidden="true"/);
+  assert.match(checkLogos(bar(img(png(288, 72), "png", 'width="96" height="24" alt=""'), "")).errors.join(), /stands alone, so it carries the host's name: write alt="Host name"/, "a raster wordmark with an empty alt is hidden too");
+});

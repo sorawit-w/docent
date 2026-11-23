@@ -252,7 +252,8 @@ function checkLogos(markup) {
     if (text && !logo.hidden) errors.push(`${what} stands before the host's name, so a screen reader would read the name twice; write ${logo.raster ? 'alt=""' : 'aria-hidden="true"'} on it`);
     if (!text) {
       const label = (logo.label || "").trim();
-      if (!label || (!logo.raster && logo.role !== "img")) errors.push(`${what} stands alone, so it carries the host's name: write ${logo.raster ? 'alt="Host name"' : 'role="img" aria-label="Host name"'} on it`);
+      if (logo.hidden && !logo.raster) errors.push(`${what} stands alone, so it is the only place that names the host; take out aria-hidden="true", which hides it from a screen reader`);
+      else if (!label || (!logo.raster && logo.role !== "img")) errors.push(`${what} stands alone, so it carries the host's name: write ${logo.raster ? 'alt="Host name"' : 'role="img" aria-label="Host name"'} on it`);
       else if (name && label !== name) errors.push(`the two logos carry two names, "${name}" and "${label}"`);
       else name = label;
     }
