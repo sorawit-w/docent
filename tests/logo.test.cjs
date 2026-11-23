@@ -181,3 +181,10 @@ test("a gradient stop with no color is black, and a logo has at most 400 element
   assert.equal(why('<g>'.repeat(DEEPEST - 2) + '<path d="M0 0h1" fill="currentColor"/>' + '</g>'.repeat(DEEPEST - 2)), "", "the svg, six groups and a path: 8 levels");
   assert.match(why('<g>'.repeat(DEEPEST) + '<path d="M0 0h1"/>' + '</g>'.repeat(DEEPEST)), /more than 8 levels inside one another/);
 });
+
+test("a logo stands directly inside the host span, because the kit's rules select .host > .logo", () => {
+  const logo = svg('<path d="M0 0h1" fill="currentColor"/>');
+  assert.match(checkLogos(bar(`<a href="#">${logo}</a>`)).errors.join(), /a logo stands inside another element in the host's name/);
+  assert.match(checkLogos(bar(`<span>${logo}</span>`)).errors.join(), /a logo stands inside another element/);
+  assert.deepEqual(checkLogos(bar(`<span>x</span>${logo}`, "")).errors.filter((e) => /inside another element/.test(e)), [], "an element that closes before the logo is fine");
+});

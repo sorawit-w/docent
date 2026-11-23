@@ -203,6 +203,10 @@ function checkLogos(markup, PAGES = DOCENT_PAGES) {
   const logos = [];
   for (const item of found) {
     if (!item.inHost) { errors.push("a logo stands outside the top bar; it appears once, in the top bar, before the host's name"); continue; }
+    // The kit's rules select .host > .logo, so a logo inside another element in the host (a link, a span) would show in every theme.
+    const before = markup.slice(host.index + host[0].indexOf(">") + 1, item.start).replace(/<svg\b[\s\S]*?<\/svg>|<img\b[^>]*>/gi, "");
+    const open = (before.match(/<[a-z][\w-]*\b[^>]*>/gi) || []).filter((t) => !/\/>$/.test(t)).length - (before.match(/<\/[a-z][\w-]*\s*>/gi) || []).length;
+    if (open > 0) { errors.push("a logo stands inside another element in the host's name; it stands directly inside <span class=\"host\">, because the kit's rules for its themes and its tile select it there"); continue; }
     const kind = /^<svg\b/i.test(item.text) ? "svg" : /^<img\b/i.test(item.text) ? "img" : null;
     if (!kind) { errors.push(`the top bar holds a logo that is not an <svg> or an <img>: ${item.text.slice(0, 40)}`); continue; }
     // The kit's rules for the size, the theme versions and the tile all select .logo, so a logo without the class would show in every theme.
