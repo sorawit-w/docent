@@ -97,6 +97,7 @@ test("the rest of the contract: size, values, the name and the words", () => {
   assert.match(errs(swap('role="img" ', "")), /rule 8, an accessible name: the <svg> has no role; it has role="img"/);
   assert.match(errs(swap('aria-labelledby="hd-repeat-t hd-repeat-d"', 'aria-labelledby="hd-repeat-t"')), /rule 8, an accessible name: the <svg> has aria-labelledby="hd-repeat-t"; it names the title and the desc: aria-labelledby="hd-repeat-t hd-repeat-d"/);
   assert.match(errs((f) => f.replace('<section id="hand"', '<p id="hd-repeat-t" hidden>x</p><section id="hand"')), /rule 8, an accessible name: the id "hd-repeat-t" is used 2 times in the page/);
+  assert.equal(errs((f) => f.replace('<section id="hand"', '<!-- <p id="hd-repeat-t">draft</p> --><section id="hand"')), "", "an id in a comment is not on the page");
   assert.match(errs(swap('<details class="dg-words">', '<details class="dg-words" open>')), /rule 9, the diagram in words: the <details class="dg-words"> is open; it is closed/);
   assert.match(errs((f) => f.replace(/<table>[\s\S]*?<\/table>/, "")), /rule 9, the diagram in words: the <details class="dg-words"> holds no table or list with words in it/);
   assert.match(errs((f) => f.replace(/<table>[\s\S]*?<\/table>/, "<!-- <ul><li>old data</li></ul> -->")), /holds no table or list with words in it/, "a table that is commented out says nothing");
