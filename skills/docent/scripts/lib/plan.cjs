@@ -5,15 +5,12 @@
 // The rules come from docs/proposals/two-dimensional-layouts.md.
 const { DataError, fail, words, id } = require("./blocks.cjs");
 const { textWidth } = require("./text.cjs");
-const { wrapName, graphemes, NO_SPACES } = require("./range.cjs");
+const { WIDE, PHONE, esc, wrapName, graphemes, NO_SPACES, valueWidth, fmt, isNum, num, diff } = require("./chart.cjs");
 const { onLines } = require("./layout.cjs");
-const { valueWidth, fmt, isNum, num, diff } = require("./scale.cjs");
 
 const MOST = { rows: 5, columns: 4, boxes: 8, name: 20, note: 24, unit: 12, nameLines: 3, noteLines: 2 };
-const WIDE = 640, PHONE = 264; // as for a scale chart: a desktop and A4 paper, and a 320px screen
 const SIDE = 12; // the plan's columns start 12px from each side of the drawing
 const NAME = 18, NOTE = 16; // the height of a line of a name (14px) and of a note (12px)
-const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 const and = (list) => (list.length > 1 ? `${list.slice(0, -1).join(", ")}${list.length > 2 ? "," : ""} and ${list[list.length - 1]}` : list[0]);
 const sum = (list) => list.reduce((a, b) => a + b, 0);
 const add = (a, b) => diff(-a, b); // a + b without the noise of the sum (0.1 + 0.2 is 0.3)
@@ -296,4 +293,4 @@ function scaleNote(model, scene, phone) {
   return desk || (phone.toScale ? "" : "not to scale on a phone");
 }
 
-module.exports = { readPlan, drawPlan, wordsOf, scaleNote, sizeColumns, MOST, WIDE, PHONE };
+module.exports = { readPlan, drawPlan, wordsOf, scaleNote, sizeColumns, MOST };

@@ -5,29 +5,10 @@
 // has no color, and no drop is marked as the largest. The author writes the counts; every drop and share is computed here.
 const { fail, words, id } = require("./blocks.cjs");
 const { textWidth } = require("./text.cjs");
-const { wrapName, NO_SPACES, WIDE, PHONE } = require("./range.cjs");
-const { valueWidth, num } = require("./scale.cjs");
+const { WIDE, PHONE, esc, wrapName, NO_SPACES, comma, share, valueWidth, num } = require("./chart.cjs");
 
 const MOST = { steps: 8, name: 28, unit: 20, word: 200, count: 999999999 };
-const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
-
-/** A count as written: a comma every three digits, and every digit. */
-const comma = (n) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-
-/**
- * part ÷ whole as a whole percent, a half rounded up, in whole-number arithmetic so no rounding error moves a half. A share
- * above 0 that would round to 0%, or below 100 that would round to 100%, keeps one decimal, so a small share stays honest.
- */
-function share(part, whole) {
-  if (part === 0) return "0%";
-  if (part === whole) return "100%";
-  const whole100 = Math.floor((part * 200 + whole) / (2 * whole));
-  if (whole100 > 0 && whole100 < 100) return `${whole100}%`;
-  if (whole100 === 0 && part * 1000 < whole) return "under 0.1%";
-  if (whole100 === 100 && part * 1000 > whole * 999) return "over 99.9%";
-  return `${Math.floor((part * 2000 + whole) / (2 * whole)) / 10}%`;
-}
 
 /** Checks funnel data and returns the model, with every drop and share computed from the counts. */
 function readFunnel(data) {
@@ -173,4 +154,4 @@ function wordsOf(model, scene, phone) {
   return `<div class="table-wrap is-text" role="region" aria-label="The steps of the funnel" tabindex="0"><table><thead>${head}</thead><tbody>${body}</tbody></table></div>\n<ul>${lines.map((l) => `<li>${l}</li>`).join("")}</ul>`;
 }
 
-module.exports = { readFunnel, drawFunnel, wordsOf, share, comma, MOST };
+module.exports = { readFunnel, drawFunnel, wordsOf, MOST };

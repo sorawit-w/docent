@@ -4,9 +4,8 @@
 // The phone form keeps the grid: each row name stands on its own line above its row of cells, and the columns still line up.
 const { fail, words, id } = require("./blocks.cjs");
 const { textWidth } = require("./text.cjs");
-const { PHONE } = require("./range.cjs");
-const { readScale, tickAt, valueWidth, fmt, isNum, num } = require("./scale.cjs");
-const { refuseFields, readGrid, drawGrid, labelNote, cellsWith, gridTables, esc, MOST } = require("./grid.cjs");
+const { PHONE, esc, gridTables, readScale, tickAt, valueWidth, fmt, isNum, num } = require("./chart.cjs");
+const { refuseFields, readGrid, drawGrid, labelNote, cellsWith, MOST } = require("./grid.cjs");
 
 const LEAST = { rows: 2 };
 const HEAT = { 3: [1, 3, 5], 4: [1, 2, 4, 5], 5: [1, 2, 3, 4, 5] }; // the heat step of each scale step: the least and the most look the same in every heat map

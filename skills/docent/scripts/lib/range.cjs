@@ -4,37 +4,10 @@
 // where each row name stands on its own line above its mark. Its rows are also written as a table, in words.
 const { fail, words, id } = require("./blocks.cjs");
 const { textWidth } = require("./text.cjs");
-const { wrap } = require("./graph.cjs");
-const { readScale, makeScale, drawHead, drawGrid, linesIn, placeLabel, valueWidth, fmt, isNum, num } = require("./scale.cjs");
+const { WIDE, PHONE, esc, wrapName, readScale, makeScale, drawHead, drawGrid, linesIn, placeLabel, valueWidth, fmt, isNum, num } = require("./chart.cjs");
 
 const MOST = { rows: 12, groups: 3, name: 28, note: 24, group: 20 };
-const WIDE = 640; // the desktop and paper form: it fits an A4 figure well (about 641.6px) with no shrink
-const PHONE = 264; // the phone form: it fits a 320px screen
 const ROW = 32; // the height of one mark's strip
-const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-// A name on a phone wraps at its spaces, and inside a word that is wider than the room alone, as in a language without
-// spaces. It breaks between whole characters as a reader sees them, so a Thai vowel mark stays with its consonant.
-// With every: false (a plan), only a word of a script written without spaces breaks; any other word stays whole.
-const graphemes = new Intl.Segmenter(undefined, { granularity: "grapheme" });
-const NO_SPACES = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Thai}\p{Script=Lao}\p{Script=Khmer}\p{Script=Myanmar}]/u;
-const wrapName = (str, room, { size = 14, weight = 600, every = true } = {}) => {
-  const width = (s) => textWidth(s, size, weight);
-  const lines = size === 14 && weight === 600 ? wrap(str, "name", room) : String(str).split(" ").reduce((out, word) => {
-    const last = out.length ? `${out[out.length - 1]} ${word}` : word;
-    if (out.length && width(last) <= room) out[out.length - 1] = last; else out.push(word);
-    return out;
-  }, []);
-  return lines.flatMap((line) => {
-    if (width(line) <= room || (!every && !NO_SPACES.test(line))) return [line];
-    const out = [""];
-    for (const { segment: ch } of graphemes.segment(line)) {
-      const next = out[out.length - 1] + ch;
-      if (out[out.length - 1] && width(next) > room) out.push(ch);
-      else out[out.length - 1] = next;
-    }
-    return out;
-  });
-};
 
 /** Checks range data and returns the model. */
 function readRange(data) {
@@ -185,4 +158,4 @@ function wordsOf(model) {
   return `<div class="table-wrap is-text" role="region" aria-label="The rows of the range chart" tabindex="0"><table><thead>${head}</thead><tbody>${body}</tbody></table></div>${marks ? `\n<ul>${marks}</ul>` : ""}`;
 }
 
-module.exports = { readRange, layoutRange, wordsOf, wrapName, graphemes, NO_SPACES, MOST, WIDE, PHONE };
+module.exports = { readRange, layoutRange, wordsOf, MOST };
