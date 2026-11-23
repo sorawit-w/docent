@@ -25,6 +25,13 @@ rows.append(("dark lamp dot on page", D["lamp"], D["page"], 3.0))
 rows.append(("dark lamp dot on well", D["lamp"], D["well"], 3.0))
 rows.append(("light primary dot on page", L["primary"], L["page"], 3.0))
 rows.append(("mark: white on primary", "#ffffff", L["primary"], 3.0))
+# The host colors of the SKILL.md example. In dark mode the dot takes the dark accent: a mark needs 3:1, and the accent already has 4.5:1.
+HOST = dict(accent="#a21caf", dark="#ec6cf7", ink="#4d0055")
+for bg in ("page", "well"):
+    rows.append((f"host accent on {bg}", HOST["accent"], L[bg], 4.5))
+    rows.append((f"host dark accent on dark {bg}", HOST["dark"], D[bg], 4.5))
+    rows.append((f"host dark dot on dark {bg}", HOST["dark"], D[bg], 3.0))
+rows.append(("host ink on page", HOST["ink"], L["page"], 4.5))
 # A host's logo for one theme only stands on a tile in the page color of that theme. The tile must stand out from the other page.
 rows.append(("dark: logo tile (light page) on page", L["page"], D["page"], 3.0))
 rows.append(("light: logo tile (dark page) on page", D["page"], L["page"], 3.0))

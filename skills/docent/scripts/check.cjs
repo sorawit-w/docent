@@ -9,13 +9,17 @@ const { renderWidget, PLACE, esc } = require("./lib/widget.cjs");
 const { findBlocks, block } = require("./lib/blocks.cjs");
 const { PROFILES, suggestProfile } = require("./lib/profile.cjs");
 const { checkLogos } = require("./lib/logo.cjs");
+const { lab, darkAccent, nearestStatus } = require("./lib/color.cjs");
 
 const MOST_WIDGETS = 4; // more widgets than this in one document gives a warning
 const CARDS = [3, 8]; // a card grid holds 3 to 8 cards
 const TAGLINE = 90; // characters: the tagline is one line
 // The pages that the kit draws on, light and dark: a host color must read on both the page and the well.
 const GROUNDS = { light: ["#fbfbfe", "#f2f3f9"], dark: ["#12141f", "#0b0d15"] };
-const HOST = { "host-accent": "light", "host-accent-dark": "dark", "host-ink": "light" };
+// Each host color, the theme it shows in, and the contrast it needs: text needs 4.5:1, the dot is a mark and needs 3:1 (WCAG 1.4.11).
+const HOST = { "host-accent": ["light", 4.5], "host-accent-dark": ["dark", 4.5], "host-ink": ["light", 4.5], "host-dot-dark": ["dark", 3] };
+const NEAR = 25; // CIE76: an accent closer than this to a status color reads as that status
+const GRAY = 10; // CIELAB chroma: an accent with less looks like the body text
 
 const luminance = (hex) => {
   const full = hex.length === 4 ? hex.replace(/^#(.)(.)(.)$/, "#$1$1$2$2$3$3") : hex;
@@ -168,12 +172,24 @@ function checkDocument(html) {
   }
   // Host colors and fonts go through the --host-* tokens. The kit sets its own tokens in four places (light, dark by the system, dark by the switch, print), so an author's value for one of them is lost in some of them.
   for (const [, name] of css.matchAll(/(?:^|[;{\s])--(bg|panel|fig|text|muted|line|primary|ink|dot|ok|warn|err|heat-[1-5]|heat-text|heat-page|serif|sans|mono)\s*:/g)) warnings.push(`a style sets --${name}; the kit sets it in four places, so your value is lost in dark mode or in print. Use the --host-* tokens (see SKILL.md)`);
-  for (const [, name, value] of css.matchAll(/--(host-accent-dark|host-accent|host-ink)\s*:\s*([^;}]+)/g)) {
+  const hosts = {};
+  for (const [, name, value] of css.matchAll(/--(host-accent-dark|host-accent|host-ink|host-dot-dark)\s*:\s*([^;}]+)/g)) {
     const color = value.trim();
-    if (!/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(color)) { warnings.push(`--${name} is "${color}"; check tests the contrast of a hex color only, such as #2f3fd0`); continue; }
-    const low = GROUNDS[HOST[name]].map((ground) => [ground, contrast(color, ground)]).filter(([, ratio]) => ratio < 4.5);
-    if (low.length) errors.push(`--${name} ${color} has a contrast of ${low.map(([g, r]) => `${r.toFixed(2)}:1 on ${g}`).join(" and ")}; text needs 4.5:1`);
+    if (!/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(color)) { warnings.push(`--${name} is "${color}"; check tests the contrast of a hex color only, such as #2f3fd0`); hosts[name] = null; continue; }
+    hosts[name] = color;
+    const [theme, need] = HOST[name];
+    const low = GROUNDS[theme].map((ground) => [ground, contrast(color, ground)]).filter(([, ratio]) => ratio < need);
+    if (low.length) errors.push(`--${name} ${color} has a contrast of ${low.map(([g, r]) => `${r.toFixed(2)}:1 on ${g}`).join(" and ")}; ${need === 3 ? "the dot is a mark and needs 3:1" : "text needs 4.5:1"}`);
   }
+  // An accent can pass contrast and still mislead: it looks like a status, or like the body text, or dark mode falls back to Docent's own accent.
+  for (const [name, theme] of [["host-accent", "light"], ["host-accent-dark", "dark"]]) {
+    const color = hosts[name];
+    if (!color) continue;
+    const near = nearestStatus(color, theme);
+    if (near.distance < NEAR) warnings.push(`--${name} ${color} is close to the ${theme === "dark" ? "dark " : ""}status color "${near.name}" (a distance of ${near.distance.toFixed(1)}); its links and dots would read as ${{ ok: "success", warn: "a warning", err: "an error" }[near.name]}. Choose an accent further from green, amber and red`);
+    if (lab(color).C < GRAY) warnings.push(`--${name} ${color} has almost no color (chroma ${lab(color).C.toFixed(1)}); it looks like the body text, so a link is told apart by its underline only`);
+  }
+  if (hosts["host-accent"] && !("host-accent-dark" in hosts)) warnings.push(`--host-accent is set and --host-accent-dark is not, so dark mode shows Docent's ultramarine links on the host's page. The same hue at 7:1 on the dark page is ${darkAccent(hosts["host-accent"])}: --host-accent-dark: ${darkAccent(hosts["host-accent"])};`);
   if (/@import\b/i.test(css)) errors.push("a style uses @import; a document is one file with no network");
   for (const [, target] of css.matchAll(/url\(\s*["']?([^"')]*)/gi)) if (!local(target)) errors.push(`a style loads url(${target.slice(0, 60)}); a document is one file with no network`);
   if (scripts.trim()) {

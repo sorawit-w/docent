@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Page layout for generated documents — Docent</title>
 <style>
-/* docent:kit 0.12.0 */
+/* docent:kit 0.13.0 */
 /* Docent page styles. Tokens come from references/DESIGN.md. One file, no network. */
 :root {
   color-scheme: light;
@@ -19,7 +19,8 @@
   --heat-text: #1c1f2e; --heat-page: #fbfbfe;
   /* A host's logo for one theme (data-for) shows in that theme. A logo with no version for this theme stands on a tile in the page color of its own theme. */
   --logo-light: block; --logo-dark: none; --tile-light: transparent; --tile-dark: #12141f;
-  /* A host project sets its own accent, heading color and fonts with the --host-* tokens. The kit never sets them, so they hold in every theme and in print. */
+  /* A host project sets its own accent, heading color and fonts with the --host-* tokens. The kit never sets them, so they hold in every theme and in print.
+     In dark mode the dot follows the host's dark accent, or --host-dot-dark; on Docent's own pages it is the lamp. */
   --serif: var(--host-serif, Charter, "Bitstream Charter", "Sitka Heading", "Sitka Text", Cambria, Georgia, serif);
   --sans: var(--host-sans, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif);
   --mono: var(--host-mono, ui-monospace, "SF Mono", "Cascadia Code", Consolas, Menlo, monospace);
@@ -40,7 +41,7 @@ html[data-text="large"] { font-size: 112.5%; }
     color-scheme: dark;
     --bg: #12141f; --panel: #0b0d15; --fig: #0b0d15;
     --text: #e7e9f3; --muted: #959bb3; --line: #2d3146;
-    --primary: var(--host-accent-dark, #8e9bff); --ink: #e7e9f3; --dot: #f2b824;
+    --primary: var(--host-accent-dark, #8e9bff); --ink: #e7e9f3; --dot: var(--host-dot-dark, var(--host-accent-dark, #f2b824));
     --ok: #3fb950; --warn: #d29922; --err: #f85149;
     --heat-1: #093339; --heat-2: #054e58; --heat-3: #006b78; --heat-4: #36a0b1; --heat-5: #80cad7; --heat-text: #e7e9f3; --heat-page: #12141f;
     --logo-light: none; --logo-dark: block; --tile-light: #fbfbfe; --tile-dark: transparent;
@@ -50,7 +51,7 @@ html[data-text="large"] { font-size: 112.5%; }
   color-scheme: dark;
   --bg: #12141f; --panel: #0b0d15; --fig: #0b0d15;
   --text: #e7e9f3; --muted: #959bb3; --line: #2d3146;
-  --primary: var(--host-accent-dark, #8e9bff); --ink: #e7e9f3; --dot: #f2b824;
+  --primary: var(--host-accent-dark, #8e9bff); --ink: #e7e9f3; --dot: var(--host-dot-dark, var(--host-accent-dark, #f2b824));
   --ok: #3fb950; --warn: #d29922; --err: #f85149;
   --heat-1: #093339; --heat-2: #054e58; --heat-3: #006b78; --heat-4: #36a0b1; --heat-5: #80cad7; --heat-text: #e7e9f3; --heat-page: #12141f;
   --logo-light: none; --logo-dark: block; --tile-light: #fbfbfe; --tile-dark: transparent;
@@ -1530,7 +1531,7 @@ footer p { margin: 0; }
   </div>
 </footer>
 <script>
-// docent:kit 0.12.0
+// docent:kit 0.13.0
 (() => {
   const root = document.documentElement;
   root.classList.add('js');

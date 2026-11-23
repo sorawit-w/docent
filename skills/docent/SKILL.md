@@ -128,15 +128,17 @@ A host project may set its accent, its heading color and its fonts, with these t
 ```html
 <style>
 :root {
-  --host-accent: #0b6e4f;       /* links, the dots and the focus ring in light mode and on paper */
-  --host-accent-dark: #6fd3a8;  /* the same in dark mode */
-  --host-ink: #0b3d2e;          /* the title and section headings in light mode */
+  --host-accent: #a21caf;       /* links, the dots and the focus ring in light mode and on paper */
+  --host-accent-dark: #ec6cf7;  /* the same in dark mode, also the dots */
+  --host-ink: #4d0055;          /* the title and section headings in light mode */
   --host-sans: "Inter", system-ui, sans-serif;  /* body text; also --host-serif and --host-mono */
 }
 </style>
 ```
 
-- Set the accent for both themes. Each needs a contrast of 4.5:1 on its page: `check` tests a hex color and reports an error below that.
+- Set the accent for both themes. Each needs a contrast of 4.5:1 on its page: `check` tests a hex color and reports an error below that. When only the light accent is set, `check` warns and names the dark accent of the same hue.
+- In dark mode the dots take the dark accent. For a dot of another color, such as the host's second color, set `--host-dot-dark`; it needs 3:1 on the dark page. To keep Docent's lamp dot, write `--host-dot-dark: #f2b824`. A page that set `--host-accent-dark` before kit 0.13 had the lamp dot in dark mode; it takes the dark accent the next time `stamp` runs.
+- `check` warns when an accent is close to green, amber or red, because its links and dots would read as a status, and when it has almost no color, because it looks like the body text.
 - Do not set the kit's own tokens (`--primary`, `--bg`, and the others). The kit sets them in four places, so your value is lost in dark mode or in print; `check` warns.
 - There is no token for the page, the text or the status colors.
 - A font must be in the file or on the reader's system. Drawings keep the system font.
