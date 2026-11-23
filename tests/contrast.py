@@ -25,6 +25,10 @@ rows.append(("dark lamp dot on page", D["lamp"], D["page"], 3.0))
 rows.append(("dark lamp dot on well", D["lamp"], D["well"], 3.0))
 rows.append(("light primary dot on page", L["primary"], L["page"], 3.0))
 rows.append(("mark: white on primary", "#ffffff", L["primary"], 3.0))
+# A host's logo for one theme only stands on a tile in the page color of that theme. The tile must stand out from the other page.
+rows.append(("dark: logo tile (light page) on page", L["page"], D["page"], 3.0))
+rows.append(("light: logo tile (dark page) on page", D["page"], L["page"], 3.0))
+rows.append(("paper: logo tile (dark page) on page", D["page"], "#ffffff", 3.0))
 # The heat steps: a number on steps 1 to 3 takes the text color, on steps 4 and 5 the page color. The outline of a cell with no data is muted.
 # A heat plan adds no new pair: the name, the value and the note of a box on a step take these same two colors.
 HEAT = dict(light=(L, ["#c6e9ef", "#86c9d5", "#3da6b6", "#00707e", "#004a53"]), dark=(D, ["#093339", "#054e58", "#006b78", "#36a0b1", "#80cad7"]), paper=(dict(L, page="#ffffff"), ["#dee2f0", "#babecb", "#9498a5", "#616571", "#3e424d"]))

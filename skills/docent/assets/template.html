@@ -10,8 +10,12 @@
 <title>Document title — Host project</title>
 </head>
 <body>
-<!-- TOP BAR. The host project's name, one link for each section, and the theme switch.
-     Keep the button and the route-dot as they are. Each link points at the id of a section. -->
+<!-- TOP BAR. The host's logo and name, one link for each section, and the theme switch.
+     Keep the button and the route-dot as they are. Each link points at the id of a section.
+     A LOGO is optional. It goes inside the host span, before the name: an inline <svg class="logo"> with aria-hidden="true",
+     or <img class="logo" alt="" src="data:image/png;base64,..."> (PNG or WebP). check names its width and height.
+     A wordmark holds the name, so it stands alone and carries it: role="img" aria-label="Host project" (or alt="Host project").
+     A logo for one theme only takes data-for="light" or data-for="dark"; give both, or the kit shows it on a tile. See SKILL.md. -->
 <header class="topbar">
   <div class="shell">
     <span class="host">Host project</span>
@@ -272,14 +276,12 @@ command --option value</code></pre>
   </section>
 </main>
 
-<!-- FOOTER. Docent's mark appears once, small. Keep it as it is. -->
+<!-- FOOTER. At the left, the host's tagline: one line in the host's own words, never written by the agent. Without one, take out the <p class="tagline">.
+     At the right, the credit. Keep its words. "Docent" is a link by default; when the host chose plain text, take out the <a> and keep the word. -->
 <footer>
   <div class="shell">
-    <span class="brand">
-      <svg viewBox="0 0 64 64" role="img" aria-label="Docent"><rect width="64" height="64" rx="14" fill="#2f3fd0"/><path d="M20 37V18H30A14 14 0 0 1 30 46H29" fill="none" stroke="#ffffff" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="20" cy="46" r="4" fill="#f2b824"/></svg>
-      Docent
-    </span>
-    <span>A guide inside every document.</span>
+    <p class="tagline">The host's tagline, in its own words.</p>
+    <p class="credit"><svg viewBox="13 13 38 38" aria-hidden="true"><path d="M20 37V18H30A14 14 0 0 1 30 46H29" fill="none" stroke="currentColor" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="20" cy="46" r="4" fill="currentColor"/></svg>Made with <a href="https://github.com/sorawit-w/docent">Docent</a></p>
   </div>
 </footer>
 </body>

@@ -168,7 +168,7 @@ A page for the public or for older readers also has `data-text="large"`: the bod
 
 **Facts about one item go in the margin.** When an item, such as an event in a log or a case in a report, has a few short facts (its time, its source, a reference), list them in a margin note beside the item, as a facts list (`<ul class="facts">`). The item's heading may stand in the text column of the row when the item has no text of its own. Do not join the facts into one line of text with `|` or `·`: that line fills the text column and leaves the margin empty.
 
-**The route.** The top bar holds the host project's name, the section links and the theme switch. Its bottom line is the route through the document. A dot sits on that line under the current section. On a phone the bar is not fixed, and the links wrap instead of scrolling.
+**The route.** The top bar holds the host project's logo and name, the section links and the theme switch. Its bottom line is the route through the document. A dot sits on that line under the current section. On a phone the bar is not fixed, and the links wrap instead of scrolling.
 
 **The walkthrough.** Steps sit on a rail: one thin line with a small ring per step. One dot marks the current step and slides to the next. The other steps use the muted text color. The figure stays in view beside the steps on wide screens. On narrow screens and in print the figure comes first and the steps follow. With JavaScript off, every step has the full text color.
 
@@ -244,7 +244,7 @@ A page for the public or for older readers also has `data-text="large"`: the bod
 
 **Spacing.** More space goes above a heading than below it: 72px above a section (less on Task, Reference and Brief pages), 16px below its heading. Blocks inside a section are 24px to 32px apart, and two paragraphs are 16px apart. A block heading (h3) in the text flow has 32px above it and 8px below it. No block touches the block before it.
 
-**Print** is a first-class layout. The page prints in light colors on white paper, without the top bar, and without any moving part. A closed section opens for printing, so its text is on the paper. On paper the body text is 11pt, and the page margin (18mm) is the edge. Each margin note sits beside its text again: an A4 page holds a 112mm text column, an 8mm gap and a 50mm note column. Code and tables use the full width of the paper on every profile, and a long line of code wraps. The lines of a paragraph keep together across a page break. Chrome and Edge print page numbers; other browsers print their own footer. The page sets no paper size, so the reader's choice wins.
+**Print** is a first-class layout. The page prints in light colors on white paper, without any moving part. Of the top bar, only the host's logo and name print, once, above the title: no links and no switch. A closed section opens for printing, so its text is on the paper. On paper the body text is 11pt, and the page margin (18mm) is the edge. Each margin note sits beside its text again: an A4 page holds a 112mm text column, an 8mm gap and a 50mm note column. Code and tables use the full width of the paper on every profile, and a long line of code wraps. The lines of a paragraph keep together across a page break. Chrome and Edge print page numbers; other browsers print their own footer. The page sets no paper size, so the reader's choice wins.
 
 ## Shapes
 
@@ -252,15 +252,15 @@ Corners are soft and consistent. Controls use `sm` (6px). Code blocks use `md` (
 
 ## Do's and Don'ts
 
-- Do let the content lead. Docent's mark appears once, small, in the footer or the cover.
+- Do let the content lead. Docent's mark appears once, small: in one color in the credit of a host's footer, and as its tile on Docent's own pages and the cover.
 - Do use the dot to show where the reader is: the current section, the current step and the chosen option.
 - Do keep WCAG AA contrast (4.5:1 for text, 3:1 for large text and for the focus ring).
 - Do keep the page readable with JavaScript off and in print.
 - Do separate blocks with space. Lines are for four things only: the route under the top bar, the rules of a table, the line above a margin label, and the line above a card. A card is a label of the same kind as a margin note.
 - Do style the parts the browser draws: the text selection, the caret, the focus ring, the underline offset and the scrollbar of a scrolling block.
 - Don't draw a box around a block. A figure or code block sits in a well; a note sits in the margin; a warning is a dot and a word.
-- Don't fill an area with `primary`, `secondary` or `tertiary`. The mark's own tile is the one exception, because a favicon must stay clear on any background.
-- Don't use gradients, drop shadows or glass effects. The page is flat.
+- Don't fill an area with `primary`, `secondary` or `tertiary`. The mark's own tile is one exception, because a favicon must stay clear on any background. The tile behind a host's logo that has one theme only is the other, for the same reason (see Logo, tagline and credit).
+- Don't use gradients, drop shadows or glass effects. The page is flat. A host's logo may hold a gradient, because it is the host's mark and not part of the page; it still holds no filter or shadow.
 - Don't use `tertiary` (lamp) for status, links or body text.
 - Don't use green, amber or red for anything except status. They mean the same thing inside the diagrams, and only the cells of a status grid are filled with them.
 - Don't use a status grid for an amount. Thresholds hide the differences inside a state; a heat map shows them.
@@ -354,6 +354,26 @@ A host project may set five things of its own, and nothing else: an accent, an a
 A drawing keeps the system sans-serif, because the renderer estimates its text widths for that font. The lamp dot of dark mode stays.
 
 **A fixed theme.** A document that must stay light (or dark) writes `data-theme="light"` (or `"dark"`) on `<html>`. Then the switch is hidden, and neither the reader's system nor a saved choice changes the theme. Print stays light.
+
+## Logo, tagline and credit
+
+A host project may show its own logo, and one line in its own words. Docent's credit stays in the footer, small.
+
+| Part | Where | On a phone | On paper |
+|---|---|---|---|
+| Logo | In the top bar, before the host's name, 10px apart. 24px high and at most 160px wide; a wide logo keeps its shape and gets lower. | The same size; the logo, the name and the switch stand on the first line. | Once, with the name, above the title. |
+| Tagline | In the footer, at the left: 14px, muted, one line of at most 90 characters, with no link. | Above the credit, and it wraps. | With the footer, at the end. |
+| Credit | In the footer, at the right: a 16px mark in one color, then "Made with Docent", 14px, muted. "Docent" is a link to the public repo, or plain text when the host chooses. | Below the tagline. | As text, with no link. |
+
+The logo appears once, in the top bar. A second copy would repeat it, and two copies of one SVG would carry the same ids.
+
+**The logo is inside the file.** It is inline SVG, flattened to plain shapes in solid colors or gradients, with no part that points at another, or a PNG or WebP data URI with at least three times the pixels it shows, so it stays sharp on a phone and on paper. A logo never loads a file, runs a script, links anywhere, or holds text: text depends on a font the reader may not have, so the letters are paths. `check` refuses a logo that breaks one of these rules and names what failed, as it does for an icon.
+
+**A symbol or a wordmark.** A symbol stands before the host's name and is hidden from a screen reader, so the name is read once. A wordmark already shows the name, so it stands alone and carries the name in its label.
+
+**Light and dark.** A logo shows on the page it sits on. A logo in one color is drawn in `currentColor`: it takes the heading color in light and the text color in dark, and one drawing serves both themes and paper. A logo in its own colors needs one color with 3:1 on the light page and one on the dark page. Otherwise the host gives a version for each theme (`data-for="light"` and `data-for="dark"`), and the kit shows one in each theme; paper takes the light one. A logo for one theme only stands on a tile in the other: the page color of its own theme, with corners of 6px and 4px around it. The tile is a fill, and it is allowed for the same reason as the mark's own tile: a logo must stay clear on any page.
+
+**The credit.** Docent's mark in the footer is drawn in one color, in the muted color of the words beside it, so a page in the host's colors carries no spot of Docent's color. The tile stays the favicon, the mark on Docent's own pages, and the cover of a deck. A link loads nothing, so the credit works offline; it simply does not open. Docent is MIT-licensed, so a host may remove the credit; `check` warns, so that the removal is a choice and not a mistake.
 
 ## Icons
 
