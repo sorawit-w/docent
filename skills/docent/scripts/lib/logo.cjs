@@ -255,4 +255,4 @@ function checkLogos(markup, PAGES = DOCENT_PAGES) {
   return { errors, warnings, logos, name };
 }
 
-module.exports = { MOST, MOST_ELEMENTS, DEEPEST, SLOT, slotSize, svgLogo, rasterLogo, rasterSize, findLogos, checkLogos, contrast };
+module.exports = { MOST, MOST_ELEMENTS, DEEPEST, SLOT, TAG, attributes, slotSize, svgLogo, rasterLogo, rasterSize, findLogos, checkLogos, contrast };

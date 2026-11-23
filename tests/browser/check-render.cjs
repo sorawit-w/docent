@@ -958,6 +958,36 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     ok("a column marked num lines up on the right, in tabular figures", nums.length >= 4 && nums.every((v) => v === "right tabular-nums"), nums);
   }
 
+  // A hand-drawn figure (a fishbone under the contract in diagrams.md): no accessibility problem in either theme, its real size on a
+  // desktop and on paper (no shrink), the drawing tokens in dark, forced colors and more contrast, and at 320px it scrolls inside its
+  // well while the page does not scroll sideways.
+  {
+    const figure = fs.readFileSync(path.join(root, "tests", "fixtures", "hand-fishbone.html"), "utf8");
+    const content = html.replace('<section id="report"', `${figure}<section id="report"`);
+    const look = (page) => page.evaluate(() => {
+      const svg = document.getElementById("hd-repeat"), r = svg.getBoundingClientRect(), well = svg.closest(".fig");
+      const paint = (sel, prop) => [...new Set([...svg.querySelectorAll(sel)].map((e) => getComputedStyle(e)[prop]))].join();
+      const sys = (c) => { const p = document.body.appendChild(document.createElement("i")); p.style.color = c; const v = getComputedStyle(p).color; p.remove(); return v; };
+      return { w: Math.round(r.width), h: Math.round(r.height), group: paint(".hd-name", "fill"), note: paint(".hd-note", "fill"), bone: paint(".hd-line", "stroke"), box: paint(".hd-box", "fill"), sizes: [...new Set([...svg.querySelectorAll("text")].map((t) => getComputedStyle(t).fontSize))].sort().join(), scrolls: well.scrollWidth > well.clientWidth, page: document.documentElement.scrollWidth, view: innerWidth, canvasText: sys("CanvasText"), canvas: sys("Canvas"), words: well.querySelector(".dg-words").open };
+    });
+    const results = {};
+    for (const [form, opts] of [["desk", { width: 1280 }], ["dark", { width: 1280, theme: "dark" }], ["narrow", { width: 320, height: 700 }], ["paper", { width: 658, height: 1123, media: "print" }], ["forced", { width: 1280, forcedColors: "active" }], ["more", { width: 1280, contrast: "more" }]]) {
+      const view = await open({ ...opts, content });
+      if (form === "paper") await view.page.evaluate(() => dispatchEvent(new Event("beforeprint")));
+      results[form] = await look(view.page);
+      if (form === "desk" || form === "dark") {
+        await view.page.addScriptTag({ path: axePath });
+        results[`${form}Axe`] = await view.page.evaluate(async () => (await window.axe.run(document.querySelector("#hand"), { runOnly: { type: "tag", values: ["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa", "best-practice"] } })).violations.map((v) => `${v.id} ${v.nodes[0].target.join(" ")}`));
+      }
+      await view.page.locator("#hand figure").screenshot({ path: `${out}/hand-${form}.png` });
+      await view.context.close();
+    }
+    const { desk, dark, narrow, paper, forced, more } = results;
+    ok("a hand-drawn figure: real size (640 × 290) on a desktop and on paper, text 12px and 14px, closed words on screen and open on paper, and 0 axe violations in light and dark", desk.w === 640 && desk.h === 290 && paper.w === 640 && paper.h === 290 && desk.sizes === "12px,14px" && !desk.words && paper.words && results.deskAxe.length === 0 && results.darkAxe.length === 0, results);
+    ok("a hand-drawn figure takes the page tokens: light, dark, forced colors and more contrast", desk.group === LIGHT.text && desk.box === LIGHT.bg && dark.group === DARK.text && dark.bone === DARK.text && dark.box === DARK.bg && forced.group === forced.canvasText && forced.note === forced.canvasText && forced.box === forced.canvas && more.note === LIGHT.text, { desk, dark, forced, more });
+    ok("a hand-drawn figure at 320px scrolls inside its well, and the page does not scroll sideways", narrow.scrolls && narrow.page === narrow.view, narrow);
+  }
+
   await browser.close();
   console.log(failed ? `${failed} check(s) failed` : "all browser checks passed");
   process.exitCode = failed ? 1 : 0;

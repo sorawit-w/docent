@@ -1,6 +1,6 @@
 # Diagram data
 
-A diagram is written as data, and `scripts/render.cjs` draws it. Do not write the SVG by hand, and do not edit a drawing after it is made. To change a drawing, change its data and run `render` again.
+A diagram is written as data, and `scripts/render.cjs` draws it. Do not write the SVG of a built-in kind by hand, and do not edit a drawing after it is made. Only the rare types in "Hand-drawn figures" below may be drawn by hand. To change a drawing, change its data and run `render` again.
 
 ## The block
 
@@ -1165,6 +1165,87 @@ A status grid shows the state of each pair of a row and a column, such as the up
 - `render` also writes the states as a table under the drawing, with the same rows and columns. A cell holds its number, and its state word when it is not OK, such as "98.6 Error"; with states written directly, the state word. Lines under the table say the thresholds, count the cells of each state, name each Error cell (up to 6), and give the worst value. A table too wide for paper is split, as for a heat map.
 - `render` says how the column labels came out, such as `drawn as statusgrid; column labels on two lines on a phone`.
 
+## Hand-drawn figures
+
+A few rare types have no built-in kind. For these seven only, you may draw the SVG by hand, under a contract that `check` tests:
+
+| `data-type` | The type | Use it for |
+|---|---|---|
+| `quadrant` | A 2×2 | Things placed on two axes that are judgments, not measures. When both axes are measured numbers, it is a scatter plot: a table until that kind is built. |
+| `nested` | A containment diagram | Trust zones and scopes: what lies inside what. Machines inside environments are a deployment diagram. |
+| `venn` | A Venn diagram | Two or three sets that overlap. A table of "A only, both, B only" often says it better. |
+| `fishbone` | A fishbone (Ishikawa) | The causes of a problem, in groups, as in an incident report. |
+| `wardley-map` | A Wardley map | Parts of a service placed by how visible and how mature each is. |
+| `user-journey` | A user journey | How a user feels at each stage. The steps alone are a workflow diagram. |
+| `story-map` | A story map | A backbone of steps, with the stories under each, split into releases. |
+
+Every other type is refused, with a message that says what to do:
+
+- **A type that Docent draws from data,** such as `bar`, `line`, `flowchart`, `sequence`, `swimlane` or `funnel`: write its data in a block with the kind that the message names, and run `render`.
+- **A type that Docent plans as a kind:** `scatter`, `timeline`, `gantt`, `roadmap`, `tree`, `org-chart` and `schema`. Until the kind is built, write the data as a table or in words.
+- **A type that Docent leaves out:** `pie`, `donut`, `radar`, `polar`, `pyramid`, `treemap`, `bubble`, `sankey` and `ridgeline`. These show an amount by an angle or an area, or claim more than the data says (see "Position and length" in `DESIGN.md`). Use a bar chart, small multiples or a table. If the user asks for one after you name the rule, it is their call, and `check` still reports it.
+- **Any other name** is not in the list.
+
+### The contract
+
+A hand-drawn figure holds no CSS and no colors of its own. It is plain shapes and texts, placed by their numbers, and each takes a class from the kit. The kit draws every class from Docent's tokens, so the figure follows dark mode, print, a palette, forced colors and more contrast with no work, and no class is under 12px. This fishbone keeps the contract; copy its frame.
+
+```html
+<figure><div class="fig" role="region" aria-label="Figure 3, why a bug report cannot be repeated" tabindex="0">
+<svg id="hd-repeat" data-drawn="hand" data-type="fishbone" xmlns="http://www.w3.org/2000/svg" width="640" height="290" viewBox="0 0 640 290" role="img" aria-labelledby="hd-repeat-t hd-repeat-d">
+<title id="hd-repeat-t">Why a bug report cannot be repeated</title>
+<desc id="hd-repeat-d">A fishbone diagram. Four groups of causes lead to the head, "Cannot repeat the bug" ...</desc>
+<!-- the spine, then each group: its name, its bone, and a line and a note for each cause -->
+<line class="hd-strong" x1="24" y1="150" x2="488" y2="150"/>
+<text class="hd-name" x="130" y="30">Steps</text>
+<line class="hd-line" x1="140" y1="44" x2="220" y2="150"/>
+<line class="hd-muted" x1="25.7" y1="78" x2="165.7" y2="78"/>
+<text class="hd-note" text-anchor="end" x="143.7" y="72">A step is left out</text>
+<rect class="hd-box" x="488" y="122" width="136" height="56" rx="6"/>
+<text class="hd-name" text-anchor="middle" x="556" y="146">Cannot repeat</text>
+</svg>
+<details class="dg-words">
+<summary>The diagram in words</summary>
+<table><thead><tr><th scope="col">Group</th><th scope="col">Cause</th></tr></thead><tbody><!-- one row for each cause --></tbody></table>
+</details>
+</div><figcaption><strong>Figure 3</strong>Why a bug report cannot be repeated.</figcaption></figure>
+```
+
+The classes:
+
+| Class | Draws |
+|---|---|
+| `hd-line` | A 1.5px line in the text color. A shape with no class looks like this. |
+| `hd-strong` | A 2.5px line in the text color, for the main line, such as a fishbone's spine. |
+| `hd-muted` | A 1px line in the muted color. |
+| `hd-rule` | A 1px line in the outline color, for a grid or an axis. |
+| `hd-fill` | A shape filled with the text color, such as a dot or an arrowhead. |
+| `hd-box` | A box in the page color with a text-color outline. |
+| `hd-band` | A band in the page color, with no outline, on the well. |
+| `hd-name` | A name: 14px, weight 600. |
+| `hd-text` | A text: 14px, weight 400. A text with no class looks like this. |
+| `hd-note` | A note: 12px, in the muted color. |
+
+| # | Rule | What `check` tests |
+|---|---|---|
+| 1 | **A marker.** | The `<svg>` has `data-drawn="hand"` and a `data-type` from the list above. |
+| 2 | **The kit's classes only.** | Every `class` is one of the classes above. No `fill`, `stroke`, `color`, `opacity`, `stroke-width` or other attribute that draws, not even a token: the class draws it. No `style` attribute and no `<style>` element. No gradient, filter, pattern or mask. |
+| 3 | **No text under 12px.** | No `font-size`, `textLength` or `lengthAdjust`: the class sets the size. |
+| 4 | **Real size.** | `width` and `height` equal the size of the `viewBox`, at most 640 by 831px, so the drawing shows at its real size and print never shrinks it. A larger figure is split into two. A `transform` only moves or turns a part (`translate`, `rotate`), and only the `<svg>` has a `viewBox`. |
+| 5 | **The page's font.** | No `font-family`, `font-weight` or other font attribute. The figure takes the page's sans-serif, and `hd-name` is the one weight of 600. |
+| 6 | **No network and no script.** | No `<script>`, `<foreignObject>`, `<image>`, `<a>`, `<animate>` or `<set>`, no event attribute (`on…`) and no `href`. |
+| 7 | **Nothing dashed.** | No `stroke-dasharray`: a dashed line means a path that only some readers take. |
+| 8 | **An accessible name.** | `role="img"`; a `<title>` as the first element and a `<desc>`, both with an id and both not empty; `aria-labelledby` names both. Every id in the drawing is used once in the page. |
+| 9 | **The diagram in words.** | The figure well holds a closed `<details class="dg-words">` with a table or a list, not empty, that says everything the drawing says. |
+
+The drawing may use only these elements: `svg`, `g`, `path`, `line`, `polyline`, `polygon`, `rect`, `circle`, `ellipse`, `text`, `tspan`, `title` and `desc`. Draw an arrowhead as a small `path` with `hd-fill`. It may use only these attributes: the geometry (`x`, `y`, `dx`, `dy`, `width`, `height`, `d`, `points`, `cx`, `cy`, `r`, `rx`, `ry`, `x1`, `y1`, `x2`, `y2`, `transform`), `viewBox` on the `<svg>`, `text-anchor`, `dominant-baseline`, `id`, `role`, `aria-…`, `class`, `xmlns`, `data-drawn` and `data-type`. A geometry value holds numbers only, and a path holds its commands and numbers. A comment is a note for the author, and `check` skips it.
+
+`check` cannot see the layout: a label over a line, two labels on top of each other, an arrow that points at the wrong box, or a number that differs from the words. It also cannot see a style of the page that reaches into the drawing; write none. So for each hand-drawn figure it warns: `Figure 3, ... is hand-drawn (fishbone); check cannot see its layout, so open the page in a browser in light and in dark, at 375px and in print preview, and look at it`. Do that, and fix what you see. Then tell the user the figure is hand-drawn.
+
+**What it costs.** Two agents draw the same data in two ways. There is no data block, so `render` cannot draw it again, and a change means drawing it again by hand. It has no phone form: on a phone it scrolls sideways inside its well, and the words are the phone reader's real form. These costs are why the list is short, and why a type becomes a built-in kind once two real documents use it.
+
+**Where the layout comes from.** For the layout of each type and its anti-patterns, you may follow the type guides of the diagram-design skill by Cathryn Lavery ([github.com/cathrynlavery/diagram-design](https://github.com/cathrynlavery/diagram-design), MIT license), if it is installed. Take its layout only. Its fonts, label sizes, colors and legend strip break Docent's rules; Docent's rules always win.
+
 ## Optional legs
 
 A leg with `"optional": true` is a path that only some readers take, or that happens only in some cases. It is drawn as a dashed arrow:
@@ -1249,7 +1330,9 @@ An icon may hold only these shapes and attributes: `path` (`d`), `circle` (`cx`,
   - `... warning: 40 of 72 cells have no data; a table of the cells that have data may say this better` — as for a heat map.
   - `... warning: only every 3rd column label fits on a desktop; when the columns are names, not a series such as days, turn the grid so that the names are rows` — as for a heat map; a calendar never gets it, because its columns are weeks.
 
-`check` also reports a figure well that holds a drawing no diagram block made: `check doc.html: error: Figure 2, ... holds a drawing that no diagram block made; write its data in a block and run render`. A hand-drawn SVG cannot be drawn again or checked against data. Icons outside figure wells are not touched.
+`check` also reports a figure well that holds a drawing no diagram block made and no `data-drawn="hand"` marks: `check doc.html: error: Figure 2, ... holds a drawing that no diagram block made; write its data in a block and run render. Only a type in the hand-drawn list may be drawn by hand ...`. A drawing like that cannot be drawn again or checked against data. Icons outside figure wells, and the arrow in the summary of the words, are not touched.
+
+For a hand-drawn figure, `check` names the figure, the rule and the element: `check doc.html: error: Figure 3, ..., hand-drawn: rule 2, the kit's classes only: <path> has stroke="#cf222e"; the class sets how a shape is drawn, from Docent's tokens: ...`. When the same reason repeats, it says so once, with "(and 4 more like it)". A figure of a type with a built-in kind gets one error that names the kind: `rule 1, a marker: it is a hand-drawn bar, which Docent draws from data; write its data in a block with "kind": "bar" and run render`. A figure that keeps the contract gets the warning above, asking you to look at it.
 
 `render` draws every diagram that it can. When one is refused, the others are still drawn, and `render` ends with exit code 1.
 

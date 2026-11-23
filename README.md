@@ -8,7 +8,7 @@ Docent is packaged as an agent skill. An agent that writes a document loads the 
 
 ## Status
 
-Version 0.17.0. The design is settled, and the three scripts exist with tests.
+Version 0.18.0. The design is settled, and the three scripts exist with tests.
 
 | Part | State |
 |---|---|

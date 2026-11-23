@@ -27,7 +27,8 @@ test("a table cell lets code break, and a closed section that holds a table take
 });
 
 test("text sizes are in rem, so a reader who sets a larger text size gets larger text, not longer lines", () => {
-  assert.deepEqual(css.match(/font(-size)?:[^;}]*\b\d+px/g), null);
+  // A drawing keeps its real size in px, as every drawing does: the rules for a hand-drawn figure are the one place.
+  assert.deepEqual(css.split("\n").filter((l) => !l.startsWith('svg[data-drawn="hand"]')).join("\n").match(/font(-size)?:[^;}]*\b\d+px/g), null);
 });
 
 test("on a wide screen the text and its notes sit in the middle, and wide blocks keep the same left edge", () => {
