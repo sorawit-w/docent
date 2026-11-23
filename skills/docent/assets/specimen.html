@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex">
 <title>Report a bug and get a fix — Example project</title>
 <style>
-/* docent:kit 0.14.0 */
+/* docent:kit 0.15.0 */
 /* Docent page styles. Tokens come from references/DESIGN.md. One file, no network. */
 :root {
   color-scheme: light;
@@ -64,6 +64,9 @@ body { margin: 0; background: var(--bg); color: var(--text); font: 400 1rem/1.65
 :focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
 a { color: var(--primary); text-decoration-thickness: 1px; text-underline-offset: 0.2em; }
 a:hover { text-decoration-thickness: 2px; }
+/* The skip link: the first thing a keyboard reaches. It is hidden until it has focus; then it stands at the upper left, over the top bar, and jumps to the main element. */
+.skip { position: absolute; top: 12px; left: 12px; z-index: 3; display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); font-size: 0.875rem; }
+.skip:not(:focus) { width: 1px; height: 1px; padding: 0; border: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 /* One left edge for the whole page. On a wide screen the text and its notes sit in the middle as a group; wide blocks start at the same edge and grow to the right, up to --wide. */
 .shell {
   --left: max(40px, min((100% - var(--measure) - var(--gap) - var(--margin-col)) / 2, 100% - var(--wide) - 40px));
@@ -216,6 +219,9 @@ th, td { text-align: left; vertical-align: top; padding: var(--cell-y) 24px var(
 thead th { border-bottom: 1px solid var(--text); padding-bottom: 10px; font-size: 0.875rem; line-height: 1.5; font-weight: 600; color: var(--muted); }
 tbody th { font-weight: 600; white-space: nowrap; }
 tbody tr { border-bottom: 1px solid var(--line); }
+/* A column of numbers (class "num" on its th and td cells): the numbers line up on the right, in tabular figures. The last column ends at the table's edge. */
+:is(th, td).num { text-align: right; font-variant-numeric: tabular-nums; }
+:is(th, td).num:last-child { padding-right: 0; }
 .state { display: inline-flex; align-items: baseline; gap: 8px; font-weight: 600; }
 .state::before { content: ""; flex: none; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
 .state.ok { color: var(--ok); } .state.warn { color: var(--warn); } .state.err { color: var(--err); }
@@ -375,7 +381,7 @@ footer p { margin: 0; }
   .logo { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   /* Paper has no link: the credit prints as text. */
   .credit a { color: inherit; text-decoration: none; }
-  .route, .theme, .route-dot, .rail-dot, .choose > .opt, .values > .opt, .decide-ask, .wd-foot, .copy, .fig-more { display: none !important; }
+  .skip, .route, .theme, .route-dot, .rail-dot, .choose > .opt, .values > .opt, .decide-ask, .wd-foot, .copy, .fig-more { display: none !important; }
   .choose > .case { display: block !important; margin-top: 16px; } .case-t { display: block; }
   .checks input:checked + label, .decide tr.is-out { color: var(--text) !important; }
   .steps li h3, .steps li p { color: var(--text) !important; }
@@ -396,6 +402,7 @@ footer p { margin: 0; }
 </style>
 </head>
 <body>
+<a class="skip" href="#content">Skip to the content</a>
 <header class="topbar">
   <div class="shell">
     <span class="host">Example project</span>
@@ -418,7 +425,7 @@ footer p { margin: 0; }
   </div>
 </header>
 
-<main class="shell">
+<main class="shell" id="content">
   <div class="title">
     <h1>Report a bug and get a fix</h1>
     <div class="row">
@@ -1006,12 +1013,12 @@ footer p { margin: 0; }
     <div class="table-wrap" role="region" aria-label="Triage results table" tabindex="0">
       <table>
         <thead>
-          <tr><th scope="col">Result</th><th scope="col">What it means</th><th scope="col">What you do</th><th scope="col">State</th></tr>
+          <tr><th scope="col">Result</th><th scope="col">What it means</th><th scope="col">What you do</th><th scope="col" class="num">Last month</th><th scope="col">State</th></tr>
         </thead>
         <tbody>
-          <tr><th scope="row">Confirmed</th><td>The maintainers can see the bug.</td><td>Wait for the fix, then install the new version.</td><td><span class="state ok">Continue</span></td></tr>
-          <tr><th scope="row">Needs steps</th><td>The maintainers cannot see the bug yet.</td><td>Send the steps, then wait.</td><td><span class="state warn">Answer, then continue</span></td></tr>
-          <tr><th scope="row">Not a bug</th><td>The program works as designed.</td><td>Read the reply. Do not file the report again.</td><td><span class="state err">Stop</span></td></tr>
+          <tr><th scope="row">Confirmed</th><td>The maintainers can see the bug.</td><td>Wait for the fix, then install the new version.</td><td class="num">300</td><td><span class="state ok">Continue</span></td></tr>
+          <tr><th scope="row">Needs steps</th><td>The maintainers cannot see the bug yet.</td><td>Send the steps, then wait.</td><td class="num">109</td><td><span class="state warn">Answer, then continue</span></td></tr>
+          <tr><th scope="row">Not a bug</th><td>The program works as designed.</td><td>Read the reply. Do not file the report again.</td><td class="num">71</td><td><span class="state err">Stop</span></td></tr>
         </tbody>
       </table>
     </div>
@@ -1694,7 +1701,7 @@ grep -i password bug.log</code></pre>
 </footer>
 
 <script>
-// docent:kit 0.14.0
+// docent:kit 0.15.0
 (() => {
   const root = document.documentElement;
   root.classList.add('js');

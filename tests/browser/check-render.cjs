@@ -921,6 +921,43 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     }
   }
 
+  // The skip link: the first Tab from the top shows it at the upper left, over the top bar, with 4.5:1 and the focus ring, in every
+  // theme and setting and with scripts off; Enter moves the keyboard to <main>. A column of numbers lines up on the right.
+  {
+    const probe = () => {
+      const a = document.activeElement, r = a.getBoundingClientRect(), s = getComputedStyle(a);
+      const rgb = (c) => (c.match(/[\d.]+/g) || []).slice(0, 3).map(Number);
+      const lum = (c) => { const [R, G, B] = rgb(c).map((v) => v / 255).map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4)); return 0.2126 * R + 0.7152 * G + 0.0722 * B; };
+      const ratio = (x, y) => { const [h, l] = [lum(x), lum(y)].sort((m, n) => n - m); return (h + 0.05) / (l + 0.05); };
+      const bar = document.querySelector(".topbar").getBoundingClientRect();
+      return { skip: a.classList.contains("skip"), w: Math.round(r.width), top: Math.round(r.top), left: Math.round(r.left), over: r.bottom <= bar.bottom + 8 && document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2) === a, contrast: Number(ratio(s.color, s.backgroundColor).toFixed(2)), ring: `${s.outlineStyle} ${s.outlineWidth}`, ringContrast: Number(ratio(s.outlineColor, getComputedStyle(document.body).backgroundColor).toFixed(2)) };
+    };
+    for (const [name, opts, setup] of [["light", {}], ["dark by the system", { theme: "dark" }], ["dark by the switch", {}, "dark"], ["forced colors", { forcedColors: "active" }], ["more contrast, dark", { theme: "dark", contrast: "more" }], ["a phone", { width: 390, height: 844 }]]) {
+      const { page, context } = await open({ width: 1280, ...opts });
+      if (setup) await page.evaluate((t) => { document.documentElement.dataset.theme = t; }, setup);
+      const hidden = await page.evaluate(() => Math.round(document.querySelector(".skip").getBoundingClientRect().width));
+      await page.keyboard.press("Tab");
+      const shown = await page.evaluate(probe);
+      if (name === "light" || name === "dark by the system") await page.screenshot({ path: `${out}/skip-${name.split(" ")[0]}.png`, clip: { x: 0, y: 0, width: 640, height: 120 } });
+      await page.keyboard.press("Enter");
+      await page.keyboard.press("Tab");
+      const next = await page.evaluate(() => ({ hash: location.hash, inMain: !!document.activeElement.closest("main") }));
+      ok(`skip link, ${name}: hidden until the first Tab, then shown over the top bar with ${shown.contrast}:1 and a 2px ring; Enter moves the keyboard into <main>`, hidden <= 1 && shown.skip && shown.w > 100 && shown.over && shown.contrast >= 4.5 && shown.ring === "solid 2px" && shown.ringContrast >= 3 && next.inMain, { hidden, shown, next });
+      await context.close();
+    }
+    const off = await browser.newContext({ viewport: { width: 1280, height: 900 }, javaScriptEnabled: false });
+    const offPage = await off.newPage();
+    await offPage.setContent(html, { waitUntil: "load" });
+    await offPage.keyboard.press("Tab");
+    const offShown = await offPage.evaluate(probe);
+    await off.close();
+    ok("skip link with scripts off: the first Tab shows it", offShown.skip && offShown.w > 100 && offShown.contrast >= 4.5, offShown);
+    const { page, context } = await open({ width: 1280 });
+    const nums = await page.evaluate(() => [...document.querySelectorAll("main table .num")].map((c) => { const s = getComputedStyle(c); return `${s.textAlign} ${s.fontVariantNumeric}`; }));
+    await context.close();
+    ok("a column marked num lines up on the right, in tabular figures", nums.length >= 4 && nums.every((v) => v === "right tabular-nums"), nums);
+  }
+
   await browser.close();
   console.log(failed ? `${failed} check(s) failed` : "all browser checks passed");
   process.exitCode = failed ? 1 : 0;

@@ -10,6 +10,8 @@
 <title>Document title — Host project</title>
 </head>
 <body>
+<!-- SKIP LINK. The first thing a keyboard reaches: it shows when it has focus, and jumps past the top bar to <main id="content">. Keep it first. -->
+<a class="skip" href="#content">Skip to the content</a>
 <!-- TOP BAR. The host's logo and name, one link for each section, and the theme switch.
      Keep the button and the route-dot as they are. Each link points at the id of a section.
      A LOGO is optional. It goes inside the host span, before the name: an inline <svg class="logo"> with aria-hidden="true",
@@ -36,7 +38,7 @@
   </div>
 </header>
 
-<main class="shell">
+<main class="shell" id="content">
   <!-- TITLE BLOCK. One h1, at most two lines. The opening paragraph (standfirst) says what the document is for.
        The facts about the document sit in the margin note beside it, never above the title. -->
   <div class="title">
@@ -245,16 +247,16 @@
     </dl>
     <h3 class="step">A step that holds a block</h3>
     <p>The kit writes the number before this heading. A code block, a table or a widget can follow.</p>
-    <p>A table uses the full width. A state is a dot and a word: <code>ok</code>, <code>warn</code> or <code>err</code>.</p>
+    <p>A table uses the full width. A state is a dot and a word: <code>ok</code>, <code>warn</code> or <code>err</code>. A column of numbers takes <code>class="num"</code> on each cell, so the numbers line up on the right.</p>
     <div class="table-wrap" role="region" aria-label="Example table" tabindex="0">
       <table>
         <thead>
-          <tr><th scope="col">Case</th><th scope="col">What it means</th><th scope="col">What you do</th><th scope="col">State</th></tr>
+          <tr><th scope="col">Case</th><th scope="col">What it means</th><th scope="col">What you do</th><th scope="col" class="num">Reports</th><th scope="col">State</th></tr>
         </thead>
         <tbody>
-          <tr><th scope="row">First case</th><td>All is well.</td><td>Go on.</td><td><span class="state ok">Continue</span></td></tr>
-          <tr><th scope="row">Second case</th><td>Something needs care.</td><td>Fix it, then go on.</td><td><span class="state warn">Fix, then continue</span></td></tr>
-          <tr><th scope="row">Third case</th><td>Something is wrong.</td><td>Stop and ask.</td><td><span class="state err">Stop</span></td></tr>
+          <tr><th scope="row">First case</th><td>All is well.</td><td>Go on.</td><td class="num">1,204</td><td><span class="state ok">Continue</span></td></tr>
+          <tr><th scope="row">Second case</th><td>Something needs care.</td><td>Fix it, then go on.</td><td class="num">38</td><td><span class="state warn">Fix, then continue</span></td></tr>
+          <tr><th scope="row">Third case</th><td>Something is wrong.</td><td>Stop and ask.</td><td class="num">5</td><td><span class="state err">Stop</span></td></tr>
         </tbody>
       </table>
     </div>
