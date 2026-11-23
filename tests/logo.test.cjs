@@ -175,3 +175,9 @@ test("an id in a logo is used once in the whole page, because a url() finds the 
   const page = bar(svg('<defs><path id="short" d="M0 0h1" fill="currentColor"/></defs><use href="#short"/>')) + '<section id="short"></section>';
   assert.match(checkLogos(page).errors.join(), /the id "short" in a logo is used 2 times in the page/, "an id the page already uses for a section");
 });
+
+test("a logo in the top bar has the class logo, because the kit's rules for its themes and its tile select it", () => {
+  assert.match(checkLogos(bar('<svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M0 0h1" fill="currentColor"/></svg>')).errors.join(), /the <svg> in the top bar has no class="logo"/);
+  assert.match(checkLogos(bar(img(png(288, 72)).replace(' class="logo"', ""))).errors.join(), /the <img> in the top bar has no class="logo"/);
+  assert.deepEqual(checkLogos(bar(svg('<path d="M0 0h1" fill="currentColor"/>').replace('class="logo"', 'class="brand-mark logo"'))).errors, [], "other classes may stand beside it");
+});

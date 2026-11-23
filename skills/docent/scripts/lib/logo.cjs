@@ -215,6 +215,8 @@ function checkLogos(markup) {
     if (!item.inHost) { errors.push("a logo stands outside the top bar; it appears once, in the top bar, before the host's name"); continue; }
     const kind = /^<svg\b/i.test(item.text) ? "svg" : /^<img\b/i.test(item.text) ? "img" : null;
     if (!kind) { errors.push(`the top bar holds a logo that is not an <svg> or an <img>: ${item.text.slice(0, 40)}`); continue; }
+    // The kit's rules for the size, the theme versions and the tile all select .logo, so a logo without the class would show in every theme.
+    if (!/^<(svg|img)\b[^>]*\bclass\s*=\s*["'](?:[^"']*\s)?logo(?:\s[^"']*)?["']/i.test(item.text)) { errors.push(`the ${kind === "svg" ? "<svg>" : "<img>"} in the top bar has no class="logo"; the kit shows each version of a logo in its own theme by that class`); continue; }
     const result = kind === "svg" ? svgLogo(item.text) : rasterLogo(item.text);
     if (result.error) { errors.push(`the logo in the top bar is refused: ${result.error}`); continue; }
     logos.push({ ...item, ...result });
