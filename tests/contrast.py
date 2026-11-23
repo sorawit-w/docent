@@ -25,6 +25,13 @@ rows.append(("dark lamp dot on page", D["lamp"], D["page"], 3.0))
 rows.append(("dark lamp dot on well", D["lamp"], D["well"], 3.0))
 rows.append(("light primary dot on page", L["primary"], L["page"], 3.0))
 rows.append(("mark: white on primary", "#ffffff", L["primary"], 3.0))
+# The heat steps: a number on steps 1 to 3 takes the text color, on steps 4 and 5 the page color. The outline of a cell with no data is muted.
+HEAT = dict(light=(L, ["#dee2f0", "#babecb", "#9498a5", "#616571", "#3e424d"]), dark=(D, ["#2a2e38", "#434751", "#5d616c", "#8f939f", "#babecb"]), paper=(dict(L, page="#ffffff"), ["#dee2f0", "#babecb", "#9498a5", "#616571", "#3e424d"]))
+for name, (t, steps) in HEAT.items():
+    for k, step in enumerate(steps, 1):
+        fg = "text" if k <= 3 else "page"
+        rows.append((f"{name} {fg} on heat-{k}", t[fg], step, 4.5))
+    rows.append((f"{name} no-data outline on page", t["muted"], t["page"], 3.0))
 
 fails = 0
 for label, fg, bg, need in rows:

@@ -1,8 +1,9 @@
 // Fit warnings: signs in the data that another kind of diagram, or no diagram, may serve the reader better. They never
 // change the drawing; the author decides. render and check report them like the other warnings.
 
-/** The fit warnings for a model of one kind: plain sentences that name the cause and the kind that may fit. */
-function fitWarnings(kind, model) {
+/** The fit warnings for a model of one kind: plain sentences that name the cause and the kind that may fit. A scale chart also
+ * passes its desktop drawing, for a warning that depends on how the drawing came out. */
+function fitWarnings(kind, model, scene) {
   const out = [];
   if (kind === "sequence") {
     const forward = model.legs.every((l) => l.type !== "reply" && l.from < l.to);
@@ -32,6 +33,15 @@ function fitWarnings(kind, model) {
     if (steps.length === 2) out.push("the funnel has 2 steps; a sentence says this more simply");
     if (last.count === first) out.push("no step loses anyone; a sentence says this more simply");
     else if (last.count * 100 >= first * 95) out.push(`the last step keeps ${last.ofFirst} of the first, so the bars look almost the same; a table shows small drops better`);
+  }
+  if (kind === "heatmap") {
+    const cells = model.rows.flatMap((r) => r.cells), full = cells.filter(Boolean), empty = cells.length - full.length;
+    const steps = new Set(full.map((c) => c.step)), lowest = full.filter((c) => c.step === 0).length;
+    if (steps.size === 1) out.push("every number is in one step, so the shades show nothing; a sentence or a table says this more simply");
+    else if (lowest * 5 >= full.length * 4) out.push(`${lowest} of ${full.length} cells are in the lowest step; one large number may set the scale. Check "to", or say the large number in the text`);
+    if (cells.length < 12) out.push(`the heat map has ${cells.length} cells; a table with the numbers says this more simply`);
+    if (empty * 2 > cells.length) out.push(`${empty} of ${cells.length} cells have no data; a table of the cells that have data may say this better`);
+    if (scene && scene.labels && scene.labels.every > 1) out.push(`only every ${scene.labels.every}${scene.labels.every === 2 ? "nd" : scene.labels.every === 3 ? "rd" : "th"} column label fits on a desktop; when the columns are names, not a series such as hours, turn the grid so that the names are rows`);
   }
   if (kind === "range" && model.rows.length < 3) out.push(`the range chart has ${model.rows.length} rows; a sentence says this more simply`);
   return out;

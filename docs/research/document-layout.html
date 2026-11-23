@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Page layout for generated documents — Docent</title>
 <style>
-/* docent:kit 0.6.0 */
+/* docent:kit 0.7.0 */
 /* Docent page styles. Tokens come from references/DESIGN.md. One file, no network. */
 :root {
   color-scheme: light;
@@ -13,6 +13,8 @@
   --text: #1c1f2e; --muted: #575d75; --line: #d3d6e3;
   --primary: var(--host-accent, #2f3fd0); --ink: var(--host-ink, #1b2260); --dot: var(--host-accent, #2f3fd0);
   --ok: #1a7f37; --warn: #7d4e00; --err: #cf222e;
+  /* The heat steps fill the cells of a heat map and nothing else: from the least (1) to the most (5). */
+  --heat-1: #dee2f0; --heat-2: #babecb; --heat-3: #9498a5; --heat-4: #616571; --heat-5: #3e424d;
   /* A host project sets its own accent, heading color and fonts with the --host-* tokens. The kit never sets them, so they hold in every theme and in print. */
   --serif: var(--host-serif, Charter, "Bitstream Charter", "Sitka Heading", "Sitka Text", Cambria, Georgia, serif);
   --sans: var(--host-sans, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif);
@@ -36,6 +38,7 @@ html[data-text="large"] { font-size: 112.5%; }
     --text: #e7e9f3; --muted: #959bb3; --line: #2d3146;
     --primary: var(--host-accent-dark, #8e9bff); --ink: #e7e9f3; --dot: #f2b824;
     --ok: #3fb950; --warn: #d29922; --err: #f85149;
+    --heat-1: #2a2e38; --heat-2: #434751; --heat-3: #5d616c; --heat-4: #8f939f; --heat-5: #babecb;
   }
 }
 :root[data-theme="dark"] {
@@ -44,6 +47,7 @@ html[data-text="large"] { font-size: 112.5%; }
   --text: #e7e9f3; --muted: #959bb3; --line: #2d3146;
   --primary: var(--host-accent-dark, #8e9bff); --ink: #e7e9f3; --dot: #f2b824;
   --ok: #3fb950; --warn: #d29922; --err: #f85149;
+  --heat-1: #2a2e38; --heat-2: #434751; --heat-3: #5d616c; --heat-4: #8f939f; --heat-5: #babecb;
 }
 *, *::before, *::after { box-sizing: border-box; }
 html { scroll-padding-top: 88px; -webkit-text-size-adjust: 100%; }
@@ -164,6 +168,13 @@ section > figure { margin-top: 24px; }
 /* A long name with no spaces breaks inside its cell, so the table never runs past a phone screen. */
 .dg-words tbody th { white-space: normal; }
 .dg-words :is(th, td) { overflow-wrap: anywhere; }
+/* A wide grid in words, such as the numbers of a heat map: each cell stays on one line, numbers line up on the right, and the
+   table scrolls inside its wrapper on a narrow screen. The lines under it keep the width of the text. */
+.dg-words > .table-wrap { margin-top: 8px; max-width: none; }
+.dg-words > .table-wrap :is(th, td) { white-space: nowrap; overflow-wrap: normal; padding-right: 12px; }
+.dg-words > .table-wrap :is(td, thead th) { text-align: right; font-variant-numeric: tabular-nums; }
+.dg-words:has(> .table-wrap) { min-width: 0; } /* a flex item: without this it grows to the table, and the wrapper never scrolls */
+.dg-words:has(> .table-wrap) > ul { max-width: var(--measure); }
 figcaption { margin-top: 12px; font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
 figcaption strong { font-weight: 600; color: var(--text); margin-right: 8px; }
 
@@ -303,7 +314,7 @@ footer .shell { display: flex; align-items: center; justify-content: space-betwe
   *, *::before, *::after { transition: none !important; }
 }
 @media print {
-  html:root:not([data-never]) { color-scheme: light; --bg: #ffffff; --panel: #f2f3f9; --fig: #f2f3f9; --text: #1c1f2e; --muted: #575d75; --line: #d3d6e3; --primary: var(--host-accent, #2f3fd0); --ink: var(--host-ink, #1b2260); --dot: var(--host-accent, #2f3fd0); --ok: #1a7f37; --warn: #7d4e00; --err: #cf222e; }
+  html:root:not([data-never]) { color-scheme: light; --bg: #ffffff; --panel: #f2f3f9; --fig: #f2f3f9; --text: #1c1f2e; --muted: #575d75; --line: #d3d6e3; --primary: var(--host-accent, #2f3fd0); --ink: var(--host-ink, #1b2260); --dot: var(--host-accent, #2f3fd0); --ok: #1a7f37; --warn: #7d4e00; --err: #cf222e; --heat-1: #dee2f0; --heat-2: #babecb; --heat-3: #9498a5; --heat-4: #616571; --heat-5: #3e424d; }
   /* Paper: 11pt text, the page margin as the edge, and the notes beside the text again. An A4 page holds the text (112mm), a gap and the notes (50mm). */
   html { font-size: 11pt; } html[data-text="large"] { font-size: 12pt; }
   html:root:not([data-never]) { --measure: 112mm; --gap: 8mm; --margin-col: 50mm; --block: 100%; }
@@ -320,6 +331,8 @@ footer .shell { display: flex; align-items: center; justify-content: space-betwe
   .steps li h3, .steps li p { color: var(--text) !important; }
   .walk { grid-template-columns: minmax(0, 1fr); row-gap: 32px; } .walk figure { position: static; order: -1; }
   table { min-width: 0; } .table-wrap { overflow: visible; }
+  /* Paper cannot scroll, so a wide grid in words, such as the numbers of a heat map, takes the smallest text size and tighter cells; render splits a grid that is still too wide into several tables. */
+  .dg-words > .table-wrap table { font-size: 0.875rem; } .dg-words > .table-wrap thead th { font-size: inherit; } .dg-words > .table-wrap :is(th, td) { padding: 4px 6px 4px 0; }
   /* A browser leaves out backgrounds on paper. These carry meaning, so they print: status dots, the rail of the steps, and the ground of figures and code. */
   .state::before, .steps::before, .fig, pre, code { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   /* Paper cannot scroll, and a drawing cannot split across pages. So a drawing that is wider than the paper, or taller than a page, shrinks to fit, under its caption, on A4 and on Letter. */
@@ -1470,7 +1483,7 @@ footer .shell { display: flex; align-items: center; justify-content: space-betwe
   </div>
 </footer>
 <script>
-// docent:kit 0.6.0
+// docent:kit 0.7.0
 (() => {
   const root = document.documentElement;
   root.classList.add('js');

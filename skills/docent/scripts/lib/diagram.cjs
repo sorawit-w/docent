@@ -53,22 +53,22 @@ function renderTiming(data) {
 }
 
 /**
- * A scale chart (a range chart, a layout to scale, a plan or a funnel): one form 640px wide for a desktop and for paper, one 264px wide for
+ * A scale chart (a range chart, a layout to scale, a plan, a funnel or a heat map): one form 640px wide for a desktop and for paper, one 264px wide for
  * a phone, and its rows as a table in words.
  */
 function renderScaleChart(data) {
   const kind = data.kind;
   const lib = require(`./${kind}.cjs`);
-  const [read, draw] = { range: [lib.readRange, lib.layoutRange], layout: [lib.readLayout, lib.drawLayout], plan: [lib.readPlan, lib.drawPlan], funnel: [lib.readFunnel, lib.drawFunnel] }[kind];
+  const [read, draw] = { range: [lib.readRange, lib.layoutRange], layout: [lib.readLayout, lib.drawLayout], plan: [lib.readPlan, lib.drawPlan], funnel: [lib.readFunnel, lib.drawFunnel], heatmap: [lib.readHeatmap, lib.drawHeatmap] }[kind];
   const model = read(data);
   const scene = draw(model), phone = draw(model, true);
   const id = `dg-${model.id}`;
   const main = toSvg(scene, { id, label: model.label, mode: "auto", swap: { phone: `${id}-phone` } });
   // On paper the 640px form prints at its real size, because it fits the sheet; the phone form is for narrow screens only.
   const small = toSvg(phone, { id: `${id}-phone`, label: model.label, mode: "auto", swap: { main: id, below: scene.w + ROOM, printMain: true } });
-  // A plan also says which of its forms are not to scale, from the sizing result of each form.
+  // A plan says which of its forms are not to scale, and a heat map where its cells show numbers and how its labels fit.
   const note = lib.scaleNote ? lib.scaleNote(model, scene, phone) : "";
-  return { svg: `${main}\n${small}\n${inWords(lib.wordsOf(model, scene, phone))}`, form: kind, note, warnings: fitWarnings(kind, model), icons: [], model, scene, phone };
+  return { svg: `${main}\n${small}\n${inWords(lib.wordsOf(model, scene, phone))}`, form: kind, note, warnings: fitWarnings(kind, model, scene), icons: [], model, scene, phone };
 }
 
 const FORMS = ["wide", "tall", "plates"];
@@ -204,8 +204,8 @@ function renderDiagram(data) {
     if (data.kind === "flow") return renderFlow(data);
     if (Object.hasOwn(GRAPH_KINDS, data.kind)) return renderGraphKind(data);
     if (data.kind === "timing") return renderTiming(data);
-    if (["range", "layout", "plan", "funnel"].includes(data.kind)) return renderScaleChart(data);
-    fail(`"kind" must be one of ${["sequence", "flow", ...Object.keys(GRAPH_KINDS), "timing", "range", "layout", "plan", "funnel"].map((k) => `"${k}"`).join(", ")}, or left out for a workflow diagram`);
+    if (["range", "layout", "plan", "funnel", "heatmap"].includes(data.kind)) return renderScaleChart(data);
+    fail(`"kind" must be one of ${["sequence", "flow", ...Object.keys(GRAPH_KINDS), "timing", "range", "layout", "plan", "funnel", "heatmap"].map((k) => `"${k}"`).join(", ")}, or left out for a workflow diagram`);
   }
   const { model, warnings } = readData(data);
   const icons = warnings.filter((w) => !w.startsWith("every part has the state") && !w.startsWith("no leg has a verb")); // these warnings are about icons; check reports them as errors

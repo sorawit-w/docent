@@ -1,0 +1,15 @@
+{
+  "id": "errors-by-day",
+  "kind": "heatmap",
+  "label": "Errors of a web service in one week, by part and day. Checkout and Payments had most errors on Wednesday and Thursday, after a release. Image upload rose through the weekend. Email has no data for Thursday.",
+  "scale": {"from": 0, "to": 40, "step": 10, "unit": "errors"},
+  "columns": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+  "rows": [
+    {"name": "Sign-in",      "values": [3, 2, 4, 3, 5, 1, 1]},
+    {"name": "Search",       "values": [6, 7, 5, 9, 8, 4, 3]},
+    {"name": "Checkout",     "values": [12, 14, 38, 31, 11, 6, 5]},
+    {"name": "Payments",     "values": [4, 5, 22, 17, 4, 2, 2]},
+    {"name": "Email",        "values": [1, 0, 2, null, 1, 0, 0]},
+    {"name": "Image upload", "values": [9, 8, 10, 12, 15, 19, 21]}
+  ]
+}
