@@ -125,7 +125,7 @@ The palette is one ink, one light, and Docent's own grays, with one teal for the
 - **Tertiary — Lamp (#f2b824):** The docent's lamp, and always a dot. It is the dot in the mark, and the route dot, the rail dot and the dot of a chosen option in dark mode. On a host's page with its own dark accent, the dots in dark mode take that accent instead (see Host tokens), so the page has one accent color in each theme. Lamp on the light page has a contrast of 1.74:1, so it is not used there; the dots in light mode are ultramarine.
 - **Neutral — Well (#f2f3f9):** The ground of figures and code. A well is one step darker than the page in both themes, and it has no outline.
 - **Status:** `success`, `warning` and `error` are for status only, as a small dot with a word beside it. Two more kinds of status note have no status color: plain information has a muted dot, and a thing that is planned, or not turned on yet, has a muted ring. The ring differs from the dot by its shape, so it does not need a color. A status label wraps on a narrow screen. In a diagram, a part that carries a state takes the status color on its outline and gets the same small dot; its note says the status in words. In a status grid, each cell shows its state. On screen an OK cell is filled in the success color, a Warning cell in the warning color with a slash in the page color, and an Error cell in the error color with a cross in the page color. On paper an OK cell and a Warning cell take the outline color, the Warning slash takes the warning color, and the Error cell keeps its fill and its cross, so in gray print only the failures stand out. This is the one place where the status colors fill a shape. The marks, not the colors, tell the states apart for readers who cannot see the colors.
-- **Heat steps (heat-1 to heat-5):** Five steps of one teal on screen, and five of Docent's grays on paper, for the cells of a heat map and the boxes of a heat plan, and nothing else. Teal means nothing else on the page: it is far from the status green (70°) and from the ultramarine (85°), and it does not change with a host's accent. Each teal step has the lightness of its gray, so the contrast of a number on it stays the same. Step 1 holds the least and step 5 the most. In light the steps grow darker, and in dark they grow lighter, so the most is always the step that stands out most from the page. A step is a fill, but it is not a mark and not a status: a heat map has no ultramarine, no lamp, and no green, amber or red. A number on steps 1 to 3 takes the text color, and a number on steps 4 and 5 takes the page color; so do the name and the note of a heat plan's box. Every heat map and heat plan has a legend, and its exact numbers are in the table in words.
+- **Heat steps (heat-1 to heat-5):** Five steps of one teal on screen, and five of Docent's grays on paper, for the cells of a heat map and the boxes of a heat plan, and nothing else. Teal means nothing else on the page: it is far from the status green (70°) and from the ultramarine (85°), and it does not change with a host's accent. A palette sets its own five steps by the same rule (see Palettes). Each teal step has the lightness of its gray, so the contrast of a number on it stays the same. Step 1 holds the least and step 5 the most. In light the steps grow darker, and in dark they grow lighter, so the most is always the step that stands out most from the page. A step is a fill, but it is not a mark and not a status: a heat map has no ultramarine, no lamp, and no green, amber or red. A number on steps 1 to 3 takes the text color, and a number on steps 4 and 5 takes the page color; so do the name and the note of a heat plan's box. Every heat map and heat plan has a legend, and its exact numbers are in the table in words.
 
 **Diagrams.** Docent draws its own diagrams, in three forms (see Layout). A diagram uses the page's tokens and nothing else: lines, parts and names in the text color, notes in the muted color, tracks in the outline color, lane bands in the page color, and the well as its ground. Because it reads the tokens, one drawing serves both themes. Each drawing carries its own styles, with the light values as a fallback, so a drawing that is copied out of the page keeps the light colors. Ultramarine marks the current leg, and the dot on it is ultramarine in light and lamp in dark (on a host's page: the host's accent in light, and its dark accent in dark). Other colors can appear in a diagram only in three places: a status color, on the outline of a part that carries a state; the status colors, in the cells of a status grid (see Status above); and the heat steps, in the cells of a heat map and the boxes of a heat plan (see Heat steps above). An author cannot give a diagram any other color. Docent does not use a third-party diagram renderer.
 
@@ -265,7 +265,7 @@ Corners are soft and consistent. Controls use `sm` (6px). Code blocks use `md` (
 - Don't use green, amber or red for anything except status. They mean the same thing inside the diagrams, and only the cells of a status grid are filled with them.
 - Don't use a status grid for an amount. Thresholds hide the differences inside a state; a heat map shows them.
 - Don't use a heat step outside the cells of a heat map and the boxes of a heat plan, and don't use a step to make a part stand out. A heat step says how much, and nothing else.
-- Don't add a host project's colors to these tokens. A project that needs its own accent, heading color or fonts sets the `--host-*` tokens (see Host tokens). There is no token for the page, the text or the status colors.
+- Don't add a host project's colors to these tokens. A project that needs its own accent, heading color or fonts sets the `--host-*` tokens (see Host tokens). A page that needs a tinted page and grays names a palette (see Palettes). There is no token for the page, the text or the status colors.
 - Don't color a short code or a label. A code is `code`, in its small well; a status is a state, a dot and a word. A colored badge is a fill, and green, amber and red mean status only.
 - Don't color the words of code by kind. A code block has two colors: the text color, and the muted color for a comment line. More colors would add a palette that the page does not have.
 - Don't load fonts, scripts or images from the network.
@@ -361,6 +361,37 @@ A drawing keeps the system sans-serif, because the renderer estimates its text w
 **An accent that passes contrast can still mislead.** `check` warns in three cases. The accent is close to a status color (a CIE76 distance under 25 from green, amber or red), so its links and dots read as a status. The accent has almost no color (a chroma under 10), so it looks like the body text. Or `--host-accent` is set and `--host-accent-dark` is not, so dark mode shows Docent's ultramarine on the host's page; the warning names the dark accent of the same hue at 7:1 on the dark page.
 
 **A fixed theme.** A document that must stay light (or dark) writes `data-theme="light"` (or `"dark"`) on `<html>`. Then the switch is hidden, and neither the reader's system nor a saved choice changes the theme. Print stays light.
+
+## Palettes
+
+A palette turns Docent's own tokens toward one hue: the page, the well, the line, the muted and text colors, the accent pair, the heading color, the five heat steps and the heading font, each in light and dark. A page names its palette on `<html>`: `data-palette="harbor"`. Docent ships three. With no palette, a page has Docent's own colors.
+
+Docent calls these palettes, not themes, because a theme in Docent is light or dark already.
+
+| | Harbor | Plum | Sepia |
+|---|---|---|---|
+| Mood | Cool blue-green, for engineering and operations | Deep violet-red, for product and design | Warm paper, for long reading and policy |
+| Page, light / dark | `#f6fcfe` / `#01181d` | `#fefafe` / `#1f0f1d` | `#fffbf6` / `#1e1301` |
+| Well, light / dark | `#e9f6fa` / `#001013` | `#faf1f8` / `#160914` | `#fcf2e8` / `#150c00` |
+| Line, light / dark | `#c0dbe3` / `#1e363c` | `#e3d1e0` / `#3c2e3a` | `#e3d4c4` / `#3b3024` |
+| Muted, light / dark | `#526064` / `#8f9ea3` | `#645b63` / `#a399a1` | `#645d54` / `#a39a91` |
+| Text, light / dark | `#152225` / `#dcecf1` | `#251d24` / `#f1e6ef` | `#251f18` / `#f1e8de` |
+| Accent, light / dark | `#0a5f8a` / `#72c2ee` | `#86307f` / `#e49ad9` | `#2b4f8c` / `#93b4ef` |
+| Heading color | `#0d3550` | `#3d1640` | `#3a2a1a` |
+| Heat steps, light | `#f0ddf0` `#d6b4d6` `#b68ab8` `#7d597f` `#533a54` | `#cbe7f6` `#8fc6e1` `#4da2c6` `#1d6d8a` `#10485c` | `#c6e9ee` `#86c9d2` `#3da6b2` `#01707a` `#014a51` |
+| Heat steps, dark | `#39283a` `#573e58` `#785579` `#b085b1` `#d8b3d8` | `#10323f` `#144c61` `#1b6884` `#479dc0` `#8ac7e4` | `#093338` `#054e55` `#016b75` `#36a1ac` `#80cad4` |
+| Heat hue (CIELAB) | 325° | 240° | 210° |
+| Headings | The system sans-serif, weight 600 | Iowan Old Style, Palatino | Iowan Old Style, Palatino |
+
+**Why a palette may change more than a host may.** A host's colors are not known in advance, so they may touch the host tokens only, and `check` tests them on each page. A palette is known in advance, so it may set Docent's own tokens, because `tests/contrast.py` tests every pair before it ships: text, muted, accent, heading and the three status colors on the page and the well, the dot, the number on each heat step and the outline of a cell with no data, in light, dark and on paper. Two distances are tested too: the muted color stands at least 25 (CIE76) from the accent, so a note never looks like a link, and the accent stands at least 25 from each status color.
+
+**What stays.** Green, amber and red are Docent's own on every page. Each gray keeps the lightness of Docent's, so every contrast rule holds unchanged. The dot in dark mode is the palette's dark accent. Paper is white, with the palette's light colors and Docent's gray heat steps.
+
+**The heat steps of a palette.** Each step keeps the lightness and chroma of Docent's teal step, turned to one hue: the hue that stands furthest from both the palette's accent and the three status colors, in steps of 5°. For Docent's own colors this rule gives 220°, next to teal's 215°. For Harbor it gives a mauve, because a teal stands only 32° from Harbor's blue-green accent and would read as the current step.
+
+**With host tokens.** A host may use a palette with its own accent, heading color or fonts; the host tokens win over the palette's. `check` then tests the host's colors on the palette's page and well.
+
+**Each drawing** carries the palette's light values as its fallback colors, so a drawing copied out of the page keeps the palette. `stamp` writes only the palette that the page names.
 
 ## Logo, tagline and credit
 

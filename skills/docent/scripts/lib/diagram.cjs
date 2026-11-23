@@ -2,6 +2,7 @@
 const { ICONS, iconProblem } = require("./icons.cjs");
 const { layoutRoute, layoutColumn } = require("./route.cjs");
 const { toSvg } = require("./svg.cjs");
+const { paletteOf, paint } = require("./palettes.cjs");
 const { DataError, fail, words, id, findBlocks, block, replaceBlocks } = require("./blocks.cjs");
 const { renderWidget, fillPlaces } = require("./widget.cjs");
 const { textWidth } = require("./text.cjs");
@@ -265,9 +266,10 @@ function renderDiagram(data) {
 
 /** Draws every diagram block and builds every widget block of a document, in place. Returns { html, results, widgets }: one result for each block, { id, form, warnings, error }. */
 function renderDocument(html) {
+  const palette = paletteOf(html); // a drawing carries the light values of the page's palette as its fallback colors
   const diagrams = replaceBlocks(html, "diagram", (data) => {
     const drawn = renderDiagram(data);
-    return { id: drawn.model.id, out: drawn.svg, form: drawn.note ? `${drawn.form}; ${drawn.note}` : drawn.form, warnings: drawn.warnings };
+    return { id: drawn.model.id, out: paint(drawn.svg, palette), form: drawn.note ? `${drawn.form}; ${drawn.note}` : drawn.form, warnings: drawn.warnings };
   });
   const widgets = replaceBlocks(diagrams.html, "widget", (data) => {
     const built = renderWidget(data);

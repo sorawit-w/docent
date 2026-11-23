@@ -1,0 +1,107 @@
+{
+  "harbor": {
+    "name": "Harbor",
+    "mood": "Cool blue-green, for engineering and operations",
+    "heatHue": 325,
+    "serif": "system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+    "light": {
+      "bg": "#f6fcfe",
+      "panel": "#e9f6fa",
+      "fig": "#e9f6fa",
+      "text": "#152225",
+      "muted": "#526064",
+      "line": "#c0dbe3",
+      "primary": "#0a5f8a",
+      "ink": "#0d3550",
+      "heat-1": "#f0ddf0",
+      "heat-2": "#d6b4d6",
+      "heat-3": "#b68ab8",
+      "heat-4": "#7d597f",
+      "heat-5": "#533a54"
+    },
+    "dark": {
+      "bg": "#01181d",
+      "panel": "#001013",
+      "fig": "#001013",
+      "text": "#dcecf1",
+      "muted": "#8f9ea3",
+      "line": "#1e363c",
+      "primary": "#72c2ee",
+      "heat-1": "#39283a",
+      "heat-2": "#573e58",
+      "heat-3": "#785579",
+      "heat-4": "#b085b1",
+      "heat-5": "#d8b3d8"
+    }
+  },
+  "plum": {
+    "name": "Plum",
+    "mood": "Deep violet-red, for product and design",
+    "heatHue": 240,
+    "serif": "\"Iowan Old Style\", \"Palatino Linotype\", Palatino, Charter, \"Bitstream Charter\", \"Sitka Heading\", \"Sitka Text\", Cambria, Georgia, serif",
+    "light": {
+      "bg": "#fefafe",
+      "panel": "#faf1f8",
+      "fig": "#faf1f8",
+      "text": "#251d24",
+      "muted": "#645b63",
+      "line": "#e3d1e0",
+      "primary": "#86307f",
+      "ink": "#3d1640",
+      "heat-1": "#cbe7f6",
+      "heat-2": "#8fc6e1",
+      "heat-3": "#4da2c6",
+      "heat-4": "#1d6d8a",
+      "heat-5": "#10485c"
+    },
+    "dark": {
+      "bg": "#1f0f1d",
+      "panel": "#160914",
+      "fig": "#160914",
+      "text": "#f1e6ef",
+      "muted": "#a399a1",
+      "line": "#3c2e3a",
+      "primary": "#e49ad9",
+      "heat-1": "#10323f",
+      "heat-2": "#144c61",
+      "heat-3": "#1b6884",
+      "heat-4": "#479dc0",
+      "heat-5": "#8ac7e4"
+    }
+  },
+  "sepia": {
+    "name": "Sepia",
+    "mood": "Warm paper, for long reading and policy",
+    "heatHue": 210,
+    "serif": "\"Iowan Old Style\", \"Palatino Linotype\", Palatino, Charter, \"Bitstream Charter\", \"Sitka Heading\", \"Sitka Text\", Cambria, Georgia, serif",
+    "light": {
+      "bg": "#fffbf6",
+      "panel": "#fcf2e8",
+      "fig": "#fcf2e8",
+      "text": "#251f18",
+      "muted": "#645d54",
+      "line": "#e3d4c4",
+      "primary": "#2b4f8c",
+      "ink": "#3a2a1a",
+      "heat-1": "#c6e9ee",
+      "heat-2": "#86c9d2",
+      "heat-3": "#3da6b2",
+      "heat-4": "#01707a",
+      "heat-5": "#014a51"
+    },
+    "dark": {
+      "bg": "#1e1301",
+      "panel": "#150c00",
+      "fig": "#150c00",
+      "text": "#f1e8de",
+      "muted": "#a39a91",
+      "line": "#3b3024",
+      "primary": "#93b4ef",
+      "heat-1": "#093338",
+      "heat-2": "#054e55",
+      "heat-3": "#016b75",
+      "heat-4": "#36a1ac",
+      "heat-5": "#80cad4"
+    }
+  }
+}
