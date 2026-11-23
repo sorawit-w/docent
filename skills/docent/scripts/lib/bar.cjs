@@ -200,14 +200,14 @@ function drawBar(model, phone = false) {
         value(Math.max(xa, xb) + 13, cy + 4, fmt(Math.max(p, q)), "start");
       }
       if (keys.length) {
-        // The series names stand above their marks, 8px apart at least. A name that moves for the other gets a thin line to its mark.
-        const items = keys.map((k) => ({ at: sc.x(r.values[k]), size: textWidth(series[k], 12) }));
+        // The series names stand above their marks, 8px apart at least, in tabular figures, as a year often is. A name that moves for the other gets a thin line to its mark.
+        const items = keys.map((k) => ({ at: sc.x(r.values[k]), size: valueWidth(series[k]) }));
         const at = apart(items, 12, W - 12, 8);
         if (!at) fail(`the series names "${series[0]}" and "${series[1]}" do not fit side by side ${where}; shorten them`);
         const ny = cy - 18 - above;
         keys.forEach((k, j) => {
           const w = items[j].size;
-          s.notes.push({ x: at[j], y: ny, s: series[k], cls: "sub", anchor: "middle", knock: { x: at[j] - w / 2 - 4, y: ny - 12, w: w + 8, h: 16 } });
+          s.notes.push({ x: at[j], y: ny, s: series[k], cls: "val", anchor: "middle", knock: { x: at[j] - w / 2 - 4, y: ny - 12, w: w + 8, h: 16 } });
           if (Math.abs(at[j] - items[j].at) > 0.5) svg += `<line x1="${num(at[j])}" y1="${num(ny + 4)}" x2="${num(items[j].at)}" y2="${num(cy - 7)}" class="d-lead"/>`;
         });
       }
