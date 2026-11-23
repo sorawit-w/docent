@@ -142,7 +142,12 @@ function drawBar(model, phone = false) {
     const w = valueWidth(str), start = anchor === "end" ? x - w : x;
     s.notes.push({ x, y: ty, s: str, cls: "val", anchor, knock: { x: start - 4, y: ty - 12, w: w + 8, h: 16 } });
   };
-  const noData = (x, cy) => s.notes.push({ x, y: cy + 4, s: "no data", cls: "sub", anchor: "start", knock: { x: x - 4, y: cy - 8, w: textWidth("no data", 12) + 8, h: 16 } });
+  // "no data" starts where the bar would start. On a scale that ends at 0 there is no room after 0, so it stands 8px left of
+  // 0, as the value of a bar below 0 does.
+  const noData = (x, cy) => {
+    const w = textWidth("no data", 12), left = x + w > hi;
+    s.notes.push({ x: left ? x - 8 : x, y: cy + 4, s: "no data", cls: "sub", anchor: left ? "end" : "start", knock: { x: (left ? x - 8 - w : x) - 4, y: cy - 8, w: w + 8, h: 16 } });
+  };
 
   const spans = [];
   const groups = model.groups.length ? model.groups : [{ name: "", rows }];

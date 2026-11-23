@@ -118,6 +118,19 @@ test("a value below 0 runs left of a muted 0 line, with its value on its left", 
   assert.deepEqual(renderDiagram(bars()).scene.under, []);
 });
 
+test("on a scale that ends at 0, no data stands left of 0 and stays inside the drawing", () => {
+  const d = bars();
+  d.scale = { from: -100, to: 0, step: 25, unit: "points" };
+  d.rows = [{ name: "Sign-in", value: -30 }, { name: "Search", value: null }];
+  const { scene, phone } = renderDiagram(d);
+  for (const sc of [scene, phone]) {
+    const zero = sc.notes.find((n) => n.s === "0" && n.cls === "val").x, none = sc.notes.find((n) => n.s === "no data");
+    assert.deepEqual([none.anchor, none.x], ["end", zero - 8]);
+    assert.ok(none.knock.x + none.knock.w <= sc.w - 8);
+    assert.deepEqual(clashes(sc), []);
+  }
+});
+
 test("a bar narrower than 2px is drawn 2px wide, and the words say so", () => {
   const d = bars();
   d.rows[5].value = 0.4;
