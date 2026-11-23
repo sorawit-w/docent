@@ -1,0 +1,238 @@
+<svg id="dg-reports-panels" class="dg dg-line dg-auto" xmlns="http://www.w3.org/2000/svg" width="640" height="388" viewBox="0 0 640 388" role="img" aria-label="Reports for each of four areas over twelve months. Sign-in rose to 138 in June and fell back. Search rose slowly all year. Checkout stayed near 32. Settings fell from 58 to 24.">
+<style>
+#dg-reports-panels{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-reports-panels .ground{fill:var(--fig,#f2f3f9)}
+#dg-reports-panels .band{fill:var(--bg,#fbfbfe)}
+#dg-reports-panels .track{stroke:var(--line,#d3d6e3)}
+#dg-reports-panels .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-reports-panels .head{fill:var(--text,#1c1f2e)}
+#dg-reports-panels .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-reports-panels .stop.end{fill:var(--text,#1c1f2e)}
+#dg-reports-panels .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-reports-panels .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-reports-panels .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-reports-panels .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-reports-panels .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-reports-panels .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-reports-panels .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-reports-panels .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-reports-panels .sub,#dg-reports-panels .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-reports-panels .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-reports-panels .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-reports-panels .dim{font-size:14px;fill:var(--muted,#575d75)}
+#dg-reports-panels .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-reports-panels .ln{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}#dg-reports-panels .pt{fill:var(--text,#1c1f2e)}
+#dg-reports-panels .ln-o{fill:none;stroke:var(--muted,#575d75);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}#dg-reports-panels .pt-o{fill:var(--muted,#575d75)}
+#dg-reports-panels .ln-g{fill:none;stroke:var(--line,#d3d6e3);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}#dg-reports-panels .pt-g{fill:var(--line,#d3d6e3)}
+#dg-reports-panels .ld{stroke:var(--muted,#575d75);stroke-width:1}
+#dg-reports-panels .r-ref{stroke:var(--muted,#575d75)}
+@media (prefers-reduced-motion:reduce){#dg-reports-panels .pulse{animation:none!important}#dg-reports-panels .pulse{display:none!important}}
+@media print{#dg-reports-panels{max-width:100%;height:auto}#dg-reports-panels .pulse{display:none!important}}
+#dg-reports-panels-phone{display:none}
+</style>
+<rect width="640" height="388" class="ground"/>
+<rect x="12" y="36" width="200" height="168" rx="10" class="band"/>
+<rect x="220" y="36" width="200" height="168" rx="10" class="band"/>
+<rect x="12" y="212" width="200" height="168" rx="10" class="band"/>
+<rect x="220" y="212" width="200" height="168" rx="10" class="band"/>
+<line x1="52" y1="176" x2="204" y2="176" class="track"/>
+<line x1="52" y1="142.67" x2="204" y2="142.67" class="track"/>
+<line x1="52" y1="109.33" x2="204" y2="109.33" class="track"/>
+<line x1="52" y1="76" x2="204" y2="76" class="track"/>
+<line x1="260" y1="176" x2="412" y2="176" class="track"/>
+<line x1="260" y1="142.67" x2="412" y2="142.67" class="track"/>
+<line x1="260" y1="109.33" x2="412" y2="109.33" class="track"/>
+<line x1="260" y1="76" x2="412" y2="76" class="track"/>
+<line x1="52" y1="352" x2="204" y2="352" class="track"/>
+<line x1="52" y1="318.67" x2="204" y2="318.67" class="track"/>
+<line x1="52" y1="285.33" x2="204" y2="285.33" class="track"/>
+<line x1="52" y1="252" x2="204" y2="252" class="track"/>
+<line x1="260" y1="352" x2="412" y2="352" class="track"/>
+<line x1="260" y1="318.67" x2="412" y2="318.67" class="track"/>
+<line x1="260" y1="285.33" x2="412" y2="285.33" class="track"/>
+<line x1="260" y1="252" x2="412" y2="252" class="track"/>
+<text x="20" y="24" class="sub" text-anchor="start">Reports, scale from 0. Each panel draws one series; the others are the thin gray lines behind it.</text>
+<text x="20" y="56" class="name" text-anchor="start">Sign-in</text>
+<text x="44" y="180" class="val" text-anchor="end">0</text>
+<text x="44" y="146.67" class="val" text-anchor="end">50</text>
+<text x="44" y="113.33" class="val" text-anchor="end">100</text>
+<text x="44" y="80" class="val" text-anchor="end">150</text>
+<text x="52" y="194" class="val" text-anchor="middle">Jan</text>
+<text x="79.64" y="194" class="val" text-anchor="middle">Mar</text>
+<text x="107.27" y="194" class="val" text-anchor="middle">May</text>
+<text x="134.91" y="194" class="val" text-anchor="middle">Jul</text>
+<text x="162.55" y="194" class="val" text-anchor="middle">Sep</text>
+<text x="190.18" y="194" class="val" text-anchor="middle">Nov</text>
+<text x="228" y="56" class="name" text-anchor="start">Search</text>
+<text x="252" y="180" class="val" text-anchor="end">0</text>
+<text x="252" y="146.67" class="val" text-anchor="end">50</text>
+<text x="252" y="113.33" class="val" text-anchor="end">100</text>
+<text x="252" y="80" class="val" text-anchor="end">150</text>
+<text x="260" y="194" class="val" text-anchor="middle">Jan</text>
+<text x="287.64" y="194" class="val" text-anchor="middle">Mar</text>
+<text x="315.27" y="194" class="val" text-anchor="middle">May</text>
+<text x="342.91" y="194" class="val" text-anchor="middle">Jul</text>
+<text x="370.55" y="194" class="val" text-anchor="middle">Sep</text>
+<text x="398.18" y="194" class="val" text-anchor="middle">Nov</text>
+<text x="20" y="232" class="name" text-anchor="start">Checkout</text>
+<text x="44" y="356" class="val" text-anchor="end">0</text>
+<text x="44" y="322.67" class="val" text-anchor="end">50</text>
+<text x="44" y="289.33" class="val" text-anchor="end">100</text>
+<text x="44" y="256" class="val" text-anchor="end">150</text>
+<text x="52" y="370" class="val" text-anchor="middle">Jan</text>
+<text x="79.64" y="370" class="val" text-anchor="middle">Mar</text>
+<text x="107.27" y="370" class="val" text-anchor="middle">May</text>
+<text x="134.91" y="370" class="val" text-anchor="middle">Jul</text>
+<text x="162.55" y="370" class="val" text-anchor="middle">Sep</text>
+<text x="190.18" y="370" class="val" text-anchor="middle">Nov</text>
+<text x="228" y="232" class="name" text-anchor="start">Settings</text>
+<text x="252" y="356" class="val" text-anchor="end">0</text>
+<text x="252" y="322.67" class="val" text-anchor="end">50</text>
+<text x="252" y="289.33" class="val" text-anchor="end">100</text>
+<text x="252" y="256" class="val" text-anchor="end">150</text>
+<text x="260" y="370" class="val" text-anchor="middle">Jan</text>
+<text x="287.64" y="370" class="val" text-anchor="middle">Mar</text>
+<text x="315.27" y="370" class="val" text-anchor="middle">May</text>
+<text x="342.91" y="370" class="val" text-anchor="middle">Jul</text>
+<text x="370.55" y="370" class="val" text-anchor="middle">Sep</text>
+<text x="398.18" y="370" class="val" text-anchor="middle">Nov</text>
+<path d="M52,149.33 L65.82,148 L79.64,150 L93.45,146 L107.27,144 L121.09,146.67 L134.91,145.33 L148.73,142.67 L162.55,144.67 L176.36,143.33 L190.18,141.33 L204,142" class="ln-g"/><path d="M52,156 L65.82,157.33 L79.64,152.67 L93.45,154 L107.27,155.33 L121.09,152 L134.91,153.33 L148.73,156 L162.55,156.67 L176.36,154 L190.18,154.67 L204,152.67" class="ln-g"/><path d="M52,137.33 L65.82,139.33 L79.64,142 L93.45,143.33 L107.27,146.67 L121.09,149.33 L134.91,150.67 L148.73,154 L162.55,155.33 L176.36,157.33 L190.18,158.67 L204,160" class="ln-g"/><path d="M52,134.67 L65.82,129.33 L79.64,122 L93.45,112.67 L107.27,96 L121.09,84 L134.91,88.67 L148.73,101.33 L162.55,112 L176.36,120 L190.18,128.67 L204,132" class="ln"/><circle cx="52" cy="134.67" r="3" class="pt"/><circle cx="65.82" cy="129.33" r="3" class="pt"/><circle cx="79.64" cy="122" r="3" class="pt"/><circle cx="93.45" cy="112.67" r="3" class="pt"/><circle cx="107.27" cy="96" r="3" class="pt"/><circle cx="121.09" cy="84" r="3" class="pt"/><circle cx="134.91" cy="88.67" r="3" class="pt"/><circle cx="148.73" cy="101.33" r="3" class="pt"/><circle cx="162.55" cy="112" r="3" class="pt"/><circle cx="176.36" cy="120" r="3" class="pt"/><circle cx="190.18" cy="128.67" r="3" class="pt"/><circle cx="204" cy="132" r="3" class="pt"/>
+<path d="M260,134.67 L273.82,129.33 L287.64,122 L301.45,112.67 L315.27,96 L329.09,84 L342.91,88.67 L356.73,101.33 L370.55,112 L384.36,120 L398.18,128.67 L412,132" class="ln-g"/><path d="M260,156 L273.82,157.33 L287.64,152.67 L301.45,154 L315.27,155.33 L329.09,152 L342.91,153.33 L356.73,156 L370.55,156.67 L384.36,154 L398.18,154.67 L412,152.67" class="ln-g"/><path d="M260,137.33 L273.82,139.33 L287.64,142 L301.45,143.33 L315.27,146.67 L329.09,149.33 L342.91,150.67 L356.73,154 L370.55,155.33 L384.36,157.33 L398.18,158.67 L412,160" class="ln-g"/><path d="M260,149.33 L273.82,148 L287.64,150 L301.45,146 L315.27,144 L329.09,146.67 L342.91,145.33 L356.73,142.67 L370.55,144.67 L384.36,143.33 L398.18,141.33 L412,142" class="ln"/><circle cx="260" cy="149.33" r="3" class="pt"/><circle cx="273.82" cy="148" r="3" class="pt"/><circle cx="287.64" cy="150" r="3" class="pt"/><circle cx="301.45" cy="146" r="3" class="pt"/><circle cx="315.27" cy="144" r="3" class="pt"/><circle cx="329.09" cy="146.67" r="3" class="pt"/><circle cx="342.91" cy="145.33" r="3" class="pt"/><circle cx="356.73" cy="142.67" r="3" class="pt"/><circle cx="370.55" cy="144.67" r="3" class="pt"/><circle cx="384.36" cy="143.33" r="3" class="pt"/><circle cx="398.18" cy="141.33" r="3" class="pt"/><circle cx="412" cy="142" r="3" class="pt"/>
+<path d="M52,310.67 L65.82,305.33 L79.64,298 L93.45,288.67 L107.27,272 L121.09,260 L134.91,264.67 L148.73,277.33 L162.55,288 L176.36,296 L190.18,304.67 L204,308" class="ln-g"/><path d="M52,325.33 L65.82,324 L79.64,326 L93.45,322 L107.27,320 L121.09,322.67 L134.91,321.33 L148.73,318.67 L162.55,320.67 L176.36,319.33 L190.18,317.33 L204,318" class="ln-g"/><path d="M52,313.33 L65.82,315.33 L79.64,318 L93.45,319.33 L107.27,322.67 L121.09,325.33 L134.91,326.67 L148.73,330 L162.55,331.33 L176.36,333.33 L190.18,334.67 L204,336" class="ln-g"/><path d="M52,332 L65.82,333.33 L79.64,328.67 L93.45,330 L107.27,331.33 L121.09,328 L134.91,329.33 L148.73,332 L162.55,332.67 L176.36,330 L190.18,330.67 L204,328.67" class="ln"/><circle cx="52" cy="332" r="3" class="pt"/><circle cx="65.82" cy="333.33" r="3" class="pt"/><circle cx="79.64" cy="328.67" r="3" class="pt"/><circle cx="93.45" cy="330" r="3" class="pt"/><circle cx="107.27" cy="331.33" r="3" class="pt"/><circle cx="121.09" cy="328" r="3" class="pt"/><circle cx="134.91" cy="329.33" r="3" class="pt"/><circle cx="148.73" cy="332" r="3" class="pt"/><circle cx="162.55" cy="332.67" r="3" class="pt"/><circle cx="176.36" cy="330" r="3" class="pt"/><circle cx="190.18" cy="330.67" r="3" class="pt"/><circle cx="204" cy="328.67" r="3" class="pt"/>
+<path d="M260,310.67 L273.82,305.33 L287.64,298 L301.45,288.67 L315.27,272 L329.09,260 L342.91,264.67 L356.73,277.33 L370.55,288 L384.36,296 L398.18,304.67 L412,308" class="ln-g"/><path d="M260,325.33 L273.82,324 L287.64,326 L301.45,322 L315.27,320 L329.09,322.67 L342.91,321.33 L356.73,318.67 L370.55,320.67 L384.36,319.33 L398.18,317.33 L412,318" class="ln-g"/><path d="M260,332 L273.82,333.33 L287.64,328.67 L301.45,330 L315.27,331.33 L329.09,328 L342.91,329.33 L356.73,332 L370.55,332.67 L384.36,330 L398.18,330.67 L412,328.67" class="ln-g"/><path d="M260,313.33 L273.82,315.33 L287.64,318 L301.45,319.33 L315.27,322.67 L329.09,325.33 L342.91,326.67 L356.73,330 L370.55,331.33 L384.36,333.33 L398.18,334.67 L412,336" class="ln"/><circle cx="260" cy="313.33" r="3" class="pt"/><circle cx="273.82" cy="315.33" r="3" class="pt"/><circle cx="287.64" cy="318" r="3" class="pt"/><circle cx="301.45" cy="319.33" r="3" class="pt"/><circle cx="315.27" cy="322.67" r="3" class="pt"/><circle cx="329.09" cy="325.33" r="3" class="pt"/><circle cx="342.91" cy="326.67" r="3" class="pt"/><circle cx="356.73" cy="330" r="3" class="pt"/><circle cx="370.55" cy="331.33" r="3" class="pt"/><circle cx="384.36" cy="333.33" r="3" class="pt"/><circle cx="398.18" cy="334.67" r="3" class="pt"/><circle cx="412" cy="336" r="3" class="pt"/>
+</svg>
+<svg id="dg-reports-panels-phone" class="dg dg-line dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="836" viewBox="0 0 264 836" role="img" aria-label="Reports for each of four areas over twelve months. Sign-in rose to 138 in June and fell back. Search rose slowly all year. Checkout stayed near 32. Settings fell from 58 to 24.">
+<style>
+#dg-reports-panels-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-reports-panels-phone .ground{fill:var(--fig,#f2f3f9)}
+#dg-reports-panels-phone .band{fill:var(--bg,#fbfbfe)}
+#dg-reports-panels-phone .track{stroke:var(--line,#d3d6e3)}
+#dg-reports-panels-phone .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-reports-panels-phone .head{fill:var(--text,#1c1f2e)}
+#dg-reports-panels-phone .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-reports-panels-phone .stop.end{fill:var(--text,#1c1f2e)}
+#dg-reports-panels-phone .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-reports-panels-phone .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-reports-panels-phone .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-reports-panels-phone .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-reports-panels-phone .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-reports-panels-phone .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-reports-panels-phone .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-reports-panels-phone .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-reports-panels-phone .sub,#dg-reports-panels-phone .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-reports-panels-phone .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-reports-panels-phone .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-reports-panels-phone .dim{font-size:14px;fill:var(--muted,#575d75)}
+#dg-reports-panels-phone .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-reports-panels-phone .ln{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}#dg-reports-panels-phone .pt{fill:var(--text,#1c1f2e)}
+#dg-reports-panels-phone .ln-o{fill:none;stroke:var(--muted,#575d75);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}#dg-reports-panels-phone .pt-o{fill:var(--muted,#575d75)}
+#dg-reports-panels-phone .ln-g{fill:none;stroke:var(--line,#d3d6e3);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}#dg-reports-panels-phone .pt-g{fill:var(--line,#d3d6e3)}
+#dg-reports-panels-phone .ld{stroke:var(--muted,#575d75);stroke-width:1}
+#dg-reports-panels-phone .r-ref{stroke:var(--muted,#575d75)}
+@media (prefers-reduced-motion:reduce){#dg-reports-panels-phone .pulse{animation:none!important}#dg-reports-panels-phone .pulse{display:none!important}}
+@media print{#dg-reports-panels-phone{max-width:100%;height:auto}#dg-reports-panels-phone .pulse{display:none!important}}
+@media (max-width:736px){#dg-reports-panels{display:none}#dg-reports-panels-phone{display:block}}
+@media print{#dg-reports-panels{display:block!important}#dg-reports-panels-phone{display:none!important}}
+</style>
+<rect width="264" height="836" class="ground"/>
+<rect x="12" y="68" width="240" height="184" rx="10" class="band"/>
+<rect x="12" y="260" width="240" height="184" rx="10" class="band"/>
+<rect x="12" y="452" width="240" height="184" rx="10" class="band"/>
+<rect x="12" y="644" width="240" height="184" rx="10" class="band"/>
+<line x1="52" y1="208" x2="244" y2="208" class="track"/>
+<line x1="52" y1="174.67" x2="244" y2="174.67" class="track"/>
+<line x1="52" y1="141.33" x2="244" y2="141.33" class="track"/>
+<line x1="52" y1="108" x2="244" y2="108" class="track"/>
+<line x1="52" y1="400" x2="244" y2="400" class="track"/>
+<line x1="52" y1="366.67" x2="244" y2="366.67" class="track"/>
+<line x1="52" y1="333.33" x2="244" y2="333.33" class="track"/>
+<line x1="52" y1="300" x2="244" y2="300" class="track"/>
+<line x1="52" y1="592" x2="244" y2="592" class="track"/>
+<line x1="52" y1="558.67" x2="244" y2="558.67" class="track"/>
+<line x1="52" y1="525.33" x2="244" y2="525.33" class="track"/>
+<line x1="52" y1="492" x2="244" y2="492" class="track"/>
+<line x1="52" y1="784" x2="244" y2="784" class="track"/>
+<line x1="52" y1="750.67" x2="244" y2="750.67" class="track"/>
+<line x1="52" y1="717.33" x2="244" y2="717.33" class="track"/>
+<line x1="52" y1="684" x2="244" y2="684" class="track"/>
+<text x="20" y="24" class="sub" text-anchor="start">Reports, scale from 0. Each panel</text>
+<text x="20" y="40" class="sub" text-anchor="start">draws one series; the others are the</text>
+<text x="20" y="56" class="sub" text-anchor="start">thin gray lines behind it.</text>
+<text x="20" y="88" class="name" text-anchor="start">Sign-in</text>
+<text x="44" y="212" class="val" text-anchor="end">0</text>
+<text x="44" y="178.67" class="val" text-anchor="end">50</text>
+<text x="44" y="145.33" class="val" text-anchor="end">100</text>
+<text x="44" y="112" class="val" text-anchor="end">150</text>
+<text x="52" y="226" class="val" text-anchor="middle">Jan</text>
+<text x="69.45" y="242" class="val" text-anchor="middle">Feb</text>
+<text x="86.91" y="226" class="val" text-anchor="middle">Mar</text>
+<text x="104.36" y="242" class="val" text-anchor="middle">Apr</text>
+<text x="121.82" y="226" class="val" text-anchor="middle">May</text>
+<text x="139.27" y="242" class="val" text-anchor="middle">Jun</text>
+<text x="156.73" y="226" class="val" text-anchor="middle">Jul</text>
+<text x="174.18" y="242" class="val" text-anchor="middle">Aug</text>
+<text x="191.64" y="226" class="val" text-anchor="middle">Sep</text>
+<text x="209.09" y="242" class="val" text-anchor="middle">Oct</text>
+<text x="226.55" y="226" class="val" text-anchor="middle">Nov</text>
+<text x="236.5" y="242" class="val" text-anchor="middle">Dec</text>
+<text x="20" y="280" class="name" text-anchor="start">Search</text>
+<text x="44" y="404" class="val" text-anchor="end">0</text>
+<text x="44" y="370.67" class="val" text-anchor="end">50</text>
+<text x="44" y="337.33" class="val" text-anchor="end">100</text>
+<text x="44" y="304" class="val" text-anchor="end">150</text>
+<text x="52" y="418" class="val" text-anchor="middle">Jan</text>
+<text x="69.45" y="434" class="val" text-anchor="middle">Feb</text>
+<text x="86.91" y="418" class="val" text-anchor="middle">Mar</text>
+<text x="104.36" y="434" class="val" text-anchor="middle">Apr</text>
+<text x="121.82" y="418" class="val" text-anchor="middle">May</text>
+<text x="139.27" y="434" class="val" text-anchor="middle">Jun</text>
+<text x="156.73" y="418" class="val" text-anchor="middle">Jul</text>
+<text x="174.18" y="434" class="val" text-anchor="middle">Aug</text>
+<text x="191.64" y="418" class="val" text-anchor="middle">Sep</text>
+<text x="209.09" y="434" class="val" text-anchor="middle">Oct</text>
+<text x="226.55" y="418" class="val" text-anchor="middle">Nov</text>
+<text x="236.5" y="434" class="val" text-anchor="middle">Dec</text>
+<text x="20" y="472" class="name" text-anchor="start">Checkout</text>
+<text x="44" y="596" class="val" text-anchor="end">0</text>
+<text x="44" y="562.67" class="val" text-anchor="end">50</text>
+<text x="44" y="529.33" class="val" text-anchor="end">100</text>
+<text x="44" y="496" class="val" text-anchor="end">150</text>
+<text x="52" y="610" class="val" text-anchor="middle">Jan</text>
+<text x="69.45" y="626" class="val" text-anchor="middle">Feb</text>
+<text x="86.91" y="610" class="val" text-anchor="middle">Mar</text>
+<text x="104.36" y="626" class="val" text-anchor="middle">Apr</text>
+<text x="121.82" y="610" class="val" text-anchor="middle">May</text>
+<text x="139.27" y="626" class="val" text-anchor="middle">Jun</text>
+<text x="156.73" y="610" class="val" text-anchor="middle">Jul</text>
+<text x="174.18" y="626" class="val" text-anchor="middle">Aug</text>
+<text x="191.64" y="610" class="val" text-anchor="middle">Sep</text>
+<text x="209.09" y="626" class="val" text-anchor="middle">Oct</text>
+<text x="226.55" y="610" class="val" text-anchor="middle">Nov</text>
+<text x="236.5" y="626" class="val" text-anchor="middle">Dec</text>
+<text x="20" y="664" class="name" text-anchor="start">Settings</text>
+<text x="44" y="788" class="val" text-anchor="end">0</text>
+<text x="44" y="754.67" class="val" text-anchor="end">50</text>
+<text x="44" y="721.33" class="val" text-anchor="end">100</text>
+<text x="44" y="688" class="val" text-anchor="end">150</text>
+<text x="52" y="802" class="val" text-anchor="middle">Jan</text>
+<text x="69.45" y="818" class="val" text-anchor="middle">Feb</text>
+<text x="86.91" y="802" class="val" text-anchor="middle">Mar</text>
+<text x="104.36" y="818" class="val" text-anchor="middle">Apr</text>
+<text x="121.82" y="802" class="val" text-anchor="middle">May</text>
+<text x="139.27" y="818" class="val" text-anchor="middle">Jun</text>
+<text x="156.73" y="802" class="val" text-anchor="middle">Jul</text>
+<text x="174.18" y="818" class="val" text-anchor="middle">Aug</text>
+<text x="191.64" y="802" class="val" text-anchor="middle">Sep</text>
+<text x="209.09" y="818" class="val" text-anchor="middle">Oct</text>
+<text x="226.55" y="802" class="val" text-anchor="middle">Nov</text>
+<text x="236.5" y="818" class="val" text-anchor="middle">Dec</text>
+<path d="M52,181.33 L69.45,180 L86.91,182 L104.36,178 L121.82,176 L139.27,178.67 L156.73,177.33 L174.18,174.67 L191.64,176.67 L209.09,175.33 L226.55,173.33 L244,174" class="ln-g"/><path d="M52,188 L69.45,189.33 L86.91,184.67 L104.36,186 L121.82,187.33 L139.27,184 L156.73,185.33 L174.18,188 L191.64,188.67 L209.09,186 L226.55,186.67 L244,184.67" class="ln-g"/><path d="M52,169.33 L69.45,171.33 L86.91,174 L104.36,175.33 L121.82,178.67 L139.27,181.33 L156.73,182.67 L174.18,186 L191.64,187.33 L209.09,189.33 L226.55,190.67 L244,192" class="ln-g"/><path d="M52,166.67 L69.45,161.33 L86.91,154 L104.36,144.67 L121.82,128 L139.27,116 L156.73,120.67 L174.18,133.33 L191.64,144 L209.09,152 L226.55,160.67 L244,164" class="ln"/><circle cx="52" cy="166.67" r="3" class="pt"/><circle cx="69.45" cy="161.33" r="3" class="pt"/><circle cx="86.91" cy="154" r="3" class="pt"/><circle cx="104.36" cy="144.67" r="3" class="pt"/><circle cx="121.82" cy="128" r="3" class="pt"/><circle cx="139.27" cy="116" r="3" class="pt"/><circle cx="156.73" cy="120.67" r="3" class="pt"/><circle cx="174.18" cy="133.33" r="3" class="pt"/><circle cx="191.64" cy="144" r="3" class="pt"/><circle cx="209.09" cy="152" r="3" class="pt"/><circle cx="226.55" cy="160.67" r="3" class="pt"/><circle cx="244" cy="164" r="3" class="pt"/>
+<path d="M52,358.67 L69.45,353.33 L86.91,346 L104.36,336.67 L121.82,320 L139.27,308 L156.73,312.67 L174.18,325.33 L191.64,336 L209.09,344 L226.55,352.67 L244,356" class="ln-g"/><path d="M52,380 L69.45,381.33 L86.91,376.67 L104.36,378 L121.82,379.33 L139.27,376 L156.73,377.33 L174.18,380 L191.64,380.67 L209.09,378 L226.55,378.67 L244,376.67" class="ln-g"/><path d="M52,361.33 L69.45,363.33 L86.91,366 L104.36,367.33 L121.82,370.67 L139.27,373.33 L156.73,374.67 L174.18,378 L191.64,379.33 L209.09,381.33 L226.55,382.67 L244,384" class="ln-g"/><path d="M52,373.33 L69.45,372 L86.91,374 L104.36,370 L121.82,368 L139.27,370.67 L156.73,369.33 L174.18,366.67 L191.64,368.67 L209.09,367.33 L226.55,365.33 L244,366" class="ln"/><circle cx="52" cy="373.33" r="3" class="pt"/><circle cx="69.45" cy="372" r="3" class="pt"/><circle cx="86.91" cy="374" r="3" class="pt"/><circle cx="104.36" cy="370" r="3" class="pt"/><circle cx="121.82" cy="368" r="3" class="pt"/><circle cx="139.27" cy="370.67" r="3" class="pt"/><circle cx="156.73" cy="369.33" r="3" class="pt"/><circle cx="174.18" cy="366.67" r="3" class="pt"/><circle cx="191.64" cy="368.67" r="3" class="pt"/><circle cx="209.09" cy="367.33" r="3" class="pt"/><circle cx="226.55" cy="365.33" r="3" class="pt"/><circle cx="244" cy="366" r="3" class="pt"/>
+<path d="M52,550.67 L69.45,545.33 L86.91,538 L104.36,528.67 L121.82,512 L139.27,500 L156.73,504.67 L174.18,517.33 L191.64,528 L209.09,536 L226.55,544.67 L244,548" class="ln-g"/><path d="M52,565.33 L69.45,564 L86.91,566 L104.36,562 L121.82,560 L139.27,562.67 L156.73,561.33 L174.18,558.67 L191.64,560.67 L209.09,559.33 L226.55,557.33 L244,558" class="ln-g"/><path d="M52,553.33 L69.45,555.33 L86.91,558 L104.36,559.33 L121.82,562.67 L139.27,565.33 L156.73,566.67 L174.18,570 L191.64,571.33 L209.09,573.33 L226.55,574.67 L244,576" class="ln-g"/><path d="M52,572 L69.45,573.33 L86.91,568.67 L104.36,570 L121.82,571.33 L139.27,568 L156.73,569.33 L174.18,572 L191.64,572.67 L209.09,570 L226.55,570.67 L244,568.67" class="ln"/><circle cx="52" cy="572" r="3" class="pt"/><circle cx="69.45" cy="573.33" r="3" class="pt"/><circle cx="86.91" cy="568.67" r="3" class="pt"/><circle cx="104.36" cy="570" r="3" class="pt"/><circle cx="121.82" cy="571.33" r="3" class="pt"/><circle cx="139.27" cy="568" r="3" class="pt"/><circle cx="156.73" cy="569.33" r="3" class="pt"/><circle cx="174.18" cy="572" r="3" class="pt"/><circle cx="191.64" cy="572.67" r="3" class="pt"/><circle cx="209.09" cy="570" r="3" class="pt"/><circle cx="226.55" cy="570.67" r="3" class="pt"/><circle cx="244" cy="568.67" r="3" class="pt"/>
+<path d="M52,742.67 L69.45,737.33 L86.91,730 L104.36,720.67 L121.82,704 L139.27,692 L156.73,696.67 L174.18,709.33 L191.64,720 L209.09,728 L226.55,736.67 L244,740" class="ln-g"/><path d="M52,757.33 L69.45,756 L86.91,758 L104.36,754 L121.82,752 L139.27,754.67 L156.73,753.33 L174.18,750.67 L191.64,752.67 L209.09,751.33 L226.55,749.33 L244,750" class="ln-g"/><path d="M52,764 L69.45,765.33 L86.91,760.67 L104.36,762 L121.82,763.33 L139.27,760 L156.73,761.33 L174.18,764 L191.64,764.67 L209.09,762 L226.55,762.67 L244,760.67" class="ln-g"/><path d="M52,745.33 L69.45,747.33 L86.91,750 L104.36,751.33 L121.82,754.67 L139.27,757.33 L156.73,758.67 L174.18,762 L191.64,763.33 L209.09,765.33 L226.55,766.67 L244,768" class="ln"/><circle cx="52" cy="745.33" r="3" class="pt"/><circle cx="69.45" cy="747.33" r="3" class="pt"/><circle cx="86.91" cy="750" r="3" class="pt"/><circle cx="104.36" cy="751.33" r="3" class="pt"/><circle cx="121.82" cy="754.67" r="3" class="pt"/><circle cx="139.27" cy="757.33" r="3" class="pt"/><circle cx="156.73" cy="758.67" r="3" class="pt"/><circle cx="174.18" cy="762" r="3" class="pt"/><circle cx="191.64" cy="763.33" r="3" class="pt"/><circle cx="209.09" cy="765.33" r="3" class="pt"/><circle cx="226.55" cy="766.67" r="3" class="pt"/><circle cx="244" cy="768" r="3" class="pt"/>
+</svg>
+<details class="dg-words">
+<summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>The diagram in words</summary>
+<div class="table-wrap" role="region" aria-label="The values of the line chart" tabindex="0"><table><thead><tr><td></td><th scope="col">Sign-in</th><th scope="col">Search</th><th scope="col">Checkout</th><th scope="col">Settings</th></tr></thead><tbody><tr><th scope="row">Jan</th><td>62</td><td>40</td><td>30</td><td>58</td></tr><tr><th scope="row">Feb</th><td>70</td><td>42</td><td>28</td><td>55</td></tr><tr><th scope="row">Mar</th><td>81</td><td>39</td><td>35</td><td>51</td></tr><tr><th scope="row">Apr</th><td>95</td><td>45</td><td>33</td><td>49</td></tr><tr><th scope="row">May</th><td>120</td><td>48</td><td>31</td><td>44</td></tr><tr><th scope="row">Jun</th><td>138</td><td>44</td><td>36</td><td>40</td></tr><tr><th scope="row">Jul</th><td>131</td><td>46</td><td>34</td><td>38</td></tr><tr><th scope="row">Aug</th><td>112</td><td>50</td><td>30</td><td>33</td></tr><tr><th scope="row">Sep</th><td>96</td><td>47</td><td>29</td><td>31</td></tr><tr><th scope="row">Oct</th><td>84</td><td>49</td><td>33</td><td>28</td></tr><tr><th scope="row">Nov</th><td>71</td><td>52</td><td>32</td><td>26</td></tr><tr><th scope="row">Dec</th><td>66</td><td>51</td><td>35</td><td>24</td></tr></tbody></table></div>
+<ul><li>Reports, scale from 0. Each panel draws one series; the others are the thin gray lines behind it.</li><li>Sign-in: 62 in Jan, 66 in Dec; highest 138 in Jun; lowest 62 in Jan.</li><li>Search: 40 in Jan, 51 in Dec; highest 52 in Nov; lowest 39 in Mar.</li><li>Checkout: 30 in Jan, 35 in Dec; highest 36 in Jun; lowest 28 in Feb.</li><li>Settings: 58 in Jan, 24 in Dec; highest 58 in Jan; lowest 24 in Dec.</li></ul>
+</details>

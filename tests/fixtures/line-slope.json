@@ -1,0 +1,14 @@
+{
+  "id": "days-to-fix-slope",
+  "kind": "line",
+  "label": "The median time to fix a bug fell in three of five areas from 2025 to 2026. Settings fell most, from 15 days to 6. Checkout rose from 6 to 8. Profile stayed at 5.",
+  "scale": {"from": 0, "to": 20, "unit": "days"},
+  "points": ["2025", "2026"],
+  "series": [
+    {"name": "Sign-in", "values": [9, 4]},
+    {"name": "Search", "values": [12, 7]},
+    {"name": "Checkout", "focus": true, "values": [6, 8]},
+    {"name": "Settings", "values": [15, 6]},
+    {"name": "Profile", "values": [5, 5]}
+  ]
+}

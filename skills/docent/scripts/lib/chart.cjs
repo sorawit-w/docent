@@ -1,6 +1,6 @@
 // The chart core: the parts that every scale chart shares, so each kind holds only what is its own. It gives the two forms'
 // widths, text escaped for SVG, names that wrap (also in scripts written without spaces), counts and shares as written,
-// column labels that keep apart, the line above a chart, labels that move apart from their points, and the table in words
+// column labels that keep apart (also along a time axis), the value axis that runs up the page, the line above a chart, labels that move apart from their points, and the table in words
 // that splits for paper. The numeric scale stays in scale.cjs, and
 // this file passes it on, so a chart kind needs this one file for its scale, its ticks and the places of its labels.
 const { fail } = require("./blocks.cjs");
@@ -70,24 +70,45 @@ function onLines(items, most) {
 }
 
 /**
- * The labels along a row of columns, each centred on center(i) and kept 12px inside the drawing W px wide: every label on
- * one line, then on two lines, then every 2nd to 12th label, never fewer than three. Returns { items, lines, every }, where
- * each item is { s, w, cx, x0, line }; it refuses labels that do not fit, naming `where`.
+ * The labels along a row of columns, each centred on center(i) and kept 12px inside the drawing W px wide (or between lo and
+ * hi): every label on one line, then on two lines, then every 2nd to 12th label, never fewer than `least`. A grid keeps three;
+ * a time axis may keep two, because the reader knows that the times between them are there. Returns { items, lines, every },
+ * where each item is { s, w, cx, x0, line }; it refuses labels that do not fit, naming `where`.
  */
-function labelsOf(labels, center, W, where) {
+function labelsOf(labels, center, W, where, { least = 3, lo = 12, hi = W - 12 } = {}) {
   const all = labels.map((s, i) => {
-    const w = valueWidth(s), cx = Math.min(Math.max(center(i), 12 + w / 2), W - 12 - w / 2);
+    const w = valueWidth(s), cx = Math.min(Math.max(center(i), lo + w / 2), hi - w / 2);
     return { s, w, cx, x0: cx - w / 2, line: 0 };
   });
   if (onLines(all, 1)) return { items: all, lines: 1, every: 1 };
   if (onLines(all, 2)) return { items: all, lines: 2, every: 1 };
   for (const every of EVERY) {
     const kept = all.filter((_, i) => i % every === 0);
-    if (kept.length < 3) break;
+    if (kept.length < least) break;
     if (onLines(kept, 1)) return { items: kept, lines: 1, every };
   }
   const widest = all.reduce((a, b) => (b.w > a.w ? b : a));
   fail(`the column labels do not fit ${where}, even on two lines or with every 12th label; the widest is "${widest.s}", ${Math.ceil(widest.w)}px. Shorten the labels to about 7 characters, or use fewer columns`);
+}
+
+/**
+ * The value axis that runs up the page: the scale laid from y0 at the bottom ("from") up to y1 at the top ("to"), with the
+ * ticks whose labels stand at least 24px apart, since a label is 12px tall: every tick, then every 2nd, 5th, 10th or 20th.
+ * Returns { per, y(v), ticks }, each tick { v, y, label }. A scale with no step has no ticks.
+ */
+function upAxis(scale, y0, y1) {
+  const per = (y0 - y1) / (scale.to - scale.from);
+  const y = (v) => y0 - (v - scale.from) * per;
+  const ticks = [];
+  if (scale.count) {
+    // The last spacing keeps the first and the last tick, which stand the whole height apart.
+    const keep = [...[1, 2, 5, 10, 20].filter((n) => n < scale.count), scale.count].find((n) => n * scale.step * per >= 24) || scale.count;
+    for (let k = 0; k <= scale.count; k += keep) {
+      const v = tickAt(scale, scale.count, k);
+      ticks.push({ v, y: y(k === 0 || k === scale.count ? v : scale.from + k * scale.step), label: fmt(v) });
+    }
+  }
+  return { per, y, ticks };
 }
 
 /** The line above a chart: what the numbers count and how to read them. Each sentence starts a line and wraps at its spaces,
@@ -160,7 +181,7 @@ function gridTables(model, text, name) {
 }
 
 module.exports = {
-  WIDE, PHONE, esc, graphemes, NO_SPACES, wrapName, comma, share, EVERY, onLines, labelsOf, headLines, apart, PAPER, tablesOf, gridTables,
+  WIDE, PHONE, esc, graphemes, NO_SPACES, wrapName, comma, share, EVERY, onLines, labelsOf, upAxis, headLines, apart, PAPER, tablesOf, gridTables,
   // The numeric scale, from scale.cjs.
   readScale, makeScale, tickAt, drawHead, drawGrid, linesIn, placeLabel, valueWidth, fmt, isNum, num, diff,
 };

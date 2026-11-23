@@ -137,3 +137,26 @@ test("labels move apart and keep their order; their points never move", () => {
   // Too long for the room: null, so the chart can refuse with a plain reason.
   assert.equal(apart([{ at: 50, size: 60 }, { at: 60, size: 60 }], 0, 100, 8), null);
 });
+
+test("a time axis may keep two labels as its last step, where a grid keeps three", () => {
+  // 24 months on a phone plot of 153px: every 12th label is the last step, and it keeps two, January of each year.
+  const labels = Array.from({ length: 24 }, (_, i) => (i % 12 ? "Mmm" : `Jan ${25 + i / 12}`));
+  const at = (i) => 20 + (i * 153) / 23;
+  assert.throws(() => labelsOf(labels, at, PHONE, "on a phone"), /the column labels do not fit on a phone/);
+  const time = labelsOf(labels, at, PHONE, "on a phone", { least: 2 });
+  assert.deepEqual([time.items.map((it) => it.s), time.every], [["Jan 25", "Jan 26"], 12]);
+  // lo and hi keep labels inside a panel instead of the whole drawing.
+  const panel = labelsOf(["Jan", "Feb", "Mar"], (i) => 100 + i * 40, WIDE, "in a panel", { lo: 104, hi: 200 });
+  assert.equal(panel.items[0].x0, 104);
+});
+
+test("the value axis runs up the page, with its labels at least 24px apart", () => {
+  const { upAxis } = chart;
+  const ax = upAxis(read({ from: 0, to: 150, step: 50 }), 260, 60);
+  assert.deepEqual([ax.y(0), ax.y(150), ax.y(75)], [260, 60, 160], "from at the bottom, to at the top");
+  assert.deepEqual(ax.ticks.map((t) => [t.label, Math.round(t.y * 100) / 100]), [["0", 260], ["50", 193.33], ["100", 126.67], ["150", 60]]);
+  // 20 steps in 100px: a step is 5px, so every 5th tick stands, 25px apart.
+  const dense = upAxis(read({ from: 0, to: 100, step: 5 }), 200, 100);
+  assert.deepEqual(dense.ticks.map((t) => t.label), ["0", "25", "50", "75", "100"]);
+  assert.deepEqual(upAxis(readScale({ from: 0, to: 20 }, { needStep: false }), 300, 100).ticks, [], "a scale with no step has no ticks");
+});

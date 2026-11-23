@@ -1,0 +1,131 @@
+<svg id="dg-days-to-fix-slope" class="dg dg-line dg-auto" xmlns="http://www.w3.org/2000/svg" width="640" height="308" viewBox="0 0 640 308" role="img" aria-label="The median time to fix a bug fell in three of five areas from 2025 to 2026. Settings fell most, from 15 days to 6. Checkout rose from 6 to 8. Profile stayed at 5.">
+<style>
+#dg-days-to-fix-slope{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-days-to-fix-slope .ground{fill:var(--fig,#f2f3f9)}
+#dg-days-to-fix-slope .band{fill:var(--bg,#fbfbfe)}
+#dg-days-to-fix-slope .track{stroke:var(--line,#d3d6e3)}
+#dg-days-to-fix-slope .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-days-to-fix-slope .head{fill:var(--text,#1c1f2e)}
+#dg-days-to-fix-slope .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-days-to-fix-slope .stop.end{fill:var(--text,#1c1f2e)}
+#dg-days-to-fix-slope .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-days-to-fix-slope .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-days-to-fix-slope .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-days-to-fix-slope .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-days-to-fix-slope .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-days-to-fix-slope .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-days-to-fix-slope .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-days-to-fix-slope .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-days-to-fix-slope .sub,#dg-days-to-fix-slope .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-days-to-fix-slope .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-days-to-fix-slope .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-days-to-fix-slope .dim{font-size:14px;fill:var(--muted,#575d75)}
+#dg-days-to-fix-slope .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-days-to-fix-slope .ln{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}#dg-days-to-fix-slope .pt{fill:var(--text,#1c1f2e)}
+#dg-days-to-fix-slope .ln-o{fill:none;stroke:var(--muted,#575d75);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}#dg-days-to-fix-slope .pt-o{fill:var(--muted,#575d75)}
+#dg-days-to-fix-slope .ln-g{fill:none;stroke:var(--line,#d3d6e3);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}#dg-days-to-fix-slope .pt-g{fill:var(--line,#d3d6e3)}
+#dg-days-to-fix-slope .ld{stroke:var(--muted,#575d75);stroke-width:1}
+#dg-days-to-fix-slope .r-ref{stroke:var(--muted,#575d75)}
+@media (prefers-reduced-motion:reduce){#dg-days-to-fix-slope .pulse{animation:none!important}#dg-days-to-fix-slope .pulse{display:none!important}}
+@media print{#dg-days-to-fix-slope{max-width:100%;height:auto}#dg-days-to-fix-slope .pulse{display:none!important}}
+#dg-days-to-fix-slope-phone{display:none}
+</style>
+<rect width="640" height="308" class="ground"/>
+<rect x="8" y="36" width="624" height="264" rx="10" class="band"/>
+<line x1="224" y1="76" x2="224" y2="276" class="track"/>
+<line x1="424" y1="76" x2="424" y2="276" class="track"/>
+<text x="20" y="24" class="sub" text-anchor="start">Days, scale from 0.</text>
+<text x="224" y="56" class="val" text-anchor="middle">2025</text>
+<text x="424" y="56" class="val" text-anchor="middle">2026</text>
+<text x="204" y="190" class="val" text-anchor="end">9</text>
+<text x="180.16" y="191" class="dim" text-anchor="end">Sign-in</text>
+<text x="444" y="256" class="val" text-anchor="start">4</text>
+<text x="459.92" y="257" class="dim" text-anchor="start">Sign-in</text>
+<text x="204" y="160" class="val" text-anchor="end">12</text>
+<text x="180.16" y="161" class="dim" text-anchor="end">Search</text>
+<text x="444" y="202" class="val" text-anchor="start">7</text>
+<text x="459.92" y="203" class="dim" text-anchor="start">Search</text>
+<text x="204" y="130" class="val" text-anchor="end">15</text>
+<text x="180.16" y="131" class="dim" text-anchor="end">Settings</text>
+<text x="444" y="220" class="val" text-anchor="start">6</text>
+<text x="459.92" y="221" class="dim" text-anchor="start">Settings</text>
+<text x="204" y="234" class="val" text-anchor="end">5</text>
+<text x="180.16" y="235" class="dim" text-anchor="end">Profile</text>
+<text x="444" y="238" class="val" text-anchor="start">5</text>
+<text x="459.92" y="239" class="dim" text-anchor="start">Profile</text>
+<text x="204" y="216" class="val" text-anchor="end">6</text>
+<text x="180.16" y="217" class="row" text-anchor="end">Checkout</text>
+<text x="444" y="184" class="val" text-anchor="start">8</text>
+<text x="459.92" y="185" class="row" text-anchor="start">Checkout</text>
+<path d="M224,186 L424,236" class="ln-o"/><line x1="428" y1="236" x2="440" y2="252" class="ld"/>
+<path d="M224,156 L424,206" class="ln-o"/><line x1="428" y1="206" x2="440" y2="198" class="ld"/>
+<path d="M224,126 L424,216" class="ln-o"/>
+<path d="M224,226 L424,226" class="ln-o"/><line x1="220" y1="226" x2="208" y2="230" class="ld"/><line x1="428" y1="226" x2="440" y2="234" class="ld"/>
+<path d="M224,216 L424,196" class="ln"/><circle cx="224" cy="216" r="3" class="pt"/><circle cx="424" cy="196" r="3" class="pt"/><line x1="220" y1="216" x2="208" y2="212" class="ld"/><line x1="428" y1="196" x2="440" y2="180" class="ld"/>
+</svg>
+<svg id="dg-days-to-fix-slope-phone" class="dg dg-line dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="308" viewBox="0 0 264 308" role="img" aria-label="The median time to fix a bug fell in three of five areas from 2025 to 2026. Settings fell most, from 15 days to 6. Checkout rose from 6 to 8. Profile stayed at 5.">
+<style>
+#dg-days-to-fix-slope-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-days-to-fix-slope-phone .ground{fill:var(--fig,#f2f3f9)}
+#dg-days-to-fix-slope-phone .band{fill:var(--bg,#fbfbfe)}
+#dg-days-to-fix-slope-phone .track{stroke:var(--line,#d3d6e3)}
+#dg-days-to-fix-slope-phone .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-days-to-fix-slope-phone .head{fill:var(--text,#1c1f2e)}
+#dg-days-to-fix-slope-phone .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-days-to-fix-slope-phone .stop.end{fill:var(--text,#1c1f2e)}
+#dg-days-to-fix-slope-phone .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-days-to-fix-slope-phone .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-days-to-fix-slope-phone .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-days-to-fix-slope-phone .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-days-to-fix-slope-phone .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-days-to-fix-slope-phone .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-days-to-fix-slope-phone .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-days-to-fix-slope-phone .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-days-to-fix-slope-phone .sub,#dg-days-to-fix-slope-phone .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-days-to-fix-slope-phone .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-days-to-fix-slope-phone .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-days-to-fix-slope-phone .dim{font-size:14px;fill:var(--muted,#575d75)}
+#dg-days-to-fix-slope-phone .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-days-to-fix-slope-phone .ln{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}#dg-days-to-fix-slope-phone .pt{fill:var(--text,#1c1f2e)}
+#dg-days-to-fix-slope-phone .ln-o{fill:none;stroke:var(--muted,#575d75);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}#dg-days-to-fix-slope-phone .pt-o{fill:var(--muted,#575d75)}
+#dg-days-to-fix-slope-phone .ln-g{fill:none;stroke:var(--line,#d3d6e3);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}#dg-days-to-fix-slope-phone .pt-g{fill:var(--line,#d3d6e3)}
+#dg-days-to-fix-slope-phone .ld{stroke:var(--muted,#575d75);stroke-width:1}
+#dg-days-to-fix-slope-phone .r-ref{stroke:var(--muted,#575d75)}
+@media (prefers-reduced-motion:reduce){#dg-days-to-fix-slope-phone .pulse{animation:none!important}#dg-days-to-fix-slope-phone .pulse{display:none!important}}
+@media print{#dg-days-to-fix-slope-phone{max-width:100%;height:auto}#dg-days-to-fix-slope-phone .pulse{display:none!important}}
+@media (max-width:736px){#dg-days-to-fix-slope{display:none}#dg-days-to-fix-slope-phone{display:block}}
+@media print{#dg-days-to-fix-slope{display:block!important}#dg-days-to-fix-slope-phone{display:none!important}}
+</style>
+<rect width="264" height="308" class="ground"/>
+<rect x="8" y="36" width="248" height="264" rx="10" class="band"/>
+<line x1="56" y1="76" x2="56" y2="276" class="track"/>
+<line x1="145.24" y1="76" x2="145.24" y2="276" class="track"/>
+<text x="20" y="24" class="sub" text-anchor="start">Days, scale from 0.</text>
+<text x="56" y="56" class="val" text-anchor="middle">2025</text>
+<text x="145.24" y="56" class="val" text-anchor="middle">2026</text>
+<text x="36" y="190" class="val" text-anchor="end">9</text>
+<text x="165.24" y="256" class="val" text-anchor="start">4</text>
+<text x="181.16" y="257" class="dim" text-anchor="start">Sign-in</text>
+<text x="36" y="160" class="val" text-anchor="end">12</text>
+<text x="165.24" y="202" class="val" text-anchor="start">7</text>
+<text x="181.16" y="203" class="dim" text-anchor="start">Search</text>
+<text x="36" y="130" class="val" text-anchor="end">15</text>
+<text x="165.24" y="220" class="val" text-anchor="start">6</text>
+<text x="181.16" y="221" class="dim" text-anchor="start">Settings</text>
+<text x="36" y="234" class="val" text-anchor="end">5</text>
+<text x="165.24" y="238" class="val" text-anchor="start">5</text>
+<text x="181.16" y="239" class="dim" text-anchor="start">Profile</text>
+<text x="36" y="216" class="val" text-anchor="end">6</text>
+<text x="165.24" y="184" class="val" text-anchor="start">8</text>
+<text x="181.16" y="185" class="row" text-anchor="start">Checkout</text>
+<path d="M56,186 L145.24,236" class="ln-o"/><line x1="149.24" y1="236" x2="161.24" y2="252" class="ld"/>
+<path d="M56,156 L145.24,206" class="ln-o"/><line x1="149.24" y1="206" x2="161.24" y2="198" class="ld"/>
+<path d="M56,126 L145.24,216" class="ln-o"/>
+<path d="M56,226 L145.24,226" class="ln-o"/><line x1="52" y1="226" x2="40" y2="230" class="ld"/><line x1="149.24" y1="226" x2="161.24" y2="234" class="ld"/>
+<path d="M56,216 L145.24,196" class="ln"/><circle cx="56" cy="216" r="3" class="pt"/><circle cx="145.24" cy="196" r="3" class="pt"/><line x1="52" y1="216" x2="40" y2="212" class="ld"/><line x1="149.24" y1="196" x2="161.24" y2="180" class="ld"/>
+</svg>
+<details class="dg-words">
+<summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>The diagram in words</summary>
+<div class="table-wrap is-text" role="region" aria-label="The values of the slopegraph" tabindex="0"><table><thead><tr><th scope="col">Series</th><th scope="col">2025</th><th scope="col">2026</th><th scope="col">Change, in days</th></tr></thead><tbody><tr><th scope="row">Sign-in</th><td>9</td><td>4</td><td>−5</td></tr><tr><th scope="row">Search</th><td>12</td><td>7</td><td>−5</td></tr><tr><th scope="row">Checkout</th><td>6</td><td>8</td><td>+2</td></tr><tr><th scope="row">Settings</th><td>15</td><td>6</td><td>−9</td></tr><tr><th scope="row">Profile</th><td>5</td><td>5</td><td>0</td></tr></tbody></table></div>
+<ul><li>Days, scale from 0.</li></ul>
+</details>

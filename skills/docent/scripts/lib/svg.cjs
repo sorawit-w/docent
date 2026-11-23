@@ -121,6 +121,10 @@ function styles(scene, id, mode, swap) {
   // in the muted color. A dumbbell: the first value a ring, the second a dot in the text color, the gap between them a 2px muted
   // line, and a thin muted line from a moved series name to its mark.
   if (scene.form === "bar") css.push(`${s} .row{font-size:14px;fill:${v("text")}}`, `${s} .val{font-size:12px;fill:${v("muted")};font-variant-numeric:tabular-nums}`, `${s} .r-bar{fill:${v("bg")};stroke:${v("text")};stroke-width:1.5}`, `${s} .r-ref{stroke:${v("muted")}}`, `${s} .r-pt{fill:${v("text")}}`, `${s} .d-ring{fill:${v("bg")};stroke:${v("text")};stroke-width:1.5}`, `${s} .d-gap{stroke:${v("muted")};stroke-width:2}`, `${s} .d-lead{stroke:${v("muted")};stroke-width:1}`);
+  // A line chart: the series that the text talks about as a 2.5px line in the text color, with its name in the text color;
+  // another series as a 1.5px muted line with a muted name; a series behind a panel's own in the outline color. Values with
+  // tabular figures.
+  if (scene.form === "line") css.push(`${s} .row{font-size:14px;fill:${v("text")}}`, `${s} .dim{font-size:14px;fill:${v("muted")}}`, `${s} .val{font-size:12px;fill:${v("muted")};font-variant-numeric:tabular-nums}`, ...[["", "text", 2.5], ["-o", "muted", 1.5], ["-g", "line", 1.5]].map(([k, c, w]) => `${s} .ln${k}{fill:none;stroke:${v(c)};stroke-width:${w};stroke-linecap:round;stroke-linejoin:round}${s} .pt${k}{fill:${v(c)}}`), `${s} .ld{stroke:${v("muted")};stroke-width:1}`, `${s} .r-ref{stroke:${v("muted")}}`);
   // A heat map: row names in weight 400, column labels and legend numbers with tabular figures, each cell in its heat step, and a
   // cell with no data hollow in a muted outline. A number takes the text color on steps 1 to 3 and the page color on 4 and 5.
   // Text on a step reads --heat-text and --heat-page, the kit's own text and page colors: with the reader's high contrast mode

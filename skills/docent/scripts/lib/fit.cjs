@@ -40,6 +40,10 @@ function fitWarnings(kind, model, scene) {
     if (model.series) { if (pairs.length && pairs.every((r) => r.values[0] === r.values[1])) out.push("no row changes; a sentence says this more simply"); }
     else if (known.length > 1 && known.every((v) => v === known[0])) out.push("every value is the same; a sentence says this more simply");
   }
+  if (kind === "line") {
+    if (model.series.length === 1 && model.points.length === 3) out.push("the line chart has one series of 3 points; a sentence says this more simply");
+    if (model.series.every((sr) => { const known = sr.values.filter((v) => v !== null); return known.every((v) => v === known[0]); })) out.push("no value changes; a sentence says this more simply");
+  }
   if (kind === "heatmap") {
     const cells = model.rows.flatMap((r) => r.cells), full = cells.filter(Boolean), empty = cells.length - full.length;
     const steps = new Set(full.map((c) => c.step)), lowest = full.filter((c) => c.step === 0).length;
