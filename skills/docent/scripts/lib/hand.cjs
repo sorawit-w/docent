@@ -188,7 +188,7 @@ function checkDrawing(source, { html = "" } = {}) {
   const named = (root["aria-labelledby"] || "").trim().split(/\s+/).filter(Boolean);
   if (title?.attrs.id && desc?.attrs.id && !(named.includes(title.attrs.id) && named.includes(desc.attrs.id))) fail(8, `the <svg> has ${root["aria-labelledby"] ? `aria-labelledby="${root["aria-labelledby"]}"` : "no aria-labelledby"}; it names the title and the desc: aria-labelledby="${title.attrs.id} ${desc.attrs.id}"`);
   for (const id of new Set(ids)) {
-    const count = (blank(html).match(new RegExp(`\\bid\\s*=\\s*["']${id.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}["']`, "g")) || []).length;
+    const count = (blank(html).match(new RegExp(`(?<![\\w:-])id\\s*=\\s*["']${id.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}["']`, "g")) || []).length;
     if (count > 1 || ids.filter((x) => x === id).length > 1) fail(8, `the id "${id}" is used ${Math.max(count, 2)} times in the page; an id is page-wide, so each one is used once`);
   }
   return { type, errors: errors() };
