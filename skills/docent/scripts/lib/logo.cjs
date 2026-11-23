@@ -115,7 +115,7 @@ function svgLogo(markup) {
     if (attrs.id) byId.set(attrs.id, node);
     if (name === "svg") root = attrs;
     if (name === "linearGradient" || name === "radialGradient") { gradient = { name, id: attrs.id }; if (attrs.id) stops.set(attrs.id, []); }
-    if (name === "stop" && gradient?.id && attrs["stop-color"]) stops.get(gradient.id).push(attrs["stop-color"]);
+    if (name === "stop" && gradient?.id) stops.get(gradient.id).push(attrs["stop-color"] ?? "#000000"); // a stop with no color is black
     if (!selfClose) stack.push(node);
   }
   if (markup.slice(at).trim()) return { error: "it holds something after </svg>, or markup that check cannot read" };
@@ -136,11 +136,14 @@ function svgLogo(markup) {
   };
   const up = (node, key, stop = null) => { for (let n = node; n && n !== stop?.parent; n = n.parent) if (n.own[key] != null) return n.own[key]; return null; };
   const inside = (node, target) => { for (let n = node; n; n = n.parent) if (n === target) return true; return false; };
+  // Each element is read once for each fill and stroke it inherits, so uses inside uses cannot make the work grow without end.
+  const done = new Set();
   const paint = (node, inherited, seen) => {
     const fill = node.own.fill ?? inherited.fill, stroke = node.own.stroke ?? inherited.stroke;
     if (node.name !== "use") { add(fill ?? (node.name === "line" ? null : "#000000")); add(stroke); return; }
-    const target = byId.get(node.href);
-    if (!target || seen.has(target)) return; // a use that points at itself, directly or through another use, draws nothing more
+    const target = byId.get(node.href), key = `${node.href}|${fill}|${stroke}`;
+    if (!target || seen.has(target) || done.has(key)) return; // a use that points at itself, directly or through another use, draws nothing more
+    done.add(key);
     const next = new Set(seen).add(target);
     for (const shape of nodes) {
       if (!SHAPES.has(shape.name) || !inside(shape, target)) continue;

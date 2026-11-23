@@ -154,3 +154,16 @@ test("a url() may stand in fill, stroke and clip-path only, so a gradient cannot
   assert.match(why('<defs><linearGradient id="g"><stop offset="0" stop-color="url(#g)"/></linearGradient></defs><path d="M0 0h1" fill="url(#g)"/>'), /<stop> has stop-color="url\(#g\)"; only fill, stroke and clip-path may hold a url\(\)/);
   assert.match(why('<path id="p" d="M0 0h1" transform="url(#p)"/>'), /only fill, stroke and clip-path may hold a url\(\)/);
 });
+
+test("a gradient stop with no color is black, and uses inside uses are read once each, so check stays fast", () => {
+  const black = svgLogo(svg('<defs><linearGradient id="g"><stop offset="0"/><stop offset="1"/></linearGradient></defs><rect width="24" height="24" fill="url(#g)"/>'));
+  assert.deepEqual([...black.colors], ["#000000"]);
+  assert.deepEqual(checkLogos(bar(svg('<defs><linearGradient id="g"><stop offset="0"/><stop offset="1"/></linearGradient></defs><rect width="24" height="24" fill="url(#g)"/>', 'width="24" height="24" aria-hidden="true" data-for="light"'))).errors, [], "a black gradient logo reads on the light page");
+  // Each group holds two uses of the one before it: read naively, the work doubles at each of 40 levels.
+  let defs = '<g id="g0"><path d="M0 0h1" fill="#0d3550"/></g>';
+  for (let i = 1; i <= 40; i++) defs += `<g id="g${i}"><use href="#g${i - 1}"/><use href="#g${i - 1}" fill="#72c2ee"/></g>`;
+  const started = Date.now();
+  const deep = svgLogo(svg(`<defs>${defs}</defs><use href="#g40"/>`));
+  assert.ok(Date.now() - started < 500, `read in ${Date.now() - started}ms`);
+  assert.deepEqual([...deep.colors], ["#0d3550"], "the path has its own fill, so the use's fill does not reach it");
+});
