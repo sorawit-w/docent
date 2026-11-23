@@ -1310,6 +1310,181 @@ footer .shell { display: flex; align-items: center; justify-content: space-betwe
       <span class="state plan">Planned</span>
       <p>A form that adds the version for you is planned. Until it is turned on, type the version by hand.</p>
     </div>
+    <p>The bug tracker can fail too. Each day its parts are measured, and a day counts as OK when a part was up for 99.9% of it.</p>
+    <figure>
+      <div class="fig" role="region" aria-label="Figure 6, uptime of the bug tracker" tabindex="0">
+        <!-- docent:diagram
+{
+  "id": "bug-tracker-uptime",
+  "kind": "statusgrid",
+  "label": "Uptime of the bug tracker's parts from 3 to 16 November. On 11 November the API and Search were down for part of the day, and Sign-in was slow. Every other day was OK, except three short slow periods. Email alerts has no data for 14 November.",
+  "thresholds": {"better": "higher", "ok": 99.9, "warn": 99, "unit": "%"},
+  "columns": ["3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16"],
+  "rows": [
+    {
+      "name": "Website",
+      "values": [100, 100, 99.98, 100, 100, 100, 100, 100, 99.95, 100, 100, 100, 100, 100]
+    },
+    {
+      "name": "Sign-in",
+      "values": [100, 100, 100, 100, 100, 100, 100, 100, 99.4, 100, 100, 100, 100, 100]
+    },
+    {
+      "name": "API",
+      "values": [100, 99.99, 100, 100, 100, 100, 100, 100, 98.6, 99.7, 100, 100, 100, 100]
+    },
+    {
+      "name": "Email alerts",
+      "values": [100, 100, 100, 99.6, 100, 100, 100, 100, 100, 100, 100, null, 100, 100]
+    },
+    {
+      "name": "Search",
+      "values": [100, 100, 100, 100, 100, 99.97, 100, 100, 97.9, 100, 100, 100, 100, 100]
+    }
+  ]
+}
+-->
+<svg id="dg-bug-tracker-uptime" class="dg dg-statusgrid dg-auto" xmlns="http://www.w3.org/2000/svg" width="640" height="216" viewBox="0 0 640 216" role="img" aria-label="Uptime of the bug tracker's parts from 3 to 16 November. On 11 November the API and Search were down for part of the day, and Sign-in was slow. Every other day was OK, except three short slow periods. Email alerts has no data for 14 November.">
+<style>
+#dg-bug-tracker-uptime{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-bug-tracker-uptime .ground{fill:var(--fig,#f2f3f9)}
+#dg-bug-tracker-uptime .band{fill:var(--bg,#fbfbfe)}
+#dg-bug-tracker-uptime .track{stroke:var(--line,#d3d6e3)}
+#dg-bug-tracker-uptime .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-bug-tracker-uptime .head{fill:var(--text,#1c1f2e)}
+#dg-bug-tracker-uptime .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-bug-tracker-uptime .stop.end{fill:var(--text,#1c1f2e)}
+#dg-bug-tracker-uptime .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-bug-tracker-uptime .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-bug-tracker-uptime .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-bug-tracker-uptime .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-bug-tracker-uptime .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-bug-tracker-uptime .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-bug-tracker-uptime .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-bug-tracker-uptime .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-bug-tracker-uptime .sub,#dg-bug-tracker-uptime .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-bug-tracker-uptime .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-bug-tracker-uptime .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-bug-tracker-uptime .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-bug-tracker-uptime .h0{fill:var(--bg,#fbfbfe);stroke:var(--muted,#575d75);stroke-width:1}
+#dg-bug-tracker-uptime .s-ok{fill:var(--ok,#1a7f37)}
+#dg-bug-tracker-uptime .s-warn{fill:var(--warn,#7d4e00)}
+#dg-bug-tracker-uptime .s-err{fill:var(--err,#cf222e)}
+#dg-bug-tracker-uptime .sm{fill:none;stroke:var(--heat-page,#fbfbfe);stroke-width:1.5;stroke-linecap:round}
+@media (prefers-reduced-motion:reduce){#dg-bug-tracker-uptime .pulse{animation:none!important}#dg-bug-tracker-uptime .pulse{display:none!important}}
+@media print{#dg-bug-tracker-uptime{max-width:100%;height:auto}#dg-bug-tracker-uptime .pulse{display:none!important}#dg-bug-tracker-uptime .s-ok,#dg-bug-tracker-uptime .s-warn{fill:var(--line,#d3d6e3)}#dg-bug-tracker-uptime .sm-warn{stroke:var(--warn,#7d4e00)}}
+#dg-bug-tracker-uptime-phone{display:none}
+</style>
+<rect width="640" height="216" class="ground"/>
+<rect x="8" y="64" width="624" height="136" rx="10" class="band"/>
+<text x="42" y="22" class="sub" text-anchor="start">OK: 99.9% or more</text>
+<text x="192" y="22" class="sub" text-anchor="start">Warning: 99% to below 99.9%</text>
+<text x="405" y="22" class="sub" text-anchor="start">Error: below 99%</text>
+<text x="544" y="22" class="sub" text-anchor="start">No data</text>
+<text x="132.07" y="56" class="val" text-anchor="middle">3</text>
+<text x="168.21" y="56" class="val" text-anchor="middle">4</text>
+<text x="204.36" y="56" class="val" text-anchor="middle">5</text>
+<text x="240.5" y="56" class="val" text-anchor="middle">6</text>
+<text x="276.64" y="56" class="val" text-anchor="middle">7</text>
+<text x="312.79" y="56" class="val" text-anchor="middle">8</text>
+<text x="348.93" y="56" class="val" text-anchor="middle">9</text>
+<text x="385.07" y="56" class="val" text-anchor="middle">10</text>
+<text x="421.21" y="56" class="val" text-anchor="middle">11</text>
+<text x="457.36" y="56" class="val" text-anchor="middle">12</text>
+<text x="493.5" y="56" class="val" text-anchor="middle">13</text>
+<text x="529.64" y="56" class="val" text-anchor="middle">14</text>
+<text x="565.79" y="56" class="val" text-anchor="middle">15</text>
+<text x="601.93" y="56" class="val" text-anchor="middle">16</text>
+<text x="20" y="89" class="row" text-anchor="start">Website</text>
+<text x="20" y="113" class="row" text-anchor="start">Sign-in</text>
+<text x="20" y="137" class="row" text-anchor="start">API</text>
+<text x="20" y="161" class="row" text-anchor="start">Email alerts</text>
+<text x="20" y="185" class="row" text-anchor="start">Search</text>
+<rect x="20" y="12" width="16" height="12" rx="2" class="s-ok"/><rect x="170" y="12" width="16" height="12" rx="2" class="s-warn"/><path d="M173.5,22.5 L182.5,13.5" class="sm sm-warn"/><rect x="383" y="12" width="16" height="12" rx="2" class="s-err"/><path d="M386.5,22.5 L395.5,13.5 M386.5,13.5 L395.5,22.5" class="sm sm-err"/><rect x="522.5" y="12.5" width="15" height="11" rx="2" class="h0"/>
+<rect x="115" y="73" width="34.14" height="22" rx="2" class="s-ok"/><rect x="151.14" y="73" width="34.14" height="22" rx="2" class="s-ok"/><rect x="187.29" y="73" width="34.14" height="22" rx="2" class="s-ok"/><rect x="223.43" y="73" width="34.14" height="22" rx="2" class="s-ok"/><rect x="259.57" y="73" width="34.14" height="22" rx="2" class="s-ok"/><rect x="295.71" y="73" width="34.14" height="22" rx="2" class="s-ok"/><rect x="331.86" y="73" width="34.14" height="22" rx="2" class="s-ok"/><rect x="368" y="73" width="34.14" height="22" rx="2" class="s-ok"/><rect x="404.14" y="73" width="34.14" height="22" rx="2" class="s-ok"/><rect x="440.29" y="73" width="34.14" height="22" rx="2" class="s-ok"/><rect x="476.43" y="73" width="34.14" height="22" rx="2" class="s-ok"/><rect x="512.57" y="73" width="34.14" height="22" rx="2" class="s-ok"/><rect x="548.71" y="73" width="34.14" height="22" rx="2" class="s-ok"/><rect x="584.86" y="73" width="34.14" height="22" rx="2" class="s-ok"/>
+<rect x="115" y="97" width="34.14" height="22" rx="2" class="s-ok"/><rect x="151.14" y="97" width="34.14" height="22" rx="2" class="s-ok"/><rect x="187.29" y="97" width="34.14" height="22" rx="2" class="s-ok"/><rect x="223.43" y="97" width="34.14" height="22" rx="2" class="s-ok"/><rect x="259.57" y="97" width="34.14" height="22" rx="2" class="s-ok"/><rect x="295.71" y="97" width="34.14" height="22" rx="2" class="s-ok"/><rect x="331.86" y="97" width="34.14" height="22" rx="2" class="s-ok"/><rect x="368" y="97" width="34.14" height="22" rx="2" class="s-ok"/><rect x="404.14" y="97" width="34.14" height="22" rx="2" class="s-warn"/><path d="M416.21,113 L426.21,103" class="sm sm-warn"/><rect x="440.29" y="97" width="34.14" height="22" rx="2" class="s-ok"/><rect x="476.43" y="97" width="34.14" height="22" rx="2" class="s-ok"/><rect x="512.57" y="97" width="34.14" height="22" rx="2" class="s-ok"/><rect x="548.71" y="97" width="34.14" height="22" rx="2" class="s-ok"/><rect x="584.86" y="97" width="34.14" height="22" rx="2" class="s-ok"/>
+<rect x="115" y="121" width="34.14" height="22" rx="2" class="s-ok"/><rect x="151.14" y="121" width="34.14" height="22" rx="2" class="s-ok"/><rect x="187.29" y="121" width="34.14" height="22" rx="2" class="s-ok"/><rect x="223.43" y="121" width="34.14" height="22" rx="2" class="s-ok"/><rect x="259.57" y="121" width="34.14" height="22" rx="2" class="s-ok"/><rect x="295.71" y="121" width="34.14" height="22" rx="2" class="s-ok"/><rect x="331.86" y="121" width="34.14" height="22" rx="2" class="s-ok"/><rect x="368" y="121" width="34.14" height="22" rx="2" class="s-ok"/><rect x="404.14" y="121" width="34.14" height="22" rx="2" class="s-err"/><path d="M416.21,137 L426.21,127 M416.21,127 L426.21,137" class="sm sm-err"/><rect x="440.29" y="121" width="34.14" height="22" rx="2" class="s-warn"/><path d="M452.36,137 L462.36,127" class="sm sm-warn"/><rect x="476.43" y="121" width="34.14" height="22" rx="2" class="s-ok"/><rect x="512.57" y="121" width="34.14" height="22" rx="2" class="s-ok"/><rect x="548.71" y="121" width="34.14" height="22" rx="2" class="s-ok"/><rect x="584.86" y="121" width="34.14" height="22" rx="2" class="s-ok"/>
+<rect x="115" y="145" width="34.14" height="22" rx="2" class="s-ok"/><rect x="151.14" y="145" width="34.14" height="22" rx="2" class="s-ok"/><rect x="187.29" y="145" width="34.14" height="22" rx="2" class="s-ok"/><rect x="223.43" y="145" width="34.14" height="22" rx="2" class="s-warn"/><path d="M235.5,161 L245.5,151" class="sm sm-warn"/><rect x="259.57" y="145" width="34.14" height="22" rx="2" class="s-ok"/><rect x="295.71" y="145" width="34.14" height="22" rx="2" class="s-ok"/><rect x="331.86" y="145" width="34.14" height="22" rx="2" class="s-ok"/><rect x="368" y="145" width="34.14" height="22" rx="2" class="s-ok"/><rect x="404.14" y="145" width="34.14" height="22" rx="2" class="s-ok"/><rect x="440.29" y="145" width="34.14" height="22" rx="2" class="s-ok"/><rect x="476.43" y="145" width="34.14" height="22" rx="2" class="s-ok"/><rect x="513.07" y="145.5" width="33.14" height="21" rx="2" class="h0"/><rect x="548.71" y="145" width="34.14" height="22" rx="2" class="s-ok"/><rect x="584.86" y="145" width="34.14" height="22" rx="2" class="s-ok"/>
+<rect x="115" y="169" width="34.14" height="22" rx="2" class="s-ok"/><rect x="151.14" y="169" width="34.14" height="22" rx="2" class="s-ok"/><rect x="187.29" y="169" width="34.14" height="22" rx="2" class="s-ok"/><rect x="223.43" y="169" width="34.14" height="22" rx="2" class="s-ok"/><rect x="259.57" y="169" width="34.14" height="22" rx="2" class="s-ok"/><rect x="295.71" y="169" width="34.14" height="22" rx="2" class="s-ok"/><rect x="331.86" y="169" width="34.14" height="22" rx="2" class="s-ok"/><rect x="368" y="169" width="34.14" height="22" rx="2" class="s-ok"/><rect x="404.14" y="169" width="34.14" height="22" rx="2" class="s-err"/><path d="M416.21,185 L426.21,175 M416.21,175 L426.21,185" class="sm sm-err"/><rect x="440.29" y="169" width="34.14" height="22" rx="2" class="s-ok"/><rect x="476.43" y="169" width="34.14" height="22" rx="2" class="s-ok"/><rect x="512.57" y="169" width="34.14" height="22" rx="2" class="s-ok"/><rect x="548.71" y="169" width="34.14" height="22" rx="2" class="s-ok"/><rect x="584.86" y="169" width="34.14" height="22" rx="2" class="s-ok"/>
+</svg>
+<svg id="dg-bug-tracker-uptime-phone" class="dg dg-statusgrid dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="346" viewBox="0 0 264 346" role="img" aria-label="Uptime of the bug tracker's parts from 3 to 16 November. On 11 November the API and Search were down for part of the day, and Sign-in was slow. Every other day was OK, except three short slow periods. Email alerts has no data for 14 November.">
+<style>
+#dg-bug-tracker-uptime-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-bug-tracker-uptime-phone .ground{fill:var(--fig,#f2f3f9)}
+#dg-bug-tracker-uptime-phone .band{fill:var(--bg,#fbfbfe)}
+#dg-bug-tracker-uptime-phone .track{stroke:var(--line,#d3d6e3)}
+#dg-bug-tracker-uptime-phone .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-bug-tracker-uptime-phone .head{fill:var(--text,#1c1f2e)}
+#dg-bug-tracker-uptime-phone .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-bug-tracker-uptime-phone .stop.end{fill:var(--text,#1c1f2e)}
+#dg-bug-tracker-uptime-phone .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-bug-tracker-uptime-phone .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-bug-tracker-uptime-phone .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-bug-tracker-uptime-phone .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-bug-tracker-uptime-phone .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-bug-tracker-uptime-phone .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-bug-tracker-uptime-phone .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-bug-tracker-uptime-phone .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-bug-tracker-uptime-phone .sub,#dg-bug-tracker-uptime-phone .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-bug-tracker-uptime-phone .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-bug-tracker-uptime-phone .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-bug-tracker-uptime-phone .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-bug-tracker-uptime-phone .h0{fill:var(--bg,#fbfbfe);stroke:var(--muted,#575d75);stroke-width:1}
+#dg-bug-tracker-uptime-phone .s-ok{fill:var(--ok,#1a7f37)}
+#dg-bug-tracker-uptime-phone .s-warn{fill:var(--warn,#7d4e00)}
+#dg-bug-tracker-uptime-phone .s-err{fill:var(--err,#cf222e)}
+#dg-bug-tracker-uptime-phone .sm{fill:none;stroke:var(--heat-page,#fbfbfe);stroke-width:1.5;stroke-linecap:round}
+@media (prefers-reduced-motion:reduce){#dg-bug-tracker-uptime-phone .pulse{animation:none!important}#dg-bug-tracker-uptime-phone .pulse{display:none!important}}
+@media print{#dg-bug-tracker-uptime-phone{max-width:100%;height:auto}#dg-bug-tracker-uptime-phone .pulse{display:none!important}#dg-bug-tracker-uptime-phone .s-ok,#dg-bug-tracker-uptime-phone .s-warn{fill:var(--line,#d3d6e3)}#dg-bug-tracker-uptime-phone .sm-warn{stroke:var(--warn,#7d4e00)}}
+@media (max-width:736px){#dg-bug-tracker-uptime{display:none}#dg-bug-tracker-uptime-phone{display:block}}
+@media print{#dg-bug-tracker-uptime{display:block!important}#dg-bug-tracker-uptime-phone{display:none!important}}
+</style>
+<rect width="264" height="346" class="ground"/>
+<rect x="8" y="120" width="248" height="210" rx="10" class="band"/>
+<text x="42" y="22" class="sub" text-anchor="start">OK: 99.9% or more</text>
+<text x="42" y="42" class="sub" text-anchor="start">Warning: 99% to below 99.9%</text>
+<text x="42" y="62" class="sub" text-anchor="start">Error: below 99%</text>
+<text x="181" y="62" class="sub" text-anchor="start">No data</text>
+<text x="28" y="96" class="val" text-anchor="middle">3</text>
+<text x="44" y="96" class="val" text-anchor="middle">4</text>
+<text x="60" y="96" class="val" text-anchor="middle">5</text>
+<text x="76" y="96" class="val" text-anchor="middle">6</text>
+<text x="92" y="96" class="val" text-anchor="middle">7</text>
+<text x="108" y="96" class="val" text-anchor="middle">8</text>
+<text x="124" y="96" class="val" text-anchor="middle">9</text>
+<text x="140" y="96" class="val" text-anchor="middle">10</text>
+<text x="156" y="112" class="val" text-anchor="middle">11</text>
+<text x="172" y="96" class="val" text-anchor="middle">12</text>
+<text x="188" y="112" class="val" text-anchor="middle">13</text>
+<text x="204" y="96" class="val" text-anchor="middle">14</text>
+<text x="220" y="112" class="val" text-anchor="middle">15</text>
+<text x="236" y="96" class="val" text-anchor="middle">16</text>
+<text x="20" y="142" class="row" text-anchor="start">Website</text>
+<text x="20" y="182" class="row" text-anchor="start">Sign-in</text>
+<text x="20" y="222" class="row" text-anchor="start">API</text>
+<text x="20" y="262" class="row" text-anchor="start">Email alerts</text>
+<text x="20" y="302" class="row" text-anchor="start">Search</text>
+<rect x="20" y="12" width="16" height="12" rx="2" class="s-ok"/><rect x="20" y="32" width="16" height="12" rx="2" class="s-warn"/><path d="M23.5,42.5 L32.5,33.5" class="sm sm-warn"/><rect x="20" y="52" width="16" height="12" rx="2" class="s-err"/><path d="M23.5,62.5 L32.5,53.5 M23.5,53.5 L32.5,62.5" class="sm sm-err"/><rect x="159.5" y="52.5" width="15" height="11" rx="2" class="h0"/>
+<rect x="20.5" y="146.5" width="15" height="15" rx="2" class="s-ok"/><rect x="36.5" y="146.5" width="15" height="15" rx="2" class="s-ok"/><rect x="52.5" y="146.5" width="15" height="15" rx="2" class="s-ok"/><rect x="68.5" y="146.5" width="15" height="15" rx="2" class="s-ok"/><rect x="84.5" y="146.5" width="15" height="15" rx="2" class="s-ok"/><rect x="100.5" y="146.5" width="15" height="15" rx="2" class="s-ok"/><rect x="116.5" y="146.5" width="15" height="15" rx="2" class="s-ok"/><rect x="132.5" y="146.5" width="15" height="15" rx="2" class="s-ok"/><rect x="148.5" y="146.5" width="15" height="15" rx="2" class="s-ok"/><rect x="164.5" y="146.5" width="15" height="15" rx="2" class="s-ok"/><rect x="180.5" y="146.5" width="15" height="15" rx="2" class="s-ok"/><rect x="196.5" y="146.5" width="15" height="15" rx="2" class="s-ok"/><rect x="212.5" y="146.5" width="15" height="15" rx="2" class="s-ok"/><rect x="228.5" y="146.5" width="15" height="15" rx="2" class="s-ok"/>
+<rect x="20.5" y="186.5" width="15" height="15" rx="2" class="s-ok"/><rect x="36.5" y="186.5" width="15" height="15" rx="2" class="s-ok"/><rect x="52.5" y="186.5" width="15" height="15" rx="2" class="s-ok"/><rect x="68.5" y="186.5" width="15" height="15" rx="2" class="s-ok"/><rect x="84.5" y="186.5" width="15" height="15" rx="2" class="s-ok"/><rect x="100.5" y="186.5" width="15" height="15" rx="2" class="s-ok"/><rect x="116.5" y="186.5" width="15" height="15" rx="2" class="s-ok"/><rect x="132.5" y="186.5" width="15" height="15" rx="2" class="s-ok"/><rect x="148.5" y="186.5" width="15" height="15" rx="2" class="s-warn"/><path d="M151,199 L161,189" class="sm sm-warn"/><rect x="164.5" y="186.5" width="15" height="15" rx="2" class="s-ok"/><rect x="180.5" y="186.5" width="15" height="15" rx="2" class="s-ok"/><rect x="196.5" y="186.5" width="15" height="15" rx="2" class="s-ok"/><rect x="212.5" y="186.5" width="15" height="15" rx="2" class="s-ok"/><rect x="228.5" y="186.5" width="15" height="15" rx="2" class="s-ok"/>
+<rect x="20.5" y="226.5" width="15" height="15" rx="2" class="s-ok"/><rect x="36.5" y="226.5" width="15" height="15" rx="2" class="s-ok"/><rect x="52.5" y="226.5" width="15" height="15" rx="2" class="s-ok"/><rect x="68.5" y="226.5" width="15" height="15" rx="2" class="s-ok"/><rect x="84.5" y="226.5" width="15" height="15" rx="2" class="s-ok"/><rect x="100.5" y="226.5" width="15" height="15" rx="2" class="s-ok"/><rect x="116.5" y="226.5" width="15" height="15" rx="2" class="s-ok"/><rect x="132.5" y="226.5" width="15" height="15" rx="2" class="s-ok"/><rect x="148.5" y="226.5" width="15" height="15" rx="2" class="s-err"/><path d="M151,239 L161,229 M151,229 L161,239" class="sm sm-err"/><rect x="164.5" y="226.5" width="15" height="15" rx="2" class="s-warn"/><path d="M167,239 L177,229" class="sm sm-warn"/><rect x="180.5" y="226.5" width="15" height="15" rx="2" class="s-ok"/><rect x="196.5" y="226.5" width="15" height="15" rx="2" class="s-ok"/><rect x="212.5" y="226.5" width="15" height="15" rx="2" class="s-ok"/><rect x="228.5" y="226.5" width="15" height="15" rx="2" class="s-ok"/>
+<rect x="20.5" y="266.5" width="15" height="15" rx="2" class="s-ok"/><rect x="36.5" y="266.5" width="15" height="15" rx="2" class="s-ok"/><rect x="52.5" y="266.5" width="15" height="15" rx="2" class="s-ok"/><rect x="68.5" y="266.5" width="15" height="15" rx="2" class="s-warn"/><path d="M71,279 L81,269" class="sm sm-warn"/><rect x="84.5" y="266.5" width="15" height="15" rx="2" class="s-ok"/><rect x="100.5" y="266.5" width="15" height="15" rx="2" class="s-ok"/><rect x="116.5" y="266.5" width="15" height="15" rx="2" class="s-ok"/><rect x="132.5" y="266.5" width="15" height="15" rx="2" class="s-ok"/><rect x="148.5" y="266.5" width="15" height="15" rx="2" class="s-ok"/><rect x="164.5" y="266.5" width="15" height="15" rx="2" class="s-ok"/><rect x="180.5" y="266.5" width="15" height="15" rx="2" class="s-ok"/><rect x="197" y="267" width="14" height="14" rx="2" class="h0"/><rect x="212.5" y="266.5" width="15" height="15" rx="2" class="s-ok"/><rect x="228.5" y="266.5" width="15" height="15" rx="2" class="s-ok"/>
+<rect x="20.5" y="306.5" width="15" height="15" rx="2" class="s-ok"/><rect x="36.5" y="306.5" width="15" height="15" rx="2" class="s-ok"/><rect x="52.5" y="306.5" width="15" height="15" rx="2" class="s-ok"/><rect x="68.5" y="306.5" width="15" height="15" rx="2" class="s-ok"/><rect x="84.5" y="306.5" width="15" height="15" rx="2" class="s-ok"/><rect x="100.5" y="306.5" width="15" height="15" rx="2" class="s-ok"/><rect x="116.5" y="306.5" width="15" height="15" rx="2" class="s-ok"/><rect x="132.5" y="306.5" width="15" height="15" rx="2" class="s-ok"/><rect x="148.5" y="306.5" width="15" height="15" rx="2" class="s-err"/><path d="M151,319 L161,309 M151,309 L161,319" class="sm sm-err"/><rect x="164.5" y="306.5" width="15" height="15" rx="2" class="s-ok"/><rect x="180.5" y="306.5" width="15" height="15" rx="2" class="s-ok"/><rect x="196.5" y="306.5" width="15" height="15" rx="2" class="s-ok"/><rect x="212.5" y="306.5" width="15" height="15" rx="2" class="s-ok"/><rect x="228.5" y="306.5" width="15" height="15" rx="2" class="s-ok"/>
+</svg>
+<details class="dg-words">
+<summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>The diagram in words</summary>
+<div class="table-wrap" role="region" aria-label="The states of the status grid, columns 3 to 9" tabindex="0"><table><thead><tr><td></td><th scope="col">3</th><th scope="col">4</th><th scope="col">5</th><th scope="col">6</th><th scope="col">7</th><th scope="col">8</th><th scope="col">9</th></tr></thead><tbody><tr><th scope="row">Website</th><td>100</td><td>100</td><td>99.98</td><td>100</td><td>100</td><td>100</td><td>100</td></tr><tr><th scope="row">Sign-in</th><td>100</td><td>100</td><td>100</td><td>100</td><td>100</td><td>100</td><td>100</td></tr><tr><th scope="row">API</th><td>100</td><td>99.99</td><td>100</td><td>100</td><td>100</td><td>100</td><td>100</td></tr><tr><th scope="row">Email alerts</th><td>100</td><td>100</td><td>100</td><td>99.6 Warning</td><td>100</td><td>100</td><td>100</td></tr><tr><th scope="row">Search</th><td>100</td><td>100</td><td>100</td><td>100</td><td>100</td><td>99.97</td><td>100</td></tr></tbody></table></div>
+<div class="table-wrap" role="region" aria-label="The states of the status grid, columns 10 to 16" tabindex="0"><table><thead><tr><td></td><th scope="col">10</th><th scope="col">11</th><th scope="col">12</th><th scope="col">13</th><th scope="col">14</th><th scope="col">15</th><th scope="col">16</th></tr></thead><tbody><tr><th scope="row">Website</th><td>100</td><td>99.95</td><td>100</td><td>100</td><td>100</td><td>100</td><td>100</td></tr><tr><th scope="row">Sign-in</th><td>100</td><td>99.4 Warning</td><td>100</td><td>100</td><td>100</td><td>100</td><td>100</td></tr><tr><th scope="row">API</th><td>100</td><td>98.6 Error</td><td>99.7 Warning</td><td>100</td><td>100</td><td>100</td><td>100</td></tr><tr><th scope="row">Email alerts</th><td>100</td><td>100</td><td>100</td><td>100</td><td>no data</td><td>100</td><td>100</td></tr><tr><th scope="row">Search</th><td>100</td><td>97.9 Error</td><td>100</td><td>100</td><td>100</td><td>100</td><td>100</td></tr></tbody></table></div>
+<ul><li>Each number is in %. A cell is OK at 99.9 or more, Warning from 99 to below 99.9, and Error below 99; a value on a threshold takes the better state. A cell with no state word is OK.</li><li>64 cells are OK, 3 are Warning and 2 are Error. 1 cell has no data.</li><li>Error: API, 11 (98.6); Search, 11 (97.9).</li><li>The worst is 97.9 (Search, 11).</li></ul>
+</details>
+<!-- /docent:diagram -->
+      </div>
+      <figcaption><strong>Figure 6</strong>Uptime of the bug tracker's parts, day by day, from 3 to 16 November.</figcaption>
+    </figure>
+    <div class="status">
+      <span class="state warn">Warning</span>
+      <p>A report filed while the API was down may be lost. If you filed one on 11 November, check that it is in your list of reports.</p>
+    </div>
   </section>
 
   <section id="report" aria-labelledby="report-h">
