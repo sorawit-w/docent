@@ -111,6 +111,26 @@ test("a drawing cannot set its own tokens, a gradient or a color in another prop
   assert.equal(errs("#hd-repeat{background:var(--fig,#f2f3f9)}\n#hd-repeat .box{outline:1px solid var(--line,#d3d6e3)}"), "", "a token with its light value is fine in these properties too");
 });
 
+test("a comment cannot stand in for the words, or hide a property from the check", () => {
+  const errs = (change) => hand(checkDocument(page(change)).errors).join("\n");
+  assert.match(errs((f) => f.replace(/<table>[\s\S]*?<\/table>/, "<!-- <ul><li>old data</li></ul> -->")), /rule 9, the diagram in words: the <details class="dg-words"> holds no table or list with words in it/);
+  assert.match(errs(swap('<text class="head" x="556" y="146">', '<text class="head" style="/* heading */ font-size:10px" x="556" y="146">')), /rule 3, no text under 12px: <text> style has font-size="10px"/);
+});
+
+test("entities, escapes, scaling and squeezed text cannot get past the rules on size", () => {
+  const errs = (change) => hand(checkDocument(page(change)).errors).join("\n");
+  const head = '<text class="head" x="556" y="146">';
+  assert.match(errs(swap(head, '<text class="head" style="font-size&#58;10px" x="556" y="146">')), /rule 3, no text under 12px: <text> style has font-size="10px"/);
+  assert.match(errs(swap(head, '<text class="head" fill="&#35;000" x="556" y="146">')), /rule 2, page tokens only: <text> has fill="#000"/);
+  assert.match(errs(swap(head, '<text class="head" fill="&black;" x="556" y="146">')), /the markup: <text> has fill="&black;", with a named character reference/);
+  assert.match(errs(swap("</style>", "#hd-repeat .note{font-s\\69 ze:10px}\n</style>")), /the markup: a <style> holds a backslash escape/);
+  assert.match(errs(swap('<rect class="box"', '<g transform="scale(0.5)"><text x="0" y="0">Small</text></g><rect class="box"')), /rule 4, real size: <g> has transform="scale\(0\.5\)"; a drawing does not scale its parts/);
+  assert.match(errs(swap("</style>", "#hd-repeat .head{transform:matrix(0.5,0,0,0.5,0,0)}\n</style>")), /rule 4, real size: .* has transform="matrix\(0\.5,0,0,0\.5,0,0\)"/);
+  assert.match(errs(swap('<rect class="box"', '<symbol id="hd-s" viewBox="0 0 10 10"><text x="0" y="9">Big</text></symbol><use href="#hd-s" width="5" height="5"/><rect class="box"')), /rule 4, real size: <symbol> has a viewBox, which scales what it holds/);
+  assert.match(errs(swap(head, '<text class="head" textLength="40" x="556" y="146">')), /rule 3, no text under 12px: <text> has textlength="40"; it squeezes the letters/);
+  assert.equal(errs(swap('<rect class="box"', '<g transform="translate(2 0) rotate(0)"><rect width="1" height="1" fill="var(--line)"/></g><rect class="box"')), "", "a move or a turn keeps the real size");
+});
+
 test("a hand-drawn drawing outside a figure well is refused", () => {
   const svg = figure.match(/<svg id="hd-repeat"[\s\S]*?<\/svg>/)[0];
   assert.match(checkDocument(specimen.replace('<section id="report"', `<p>${svg}</p><section id="report"`)).errors.join("\n"), /a hand-drawn drawing stands outside a figure well/);

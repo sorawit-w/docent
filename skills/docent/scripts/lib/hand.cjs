@@ -51,6 +51,9 @@ const LITERAL = /(^|[\s,(])#[0-9a-f]{3,8}\b|\b(rgba?|hsla?|hwb|lab|lch|oklab|okl
 const OPACITY = new Set(["opacity", "fill-opacity", "stroke-opacity", "stop-opacity"]);
 const TOKEN_LIST = "var(--text), var(--muted), var(--line), var(--bg) or var(--fig)";
 
+const NAMED = { amp: "&", lt: "<", gt: ">", quot: '"', apos: "'", nbsp: "\u00a0" };
+/** An attribute value as the browser reads it: numeric and common named entities decoded. Null when it holds another named entity. */
+const decode = (v) => { let unknown = false; const out = v.replace(/&(#x[0-9a-f]+|#\d+|\w+);/gi, (all, e) => (e[0] === "#" ? String.fromCodePoint(parseInt(e[1] === "x" || e[1] === "X" ? e.slice(2) : e.slice(1), e[1] === "x" || e[1] === "X" ? 16 : 10)) : Object.hasOwn(NAMED, e) ? NAMED[e] : ((unknown = true), all))); return unknown ? null : out; };
 const words = (s) => s.replace(/<[^>]*>/g, "").replace(/&[#\w]+;/g, "x").trim();
 const blank = (s) => s.replace(/<!--[\s\S]*?-->/g, (c) => " ".repeat(c.length));
 
@@ -81,11 +84,14 @@ function badColor(value, palette) {
 }
 
 /** The declarations of a style attribute or a style rule, as [property, value]. */
-const declarations = (css) => css.split(";").map((d) => d.trim()).filter(Boolean).map((d) => { const at = d.indexOf(":"); return at < 0 ? [d.toLowerCase(), ""] : [d.slice(0, at).trim().toLowerCase(), d.slice(at + 1).trim()]; });
+const declarations = (css) => css.replace(/\/\*[\s\S]*?\*\//g, " ").split(";").map((d) => d.trim()).filter(Boolean).map((d) => { const at = d.indexOf(":"); return at < 0 ? [d.toLowerCase(), ""] : [d.slice(0, at).trim().toLowerCase(), d.slice(at + 1).trim()]; });
 
 /** Tests one property and its value, in an attribute or in a style. Calls fail(rule, why) for each break. */
 function testProperty(prop, value, where, fail, palette) {
   const shown = `${where} has ${prop}="${value.length > 48 ? `${value.slice(0, 48)}…` : value}"`;
+  if (value.includes("\\") || prop.includes("\\")) return fail(0, `${shown}; a drawing's style holds no backslash escapes, so check reads it as the browser does`);
+  if ((prop === "transform" && /\b(scale|matrix|skew)[\w]*\s*\(/i.test(value)) || prop === "scale" || prop === "zoom") return fail(4, `${shown}; a drawing does not scale its parts, so its text keeps its real size; move or rotate a part instead`);
+  if (prop === "textlength" || prop === "lengthadjust") return fail(3, `${shown}; it squeezes the letters, so the text no longer shows at its size`);
   if (prop.startsWith("--")) return fail(2, `${shown}; a drawing sets no token of its own, so var(--text) and the others keep the page's tested colors in every theme`);
   if (/gradient\s*\(/i.test(value)) return fail(2, `${shown}; the page is flat, with no gradient`);
   if (/url\s*\(/i.test(value)) {
@@ -120,6 +126,7 @@ function inside(sel, id) {
 /** Tests the rules of a <style> element: each one starts with the drawing's id, because a style element applies to the whole page. */
 function testStyle(css, id, fail, palette) {
   const body = css.replace(/\/\*[\s\S]*?\*\//g, "");
+  if (body.includes("\\")) { fail(0, "a <style> holds a backslash escape; a drawing's style holds none, so check reads it as the browser does"); return; }
   if (/@/.test(body)) { fail(/@(import|font-face)/i.test(body) ? (/@import/i.test(body) ? 6 : 5) : 0, `a <style> holds ${(body.match(/@[\w-]+/) || ["@"])[0]}; a drawing's style holds plain rules only`); return; }
   for (const [, selectors, decls] of body.matchAll(/([^{}]*)\{([^{}]*)\}/g)) {
     for (const sel of selectors.split(",").map((s) => s.trim()).filter(Boolean)) {
@@ -174,9 +181,10 @@ function checkDrawing(source, { html = "", palette = null } = {}) {
     else if (!ELEMENTS.has(name)) fail(0, `<${name}> is not an element a hand-drawn figure takes`);
     const read = attributes(rawAttrs);
     if (read.error) { fail(0, `<${name}>: ${read.error}`); continue; }
-    const attrs = Object.fromEntries(read.list.map(([k, v]) => [k, v]));
-    for (const [attr, value] of read.list) {
-      const low = attr.toLowerCase();
+    const attrs = Object.fromEntries(read.list.map(([k, v]) => [k, decode(v) ?? v]));
+    for (const [attr, raw] of read.list) {
+      const low = attr.toLowerCase(), value = decode(raw);
+      if (value == null) { fail(0, `<${name}> has ${attr}="${raw.slice(0, 48)}", with a named character reference that check cannot read; write the character itself`); continue; }
       if (low.startsWith("on")) { fail(6, `<${name}> has the event attribute "${attr}", which runs code`); continue; }
       if (low === "href" || low.endsWith(":href")) { if (!value.trim().startsWith("#")) fail(6, `<${name}> has ${attr}="${value.slice(0, 48)}"; an href points inside the drawing, such as #bone`); continue; }
       if (low === "id") { ids.push(value); continue; }
@@ -184,6 +192,7 @@ function checkDrawing(source, { html = "", palette = null } = {}) {
       testProperty(low, value, `<${name}>`, fail, palette);
     }
     const node = { name, attrs, parent: open || null, styled: attrs.style || "", text: "", needsFill: FILLED.has(name) };
+    if (root && attrs.viewBox != null && name !== "marker") fail(4, `<${name}> has a viewBox, which scales what it holds, so its text no longer shows at its real size; only the <svg> and a <marker> have one`);
     if (!root) { root = attrs; type = attrs["data-type"] ?? null; styleId = attrs.id || null; }
     else if (stack.length === 1) children.push(node);
     nodes.push(node);
@@ -232,8 +241,9 @@ function checkDrawing(source, { html = "", palette = null } = {}) {
 }
 
 /** The closed section with the diagram in words, in a well: why it breaks rule 9, or null. */
-function wordsProblem(inner) {
-  const all = [...blank(inner).matchAll(/<details\b([^>]*)>/gi)].filter(([, a]) => /\bclass="(?:[^"]*\s)?dg-words(?:\s[^"]*)?"/.test(a));
+function wordsProblem(source) {
+  const inner = blank(source); // a table that is commented out says nothing to the reader
+  const all = [...inner.matchAll(/<details\b([^>]*)>/gi)].filter(([, a]) => /\bclass="(?:[^"]*\s)?dg-words(?:\s[^"]*)?"/.test(a));
   if (!all.length) return 'the figure has no <details class="dg-words"> with a table or a list that says everything the drawing says';
   const [tag, attrs] = all[0], start = all[0].index + tag.length, end = inner.indexOf("</details>", start);
   if (/\bopen\b/.test(attrs.replace(/"[^"]*"/g, ""))) return 'the <details class="dg-words"> is open; it is closed, as under every drawing';
