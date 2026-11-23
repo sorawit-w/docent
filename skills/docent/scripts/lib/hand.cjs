@@ -142,7 +142,10 @@ function checkDrawing(source, { html = "" } = {}) {
     if (!ELEMENTS.has(name)) { const [rule, why] = REFUSED[name] || [0, "a hand-drawn figure does not take it"]; fail(rule, `<${name}> is not allowed: ${why}`); continue; }
     const read = attributes(rawAttrs);
     if (read.error) { fail(0, `<${name}>: ${read.error}`); continue; }
+    const seen = new Set();
     for (const [attr, value] of read.list) {
+      if (seen.has(attr.toLowerCase())) { fail(0, `<${name}> has the attribute "${attr}" twice; the browser keeps the first, so write it once`); continue; }
+      seen.add(attr.toLowerCase());
       const shown = `<${name}> has ${attr}="${value.length > 48 ? `${value.slice(0, 48)}…` : value}"`;
       if (!GEOMETRY.has(attr) && !PLAIN.has(attr) && !attr.startsWith("aria-")) { const [rule, why] = refusedAttribute(attr.toLowerCase()); fail(rule, `${shown}; ${why}`); continue; }
       const bad = badValue(name, attr, value);

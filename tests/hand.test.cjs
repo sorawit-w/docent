@@ -76,6 +76,8 @@ test("the rest of the contract: size, values, the name and the words", () => {
   assert.match(errs(swap('width="640" height="290" viewBox="0 0 640 290"', 'width="800" height="290" viewBox="0 0 800 290"')), /rule 4, real size: the drawing is 800 × 290px; it is at most 640px wide and 831px high, so print never shrinks it/);
   assert.match(errs(swap('width="640" height="290" viewBox', 'width="100%" height="290" viewBox')), /the markup: <svg> has width="100%"; it holds numbers only/);
   assert.match(errs(swap('width="640" height="290" viewBox', 'height="290" viewBox')), /rule 4, real size: the <svg> has width="" height="290"; they equal the viewBox, width="640" height="290"/);
+  assert.match(errs(swap('width="640" height="290" viewBox', 'width="320" height="145" width="640" height="290" viewBox')), /the markup: <svg> has the attribute "width" twice; the browser keeps the first/);
+  assert.match(errs(swap(BOX, '<rect class="hd-box" CLASS="hd-fill"')), /<rect> has the attribute "CLASS" twice/, "in any case");
   assert.match(errs(swap(BOX, '<g viewBox="0 0 9 9"></g>' + BOX)), /rule 4, real size: <g> has viewBox="0 0 9 9"; a viewBox scales what it holds/);
   assert.match(errs(swap(BOX, '<rect class="hd-box" stroke="var(--text)"')), /rule 2, the kit's classes only: <rect> has stroke="var\(--text\)"/, "even a token: the class draws it");
   assert.match(errs(swap(BOX, '<rect class="hd-box" opacity="0.5"')), /rule 2, the kit's classes only: <rect> has opacity="0\.5"/);
