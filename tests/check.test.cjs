@@ -238,3 +238,17 @@ test("the logo, the tagline and the credit: a logo may hold a gradient, the titl
   assert.match(result((h) => h.replace("The host's tagline, in its own words.", "x".repeat(91))).warnings.join(), /the tagline has 91 characters; it is one line of at most 90/);
   assert.match(result((h) => h.replace("in its own words.", '<a href="#short">in its own words</a>.')).warnings.join(), /the tagline holds markup or a link/);
 });
+
+test("the branded sample page is the specimen with a logo, a tagline and the Harbor palette; it is built and passes check", () => {
+  const branded = fs.readFileSync(path.join(__dirname, "..", "skills", "docent", "assets", "specimen-branded.html"), "utf8");
+  assert.equal(renderDocument(stampHtml(branded).html).html, branded, "run render and stamp on specimen-branded.html, then commit it");
+  const { errors, warnings } = checkDocument(branded);
+  assert.deepEqual(errors, []);
+  assert.deepEqual(warnings, checkDocument(specimen).warnings, "the same two warnings as the specimen, which shows one workflow in three forms");
+  assert.match(branded, /<html lang="en" data-profile="standard" data-palette="harbor">/);
+  assert.equal((branded.match(/<svg class="logo"/g) || []).length, 2, "a light and a dark version of the logo");
+  assert.match(branded, /<p class="tagline">[^<]+<\/p>/);
+  const strip = (h) => h.replace(/<style>[\s\S]*?<\/style>/, "").replace(/<svg id="dg-[\s\S]*?<\/svg>/g, "").replace(/<header[\s\S]*?<\/header>/, "").replace(/<footer[\s\S]*?<\/footer>/, "").replace(/ data-palette="harbor"/, "");
+  assert.equal(strip(branded), strip(specimen), "apart from the palette, the top bar, the footer and the drawings' fallback colors, it is the specimen word for word");
+  assert.ok(!/data-palette|class="logo"|class="tagline"/.test(specimen), "the specimen itself stays unbranded");
+});

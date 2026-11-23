@@ -18,6 +18,7 @@ Docent is a design kit for documents: single HTML files that open without a netw
 | [`references/widgets.md`](references/widgets.md) | When a widget is allowed, and how to write one as data. |
 | [`assets/template.html`](assets/template.html) | The starting page. It holds one of each block, and a comment names each block. It is not built yet: it has no page styles and no drawings until `render` and `stamp` run. It is short, so read all of it. |
 | [`assets/specimen.html`](assets/specimen.html) | The sample page: a full, built document that follows every rule. Open it in a browser to see the look. Do not read its source: it is long, and the starting page shows every block. |
+| [`assets/specimen-branded.html`](assets/specimen-branded.html) | The same sample page for a host with a brand: a logo in a light and a dark version, a tagline, and the Harbor palette. Open it in a browser; do not read its source. |
 | `scripts/render.cjs` | Draws every diagram and builds every widget of a document, each from its data. |
 | `scripts/stamp.cjs` | Puts the page styles and the page script into a document. |
 | `scripts/check.cjs` | Tests a document against the rules. |
