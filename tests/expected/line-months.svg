@@ -1,0 +1,128 @@
+<svg id="dg-crashes-36-months" class="dg dg-line dg-auto" xmlns="http://www.w3.org/2000/svg" width="640" height="296" viewBox="0 0 640 296" role="img" aria-label="The app had more crash reports almost every month for three years, from 40 in January 2024 to 94 in June 2026. The web and the server stayed between 21 and 36. No count exists for March, April, June and July 2025, when the tracker moved.">
+<style>
+#dg-crashes-36-months{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-crashes-36-months .ground{fill:var(--fig,#f2f3f9)}
+#dg-crashes-36-months .band{fill:var(--bg,#fbfbfe)}
+#dg-crashes-36-months .track{stroke:var(--line,#d3d6e3)}
+#dg-crashes-36-months .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-crashes-36-months .head{fill:var(--text,#1c1f2e)}
+#dg-crashes-36-months .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-crashes-36-months .stop.end{fill:var(--text,#1c1f2e)}
+#dg-crashes-36-months .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-crashes-36-months .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-crashes-36-months .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-crashes-36-months .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-crashes-36-months .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-crashes-36-months .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-crashes-36-months .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-crashes-36-months .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-crashes-36-months .sub,#dg-crashes-36-months .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-crashes-36-months .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-crashes-36-months .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-crashes-36-months .dim{font-size:14px;fill:var(--muted,#575d75)}
+#dg-crashes-36-months .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-crashes-36-months .ln{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}#dg-crashes-36-months .pt{fill:var(--text,#1c1f2e)}
+#dg-crashes-36-months .ln-o{fill:none;stroke:var(--muted,#575d75);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}#dg-crashes-36-months .pt-o{fill:var(--muted,#575d75)}
+#dg-crashes-36-months .ln-g{fill:none;stroke:var(--line,#d3d6e3);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}#dg-crashes-36-months .pt-g{fill:var(--line,#d3d6e3)}
+#dg-crashes-36-months .ld{stroke:var(--muted,#575d75);stroke-width:1}
+#dg-crashes-36-months .r-ref{stroke:var(--muted,#575d75)}
+@media (prefers-reduced-motion:reduce){#dg-crashes-36-months .pulse{animation:none!important}#dg-crashes-36-months .pulse{display:none!important}}
+@media print{#dg-crashes-36-months{max-width:100%;height:auto}#dg-crashes-36-months .pulse{display:none!important}}
+#dg-crashes-36-months-phone{display:none}
+</style>
+<rect width="640" height="296" class="ground"/>
+<rect x="8" y="36" width="624" height="252" rx="10" class="band"/>
+<line x1="52" y1="260" x2="556" y2="260" class="track"/>
+<line x1="52" y1="226.67" x2="556" y2="226.67" class="track"/>
+<line x1="52" y1="193.33" x2="556" y2="193.33" class="track"/>
+<line x1="52" y1="160" x2="556" y2="160" class="track"/>
+<line x1="52" y1="126.67" x2="556" y2="126.67" class="track"/>
+<line x1="52" y1="93.33" x2="556" y2="93.33" class="track"/>
+<line x1="52" y1="60" x2="556" y2="60" class="track"/>
+<text x="20" y="24" class="sub" text-anchor="start">Crashes, scale from 0. A gap in a line is a time with no data.</text>
+<text x="52" y="278" class="val" text-anchor="middle">2024</text>
+<text x="95.2" y="278" class="val" text-anchor="middle">Apr</text>
+<text x="138.4" y="278" class="val" text-anchor="middle">Jul</text>
+<text x="181.6" y="278" class="val" text-anchor="middle">Oct</text>
+<text x="224.8" y="278" class="val" text-anchor="middle">2025</text>
+<text x="268" y="278" class="val" text-anchor="middle">Apr</text>
+<text x="311.2" y="278" class="val" text-anchor="middle">Jul</text>
+<text x="354.4" y="278" class="val" text-anchor="middle">Oct</text>
+<text x="397.6" y="278" class="val" text-anchor="middle">2026</text>
+<text x="440.8" y="278" class="val" text-anchor="middle">Apr</text>
+<text x="484" y="278" class="val" text-anchor="middle">Jul</text>
+<text x="527.2" y="278" class="val" text-anchor="middle">Oct</text>
+<text x="576" y="206" class="dim" text-anchor="start">Web</text>
+<text x="576" y="224" class="dim" text-anchor="start">Server</text>
+<text x="576" y="118.33" class="row" text-anchor="start">App</text>
+<text x="44" y="264" class="val" text-anchor="end">0</text>
+<text x="44" y="230.67" class="val" text-anchor="end">20</text>
+<text x="44" y="197.33" class="val" text-anchor="end">40</text>
+<text x="44" y="164" class="val" text-anchor="end">60</text>
+<text x="44" y="130.67" class="val" text-anchor="end">80</text>
+<text x="44" y="97.33" class="val" text-anchor="end">100</text>
+<text x="44" y="64" class="val" text-anchor="end">120</text>
+<path d="M52,200 L66.4,200 L80.8,201.67 L95.2,205 L109.6,208.33 L124,211.67 L138.4,213.33 L152.8,216.67 L167.2,218.33 L181.6,220 L196,220 L210.4,218.33 L224.8,216.67 L239.2,213.33 L253.6,210 L268,206.67 L282.4,205 L296.8,201.67 L311.2,200 L325.6,200 L340,200 L354.4,201.67 L368.8,205 L383.2,208.33 L397.6,211.67 L412,215 L426.4,216.67 L440.8,218.33 L455.2,220 L469.6,220 L484,218.33 L498.4,216.67 L512.8,213.33 L527.2,210 L541.6,206.67 L556,208.33" class="ln-o"/><line x1="560" y1="208.33" x2="572" y2="201" class="ld"/>
+<path d="M52,210 L66.4,208.33 L80.8,208.33 L95.2,208.33 L109.6,208.33 L124,210 L138.4,211.67 L152.8,213.33 L167.2,215 L181.6,218.33 L196,220 L210.4,221.67 L224.8,223.33 L239.2,223.33 L253.6,225 L268,225 L282.4,225 L296.8,223.33 L311.2,223.33 L325.6,221.67 L340,218.33 L354.4,216.67 L368.8,215 L383.2,213.33 L397.6,211.67 L412,210 L426.4,208.33 L440.8,208.33 L455.2,208.33 L469.6,208.33 L484,210 L498.4,211.67 L512.8,213.33 L527.2,215 L541.6,216.67 L556,211.67" class="ln-o"/><line x1="560" y1="211.67" x2="572" y2="219" class="ld"/>
+<path d="M52,193.33 L66.4,185 L80.8,176.67 L95.2,171.67 L109.6,170 L124,171.67 L138.4,175 L152.8,180 L167.2,181.67 L181.6,181.67 L196,180 L210.4,173.33 L224.8,165 L239.2,155" class="ln"/><circle cx="52" cy="193.33" r="3" class="pt"/><circle cx="66.4" cy="185" r="3" class="pt"/><circle cx="80.8" cy="176.67" r="3" class="pt"/><circle cx="95.2" cy="171.67" r="3" class="pt"/><circle cx="109.6" cy="170" r="3" class="pt"/><circle cx="124" cy="171.67" r="3" class="pt"/><circle cx="138.4" cy="175" r="3" class="pt"/><circle cx="152.8" cy="180" r="3" class="pt"/><circle cx="167.2" cy="181.67" r="3" class="pt"/><circle cx="181.6" cy="181.67" r="3" class="pt"/><circle cx="196" cy="180" r="3" class="pt"/><circle cx="210.4" cy="173.33" r="3" class="pt"/><circle cx="224.8" cy="165" r="3" class="pt"/><circle cx="239.2" cy="155" r="3" class="pt"/><circle cx="282.4" cy="136.67" r="3" class="pt"/><path d="M325.6,143.33 L340,146.67 L354.4,148.33 L368.8,148.33 L383.2,143.33 L397.6,136.67 L412,128.33 L426.4,118.33 L440.8,110 L455.2,105 L469.6,103.33 L484,105 L498.4,108.33 L512.8,111.67 L527.2,115 L541.6,115 L556,113.33" class="ln"/><circle cx="325.6" cy="143.33" r="3" class="pt"/><circle cx="340" cy="146.67" r="3" class="pt"/><circle cx="354.4" cy="148.33" r="3" class="pt"/><circle cx="368.8" cy="148.33" r="3" class="pt"/><circle cx="383.2" cy="143.33" r="3" class="pt"/><circle cx="397.6" cy="136.67" r="3" class="pt"/><circle cx="412" cy="128.33" r="3" class="pt"/><circle cx="426.4" cy="118.33" r="3" class="pt"/><circle cx="440.8" cy="110" r="3" class="pt"/><circle cx="455.2" cy="105" r="3" class="pt"/><circle cx="469.6" cy="103.33" r="3" class="pt"/><circle cx="484" cy="105" r="3" class="pt"/><circle cx="498.4" cy="108.33" r="3" class="pt"/><circle cx="512.8" cy="111.67" r="3" class="pt"/><circle cx="527.2" cy="115" r="3" class="pt"/><circle cx="541.6" cy="115" r="3" class="pt"/><circle cx="556" cy="113.33" r="3" class="pt"/>
+</svg>
+<svg id="dg-crashes-36-months-phone" class="dg dg-line dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="252" viewBox="0 0 264 252" role="img" aria-label="The app had more crash reports almost every month for three years, from 40 in January 2024 to 94 in June 2026. The web and the server stayed between 21 and 36. No count exists for March, April, June and July 2025, when the tracker moved.">
+<style>
+#dg-crashes-36-months-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-crashes-36-months-phone .ground{fill:var(--fig,#f2f3f9)}
+#dg-crashes-36-months-phone .band{fill:var(--bg,#fbfbfe)}
+#dg-crashes-36-months-phone .track{stroke:var(--line,#d3d6e3)}
+#dg-crashes-36-months-phone .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-crashes-36-months-phone .head{fill:var(--text,#1c1f2e)}
+#dg-crashes-36-months-phone .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-crashes-36-months-phone .stop.end{fill:var(--text,#1c1f2e)}
+#dg-crashes-36-months-phone .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-crashes-36-months-phone .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-crashes-36-months-phone .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-crashes-36-months-phone .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-crashes-36-months-phone .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-crashes-36-months-phone .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-crashes-36-months-phone .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-crashes-36-months-phone .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-crashes-36-months-phone .sub,#dg-crashes-36-months-phone .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-crashes-36-months-phone .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-crashes-36-months-phone .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-crashes-36-months-phone .dim{font-size:14px;fill:var(--muted,#575d75)}
+#dg-crashes-36-months-phone .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-crashes-36-months-phone .ln{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}#dg-crashes-36-months-phone .pt{fill:var(--text,#1c1f2e)}
+#dg-crashes-36-months-phone .ln-o{fill:none;stroke:var(--muted,#575d75);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}#dg-crashes-36-months-phone .pt-o{fill:var(--muted,#575d75)}
+#dg-crashes-36-months-phone .ln-g{fill:none;stroke:var(--line,#d3d6e3);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}#dg-crashes-36-months-phone .pt-g{fill:var(--line,#d3d6e3)}
+#dg-crashes-36-months-phone .ld{stroke:var(--muted,#575d75);stroke-width:1}
+#dg-crashes-36-months-phone .r-ref{stroke:var(--muted,#575d75)}
+@media (prefers-reduced-motion:reduce){#dg-crashes-36-months-phone .pulse{animation:none!important}#dg-crashes-36-months-phone .pulse{display:none!important}}
+@media print{#dg-crashes-36-months-phone{max-width:100%;height:auto}#dg-crashes-36-months-phone .pulse{display:none!important}}
+@media (max-width:736px){#dg-crashes-36-months{display:none}#dg-crashes-36-months-phone{display:block}}
+@media print{#dg-crashes-36-months{display:block!important}#dg-crashes-36-months-phone{display:none!important}}
+</style>
+<rect width="264" height="252" class="ground"/>
+<rect x="8" y="52" width="248" height="192" rx="10" class="band"/>
+<line x1="20" y1="216" x2="180" y2="216" class="track"/>
+<line x1="20" y1="169.33" x2="180" y2="169.33" class="track"/>
+<line x1="20" y1="122.67" x2="180" y2="122.67" class="track"/>
+<line x1="20" y1="76" x2="180" y2="76" class="track"/>
+<text x="20" y="24" class="sub" text-anchor="start">Crashes, scale from 0. A gap in a line</text>
+<text x="20" y="40" class="sub" text-anchor="start">is a time with no data.</text>
+<text x="27.84" y="234" class="val" text-anchor="middle">2024</text>
+<text x="74.86" y="234" class="val" text-anchor="middle">2025</text>
+<text x="129.71" y="234" class="val" text-anchor="middle">2026</text>
+<text x="200" y="177" class="dim" text-anchor="start">Web</text>
+<text x="200" y="195" class="dim" text-anchor="start">Server</text>
+<text x="200" y="118.33" class="row" text-anchor="start">App</text>
+<text x="20" y="212" class="val" text-anchor="start">0</text>
+<text x="20" y="165.33" class="val" text-anchor="start">40</text>
+<text x="20" y="118.67" class="val" text-anchor="start">80</text>
+<text x="20" y="72" class="val" text-anchor="start">120</text>
+<path d="M20,174 L24.57,174 L29.14,175.17 L33.71,177.5 L38.29,179.83 L42.86,182.17 L47.43,183.33 L52,185.67 L56.57,186.83 L61.14,188 L65.71,188 L70.29,186.83 L74.86,185.67 L79.43,183.33 L84,181 L88.57,178.67 L93.14,177.5 L97.71,175.17 L102.29,174 L106.86,174 L111.43,174 L116,175.17 L120.57,177.5 L125.14,179.83 L129.71,182.17 L134.29,184.5 L138.86,185.67 L143.43,186.83 L148,188 L152.57,188 L157.14,186.83 L161.71,185.67 L166.29,183.33 L170.86,181 L175.43,178.67 L180,179.83" class="ln-o"/><line x1="184" y1="179.83" x2="196" y2="172" class="ld"/>
+<path d="M20,181 L24.57,179.83 L29.14,179.83 L33.71,179.83 L38.29,179.83 L42.86,181 L47.43,182.17 L52,183.33 L56.57,184.5 L61.14,186.83 L65.71,188 L70.29,189.17 L74.86,190.33 L79.43,190.33 L84,191.5 L88.57,191.5 L93.14,191.5 L97.71,190.33 L102.29,190.33 L106.86,189.17 L111.43,186.83 L116,185.67 L120.57,184.5 L125.14,183.33 L129.71,182.17 L134.29,181 L138.86,179.83 L143.43,179.83 L148,179.83 L152.57,179.83 L157.14,181 L161.71,182.17 L166.29,183.33 L170.86,184.5 L175.43,185.67 L180,182.17" class="ln-o"/><line x1="184" y1="182.17" x2="196" y2="190" class="ld"/>
+<path d="M20,169.33 L24.57,163.5 L29.14,157.67 L33.71,154.17 L38.29,153 L42.86,154.17 L47.43,156.5 L52,160 L56.57,161.17 L61.14,161.17 L65.71,160 L70.29,155.33 L74.86,149.5 L79.43,142.5" class="ln"/><circle cx="93.14" cy="129.67" r="3" class="pt"/><path d="M106.86,134.33 L111.43,136.67 L116,137.83 L120.57,137.83 L125.14,134.33 L129.71,129.67 L134.29,123.83 L138.86,116.83 L143.43,111 L148,107.5 L152.57,106.33 L157.14,107.5 L161.71,109.83 L166.29,112.17 L170.86,114.5 L175.43,114.5 L180,113.33" class="ln"/>
+</svg>
+<details class="dg-words">
+<summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>The diagram in words</summary>
+<div class="table-wrap" role="region" aria-label="The values of the line chart" tabindex="0"><table><thead><tr><td></td><th scope="col">App</th><th scope="col">Web</th><th scope="col">Server</th></tr></thead><tbody><tr><th scope="row">2024</th><td>40</td><td>36</td><td>30</td></tr><tr><th scope="row">Feb</th><td>45</td><td>36</td><td>31</td></tr><tr><th scope="row">Mar</th><td>50</td><td>35</td><td>31</td></tr><tr><th scope="row">Apr</th><td>53</td><td>33</td><td>31</td></tr><tr><th scope="row">May</th><td>54</td><td>31</td><td>31</td></tr><tr><th scope="row">Jun</th><td>53</td><td>29</td><td>30</td></tr><tr><th scope="row">Jul</th><td>51</td><td>28</td><td>29</td></tr><tr><th scope="row">Aug</th><td>48</td><td>26</td><td>28</td></tr><tr><th scope="row">Sep</th><td>47</td><td>25</td><td>27</td></tr><tr><th scope="row">Oct</th><td>47</td><td>24</td><td>25</td></tr><tr><th scope="row">Nov</th><td>48</td><td>24</td><td>24</td></tr><tr><th scope="row">Dec</th><td>52</td><td>25</td><td>23</td></tr><tr><th scope="row">2025</th><td>57</td><td>26</td><td>22</td></tr><tr><th scope="row">Feb</th><td>63</td><td>28</td><td>22</td></tr><tr><th scope="row">Mar</th><td>no data</td><td>30</td><td>21</td></tr><tr><th scope="row">Apr</th><td>no data</td><td>32</td><td>21</td></tr><tr><th scope="row">May</th><td>74</td><td>33</td><td>21</td></tr><tr><th scope="row">Jun</th><td>no data</td><td>35</td><td>22</td></tr><tr><th scope="row">Jul</th><td>no data</td><td>36</td><td>22</td></tr><tr><th scope="row">Aug</th><td>70</td><td>36</td><td>23</td></tr><tr><th scope="row">Sep</th><td>68</td><td>36</td><td>25</td></tr><tr><th scope="row">Oct</th><td>67</td><td>35</td><td>26</td></tr><tr><th scope="row">Nov</th><td>67</td><td>33</td><td>27</td></tr><tr><th scope="row">Dec</th><td>70</td><td>31</td><td>28</td></tr><tr><th scope="row">2026</th><td>74</td><td>29</td><td>29</td></tr><tr><th scope="row">Feb</th><td>79</td><td>27</td><td>30</td></tr><tr><th scope="row">Mar</th><td>85</td><td>26</td><td>31</td></tr><tr><th scope="row">Apr</th><td>90</td><td>25</td><td>31</td></tr><tr><th scope="row">May</th><td>93</td><td>24</td><td>31</td></tr><tr><th scope="row">Jun</th><td>94</td><td>24</td><td>31</td></tr><tr><th scope="row">Jul</th><td>93</td><td>25</td><td>30</td></tr><tr><th scope="row">Aug</th><td>91</td><td>26</td><td>29</td></tr><tr><th scope="row">Sep</th><td>89</td><td>28</td><td>28</td></tr><tr><th scope="row">Oct</th><td>87</td><td>30</td><td>27</td></tr><tr><th scope="row">Nov</th><td>87</td><td>32</td><td>26</td></tr><tr><th scope="row">Dec</th><td>88</td><td>31</td><td>29</td></tr></tbody></table></div>
+<ul><li>Crashes, scale from 0. A gap in a line is a time with no data.</li><li>App: 40 in 2024, 88 in Dec (point 36); highest 94 in Jun (point 30); lowest 40 in 2024; no data in Mar (point 15), Apr (point 16), Jun (point 18), Jul (point 19).</li><li>Web: 36 in 2024, 31 in Dec (point 36); highest 36 in 2024; lowest 24 in Oct (point 10).</li><li>Server: 30 in 2024, 29 in Dec (point 36); highest 31 in Feb (point 2); lowest 21 in Mar (point 15).</li></ul>
+</details>

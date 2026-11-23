@@ -153,7 +153,8 @@ test("check accepts a layout that render drew, and reports one that was changed 
   const specimen = fs.readFileSync(path.join(__dirname, "..", "skills", "docent", "assets", "specimen.html"), "utf8");
   const page = renderDocument(specimen.replace("</main>", `${block}</main>`)).html;
   assert.deepEqual(checkDocument(page).errors, []);
-  assert.match(checkDocument(page.replace(">112<", ">113<")).errors.join("\n"), /\("a4-notes"\): the drawing does not match its data; run render/);
+  const at = page.lastIndexOf(">112<"); // a number of the layout added here, not of a sample page's own figures
+  assert.match(checkDocument(`${page.slice(0, at)}>113<${page.slice(at + 5)}`).errors.join("\n"), /\("a4-notes"\): the drawing does not match its data; run render/);
 });
 
 test("a layout takes every color from the page tokens, uses no ultramarine, and is flat", () => {

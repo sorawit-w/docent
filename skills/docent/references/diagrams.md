@@ -730,7 +730,7 @@ A communication diagram shows who is linked to whom, and the numbered messages t
 
 ## Range charts
 
-A range chart shows values and ranges on one numeric scale, one row each, so the reader sees where each one falls and whether one range sits inside another: line lengths that studies recommend, and the line length of a page. Write it with `"kind": "range"` when there are 3 to 12 values in one unit. For one or two values, write a sentence. For values over time, use a timing diagram or a table. For amounts compared by size from zero, use a bar chart (see "Bar charts" below).
+A range chart shows values and ranges on one numeric scale, one row each, so the reader sees where each one falls and whether one range sits inside another: line lengths that studies recommend, and the line length of a page. Write it with `"kind": "range"` when there are 3 to 12 values in one unit. For one or two values, write a sentence. For an amount over time, use a line chart (see "Line charts" below); for states over time, a timing diagram. For amounts compared by size from zero, use a bar chart (see "Bar charts" below).
 
 ```json
 {
@@ -848,7 +848,7 @@ A plan shows where the parts of a page or a screen sit, and what is next to what
 
 ## Funnels
 
-A funnel shows how many people reach each step of one flow, and how many leave between two steps: of everyone who opened the sign-up page, how many finished, and which step lost the most. Write it with `"kind": "funnel"` when one flow has 3 to 8 steps, every person takes them in the same order, and you have a count for each step. For two steps, write a sentence. For paths that split, steps that people skip, or people who go back, use a flowchart with the counts in its notes, or a table. For a count over time, use a table.
+A funnel shows how many people reach each step of one flow, and how many leave between two steps: of everyone who opened the sign-up page, how many finished, and which step lost the most. Write it with `"kind": "funnel"` when one flow has 3 to 8 steps, every person takes them in the same order, and you have a count for each step. For two steps, write a sentence. For paths that split, steps that people skip, or people who go back, use a flowchart with the counts in its notes, or a table. For a count over time, use a line chart.
 
 ```json
 {
@@ -885,7 +885,7 @@ A funnel shows how many people reach each step of one flow, and how many leave b
 
 ## Bar charts
 
-A bar chart shows how large each amount is, and which is largest: how many bug reports each area of the app got last quarter. Write it with `"kind": "bar"` when there are 2 to 16 amounts in one unit, each for one named thing. For one or two amounts, write a sentence. For the steps of one flow, use a funnel. For values or ranges on a scale that does not start at 0, use a range chart. For amounts over time, or when each exact number matters more than the picture, use a table.
+A bar chart shows how large each amount is, and which is largest: how many bug reports each area of the app got last quarter. Write it with `"kind": "bar"` when there are 2 to 16 amounts in one unit, each for one named thing. For one or two amounts, write a sentence. For the steps of one flow, use a funnel. For values or ranges on a scale that does not start at 0, use a range chart. For amounts over time, use a line chart. When each exact number matters more than the picture, use a table.
 
 ```json
 {
@@ -954,9 +954,79 @@ When the reader compares two values for each thing, such as last year and this y
 
 The rules against a cut scale, for a stated order, for rows with no data and for the dumbbell's line follow the chart guides of diagram-design by Cathryn Lavery (MIT).
 
+## Line charts
+
+A line chart shows how an amount changed over time, and when it rose or fell: how many bug reports came in each month for each area. Write it with `"kind": "line"` when there are 3 to 36 points in time, equally spaced, such as days, weeks or months, and 1 to 5 series in one unit. For amounts for named things, not for times, use a bar chart. For the states a thing was in against a clock, use a timing diagram. For the state of each cell, such as uptime each day, use a status grid. For points that are not equally spaced in time, use a table: a line drawn across unequal steps tells the reader a false rate.
+
+```json
+{
+  "id": "reports-by-month",
+  "kind": "line",
+  "label": "Sign-in reports rose from 62 in January to 138 in June, then fell to 66 in December. Search and Checkout stayed between 28 and 52 all year.",
+  "scale": {"from": 0, "to": 150, "step": 50, "unit": "reports"},
+  "points": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+  "series": [
+    {"name": "Sign-in", "focus": true, "values": [62, 70, 81, 95, 120, 138, 131, 112, 96, 84, 71, 66]},
+    {"name": "Search", "values": [40, 42, 39, 45, 48, 44, 46, 50, 47, 49, 52, 51]},
+    {"name": "Checkout", "values": [30, 28, 35, 33, 31, 36, 34, 30, 29, 33, 32, 35]}
+  ]
+}
+```
+
+| Field | What it is |
+|---|---|
+| `scale` | `from`, `to`, `step` and an optional `unit`, as in a range chart, with no `marks`. It may start above 0, because a line shows change, not size; the line above the chart then says so: "The scale starts at 40, not 0." A scale across 0 has a solid muted line at 0. |
+| `points` | 3 to 36 labels for the points in time, at most 10 characters each, such as `Jan`, `W14` or `2026`. They are equally spaced. A label may be used again, such as `Feb` in each year; mark each January with its year, such as `2026`, so a phone keeps one label a year. Two points make a slopegraph (below). |
+| `series` | 1 to 5. Each has a `name` (at most 20 characters) and `values`, one for each point: a number on the scale, or `null` when it is not known. |
+| `focus` | `true` on the one series that the text talks about. At most one series has it. A chart with one series draws it in the text color, with no `focus`. |
+| `multiples` | `true` for small multiples (below). |
+
+- **The series that the text talks about takes the text color; the others are gray.** The focus line is 2.5px in the text color, with a small dot at each point when the points stand at least 8px apart. Every other line is 1.5px in the muted color, with no dots. Both pass 3:1 on the page, so nothing rests on a color the reader must tell apart.
+- **With two or more series and no `focus`, choose.** Such data is refused: say which series the text talks about with `focus`, or show each series in its own panel with `"multiples": true`. Five gray lines with no main series say what a table says.
+- **Each line is named at its end,** 8px after its last point, in 14px text: the focus name in the text color, the others muted. When two names would stand closer than 18px, they move apart in the order of their lines, and a thin muted line joins each moved name to its line's end; so does a name whose line ends before the last point. Every name then stands 20px after the plot, so those lines have room. The last point never moves. No chart has a legend.
+- **A gap stays a gap.** A `null` breaks the line, and a point alone between two gaps is a dot. Lines are straight from point to point and never smoothed. The line above the chart says "A gap in a line is a time with no data."
+- `render` refuses a value outside the scale, a series whose number of values is not the number of points, two series with the same name, and two series that are equal at every point: they cannot be told apart, so write one and say in the text that both are the same.
+- The forms: 640px on a desktop and on paper, with the value labels at the left of the plot and the points along the bottom; and 264px on a phone, where the value labels stand inside the plot, above their grid lines at the left edge, so they take no width. On a phone a name wider than 96px wraps onto two lines, so the plot keeps 120px. The time labels follow the heat map's rule (one line, two lines, then every 2nd, 3rd, 4th, 6th or 12th label), and a time axis may keep two labels as its last step. It prints at 640px, with no shrink.
+- `render` also writes the values as a table under the drawing, a row for each point and a column for each series, and one line for each series: "Sign-in: 62 in Jan, 66 in Dec; highest 138 in Jun; lowest 62 in Jan." A label used more than once is named with its place, such as "Feb (point 14)".
+
+### Several series that matter equally: small multiples
+
+With `"multiples": true`, each series gets its own small panel. All panels share one scale and one set of points, so they compare. Each panel names its series above it, at 14px weight 600, and draws its series in the text color; the other series stand behind it as thin lines in the outline color, so the reader sees where this series stands among the others. Those lines have low contrast on purpose: they repeat data that another panel draws in the text color.
+
+- 2 to 6 panels. `focus` is refused with `multiples`.
+- On a desktop and on paper up to 3 panels stand in a row, each 184px wide; 4 panels make two rows of 2. On a phone each panel has a row, 224px wide.
+
+### Two points in time: the slopegraph
+
+When `points` has exactly two labels, the line chart draws a slopegraph: two upright axes, one for each point, and a straight line for each series between them. The reader sees which series rose or fell, how steeply, and which passed another.
+
+```json
+{
+  "id": "days-to-fix-slope",
+  "kind": "line",
+  "label": "The median time to fix a bug fell in three of five areas from 2025 to 2026. Settings fell most, from 15 days to 6. Checkout rose from 6 to 8. Profile stayed at 5.",
+  "scale": {"from": 0, "to": 20, "unit": "days"},
+  "points": ["2025", "2026"],
+  "series": [
+    {"name": "Sign-in", "values": [9, 4]},
+    {"name": "Search", "values": [12, 7]},
+    {"name": "Checkout", "focus": true, "values": [6, 8]},
+    {"name": "Settings", "values": [15, 6]},
+    {"name": "Profile", "values": [5, 5]}
+  ]
+}
+```
+
+- 2 to 10 series. The focus rule and the rule for names that would meet are as above. Both values of each series are needed: a slopegraph refuses a `null`, so leave such a series out and say why in the text.
+- Each line is named at both ends, with its value: name, then value, on the left; value, then name, on the right. On a phone the names stand on the right only, and the left axis shows the values alone. The two point labels stand above their axes.
+- The run between the axes is no wider than the plot is tall, so the slopes keep their angle. A slopegraph draws no grid, so its scale needs no `step`. The scale may start above 0: the slopes do not change when both axes move together.
+- The table in words has a row for each series, a column for each point, and a column for the change, such as `−9` or `+2`. When every series matters equally, a dumbbell (a bar chart with `series`) compares the two times row by row.
+
+The rules for gaps, for lines that are never smoothed, for names that move while their points stay, and for the slopegraph's run follow the chart guides of diagram-design by Cathryn Lavery (MIT).
+
 ## Heat maps
 
-A heat map shows one number for each pair of a row and a column, such as sign-ups by weekday and hour, or errors by service and day. Write it with `"kind": "heatmap"` when there are 2 to 12 rows and 3 to 24 columns, one number in each cell, and the reader needs the pattern more than each number: the busy hours, the bad day, the one service that differs. For fewer than 12 cells, or when each exact number matters, write a table. For values on one scale, one row each, use a range chart. For change over time in one or two series, or for numbers above and below a middle (such as change against last week), use a table.
+A heat map shows one number for each pair of a row and a column, such as sign-ups by weekday and hour, or errors by service and day. Write it with `"kind": "heatmap"` when there are 2 to 12 rows and 3 to 24 columns, one number in each cell, and the reader needs the pattern more than each number: the busy hours, the bad day, the one service that differs. For fewer than 12 cells, or when each exact number matters, write a table. For values on one scale, one row each, use a range chart. For change over time in one to five series, use a line chart. For numbers above and below a middle (such as change against last week), use a table.
 
 ```json
 {
@@ -1162,6 +1232,8 @@ An icon may hold only these shapes and attributes: `path` (`d`), `circle` (`cx`,
   - `... warning: the last step keeps 96% of the first, so the bars look almost the same; a table shows small drops better` — when the last count is at least 95% of the first, the loss is too short to see on a phone.
   - `... warning: the bar chart has 2 rows; a sentence says this more simply` — two amounts read better in a sentence.
   - `... warning: every value is the same; a sentence says this more simply` — every bar has the same length. For a dumbbell: `no row changes; a sentence says this more simply`.
+  - `... warning: the line chart has one series of 3 points; a sentence says this more simply` — three values read better in a sentence.
+  - `... warning: no value changes; a sentence says this more simply` — every line of a line chart, or of a slopegraph, is flat.
   - `... warning: every number is in one step, so the shades show nothing; a sentence or a table says this more simply` — every cell has the same shade.
   - `... warning: 61 of 72 cells are in the lowest step; one large number may set the scale. Check "to", or say the large number in the text` — four cells in five, or more, have the palest shade.
   - `... warning: the heat map has 9 cells; a table with the numbers says this more simply` — fewer than 12 cells.

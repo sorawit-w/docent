@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex">
 <title>Report a bug and get a fix — Example project</title>
 <style>
-/* docent:kit 0.16.0 */
+/* docent:kit 0.17.0 */
 /* Docent page styles. Tokens come from references/DESIGN.md. One file, no network. */
 :root {
   color-scheme: light;
@@ -1342,9 +1342,159 @@ footer p { margin: 0; }
       </div>
       <figcaption><strong>Figure 5</strong>Last month's bug reports by the part of the program they were about.</figcaption>
     </figure>
+    <p>Fewer new reports have come in each month since June, when the report form began to ask for the steps.</p>
+    <figure>
+      <div class="fig" role="region" aria-label="Figure 6, new and closed reports each month" tabindex="0">
+        <!-- docent:diagram
+{
+  "id": "reports-over-year",
+  "kind": "line",
+  "label": "New bug reports rose from 96 in January to 160 in May, then fell to 88 in December, after the report form began to ask for the steps in June. Closed reports stayed between 90 and 122 each month.",
+  "scale": {"from": 0, "to": 200, "step": 50, "unit": "reports"},
+  "points": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+  "series": [
+    {"name": "New", "focus": true, "values": [96, 104, 118, 131, 160, 142, 121, 108, 99, 94, 90, 88]},
+    {"name": "Closed", "values": [90, 95, 99, 104, 112, 118, 122, 120, 114, 106, 98, 92]}
+  ]
+}
+-->
+<svg id="dg-reports-over-year" class="dg dg-line dg-auto" xmlns="http://www.w3.org/2000/svg" width="640" height="296" viewBox="0 0 640 296" role="img" aria-label="New bug reports rose from 96 in January to 160 in May, then fell to 88 in December, after the report form began to ask for the steps in June. Closed reports stayed between 90 and 122 each month.">
+<style>
+#dg-reports-over-year{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-reports-over-year .ground{fill:var(--fig,#f2f3f9)}
+#dg-reports-over-year .band{fill:var(--bg,#fbfbfe)}
+#dg-reports-over-year .track{stroke:var(--line,#d3d6e3)}
+#dg-reports-over-year .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-reports-over-year .head{fill:var(--text,#1c1f2e)}
+#dg-reports-over-year .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-reports-over-year .stop.end{fill:var(--text,#1c1f2e)}
+#dg-reports-over-year .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-reports-over-year .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-reports-over-year .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-reports-over-year .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-reports-over-year .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-reports-over-year .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-reports-over-year .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-reports-over-year .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-reports-over-year .sub,#dg-reports-over-year .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-reports-over-year .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-reports-over-year .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-reports-over-year .dim{font-size:14px;fill:var(--muted,#575d75)}
+#dg-reports-over-year .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-reports-over-year .ln{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}#dg-reports-over-year .pt{fill:var(--text,#1c1f2e)}
+#dg-reports-over-year .ln-o{fill:none;stroke:var(--muted,#575d75);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}#dg-reports-over-year .pt-o{fill:var(--muted,#575d75)}
+#dg-reports-over-year .ln-g{fill:none;stroke:var(--line,#d3d6e3);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}#dg-reports-over-year .pt-g{fill:var(--line,#d3d6e3)}
+#dg-reports-over-year .ld{stroke:var(--muted,#575d75);stroke-width:1}
+#dg-reports-over-year .r-ref{stroke:var(--muted,#575d75)}
+@media (prefers-reduced-motion:reduce){#dg-reports-over-year .pulse{animation:none!important}#dg-reports-over-year .pulse{display:none!important}}
+@media print{#dg-reports-over-year{max-width:100%;height:auto}#dg-reports-over-year .pulse{display:none!important}}
+#dg-reports-over-year-phone{display:none}
+</style>
+<rect width="640" height="296" class="ground"/>
+<rect x="8" y="36" width="624" height="252" rx="10" class="band"/>
+<line x1="52" y1="260" x2="554" y2="260" class="track"/>
+<line x1="52" y1="210" x2="554" y2="210" class="track"/>
+<line x1="52" y1="160" x2="554" y2="160" class="track"/>
+<line x1="52" y1="110" x2="554" y2="110" class="track"/>
+<line x1="52" y1="60" x2="554" y2="60" class="track"/>
+<text x="20" y="24" class="sub" text-anchor="start">Reports, scale from 0.</text>
+<text x="52" y="278" class="val" text-anchor="middle">Jan</text>
+<text x="97.64" y="278" class="val" text-anchor="middle">Feb</text>
+<text x="143.27" y="278" class="val" text-anchor="middle">Mar</text>
+<text x="188.91" y="278" class="val" text-anchor="middle">Apr</text>
+<text x="234.55" y="278" class="val" text-anchor="middle">May</text>
+<text x="280.18" y="278" class="val" text-anchor="middle">Jun</text>
+<text x="325.82" y="278" class="val" text-anchor="middle">Jul</text>
+<text x="371.45" y="278" class="val" text-anchor="middle">Aug</text>
+<text x="417.09" y="278" class="val" text-anchor="middle">Sep</text>
+<text x="462.73" y="278" class="val" text-anchor="middle">Oct</text>
+<text x="508.36" y="278" class="val" text-anchor="middle">Nov</text>
+<text x="554" y="278" class="val" text-anchor="middle">Dec</text>
+<text x="574" y="166" class="dim" text-anchor="start">Closed</text>
+<text x="574" y="184" class="row" text-anchor="start">New</text>
+<text x="44" y="264" class="val" text-anchor="end">0</text>
+<text x="44" y="214" class="val" text-anchor="end">50</text>
+<text x="44" y="164" class="val" text-anchor="end">100</text>
+<text x="44" y="114" class="val" text-anchor="end">150</text>
+<text x="44" y="64" class="val" text-anchor="end">200</text>
+<path d="M52,170 L97.64,165 L143.27,161 L188.91,156 L234.55,148 L280.18,142 L325.82,138 L371.45,140 L417.09,146 L462.73,154 L508.36,162 L554,168" class="ln-o"/><line x1="558" y1="168" x2="570" y2="161" class="ld"/>
+<path d="M52,164 L97.64,156 L143.27,142 L188.91,129 L234.55,100 L280.18,118 L325.82,139 L371.45,152 L417.09,161 L462.73,166 L508.36,170 L554,172" class="ln"/><circle cx="52" cy="164" r="3" class="pt"/><circle cx="97.64" cy="156" r="3" class="pt"/><circle cx="143.27" cy="142" r="3" class="pt"/><circle cx="188.91" cy="129" r="3" class="pt"/><circle cx="234.55" cy="100" r="3" class="pt"/><circle cx="280.18" cy="118" r="3" class="pt"/><circle cx="325.82" cy="139" r="3" class="pt"/><circle cx="371.45" cy="152" r="3" class="pt"/><circle cx="417.09" cy="161" r="3" class="pt"/><circle cx="462.73" cy="166" r="3" class="pt"/><circle cx="508.36" cy="170" r="3" class="pt"/><circle cx="554" cy="172" r="3" class="pt"/><line x1="558" y1="172" x2="570" y2="179" class="ld"/>
+</svg>
+<svg id="dg-reports-over-year-phone" class="dg dg-line dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="252" viewBox="0 0 264 252" role="img" aria-label="New bug reports rose from 96 in January to 160 in May, then fell to 88 in December, after the report form began to ask for the steps in June. Closed reports stayed between 90 and 122 each month.">
+<style>
+#dg-reports-over-year-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-reports-over-year-phone .ground{fill:var(--fig,#f2f3f9)}
+#dg-reports-over-year-phone .band{fill:var(--bg,#fbfbfe)}
+#dg-reports-over-year-phone .track{stroke:var(--line,#d3d6e3)}
+#dg-reports-over-year-phone .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-reports-over-year-phone .head{fill:var(--text,#1c1f2e)}
+#dg-reports-over-year-phone .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-reports-over-year-phone .stop.end{fill:var(--text,#1c1f2e)}
+#dg-reports-over-year-phone .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-reports-over-year-phone .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-reports-over-year-phone .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-reports-over-year-phone .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-reports-over-year-phone .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-reports-over-year-phone .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-reports-over-year-phone .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-reports-over-year-phone .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-reports-over-year-phone .sub,#dg-reports-over-year-phone .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-reports-over-year-phone .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-reports-over-year-phone .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-reports-over-year-phone .dim{font-size:14px;fill:var(--muted,#575d75)}
+#dg-reports-over-year-phone .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-reports-over-year-phone .ln{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}#dg-reports-over-year-phone .pt{fill:var(--text,#1c1f2e)}
+#dg-reports-over-year-phone .ln-o{fill:none;stroke:var(--muted,#575d75);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}#dg-reports-over-year-phone .pt-o{fill:var(--muted,#575d75)}
+#dg-reports-over-year-phone .ln-g{fill:none;stroke:var(--line,#d3d6e3);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}#dg-reports-over-year-phone .pt-g{fill:var(--line,#d3d6e3)}
+#dg-reports-over-year-phone .ld{stroke:var(--muted,#575d75);stroke-width:1}
+#dg-reports-over-year-phone .r-ref{stroke:var(--muted,#575d75)}
+@media (prefers-reduced-motion:reduce){#dg-reports-over-year-phone .pulse{animation:none!important}#dg-reports-over-year-phone .pulse{display:none!important}}
+@media print{#dg-reports-over-year-phone{max-width:100%;height:auto}#dg-reports-over-year-phone .pulse{display:none!important}}
+@media (max-width:736px){#dg-reports-over-year{display:none}#dg-reports-over-year-phone{display:block}}
+@media print{#dg-reports-over-year{display:block!important}#dg-reports-over-year-phone{display:none!important}}
+</style>
+<rect width="264" height="252" class="ground"/>
+<rect x="8" y="36" width="248" height="208" rx="10" class="band"/>
+<line x1="20" y1="200" x2="178" y2="200" class="track"/>
+<line x1="20" y1="165" x2="178" y2="165" class="track"/>
+<line x1="20" y1="130" x2="178" y2="130" class="track"/>
+<line x1="20" y1="95" x2="178" y2="95" class="track"/>
+<line x1="20" y1="60" x2="178" y2="60" class="track"/>
+<text x="20" y="24" class="sub" text-anchor="start">Reports, scale from 0.</text>
+<text x="22.5" y="218" class="val" text-anchor="middle">Jan</text>
+<text x="34.36" y="234" class="val" text-anchor="middle">Feb</text>
+<text x="48.73" y="218" class="val" text-anchor="middle">Mar</text>
+<text x="63.09" y="234" class="val" text-anchor="middle">Apr</text>
+<text x="77.45" y="218" class="val" text-anchor="middle">May</text>
+<text x="91.82" y="234" class="val" text-anchor="middle">Jun</text>
+<text x="106.18" y="218" class="val" text-anchor="middle">Jul</text>
+<text x="120.55" y="234" class="val" text-anchor="middle">Aug</text>
+<text x="134.91" y="218" class="val" text-anchor="middle">Sep</text>
+<text x="149.27" y="234" class="val" text-anchor="middle">Oct</text>
+<text x="163.64" y="218" class="val" text-anchor="middle">Nov</text>
+<text x="178" y="234" class="val" text-anchor="middle">Dec</text>
+<text x="198" y="133" class="dim" text-anchor="start">Closed</text>
+<text x="198" y="151" class="row" text-anchor="start">New</text>
+<text x="20" y="196" class="val" text-anchor="start">0</text>
+<text x="20" y="161" class="val" text-anchor="start">50</text>
+<text x="20" y="126" class="val" text-anchor="start">100</text>
+<text x="20" y="91" class="val" text-anchor="start">150</text>
+<text x="20" y="56" class="val" text-anchor="start">200</text>
+<path d="M20,137 L34.36,133.5 L48.73,130.7 L63.09,127.2 L77.45,121.6 L91.82,117.4 L106.18,114.6 L120.55,116 L134.91,120.2 L149.27,125.8 L163.64,131.4 L178,135.6" class="ln-o"/><line x1="182" y1="135.6" x2="194" y2="128" class="ld"/>
+<path d="M20,132.8 L34.36,127.2 L48.73,117.4 L63.09,108.3 L77.45,88 L91.82,100.6 L106.18,115.3 L120.55,124.4 L134.91,130.7 L149.27,134.2 L163.64,137 L178,138.4" class="ln"/><circle cx="20" cy="132.8" r="3" class="pt"/><circle cx="34.36" cy="127.2" r="3" class="pt"/><circle cx="48.73" cy="117.4" r="3" class="pt"/><circle cx="63.09" cy="108.3" r="3" class="pt"/><circle cx="77.45" cy="88" r="3" class="pt"/><circle cx="91.82" cy="100.6" r="3" class="pt"/><circle cx="106.18" cy="115.3" r="3" class="pt"/><circle cx="120.55" cy="124.4" r="3" class="pt"/><circle cx="134.91" cy="130.7" r="3" class="pt"/><circle cx="149.27" cy="134.2" r="3" class="pt"/><circle cx="163.64" cy="137" r="3" class="pt"/><circle cx="178" cy="138.4" r="3" class="pt"/><line x1="182" y1="138.4" x2="194" y2="146" class="ld"/>
+</svg>
+<details class="dg-words">
+<summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>The diagram in words</summary>
+<div class="table-wrap" role="region" aria-label="The values of the line chart" tabindex="0"><table><thead><tr><td></td><th scope="col">New</th><th scope="col">Closed</th></tr></thead><tbody><tr><th scope="row">Jan</th><td>96</td><td>90</td></tr><tr><th scope="row">Feb</th><td>104</td><td>95</td></tr><tr><th scope="row">Mar</th><td>118</td><td>99</td></tr><tr><th scope="row">Apr</th><td>131</td><td>104</td></tr><tr><th scope="row">May</th><td>160</td><td>112</td></tr><tr><th scope="row">Jun</th><td>142</td><td>118</td></tr><tr><th scope="row">Jul</th><td>121</td><td>122</td></tr><tr><th scope="row">Aug</th><td>108</td><td>120</td></tr><tr><th scope="row">Sep</th><td>99</td><td>114</td></tr><tr><th scope="row">Oct</th><td>94</td><td>106</td></tr><tr><th scope="row">Nov</th><td>90</td><td>98</td></tr><tr><th scope="row">Dec</th><td>88</td><td>92</td></tr></tbody></table></div>
+<ul><li>Reports, scale from 0.</li><li>New: 96 in Jan, 88 in Dec; highest 160 in May; lowest 88 in Dec.</li><li>Closed: 90 in Jan, 92 in Dec; highest 122 in Jul; lowest 90 in Jan.</li></ul>
+</details>
+<!-- /docent:diagram -->
+      </div>
+      <figcaption><strong>Figure 6</strong>New and closed bug reports in each month of the last year.</figcaption>
+    </figure>
     <p>The time of day matters too. The maintainers answer in their working hours, and few answer on a weekend.</p>
     <figure>
-      <div class="fig" role="region" aria-label="Figure 6, when the maintainers reply" tabindex="0">
+      <div class="fig" role="region" aria-label="Figure 7, when the maintainers reply" tabindex="0">
         <!-- docent:diagram
 {
   "id": "replies-by-hour",
@@ -1519,7 +1669,7 @@ footer p { margin: 0; }
 </details>
 <!-- /docent:diagram -->
       </div>
-      <figcaption><strong>Figure 6</strong>When the maintainers replied last month, by weekday and hour in their time zone.</figcaption>
+      <figcaption><strong>Figure 7</strong>When the maintainers replied last month, by weekday and hour in their time zone.</figcaption>
     </figure>
     <div class="status">
       <span class="state plan">Planned</span>
@@ -1527,7 +1677,7 @@ footer p { margin: 0; }
     </div>
     <p>The bug tracker can fail too. Each day its parts are measured, and a day counts as OK when a part was up for 99.9% of it.</p>
     <figure>
-      <div class="fig" role="region" aria-label="Figure 7, uptime of the bug tracker" tabindex="0">
+      <div class="fig" role="region" aria-label="Figure 8, uptime of the bug tracker" tabindex="0">
         <!-- docent:diagram
 {
   "id": "bug-tracker-uptime",
@@ -1694,7 +1844,7 @@ footer p { margin: 0; }
 </details>
 <!-- /docent:diagram -->
       </div>
-      <figcaption><strong>Figure 7</strong>Uptime of the bug tracker's parts, day by day, from 3 to 16 November.</figcaption>
+      <figcaption><strong>Figure 8</strong>Uptime of the bug tracker's parts, day by day, from 3 to 16 November.</figcaption>
     </figure>
     <div class="status">
       <span class="state warn">Warning</span>
@@ -1884,7 +2034,7 @@ grep -i password bug.log</code></pre>
 </footer>
 
 <script>
-// docent:kit 0.16.0
+// docent:kit 0.17.0
 (() => {
   const root = document.documentElement;
   root.classList.add('js');
