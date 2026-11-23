@@ -24,7 +24,7 @@ Docent is a design kit for documents: single HTML files that open without a netw
 | `scripts/check.cjs` | Tests a document against the rules. |
 | `scripts/brand.cjs` | Reads a host project's `DESIGN.md` and prints its host tokens. It writes nothing. |
 
-The scripts need Node 18 or newer and nothing else. They install no packages and use no network. When Node is missing, see "When a script cannot run" below.
+The scripts need Node 24 or newer and nothing else. They install no packages and use no network. Before the first script, run `node --version`. When it is older than 24, tell the user once, in one sentence, which version you found and that Docent needs 24 or newer. Then run the scripts anyway, and report their results as not tested on that version. When Node is missing, see "When a script cannot run" below.
 
 ## When to use it
 
@@ -209,9 +209,10 @@ The starting page has a place for each one. See "Logo, tagline and credit" in `r
 
 ## When a script cannot run
 
-- **The machine has no Node 18 or newer, and you write a document.** Write the document with its data blocks. Write no drawing, no widget markup and no page styles by hand. Give the user the three commands of step 9, and say that the document is not finished until they ran.
-- **The machine has no Node 18 or newer, and you check a document.** Read its source against `references/DESIGN.md` by hand. Say that this was a reading by hand, and that `check` did not run.
-- In both cases, report no result of a script that did not run.
+- **The machine has no Node, and you write a document.** Write the document with its data blocks. Write no drawing, no widget markup and no page styles by hand. Give the user the three commands of step 9, and say that the document is not finished until they ran.
+- **The machine has no Node, and you check a document.** Read its source against `references/DESIGN.md` by hand. Say that this was a reading by hand, and that `check` did not run.
+- **Node is older than 24.** Tell the user once, in one sentence, which version `node --version` showed and that Docent needs 24 or newer. Then run the scripts anyway. They print the same warning, and they do not refuse. Report each result as not tested on that version.
+- When a script did not run, report no result of it.
 
 ## Who does what
 
@@ -230,6 +231,7 @@ Say what was tested and what was not. Use these words:
 - `check` reads the source only. It does not open a browser. So do not say that the contrast, the phone layout, print or motion were checked, unless you looked yourself. Say which views you opened.
 - When `render` refused a diagram or a widget, say which one and why.
 - Name the profile you chose and one reason, in one sentence: "I used the Reference profile, because the page is mostly commands and option tables."
+- When a script prints a warning that Node is older than 24, pass it on to the user every time, even if you told them before.
 - When `check` warns about personal data, tell the user what it found and where, as the warning names it (masked, such as `j***@company.com`). Ask whether to remove it, mask it, or keep it. Do not decide alone.
 
 ## Limits to know
