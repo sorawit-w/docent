@@ -116,7 +116,14 @@ test("a page style for a hand-drawn figure keeps text at 12px or more, and other
   const styled = (css) => checkDocument(page().replace("</head>", `<style>${css}</style></head>`)).errors.join("\n");
   assert.equal(styled('svg[data-drawn="hand"] .hd-note { font-size: 12px; }'), "");
   assert.match(styled('svg[data-drawn="hand"] text { font-size: 10px; }'), /a style sets font-size: 10px in a hand-drawn figure; text in a drawing is 12px or more, in px/);
+  assert.match(styled('svg[data-drawn="hand"] text { font: 10px Arial; }'), /a style sets font: 10px in a hand-drawn figure; text in a drawing is 12px or more, in px/);
   assert.match(styled('p, svg[data-drawn="hand"] text { font-size: 12px; }'), /a style sets font-size: 12px; no text is below 14px outside diagrams/, "a rule that also styles the page keeps the page's rule");
+});
+
+test("check reads the text of a hand-drawn figure for personal data, as it reads the page and the data of each diagram", () => {
+  const warned = checkDocument(page(swap(">Cannot repeat</text>", ">jane@acmecorp.com</text>"))).warnings.join("\n");
+  assert.match(warned, /the text of a hand-drawn figure holds what looks like personal data: an email address j\*+@acmecorp\.com/);
+  assert.doesNotMatch(checkDocument(page()).warnings.join("\n"), /personal data/);
 });
 
 test("a hand-drawn drawing outside a figure well is refused", () => {

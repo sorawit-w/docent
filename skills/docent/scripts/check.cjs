@@ -235,7 +235,7 @@ function checkDocument(html) {
   // kit's hd-* classes) styles a drawing: its text keeps its real size in px, at least 12px.
   const drawn = /(?<=^|[{};])\s*((?:svg\[data-drawn="hand"\][^,{}]*,\s*)*svg\[data-drawn="hand"\][^,{}]*)\{([^{}]*)\}/g;
   const pageCss = css.replace(drawn, (all, selectors, body) => {
-    for (const [, value, unit] of body.matchAll(/font-size\s*:\s*([\d.]+)(px|rem|em|%)/gi)) if (unit.toLowerCase() !== "px" || Number(value) < 12) errors.push(`a style sets font-size: ${value}${unit} in a hand-drawn figure; text in a drawing is 12px or more, in px`);
+    for (const [, prop, value, unit] of body.matchAll(/(?:^|[;\s])(font-size|font)\s*:[^;}]*?\b([\d.]+)(px|rem|em|%)/gi)) if (unit.toLowerCase() !== "px" || Number(value) < 12) errors.push(`a style sets ${prop.toLowerCase()}: ${value}${unit} in a hand-drawn figure; text in a drawing is 12px or more, in px`);
     return "";
   });
   const small = (value, unit) => (unit === "px" ? value < 14 : unit === "%" ? value < 87.5 : value < 0.875);
@@ -323,6 +323,8 @@ function checkDocument(html) {
   // the author decides. Reserved example names (example.com, .test, 555-0100 to 555-0199) pass. Names and postal addresses are not found.
   const pageText = [textOf(markup), ...[...markup.matchAll(/\b(?:alt|title|aria-label)="([^"]*)"/gi)].map((m) => m[1])].join(" \n ");
   const places = [["the page text", [...findPersonal(pageText), ...[...markup.matchAll(/\bhref="(mailto:[^"]*|tel:[^"]*)"/gi)].flatMap(([, href]) => (/^tel:/i.test(href) ? findTel(href) : findPersonal(decoded(href.slice(7)))))]]];
+  // A hand-drawn figure has no data block, and check leaves it out of the page text above, so its words are read here.
+  if (hand.drawn.length) places.push(["the text of a hand-drawn figure", findPersonal(hand.drawn.map((svg) => [textOf(svg), ...[...svg.matchAll(/\baria-[\w-]+="([^"]*)"/gi)].map((m) => m[1])].join(" \n ")).join(" \n "))]);
   for (const [kind, list] of [["diagram", diagrams], ["widget", widgets]]) list.forEach((found, n) => {
     let data;
     try { data = JSON.parse(found.json); } catch { return; } // an error above already names it
