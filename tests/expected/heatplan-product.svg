@@ -1,0 +1,168 @@
+<svg id="dg-product-clicks" class="dg dg-heatplan dg-auto" xmlns="http://www.w3.org/2000/svg" width="640" height="382" viewBox="0 0 640 382" role="img" aria-label="Clicks on each area of a product page in one week. The Add to cart box got the most, 870, and the photo gallery the next most, 610. The footer got the fewest, 60. The help chat was not tracked.">
+<style>
+#dg-product-clicks{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-product-clicks .ground{fill:var(--fig,#f2f3f9)}
+#dg-product-clicks .band{fill:var(--bg,#fbfbfe)}
+#dg-product-clicks .track{stroke:var(--line,#d3d6e3)}
+#dg-product-clicks .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-product-clicks .head{fill:var(--text,#1c1f2e)}
+#dg-product-clicks .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-product-clicks .stop.end{fill:var(--text,#1c1f2e)}
+#dg-product-clicks .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-product-clicks .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-product-clicks .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-product-clicks .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-product-clicks .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-product-clicks .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-product-clicks .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-product-clicks .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-product-clicks .sub,#dg-product-clicks .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-product-clicks .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-product-clicks .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-product-clicks .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-product-clicks .box{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-product-clicks .h1{fill:var(--heat-1,#dee2f0)}
+#dg-product-clicks .h2{fill:var(--heat-2,#babecb)}
+#dg-product-clicks .h3{fill:var(--heat-3,#9498a5)}
+#dg-product-clicks .h4{fill:var(--heat-4,#616571)}
+#dg-product-clicks .h5{fill:var(--heat-5,#3e424d)}
+#dg-product-clicks .hv{font-size:12px;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-product-clicks .hn{font-size:12px;fill:var(--text,#1c1f2e)}
+#dg-product-clicks .row.hi,#dg-product-clicks .hv.hi,#dg-product-clicks .hn.hi{fill:var(--bg,#fbfbfe)}
+@media (prefers-reduced-motion:reduce){#dg-product-clicks .pulse{animation:none!important}#dg-product-clicks .pulse{display:none!important}}
+@media print{#dg-product-clicks{max-width:100%;height:auto}#dg-product-clicks .pulse{display:none!important}}
+#dg-product-clicks-phone{display:none}
+</style>
+<rect width="640" height="382" class="ground"/>
+<rect x="8" y="90" width="624" height="280" rx="10" class="band"/>
+<text x="16" y="38" class="val" text-anchor="middle">0</text>
+<text x="57" y="38" class="val" text-anchor="middle">200</text>
+<text x="99" y="38" class="val" text-anchor="middle">400</text>
+<text x="141" y="38" class="val" text-anchor="middle">600</text>
+<text x="183" y="38" class="val" text-anchor="middle">800</text>
+<text x="224" y="38" class="val" text-anchor="middle">1000</text>
+<text x="232" y="22" class="sub" text-anchor="start">clicks</text>
+<text x="12" y="62" class="sub" text-anchor="start">Widths in px</text>
+<text x="114.67" y="82" class="val" text-anchor="middle">480</text>
+<text x="320" y="82" class="val" text-anchor="middle">480</text>
+<text x="525.33" y="82" class="val" text-anchor="middle">480</text>
+<rect x="16" y="12" width="40" height="12" rx="2" class="h1"/><rect x="58" y="12" width="40" height="12" rx="2" class="h2"/><rect x="100" y="12" width="40" height="12" rx="2" class="h3"/><rect x="142" y="12" width="40" height="12" rx="2" class="h4"/><rect x="184" y="12" width="40" height="12" rx="2" class="h5"/>
+<rect x="14" y="96" width="612" height="68" rx="4" class="box h3"/>
+<text x="22" y="118" class="row" text-anchor="start">Header</text>
+<text x="22" y="136" class="hv" text-anchor="start">420</text>
+<text x="22" y="152" class="hn" text-anchor="start">search and menu</text>
+<rect x="14" y="168" width="201.33" height="68" rx="4" class="box h4"/>
+<text x="22" y="190" class="row hi" text-anchor="start">Photo gallery</text>
+<text x="22" y="208" class="hv hi" text-anchor="start">610</text>
+<rect x="219.33" y="168" width="201.33" height="68" rx="4" class="box h2"/>
+<text x="227.33" y="190" class="row" text-anchor="start">Product details</text>
+<text x="227.33" y="208" class="hv" text-anchor="start">240</text>
+<rect x="424.67" y="168" width="201.33" height="68" rx="4" class="box h5"/>
+<text x="432.67" y="190" class="row hi" text-anchor="start">Add to cart</text>
+<text x="432.67" y="208" class="hv hi" text-anchor="start">870</text>
+<text x="432.67" y="224" class="hn hi" text-anchor="start">price and size</text>
+<rect x="14" y="240" width="406.67" height="52" rx="4" class="box h3"/>
+<text x="22" y="262" class="row" text-anchor="start">Reviews</text>
+<text x="22" y="280" class="hv" text-anchor="start">430</text>
+<rect x="424.67" y="240" width="201.33" height="52" rx="4" class="box h1"/>
+<text x="432.67" y="262" class="row" text-anchor="start">Related items</text>
+<text x="432.67" y="280" class="hv" text-anchor="start">150</text>
+<rect x="14" y="296" width="406.67" height="68" rx="4" class="box h1"/>
+<text x="22" y="318" class="row" text-anchor="start">Footer</text>
+<text x="22" y="336" class="hv" text-anchor="start">60</text>
+<rect x="424.67" y="296" width="201.33" height="68" rx="4" class="box"/>
+<text x="432.67" y="318" class="row" text-anchor="start">Help chat</text>
+<text x="432.67" y="336" class="sub" text-anchor="start">no data</text>
+<text x="432.67" y="352" class="sub" text-anchor="start">not tracked</text>
+</svg>
+<svg id="dg-product-clicks-phone" class="dg dg-heatplan dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="490" viewBox="0 0 264 490" role="img" aria-label="Clicks on each area of a product page in one week. The Add to cart box got the most, 870, and the photo gallery the next most, 610. The footer got the fewest, 60. The help chat was not tracked.">
+<style>
+#dg-product-clicks-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-product-clicks-phone .ground{fill:var(--fig,#f2f3f9)}
+#dg-product-clicks-phone .band{fill:var(--bg,#fbfbfe)}
+#dg-product-clicks-phone .track{stroke:var(--line,#d3d6e3)}
+#dg-product-clicks-phone .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-product-clicks-phone .head{fill:var(--text,#1c1f2e)}
+#dg-product-clicks-phone .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-product-clicks-phone .stop.end{fill:var(--text,#1c1f2e)}
+#dg-product-clicks-phone .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-product-clicks-phone .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-product-clicks-phone .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-product-clicks-phone .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-product-clicks-phone .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-product-clicks-phone .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-product-clicks-phone .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-product-clicks-phone .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-product-clicks-phone .sub,#dg-product-clicks-phone .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-product-clicks-phone .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-product-clicks-phone .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-product-clicks-phone .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-product-clicks-phone .box{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-product-clicks-phone .h1{fill:var(--heat-1,#dee2f0)}
+#dg-product-clicks-phone .h2{fill:var(--heat-2,#babecb)}
+#dg-product-clicks-phone .h3{fill:var(--heat-3,#9498a5)}
+#dg-product-clicks-phone .h4{fill:var(--heat-4,#616571)}
+#dg-product-clicks-phone .h5{fill:var(--heat-5,#3e424d)}
+#dg-product-clicks-phone .hv{font-size:12px;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-product-clicks-phone .hn{font-size:12px;fill:var(--text,#1c1f2e)}
+#dg-product-clicks-phone .row.hi,#dg-product-clicks-phone .hv.hi,#dg-product-clicks-phone .hn.hi{fill:var(--bg,#fbfbfe)}
+@media (prefers-reduced-motion:reduce){#dg-product-clicks-phone .pulse{animation:none!important}#dg-product-clicks-phone .pulse{display:none!important}}
+@media print{#dg-product-clicks-phone{max-width:100%;height:auto}#dg-product-clicks-phone .pulse{display:none!important}}
+@media (max-width:736px){#dg-product-clicks{display:none}#dg-product-clicks-phone{display:block}}
+@media print{#dg-product-clicks{display:block!important}#dg-product-clicks-phone{display:none!important}}
+</style>
+<rect width="264" height="490" class="ground"/>
+<rect x="8" y="112" width="248" height="366" rx="10" class="band"/>
+<text x="16" y="38" class="val" text-anchor="middle">0</text>
+<text x="57" y="38" class="val" text-anchor="middle">200</text>
+<text x="99" y="38" class="val" text-anchor="middle">400</text>
+<text x="141" y="38" class="val" text-anchor="middle">600</text>
+<text x="183" y="38" class="val" text-anchor="middle">800</text>
+<text x="224" y="38" class="val" text-anchor="middle">1000</text>
+<text x="16" y="56" class="sub" text-anchor="start">clicks</text>
+<text x="12" y="84" class="sub" text-anchor="start">Widths in px</text>
+<text x="52" y="104" class="val" text-anchor="middle">480</text>
+<text x="132" y="104" class="val" text-anchor="middle">480</text>
+<text x="212" y="104" class="val" text-anchor="middle">480</text>
+<rect x="16" y="12" width="40" height="12" rx="2" class="h1"/><rect x="58" y="12" width="40" height="12" rx="2" class="h2"/><rect x="100" y="12" width="40" height="12" rx="2" class="h3"/><rect x="142" y="12" width="40" height="12" rx="2" class="h4"/><rect x="184" y="12" width="40" height="12" rx="2" class="h5"/>
+<rect x="14" y="118" width="236" height="68" rx="4" class="box h3"/>
+<text x="22" y="140" class="row" text-anchor="start">Header</text>
+<text x="22" y="158" class="hv" text-anchor="start">420</text>
+<text x="22" y="174" class="hn" text-anchor="start">search and menu</text>
+<rect x="14" y="190" width="76" height="102" rx="4" class="box h4"/>
+<text x="22" y="212" class="row hi" text-anchor="start">Photo</text>
+<text x="22" y="230" class="row hi" text-anchor="start">gallery</text>
+<text x="22" y="248" class="hv hi" text-anchor="start">610</text>
+<rect x="94" y="190" width="76" height="102" rx="4" class="box h2"/>
+<text x="102" y="212" class="row" text-anchor="start">Product</text>
+<text x="102" y="230" class="row" text-anchor="start">details</text>
+<text x="102" y="248" class="hv" text-anchor="start">240</text>
+<rect x="174" y="190" width="76" height="102" rx="4" class="box h5"/>
+<text x="182" y="212" class="row hi" text-anchor="start">Add to</text>
+<text x="182" y="230" class="row hi" text-anchor="start">cart</text>
+<text x="182" y="248" class="hv hi" text-anchor="start">870</text>
+<text x="182" y="264" class="hn hi" text-anchor="start">price and</text>
+<text x="182" y="280" class="hn hi" text-anchor="start">size</text>
+<rect x="14" y="296" width="156" height="70" rx="4" class="box h3"/>
+<text x="22" y="318" class="row" text-anchor="start">Reviews</text>
+<text x="22" y="336" class="hv" text-anchor="start">430</text>
+<rect x="174" y="296" width="76" height="70" rx="4" class="box h1"/>
+<text x="182" y="318" class="row" text-anchor="start">Related</text>
+<text x="182" y="336" class="row" text-anchor="start">items</text>
+<text x="182" y="354" class="hv" text-anchor="start">150</text>
+<rect x="14" y="370" width="156" height="102" rx="4" class="box h1"/>
+<text x="22" y="392" class="row" text-anchor="start">Footer</text>
+<text x="22" y="410" class="hv" text-anchor="start">60</text>
+<rect x="174" y="370" width="76" height="102" rx="4" class="box"/>
+<text x="182" y="392" class="row" text-anchor="start">Help</text>
+<text x="182" y="410" class="row" text-anchor="start">chat</text>
+<text x="182" y="428" class="sub" text-anchor="start">no data</text>
+<text x="182" y="444" class="sub" text-anchor="start">not</text>
+<text x="182" y="460" class="sub" text-anchor="start">tracked</text>
+</svg>
+<details class="dg-words">
+<summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>The diagram in words</summary>
+<div class="table-wrap is-text" role="region" aria-label="The boxes of the heat plan" tabindex="0"><table><thead><tr><th scope="col">Box</th><th scope="col">Value</th><th scope="col">Row</th><th scope="col">Column</th><th scope="col">Width</th><th scope="col">Note</th></tr></thead><tbody><tr><th scope="row">Header</th><td>420</td><td>top</td><td>full width</td><td>1440</td><td>search and menu</td></tr><tr><th scope="row">Photo gallery</th><td>610</td><td>row 2</td><td>left</td><td>480</td><td></td></tr><tr><th scope="row">Product details</th><td>240</td><td>row 2</td><td>middle</td><td>480</td><td></td></tr><tr><th scope="row">Add to cart</th><td>870</td><td>row 2</td><td>right</td><td>480</td><td>price and size</td></tr><tr><th scope="row">Reviews</th><td>430</td><td>row 3</td><td>columns 1 to 2</td><td>960</td><td></td></tr><tr><th scope="row">Related items</th><td>150</td><td>row 3</td><td>right</td><td>480</td><td></td></tr><tr><th scope="row">Footer</th><td>60</td><td>bottom</td><td>columns 1 to 2</td><td>960</td><td></td></tr><tr><th scope="row">Help chat</th><td>no data</td><td>bottom</td><td>right</td><td>480</td><td>not tracked</td></tr></tbody></table></div>
+<p>Widths are in px. The rows are not drawn to scale.</p>
+<ul><li>Each box is shaded by its number, in 5 steps of 200 clicks from 0 to 1000. A number on the edge of two steps takes the higher step.</li><li>The highest number is 870 (Add to cart). The lowest is 60 (Footer).</li><li>1 box has no data.</li></ul>
+</details>

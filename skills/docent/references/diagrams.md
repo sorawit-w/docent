@@ -921,7 +921,53 @@ A heat map shows one number for each pair of a row and a column, such as sign-up
 - Numbers are written as you write them, with a minus sign below zero and no thousands separator. Write large counts in a larger unit, such as `thousands of visits`, when the legend needs it.
 - `render` also writes the numbers as a table under the drawing, with the same rows and columns, and lines on the steps, the highest number, the lowest and the cells with no data. A grid too wide for a sheet of paper is written as several tables of fewer columns, each with the row names, so every number prints; on a narrow screen each table scrolls inside itself.
 - `render` says how the cells and labels came out, such as `drawn as heatmap; every 3rd column label on a phone`, or `numbers in the cells on a desktop only`.
-- **The areas of a page** (clicks on the header, the sidebar and the footer) are not a heat map yet: write a plan, and the counts in a table. Raw click points do not go into the data: count them into cells first, and say the size of a cell in the label.
+- **The areas of a page** (clicks on the header, the sidebar and the footer) are not a heat map: write a heat plan (see "Heat plans" below). Raw click points do not go into the data: count them into cells first, and say the size of a cell in the label.
+
+## Heat plans
+
+A heat plan shows how much happens in each area of a page or a screen, such as the clicks on the header, the photo gallery and the "Add to cart" box of a product page. Write it with `"kind": "heatplan"` when the page has 2 to 8 areas in rows and columns, each with one number, and the reader needs to see where on the page the numbers are high. It is a plan whose boxes are filled with the shades of a heat map. For the areas alone, with no numbers, write a plan. For more than 8 areas, write a table of the counts, sorted by count. For numbers across two sets of things, such as weekdays and hours, write a heat map.
+
+This is not the blurred glow over a screenshot that analytics tools draw. A glow shows numbers between the points that were never measured, and it gives no exact value. A heat plan gives one exact number for each area you name.
+
+```json
+{
+  "id": "product-clicks",
+  "kind": "heatplan",
+  "label": "Clicks on each area of a product page in one week. The Add to cart box got the most, 870, and the photo gallery the next most, 610. The footer got the fewest, 60. The help chat was not tracked.",
+  "scale": {"from": 0, "to": 1000, "step": 200, "unit": "clicks"},
+  "unit": "px",
+  "columns": [480, 480, 480],
+  "areas": [
+    "header  header  header",
+    "gallery details cart",
+    "reviews reviews related",
+    "footer  footer  chat"
+  ],
+  "boxes": [
+    {"id": "header", "name": "Header", "note": "search and menu", "value": 420},
+    {"id": "gallery", "name": "Photo gallery", "value": 610},
+    {"id": "details", "name": "Product details", "value": 240},
+    {"id": "cart", "name": "Add to cart", "note": "price and size", "value": 870},
+    {"id": "reviews", "name": "Reviews", "value": 430},
+    {"id": "related", "name": "Related items", "value": 150},
+    {"id": "footer", "name": "Footer", "value": 60},
+    {"id": "chat", "name": "Help chat", "note": "not tracked", "value": null}
+  ]
+}
+```
+
+| Field | What it is |
+|---|---|
+| `areas`, `boxes`, `columns`, `unit` | As in a plan: the grid of named areas, 2 to 8 boxes in at most 4 columns and 5 rows, and the optional widths of the columns with their unit. |
+| `value` | On each box, needed: a number from `from` to `to` of the scale, or `null` for a box with no data. At least one box has a number. |
+| `scale` | As in a heat map: `from`, `to`, `step` and `unit`, 3 to 5 steps, and no `marks`. Its `unit` (at most 12 characters) is what is counted, such as `clicks`; the plan's own `unit` stays the unit of the widths. |
+
+- **Each box with a number is filled with its heat step,** by the rules of a heat map: you fix the scale, a value on an edge takes the higher step, and a value outside the scale is refused. The legend of a heat map stands above the plan.
+- **The value stands under the name,** at 12px with tabular figures, and the note under the value. On a step the name, the value and the note take the text color, or the page color on the two darkest steps; a note is not muted there.
+- **A box with no data** keeps the look of a plan's box, the page color inside, and says "no data" under its name. The legend needs no key for it.
+- The forms are a plan's: 640px on a desktop and on paper, and 264px on a phone, where a narrow column grows until its names and values fit. The value is one more line, so it counts in the size of each box. When the grid cannot fit a phone, each box stands on its own band, with its value and unit (`460 clicks`), beside a small map where every box is filled with its step and its own box has a thick outline with a thin light line inside, so it shows on every step.
+- `render` says which forms are not to scale, as for a plan, such as `drawn as heatplan; not to scale; stacked on a phone`.
+- `render` also writes the boxes as a table under the drawing, the plan's table with a Value column, and lines on the steps, the highest number, the lowest and the boxes with no data. On a narrow screen the table scrolls inside itself, so no word breaks.
 
 ## Optional legs
 
@@ -993,6 +1039,10 @@ An icon may hold only these shapes and attributes: `path` (`d`), `circle` (`cx`,
   - `... warning: the heat map has 9 cells; a table with the numbers says this more simply` — fewer than 12 cells.
   - `... warning: 40 of 72 cells have no data; a table of the cells that have data may say this better` — more than half of the cells are hollow.
   - `... warning: only every 3rd column label fits on a desktop; when the columns are names, not a series such as hours, turn the grid so that the names are rows` — names need every label; a series such as hours does not.
+  - `... warning: every number is in one step, so the shades show nothing; a plan, with the numbers in a table, says this more simply` — every box of a heat plan has the same shade.
+  - `... warning: 6 of 7 boxes are in the lowest step; one large number may set the scale. Check "to", or say the large number in the text` — four boxes in five, or more, have the palest shade.
+  - `... warning: 5 of 8 boxes have no data; a plan, with the numbers of the other boxes in a table, may say this better` — more than half of the boxes have no number.
+  - `... warning: the heat plan has 2 boxes; a sentence says where they sit and how much each got` — two areas read better in a sentence.
 
 `check` also reports a figure well that holds a drawing no diagram block made: `check doc.html: error: Figure 2, ... holds a drawing that no diagram block made; write its data in a block and run render`. A hand-drawn SVG cannot be drawn again or checked against data. Icons outside figure wells are not touched.
 

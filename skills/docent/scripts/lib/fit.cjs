@@ -43,6 +43,14 @@ function fitWarnings(kind, model, scene) {
     if (empty * 2 > cells.length) out.push(`${empty} of ${cells.length} cells have no data; a table of the cells that have data may say this better`);
     if (scene && scene.labels && scene.labels.every > 1) out.push(`only every ${scene.labels.every}${scene.labels.every === 2 ? "nd" : scene.labels.every === 3 ? "rd" : "th"} column label fits on a desktop; when the columns are names, not a series such as hours, turn the grid so that the names are rows`);
   }
+  if (kind === "heatplan") {
+    const full = model.boxes.filter((b) => b.value !== null), empty = model.boxes.length - full.length;
+    const steps = new Set(full.map((b) => b.step)), lowest = full.filter((b) => b.step === 0).length;
+    if (steps.size === 1) out.push("every number is in one step, so the shades show nothing; a plan, with the numbers in a table, says this more simply");
+    else if (full.length >= 3 && lowest * 5 >= full.length * 4) out.push(`${lowest} of ${full.length} boxes are in the lowest step; one large number may set the scale. Check "to", or say the large number in the text`);
+    if (empty * 2 > model.boxes.length) out.push(`${empty} of ${model.boxes.length} boxes have no data; a plan, with the numbers of the other boxes in a table, may say this better`);
+    if (model.boxes.length === 2) out.push("the heat plan has 2 boxes; a sentence says where they sit and how much each got");
+  }
   if (kind === "range" && model.rows.length < 3) out.push(`the range chart has ${model.rows.length} rows; a sentence says this more simply`);
   return out;
 }

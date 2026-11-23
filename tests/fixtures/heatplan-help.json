@@ -1,0 +1,19 @@
+{
+  "id": "help-clicks",
+  "kind": "heatplan",
+  "label": "Clicks on each area of a help page in one week. Search got the most, 460, and the question 'Was this helpful?' the next most, 320. Links inside the article got the fewest, 90.",
+  "scale": {"from": 0, "to": 500, "step": 100, "unit": "clicks"},
+  "areas": [
+    "search search  search  search",
+    "topics article article related",
+    "topics vote    contact related"
+  ],
+  "boxes": [
+    {"id": "search", "name": "Search", "value": 460},
+    {"id": "topics", "name": "Topics", "value": 210},
+    {"id": "article", "name": "Article", "note": "links in the text", "value": 90},
+    {"id": "related", "name": "Related articles", "value": 130},
+    {"id": "vote", "name": "Was this helpful?", "value": 320},
+    {"id": "contact", "name": "Contact support", "value": 180}
+  ]
+}

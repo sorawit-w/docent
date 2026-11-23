@@ -14,17 +14,29 @@ const EVERY = [2, 3, 4, 6, 12]; // they divide 24 and 12, so hours and months ke
 const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 const ordinal = (n) => `${n}${n === 2 ? "nd" : n === 3 ? "rd" : "th"}`;
 
+/** Checks the scale of a heat map or a heat plan (3 to 5 steps, a unit, no marks) and returns it with the edges of its steps. */
+function readHeatScale(raw, what = "a heat map", example = "sign-ups") {
+  if (raw && typeof raw === "object" && raw.marks != null) fail(`the scale of ${what} has no "marks"; say a value that matters in the label or the text`);
+  const scale = readScale(raw, { needStep: true });
+  if (scale.count < 3 || scale.count > 5) fail(`the scale has ${scale.count} step${scale.count === 1 ? "" : "s"}; ${what} has 3 to 5, one for each heat step. Use a ${scale.count > 5 ? "larger" : "smaller"} "step"`);
+  if (!scale.unit) fail(`the scale of ${what} needs a "unit", such as "${example}"; the legend names it`);
+  return { scale, edges: Array.from({ length: scale.count + 1 }, (_, k) => tickAt(scale, scale.count, k)) };
+}
+
+/** A value on the scale with its step: a value on an edge takes the higher step, and the value "to" takes the top step. */
+function stepOf(v, scale, edges) {
+  let step = 0;
+  while (step < scale.count - 1 && v >= edges[step + 1]) step++;
+  return { v, written: fmt(v), step, heat: HEAT[scale.count][step] };
+}
+
 /** Checks heat map data and returns the model, with the step of each value. */
 function readHeatmap(data) {
   if (data.place != null && data.place !== "flow") fail(`a heat map sits in the text flow; "place" must be "flow"`);
   if (data.form != null) fail(`a heat map has no "form"; the renderer draws it ${WIDE}px wide, and ${PHONE}px wide on a phone`);
   if (data.groups != null) fail(`a heat map has no "groups"; each row is one row of cells`);
-  if (data.areas != null) fail(`a heat map has no "areas"; for the areas of a page, write a plan, and its counts in a table`);
-  if (data.scale && typeof data.scale === "object" && data.scale.marks != null) fail(`the scale of a heat map has no "marks"; say a value that matters in the label or the text`);
-  const scale = readScale(data.scale, { needStep: true });
-  if (scale.count < 3 || scale.count > 5) fail(`the scale has ${scale.count} step${scale.count === 1 ? "" : "s"}; a heat map has 3 to 5, one for each heat step. Use a ${scale.count > 5 ? "larger" : "smaller"} "step"`);
-  if (!scale.unit) fail(`the scale of a heat map needs a "unit", such as "sign-ups"; the legend names it`);
-  const edges = Array.from({ length: scale.count + 1 }, (_, k) => tickAt(scale, scale.count, k));
+  if (data.areas != null) fail(`a heat map has no "areas"; for the areas of a page, write a heat plan, "kind": "heatplan"`);
+  const { scale, edges } = readHeatScale(data.scale);
 
   if (!Array.isArray(data.columns)) fail(`"columns" must be a list of ${LEAST.columns} to ${MOST.columns} labels, one for each column`);
   if (data.columns.length < LEAST.columns || data.columns.length > MOST.columns) fail(`a heat map has ${LEAST.columns} to ${MOST.columns} columns; this one has ${data.columns.length}`);
@@ -44,10 +56,7 @@ function readHeatmap(data) {
       if (v === null) return null;
       if (!isNum(v)) fail(`${what} has the value ${JSON.stringify(v)} in column "${columns[c]}"; a value is a number, or null for no data`);
       if (v < scale.from || v > scale.to) fail(`${what} has the value ${fmt(v)} in column "${columns[c]}"; it must be on the scale, from ${fmt(scale.from)} to ${fmt(scale.to)}`);
-      // A value on an edge takes the higher step; the value "to" takes the top step.
-      let step = 0;
-      while (step < scale.count - 1 && v >= edges[step + 1]) step++;
-      return { v, written: fmt(v), step, heat: HEAT[scale.count][step] };
+      return stepOf(v, scale, edges);
     });
     return { name, cells };
   });
@@ -58,15 +67,44 @@ function readHeatmap(data) {
 
 /** The legend's swatches and edge numbers, the same in both forms. They must fit a phone, the narrowest form; the unit and the
  * "no data" key can move to a second line, so only the swatches and their numbers can make a legend too wide. */
-function legendOf(model) {
+function legendOf(model, left = 20) {
   const { scale, edges } = model;
   const labels = edges.map(fmt), widths = labels.map((l) => valueWidth(l));
   const sw = Math.max(32, Math.ceil(Math.max(...widths) + 8));
-  const lx = Math.max(20, Math.ceil(12 + widths[0] / 2));
+  const lx = Math.max(left, Math.ceil(12 + widths[0] / 2));
   const right = lx + scale.count * (sw + 2) - 2;
   const end = right + widths[scale.count] / 2;
   if (end > PHONE - 12) fail(`the legend needs ${Math.ceil(end - 12)}px on a phone, and a phone has ${PHONE - 24}px; its widest number is "${labels[widths.indexOf(Math.max(...widths))]}". Write the values in a larger unit, such as thousands`);
   return { labels, sw, lx, right };
+}
+
+/**
+ * The legend, at the top of a drawing W px wide: one swatch for each step with its edge numbers under it, then the unit and,
+ * when `noData`, a hollow key. Each of the two stands at the right of the swatches when it fits there, or on a second line under
+ * the edge numbers. Its swatches start at `left`, or further right when the first edge number needs it. It adds its notes and its
+ * part to the scene, and returns the y under it: 42, or 64 with a second line.
+ */
+function drawLegend(model, s, W, noData, left = 20) {
+  const { scale } = model;
+  const lg = legendOf(model, left);
+  let legend = "";
+  for (let k = 0; k < scale.count; k++) legend += `<rect x="${num(lg.lx + k * (lg.sw + 2))}" y="12" width="${lg.sw}" height="12" rx="2" class="h${HEAT[scale.count][k]}"/>`;
+  lg.labels.forEach((l, k) => s.notes.push({ x: k === scale.count ? lg.right : lg.lx + k * (lg.sw + 2) - (k ? 1 : 0), y: 38, s: l, cls: "val", anchor: "middle" }));
+  const after = [{ w: textWidth(scale.unit, 12), gap: 8, unit: true }];
+  if (noData) after.push({ w: 22 + textWidth("no data", 12), gap: 16 });
+  let x = lg.right, line = 0, top = 42;
+  for (const it of after) {
+    if (line === 0 && x + it.gap + it.w > W - 12) { line = 1; x = lg.lx - it.gap; top = 64; }
+    const at = x + it.gap, y = line ? 46 : 12;
+    if (it.unit) s.notes.push({ x: at, y: y + 10, s: scale.unit, cls: "sub", anchor: "start" });
+    else {
+      legend += `<rect x="${num(at + 0.5)}" y="${num(y + 0.5)}" width="15" height="11" rx="2" class="h0"/>`;
+      s.notes.push({ x: at + 22, y: y + 10, s: "no data", cls: "sub", anchor: "start" });
+    }
+    x = at + it.w;
+  }
+  s.parts.push({ id: "legend", svg: legend, texts: [] });
+  return top;
 }
 
 /** Two labels on one line stand at least 4px apart. A label goes to the first line where it keeps 4px from the label before. */
@@ -104,27 +142,7 @@ function drawHeatmap(model, phone = false) {
   const W = phone ? PHONE : WIDE, n = columns.length;
   const where = phone ? "on a phone" : "on a desktop and on paper";
   const s = { form: "heatmap", w: W, h: 0, bands: [], gaps: [], tracks: [], lanes: [], parts: [], legs: [], notes: [], under: [], numbers: false, labels: null };
-
-  // The legend: one swatch for each step with its edge numbers under it, then the unit and, when a cell has no data, a hollow
-  // key. Each of the two stands at the right of the swatches when it fits there, or on a second line under the edge numbers.
-  const lg = legendOf(model);
-  let legend = "";
-  for (let k = 0; k < scale.count; k++) legend += `<rect x="${num(lg.lx + k * (lg.sw + 2))}" y="12" width="${lg.sw}" height="12" rx="2" class="h${HEAT[scale.count][k]}"/>`;
-  lg.labels.forEach((l, k) => s.notes.push({ x: k === scale.count ? lg.right : lg.lx + k * (lg.sw + 2) - (k ? 1 : 0), y: 38, s: l, cls: "val", anchor: "middle" }));
-  const after = [{ w: textWidth(scale.unit, 12), gap: 8, unit: true }];
-  if (rows.some((r) => r.cells.includes(null))) after.push({ w: 22 + textWidth("no data", 12), gap: 16 });
-  let x = lg.right, line = 0, top = 42;
-  for (const it of after) {
-    if (line === 0 && x + it.gap + it.w > W - 12) { line = 1; x = lg.lx - it.gap; top = 64; }
-    const at = x + it.gap, y = line ? 46 : 12;
-    if (it.unit) s.notes.push({ x: at, y: y + 10, s: scale.unit, cls: "sub", anchor: "start" });
-    else {
-      legend += `<rect x="${num(at + 0.5)}" y="${num(y + 0.5)}" width="15" height="11" rx="2" class="h0"/>`;
-      s.notes.push({ x: at + 22, y: y + 10, s: "no data", cls: "sub", anchor: "start" });
-    }
-    x = at + it.w;
-  }
-  s.parts.push({ id: "legend", svg: legend, texts: [] });
+  const top = drawLegend(model, s, W, rows.some((r) => r.cells.includes(null)));
 
   // The columns share the grid's width equally. Cells are 2px apart, or 1px when they are narrower than 16px.
   const nameW = phone ? 0 : Math.max(...rows.map((r) => textWidth(r.name, 14)));
@@ -181,10 +199,20 @@ function scaleNote(model, scene, phone) {
   return out.join("; ");
 }
 
-/** The cells that hold one number: "(Thursday, 11)" for one, "in 6 cells" for more. */
-function cellsWith(model, value) {
-  const at = model.rows.flatMap((r) => r.cells.map((c, k) => (c && c.v === value ? `${r.name}, ${model.columns[k]}` : null)).filter(Boolean));
-  return at.length === 1 ? ` (${esc(at[0])})` : `, in ${at.length} cells`;
+/**
+ * The lines under a table in words: the steps, the highest and the lowest number, and how many have no data. `found` holds each
+ * number with where it is ({ v, at }); a number in one place says where, "(Thursday, 11)", and in more, how many, "in 6 cells".
+ */
+function heatLines(scale, found, empty, [one, many]) {
+  const where = (value) => {
+    const at = found.filter((f) => f.v === value).map((f) => f.at);
+    return at.length === 1 ? ` (${esc(at[0])})` : `, in ${at.length} ${many}`;
+  };
+  const values = found.map((f) => f.v), hi = Math.max(...values), lo = Math.min(...values);
+  const lines = [`Each ${one} is shaded by its number, in ${scale.count} steps of ${fmt(scale.step)} ${esc(scale.unit)} from ${fmt(scale.from)} to ${fmt(scale.to)}. A number on the edge of two steps takes the higher step.`];
+  lines.push(hi === lo ? `Every number is ${fmt(hi)}.` : `The highest number is ${fmt(hi)}${where(hi)}. The lowest is ${fmt(lo)}${where(lo)}.`);
+  if (empty) lines.push(`${empty} ${empty === 1 ? `${one} has` : `${many} have`} no data.`);
+  return `<ul>${lines.map((l) => `<li>${l}</li>`).join("")}</ul>`;
 }
 
 // On paper a grid in words takes 0.875rem text, the smallest the page allows (12.8px in print, headers too), and cannot scroll.
@@ -217,13 +245,9 @@ function wordsOf(model) {
     const label = parts.length === 1 ? "The numbers of the heat map" : `The numbers of the heat map, columns ${esc(columns[ks[0]])} to ${esc(columns[ks[ks.length - 1]])}`;
     return `<div class="table-wrap" role="region" aria-label="${label}" tabindex="0"><table><thead>${head}</thead><tbody>${body}</tbody></table></div>`;
   });
-  const values = rows.flatMap((r) => r.cells.filter(Boolean).map((c) => c.v));
-  const hi = Math.max(...values), lo = Math.min(...values);
-  const lines = [`Each cell is shaded by its number, in ${scale.count} steps of ${fmt(scale.step)} ${esc(scale.unit)} from ${fmt(scale.from)} to ${fmt(scale.to)}. A number on the edge of two steps takes the higher step.`];
-  lines.push(hi === lo ? `Every number is ${fmt(hi)}.` : `The highest number is ${fmt(hi)}${cellsWith(model, hi)}. The lowest is ${fmt(lo)}${cellsWith(model, lo)}.`);
+  const found = rows.flatMap((r) => r.cells.map((c, k) => c && { v: c.v, at: `${r.name}, ${columns[k]}` }).filter(Boolean));
   const empty = rows.reduce((sum, r) => sum + r.cells.filter((c) => c === null).length, 0);
-  if (empty) lines.push(`${empty} cell${empty === 1 ? " has" : "s have"} no data.`);
-  return `${tables.join("\n")}\n<ul>${lines.map((l) => `<li>${l}</li>`).join("")}</ul>`;
+  return `${tables.join("\n")}\n${heatLines(scale, found, empty, ["cell", "cells"])}`;
 }
 
-module.exports = { readHeatmap, drawHeatmap, wordsOf, scaleNote, MOST, HEAT };
+module.exports = { readHeatmap, drawHeatmap, wordsOf, scaleNote, readHeatScale, stepOf, drawLegend, heatLines, MOST, HEAT };

@@ -1,0 +1,24 @@
+{
+  "id": "product-clicks",
+  "kind": "heatplan",
+  "label": "Clicks on each area of a product page in one week. The Add to cart box got the most, 870, and the photo gallery the next most, 610. The footer got the fewest, 60. The help chat was not tracked.",
+  "scale": {"from": 0, "to": 1000, "step": 200, "unit": "clicks"},
+  "unit": "px",
+  "columns": [480, 480, 480],
+  "areas": [
+    "header  header  header",
+    "gallery details cart",
+    "reviews reviews related",
+    "footer  footer  chat"
+  ],
+  "boxes": [
+    {"id": "header", "name": "Header", "note": "search and menu", "value": 420},
+    {"id": "gallery", "name": "Photo gallery", "value": 610},
+    {"id": "details", "name": "Product details", "value": 240},
+    {"id": "cart", "name": "Add to cart", "note": "price and size", "value": 870},
+    {"id": "reviews", "name": "Reviews", "value": 430},
+    {"id": "related", "name": "Related items", "value": 150},
+    {"id": "footer", "name": "Footer", "value": 60},
+    {"id": "chat", "name": "Help chat", "note": "not tracked", "value": null}
+  ]
+}
