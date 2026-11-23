@@ -146,13 +146,27 @@ test("check warns about facts joined into one line of text; they go in a margin 
 
 test("check tests the host tokens: contrast for a hex color, and a warning for a kit token set by hand", () => {
   const style = (css) => checkDocument(specimen.replace("</head>", `<style>${css}</style></head>`));
-  assert.deepEqual(style(":root { --host-accent: #0b6e4f; --host-accent-dark: #6fd3a8; --host-ink: #0b3d2e; }"), { errors: [], warnings: style("").warnings });
+  assert.deepEqual(style(":root { --host-accent: #a21caf; --host-accent-dark: #ec6cf7; --host-ink: #4d0055; }"), { errors: [], warnings: style("").warnings });
   assert.match(style(":root { --host-accent: #f2b824; }").errors.join(), /--host-accent #f2b824 has a contrast of 1\.\d\d:1 on #fbfbfe and 1\.\d\d:1 on #f2f3f9; text needs 4\.5:1/);
   assert.match(style(":root { --host-accent-dark: #2f3fd0; }").errors.join(), /--host-accent-dark #2f3fd0 has a contrast of/);
   assert.match(style(":root { --host-accent: rebeccapurple; }").warnings.join(), /check tests the contrast of a hex color only/);
   assert.match(style(":root { --primary: #0b6e4f; }").warnings.join(), /a style sets --primary; the kit sets it in four places/);
   assert.match(errorsOf((h) => h.replace('<html lang="en" data-profile="standard">', '<html lang="en" data-profile="standard" data-theme="sepia">')), /a fixed theme is "light" or "dark"/);
   assert.equal(errorsOf((h) => h.replace('<html lang="en">', '<html lang="en" data-theme="light">')), "");
+});
+
+test("the dark dot: --host-dot-dark needs 3:1 on the dark page and the dark well; three warnings on an accent that passes contrast but misleads", () => {
+  const style = (css) => checkDocument(specimen.replace("</head>", `<style>${css}</style></head>`));
+  const base = style("").warnings;
+  const extra = (css) => style(css).warnings.filter((w) => !base.includes(w)).join("\n");
+  assert.deepEqual(style(":root { --host-accent: #a21caf; --host-accent-dark: #ec6cf7; --host-dot-dark: #8a6d1f; }").errors, [], "a muted gold dot is 3.74:1 on the dark page");
+  assert.match(style(":root { --host-dot-dark: #1b2260; }").errors.join(), /--host-dot-dark #1b2260 has a contrast of 1\.26:1 on #12141f and 1\.3\d:1 on #0b0d15; the dot is a mark and needs 3:1/);
+  assert.match(extra(":root { --host-accent: #c8102e; --host-accent-dark: #ff7570; }"), /--host-accent #c8102e is close to the status color "err" \(a distance of 4\.3\); its links and dots would read as an error/);
+  assert.match(extra(":root { --host-accent: #0b6e4f; --host-accent-dark: #6fd3a8; }"), /--host-accent #0b6e4f is close to the status color "ok" \(a distance of 23\.9\)/);
+  assert.match(extra(":root { --host-accent: #a21caf; --host-accent-dark: #3fb950; }"), /--host-accent-dark #3fb950 is close to the dark status color "ok"/);
+  assert.match(extra(":root { --host-accent: #3d3d3d; --host-accent-dark: #a0a0a0; }"), /--host-accent #3d3d3d has almost no color \(chroma 0\.0\)[\s\S]*--host-accent-dark #a0a0a0 has almost no color/);
+  assert.match(extra(":root { --host-accent: #a21caf; }"), /--host-accent is set and --host-accent-dark is not[\s\S]*--host-accent-dark: #ec6cf7;/, "the warning names the dark accent that the rule gives");
+  assert.equal(extra(":root { --host-accent: #a21caf; --host-accent-dark: #ec6cf7; }"), "");
 });
 
 test("a figure holds one drawing, or two for two separate chains", () => {

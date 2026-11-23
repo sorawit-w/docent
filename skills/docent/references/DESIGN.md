@@ -5,7 +5,7 @@ description: A quiet design kit for self-contained documents. Ultramarine ink an
 colors:
   primary: "#2f3fd0"            # Ultramarine — a mark only: links, underlines, the route dot, the focus ring
   secondary: "#1b2260"          # Ink — the title and section headings, as text only
-  tertiary: "#f2b824"           # Lamp — a dot only: in the mark, and the route dot in dark mode
+  tertiary: "#f2b824"           # Lamp — a dot only: in the mark, and the route dot in dark mode on a page with no host accent
   neutral: "#f2f3f9"            # Well — the ground of figures and code, one step darker than the page
   surface: "#fbfbfe"            # Page background; never pure white
   on-surface: "#1c1f2e"         # Body text
@@ -122,12 +122,12 @@ The palette is one ink, one light, and Docent's own grays, with one teal for the
 
 - **Primary — Ultramarine (#2f3fd0):** A mark, never a fill. Use it for links, the underline of a highlighted term, the route dot, the rail dot, the dot of a chosen option and the focus ring. Two or three marks in one view are enough. It is never a button, banner or block background.
 - **Secondary — Ink (#1b2260):** The title and section headings, as text only. It is the dark form of the primary.
-- **Tertiary — Lamp (#f2b824):** The docent's lamp, and always a dot. It is the dot in the mark, and the route dot, the rail dot and the dot of a chosen option in dark mode. Lamp on the light page has a contrast of 1.74:1, so it is not used there; the dots in light mode are ultramarine.
+- **Tertiary — Lamp (#f2b824):** The docent's lamp, and always a dot. It is the dot in the mark, and the route dot, the rail dot and the dot of a chosen option in dark mode. On a host's page with its own dark accent, the dots in dark mode take that accent instead (see Host tokens), so the page has one accent color in each theme. Lamp on the light page has a contrast of 1.74:1, so it is not used there; the dots in light mode are ultramarine.
 - **Neutral — Well (#f2f3f9):** The ground of figures and code. A well is one step darker than the page in both themes, and it has no outline.
 - **Status:** `success`, `warning` and `error` are for status only, as a small dot with a word beside it. Two more kinds of status note have no status color: plain information has a muted dot, and a thing that is planned, or not turned on yet, has a muted ring. The ring differs from the dot by its shape, so it does not need a color. A status label wraps on a narrow screen. In a diagram, a part that carries a state takes the status color on its outline and gets the same small dot; its note says the status in words. In a status grid, each cell shows its state. On screen an OK cell is filled in the success color, a Warning cell in the warning color with a slash in the page color, and an Error cell in the error color with a cross in the page color. On paper an OK cell and a Warning cell take the outline color, the Warning slash takes the warning color, and the Error cell keeps its fill and its cross, so in gray print only the failures stand out. This is the one place where the status colors fill a shape. The marks, not the colors, tell the states apart for readers who cannot see the colors.
 - **Heat steps (heat-1 to heat-5):** Five steps of one teal on screen, and five of Docent's grays on paper, for the cells of a heat map and the boxes of a heat plan, and nothing else. Teal means nothing else on the page: it is far from the status green (70°) and from the ultramarine (85°), and it does not change with a host's accent. Each teal step has the lightness of its gray, so the contrast of a number on it stays the same. Step 1 holds the least and step 5 the most. In light the steps grow darker, and in dark they grow lighter, so the most is always the step that stands out most from the page. A step is a fill, but it is not a mark and not a status: a heat map has no ultramarine, no lamp, and no green, amber or red. A number on steps 1 to 3 takes the text color, and a number on steps 4 and 5 takes the page color; so do the name and the note of a heat plan's box. Every heat map and heat plan has a legend, and its exact numbers are in the table in words.
 
-**Diagrams.** Docent draws its own diagrams, in three forms (see Layout). A diagram uses the page's tokens and nothing else: lines, parts and names in the text color, notes in the muted color, tracks in the outline color, lane bands in the page color, and the well as its ground. Because it reads the tokens, one drawing serves both themes. Each drawing carries its own styles, with the light values as a fallback, so a drawing that is copied out of the page keeps the light colors. Ultramarine marks the current leg, and the dot on it is ultramarine in light and lamp in dark. Other colors can appear in a diagram only in three places: a status color, on the outline of a part that carries a state; the status colors, in the cells of a status grid (see Status above); and the heat steps, in the cells of a heat map and the boxes of a heat plan (see Heat steps above). An author cannot give a diagram any other color. Docent does not use a third-party diagram renderer.
+**Diagrams.** Docent draws its own diagrams, in three forms (see Layout). A diagram uses the page's tokens and nothing else: lines, parts and names in the text color, notes in the muted color, tracks in the outline color, lane bands in the page color, and the well as its ground. Because it reads the tokens, one drawing serves both themes. Each drawing carries its own styles, with the light values as a fallback, so a drawing that is copied out of the page keeps the light colors. Ultramarine marks the current leg, and the dot on it is ultramarine in light and lamp in dark (on a host's page: the host's accent in light, and its dark accent in dark). Other colors can appear in a diagram only in three places: a status color, on the outline of a part that carries a state; the status colors, in the cells of a status grid (see Status above); and the heat steps, in the cells of a heat map and the boxes of a heat plan (see Heat steps above). An author cannot give a diagram any other color. Docent does not use a third-party diagram renderer.
 
 **Themes.** A document follows the reader's system setting: light on a light system, dark on a dark one. A switch lets the reader choose the other theme. That choice wins over the system and is remembered. Every `dark-*` token is the dark value of the token with the same name. The page is never pure white and never pure black.
 
@@ -312,7 +312,7 @@ A document has few widgets. More than four is a sign that some are not needed.
 
 **The look.**
 
-- An option is a control: 32px high, a thin outline, corners of 6px, and a small ring before its name. The chosen option has a darker outline, and its ring becomes the dot. The dot is ultramarine in light and lamp in dark, like every dot in Docent.
+- An option is a control: 32px high, a thin outline, corners of 6px, and a small ring before its name. The chosen option has a darker outline, and its ring becomes the dot. The dot is ultramarine in light and lamp in dark, like every dot in Docent; on a host's page it follows the host's accents.
 - A box is 18px, with a thin outline and corners of 6px. The tick is drawn in the text color. A ticked line takes the muted color, the same way as a step that is not the current one.
 - The answer of a decision helper is a dot, a bold title and one or two sentences, like a status note.
 - The label of a widget is small text (14px, weight 600, muted).
@@ -342,16 +342,21 @@ A card grid shows 3 to 8 short items side by side, when the reader should see th
 
 ## Host tokens
 
-A host project may set five things of its own, and nothing else: an accent, an accent for dark mode, a heading color, and the fonts. Each is a token that the kit reads and never sets, so a value set anywhere in the document holds in light, in dark and on paper.
+A host project may set six things of its own, and nothing else: an accent, an accent for dark mode, a dot color for dark mode, a heading color, and the fonts. Each is a token that the kit reads and never sets, so a value set anywhere in the document holds in light, in dark and on paper.
 
 | Token | Takes the place of | Rule |
 |---|---|---|
 | `--host-accent` | `primary` (light and print), and the dot in light | Contrast 4.5:1 or more on the page and on the well. |
-| `--host-accent-dark` | `dark-primary` | Contrast 4.5:1 or more on the dark page and the dark well. |
+| `--host-accent-dark` | `dark-primary`, and the dot in dark | Contrast 4.5:1 or more on the dark page and the dark well. |
+| `--host-dot-dark` | The dot in dark, when it differs from the dark accent, such as the host's second color or the lamp | Contrast 3:1 or more on the dark page and the dark well, because a dot is a mark, not text (WCAG 1.4.11). |
 | `--host-ink` | `secondary`, the color of the title and section headings | Contrast 4.5:1 or more on the page. |
 | `--host-serif`, `--host-sans`, `--host-mono` | The three font stacks | Fonts in the file or on the reader's system only; nothing from the network. |
 
-A drawing keeps the system sans-serif, because the renderer estimates its text widths for that font. The lamp dot of dark mode stays.
+A drawing keeps the system sans-serif, because the renderer estimates its text widths for that font.
+
+**The dot in dark mode.** The dot follows the host's dark accent, as it follows the accent in light: `--host-dot-dark`, else `--host-accent-dark`, else the lamp. One accent color in each theme is calmer than an accent and a yellow dot side by side. The dot does not vanish on a leg of its own color, because it has a ring in the band color around it. Docent's own pages set no host accent, so they keep the lamp.
+
+**An accent that passes contrast can still mislead.** `check` warns in three cases. The accent is close to a status color (a CIE76 distance under 25 from green, amber or red), so its links and dots read as a status. The accent has almost no color (a chroma under 10), so it looks like the body text. Or `--host-accent` is set and `--host-accent-dark` is not, so dark mode shows Docent's ultramarine on the host's page; the warning names the dark accent of the same hue at 7:1 on the dark page.
 
 **A fixed theme.** A document that must stay light (or dark) writes `data-theme="light"` (or `"dark"`) on `<html>`. Then the switch is hidden, and neither the reader's system nor a saved choice changes the theme. Print stays light.
 

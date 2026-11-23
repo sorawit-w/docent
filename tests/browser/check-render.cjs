@@ -709,11 +709,17 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
   }
 
   // Host tokens: an accent, a dark accent and a font set before stamp hold in light, in dark and on paper. A drawing keeps the system font.
+  // In dark mode the dots follow the dark accent, or --host-dot-dark; a page with no host accent keeps the lamp (checked above).
   {
-    const host = html.replace("<head>", "<head>\n<style>:root { --host-accent: #0b6e4f; --host-accent-dark: #6fd3a8; --host-sans: Georgia, serif; }</style>");
-    const look = async (opts) => { const view = await open({ ...opts, content: host }); const r = await view.page.evaluate(() => ({ link: getComputedStyle(document.querySelector("main a")).color, body: getComputedStyle(document.body).fontFamily.split(",")[0], drawing: getComputedStyle(document.querySelector("svg.dg")).fontFamily.split(",")[0] })); await view.context.close(); return r; };
+    const host = html.replace("<head>", "<head>\n<style>:root { --host-accent: #a21caf; --host-accent-dark: #ec6cf7; --host-sans: Georgia, serif; }</style>");
+    const dots = () => ({ route: getComputedStyle(document.querySelector(".route-dot")).backgroundColor, rail: getComputedStyle(document.querySelector(".rail-dot")).backgroundColor, leg: getComputedStyle(document.querySelector("svg.dg-tall .leg.is-current .pulse") || document.querySelector("svg.dg .pulse")).fill });
+    const look = async (opts, content = host) => { const view = await open({ ...opts, content }); const r = await view.page.evaluate((d) => ({ link: getComputedStyle(document.querySelector("main a")).color, body: getComputedStyle(document.body).fontFamily.split(",")[0], drawing: getComputedStyle(document.querySelector("svg.dg")).fontFamily.split(",")[0], ...new Function(`return (${d})()`)() }), dots.toString()); await view.context.close(); return r; };
     const [light, dark, paper] = [await look({ width: 1280 }), await look({ width: 1280, theme: "dark" }), await look({ width: 794, media: "print", theme: "dark" })];
-    ok("host tokens set before stamp win in light, in dark and on paper, and a drawing keeps the system font", light.link === "rgb(11, 110, 79)" && dark.link === "rgb(111, 211, 168)" && paper.link === "rgb(11, 110, 79)" && light.body === "Georgia" && light.drawing === "system-ui", { light, dark, paper });
+    ok("host tokens set before stamp win in light, in dark and on paper, and a drawing keeps the system font", light.link === "rgb(162, 28, 175)" && dark.link === "rgb(236, 108, 247)" && paper.link === "rgb(162, 28, 175)" && light.body === "Georgia" && light.drawing === "system-ui", { light, dark, paper });
+    const pink = "rgb(236, 108, 247)";
+    ok("dark mode on a host's page: the route dot, the rail dot and the dot in a drawing take the host's dark accent, not the lamp", dark.route === pink && dark.rail === pink && dark.leg === pink, dark);
+    const gold = await look({ width: 1280, theme: "dark" }, host.replace("--host-sans", "--host-dot-dark: #f2b824; --host-sans"));
+    ok("--host-dot-dark wins over the dark accent: a host can keep the lamp", [gold.route, gold.rail, gold.leg].every((c) => c === DARK.lamp) && gold.link === pink, gold);
   }
 
   // The host's logo and the footer, on a page built from the starting page: each version of the logo shows in its own theme
