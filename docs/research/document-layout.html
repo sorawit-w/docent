@@ -197,6 +197,19 @@ section > figure { margin-top: 24px; }
 .dg-words > .table-wrap.is-text :is(th, td) { white-space: normal; }
 .dg-words > .table-wrap.is-text :is(td, thead th) { text-align: left; }
 .dg-words:has(> .table-wrap) { min-width: 0; } /* a flex item: without this it grows to the table, and the wrapper never scrolls */
+/* A hand-drawn figure holds no colors and no styles of its own, only these classes, so the tokens give it every theme, print and the
+   reader's settings. A shape with no class is a 1.5px line in the text color, and a text with no class is 14px. No class is under 12px. */
+svg[data-drawn="hand"] { display: block; flex: none; margin-inline: auto; }
+svg[data-drawn="hand"] :is(path, line, polyline, polygon, rect, circle, ellipse), svg[data-drawn="hand"] .hd-line { fill: none; stroke: var(--text); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+svg[data-drawn="hand"] text, svg[data-drawn="hand"] .hd-text { fill: var(--text); stroke: none; font-size: 14px; font-weight: 400; }
+svg[data-drawn="hand"] .hd-strong { stroke-width: 2.5; }
+svg[data-drawn="hand"] .hd-muted { stroke: var(--muted); stroke-width: 1; }
+svg[data-drawn="hand"] .hd-rule { stroke: var(--line); stroke-width: 1; }
+svg[data-drawn="hand"] .hd-fill { fill: var(--text); stroke: none; }
+svg[data-drawn="hand"] .hd-box { fill: var(--bg); stroke: var(--text); }
+svg[data-drawn="hand"] .hd-band { fill: var(--bg); stroke: none; }
+svg[data-drawn="hand"] .hd-name { font-weight: 600; }
+svg[data-drawn="hand"] .hd-note { font-size: 12px; fill: var(--muted); }
 figcaption { margin-top: 12px; font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
 figcaption strong { font-weight: 600; color: var(--text); margin-right: 8px; }
 

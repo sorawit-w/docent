@@ -115,7 +115,7 @@ function checkDocument(html) {
   for (const found of [...diagrams].reverse()) rest = rest.slice(0, found.start) + rest.slice(found.end);
   if (/<svg\b[^>]*\bclass="[^"]*\bdg\b/.test(rest)) errors.push("a diagram sits outside a diagram block; put its data in a block and run render");
   // Every drawing in a figure well comes from a diagram block, or is hand-drawn under the contract of "Hand-drawn figures" in diagrams.md.
-  const hand = checkFigures(wells(rest), { html, palette });
+  const hand = checkFigures(wells(rest), { html });
   errors.push(...hand.errors);
   warnings.push(...hand.warnings);
   for (const svg of hand.drawn) rest = rest.replace(svg, ""); // like a drawing that render made, it is not the author's own content
@@ -231,10 +231,16 @@ function checkDocument(html) {
   if (/text-transform\s*:\s*uppercase/i.test(css)) errors.push("a style sets text in uppercase; a label is written in sentence case");
   if (/background(-color)?\s*:\s*(#fff(fff)?\b|white\b|#000(000)?\b|black\b)/i.test(css)) errors.push("a style sets a pure white or pure black background; use the page tokens");
 
-  // 5. No text below 14px outside diagrams.
+  // 5. No text below 14px outside diagrams. A rule for a hand-drawn figure (every selector starts with svg[data-drawn="hand"], as in the
+  // kit's hd-* classes) styles a drawing: its text keeps its real size in px, at least 12px.
+  const drawn = /(?<=^|[{};])\s*((?:svg\[data-drawn="hand"\][^,{}]*,\s*)*svg\[data-drawn="hand"\][^,{}]*)\{([^{}]*)\}/g;
+  const pageCss = css.replace(drawn, (all, selectors, body) => {
+    for (const [, value, unit] of body.matchAll(/font-size\s*:\s*([\d.]+)(px|rem|em|%)/gi)) if (unit.toLowerCase() !== "px" || Number(value) < 12) errors.push(`a style sets font-size: ${value}${unit} in a hand-drawn figure; text in a drawing is 12px or more, in px`);
+    return "";
+  });
   const small = (value, unit) => (unit === "px" ? value < 14 : unit === "%" ? value < 87.5 : value < 0.875);
-  for (const [, value, unit] of css.matchAll(/font-size\s*:\s*([\d.]+)(px|rem|em|%)/gi)) if (small(Number(value), unit.toLowerCase())) errors.push(`a style sets font-size: ${value}${unit}; no text is below 14px outside diagrams`);
-  for (const [, value, unit] of css.matchAll(/(?:^|[;{\s])font\s*:[^;}]*?\b([\d.]+)(px|rem|em|%)/gi)) if (small(Number(value), unit.toLowerCase())) errors.push(`a style sets font: ${value}${unit}; no text is below 14px outside diagrams`);
+  for (const [, value, unit] of pageCss.matchAll(/font-size\s*:\s*([\d.]+)(px|rem|em|%)/gi)) if (small(Number(value), unit.toLowerCase())) errors.push(`a style sets font-size: ${value}${unit}; no text is below 14px outside diagrams`);
+  for (const [, value, unit] of pageCss.matchAll(/(?:^|[;{\s])font\s*:[^;}]*?\b([\d.]+)(px|rem|em|%)/gi)) if (small(Number(value), unit.toLowerCase())) errors.push(`a style sets font: ${value}${unit}; no text is below 14px outside diagrams`);
   for (const [, value] of markup.matchAll(/\bfont-size="([\d.]+)(?:px)?"/g)) if (Number(value) < 14) errors.push(`an element has font-size="${value}"; no text is below 14px outside diagrams`);
   for (const [, tag] of markup.matchAll(/<(small|sub|sup)\b/gi)) errors.push(`<${tag.toLowerCase()}> makes text smaller than its line; no text is below 14px outside diagrams`);
 

@@ -1,9 +1,10 @@
 // Hand-drawn figures: an SVG that the agent draws by hand in a figure well, for a rare type that has no built-in kind
-// (docs/proposals/charts.md, section 5). It keeps a contract that check tests here: a marker and a type from the list, the page's
-// drawing tokens only, no text under 12px, real size, system fonts in two weights, no network and no script, nothing dashed, an
-// accessible name, and the diagram in words beside it. The tags are read as strictly as a logo's (logo.cjs).
+// (docs/proposals/charts.md, section 5). It holds no CSS and no colors: only plain shapes and texts, placed by their geometry, with
+// classes from a fixed set that kit.css draws with Docent's tokens. So the kit gives it dark mode, print, palettes, forced colors and
+// more contrast, and its text is never under 12px, because no class is. check tests the rest of the contract here: a marker and a
+// type from the list, real size, no network and no script, an accessible name, and the diagram in words beside it. Elements and
+// attributes are read from a list, as strictly as a logo's (logo.cjs).
 const { TAG, attributes } = require("./logo.cjs");
-const { DOCENT, PALETTES } = require("./palettes.cjs");
 
 const TYPES = ["quadrant", "nested", "venn", "fishbone", "wardley-map", "user-journey", "story-map"];
 // A type that Docent draws from data: the kind to write instead ("" is the workflow diagram, which has no "kind").
@@ -32,28 +33,33 @@ const LEFT_OUT = {
   sankey: "it claims to know where each person went next, and its band widths have no Docent rules (see funnels.md); a funnel or a table shows it",
   ridgeline: "its areas overlap on purpose, so one hides another; small multiples of line charts show it",
 };
-const TOKENS = ["text", "muted", "line", "bg", "fig"]; // the five drawing tokens
-const MEANING = { primary: "the current leg", dot: "the dot", ok: "a status", warn: "a status", err: "a status", "heat-1": "a heat step", "heat-2": "a heat step", "heat-3": "a heat step", "heat-4": "a heat step", "heat-5": "a heat step", "heat-text": "the text on a heat step", "heat-page": "the text on a heat step" };
+// The classes that kit.css draws. A shape with no class is a 1.5px line in the text color; a text with no class is hd-text.
+const CLASSES = {
+  "hd-line": "a 1.5px line in the text color", "hd-strong": "a 2.5px line in the text color", "hd-muted": "a 1px line in the muted color",
+  "hd-rule": "a 1px line in the outline color", "hd-fill": "a shape filled with the text color", "hd-box": "a box in the page color with a text-color outline",
+  "hd-band": "a band in the page color", "hd-name": "a name: 14px, weight 600", "hd-text": "a text: 14px", "hd-note": "a note: 12px, muted",
+};
 const MOST = { width: 640, height: 831 }; // px: the paper form of a scale chart, and 220mm of an A4 page at 96px to the inch
-const LEAST_TEXT = 12; // px
-const ELEMENTS = new Set(["svg", "g", "defs", "symbol", "use", "marker", "clipPath", "path", "line", "polyline", "polygon", "rect", "circle", "ellipse", "text", "tspan", "textPath", "title", "desc", "style"]);
-const TEXT_HOLDERS = new Set(["text", "tspan", "textPath", "title", "desc", "style"]);
-const FILLED = new Set(["path", "polyline", "polygon", "rect", "circle", "ellipse", "text"]); // a fill that is not set shows black
-const NETWORK = { script: "a script runs code", foreignObject: "foreignObject can hold any HTML", image: "an image loads a file", a: "a link does not belong in a drawing", iframe: "a frame loads a page", video: "a video loads a file", audio: "a sound loads a file", animate: "a drawing does not move", animateMotion: "a drawing does not move", animateTransform: "a drawing does not move", set: "a drawing does not move" };
-const FLAT = { linearGradient: "a gradient", radialGradient: "a gradient", filter: "a filter", pattern: "a pattern", mask: "a mask" };
+const ELEMENTS = new Set(["svg", "g", "path", "line", "polyline", "polygon", "rect", "circle", "ellipse", "text", "tspan", "title", "desc"]);
+const TEXT_HOLDERS = new Set(["text", "tspan", "title", "desc"]);
+const REFUSED = {
+  script: [6, "a script runs code"], foreignObject: [6, "foreignObject can hold any HTML"], image: [6, "an image loads a file"], a: [6, "a link does not belong in a drawing"],
+  iframe: [6, "a frame loads a page"], video: [6, "a video loads a file"], audio: [6, "a sound loads a file"],
+  animate: [6, "a drawing does not move"], animateMotion: [6, "a drawing does not move"], animateTransform: [6, "a drawing does not move"], set: [6, "a drawing does not move"],
+  style: [2, "a hand-drawn figure has no style; give each shape and text a class from the list"],
+  linearGradient: [2, "the page is flat"], radialGradient: [2, "the page is flat"], filter: [2, "the page is flat"], pattern: [2, "the page is flat"], mask: [2, "the page is flat"],
+  use: [0, "it copies another part; draw each part on its own"], symbol: [0, "it is used through a use; draw each part on its own"], clipPath: [0, "draw each part on its own"],
+  marker: [0, "draw an arrowhead as a small path with class=\"hd-fill\""], defs: [0, "a hand-drawn figure holds no definitions"], textPath: [0, "a text stands on a straight line"],
+};
+const GEOMETRY = new Set(["x", "y", "dx", "dy", "width", "height", "d", "points", "cx", "cy", "r", "rx", "ry", "x1", "y1", "x2", "y2", "transform"]);
+const PLAIN = new Set(["xmlns", "viewBox", "id", "role", "class", "data-drawn", "data-type", "text-anchor", "dominant-baseline"]);
+const KEYWORDS = { "text-anchor": ["start", "middle", "end"], "dominant-baseline": ["auto", "middle", "central", "hanging", "alphabetic"] };
 const RULE = {
-  1: "rule 1, a marker", 2: "rule 2, page tokens only", 3: "rule 3, no text under 12px", 4: "rule 4, real size", 5: "rule 5, system fonts and two weights",
+  1: "rule 1, a marker", 2: "rule 2, the kit's classes only", 3: "rule 3, no text under 12px", 4: "rule 4, real size", 5: "rule 5, the page's font",
   6: "rule 6, no network and no script", 7: "rule 7, nothing dashed", 8: "rule 8, an accessible name", 9: "rule 9, the diagram in words", 0: "the markup",
 };
-const COLOR_PROPS = new Set(["fill", "stroke", "color", "stop-color", "flood-color", "lighting-color", "background", "background-color", "border-color", "outline-color"]);
-// A color written in any other property, such as border: 1px solid #000: a hex value or a color function.
-const LITERAL = /(^|[\s,(])#[0-9a-f]{3,8}\b|\b(rgba?|hsla?|hwb|lab|lch|oklab|oklch|color|color-mix|light-dark)\(/i;
-const OPACITY = new Set(["opacity", "fill-opacity", "stroke-opacity", "stop-opacity"]);
-const TOKEN_LIST = "var(--text), var(--muted), var(--line), var(--bg) or var(--fig)";
+const CLASS_LIST = Object.keys(CLASSES).join(", ");
 
-const NAMED = { amp: "&", lt: "<", gt: ">", quot: '"', apos: "'", nbsp: "\u00a0" };
-/** An attribute value as the browser reads it: numeric and common named entities decoded. Null when it holds another named entity. */
-const decode = (v) => { let unknown = false; const out = v.replace(/&(#x[0-9a-f]+|#\d+|\w+);/gi, (all, e) => (e[0] === "#" ? String.fromCodePoint(parseInt(e[1] === "x" || e[1] === "X" ? e.slice(2) : e.slice(1), e[1] === "x" || e[1] === "X" ? 16 : 10)) : Object.hasOwn(NAMED, e) ? NAMED[e] : ((unknown = true), all))); return unknown ? null : out; };
 const words = (s) => s.replace(/<[^>]*>/g, "").replace(/&[#\w]+;/g, "x").trim();
 const blank = (s) => s.replace(/<!--[\s\S]*?-->/g, (c) => " ".repeat(c.length));
 
@@ -69,72 +75,27 @@ function svgsIn(markup) {
   return out.map((s) => ({ ...s, text: markup.slice(s.start, s.end) }));
 }
 
-/** Why a color value breaks rule 2, or null when it is a drawing token, none, currentColor or transparent. */
-function badColor(value, palette) {
-  const v = value.trim().replace(/\s*!important$/i, "");
-  if (/^(none|currentColor|transparent)$/i.test(v)) return null;
-  const token = v.match(/^var\(\s*--([\w-]+)\s*(?:,\s*([^)]*?)\s*)?\)$/);
-  if (token && TOKENS.includes(token[1])) {
-    if (token[2] == null) return null;
-    const light = [DOCENT[token[1]], palette && PALETTES[palette] && PALETTES[palette].light[token[1]]].filter(Boolean).map((c) => c.toLowerCase());
-    return light.includes(token[2].toLowerCase()) ? null : `its fallback ${token[2]} is not the light value of --${token[1]} (${light[light.length - 1]})`;
-  }
-  if (token && MEANING[token[1]]) return `--${token[1]} has its own meaning, ${MEANING[token[1]]}, so a hand-drawn figure does not use it`;
-  return "a color in a hand-drawn figure is a drawing token";
+/** Why an attribute that is not on the list is refused: [rule, reason]. */
+function refusedAttribute(attr) {
+  if (attr.startsWith("on")) return [6, "an event attribute runs code"];
+  if (attr === "href" || attr.endsWith(":href")) return [6, "a hand-drawn figure links to nothing and loads nothing"];
+  if (attr === "style") return [2, "a hand-drawn figure has no style; give the element a class from the list"];
+  if (attr === "stroke-dasharray" || attr === "stroke-dashoffset") return [7, "in Docent a dashed line means a path that only some readers take"];
+  if (attr === "font-size" || attr === "textlength" || attr === "lengthadjust") return [3, "the class sets the size of a text: hd-name and hd-text are 14px, hd-note 12px"];
+  if (attr.startsWith("font") || attr === "letter-spacing") return [5, "a hand-drawn figure takes the page's font; hd-name sets weight 600"];
+  if (/^(fill|stroke|color|stop-color|opacity|fill-opacity|stroke-opacity|stroke-width|stroke-linecap|stroke-linejoin|paint-order|visibility|display)$/.test(attr)) return [2, `the class sets how a shape is drawn, from Docent's tokens: ${CLASS_LIST}`];
+  return [0, "a hand-drawn figure does not take it"];
 }
 
-/** The declarations of a style attribute or a style rule, as [property, value]. */
-const declarations = (css) => css.replace(/\/\*[\s\S]*?\*\//g, " ").split(";").map((d) => d.trim()).filter(Boolean).map((d) => { const at = d.indexOf(":"); return at < 0 ? [d.toLowerCase(), ""] : [d.slice(0, at).trim().toLowerCase(), d.slice(at + 1).trim()]; });
-
-/** Tests one property and its value, in an attribute or in a style. Calls fail(rule, why) for each break. */
-function testProperty(prop, value, where, fail, palette) {
-  const shown = `${where} has ${prop}="${value.length > 48 ? `${value.slice(0, 48)}…` : value}"`;
-  if (value.includes("\\") || prop.includes("\\")) return fail(0, `${shown}; a drawing's style holds no backslash escapes, so check reads it as the browser does`);
-  if ((prop === "transform" && /\b(scale|matrix|skew)[\w]*\s*\(/i.test(value)) || prop === "scale" || prop === "zoom") return fail(4, `${shown}; a drawing does not scale its parts, so its text keeps its real size; move or rotate a part instead`);
-  if (prop === "textlength" || prop === "lengthadjust") return fail(3, `${shown}; it squeezes the letters, so the text no longer shows at its size`);
-  if (prop.startsWith("--")) return fail(2, `${shown}; a drawing sets no token of its own, so var(--text) and the others keep the page's tested colors in every theme`);
-  if (/gradient\s*\(/i.test(value)) return fail(2, `${shown}; the page is flat, with no gradient`);
-  if (/url\s*\(/i.test(value)) {
-    for (const [, target] of value.matchAll(/url\(\s*["']?([^"')]*)/gi)) if (!target.trim().startsWith("#")) fail(6, `${shown}; a url() points inside the drawing, such as url(#arrow)`);
-    if (COLOR_PROPS.has(prop)) return fail(2, `${shown}; a color is ${TOKEN_LIST}, not a url()`);
-  }
-  if (COLOR_PROPS.has(prop)) { const why = badColor(value, palette); if (why) fail(2, `${shown}; ${why}: ${TOKEN_LIST}, none or currentColor`); return; }
-  if (LITERAL.test(value.replace(/url\([^)]*\)|var\([^)]*\)/gi, ""))) return fail(2, `${shown}; a color in a hand-drawn figure is a drawing token: ${TOKEN_LIST}`);
-  if (OPACITY.has(prop)) return fail(2, `${shown}; each color shows as its token, so its contrast holds; use var(--muted) or var(--line) for a fainter mark`);
-  if (prop === "font-size") {
-    const size = value.match(/^([\d.]+)(px)?$/);
-    if (!size) return fail(3, `${shown}; write the size in px, such as 14px`);
-    if (Number(size[1]) < LEAST_TEXT) fail(3, `${shown}; no text in a drawing is under ${LEAST_TEXT}px: names 14px, notes 12px`);
-    return;
-  }
-  if (prop === "font-family") { if (!/^var\(\s*--(sans|serif|mono)\s*\)$/.test(value)) fail(5, `${shown}; a drawing takes the page's sans-serif, so leave font-family out, or write var(--sans)`); return; }
-  if (prop === "font") return fail(5, `${shown}; font sets a family; write font-size and font-weight on their own`);
-  if (prop === "font-weight") { if (!/^(400|600)$/.test(value)) fail(5, `${shown}; a drawing has two weights, 400 and 600`); return; }
-  if (prop === "stroke-dasharray") return fail(7, `${shown}; in Docent a dashed line means a path that only some readers take`);
-  if (/^(animation|transition)(-|$)/.test(prop)) return fail(6, `${shown}; a drawing does not move`);
-  if (/^(filter|box-shadow|text-shadow|mask)$/.test(prop)) fail(2, `${shown}; the page is flat`);
-}
-
-/** True when a selector picks the drawing or what is inside it: it starts with the drawing's id, and no + or ~ leads from the drawing to its siblings. */
-function inside(sel, id) {
-  if (!sel.startsWith(`#${id}`)) return false;
-  const rest = sel.slice(id.length + 1);
-  if (rest && !/^[\s.:[>+~#]/.test(rest)) return false; // #hd-repeat-2 is another id
-  return !/^[+~]/.test(rest.replace(/^[^\s>+~]*/, "").trim());
-}
-
-/** Tests the rules of a <style> element: each one starts with the drawing's id, because a style element applies to the whole page. */
-function testStyle(css, id, fail, palette) {
-  const body = css.replace(/\/\*[\s\S]*?\*\//g, "");
-  if (body.includes("\\")) { fail(0, "a <style> holds a backslash escape; a drawing's style holds none, so check reads it as the browser does"); return; }
-  if (/@/.test(body)) { fail(/@(import|font-face)/i.test(body) ? (/@import/i.test(body) ? 6 : 5) : 0, `a <style> holds ${(body.match(/@[\w-]+/) || ["@"])[0]}; a drawing's style holds plain rules only`); return; }
-  for (const [, selectors, decls] of body.matchAll(/([^{}]*)\{([^{}]*)\}/g)) {
-    for (const sel of selectors.split(",").map((s) => s.trim()).filter(Boolean)) {
-      if (!id || !inside(sel, id)) fail(0, `a <style> rule "${sel.slice(0, 40)}" reaches past the drawing${id ? "" : ", and the <svg> has no id"}; a style element applies to the whole page, so each rule starts with the drawing's id, such as #${id || "hd-causes"} .note, and no + or ~ leads from the drawing to the page`);
-    }
-    for (const [prop, value] of declarations(decls)) testProperty(prop, value, `a <style> rule for "${selectors.trim().slice(0, 30)}"`, fail, palette);
-  }
-  if (body.replace(/([^{}]*)\{([^{}]*)\}/g, "").trim()) fail(0, "a <style> holds something that is not a rule");
+/** Why a value of a listed attribute is refused, or null. */
+function badValue(name, attr, value) {
+  if (attr === "class") { const bad = value.trim().split(/\s+/).filter((c) => c && !Object.hasOwn(CLASSES, c)); return bad.length ? [2, `"${bad[0]}" is not a class of the kit; the classes are ${CLASS_LIST}`] : null; }
+  if (attr === "viewBox") return name === "svg" ? null : [4, "a viewBox scales what it holds, so only the <svg> has one"];
+  if (attr === "transform") return /^(\s*(translate|rotate)\(\s*[-\d.e]+(?:[\s,]+[-\d.e]+){0,2}\s*\)\s*)+$/i.test(value) ? null : [4, "a drawing moves or turns a part with translate() or rotate(), and never scales it, so its text keeps its real size"];
+  if (KEYWORDS[attr]) return KEYWORDS[attr].includes(value) ? null : [0, `it is one of ${KEYWORDS[attr].join(", ")}`];
+  if (attr.startsWith("aria-") || ["id", "role", "data-type", "data-drawn", "xmlns"].includes(attr)) return /[<>&\\]/.test(value) ? [0, "it holds a character that it does not need"] : null;
+  if (attr === "d") return /^[MmLlHhVvCcSsQqTtAaZz\d\s.,eE+-]*$/.test(value) ? null : [0, "a path holds commands and numbers only"];
+  return /^[\d\s.,eE+-]*$/.test(value) ? null : [0, "it holds numbers only"]; // geometry
 }
 
 /** The type that a drawing names: { error, stop } when it is missing, built in, planned, left out or not on the list. */
@@ -153,50 +114,44 @@ function typeOf(type) {
 }
 
 /** Checks one hand-drawn <svg>. Returns { type, errors }, each error a sentence that names its rule and its element. */
-function checkDrawing(source, { html = "", palette = null } = {}) {
+function checkDrawing(source, { html = "" } = {}) {
   const svg = blank(source); // a comment is a note for the author: neither text nor tags
   const found = new Map(); // one message for each rule and reason, with the first element that breaks it and a count of the others
   const fail = (rule, why) => { const key = `${rule}|${why.slice(why.indexOf(";") + 1)}`, had = found.get(key); if (had) had[2] += 1; else found.set(key, [rule, why, 1]); };
   const errors = () => [...found.values()].map(([rule, why, n]) => `${RULE[rule]}: ${why}${n > 1 ? ` (and ${n - 1} more like it)` : ""}`);
-  const stack = [], ids = [], children = [], nodes = [];
-  let root = null, at = 0, type = null, styleId = null;
+  const stack = [], ids = [], children = [];
+  let root = null, at = 0, type = null;
   for (const m of svg.matchAll(TAG)) {
     const between = svg.slice(at, m.index);
     at = m.index + m[0].length;
     const open = stack.at(-1);
-    if (open && open.name === "style") { if (m[1] && m[2] === "style") testStyle(between, styleId, fail, palette); else fail(0, "a <style> holds markup"); }
-    else if (between.trim() && !(open && TEXT_HOLDERS.has(open.name))) fail(0, `it holds text ("${between.trim().slice(0, 30)}") outside a <text>`);
+    if (between.trim() && !(open && TEXT_HOLDERS.has(open.name))) fail(0, `it holds text ("${between.trim().slice(0, 30)}") outside a <text>`);
+    if (open) open.text += between;
     const [, close, name, rawAttrs, selfClose] = m;
     if (close) {
       if (open?.name !== name) { fail(0, `</${name}> does not close the element that is open`); break; }
-      if (TEXT_HOLDERS.has(name)) open.text = between;
       stack.pop();
       continue;
     }
     if (open && ["title", "desc"].includes(open.name)) fail(8, `<${name}> stands inside a <${open.name}>, which holds text only`);
     if (!root && name !== "svg") { fail(0, "it does not start with <svg>"); break; }
-    if (root && name === "svg") fail(0, "it holds a second <svg>; a hand-drawn figure is one drawing");
-    else if (NETWORK[name]) fail(6, `<${name}> is not allowed: ${NETWORK[name]}`);
-    else if (FLAT[name]) fail(2, `<${name}> is not allowed: ${FLAT[name]} is not flat`);
-    else if (!ELEMENTS.has(name)) fail(0, `<${name}> is not an element a hand-drawn figure takes`);
+    const node = { name, attrs: {}, text: "" };
+    const depth = stack.length; // 0 for the <svg>, 1 for its children
+    if (!selfClose) stack.push(node);
+    if (root && name === "svg") { fail(0, "it holds a second <svg>; a hand-drawn figure is one drawing"); continue; }
+    if (!ELEMENTS.has(name)) { const [rule, why] = REFUSED[name] || [0, "a hand-drawn figure does not take it"]; fail(rule, `<${name}> is not allowed: ${why}`); continue; }
     const read = attributes(rawAttrs);
     if (read.error) { fail(0, `<${name}>: ${read.error}`); continue; }
-    const attrs = Object.fromEntries(read.list.map(([k, v]) => [k, decode(v) ?? v]));
-    for (const [attr, raw] of read.list) {
-      const low = attr.toLowerCase(), value = decode(raw);
-      if (value == null) { fail(0, `<${name}> has ${attr}="${raw.slice(0, 48)}", with a named character reference that check cannot read; write the character itself`); continue; }
-      if (low.startsWith("on")) { fail(6, `<${name}> has the event attribute "${attr}", which runs code`); continue; }
-      if (low === "href" || low.endsWith(":href")) { if (!value.trim().startsWith("#")) fail(6, `<${name}> has ${attr}="${value.slice(0, 48)}"; an href points inside the drawing, such as #bone`); continue; }
-      if (low === "id") { ids.push(value); continue; }
-      if (low === "style") { for (const [prop, v] of declarations(value)) testProperty(prop, v, `<${name}> style`, fail, palette); continue; }
-      testProperty(low, value, `<${name}>`, fail, palette);
+    for (const [attr, value] of read.list) {
+      const shown = `<${name}> has ${attr}="${value.length > 48 ? `${value.slice(0, 48)}…` : value}"`;
+      if (!GEOMETRY.has(attr) && !PLAIN.has(attr) && !attr.startsWith("aria-")) { const [rule, why] = refusedAttribute(attr.toLowerCase()); fail(rule, `${shown}; ${why}`); continue; }
+      const bad = badValue(name, attr, value);
+      if (bad) { fail(bad[0], `${shown}; ${bad[1]}`); continue; }
+      node.attrs[attr] = value;
+      if (attr === "id") ids.push(value);
     }
-    const node = { name, attrs, parent: open || null, styled: attrs.style || "", text: "", needsFill: FILLED.has(name) };
-    if (root && attrs.viewBox != null && name !== "marker") fail(4, `<${name}> has a viewBox, which scales what it holds, so its text no longer shows at its real size; only the <svg> and a <marker> have one`);
-    if (!root) { root = attrs; type = attrs["data-type"] ?? null; styleId = attrs.id || null; }
-    else if (stack.length === 1) children.push(node);
-    nodes.push(node);
-    if (!selfClose) stack.push(node);
+    if (!root) { root = node.attrs; type = node.attrs["data-type"] ?? null; }
+    else if (depth === 1) children.push(node);
   }
   if (!found.size) {
     if (svg.slice(at).trim()) fail(0, "it holds something after </svg>, or markup that check cannot read");
@@ -209,15 +164,11 @@ function checkDrawing(source, { html = "", palette = null } = {}) {
   if (kind.stop) return { type, errors: [`${RULE[kind.error[0]]}: ${kind.error[1]}`] };
   if (kind.error) fail(...kind.error);
 
-  // Rule 2: a shape or a text whose fill is not set shows black, which disappears in dark mode. A <style> may set it, which check cannot match.
-  const sets = (n, key) => { for (let p = n; p; p = p.parent) if (p.attrs[key] != null || new RegExp(`(^|;)\\s*${key}\\s*:`).test(p.styled)) return true; return false; };
-  if (!nodes.some((n) => n.name === "style")) for (const n of nodes) if (n.needsFill && !sets(n, "fill")) fail(2, `<${n.name}> has no fill, so it shows black and disappears in dark mode; write fill="var(--text)" on it or on a group around it (fill="none" for a line)`);
-
   // Rule 4: real size, on screen and on paper.
   const box = (root.viewBox || "").trim().split(/[\s,]+/).map(Number);
   if (box.length !== 4 || box.some((n) => !Number.isFinite(n)) || box[2] <= 0 || box[3] <= 0) fail(4, 'the <svg> has no viewBox, such as viewBox="0 0 640 320"');
   else {
-    const [w, h] = [root.width, root.height].map((v) => (v == null ? NaN : Number(String(v).replace(/px$/, ""))));
+    const [w, h] = [root.width, root.height].map((v) => (v == null ? NaN : Number(v)));
     if (w !== box[2] || h !== box[3]) fail(4, `the <svg> has width="${root.width ?? ""}" height="${root.height ?? ""}"; they equal the viewBox, width="${box[2]}" height="${box[3]}", so the text shows at its real size`);
     if (box[2] > MOST.width || box[3] > MOST.height) fail(4, `the drawing is ${box[2]} × ${box[3]}px; it is at most ${MOST.width}px wide and ${MOST.height}px high, so print never shrinks it. Make it smaller, or split it into two figures`);
   }
@@ -258,7 +209,7 @@ function wordsProblem(source) {
  * contract; any other is refused, as before. Returns { errors, warnings, drawn }: drawn are the hand-drawn SVGs, which check then
  * leaves out of the tests of the author's own content, as it leaves out the drawings that render made.
  */
-function checkFigures(wells, { html = "", palette = null } = {}) {
+function checkFigures(wells, { html = "" } = {}) {
   const errors = [], warnings = [], drawn = [];
   wells.forEach(({ attrs, inner }, n) => {
     const label = (attrs.match(/aria-label="([^"]*)"/) || [])[1];
@@ -275,7 +226,7 @@ function checkFigures(wells, { html = "", palette = null } = {}) {
       hand += 1;
       drawn.push(s.text);
       const name = label || `figure ${n + 1}`;
-      const result = checkDrawing(s.text, { html, palette });
+      const result = checkDrawing(s.text, { html });
       result.errors.forEach((e) => errors.push(`${name}, hand-drawn: ${e}`));
       if (!result.errors.some((e) => e.startsWith(RULE[1]))) warnings.push(`${name} is hand-drawn (${result.type}); check cannot see its layout, so open the page in a browser in light and in dark, at 375px and in print preview, and look at it. Tell the user this figure is hand-drawn`);
     }
@@ -284,4 +235,4 @@ function checkFigures(wells, { html = "", palette = null } = {}) {
   return { errors, warnings, drawn };
 }
 
-module.exports = { TYPES, BUILT, PLANNED, LEFT_OUT, MOST, checkDrawing, checkFigures, svgsIn };
+module.exports = { TYPES, CLASSES, BUILT, PLANNED, LEFT_OUT, MOST, checkDrawing, checkFigures, svgsIn };
