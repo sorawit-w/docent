@@ -3,9 +3,9 @@
 // step, on a scale that the author fixes, with the legend of a heat map above it (from heatmap.cjs). A plan keeps its rule that
 // every box looks the same; this kind is the one that fills them. The rules come from docs/proposals/heat-maps.md, section 8.
 const { fail } = require("./blocks.cjs");
-const { readPlan, drawPlan, wordsOf: planWords, scaleNote, WIDE, PHONE } = require("./plan.cjs");
+const { readPlan, drawPlan, wordsOf: planWords, scaleNote } = require("./plan.cjs");
+const { WIDE, PHONE, isNum, fmt } = require("./chart.cjs");
 const { readHeatScale, stepOf, drawLegend, heatLines } = require("./heatmap.cjs");
-const { isNum, fmt } = require("./scale.cjs");
 
 /** Checks heat plan data and returns the model: a plan's model, with the scale, and on each box its value and heat step. */
 function readHeatplan(data) {

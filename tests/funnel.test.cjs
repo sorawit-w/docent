@@ -5,7 +5,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const { renderDiagram, renderDocument } = require("../skills/docent/scripts/lib/diagram.cjs");
 const { checkDocument } = require("../skills/docent/scripts/check.cjs");
-const { share, comma } = require("../skills/docent/scripts/lib/funnel.cjs");
+const { share, comma } = require("../skills/docent/scripts/lib/chart.cjs");
 const { valueWidth } = require("../skills/docent/scripts/lib/scale.cjs");
 const { textWidth } = require("../skills/docent/scripts/lib/text.cjs");
 

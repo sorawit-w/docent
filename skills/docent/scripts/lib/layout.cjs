@@ -4,14 +4,11 @@
 // for a phone, where each row name stands on a line above its boxes. Its boxes are also written as a table, in words.
 const { fail, words, id } = require("./blocks.cjs");
 const { textWidth } = require("./text.cjs");
-const { wrapName } = require("./range.cjs");
-const { readScale, makeScale, drawHead, drawGrid, linesIn, valueWidth, fmt, isNum, num, diff } = require("./scale.cjs");
+const { WIDE, PHONE, esc, wrapName, readScale, makeScale, drawHead, drawGrid, linesIn, valueWidth, fmt, isNum, num, diff } = require("./chart.cjs");
 
 const MOST = { rows: 6, boxes: 6, name: 16, note: 24 };
-const WIDE = 640, PHONE = 264; // as for a range chart: a desktop and A4 paper, and a 320px screen
 const BOX = 24; // the height of a box
 const LINE = 18; // the height of one line of names above a track
-const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
 /** Checks layout data and returns the model. */
 function readLayout(data) {
@@ -186,4 +183,4 @@ function wordsOf(model) {
   return `${units}<div class="table-wrap is-text" role="region" aria-label="The boxes of the layout" tabindex="0"><table><thead>${head}</thead><tbody>${body}</tbody></table></div>${lines ? `\n<ul>${lines}</ul>` : ""}`;
 }
 
-module.exports = { readLayout, drawLayout, wordsOf, stretchesOf, onLines, MOST, WIDE, PHONE };
+module.exports = { readLayout, drawLayout, wordsOf, stretchesOf, onLines, MOST };

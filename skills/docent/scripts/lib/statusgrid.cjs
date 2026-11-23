@@ -5,9 +5,8 @@
 // (grid.cjs). The rules come from docs/proposals/status-grids.md.
 const { fail, words, id } = require("./blocks.cjs");
 const { textWidth } = require("./text.cjs");
-const { wrapName } = require("./range.cjs");
-const { fmt, isNum, num } = require("./scale.cjs");
-const { refuseFields, readGrid, drawGrid, hollow, labelNote, cellsWith, gridTables, esc } = require("./grid.cjs");
+const { esc, wrapName, gridTables, fmt, isNum, num } = require("./chart.cjs");
+const { refuseFields, readGrid, drawGrid, hollow, labelNote, cellsWith } = require("./grid.cjs");
 
 const STATES = ["ok", "warn", "err"];
 const NAMES = { ok: "OK", warn: "Warning", err: "Error" };
