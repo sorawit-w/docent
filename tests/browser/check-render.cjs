@@ -722,6 +722,16 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     ok("--host-dot-dark wins over the dark accent: a host can keep the lamp", [gold.route, gold.rail, gold.leg].every((c) => c === DARK.lamp) && gold.link === pink, gold);
   }
 
+  // brand: the style block that brand.cjs prints from a host's DESIGN.md holds in light, in dark and on paper: the darkened accent, the brand's own color in dark, the worked-out heading color and the brand font first.
+  {
+    const { brand, print } = require(path.join(root, "skills", "docent", "scripts", "brand.cjs"));
+    const style = print(brand('---\ncolors:\n  primary: "#f2b824"\ntypography:\n  h1:\n    fontFamily: "Brand Serif", serif\n---\n'));
+    const start = stampHtml(renderDocument(fs.readFileSync(path.join(root, "skills", "docent", "assets", "template.html"), "utf8")).html).html.replace("</head>", `${style}\n</head>`);
+    const look = async (opts) => { const v = await open({ ...opts, content: start }); const r = await v.page.evaluate(() => ({ link: getComputedStyle(document.querySelector("main a")).color, h1: getComputedStyle(document.querySelector("h1")).color, font: getComputedStyle(document.querySelector("h1")).fontFamily.split(",")[0] })); await v.context.close(); return r; };
+    const [light, dark, paper] = [await look({ width: 1280 }), await look({ width: 1280, theme: "dark" }), await look({ width: 658, media: "print", theme: "dark" })];
+    ok("the host tokens from brand hold: the darkened accent in light and on paper, the brand's own yellow in dark, the worked-out heading color, and the brand font first", light.link === "rgb(141, 104, 0)" && paper.link === "rgb(141, 104, 0)" && dark.link === "rgb(242, 184, 36)" && light.h1 === "rgb(54, 39, 0)" && light.font === '"Brand Serif"', { light, dark, paper });
+  }
+
   // The host's logo and the footer, on a page built from the starting page: each version of the logo shows in its own theme
   // (light, dark by the system, dark by the switch, and paper), a logo for one theme stands on a tile in the other, the slot keeps
   // its size, paper prints the logo and the name once above the title, and the credit stands at the right, or below the tagline on a phone.

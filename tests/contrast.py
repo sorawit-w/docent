@@ -32,6 +32,12 @@ for bg in ("page", "well"):
     rows.append((f"host dark accent on dark {bg}", HOST["dark"], D[bg], 4.5))
     rows.append((f"host dark dot on dark {bg}", HOST["dark"], D[bg], 3.0))
 rows.append(("host ink on page", HOST["ink"], L["page"], 4.5))
+# Values that brand.cjs works out for the proposal's examples: a dark accent at 7:1 on the dark page, a darkened light accent at 4.6:1, a heading color at Docent's ink lightness.
+for name, accent, dark, ink in (("green", "#0b6e4f", "#5ab08d", "#003020"), ("yellow", "#8d6800", "#f2b824", "#362700")):
+    for bg in ("page", "well"):
+        rows.append((f"brand {name} accent on {bg}", accent, L[bg], 4.5))
+        rows.append((f"brand {name} dark accent on dark {bg}", dark, D[bg], 4.5))
+    rows.append((f"brand {name} ink on page", ink, L["page"], 4.5))
 # A host's logo for one theme only stands on a tile in the page color of that theme. The tile must stand out from the other page.
 rows.append(("dark: logo tile (light page) on page", L["page"], D["page"], 3.0))
 rows.append(("light: logo tile (dark page) on page", D["page"], L["page"], 3.0))
