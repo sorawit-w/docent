@@ -498,10 +498,10 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     ok(`a UML ${name} diagram shows its drawing on a desktop, its column on a phone, and its words with a key on paper, in both themes with no contrast problem`, desk.main > 0 && !desk.column && !desk.words && (desk.main <= 264 ? [phone, narrow].every((r) => r.main === desk.main && !r.column) : !phone.main && phone.column === 264 && narrow.column === 264) && paper.words && paper.key > 0 && [phone, narrow].every((r) => r.page === r.view) && results.deskAxe.length === 0 && results.darkAxe.length === 0, results);
   }
 
-  // The scale charts (a range chart, two layouts to scale, three plans, a funnel, two heat maps and two heat plans): the 640px form on a desktop and on paper (at its real size,
+  // The scale charts (a range chart, two layouts to scale, three plans, a funnel, two heat maps, two heat plans and three status grids): the 640px form on a desktop and on paper (at its real size,
   // no shrink), the 264px form on a phone, the rows as a table in words, text no wider than the renderer assumed, and no
   // contrast problem in either theme.
-  for (const [file, id, rows, what] of [["range", "line-lengths", 8, "a range chart"], ["layout-screen", "wide-layouts", 12, "a layout to scale with two tracks"], ["layout-a4", "a4-notes", 4, "a measured layout to scale"], ["plan-docs", "docs-page", 5, "a plan that grows a column on a phone"], ["plan-editor", "editor-screen", 5, "a plan with a box across two rows"], ["plan-dashboard", "dashboard", 5, "a plan stacked on a phone"], ["funnel", "signup-may", 5, "a funnel"], ["heatmap-signups", "signups-by-hour", 7, "a heat map of 24 columns"], ["heatmap-errors", "errors-by-day", 6, "a heat map with numbers and a cell with no data"], ["heatplan-product", "product-clicks", 8, "a heat plan with a box with no data"], ["heatplan-help", "help-clicks", 6, "a heat plan stacked on a phone"]]) {
+  for (const [file, id, rows, what] of [["range", "line-lengths", 8, "a range chart"], ["layout-screen", "wide-layouts", 12, "a layout to scale with two tracks"], ["layout-a4", "a4-notes", 4, "a measured layout to scale"], ["plan-docs", "docs-page", 5, "a plan that grows a column on a phone"], ["plan-editor", "editor-screen", 5, "a plan with a box across two rows"], ["plan-dashboard", "dashboard", 5, "a plan stacked on a phone"], ["funnel", "signup-may", 5, "a funnel"], ["heatmap-signups", "signups-by-hour", 7, "a heat map of 24 columns"], ["heatmap-errors", "errors-by-day", 6, "a heat map with numbers and a cell with no data"], ["heatplan-product", "product-clicks", 8, "a heat plan with a box with no data"], ["heatplan-help", "help-clicks", 6, "a heat plan stacked on a phone"], ["statusgrid-uptime", "tracker-uptime", 5, "a status grid with a cell with no data"], ["statusgrid-calendar", "website-13-weeks", 7, "a status grid written as a calendar"], ["statusgrid-builds", "nightly-builds", 4, "a status grid with states written directly"]]) {
     const data = fs.readFileSync(path.join(root, "tests", "fixtures", `${file}.json`), "utf8");
     const content = renderDocument(html.replace('<section id="report"', `<section id="rng" aria-labelledby="rng-h"><h2 id="rng-h">Range</h2><figure><div class="fig" role="region" aria-label="Figure 9, line lengths" tabindex="0">\n<!-- docent:diagram\n${data}\n-->\n<!-- /docent:diagram -->\n</div><figcaption><strong>Figure 9</strong>Line lengths.</figcaption></figure></section>\n<section id="report"`)).html;
     const look = (page) => page.evaluate((id) => {
@@ -548,6 +548,42 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     const { desk, phone, narrow, paper } = results;
     const real = (f) => f.w === f.real;
     ok(`${what} shows its 640px form at real size on a desktop and on paper, its 264px form on a phone, its rows as a table in words with no word split across lines, and its text fits the renderer's widths`, [desk, phone, narrow, paper].every((r) => r.broken.length === 0) && desk.main.w === 640 && real(desk.main) && !desk.phone.w && !desk.words && !phone.main.w && phone.phone.w === 264 && narrow.phone.w === 264 && paper.main.w === 640 && !paper.phone.w && paper.words && paper.rows === rows && [phone, narrow].every((r) => r.box <= r.well - 16) && paper.table <= paper.well - 16 && [phone, narrow].every((r) => r.page === r.view) && results.deskWider.length === 0 && results.phoneWider.length === 0 && results.deskAxe.length === 0 && results.darkAxe.length === 0, results);
+  }
+
+  // A status grid as readers with red-green color blindness see it (deuteranopia and protanopia, Machado, Oliveira and Fernandes
+  // 2009 at full strength, in linear RGB), in light, in dark and on paper. Color is never the only sign: every cell that is not OK
+  // has its mark (a slash for Warning, a cross for Error), and the mark stands at 3:1 or more on its own cell as each reader sees
+  // it, so a later change cannot quietly lose the marks. The shots show the drawing through the same simulation.
+  {
+    const SIM = { deutan: [[0.367322, 0.860646, -0.227968], [0.280085, 0.672501, 0.047413], [-0.01182, 0.04294, 0.968881]], protan: [[0.152286, 1.052583, -0.204868], [0.114503, 0.786281, 0.099216], [-0.003882, -0.048116, 1.051998]] };
+    const lin = (c) => (c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
+    const rgb = (css) => css.match(/\d+(\.\d+)?/g).slice(0, 3).map((v) => lin(+v / 255));
+    const seen = (css, kind) => { const v = rgb(css); return kind === "normal" ? v : SIM[kind].map((row) => Math.min(1, Math.max(0, row[0] * v[0] + row[1] * v[1] + row[2] * v[2]))); };
+    const lum = ([r, g, b]) => 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    const ratio = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p); return (x + 0.05) / (y + 0.05); };
+    const data = fs.readFileSync(path.join(root, "tests", "fixtures", "statusgrid-uptime.json"), "utf8");
+    const content = renderDocument(html.replace('<section id="report"', `<section id="sg" aria-labelledby="sg-h"><h2 id="sg-h">Status</h2><figure><div class="fig" role="region" aria-label="Figure 9, uptime" tabindex="0">\n<!-- docent:diagram\n${data}\n-->\n<!-- /docent:diagram -->\n</div><figcaption><strong>Figure 9</strong>Uptime.</figcaption></figure></section>\n<section id="report"`)).html;
+    const filters = `<svg width="0" height="0" style="position:absolute">${Object.entries(SIM).map(([k, m]) => `<filter id="sim-${k}" color-interpolation-filters="linearRGB"><feColorMatrix type="matrix" values="${m.map((r) => `${r.join(" ")} 0 0`).join(" ")} 0 0 0 1 0"/></filter>`).join("")}</svg>`;
+    const results = {};
+    for (const [look, opts] of [["light", { width: 1280 }], ["dark", { width: 1280, theme: "dark" }], ["paper", { width: 658, height: 1123, media: "print" }]]) {
+      const view = await open({ ...opts, content });
+      // Each cell of the grid with its fill and, when it has one, the number of strokes of its mark and the mark's color.
+      const cells = await view.page.evaluate(() => [...document.querySelectorAll("#dg-tracker-uptime rect[class^='s-']")].filter((r) => r.getAttribute("height") !== "12").map((r) => { // a legend key is 12px high
+        const mark = r.nextElementSibling && r.nextElementSibling.matches("path.sm") ? r.nextElementSibling : null;
+        return { state: r.getAttribute("class").slice(2), fill: getComputedStyle(r).fill, strokes: mark ? mark.getAttribute("d").split("M").length - 1 : 0, mark: mark && getComputedStyle(mark).stroke, width: mark && getComputedStyle(mark).strokeWidth };
+      }));
+      const r = { cells: cells.length, wrong: cells.filter((c) => c.strokes !== { ok: 0, warn: 1, err: 2 }[c.state]).length, weakest: {} };
+      for (const kind of ["normal", "deutan", "protan"]) r.weakest[kind] = Math.min(...cells.filter((c) => c.mark).map((c) => ratio(seen(c.mark, kind), seen(c.fill, kind)))).toFixed(2);
+      r.width = [...new Set(cells.filter((c) => c.mark).map((c) => c.width))].join();
+      results[look] = r;
+      await view.page.evaluate((f) => document.body.insertAdjacentHTML("beforeend", f), filters);
+      for (const kind of ["normal", "deutan", "protan"]) {
+        await view.page.evaluate((k) => { document.getElementById("dg-tracker-uptime").style.filter = k === "normal" ? "" : `url(#sim-${k})`; }, kind);
+        await view.page.locator("#dg-tracker-uptime").screenshot({ path: `${out}/statusgrid-${look}-${kind}.png` });
+      }
+      await view.context.close();
+    }
+    ok("a status grid keeps a mark in every Warning and Error cell, at 3:1 or more on its cell with deuteranopia and protanopia, in light, dark and on paper", Object.values(results).every((r) => r.cells === 69 && r.wrong === 0 && r.width === "1.5px" && Object.values(r.weakest).every((w) => +w >= 3)), results);
   }
 
   // Two drawings in one figure: side by side when both fit, one below the other when they do not.

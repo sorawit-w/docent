@@ -1,0 +1,29 @@
+{
+  "id": "tracker-uptime",
+  "kind": "statusgrid",
+  "label": "Uptime of the bug tracker's parts from 3 to 16 November. On 11 November the API and Search were down for part of the day, and Sign-in was slow. Every other day was OK, except three short slow periods. Email alerts has no data for 14 November.",
+  "thresholds": {"better": "higher", "ok": 99.9, "warn": 99, "unit": "%"},
+  "columns": ["3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16"],
+  "rows": [
+    {
+      "name": "Website",
+      "values": [100, 100, 99.98, 100, 100, 100, 100, 100, 99.95, 100, 100, 100, 100, 100]
+    },
+    {
+      "name": "Sign-in",
+      "values": [100, 100, 100, 100, 100, 100, 100, 100, 99.4, 100, 100, 100, 100, 100]
+    },
+    {
+      "name": "API",
+      "values": [100, 99.99, 100, 100, 100, 100, 100, 100, 98.6, 99.7, 100, 100, 100, 100]
+    },
+    {
+      "name": "Email alerts",
+      "values": [100, 100, 100, 99.6, 100, 100, 100, 100, 100, 100, 100, null, 100, 100]
+    },
+    {
+      "name": "Search",
+      "values": [100, 100, 100, 100, 100, 99.97, 100, 100, 97.9, 100, 100, 100, 100, 100]
+    }
+  ]
+}
