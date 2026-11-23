@@ -1,25 +1,27 @@
 // The host's logo in the top bar: an inline SVG made of plain shapes, or a small PNG or WebP data URI.
-// A logo is the host's own artwork, so it may use more than an icon (gradients, clip paths), but it can never
-// run a script, load a file or hold text that depends on a font. Everything that is not on the lists below is refused.
+// A logo is the host's own artwork, so it may hold a gradient, which the page may not. Everything else is a narrow subset of SVG:
+// plain shapes in groups, solid hex colors, and gradients with hex stops. No reference between parts (no use, symbol or clip path),
+// no opacity, nothing that runs code, loads a file or holds text. The agent flattens a logo to this subset before it pastes it.
 
 const MOST = 24000; // characters of an SVG logo, or of the data URI of a raster logo
+const MOST_ELEMENTS = 400; // elements in an SVG logo
+const DEEPEST = 8; // levels of elements inside one another, the <svg> counted
 const SLOT = { height: 24, width: 160, lowest: 16 }; // px: 24px high, at most 160px wide; below 16px a wordmark is hard to read
 const SHARP = 3; // a raster logo holds at least three times the pixels it shows, so it stays sharp on a phone and on paper
-const PAGES = { light: "#fbfbfe", dark: "#12141f" }; // a logo shows on the page color of each theme
+const DOCENT_PAGES = { light: "#fbfbfe", dark: "#12141f" }; // a logo shows on the page color of each theme (a palette has its own)
 const MARK = 3; // a logo is a mark, not text: 3:1 (WCAG 1.4.11)
 
-const ELEMENTS = new Set(["svg", "g", "path", "circle", "ellipse", "rect", "line", "polyline", "polygon", "title", "desc", "defs", "clipPath", "linearGradient", "radialGradient", "stop", "use"]);
-const SHAPES = new Set(["path", "circle", "ellipse", "rect", "line", "polyline", "polygon", "use"]);
+const ELEMENTS = new Set(["svg", "g", "path", "circle", "ellipse", "rect", "line", "polyline", "polygon", "title", "desc", "defs", "linearGradient", "radialGradient", "stop"]);
+const SHAPES = new Set(["path", "circle", "ellipse", "rect", "line", "polyline", "polygon"]);
+const GRADIENTS = new Set(["linearGradient", "radialGradient"]);
 const ATTRIBUTES = new Set([
   "viewBox", "width", "height", "role", "aria-label", "aria-hidden", "focusable", "data-for", "id",
   "d", "cx", "cy", "r", "rx", "ry", "x", "y", "x1", "y1", "x2", "y2", "points", "fx", "fy",
   "fill", "stroke", "stroke-width", "stroke-linecap", "stroke-linejoin", "stroke-miterlimit", "stroke-dasharray", "stroke-dashoffset",
-  "opacity", "fill-opacity", "stroke-opacity", "fill-rule", "clip-rule", "clip-path", "transform",
-  "offset", "stop-color", "stop-opacity", "gradientUnits", "gradientTransform", "spreadMethod", "clipPathUnits",
+  "fill-rule", "transform", "offset", "stop-color", "gradientUnits", "gradientTransform", "spreadMethod",
 ]);
-const FIXED = { xmlns: "http://www.w3.org/2000/svg", "xmlns:xlink": "http://www.w3.org/1999/xlink" }; // allowed with this value only
-const COLORS = new Set(["fill", "stroke", "stop-color"]);
-const URLS = new Set(["fill", "stroke", "clip-path"]); // the attributes that may point at a gradient or a clip path inside the logo
+const FIXED = { xmlns: "http://www.w3.org/2000/svg" }; // allowed with this value only
+const FLAT = "flatten the logo so that each shape stands on its own, in solid colors";
 const WHY = {
   script: "a script runs code",
   style: "a style element can load files and change the page",
@@ -28,11 +30,15 @@ const WHY = {
   a: "a link does not belong in a logo",
   filter: "a filter or a shadow is not flat",
   pattern: "a pattern is not flat",
-  mask: "a mask is not allowed; use a clipPath",
+  mask: `a mask is not allowed; ${FLAT}`,
+  clipPath: `a clip path is not allowed; ${FLAT}`,
+  use: `a use copies another part of the logo; ${FLAT}`,
+  symbol: `a symbol is used through a use; ${FLAT}`,
   animate: "a logo does not move", animateTransform: "a logo does not move", animateMotion: "a logo does not move", set: "a logo does not move",
   text: "text depends on a font the reader may not have; turn the letters into paths", tspan: "text depends on a font the reader may not have; turn the letters into paths", textPath: "text depends on a font the reader may not have; turn the letters into paths",
   svg: "a logo holds one svg",
 };
+const OPACITY = /^(opacity|fill-opacity|stroke-opacity|stop-opacity)$/;
 
 const ID = /^[A-Za-z][\w-]*$/;
 const TAG = /<(\/?)([A-Za-z][\w:.-]*)((?:\s+[^\s"'>/=]+(?:\s*=\s*(?:"[^"]*"|'[^']*'|[^\s"'=<>`]+))?)*)\s*(\/?)>/g;
@@ -62,11 +68,11 @@ function attributes(text) {
   return { list: out };
 }
 
-/** Checks one inline SVG logo. Returns { error } or { colors, viewBox, width, height, label, hidden, forTheme }. */
+/** Checks one inline SVG logo. Returns { error } or { colors, ids, ratio, width, height, label, role, hidden, forTheme }. */
 function svgLogo(markup) {
   if (markup.length > MOST) return { error: `it has ${markup.length} characters; a logo has at most ${MOST}` };
-  const stack = [], ids = new Set(), refs = new Set(), stops = new Map(), nodes = [], byId = new Map();
-  let root = null, at = 0, gradient = null;
+  const stack = [], ids = new Map(), stops = new Map(), shapes = [], paints = [];
+  let root = null, at = 0, gradient = null, count = 0;
   for (const m of markup.matchAll(TAG)) {
     const between = markup.slice(at, m.index);
     at = m.index + m[0].length;
@@ -76,11 +82,15 @@ function svgLogo(markup) {
     const [, close, name, rawAttrs, selfClose] = m;
     if (close) {
       if (stack.at(-1)?.name !== name) return { error: `</${name}> does not close the element that is open` };
-      if (stack.pop().name === gradient?.name) gradient = null;
+      if (stack.pop() === gradient) gradient = null;
       continue;
     }
     if (!ELEMENTS.has(name) || (name === "svg" && root)) return { error: `<${name}> is not allowed in a logo${WHY[name] ? `: ${WHY[name]}` : ""}` };
     if (!root && name !== "svg") return { error: "it does not start with <svg>" };
+    if (++count > MOST_ELEMENTS) return { error: `it has more than ${MOST_ELEMENTS} elements; ${FLAT}, or simplify it` };
+    if (stack.length + 1 > DEEPEST) return { error: `its elements stand more than ${DEEPEST} levels inside one another; ${FLAT}` };
+    if (["title", "desc"].includes(stack.at(-1)?.name)) return { error: `<${name}> stands inside a <${stack.at(-1).name}>, which holds text only` };
+    if (name === "stop" && !gradient) return { error: "a <stop> stands outside a gradient" };
     const read = attributes(rawAttrs);
     if (read.error) return { error: `<${name}>: ${read.error}` };
     const attrs = Object.fromEntries(read.list);
@@ -88,71 +98,51 @@ function svgLogo(markup) {
       const low = attr.toLowerCase();
       if (low.startsWith("on")) return { error: `<${name}> has the event attribute "${attr}", which runs code` };
       if (low === "style") return { error: `<${name}> has a style attribute; write each color as its own attribute, such as fill="#0b6e4f"` };
+      if (low === "href" || low.endsWith(":href")) return { error: `<${name}> has ${attr}="${value.slice(0, 40)}"; a logo links to nothing and loads nothing, and one part never points at another${GRADIENTS.has(name) ? " (a gradient holds its own stops)" : ""}` };
+      if (OPACITY.test(attr)) return { error: `<${name}> has ${attr}; ${FLAT}, because check reads each color as it shows` };
       if (FIXED[attr] != null) { if (value !== FIXED[attr]) return { error: `<${name}> has ${attr}="${value}"` }; continue; }
       if (attr === "class" && name === "svg") { if (!/^[\w -]*$/.test(value)) return { error: `<svg> has the class "${value}"` }; continue; }
-      if ((attr === "href" || attr === "xlink:href") && name === "use") {
-        if (!/^#[A-Za-z][\w-]*$/.test(value)) return { error: `<use> points at "${value.slice(0, 40)}"; in a logo it points at an id inside the same logo, such as href="#part"` };
-        refs.add(value.slice(1));
-        continue;
-      }
-      if (attr === "href" || attr === "xlink:href") return { error: `<${name}> has ${attr}="${value.slice(0, 40)}"; a logo links to nothing and loads nothing` };
       if (!ATTRIBUTES.has(attr)) return { error: `<${name}> has the attribute "${attr}", which a logo does not take` };
       if (attr === "aria-label") { if (/[<>]/.test(value)) return { error: `<${name}> has an aria-label with markup in it` }; continue; }
-      if (attr === "id") { if (!ID.test(value)) return { error: `the id "${value}" holds characters that an id does not need` }; if (ids.has(value)) return { error: `the id "${value}" is used twice` }; ids.add(value); continue; }
-      if (/url\s*\(/i.test(value)) {
-        if (!URLS.has(attr)) return { error: `<${name}> has ${attr}="${value.slice(0, 40)}"; only fill, stroke and clip-path may hold a url()` };
-        const target = value.match(/^url\(#([A-Za-z][\w-]*)\)$/);
-        if (!target) return { error: `<${name}> has ${attr}="${value.slice(0, 40)}"; a url() in a logo points at an id inside the same logo, such as url(#shade)` };
-        refs.add(target[1]);
+      if (attr === "id") { if (!ID.test(value)) return { error: `the id "${value}" holds characters that an id does not need` }; if (ids.has(value)) return { error: `the id "${value}" is used twice` }; ids.set(value, name); continue; }
+      if (attr === "stop-color") { if (!/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(value)) return { error: `<stop> has stop-color="${value.slice(0, 40)}"; a stop has a hex color, such as #0b6e4f` }; continue; }
+      if (attr === "fill" || attr === "stroke") {
+        const ref = value.match(/^url\(#([A-Za-z][\w-]*)\)$/);
+        if (ref) { if (!SHAPES.has(name)) return { error: `<${name}> has ${attr}="${value}"; only a shape takes a gradient, in its own fill or stroke` }; continue; }
+        if (/url\s*\(/i.test(value)) return { error: `<${name}> has ${attr}="${value.slice(0, 40)}"; a url() in a logo points at a gradient inside the same logo, such as url(#shade)` };
+        if (!/^(#[0-9a-fA-F]{3}|#[0-9a-fA-F]{6}|currentColor|none|transparent)$/.test(value)) return { error: `<${name}> has ${attr}="${value}"; write a color as a hex value, such as #0b6e4f, or as currentColor` };
         continue;
       }
-      if (COLORS.has(attr) && !/^(#[0-9a-fA-F]{3}|#[0-9a-fA-F]{6}|currentColor|none|transparent)$/.test(value)) return { error: `<${name}> has ${attr}="${value}"; write a color as a hex value, such as #0b6e4f, or as currentColor` };
       if (!/^[\w .,#%()+-]*$/.test(value)) return { error: `the value of "${attr}" holds characters that a shape does not need` };
+      if (/url\s*\(/i.test(value)) return { error: `<${name}> has ${attr}="${value.slice(0, 40)}"; only the fill or the stroke of a shape holds a url()` };
     }
-    const parent = stack.at(-1) || null;
-    const node = { name, parent, own: { fill: attrs.fill, stroke: attrs.stroke }, href: name === "use" ? (attrs.href || attrs["xlink:href"] || "").slice(1) : null, hidden: !!parent?.hidden || ["defs", "clipPath"].includes(name) };
-    nodes.push(node);
-    if (attrs.id) byId.set(attrs.id, node);
+    const node = { name, attrs, parent: stack.at(-1) || null, hidden: !!stack.at(-1)?.hidden || name === "defs" || GRADIENTS.has(name) };
     if (name === "svg") root = attrs;
-    if (name === "linearGradient" || name === "radialGradient") { gradient = { name, id: attrs.id }; if (attrs.id) stops.set(attrs.id, []); }
-    if (name === "stop" && gradient?.id) stops.get(gradient.id).push(attrs["stop-color"] ?? "#000000"); // a stop with no color is black
+    if (GRADIENTS.has(name)) { gradient = node; if (attrs.id) stops.set(attrs.id, []); }
+    if (name === "stop") { if (gradient.attrs.id) stops.get(gradient.attrs.id).push(attrs["stop-color"] ?? "#000000"); } // a stop with no color is black
+    if (SHAPES.has(name)) { shapes.push(node); if (node.hidden) return { error: `a <${name}> stands inside <defs> or a gradient, where it is never drawn; take it out` }; }
     if (!selfClose) stack.push(node);
   }
   if (markup.slice(at).trim()) return { error: "it holds something after </svg>, or markup that check cannot read" };
   if (stack.length) return { error: `<${stack.at(-1).name}> is never closed` };
   if (!root) return { error: "it holds no <svg>" };
-  for (const ref of refs) if (!ids.has(ref)) return { error: `it points at "#${ref}", which is not inside the logo` };
   const box = (root.viewBox || "").trim().split(/[\s,]+/).map(Number);
   if (box.length !== 4 || box.some((n) => !Number.isFinite(n)) || box[2] <= 0 || box[3] <= 0) return { error: "the <svg> has no viewBox, such as viewBox=\"0 0 96 24\"" };
-  // The colors that show: the fill of each shape (black when none is set), its stroke, and the stops of a gradient it uses.
-  // A shape inherits fill and stroke from the elements around it. A <use> draws the element it points at and all inside it,
-  // which inherit up to that element and then from the <use>.
+  // The colors that show: the fill of each shape (black when none is set), its stroke, and the stops of the gradient it uses.
+  // A shape inherits fill and stroke from the groups around it.
   const colors = new Set();
-  const add = (value) => {
-    if (!value || value === "none" || value === "transparent") return;
-    const ref = value.match(/^url\(#([\w-]+)\)$/);
-    if (ref) return (stops.get(ref[1]) || []).forEach((stop) => /^url/.test(stop) || add(stop)); // a stop is a color, never a url()
-    colors.add(value === "currentColor" ? value : hex6(value));
-  };
-  const up = (node, key, stop = null) => { for (let n = node; n && n !== stop?.parent; n = n.parent) if (n.own[key] != null) return n.own[key]; return null; };
-  const inside = (node, target) => { for (let n = node; n; n = n.parent) if (n === target) return true; return false; };
-  // Each element is read once for each fill and stroke it inherits, so uses inside uses cannot make the work grow without end.
-  const done = new Set();
-  const paint = (node, inherited, seen) => {
-    const fill = node.own.fill ?? inherited.fill, stroke = node.own.stroke ?? inherited.stroke;
-    if (node.name !== "use") { add(fill ?? (node.name === "line" ? null : "#000000")); add(stroke); return; }
-    const target = byId.get(node.href), key = `${node.href}|${fill}|${stroke}`;
-    if (!target || seen.has(target) || done.has(key)) return; // a use that points at itself, directly or through another use, draws nothing more
-    done.add(key);
-    const next = new Set(seen).add(target);
-    for (const shape of nodes) {
-      if (!SHAPES.has(shape.name) || !inside(shape, target)) continue;
-      const from = shape === target ? null : shape.parent;
-      paint(shape, { fill: (from && up(from, "fill", target)) ?? fill, stroke: (from && up(from, "stroke", target)) ?? stroke }, next);
+  const up = (node, key) => { for (let n = node; n; n = n.parent) if (n.attrs[key] != null) return n.attrs[key]; return null; };
+  for (const shape of shapes) {
+    for (const [key, value] of [["fill", up(shape, "fill") ?? (shape.name === "line" ? null : "#000000")], ["stroke", up(shape, "stroke")]]) {
+      if (!value || value === "none" || value === "transparent") continue;
+      const ref = value.match(/^url\(#([\w-]+)\)$/);
+      if (!ref) { colors.add(value === "currentColor" ? value : hex6(value)); continue; }
+      if (!GRADIENTS.has(ids.get(ref[1]))) return { error: `a ${key} points at "#${ref[1]}", which is not a gradient inside the logo` };
+      if (!stops.get(ref[1]).length) return { error: `the gradient "#${ref[1]}" has no <stop>` };
+      stops.get(ref[1]).forEach((c) => colors.add(hex6(c)));
     }
-  };
-  for (const node of nodes) if (SHAPES.has(node.name) && !node.hidden) paint(node, { fill: up(node.parent, "fill"), stroke: up(node.parent, "stroke") }, new Set());
-  return { colors, ids: [...ids], ratio: box[2] / box[3], width: Number(root.width), height: Number(root.height), label: root["aria-label"], role: root.role, hidden: root["aria-hidden"] === "true", forTheme: root["data-for"] };
+  }
+  return { colors, ids: [...ids.keys()], ratio: box[2] / box[3], width: Number(root.width), height: Number(root.height), label: root["aria-label"], role: root.role, hidden: root["aria-hidden"] === "true", forTheme: root["data-for"] };
 }
 
 /** The pixel size of a PNG or WebP, read from its first bytes, or null when the bytes are not that kind of image. */
@@ -189,7 +179,7 @@ function rasterLogo(tag) {
     return { error: "its src is not a data URI; a logo is inside the file, as inline SVG or a PNG or WebP data URI" };
   }
   const size = rasterSize(data[1], Buffer.from(data[2], "base64"));
-  if (!size) return { error: `its data is not a ${data[1].toUpperCase()} image` };
+  if (!size || !size.width || !size.height) return { error: `its data is not a ${data[1].toUpperCase()} image` };
   if (attrs.alt == null) return { error: "the <img> has no alt; write the host's name for a wordmark, or alt=\"\" beside the name" };
   return { ratio: size.width / size.height, natural: size, width: Number(attrs.width), height: Number(attrs.height), label: attrs.alt, hidden: attrs.alt === "", forTheme: attrs["data-for"], raster: true };
 }
@@ -207,7 +197,7 @@ function findLogos(markup) {
 }
 
 /** Tests every logo of a page. Returns { errors, warnings, name, logos } where name is the host name a wordmark carries. */
-function checkLogos(markup) {
+function checkLogos(markup, PAGES = DOCENT_PAGES) {
   const errors = [], warnings = [];
   const { host, found } = findLogos(markup);
   const logos = [];
@@ -261,4 +251,4 @@ function checkLogos(markup) {
   return { errors, warnings, logos, name };
 }
 
-module.exports = { MOST, SLOT, slotSize, svgLogo, rasterLogo, rasterSize, findLogos, checkLogos, contrast };
+module.exports = { MOST, MOST_ELEMENTS, DEEPEST, SLOT, slotSize, svgLogo, rasterLogo, rasterSize, findLogos, checkLogos, contrast };

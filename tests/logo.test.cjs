@@ -2,7 +2,7 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const zlib = require("node:zlib");
-const { svgLogo, rasterLogo, checkLogos, slotSize, MOST } = require("../skills/docent/scripts/lib/logo.cjs");
+const { svgLogo, rasterLogo, checkLogos, slotSize, MOST, MOST_ELEMENTS, DEEPEST } = require("../skills/docent/scripts/lib/logo.cjs");
 
 const svg = (inner, attrs = 'width="24" height="24" aria-hidden="true"') => `<svg class="logo" viewBox="0 0 24 24" ${attrs}>${inner}</svg>`;
 const why = (inner) => svgLogo(svg(inner)).error || "";
@@ -23,12 +23,12 @@ const webp = (chunk, w, h) => {
 };
 const img = (bytes, kind = "png", attrs = 'width="96" height="24" alt=""') => `<img class="logo" src="data:image/${kind};base64,${bytes.toString("base64")}" ${attrs}>`;
 
-test("a logo made of plain shapes passes: one color, a gradient, a clip path, and a use that points inside the logo", () => {
+test("a logo made of plain shapes passes: one color, groups that pass on a color, and a gradient with hex stops", () => {
   assert.equal(svgLogo(svg('<path d="M2 2h20v20H2z" fill="currentColor"/>')).error, undefined);
-  const shaded = svg('<defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#0a5f8a"/><stop offset="1" stop-color="#0d3550"/></linearGradient><clipPath id="c"><circle cx="12" cy="12" r="10"/></clipPath><path id="p" d="M2 2h8v8H2z"/></defs><g clip-path="url(#c)"><rect width="24" height="24" fill="url(#g)"/><use href="#p" fill="#ffffff"/></g><title>Example project</title>');
+  const shaded = svg('<defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#0a5f8a"/><stop offset="1" stop-color="#0d3550"/></linearGradient></defs><g fill="#ffffff"><rect width="24" height="24" fill="url(#g)"/><circle cx="12" cy="12" r="4"/></g><title>Example project</title>');
   const result = svgLogo(shaded);
   assert.equal(result.error, undefined);
-  assert.deepEqual([...result.colors].sort(), ["#0a5f8a", "#0d3550", "#ffffff"], "the colors that show: the gradient's stops and the fill of the use; the clip shape is not drawn");
+  assert.deepEqual([...result.colors].sort(), ["#0a5f8a", "#0d3550", "#ffffff"], "the colors that show: the gradient's stops, and the fill the circle takes from its group");
 });
 
 test("the logo check refuses every element that can run code, load a file, move, or depend on a font", () => {
@@ -46,7 +46,12 @@ test("the logo check refuses every element that can run code, load a file, move,
     '<text x="0" y="12">Logo</text>': /<text> is not allowed.*turn the letters into paths/,
     '<g><tspan>x</tspan></g>': /<tspan> is not allowed/,
     '<svg viewBox="0 0 1 1"/>': /<svg> is not allowed.*one svg/,
-    '<symbol id="s"/>': /<symbol> is not allowed in a logo/,
+    '<symbol id="s"/>': /<symbol> is not allowed in a logo: a symbol is used through a use; flatten the logo/,
+    '<path id="p" d="M0 0h1"/><use href="#p"/>': /<use> is not allowed in a logo: a use copies another part of the logo; flatten the logo/,
+    '<clipPath id="c"><circle r="1"/></clipPath>': /<clipPath> is not allowed in a logo: a clip path is not allowed; flatten the logo/,
+    '<title><path d="M0 0h1"/></title>': /<path> stands inside a <title>, which holds text only/,
+    '<stop offset="0" stop-color="#000000"/>': /a <stop> stands outside a gradient/,
+    '<defs><path d="M0 0h1"/></defs>': /a <path> stands inside <defs> or a gradient, where it is never drawn/,
     "Logo": /holds text \("Logo"\) outside a title/,
     "<![CDATA[x]]>": /markup that check cannot read|holds text/,
   };
@@ -60,13 +65,20 @@ test("the logo check refuses every attribute that can run code or load a file, a
     '<path d="M0 0h1" style="fill:red"/>': /a style attribute/,
     '<path d="M0 0h1" fill=red/>': /no quotes around its value/,
     '<path d="M0 0h1" hidden/>': /"hidden" has no value/,
-    '<path id="p" d="M0 0h1"/><use href="https://example.com/a.svg#p"/>': /<use> points at "https:\/\/example.com\/a.svg#p"/,
-    '<use href="javascript:alert(1)"/>': /<use> points at "javascript:alert\(1\)"/,
-    '<use xlink:href="data:image/svg+xml,x"/>': /<use> points at "data:image\/svg\+xml,x"/,
-    '<use href="#missing"/>': /points at "#missing", which is not inside the logo/,
-    '<path d="M0 0h1" href="#p"/>': /<path> has href="#p"; a logo links to nothing/,
-    '<path d="M0 0h1" fill="url(https://example.com/a.svg#g)"/>': /a url\(\) in a logo points at an id inside the same logo/,
-    '<g clip-path="url(data:image/svg+xml,x)"/>': /a url\(\) in a logo points at an id/,
+    '<path d="M0 0h1" href="#p"/>': /<path> has href="#p"; a logo links to nothing and loads nothing, and one part never points at another/,
+    '<path d="M0 0h1" xlink:href="javascript:alert(1)"/>': /<path> has xlink:href="javascript:alert\(1\)"; a logo links to nothing/,
+    '<defs><linearGradient id="a"><stop offset="0" stop-color="#000000"/></linearGradient><linearGradient id="b" href="#a"/></defs>': /<linearGradient> has href="#a";.*a gradient holds its own stops/,
+    '<path d="M0 0h1" fill="url(https://example.com/a.svg#g)"/>': /a url\(\) in a logo points at a gradient inside the same logo/,
+    '<path d="M0 0h1" fill="url(#missing)"/>': /a fill points at "#missing", which is not a gradient inside the logo/,
+    '<g id="x"><path d="M0 0h1" fill="url(#x)"/></g>': /a fill points at "#x", which is not a gradient inside the logo/,
+    '<defs><linearGradient id="g"><stop offset="0" stop-color="#000000"/></linearGradient></defs><g fill="url(#g)"><path d="M0 0h1"/></g>': /<g> has fill="url\(#g\)"; only a shape takes a gradient/,
+    '<defs><linearGradient id="g"/></defs><path d="M0 0h1" fill="url(#g)"/>': /the gradient "#g" has no <stop>/,
+    '<defs><linearGradient id="g"><stop offset="0" stop-color="url(#g)"/></linearGradient></defs>': /<stop> has stop-color="url\(#g\)"; a stop has a hex color/,
+    '<defs><linearGradient id="g"><stop offset="0" stop-color="currentColor"/></linearGradient></defs>': /<stop> has stop-color="currentColor"; a stop has a hex color/,
+    '<path d="M0 0h1" transform="url(#p)"/>': /holds characters that a shape does not need|only the fill or the stroke of a shape holds a url\(\)/,
+    '<path d="M0 0h1" opacity="0.1"/>': /<path> has opacity; flatten the logo/,
+    '<path d="M0 0h1" fill-opacity="0.5"/>': /<path> has fill-opacity; flatten the logo/,
+    '<defs><linearGradient id="g"><stop offset="0" stop-color="#000000" stop-opacity="0"/></linearGradient></defs>': /<stop> has stop-opacity; flatten the logo/,
     '<path d="M0 0h1" fill="red"/>': /fill="red"; write a color as a hex value/,
     '<path d="M0 0h1" fill="rgb(1,2,3)"/>': /write a color as a hex value/,
     '<path d="M0 0h1" data-x="1"/>': /the attribute "data-x", which a logo does not take/,
@@ -76,6 +88,7 @@ test("the logo check refuses every attribute that can run code or load a file, a
   };
   for (const [inner, pattern] of Object.entries(refused)) assert.match(why(inner), pattern, inner);
   assert.match(svgLogo('<svg class="logo" viewBox="0 0 24 24" width="24" height="24" xmlns="http://evil.example/">x</svg>').error, /xmlns="http:\/\/evil.example\/"/);
+  assert.match(svgLogo('<svg class="logo" viewBox="0 0 24 24" width="24" height="24" xmlns:xlink="http://www.w3.org/1999/xlink"></svg>').error, /the attribute "xmlns:xlink", which a logo does not take/);
   assert.match(svgLogo('<svg class="logo" width="24" height="24"><path d="M0 0h1"/></svg>').error, /no viewBox/);
 });
 
@@ -141,38 +154,11 @@ test("a logo stands in the top bar only", () => {
   assert.match(checkLogos(page).errors.join(), /a logo stands outside the top bar/);
 });
 
-test("a <use> takes the colors of the shapes it points at, which inherit up to that element and then from the <use>", () => {
-  const dark = (inner) => checkLogos(bar(svg(inner, 'width="24" height="24" aria-hidden="true" data-for="dark"'))).errors;
-  assert.deepEqual(dark('<defs><path id="p" d="M0 0h1" fill="#ffffff"/></defs><use href="#p"/>'), [], "a white path drawn through a use is white, not black");
-  assert.deepEqual(dark('<defs><g id="g" fill="#ffffff"><path d="M0 0h1"/></g></defs><use href="#g"/>'), [], "a shape inherits from the group that the use points at");
-  assert.deepEqual(dark('<defs><path id="p" d="M0 0h1"/></defs><use href="#p" fill="#ffffff"/>'), [], "a shape with no fill of its own takes the fill of the use");
-  assert.match(dark('<defs><path id="p" d="M0 0h1" fill="#000000"/></defs><use href="#p" fill="#ffffff"/>').join(), /no color with 3:1 on the dark page/, "the shape's own fill wins over the use's");
-  assert.deepEqual([...svgLogo(svg('<g id="a" fill="currentColor"><path d="M0 0h1"/><use href="#a"/></g>')).colors], ["currentColor"], "a use that points at its own group draws nothing more, and check does not loop");
-});
-
-test("a url() may stand in fill, stroke and clip-path only, so a gradient cannot point at itself through a stop", () => {
-  assert.match(why('<defs><linearGradient id="g"><stop offset="0" stop-color="url(#g)"/></linearGradient></defs><path d="M0 0h1" fill="url(#g)"/>'), /<stop> has stop-color="url\(#g\)"; only fill, stroke and clip-path may hold a url\(\)/);
-  assert.match(why('<path id="p" d="M0 0h1" transform="url(#p)"/>'), /only fill, stroke and clip-path may hold a url\(\)/);
-});
-
-test("a gradient stop with no color is black, and uses inside uses are read once each, so check stays fast", () => {
-  const black = svgLogo(svg('<defs><linearGradient id="g"><stop offset="0"/><stop offset="1"/></linearGradient></defs><rect width="24" height="24" fill="url(#g)"/>'));
-  assert.deepEqual([...black.colors], ["#000000"]);
-  assert.deepEqual(checkLogos(bar(svg('<defs><linearGradient id="g"><stop offset="0"/><stop offset="1"/></linearGradient></defs><rect width="24" height="24" fill="url(#g)"/>', 'width="24" height="24" aria-hidden="true" data-for="light"'))).errors, [], "a black gradient logo reads on the light page");
-  // Each group holds two uses of the one before it: read naively, the work doubles at each of 40 levels.
-  let defs = '<g id="g0"><path d="M0 0h1" fill="#0d3550"/></g>';
-  for (let i = 1; i <= 40; i++) defs += `<g id="g${i}"><use href="#g${i - 1}"/><use href="#g${i - 1}" fill="#72c2ee"/></g>`;
-  const started = Date.now();
-  const deep = svgLogo(svg(`<defs>${defs}</defs><use href="#g40"/>`));
-  assert.ok(Date.now() - started < 500, `read in ${Date.now() - started}ms`);
-  assert.deepEqual([...deep.colors], ["#0d3550"], "the path has its own fill, so the use's fill does not reach it");
-});
-
 test("an id in a logo is used once in the whole page, because a url() finds the first element with that id", () => {
   const version = (theme, stop) => svg(`<defs><linearGradient id="g"><stop offset="0" stop-color="${stop}"/></linearGradient></defs><rect width="24" height="24" fill="url(#g)"/>`, `width="24" height="24" aria-hidden="true" data-for="${theme}"`);
   assert.match(checkLogos(bar(version("light", "#000000") + version("dark", "#ffffff"))).errors.join(), /the id "g" in a logo is used 2 times in the page; an id is page-wide, so give each logo its own ids, such as "g-dark"/);
   assert.deepEqual(checkLogos(bar(version("light", "#000000") + version("dark", "#ffffff").replace(/"g"/, '"g-dark"').replace("url(#g)", "url(#g-dark)"))).errors, []);
-  const page = bar(svg('<defs><path id="short" d="M0 0h1" fill="currentColor"/></defs><use href="#short"/>')) + '<section id="short"></section>';
+  const page = bar(svg('<path id="short" d="M0 0h1" fill="currentColor"/>')) + '<section id="short"></section>';
   assert.match(checkLogos(page).errors.join(), /the id "short" in a logo is used 2 times in the page/, "an id the page already uses for a section");
 });
 
@@ -186,4 +172,12 @@ test("a wordmark that stands alone is never hidden from a screen reader, because
   const word = svg('<path d="M0 0h1" fill="currentColor"/>', 'width="24" height="24" role="img" aria-label="Example project" aria-hidden="true"');
   assert.match(checkLogos(bar(word, "")).errors.join(), /stands alone, so it is the only place that names the host; take out aria-hidden="true"/);
   assert.match(checkLogos(bar(img(png(288, 72), "png", 'width="96" height="24" alt=""'), "")).errors.join(), /stands alone, so it carries the host's name: write alt="Host name"/, "a raster wordmark with an empty alt is hidden too");
+});
+
+test("a gradient stop with no color is black, and a logo has at most 400 elements, 8 levels deep", () => {
+  const black = svgLogo(svg('<defs><linearGradient id="g"><stop offset="0"/><stop offset="1"/></linearGradient></defs><rect width="24" height="24" fill="url(#g)"/>'));
+  assert.deepEqual([...black.colors], ["#000000"]);
+  assert.match(why('<path d="M0 0h1" fill="currentColor"/>'.repeat(MOST_ELEMENTS)), /more than 400 elements/);
+  assert.equal(why('<g>'.repeat(DEEPEST - 2) + '<path d="M0 0h1" fill="currentColor"/>' + '</g>'.repeat(DEEPEST - 2)), "", "the svg, six groups and a path: 8 levels");
+  assert.match(why('<g>'.repeat(DEEPEST) + '<path d="M0 0h1"/>' + '</g>'.repeat(DEEPEST)), /more than 8 levels inside one another/);
 });

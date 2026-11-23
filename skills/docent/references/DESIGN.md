@@ -367,7 +367,7 @@ A host project may show its own logo, and one line in its own words. Docent's cr
 
 The logo appears once, in the top bar. A second copy would repeat it, and two copies of one SVG would carry the same ids.
 
-**The logo is inside the file.** It is inline SVG made of plain shapes, or a PNG or WebP data URI with at least three times the pixels it shows, so it stays sharp on a phone and on paper. A logo never loads a file, runs a script, links anywhere, or holds text: text depends on a font the reader may not have, so the letters are paths. `check` refuses a logo that breaks one of these rules and names what failed, as it does for an icon.
+**The logo is inside the file.** It is inline SVG, flattened to plain shapes in solid colors or gradients, with no part that points at another, or a PNG or WebP data URI with at least three times the pixels it shows, so it stays sharp on a phone and on paper. A logo never loads a file, runs a script, links anywhere, or holds text: text depends on a font the reader may not have, so the letters are paths. `check` refuses a logo that breaks one of these rules and names what failed, as it does for an icon.
 
 **A symbol or a wordmark.** A symbol stands before the host's name and is hidden from a screen reader, so the name is read once. A wordmark already shows the name, so it stands alone and carries the name in its label.
 
