@@ -253,12 +253,12 @@ test("a status grid takes every color from the page tokens: status fills on scre
     const { svg } = renderDiagram(fixture(name));
     const bare = svg.replace(/var\(--[a-z0-9-]+,#[0-9a-f]{6}\)/g, "");
     assert.doesNotMatch(bare, /#[0-9a-f]{6}\b|rgb\(|hsl\(|opacity|gradient|filter/i);
-    assert.doesNotMatch(svg, /is-(ok|warn|err)|class="pulse|dasharray|--primary|--heat/);
+    assert.doesNotMatch(svg, /is-(ok|warn|err)|class="pulse|dasharray|--primary|--heat-[1-5]|--heat-text/);
   }
   const { svg } = renderDiagram(fixture());
   const id = "#dg-tracker-uptime";
   assert.ok(svg.includes(`${id} .s-ok{fill:var(--ok,#1a7f37)}`) && svg.includes(`${id} .s-warn{fill:var(--warn,#7d4e00)}`) && svg.includes(`${id} .s-err{fill:var(--err,#cf222e)}`), "on screen each cell takes its status color");
-  assert.ok(svg.includes(`${id} .sm{fill:none;stroke:var(--bg,#fbfbfe);stroke-width:1.5;stroke-linecap:round}`), "the marks are 1.5px with round ends, in the page color");
+  assert.ok(svg.includes(`${id} .sm{fill:none;stroke:var(--heat-page,#fbfbfe);stroke-width:1.5;stroke-linecap:round}`), "the marks are 1.5px with round ends, in the kit's own page color, which high contrast mode keeps");
   const print = svg.match(/@media print\{([^\n]*)\}/)[1];
   assert.ok(print.includes(`${id} .s-ok,${id} .s-warn{fill:var(--line,#d3d6e3)}`) && print.includes(`${id} .sm-warn{stroke:var(--warn,#7d4e00)}`), "on paper OK and Warning take the outline color, and the slash the warning color");
   assert.doesNotMatch(print, /s-err/, "on paper an Error cell keeps its fill and its cross");

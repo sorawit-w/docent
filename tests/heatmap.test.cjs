@@ -201,7 +201,7 @@ test("a heat map takes every color from the page tokens, and has no state, no do
   }
   const { svg } = renderDiagram(fixture());
   assert.match(svg, /\.h1\{fill:var\(--heat-1,#c6e9ef\)\}[\s\S]*\.h5\{fill:var\(--heat-5,#004a53\)\}/);
-  assert.match(svg, /\.hv\.hi\{fill:var\(--bg,#fbfbfe\)\}/);
+  assert.match(svg, /\.hv\{font-size:12px;fill:var\(--heat-text,#1c1f2e\);[^}]*\}[\s\S]*\.hv\.hi\{fill:var\(--heat-page,#fbfbfe\)\}/, "a number on a step reads the kit's own text and page colors, which forced colors leave alone");
 });
 
 test("the kit sets the heat steps in its four places, and check warns when a page sets one", () => {
@@ -209,6 +209,8 @@ test("the kit sets the heat steps in its four places, and check warns when a pag
   assert.equal((css.match(/--heat-1: #c6e9ef;/g) || []).length, 1, "teal on a light screen");
   assert.equal((css.match(/--heat-1: #093339;/g) || []).length, 2, "teal on a dark screen: dark by the system and dark by the switch");
   assert.equal((css.match(/--heat-1: #dee2f0;/g) || []).length, 1, "gray on paper");
+  assert.equal((css.match(/--heat-text: #1c1f2e; --heat-page: #(fbfbfe|ffffff);/g) || []).length, 2, "the text on a step: light and print");
+  assert.equal((css.match(/--heat-text: #e7e9f3; --heat-page: #12141f;/g) || []).length, 2, "the text on a step: dark by the system and dark by the switch");
   const specimen = fs.readFileSync(path.join(__dirname, "..", "skills", "docent", "assets", "specimen.html"), "utf8");
   assert.match(checkDocument(specimen.replace("</head>", "<style>:root{--heat-3:#888888}</style></head>")).warnings.join("\n"), /a style sets --heat-3; the kit sets it in four places/);
 });

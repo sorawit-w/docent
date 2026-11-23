@@ -8,7 +8,7 @@ const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replac
 const at = (p) => `transform:translate(${num(p[0])}px,${num(p[1])}px)`;
 const pct = (v) => `${Math.round(v * 100) / 100}%`;
 
-const LIGHT = { bg: "#fbfbfe", fig: "#f2f3f9", text: "#1c1f2e", muted: "#575d75", line: "#d3d6e3", primary: "#2f3fd0", dot: "#2f3fd0", ok: "#1a7f37", warn: "#7d4e00", err: "#cf222e", "heat-1": "#c6e9ef", "heat-2": "#86c9d5", "heat-3": "#3da6b6", "heat-4": "#00707e", "heat-5": "#004a53" };
+const LIGHT = { bg: "#fbfbfe", fig: "#f2f3f9", text: "#1c1f2e", muted: "#575d75", line: "#d3d6e3", primary: "#2f3fd0", dot: "#2f3fd0", ok: "#1a7f37", warn: "#7d4e00", err: "#cf222e", "heat-1": "#c6e9ef", "heat-2": "#86c9d5", "heat-3": "#3da6b6", "heat-4": "#00707e", "heat-5": "#004a53", "heat-text": "#1c1f2e", "heat-page": "#fbfbfe" };
 const v = (name) => `var(--${name},${LIGHT[name]})`;
 const SANS = 'system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif';
 const CROSS = 1.6, PAUSE = 1.2; // seconds for one leg, and the rest before the run starts again
@@ -105,13 +105,13 @@ function styles(scene, id, mode, swap) {
   // A plan stacked on a phone: a small map beside each box, its boxes in thin muted outlines, the band's own box filled in the text color.
   if (scene.stack && scene.form === "plan") css.push(`${s} .m-box{fill:${v("bg")};stroke:${v("muted")};stroke-width:1}`, `${s} .m-on{fill:${v("text")};stroke:${v("text")};stroke-width:1}`);
   // A heat plan: the plan's look, and each box with a number filled with its heat step after the plan's box rule, so the step wins.
-  // On a step its name, its value and its note take the text color, or the page color on steps 4 and 5; a box with no data keeps
+  // On a step its name, its value and its note (each marked "hs") take the text color, or the page color on steps 4 and 5; a box with no data keeps
   // the plan's look. Stacked on a phone, each map shows every box in its step, and the band's own box has a 2px outline in the text
   // color with a 1px line in the page color inside it, so the outline shows on every step, in both themes.
   if (scene.form === "heatplan") {
     css.push(`${s} .row{font-size:14px;fill:${v("text")}}`, `${s} .val{font-size:12px;fill:${v("muted")};font-variant-numeric:tabular-nums}`, `${s} .box{fill:${v("bg")};stroke:${v("text")};stroke-width:1.5}`);
     if (scene.stack) css.push(`${s} .m-box{fill:${v("bg")};stroke:${v("muted")};stroke-width:1}`);
-    css.push(...[1, 2, 3, 4, 5].map((k) => `${s} .h${k}{fill:${v(`heat-${k}`)}}`), `${s} .hv{font-size:12px;fill:${v("text")};font-variant-numeric:tabular-nums}`, `${s} .hn{font-size:12px;fill:${v("text")}}`, `${s} .row.hi,${s} .hv.hi,${s} .hn.hi{fill:${v("bg")}}`);
+    css.push(...[1, 2, 3, 4, 5].map((k) => `${s} .h${k}{fill:${v(`heat-${k}`)}}`), `${s} .hv{font-size:12px;fill:${v("text")};font-variant-numeric:tabular-nums}`, `${s} .hn{font-size:12px}`, `${s} .hs{fill:${v("heat-text")}}`, `${s} .hs.hi{fill:${v("heat-page")}}`);
     if (scene.stack) css.push(`${s} .m-box.m-at{stroke:${v("text")};stroke-width:2}`, `${s} .m-in{fill:none;stroke:${v("bg")};stroke-width:1}`);
   }
   // A funnel: step names in weight 400, numbers with tabular figures, a kept bar as the bar of a range chart, and the lost part filled in the line color,
@@ -119,11 +119,15 @@ function styles(scene, id, mode, swap) {
   if (scene.form === "funnel") css.push(`${s} .row{font-size:14px;fill:${v("text")}}`, `${s} .val{font-size:12px;fill:${v("muted")};font-variant-numeric:tabular-nums}`, `${s} .r-bar{fill:${v("bg")};stroke:${v("text")};stroke-width:1.5}`, `${s} .f-lost{fill:${v("line")}}`);
   // A heat map: row names in weight 400, column labels and legend numbers with tabular figures, each cell in its heat step, and a
   // cell with no data hollow in a muted outline. A number takes the text color on steps 1 to 3 and the page color on 4 and 5.
-  if (scene.form === "heatmap") css.push(`${s} .row{font-size:14px;fill:${v("text")}}`, `${s} .val{font-size:12px;fill:${v("muted")};font-variant-numeric:tabular-nums}`, ...[1, 2, 3, 4, 5].map((k) => `${s} .h${k}{fill:${v(`heat-${k}`)}}`), `${s} .h0{fill:${v("bg")};stroke:${v("muted")};stroke-width:1}`, `${s} .hv{font-size:12px;fill:${v("text")};font-variant-numeric:tabular-nums}`, `${s} .hv.hi{fill:${v("bg")}}`);
+  // Text on a step reads --heat-text and --heat-page, the kit's own text and page colors: with the reader's high contrast mode
+  // the kit gives --text and --bg the system colors, and only its own colors are tested against the steps.
+  if (scene.form === "heatmap") css.push(`${s} .row{font-size:14px;fill:${v("text")}}`, `${s} .val{font-size:12px;fill:${v("muted")};font-variant-numeric:tabular-nums}`, ...[1, 2, 3, 4, 5].map((k) => `${s} .h${k}{fill:${v(`heat-${k}`)}}`), `${s} .h0{fill:${v("bg")};stroke:${v("muted")};stroke-width:1}`, `${s} .hv{font-size:12px;fill:${v("heat-text")};font-variant-numeric:tabular-nums}`, `${s} .hv.hi{fill:${v("heat-page")}}`);
   // A status grid: the row names and labels of a heat map. On screen each cell is filled in its status color, and the mark of
-  // a Warning or an Error cell (a slash or a cross, 1.5px with round ends) takes the page color. On paper (below) only the
-  // failures stand out: OK and Warning cells take the outline color, and the slash takes the warning color.
-  if (scene.form === "statusgrid") css.push(`${s} .row{font-size:14px;fill:${v("text")}}`, `${s} .val{font-size:12px;fill:${v("muted")};font-variant-numeric:tabular-nums}`, `${s} .h0{fill:${v("bg")};stroke:${v("muted")};stroke-width:1}`, ...["ok", "warn", "err"].map((k) => `${s} .s-${k}{fill:${v(k)}}`), `${s} .sm{fill:none;stroke:${v("bg")};stroke-width:1.5;stroke-linecap:round}`);
+  // a Warning or an Error cell (a slash or a cross, 1.5px with round ends) takes the kit's own page color, --heat-page: the
+  // reader's high contrast mode gives --bg a system color but keeps the status fills, and only the kit's own page color is
+  // tested against them. On paper (below) only the failures stand out: OK and Warning cells take the outline color, and the
+  // slash takes the warning color.
+  if (scene.form === "statusgrid") css.push(`${s} .row{font-size:14px;fill:${v("text")}}`, `${s} .val{font-size:12px;fill:${v("muted")};font-variant-numeric:tabular-nums}`, `${s} .h0{fill:${v("bg")};stroke:${v("muted")};stroke-width:1}`, ...["ok", "warn", "err"].map((k) => `${s} .s-${k}{fill:${v(k)}}`), `${s} .sm{fill:none;stroke:${v("heat-page")};stroke-width:1.5;stroke-linecap:round}`);
   if (scene.form === "layout") css.push(`${s} .row{font-size:14px;fill:${v("text")}}`, `${s} .val{font-size:12px;fill:${v("muted")};font-variant-numeric:tabular-nums}`, `${s} .box{fill:${v("bg")};stroke:${v("text")};stroke-width:1.5}`, `${s} .tick{fill:none;stroke:${v("text")};stroke-width:1}`, `${s} .r-ref{stroke:${v("muted")}}`);
   // A part with a state: its outline takes the status color, and a status dot sits on the outline. A drawing with no state carries none of these rules.
   for (const state of new Set(scene.parts.map((part) => part.state).filter(Boolean))) css.push(`${s} .stop.is-${state},${s} .card.is-${state}{stroke:${v(state)};stroke-width:1.5}`, `${s} .flag.is-${state}{fill:${v(state)};stroke:${v("bg")};stroke-width:2}`);
