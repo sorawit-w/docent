@@ -27,6 +27,12 @@ function fitWarnings(kind, model) {
     if (model.cols === 1) out.push("the plan has one column, so its boxes stand one above another; a list says this more simply");
     if (model.boxes.length === 2) out.push("the plan has 2 boxes; a sentence says where they sit");
   }
+  if (kind === "funnel") {
+    const { steps } = model, first = steps[0].count, last = steps[steps.length - 1];
+    if (steps.length === 2) out.push("the funnel has 2 steps; a sentence says this more simply");
+    if (last.count === first) out.push("no step loses anyone; a sentence says this more simply");
+    else if (last.count * 100 >= first * 95) out.push(`the last step keeps ${last.ofFirst} of the first, so the bars look almost the same; a table shows small drops better`);
+  }
   if (kind === "range" && model.rows.length < 3) out.push(`the range chart has ${model.rows.length} rows; a sentence says this more simply`);
   return out;
 }

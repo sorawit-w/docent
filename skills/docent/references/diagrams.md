@@ -730,7 +730,7 @@ A communication diagram shows who is linked to whom, and the numbered messages t
 
 ## Range charts
 
-A range chart shows values and ranges on one numeric scale, one row each, so the reader sees where each one falls and whether one range sits inside another: line lengths that studies recommend, and the line length of a page. Write it with `"kind": "range"` when there are 3 to 12 values in one unit. For one or two values, write a sentence. For values over time, use a timing diagram or a table. For amounts compared by size from zero, use a table; Docent has no bar chart.
+A range chart shows values and ranges on one numeric scale, one row each, so the reader sees where each one falls and whether one range sits inside another: line lengths that studies recommend, and the line length of a page. Write it with `"kind": "range"` when there are 3 to 12 values in one unit. For one or two values, write a sentence. For values over time, use a timing diagram or a table. For amounts compared by size from zero, use a table. Docent has one bar chart, the funnel, for the steps of one flow.
 
 ```json
 {
@@ -846,6 +846,43 @@ A plan shows where the parts of a page or a screen sit, and what is next to what
 - To show one page on a desktop and on a phone, write two plans in two figures.
 - `render` also writes the boxes as a table under the drawing: each box's row and column in words (`top`, `left`, `full width`, `rows 2 to 3`), its width, and its note.
 
+## Funnels
+
+A funnel shows how many people reach each step of one flow, and how many leave between two steps: of everyone who opened the sign-up page, how many finished, and which step lost the most. Write it with `"kind": "funnel"` when one flow has 3 to 8 steps, every person takes them in the same order, and you have a count for each step. For two steps, write a sentence. For paths that split, steps that people skip, or people who go back, use a flowchart with the counts in its notes, or a table. For a count over time, use a table.
+
+```json
+{
+  "id": "signup-may",
+  "kind": "funnel",
+  "label": "Of 12,480 people who opened the sign-up page in May, 1,860 finished the sign-up: 15%. The largest number left before the form: 4,240. The largest share left at the email check: half of the people who filled in the form did not confirm their email.",
+  "unit": "people",
+  "steps": [
+    {"name": "Open the sign-up page", "count": 12480},
+    {"name": "Fill in the form", "count": 8240},
+    {"name": "Confirm the email", "count": 4120},
+    {"name": "Choose a plan", "count": 2900},
+    {"name": "Finish the sign-up", "count": 1860}
+  ]
+}
+```
+
+| Field | What it is |
+|---|---|
+| `steps` | 2 to 8 steps, in the order people take them, top to bottom. Each has a `name` (at most 28 characters; no word in it wider than 200px at 14px, about 27 small letters) and a `count`. |
+| `count` | How many reached this step: a whole number from 0 to 999,999,999. The first count is at least 1. No count is more than the count before it, and no step comes after a step with 0. |
+| `unit` | What each count counts, as a plural noun of at most 20 characters, such as `people`, `sessions` or `bug reports`. It starts the line above the bars and heads a column of the table in words. |
+
+- **Write the counts only.** The renderer computes each drop (the count before, minus this count), its share of the step before, and each count's share of the first step. So the numbers always agree. A share is a whole percent, and a half rounds up. A share above 0 that would round to 0% keeps one decimal, such as `0.4%`, or says `under 0.1%`; a share near 100% does the same (`99.6%`, `over 99.9%`). A count is written with a comma every three digits, and every digit stays.
+- **It is drawn as bars, not as a funnel shape.** Each step is a row with a bar from 0, on one scale that ends at the first count, so every bar starts at the same left edge. A narrowing shape would make each drop look larger than it is. The kept bar is the bar of a range chart. The part that a step lost follows it on the same row, up to the length of the bar above, filled in the line color, as a soft gray block. The drop is written over it: `−4,120 (50%)`.
+- **Two shares.** Beside each name stand its count and its share of the first step: how much of the start is left. Each drop carries its share of the step before: how badly that one step loses people. The line above the bars names both bases.
+- **No mark for the largest drop.** The step that loses the most people and the step that loses the largest share are often not the same. The table in words names both. Say in the `label` and the text which one matters for the report.
+- **A count that goes up is refused.** It means people skipped a step, or the counts come from different sources, and a funnel cannot show either. Two equal counts are allowed: the drop is `0 (0%)`. A count of 0 is allowed at the end.
+- A funnel has no `scale`, no ticks, no `note` on a step, no `state`, no color and no dot. A drop is not a status, so it is never red. Write a remark about a step in the text beside the figure.
+- A count above 0 is never drawn narrower than 2px, so it shows. Its numbers give the exact count, and the words say when a bar was drawn wider than its scale.
+- The forms: 640px on a desktop and on paper, with the names, the counts and the shares in columns at the left; and 264px on a phone, where each name stands on its own line with its numbers at the right, and its bar runs under it. When a name needs more than two lines beside its numbers, the numbers go on their own line under it. Within the limits, a funnel is never refused for its width.
+- To compare two groups, such as phone and desktop, write two funnels, or a table. Each funnel has its own scale, so their shares compare and their bar lengths do not.
+- `render` also writes the steps as a table under the drawing, with both shares, and three lines: how many reached the last step, where the most people left, and where the largest share left.
+
 ## Optional legs
 
 A leg with `"optional": true` is a path that only some readers take, or that happens only in some cases. It is drawn as a dashed arrow:
@@ -908,6 +945,9 @@ An icon may hold only these shapes and attributes: `path` (`d`), `circle` (`cx`,
   - `... warning: the links form one chain, so they add little; ... a sequence diagram reads better` — a communication diagram earns its place when its links branch.
   - `... warning: the range chart has 2 rows; a sentence says this more simply` — two values read better in a sentence than on a scale.
   - `... warning: every row has one box; a range chart says this more simply` — a layout earns its place when a row holds parts side by side.
+  - `... warning: the funnel has 2 steps; a sentence says this more simply` — two counts read better in a sentence: "1,860 of 12,480 people finished".
+  - `... warning: no step loses anyone; a sentence says this more simply` — every count is the same, so the bars show nothing.
+  - `... warning: the last step keeps 96% of the first, so the bars look almost the same; a table shows small drops better` — when the last count is at least 95% of the first, the loss is too short to see on a phone.
 
 `check` also reports a figure well that holds a drawing no diagram block made: `check doc.html: error: Figure 2, ... holds a drawing that no diagram block made; write its data in a block and run render`. A hand-drawn SVG cannot be drawn again or checked against data. Icons outside figure wells are not touched.
 
