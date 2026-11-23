@@ -167,3 +167,11 @@ test("a gradient stop with no color is black, and uses inside uses are read once
   assert.ok(Date.now() - started < 500, `read in ${Date.now() - started}ms`);
   assert.deepEqual([...deep.colors], ["#0d3550"], "the path has its own fill, so the use's fill does not reach it");
 });
+
+test("an id in a logo is used once in the whole page, because a url() finds the first element with that id", () => {
+  const version = (theme, stop) => svg(`<defs><linearGradient id="g"><stop offset="0" stop-color="${stop}"/></linearGradient></defs><rect width="24" height="24" fill="url(#g)"/>`, `width="24" height="24" aria-hidden="true" data-for="${theme}"`);
+  assert.match(checkLogos(bar(version("light", "#000000") + version("dark", "#ffffff"))).errors.join(), /the id "g" in a logo is used 2 times in the page; an id is page-wide, so give each logo its own ids, such as "g-dark"/);
+  assert.deepEqual(checkLogos(bar(version("light", "#000000") + version("dark", "#ffffff").replace(/"g"/, '"g-dark"').replace("url(#g)", "url(#g-dark)"))).errors, []);
+  const page = bar(svg('<defs><path id="short" d="M0 0h1" fill="currentColor"/></defs><use href="#short"/>')) + '<section id="short"></section>';
+  assert.match(checkLogos(page).errors.join(), /the id "short" in a logo is used 2 times in the page/, "an id the page already uses for a section");
+});

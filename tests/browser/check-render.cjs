@@ -732,6 +732,11 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     ok("a logo with a version for each theme: the light one in light and on paper (also on a dark system), the dark one in dark by the system and by the switch; 24px, at the left edge, on no tile", one(light, "light") && one(dark, "dark") && one(switched, "dark") && one(paper, "light"), { light, dark, switched, paper });
     const tiled = await at({ width: 1280, theme: "dark" }, alone), untiled = await at({ width: 1280 }, alone);
     ok("a logo for the light theme only stands on a tile in the light page color in dark mode, and on none in light", tiled.length === 1 && tiled[0].tile === LIGHT.bg && tiled[0].outline === "4px" && tiled[0].w === 24 && untiled[0].tile === "rgba(0, 0, 0, 0)", { tiled, untiled });
+    const ink = brand('<svg class="logo" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" data-for="light"><circle cx="12" cy="12" r="9" fill="currentColor"/></svg>');
+    const inked = await open({ width: 1280, theme: "dark", content: ink });
+    const inkColor = await inked.page.evaluate(() => getComputedStyle(document.querySelector(".logo")).color);
+    await inked.context.close();
+    ok("a one-color logo for the light theme keeps the light heading color on its tile in dark mode, so it reads", inkColor === "rgb(27, 34, 96)", inkColor);
     const sheet = await open({ width: 658, media: "print", content: pair });
     const printed = await sheet.page.evaluate(() => ({ bar: getComputedStyle(document.querySelector(".topbar")).display, links: getComputedStyle(document.querySelector(".route")).display, button: getComputedStyle(document.querySelector(".theme")).display, name: document.querySelector(".host").getBoundingClientRect().bottom < document.querySelector("h1").getBoundingClientRect().top, credit: getComputedStyle(document.querySelector(".credit a")).color === getComputedStyle(document.querySelector(".credit")).color }));
     await sheet.context.close();

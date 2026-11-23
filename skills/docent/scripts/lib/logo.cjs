@@ -152,7 +152,7 @@ function svgLogo(markup) {
     }
   };
   for (const node of nodes) if (SHAPES.has(node.name) && !node.hidden) paint(node, { fill: up(node.parent, "fill"), stroke: up(node.parent, "stroke") }, new Set());
-  return { colors, ratio: box[2] / box[3], width: Number(root.width), height: Number(root.height), label: root["aria-label"], role: root.role, hidden: root["aria-hidden"] === "true", forTheme: root["data-for"] };
+  return { colors, ids: [...ids], ratio: box[2] / box[3], width: Number(root.width), height: Number(root.height), label: root["aria-label"], role: root.role, hidden: root["aria-hidden"] === "true", forTheme: root["data-for"] };
 }
 
 /** The pixel size of a PNG or WebP, read from its first bytes, or null when the bytes are not that kind of image. */
@@ -225,6 +225,11 @@ function checkLogos(markup) {
   const themes = logos.map((l) => l.forTheme || "both");
   for (const theme of themes) if (!["both", "light", "dark"].includes(theme)) errors.push(`a logo has data-for="${theme}"; it is "light" or "dark"`);
   if (logos.length > 2 || (logos.length === 2 && themes.sort().join() !== "dark,light")) errors.push(`the top bar has ${logos.length} logos; it has one, or one with data-for="light" and one with data-for="dark"`);
+  // An id is page-wide: two logos, or a logo and the page, that share an id can draw each other's gradient or break a link.
+  for (const id of new Set(logos.flatMap((l) => l.ids || []))) {
+    const count = (markup.match(new RegExp(`\\bid\\s*=\\s*["']${id}["']`, "g")) || []).length;
+    if (count > 1) errors.push(`the id "${id}" in a logo is used ${count} times in the page; an id is page-wide, so give each logo its own ids, such as "${id}-dark"`);
+  }
   for (const logo of logos) {
     const what = logo.forTheme ? `the ${logo.forTheme} logo` : "the logo";
     // The slot: 24px high and at most 160px wide; the logo keeps its shape.

@@ -140,7 +140,8 @@ test("the logo: each version shows in its own theme, in all four places that set
   assert.equal((css.match(/--logo-light: block; --logo-dark: none; --tile-light: transparent; --tile-dark: #12141f;/g) || []).length, 2, "light and print");
   assert.equal((css.match(/--logo-light: none; --logo-dark: block; --tile-light: #fbfbfe; --tile-dark: transparent;/g) || []).length, 2, "dark by the system and dark by the switch");
   assert.match(rule('.host:has(> .logo[data-for="dark"]) > .logo[data-for="light"]'), /display: var\(--logo-light\)/);
-  assert.match(rule('.host:not(:has(> .logo[data-for="dark"])) > .logo[data-for="light"]'), /background: var\(--tile-light\); outline: 4px solid var\(--tile-light\); border-radius: 2px/, "the tile has corners of 6px and 4px around the logo, and moves nothing");
+  assert.match(rule('.host:not(:has(> .logo[data-for="dark"])) > .logo[data-for="light"]'), /background: var\(--tile-light\); outline: 4px solid var\(--tile-light\); border-radius: 2px; color: var\(--host-ink, #1b2260\)/, "the tile has corners of 6px and 4px around the logo, moves nothing, and a one-color logo on it keeps the light ink");
+  assert.match(rule('.host:not(:has(> .logo[data-for="light"])) > .logo[data-for="dark"]'), /color: #e7e9f3/, "a dark logo on its tile keeps the dark text color");
   assert.match(rule(".logo"), /box-sizing: content-box/, "the width and height written on the logo are the size of the logo itself");
   assert.match(css, /\.topbar \{ position: static; border-bottom: 0; \}/, "on paper the logo and the name print once above the title");
   assert.match(css, /\.route, \.theme, \.route-dot, \.rail-dot/, "with no links and no switch");
