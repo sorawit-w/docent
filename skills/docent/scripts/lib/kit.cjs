@@ -9,7 +9,9 @@ const read = (name) => fs.readFileSync(path.join(SKILL, "assets", name), "utf8")
 const CSS_BLOCK = /\/\* docent:kit ([^ *]+) \*\/[\s\S]*?\/\* \/docent:kit \*\//g;
 const JS_BLOCK = /\/\/ docent:kit ([^\s]+)\n[\s\S]*?\/\/ \/docent:kit/g;
 
-const cssBlock = () => `/* docent:kit ${VERSION} */\n${read("kit.css")}\n/* /docent:kit */`;
+const { paletteOf, paletteCss } = require("./palettes.cjs");
+/** The kit styles, with the one palette that the page names, if any. */
+const cssBlock = (palette = null) => `/* docent:kit ${VERSION} */\n${read("kit.css")}${palette ? `\n${paletteCss(palette)}` : ""}\n/* /docent:kit */`;
 const jsBlock = () => `// docent:kit ${VERSION}\n${read("kit.js")}\n// /docent:kit`;
 
 /** The kit blocks found in a document: [{ kind, version, text }]. */
@@ -37,7 +39,7 @@ function stampHtml(html) {
     html = html.slice(0, at) + wrap(block) + html.slice(at);
     actions.push(`${kind} added`);
   };
-  put("styles", CSS_BLOCK, cssBlock(), (b) => `<style>\n${b}\n</style>\n`, "</head>");
+  put("styles", CSS_BLOCK, cssBlock(paletteOf(html)), (b) => `<style>\n${b}\n</style>\n`, "</head>");
   put("script", JS_BLOCK, jsBlock(), (b) => `<script>\n${b}\n</script>\n`, "</body>");
   return { html, actions };
 }

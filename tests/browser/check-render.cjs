@@ -770,6 +770,35 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     }
   }
 
+  // Palettes: each one sets the page, the heading color and the heat steps in light, in dark (by the system and by the switch) and on paper,
+  // where the page is white and the heat steps are Docent's grays. A drawing copied out of the page keeps the palette's light colors.
+  {
+    const { PALETTES } = require(path.join(root, "skills", "docent", "scripts", "lib", "palettes.cjs"));
+    const build = (name, change) => stampHtml(renderDocument(change(fs.readFileSync(path.join(root, name), "utf8"))).html).html;
+    const rgb = (hex) => `rgb(${[1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)).join(", ")})`;
+    for (const [name, p] of Object.entries(PALETTES)) {
+      const content = build("skills/docent/assets/specimen.html", (h) => h.replace('<html lang="en" data-profile="standard">', `<html lang="en" data-profile="standard" data-palette="${name}">`));
+      const look = async (opts, before) => { const v = await open({ ...opts, content }); if (before) await before(v.page); const r = await v.page.evaluate(() => { const cells = [...document.querySelectorAll("svg.dg-heatmap rect:is(.h1, .h2, .h3, .h4, .h5)")].filter((c) => c.getBoundingClientRect().width).map((c) => getComputedStyle(c).fill); return { bg: getComputedStyle(document.body).backgroundColor, h1: getComputedStyle(document.querySelector("h1")).color, link: getComputedStyle(document.querySelector("main a")).color, heat: [...new Set(cells)].sort() }; }); await v.context.close(); return r; };
+      const steps = (mode) => [1, 2, 3, 4, 5].map((i) => rgb(p[mode][`heat-${i}`]));
+      const light = await look({ width: 1280 }), dark = await look({ width: 1280, theme: "dark" }), switched = await look({ width: 1280 }, (pg) => pg.click("button.theme")), paper = await look({ width: 658, media: "print", theme: "dark" });
+      const within = (r, list) => r.heat.length > 0 && r.heat.every((c) => list.includes(c));
+      ok(`${name}: the palette's page, heading color, accent and heat steps in light; its dark values in dark by the system and by the switch`, light.bg === rgb(p.light.bg) && light.h1 === rgb(p.light.ink) && light.link === rgb(p.light.primary) && within(light, steps("light")) && [dark, switched].every((d) => d.bg === rgb(p.dark.bg) && d.link === rgb(p.dark.primary) && within(d, steps("dark"))), { light, dark, switched });
+      ok(`${name} on paper: a white page, the palette's accent, and Docent's gray heat steps`, paper.bg === "rgb(255, 255, 255)" && paper.link === rgb(p.light.primary) && within(paper, ["#dee2f0", "#babecb", "#9498a5", "#616571", "#3e424d"].map(rgb)), paper);
+      const svg = content.match(/<svg id="dg-replies-by-hour" [\s\S]*?<\/svg>/)[0];
+      const alone = await open({ width: 800, content: `<!doctype html><html><body style="margin:0">${svg}</body></html>` });
+      const copied = await alone.page.evaluate(() => ({ cells: [...new Set([...document.querySelectorAll("rect:is(.h1, .h2, .h3, .h4, .h5)")].map((c) => getComputedStyle(c).fill))] }));
+      await alone.context.close();
+      ok(`${name}: a heat map copied out of the page keeps the palette's light heat steps`, copied.cells.length > 0 && copied.cells.every((c) => steps("light").includes(c)), copied);
+      for (const theme of ["light", "dark"]) {
+        const { page, context } = await open({ width: 1280, theme, content });
+        await page.addScriptTag({ path: axePath });
+        const result = await page.evaluate(async () => await window.axe.run(document, { runOnly: { type: "tag", values: ["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"] } }));
+        ok(`${name} ${theme}: 0 axe violations`, result.violations.length === 0, result.violations.map((v) => `${v.id}(${v.nodes.length}) ${v.nodes[0].target.join(" ")}`));
+        await context.close();
+      }
+    }
+  }
+
   // A theme written on <html> is fixed: a dark system and a saved dark choice do not change it, and the switch is hidden.
   {
     // Opened from a file, so the page has storage: a saved choice of "dark" is stored first, then the page loads again.

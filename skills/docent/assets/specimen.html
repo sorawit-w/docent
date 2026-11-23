@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex">
 <title>Report a bug and get a fix — Example project</title>
 <style>
-/* docent:kit 0.13.0 */
+/* docent:kit 0.14.0 */
 /* Docent page styles. Tokens come from references/DESIGN.md. One file, no network. */
 :root {
   color-scheme: light;
@@ -99,7 +99,8 @@ html:not(.js) .theme, .theme[hidden] { display: none; }
 /* Title block: the title leads; facts about the document sit below it. */
 .title { padding: 80px 0 8px; }
 .title .row { margin-top: 24px; }
-h1, h2 { font-family: var(--serif); font-weight: 700; color: var(--ink); text-wrap: balance; margin: 0; }
+/* The serif headings take weight 700. A palette with sans-serif headings sets 600, so the sans-serif keeps two weights. */
+h1, h2 { font-family: var(--serif); font-weight: var(--heading-weight, 700); color: var(--ink); text-wrap: balance; margin: 0; }
 h1 { font-size: 3.25rem; line-height: 1.06; letter-spacing: -0.02em; }
 .standfirst { font: 400 1.3125rem/1.5 var(--serif); margin: 0; text-wrap: pretty; }
 .facts { margin: 0; padding-left: 0; list-style: none; font-variant-numeric: tabular-nums; }
@@ -202,7 +203,7 @@ figcaption strong { font-weight: 600; color: var(--text); margin-right: 8px; }
 .cards > li { min-width: 0; padding-top: 12px; border-top: 1px solid var(--line); }
 .cards h3 { margin: 0 0 4px; font-size: 1rem; line-height: 1.5; }
 .cards p { margin: 0; font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
-.cards .big { margin-bottom: 4px; font: 700 1.875rem/1.2 var(--serif); color: var(--ink); font-variant-numeric: tabular-nums; }
+.cards .big { margin-bottom: 4px; font: 700 1.875rem/1.2 var(--serif); font-weight: var(--heading-weight, 700); color: var(--ink); font-variant-numeric: tabular-nums; }
 .cards + :is(p, ul, ol, dl) { margin-top: 24px; }
 
 /* Code, tables and cards end at the profile's block width. */
@@ -1693,7 +1694,7 @@ grep -i password bug.log</code></pre>
 </footer>
 
 <script>
-// docent:kit 0.13.0
+// docent:kit 0.14.0
 (() => {
   const root = document.documentElement;
   root.classList.add('js');

@@ -70,10 +70,64 @@ for name, t in (("light", L), ("dark", D)):
         rows.append((f"{name} more: line on {bg} (non-text)", t["muted"], t[bg], 3.0))
         rows.append((f"{name} more: muted text on {bg}", t["text"], t[bg], 4.5))
 
+# Palettes (skills/docent/assets/palettes.json): the same pairs for each palette, in light, dark and on paper.
+# Paper is white, with the palette's light colors and Docent's gray heat steps.
+import json, math, os
+PALETTES = json.load(open(os.path.join(os.path.dirname(__file__), "..", "skills", "docent", "assets", "palettes.json")))
+PAPER_HEAT = HEAT["paper"][1]
+
+
+def lab(h):
+    h = h.lstrip("#")
+    r, g, b = ((lambda c: c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4)(int(h[i:i + 2], 16) / 255) for i in (0, 2, 4))
+    xyz = (0.4124564 * r + 0.3575761 * g + 0.1804375 * b, 0.2126729 * r + 0.7151522 * g + 0.072175 * b, 0.0193339 * r + 0.119192 * g + 0.9503041 * b)
+    f = lambda t: t ** (1 / 3) if t > 216 / 24389 else (24389 / 27 * t + 16) / 116
+    fx, fy, fz = (f(v / w) for v, w in zip(xyz, (0.95047, 1, 1.08883)))
+    return 116 * fy - 16, 500 * (fx - fy), 200 * (fy - fz)
+
+
+def de(a, b):  # CIE76
+    return math.dist(lab(a), lab(b))
+
+
+# Distances that must hold, beside contrast: (label, value, minimum).
+gaps = []
+for key, pal in PALETTES.items():
+    n = pal["name"].lower()
+    lt = dict(page=pal["light"]["bg"], well=pal["light"]["panel"], text=pal["light"]["text"], muted=pal["light"]["muted"], line=pal["light"]["line"], primary=pal["light"]["primary"], ink=pal["light"]["ink"], ok=L["ok"], warn=L["warn"], err=L["err"])
+    dk = dict(page=pal["dark"]["bg"], well=pal["dark"]["panel"], text=pal["dark"]["text"], muted=pal["dark"]["muted"], line=pal["dark"]["line"], primary=pal["dark"]["primary"], ink=pal["dark"]["text"], ok=D["ok"], warn=D["warn"], err=D["err"])
+    pp = dict(lt, page="#ffffff")
+    for mode, t in (("light", lt), ("dark", dk), ("paper", pp)):
+        for fg in ("text", "muted", "primary", "ink", "ok", "warn", "err"):
+            for bg in ("page", "well"):
+                rows.append((f"{n} {mode} {fg} on {bg}", t[fg], t[bg], 4.5))
+        rows.append((f"{n} {mode} line on page (non-text)", t["line"], t["page"], 0))
+        if mode != "paper":  # more contrast, on screen only: the line takes the muted color, and muted text the text color
+            for bg in ("page", "well"):
+                rows.append((f"{n} {mode} more: line on {bg} (non-text)", t["muted"], t[bg], 3.0))
+                rows.append((f"{n} {mode} more: muted text on {bg}", t["text"], t[bg], 4.5))
+        rows.append((f"{n} {mode} no-data outline on page", t["muted"], t["page"], 3.0))
+        steps = PAPER_HEAT if mode == "paper" else [pal[mode][f"heat-{k}"] for k in range(1, 6)]
+        for k, step in enumerate(steps, 1):
+            fg = "text" if k <= 3 else "page"
+            rows.append((f"{n} {mode} {fg} on heat-{k}", t[fg], step, 4.5))
+        if mode != "paper":
+            gaps += [(f"{n} {mode} heat steps {k} and {k + 1} (CIE76)", de(steps[k - 1], steps[k]), 12) for k in range(1, 5)]
+    rows.append((f"{n} light primary dot on page", lt["primary"], lt["page"], 3.0))
+    for bg in ("page", "well"):
+        rows.append((f"{n} dark dot on dark {bg}", dk["primary"], dk[bg], 3.0))
+    # A note must not look like a link, and the accent must not read as a status.
+    gaps += [(f"{n} {mode} muted vs accent (CIE76)", de(t["muted"], t["primary"]), 25) for mode, t in (("light", lt), ("dark", dk))]
+    gaps += [(f"{n} {mode} accent vs {st} (CIE76)", de(t["primary"], t[st]), 25) for mode, t in (("light", lt), ("dark", dk)) for st in ("ok", "warn", "err")]
+
 fails = 0
+for label, value, need in gaps:
+    good = value >= need
+    fails += not good
+    print(f"{label:44} {value:6.1f}  {'ok' if good else 'FAIL'} (min {need})")
 for label, fg, bg, need in rows:
     r = ratio(fg, bg)
     ok = r >= need
     fails += not ok
     print(f"{label:34} {fg} on {bg}  {r:5.2f}  {'ok' if ok else 'FAIL'}" + (f" (min {need})" if need else ""))
-print("pairs:", len(rows), "| fails:", fails)
+print("pairs:", len(rows), "| distances:", len(gaps), "| fails:", fails)

@@ -10,12 +10,11 @@ const { findBlocks, block } = require("./lib/blocks.cjs");
 const { PROFILES, suggestProfile } = require("./lib/profile.cjs");
 const { checkLogos } = require("./lib/logo.cjs");
 const { lab, darkAccent, nearestStatus } = require("./lib/color.cjs");
+const { NAMES: PALETTES, paletteOf, paint, grounds } = require("./lib/palettes.cjs");
 
 const MOST_WIDGETS = 4; // more widgets than this in one document gives a warning
 const CARDS = [3, 8]; // a card grid holds 3 to 8 cards
 const TAGLINE = 90; // characters: the tagline is one line
-// The pages that the kit draws on, light and dark: a host color must read on both the page and the well.
-const GROUNDS = { light: ["#fbfbfe", "#f2f3f9"], dark: ["#12141f", "#0b0d15"] };
 // Each host color, the theme it shows in, and the contrast it needs: text needs 4.5:1, the dot is a mark and needs 3:1 (WCAG 1.4.11).
 const HOST = { "host-accent": ["light", 4.5], "host-accent-dark": ["dark", 4.5], "host-ink": ["light", 4.5], "host-dot-dark": ["dark", 3] };
 const NEAR = 25; // CIE76: an accent closer than this to a status color reads as that status
@@ -51,13 +50,19 @@ function wells(html) {
 /** Returns { errors, warnings }: two lists of plain sentences. */
 function checkDocument(html) {
   const errors = [], warnings = [];
+  // A palette turns Docent's own tokens to one hue. A host color is tested on the palette's pages, and each drawing carries its light values.
+  const named = paletteOf(html), palette = PALETTES.includes(named) ? named : null;
+  if (named != null && !palette) errors.push(`<html> has data-palette="${named}"; the palettes are ${PALETTES.map((n) => `"${n}"`).join(", ")} (see "Palettes" in DESIGN.md)`);
+  const carried = (text) => [null, ...PALETTES].findIndex((p) => text === cssBlock(p)); // 0: no palette, n: the nth palette, -1: neither
+  const GROUNDS = grounds(palette); // the pages that the kit draws on, light and dark: a host color must read on both the page and the well
 
   // 1. The kit: the same styles and script in every document.
-  for (const [kind, current] of [["styles", cssBlock()], ["script", jsBlock()]]) {
+  for (const [kind, current] of [["styles", cssBlock(palette)], ["script", jsBlock()]]) {
     const found = findKit(html).filter((k) => k.kind === kind);
     if (!found.length) errors.push(`the document has no kit ${kind}; run stamp`);
     else if (found.length > 1) errors.push(`the document has ${found.length} kit ${kind} blocks; it must have one`);
     else if (found[0].version !== VERSION) errors.push(`the kit ${kind} are version ${found[0].version}; this skill has ${VERSION}; run stamp`);
+    else if (found[0].text !== current && kind === "styles" && carried(found[0].text) >= 0) errors.push(`the kit styles carry ${carried(found[0].text) ? `the palette "${PALETTES[carried(found[0].text) - 1]}"` : "no palette"}, but <html> names ${palette ? `"${palette}"` : "none"}; run stamp`);
     else if (found[0].text !== current) errors.push(`the kit ${kind} were changed by hand or by a code formatter; run stamp, keep your own styles outside the markers, and keep the document out of the formatter (see SKILL.md)`);
   }
 
@@ -74,7 +79,7 @@ function checkDocument(html) {
       ids.add(drawn.model.id);
       drawn.icons.forEach((w) => errors.push(`${label}: ${w}`));
       drawn.warnings.filter((w) => !drawn.icons.includes(w)).forEach((w) => warnings.push(`${label}: ${w}`));
-      if (found.text !== block("diagram", found.json, drawn.svg)) errors.push(`${label}: the drawing does not match its data; run render`);
+      if (found.text !== block("diagram", found.json, paint(drawn.svg, palette))) errors.push(`${label}: the drawing does not match its data; run render`);
       // A document should not draw the same thing twice.
       const shape = drawn.model.legs ? JSON.stringify([drawn.model.lanes.map((l) => l.name), drawn.model.parts.map((p) => [p.lane, p.name, p.note]), drawn.model.legs.map((l) => [l.from, l.to, l.verb])]) : JSON.stringify({ ...data, id: null, label: null }); // a UML graph kind: its data without the id and label
       if (shapes.has(shape)) warnings.push(`${label} shows the same ${drawn.model.legs ? "lanes, parts and legs" : "data"} as diagram "${shapes.get(shape)}"; a document should not draw the same thing twice`);
@@ -171,7 +176,7 @@ function checkDocument(html) {
     }
   }
   // Host colors and fonts go through the --host-* tokens. The kit sets its own tokens in four places (light, dark by the system, dark by the switch, print), so an author's value for one of them is lost in some of them.
-  for (const [, name] of css.matchAll(/(?:^|[;{\s])--(bg|panel|fig|text|muted|line|primary|ink|dot|ok|warn|err|heat-[1-5]|heat-text|heat-page|serif|sans|mono)\s*:/g)) warnings.push(`a style sets --${name}; the kit sets it in four places, so your value is lost in dark mode or in print. Use the --host-* tokens (see SKILL.md)`);
+  for (const [, name] of css.matchAll(/(?:^|[;{\s])--(bg|panel|fig|text|muted|line|primary|ink|dot|ok|warn|err|heat-[1-5]|heat-text|heat-page|serif|sans|mono)\s*:/g)) warnings.push(`a style sets --${name}; the kit sets it in four places, so your value is lost in dark mode or in print. Use the --host-* tokens, or a palette for the page and the grays (see SKILL.md)`);
   const hosts = {};
   for (const [, name, value] of css.matchAll(/--(host-accent-dark|host-accent|host-ink|host-dot-dark)\s*:\s*([^;}]+)/g)) {
     const color = value.trim();
@@ -198,7 +203,7 @@ function checkDocument(html) {
   }
 
   // 3b. The host's logo in the top bar: plain shapes only, inside the file, in its slot, and readable in both themes.
-  const logo = checkLogos(markup);
+  const logo = checkLogos(markup, { light: GROUNDS.light[0], dark: GROUNDS.dark[0] });
   errors.push(...logo.errors);
   warnings.push(...logo.warnings);
   let unbranded = markup; // the page without its logo: a logo is the host's own mark, so it may hold a gradient

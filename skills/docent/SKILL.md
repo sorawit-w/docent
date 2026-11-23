@@ -141,7 +141,8 @@ A host project may set its accent, its heading color and its fonts, with these t
 - In dark mode the dots take the dark accent. For a dot of another color, such as the host's second color, set `--host-dot-dark`; it needs 3:1 on the dark page. To keep Docent's lamp dot, write `--host-dot-dark: #f2b824`. A page that set `--host-accent-dark` before kit 0.13 had the lamp dot in dark mode; it takes the dark accent the next time `stamp` runs.
 - `check` warns when an accent is close to green, amber or red, because its links and dots would read as a status, and when it has almost no color, because it looks like the body text.
 - Do not set the kit's own tokens (`--primary`, `--bg`, and the others). The kit sets them in four places, so your value is lost in dark mode or in print; `check` warns.
-- There is no token for the page, the text or the status colors.
+- There is no token for the page, the text or the status colors. For a tinted page and grays, name a palette instead.
+- **A palette** turns Docent's own colors to one hue, tested in advance: write `data-palette="harbor"`, `"plum"` or `"sepia"` on `<html>`, then run `render` and `stamp`. Harbor is a cool blue-green, for engineering and operations; Plum a deep violet-red, for product and design; Sepia warm paper, for long reading and policy. Host tokens still win over a palette's. See "Palettes" in `references/DESIGN.md`.
 - A font must be in the file or on the reader's system. Drawings keep the system font.
 - **To turn dark mode off**, write `<html lang="en" data-theme="light">`. The switch is hidden, and the page stays light. `data-theme="dark"` keeps it dark.
 
@@ -162,7 +163,7 @@ When you create the first Docent page in a repo, ask about the brand once. When 
 |---|---|---|---|
 | — | "The top bar will say **Example project** (from `package.json`)." | A fact. The user can correct it. | That name. With no name found, the folder's name, and say so. |
 | 1 | "Which logo should the top bar show?" | Up to three files found, then "No logo". | No logo. |
-| 2 | "Which colors should the page use?" | "From your DESIGN.md (accent #…)" when there is one; then "Docent's own colors". | Docent's own colors. |
+| 2 | "Which colors should the page use?" | "From your DESIGN.md (accent #…)" when there is one; each palette by name with its mood (Harbor, Plum, Sepia); then "Docent's own colors". | Docent's own colors. |
 | 3 | "Which tagline should the footer show?" | Each line found, word for word, then "No tagline". The user may type their own. | No tagline. Never write one. |
 | 4 | "The footer says 'Made with Docent'. Keep 'Docent' as a link to the public repo, or plain text?" | "A link (Recommended)", "Plain text". | A link. |
 
