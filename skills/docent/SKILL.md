@@ -21,6 +21,7 @@ Docent is a design kit for documents: single HTML files that open without a netw
 | `scripts/render.cjs` | Draws every diagram and builds every widget of a document, each from its data. |
 | `scripts/stamp.cjs` | Puts the page styles and the page script into a document. |
 | `scripts/check.cjs` | Tests a document against the rules. |
+| `scripts/brand.cjs` | Reads a host project's `DESIGN.md` and prints its host tokens. It writes nothing. |
 
 The scripts need Node 18 or newer and nothing else. They install no packages and use no network. When Node is missing, see "When a script cannot run" below.
 
@@ -143,6 +144,39 @@ A host project may set its accent, its heading color and its fonts, with these t
 - There is no token for the page, the text or the status colors.
 - A font must be in the file or on the reader's system. Drawings keep the system font.
 - **To turn dark mode off**, write `<html lang="en" data-theme="light">`. The switch is hidden, and the page stays light. `data-theme="dark"` keeps it dark.
+
+## Ask about the brand once
+
+When you create the first Docent page in a repo, ask about the brand once. When the repo already has a Docent page (it carries the `docent:kit` marker), copy the brand from the newest one: the logo, the host tokens, the tagline and the credit. Then ask one question only: "Use the same brand as `docs/onboarding.html`?" The page is the record of the choices; write no other file into the host repo.
+
+**First, read the repo, and change nothing:**
+
+- a `DESIGN.md` at the root or in `docs/`;
+- logo files: `logo*.svg`, `*-logo.svg`, `favicon.svg`, and SVG files in folders named `brand`, `logo`, `public`, `static` or `assets`, but not in `node_modules` or a build folder. Offer a PNG only when there is no SVG;
+- lines for a tagline: the README's first line under its title, and the `description` in `package.json`, `pyproject.toml` or `Cargo.toml`;
+- the host's name: the `name` in the same files, or the README's title.
+
+**Then send one message with the name as a fact and four questions.** The user answers only what they want to change.
+
+| # | Ask | Choices | When the user skips it |
+|---|---|---|---|
+| — | "The top bar will say **Example project** (from `package.json`)." | A fact. The user can correct it. | That name. With no name found, the folder's name, and say so. |
+| 1 | "Which logo should the top bar show?" | Up to three files found, then "No logo". | No logo. |
+| 2 | "Which colors should the page use?" | "From your DESIGN.md (accent #…)" when there is one; then "Docent's own colors". | Docent's own colors. |
+| 3 | "Which tagline should the footer show?" | Each line found, word for word, then "No tagline". The user may type their own. | No tagline. Never write one. |
+| 4 | "The footer says 'Made with Docent'. Keep 'Docent' as a link to the public repo, or plain text?" | "A link (Recommended)", "Plain text". | A link. |
+
+**Colors from a `DESIGN.md`.** Run `node SKILL/scripts/brand.cjs DESIGN.md` and copy its style block into the page's `<head>`. Never pick a color by eye. `brand` fills the six host tokens and nothing else: it darkens a light accent that fails contrast, works out a missing dark accent and heading color with fixed rules, and keeps a brand font by name with Docent's fonts after it. It names every key it does not use, such as the page, status and spacing values: those would break dark mode, print and the tested contrast.
+
+**When there is no `DESIGN.md`** and the host wants its own colors, three other skills can propose one, if they are installed. Offer each only in its case, and say first what it writes:
+
+- **screenwright** infers tokens from the repo's styles and writes a `DESIGN.md` into the repo. Offer it for a repo that has styles.
+- **impeccable**, with its `document` command, writes a `DESIGN.md` from the project's code.
+- **brand-workshop** makes a new brand: a logo, a tagline and a `DESIGN.md`. Offer it only when the user says they have no brand and want one.
+
+**After the answers,** build the page, run `check`, and report in one or two lines what was worked out and what was not used. For example: "Your DESIGN.md has no dark accent, so `brand` worked one out: #5ab08d. It did not use your page and status colors; Docent keeps its own, so dark mode and print stay readable."
+
+**A logo that needs work.** `check` accepts a flat logo only (see "Logo, tagline and credit" below). When the chosen file uses `use`, `symbol`, a clip path, a mask or opacity, flatten it first: each shape on its own, in solid colors or gradients with hex stops. When it holds text, turn the letters into paths. When it has one color, offer to draw it with `currentColor`. When it shows only on a light page, say that dark mode puts it on a tile, and ask for a dark version. Never change the shapes or the colors as the reader sees them.
 
 ## Logo, tagline and credit
 
