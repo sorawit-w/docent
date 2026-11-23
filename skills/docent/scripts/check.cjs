@@ -11,6 +11,7 @@ const { PROFILES, suggestProfile } = require("./lib/profile.cjs");
 const { checkLogos } = require("./lib/logo.cjs");
 const { lab, darkAccent, nearestStatus } = require("./lib/color.cjs");
 const { NAMES: PALETTES, paletteOf, paint, grounds } = require("./lib/palettes.cjs");
+const { findPersonal, findTel } = require("./lib/personal.cjs");
 
 const MOST_WIDGETS = 4; // more widgets than this in one document gives a warning
 const CARDS = [3, 8]; // a card grid holds 3 to 8 cards
@@ -31,6 +32,16 @@ const plain = (s) => s.replace(/<[^>]*>/g, "").replace(/&amp;/g, "&").replace(/&
 const words = (s) => s.toLowerCase().match(/[\p{L}\p{N}]+/gu) || [];
 /** True when every word of a appears in b, in the same order. */
 const shorter = (a, b) => { const want = words(a), have = words(b); let at = 0; for (const w of have) if (w === want[at]) at += 1; return want.length > 0 && at === want.length; };
+/** The text of markup, with a space where each tag was, so the words of two cells do not run together. */
+const textOf = (s) => plain(s.replace(/</g, " <"));
+/** A cell that holds a number only: a sign, a currency, thousands separators, decimals, and a percent or a short unit. */
+const NUMBER = /^[−+-]?[$€£¥]?(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?\s?(?:%|[kKMB]|ms|s|px|x)?$/;
+const BLANK = /^(?:|—|–|-|n\/a)$/i; // an empty cell in a column of numbers
+const hasClass = (attrs, name) => new RegExp(`\\bclass="(?:[^"]*\\s)?${name}(?:\\s[^"]*)?"`).test(attrs);
+/** A link address with its %-escapes decoded; a bare % (as in "100% done") leaves it as it is. */
+const decoded = (s) => { try { return decodeURIComponent(s); } catch { return s; } };
+/** Every string in a diagram's or a widget's data, except the SVG of an icon. */
+const strings = (value, key) => (key === "icons" ? [] : typeof value === "string" ? [value] : value && typeof value === "object" ? Object.entries(value).flatMap(([k, v]) => strings(v, Array.isArray(value) ? key : k)) : []);
 const local = (value) => /^(#|data:)/i.test(value.trim()) || value.trim() === "";
 /** Each figure well (a div with the class fig) and all that is inside it, counting nested divs so the whole well is read. */
 function wells(html) {
@@ -268,6 +279,51 @@ function checkDocument(html) {
   const looks = suggested.sure && suggested.profile !== "standard" ? `; the page looks like "${suggested.profile}": ${suggested.reasons[0]}` : "";
   if (profile == null) warnings.push(`<html> has no data-profile, so the page uses "standard"${looks}; write the profile on <html> (see "Choose a profile" in SKILL.md)`);
   else if (PROFILES.includes(profile) && looks && suggested.profile !== profile) warnings.push(`<html> has data-profile="${profile}"${looks}; keep the profile only if the readers need it (see "Choose a profile" in SKILL.md)`);
+
+  // 9. A skip link: the first thing a keyboard reaches, so the reader can jump past the top bar to <main>.
+  const mainId = ((markup.match(/<main\b[^>]*>/i) || [""])[0].match(/\bid="([^"]+)"/) || [])[1];
+  const skip = [...markup.matchAll(/<a\b([^>]*)>/gi)].find(([, attrs]) => hasClass(attrs, "skip"));
+  const skipHint = '<a class="skip" href="#content">Skip to the content</a> first in <body>, and id="content" on <main> (see the starting page)';
+  if (!skip) warnings.push(`the page has no skip link; a keyboard reader must tab through the whole top bar first. Put ${skipHint}`);
+  else {
+    const target = (skip[1].match(/\bhref="#([^"]*)"/) || [])[1];
+    if (target == null || target !== mainId) warnings.push(`the skip link points at ${target == null ? "no place on the page" : `"#${target}"`}, but <main> has ${mainId ? `id="${mainId}"` : "no id"}; it jumps to <main>`);
+    const before = markup.slice(markup.search(/<body\b/i), skip.index);
+    if (/<(?:a\b[^>]*\bhref=|button\b|input\b|select\b|textarea\b|summary\b)|\btabindex="(?!-)/i.test(before)) warnings.push("the skip link is not the first thing a keyboard reaches; put it first in <body>");
+  }
+
+  // 10. Numbers line up on the right: a column of an author's table that holds numbers only takes the class "num".
+  for (const table of markup.matchAll(/<table\b[^>]*>([\s\S]*?)<\/table>/gi)) {
+    const head = (table[1].match(/<thead\b[^>]*>([\s\S]*?)<\/thead>/i) || [])[1] || "";
+    const body = table[1].replace(/<thead\b[^>]*>[\s\S]*?<\/thead>/i, "");
+    if (/\b(colspan|rowspan)=/i.test(body)) continue; // the columns of a merged cell are not clear from the source
+    const cells = (rows) => [...rows.matchAll(/<tr\b[^>]*>([\s\S]*?)<\/tr>/gi)].map(([, row]) => [...row.matchAll(/<(td|th)\b([^>]*)>([\s\S]*?)<\/\1>/gi)].map(([, tag, attrs, inner]) => ({ tag: tag.toLowerCase(), attrs, text: plain(inner) })));
+    const rows = cells(body), names = (cells(head)[0] || []).map((c) => c.text);
+    const label = (markup.slice(0, table.index).match(/aria-label="([^"]*)"[^>]*>\s*$/) || [])[1];
+    for (let c = 0; c < Math.max(0, ...rows.map((r) => r.length)); c += 1) {
+      const column = rows.map((r) => r[c]).filter(Boolean);
+      if (column.some((cell) => cell.tag === "th")) continue; // a row heading names its row, like an id, even when it is a number
+      const numbers = column.filter((cell) => NUMBER.test(cell.text));
+      if (!numbers.length || !column.every((cell) => NUMBER.test(cell.text) || BLANK.test(cell.text)) || numbers.every((cell) => hasClass(cell.attrs, "num"))) continue;
+      warnings.push(`${label ? `the table "${label}"` : "a table"}: the column ${names[c] ? `"${names[c]}"` : c + 1} holds numbers only; add class="num" to its th and td cells, so the numbers line up on the right`);
+    }
+  }
+
+  // 11. Personal data: email addresses and phone numbers, in the page text and in the data of each diagram and widget. A warning only:
+  // the author decides. Reserved example names (example.com, .test, 555-0100 to 555-0199) pass. Names and postal addresses are not found.
+  const pageText = [textOf(markup), ...[...markup.matchAll(/\b(?:alt|title|aria-label)="([^"]*)"/gi)].map((m) => m[1])].join(" \n ");
+  const places = [["the page text", [...findPersonal(pageText), ...[...markup.matchAll(/\bhref="(mailto:[^"]*|tel:[^"]*)"/gi)].flatMap(([, href]) => (/^tel:/i.test(href) ? findTel(href) : findPersonal(decoded(href.slice(7)))))]]];
+  for (const [kind, list] of [["diagram", diagrams], ["widget", widgets]]) list.forEach((found, n) => {
+    let data;
+    try { data = JSON.parse(found.json); } catch { return; } // an error above already names it
+    places.push([`the data of ${kind} ${n + 1}${data && data.id ? ` ("${data.id}")` : ""}`, findPersonal(strings(data).join(" \n "))]);
+  });
+  for (const [where, found] of places) {
+    const unique = found.filter((f, i) => found.findIndex((g) => g.masked === f.masked) === i);
+    if (!unique.length) continue;
+    const named = unique.slice(0, 3).map((f) => `${f.kind === "email" ? "an email address" : "a phone number"} ${f.masked}`).join(", ");
+    warnings.push(`${where} holds what looks like personal data: ${named}${unique.length > 3 ? `, and ${unique.length - 3} more` : ""}. Remove it or mask it, or use a reserved example such as name@example.com or 555-0100`);
+  }
   return { errors, warnings };
 }
 

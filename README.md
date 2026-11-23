@@ -2,7 +2,7 @@
 
 **A guide inside every document.**
 
-Docent is a design kit for documents: guides and reports written as single HTML files. It gives a document one calm look, a walkthrough that lights one step at a time, workflow diagrams where a dot travels the route, card grids, and four small widgets for the reader: a chooser, a value picker, a checklist and a decision helper. A document opens in light or dark, prints cleanly, and stays readable without scripts.
+Docent is a design kit for documents written as single HTML files: design docs, runbooks, release notes and other documents for software teams, and analysis reports and metrics reviews for business teams. It gives a document one calm look, a walkthrough that lights one step at a time, workflow diagrams where a dot travels the route, card grids, and four small widgets for the reader: a chooser, a value picker, a checklist and a decision helper. A document opens in light or dark, prints cleanly, and stays readable without scripts.
 
 Docent is packaged as an agent skill. An agent that writes a document loads the skill, follows its rules, and runs its scripts.
 

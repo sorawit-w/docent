@@ -252,3 +252,60 @@ test("the branded sample page is the specimen with a logo, a tagline and the Har
   assert.equal(strip(branded), strip(specimen), "apart from the palette, the top bar, the footer and the drawings' fallback colors, it is the specimen word for word");
   assert.ok(!/data-palette|class="logo"|class="tagline"/.test(specimen), "the specimen itself stays unbranded");
 });
+
+test("the skip link: check warns when it is missing, points elsewhere, or is not the first thing a keyboard reaches", () => {
+  const warned = (change) => checkDocument(change(specimen)).warnings.filter((w) => /skip link/.test(w)).join("\n");
+  assert.equal(warned((h) => h), "", "the sample page has one, first in <body>, pointing at <main>");
+  assert.match(warned((h) => h.replace('<a class="skip" href="#content">Skip to the content</a>\n', "")), /the page has no skip link[\s\S]*<a class="skip" href="#content">/);
+  assert.match(warned((h) => h.replace('<main class="shell" id="content">', '<main class="shell">')), /the skip link points at "#content", but <main> has no id/);
+  assert.match(warned((h) => h.replace('href="#content">Skip', 'href="#short">Skip')), /points at "#short", but <main> has id="content"/);
+  assert.match(warned((h) => h.replace('<a class="skip" href="#content">Skip to the content</a>\n', "").replace("</header>", '</header>\n<a class="skip" href="#content">Skip to the content</a>')), /is not the first thing a keyboard reaches/);
+});
+
+test("a column of numbers: check warns when every body cell is a number and the column is not marked with num", () => {
+  const table = (head, rows) => `<div class="table-wrap" role="region" aria-label="Counts" tabindex="0"><table><thead><tr>${head.map((h) => `<th scope="col">${h}</th>`).join("")}</tr></thead><tbody>${rows.map((r) => `<tr>${r.map((c) => (c.startsWith("<") ? c : `<td>${c}</td>`)).join("")}</tr>`).join("")}</tbody></table></div>`;
+  const warned = (html) => checkDocument(specimen.replace("</main>", `${html}</main>`)).warnings.filter((w) => /holds numbers only/.test(w));
+  assert.deepEqual(checkDocument(specimen).warnings.filter((w) => /holds numbers only/.test(w)), [], "the sample page marks its column of numbers");
+  assert.deepEqual(warned(table(["Team", "Bugs", "Share"], [["Web", "1,204", "62%"], ["API", "−38", "4.5%"], ["Docs", "—", "0.5 ms"]])).length, 2);
+  assert.match(warned(table(["Team", "Bugs"], [["Web", "12"], ["API", "7"]])).join(), /the table "Counts": the column "Bugs" holds numbers only; add class="num" to its th and td cells/);
+  assert.deepEqual(warned(table(["Team", "Bugs"], [["Web", '<td class="num">12</td>'], ["API", '<td class="num">7</td>']])), [], "a marked column");
+  for (const [what, cells] of [["dates", ["2026-11-23", "2026-11-24"]], ["versions", ["1.2.3", "0.15.0"]], ["ids", ["BUG-12", "BUG-13"]], ["words and numbers", ["12", "about 7"]], ["empty cells only", ["—", ""]], ["times", ["10:42", "11:05"]]]) {
+    assert.deepEqual(warned(table(["Team", "Value"], [["Web", cells[0]], ["API", cells[1]]])), [], what);
+  }
+  assert.deepEqual(warned(table(["Team", "Bugs"], [["Web", '<td colspan="2">none</td>'], ["API", "7"]])), [], "a merged cell makes the columns unclear, so check does not guess");
+  assert.deepEqual(warned(table(["Code", "Meaning"], [['<th scope="row">0</th>', "It worked."], ['<th scope="row">2</th>', "An option is wrong."]])), [], "a row heading names its row, like an id");
+});
+
+test("personal data: email addresses and phone numbers are found, and dates, times, versions, IP addresses, thousands, ids and hashes are not", () => {
+  const { findPersonal, findTel } = require("../skills/docent/scripts/lib/personal.cjs");
+  const found = {
+    "jane.doe@company.com": "j***@company.com", "Write to j.smith+bugs@mail.acme.co.uk.": "j***@mail.acme.co.uk",
+    "+1 415 555 2671": "+* *** *** **71", "+1 (415) 555-2671": "+* (***) ***-**71", "Call (415) 555-2671.": "(***) ***-**71",
+    "415-555-2671": "***-***-**71", "415.555.2671": "***.***.**71", "415 555 2671": "*** *** **71",
+    "+44 20 7946 0958": "+** ** **** **58", "020 7946 0958": "*** **** **58", "+66 81 234 5678": "+** ** *** **78", "081 234 5678": "*** *** **78",
+  };
+  for (const [text, masked] of Object.entries(found)) assert.deepEqual(findPersonal(text).map((f) => f.masked), [masked], text);
+  const reserved = ["name@example.com", "ops@mail.example.org", "team@example.net", "a@b.example", "x@host.test", "y@z.invalid", "dev@app.localhost", "555-0100", "(415) 555-0123", "+1 415 555 0199"];
+  const nearMisses = ["git@github.com:org/repo.git", "noreply@github.com", "icon@2x.png", "@types/node", "pkg@1.2.3",
+    "2026-11-23", "2026-11-23T10:42:00Z", "23.11.2026", "11/23/2026", "10:42:07", "2026-11-23 10:42", "v1.22.333", "10.0.19045.3803",
+    "192.168.100.200", "10.0.0.1", "1,234,567,890", "12 345 678", "1 234 567 890", "$1,415.55", "port 8080 and 443",
+    "BUG-415-555-2671", "id 4155552671", "a3f9c2e1b4d5", "sha 9f86d081884c7d659a2feaa0c55ad015", "415-555-2671-9", "build 415.555.2671.3"];
+  for (const text of [...reserved, ...nearMisses]) assert.deepEqual(findPersonal(text), [], text);
+  assert.deepEqual(findTel("tel:+14155552671").map((f) => f.masked), ["+*********71"], "a tel: link is a phone number whatever its shape");
+  assert.deepEqual(findTel("tel:+14155550123"), [], "the fake range");
+});
+
+test("check warns about personal data in the page text, in a link, and in the data of a diagram or a widget, and names it masked", () => {
+  const warned = (html) => checkDocument(html).warnings.filter((w) => /personal data/.test(w));
+  assert.deepEqual(warned(specimen), [], "the sample page uses reserved example names only");
+  assert.match(warned(specimen.replace("</main>", "<p>Ask Jane at jane.doe@company.com or (415) 555-2671.</p></main>")).join(), /the page text holds what looks like personal data: an email address j\*\*\*@company\.com, a phone number \(\*\*\*\) \*\*\*-\*\*71\. Remove it or mask it, or use a reserved example such as name@example\.com or 555-0100/);
+  assert.match(warned(specimen.replace("</main>", '<p><a href="mailto:jane.doe@company.com">Write to Jane</a>, or <a href="tel:+14155552671">call her</a>.</p></main>')).join(), /an email address j\*\*\*@company\.com, a phone number \+\*{9}71/);
+  const bare = checkDocument(specimen.replace("</main>", '<p><a href="mailto:ops@company.com?subject=100% done">Write to ops</a>.</p></main>'));
+  assert.deepEqual(bare.errors, [], "a bare % in a mailto link does not stop the check");
+  assert.match(bare.warnings.join(), /an email address o\*\*\*@company\.com/);
+  assert.equal(warned(specimen.replace("</main>", "<p>Write to bugs@example.com, call 555-0142, or see 2026-11-23 10:42.</p></main>")).length, 0, "reserved names and a date pass");
+  const inData = renderDocument(specimen.replace('"note": "what went wrong"', '"note": "ask ops@company.com"')).html;
+  assert.match(warned(inData).join("\n"), /the data of diagram 1 \("path"\) holds what looks like personal data: an email address o\*\*\*@company\.com/);
+  const inWidget = renderDocument(specimen.replace('"Write the steps that lead to the problem.",', '"Write the steps that lead to the problem. Call +44 20 7946 0958.",')).html;
+  assert.match(warned(inWidget).join("\n"), /the data of widget 3 \("ready"\) holds what looks like personal data: a phone number \+\*\* \*\* \*\*\*\* \*\*58/);
+});

@@ -147,3 +147,11 @@ test("the logo: each version shows in its own theme, in all four places that set
   assert.match(css, /\.topbar \{ position: static; border-bottom: 0; \}/, "on paper the logo and the name print once above the title");
   assert.match(css, /\.route, \.theme, \.route-dot, \.rail-dot/, "with no links and no switch");
 });
+
+test("the skip link is hidden until it has focus, stands over the top bar, and does not print; a column of numbers lines up on the right", () => {
+  assert.match(rule(".skip:not(:focus)"), /clip-path: inset\(50%\)/, "hidden but still in the tab order, so it works with scripts off");
+  assert.match(rule(".skip"), /z-index: 3/, "over the sticky top bar, which has z-index 2");
+  assert.match(rule(".skip"), /background: var\(--bg\)/, "the link color on the page color: the contrast of every link");
+  assert.match(css, /@media print \{[\s\S]*\.skip, \.route, \.theme/);
+  assert.match(rule(":is(th, td).num"), /text-align: right; font-variant-numeric: tabular-nums/);
+});
