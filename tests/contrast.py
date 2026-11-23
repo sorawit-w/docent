@@ -33,6 +33,19 @@ for name, (t, steps) in HEAT.items():
         fg = "text" if k <= 3 else "page"
         rows.append((f"{name} {fg} on heat-{k}", t[fg], step, 4.5))
     rows.append((f"{name} no-data outline on page", t["muted"], t["page"], 3.0))
+# A status grid. On screen each cell is filled in its status color on the band (the page color), and the mark of a Warning or
+# an Error cell (a slash or a cross) takes the page color. On paper only the failures stand out: OK and Warning cells take the
+# outline color, the slash the warning color, and the Error cell keeps its fill and its cross. Fills and marks are graphics: 3:1.
+for name, t in (("light", L), ("dark", D)):
+    for k in ("ok", "warn", "err"):
+        rows.append((f"{name} status {k} cell on page", t[k], t["page"], 3.0))
+    for k in ("warn", "err"):
+        rows.append((f"{name} status mark on {k} cell", t["page"], t[k], 3.0))
+P = dict(L, page="#ffffff")
+rows.append(("paper status err cell on page", P["err"], P["page"], 3.0))
+rows.append(("paper status cross on err cell", P["page"], P["err"], 3.0))
+rows.append(("paper status err cell vs OK cell", P["err"], P["line"], 3.0))
+rows.append(("paper status slash on OK cell", P["warn"], P["line"], 3.0))
 
 # More contrast (the reader's system setting): the line takes the muted value, and muted text the text value, on the page and the well.
 for name, t in (("light", L), ("dark", D)):

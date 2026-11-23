@@ -1,0 +1,112 @@
+<svg id="dg-nightly-builds" class="dg dg-statusgrid dg-auto" xmlns="http://www.w3.org/2000/svg" width="640" height="192" viewBox="0 0 640 192" role="img" aria-label="Nightly builds of four projects in the week of 16 November. The mobile app failed on Tuesday and Wednesday; every other build passed.">
+<style>
+#dg-nightly-builds{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-nightly-builds .ground{fill:var(--fig,#f2f3f9)}
+#dg-nightly-builds .band{fill:var(--bg,#fbfbfe)}
+#dg-nightly-builds .track{stroke:var(--line,#d3d6e3)}
+#dg-nightly-builds .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-nightly-builds .head{fill:var(--text,#1c1f2e)}
+#dg-nightly-builds .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-nightly-builds .stop.end{fill:var(--text,#1c1f2e)}
+#dg-nightly-builds .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-nightly-builds .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-nightly-builds .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-nightly-builds .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-nightly-builds .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-nightly-builds .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-nightly-builds .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-nightly-builds .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-nightly-builds .sub,#dg-nightly-builds .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-nightly-builds .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-nightly-builds .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-nightly-builds .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-nightly-builds .h0{fill:var(--bg,#fbfbfe);stroke:var(--muted,#575d75);stroke-width:1}
+#dg-nightly-builds .s-ok{fill:var(--ok,#1a7f37)}
+#dg-nightly-builds .s-warn{fill:var(--warn,#7d4e00)}
+#dg-nightly-builds .s-err{fill:var(--err,#cf222e)}
+#dg-nightly-builds .sm{fill:none;stroke:var(--heat-page,#fbfbfe);stroke-width:1.5;stroke-linecap:round}
+@media (prefers-reduced-motion:reduce){#dg-nightly-builds .pulse{animation:none!important}#dg-nightly-builds .pulse{display:none!important}}
+@media print{#dg-nightly-builds{max-width:100%;height:auto}#dg-nightly-builds .pulse{display:none!important}#dg-nightly-builds .s-ok,#dg-nightly-builds .s-warn{fill:var(--line,#d3d6e3)}#dg-nightly-builds .sm-warn{stroke:var(--warn,#7d4e00)}}
+#dg-nightly-builds-phone{display:none}
+</style>
+<rect width="640" height="192" class="ground"/>
+<rect x="8" y="64" width="624" height="112" rx="10" class="band"/>
+<text x="42" y="22" class="sub" text-anchor="start">Passed</text>
+<text x="122" y="22" class="sub" text-anchor="start">Failed</text>
+<text x="195" y="22" class="sub" text-anchor="start">No data</text>
+<text x="146.43" y="56" class="val" text-anchor="middle">Mon</text>
+<text x="219.29" y="56" class="val" text-anchor="middle">Tue</text>
+<text x="292.14" y="56" class="val" text-anchor="middle">Wed</text>
+<text x="365" y="56" class="val" text-anchor="middle">Thu</text>
+<text x="437.86" y="56" class="val" text-anchor="middle">Fri</text>
+<text x="510.71" y="56" class="val" text-anchor="middle">Sat</text>
+<text x="583.57" y="56" class="val" text-anchor="middle">Sun</text>
+<text x="20" y="89" class="row" text-anchor="start">Server</text>
+<text x="20" y="113" class="row" text-anchor="start">Web app</text>
+<text x="20" y="137" class="row" text-anchor="start">Mobile app</text>
+<text x="20" y="161" class="row" text-anchor="start">Docs</text>
+<rect x="20" y="12" width="16" height="12" rx="2" class="s-ok"/><rect x="100" y="12" width="16" height="12" rx="2" class="s-err"/><path d="M103.5,22.5 L112.5,13.5 M103.5,13.5 L112.5,22.5" class="sm sm-err"/><rect x="173.5" y="12.5" width="15" height="11" rx="2" class="h0"/>
+<rect x="111" y="73" width="70.86" height="22" rx="2" class="s-ok"/><rect x="183.86" y="73" width="70.86" height="22" rx="2" class="s-ok"/><rect x="256.71" y="73" width="70.86" height="22" rx="2" class="s-ok"/><rect x="329.57" y="73" width="70.86" height="22" rx="2" class="s-ok"/><rect x="402.43" y="73" width="70.86" height="22" rx="2" class="s-ok"/><rect x="475.29" y="73" width="70.86" height="22" rx="2" class="s-ok"/><rect x="548.14" y="73" width="70.86" height="22" rx="2" class="s-ok"/>
+<rect x="111" y="97" width="70.86" height="22" rx="2" class="s-ok"/><rect x="183.86" y="97" width="70.86" height="22" rx="2" class="s-ok"/><rect x="256.71" y="97" width="70.86" height="22" rx="2" class="s-ok"/><rect x="329.57" y="97" width="70.86" height="22" rx="2" class="s-ok"/><rect x="402.43" y="97" width="70.86" height="22" rx="2" class="s-ok"/><rect x="475.29" y="97" width="70.86" height="22" rx="2" class="s-ok"/><rect x="548.14" y="97" width="70.86" height="22" rx="2" class="s-ok"/>
+<rect x="111" y="121" width="70.86" height="22" rx="2" class="s-ok"/><rect x="183.86" y="121" width="70.86" height="22" rx="2" class="s-err"/><path d="M214.29,137 L224.29,127 M214.29,127 L224.29,137" class="sm sm-err"/><rect x="256.71" y="121" width="70.86" height="22" rx="2" class="s-err"/><path d="M287.14,137 L297.14,127 M287.14,127 L297.14,137" class="sm sm-err"/><rect x="329.57" y="121" width="70.86" height="22" rx="2" class="s-ok"/><rect x="402.43" y="121" width="70.86" height="22" rx="2" class="s-ok"/><rect x="475.29" y="121" width="70.86" height="22" rx="2" class="s-ok"/><rect x="548.14" y="121" width="70.86" height="22" rx="2" class="s-ok"/>
+<rect x="111" y="145" width="70.86" height="22" rx="2" class="s-ok"/><rect x="183.86" y="145" width="70.86" height="22" rx="2" class="s-ok"/><rect x="256.71" y="145" width="70.86" height="22" rx="2" class="s-ok"/><rect x="329.57" y="145" width="70.86" height="22" rx="2" class="s-ok"/><rect x="402.43" y="145" width="70.86" height="22" rx="2" class="s-ok"/><rect x="475.29" y="145" width="70.86" height="22" rx="2" class="s-ok"/><rect x="548.64" y="145.5" width="69.86" height="21" rx="2" class="h0"/>
+</svg>
+<svg id="dg-nightly-builds-phone" class="dg dg-statusgrid dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="250" viewBox="0 0 264 250" role="img" aria-label="Nightly builds of four projects in the week of 16 November. The mobile app failed on Tuesday and Wednesday; every other build passed.">
+<style>
+#dg-nightly-builds-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-nightly-builds-phone .ground{fill:var(--fig,#f2f3f9)}
+#dg-nightly-builds-phone .band{fill:var(--bg,#fbfbfe)}
+#dg-nightly-builds-phone .track{stroke:var(--line,#d3d6e3)}
+#dg-nightly-builds-phone .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-nightly-builds-phone .head{fill:var(--text,#1c1f2e)}
+#dg-nightly-builds-phone .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-nightly-builds-phone .stop.end{fill:var(--text,#1c1f2e)}
+#dg-nightly-builds-phone .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-nightly-builds-phone .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-nightly-builds-phone .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-nightly-builds-phone .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-nightly-builds-phone .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-nightly-builds-phone .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-nightly-builds-phone .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-nightly-builds-phone .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-nightly-builds-phone .sub,#dg-nightly-builds-phone .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-nightly-builds-phone .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-nightly-builds-phone .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-nightly-builds-phone .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-nightly-builds-phone .h0{fill:var(--bg,#fbfbfe);stroke:var(--muted,#575d75);stroke-width:1}
+#dg-nightly-builds-phone .s-ok{fill:var(--ok,#1a7f37)}
+#dg-nightly-builds-phone .s-warn{fill:var(--warn,#7d4e00)}
+#dg-nightly-builds-phone .s-err{fill:var(--err,#cf222e)}
+#dg-nightly-builds-phone .sm{fill:none;stroke:var(--heat-page,#fbfbfe);stroke-width:1.5;stroke-linecap:round}
+@media (prefers-reduced-motion:reduce){#dg-nightly-builds-phone .pulse{animation:none!important}#dg-nightly-builds-phone .pulse{display:none!important}}
+@media print{#dg-nightly-builds-phone{max-width:100%;height:auto}#dg-nightly-builds-phone .pulse{display:none!important}#dg-nightly-builds-phone .s-ok,#dg-nightly-builds-phone .s-warn{fill:var(--line,#d3d6e3)}#dg-nightly-builds-phone .sm-warn{stroke:var(--warn,#7d4e00)}}
+@media (max-width:736px){#dg-nightly-builds{display:none}#dg-nightly-builds-phone{display:block}}
+@media print{#dg-nightly-builds{display:block!important}#dg-nightly-builds-phone{display:none!important}}
+</style>
+<rect width="264" height="250" class="ground"/>
+<rect x="8" y="64" width="248" height="170" rx="10" class="band"/>
+<text x="42" y="22" class="sub" text-anchor="start">Passed</text>
+<text x="122" y="22" class="sub" text-anchor="start">Failed</text>
+<text x="195" y="22" class="sub" text-anchor="start">No data</text>
+<text x="36" y="56" class="val" text-anchor="middle">Mon</text>
+<text x="68" y="56" class="val" text-anchor="middle">Tue</text>
+<text x="100" y="56" class="val" text-anchor="middle">Wed</text>
+<text x="132" y="56" class="val" text-anchor="middle">Thu</text>
+<text x="164" y="56" class="val" text-anchor="middle">Fri</text>
+<text x="196" y="56" class="val" text-anchor="middle">Sat</text>
+<text x="228" y="56" class="val" text-anchor="middle">Sun</text>
+<text x="20" y="86" class="row" text-anchor="start">Server</text>
+<text x="20" y="126" class="row" text-anchor="start">Web app</text>
+<text x="20" y="166" class="row" text-anchor="start">Mobile app</text>
+<text x="20" y="206" class="row" text-anchor="start">Docs</text>
+<rect x="20" y="12" width="16" height="12" rx="2" class="s-ok"/><rect x="100" y="12" width="16" height="12" rx="2" class="s-err"/><path d="M103.5,22.5 L112.5,13.5 M103.5,13.5 L112.5,22.5" class="sm sm-err"/><rect x="173.5" y="12.5" width="15" height="11" rx="2" class="h0"/>
+<rect x="21" y="90.5" width="30" height="15" rx="2" class="s-ok"/><rect x="53" y="90.5" width="30" height="15" rx="2" class="s-ok"/><rect x="85" y="90.5" width="30" height="15" rx="2" class="s-ok"/><rect x="117" y="90.5" width="30" height="15" rx="2" class="s-ok"/><rect x="149" y="90.5" width="30" height="15" rx="2" class="s-ok"/><rect x="181" y="90.5" width="30" height="15" rx="2" class="s-ok"/><rect x="213" y="90.5" width="30" height="15" rx="2" class="s-ok"/>
+<rect x="21" y="130.5" width="30" height="15" rx="2" class="s-ok"/><rect x="53" y="130.5" width="30" height="15" rx="2" class="s-ok"/><rect x="85" y="130.5" width="30" height="15" rx="2" class="s-ok"/><rect x="117" y="130.5" width="30" height="15" rx="2" class="s-ok"/><rect x="149" y="130.5" width="30" height="15" rx="2" class="s-ok"/><rect x="181" y="130.5" width="30" height="15" rx="2" class="s-ok"/><rect x="213" y="130.5" width="30" height="15" rx="2" class="s-ok"/>
+<rect x="21" y="170.5" width="30" height="15" rx="2" class="s-ok"/><rect x="53" y="170.5" width="30" height="15" rx="2" class="s-err"/><path d="M63,183 L73,173 M63,173 L73,183" class="sm sm-err"/><rect x="85" y="170.5" width="30" height="15" rx="2" class="s-err"/><path d="M95,183 L105,173 M95,173 L105,183" class="sm sm-err"/><rect x="117" y="170.5" width="30" height="15" rx="2" class="s-ok"/><rect x="149" y="170.5" width="30" height="15" rx="2" class="s-ok"/><rect x="181" y="170.5" width="30" height="15" rx="2" class="s-ok"/><rect x="213" y="170.5" width="30" height="15" rx="2" class="s-ok"/>
+<rect x="21" y="210.5" width="30" height="15" rx="2" class="s-ok"/><rect x="53" y="210.5" width="30" height="15" rx="2" class="s-ok"/><rect x="85" y="210.5" width="30" height="15" rx="2" class="s-ok"/><rect x="117" y="210.5" width="30" height="15" rx="2" class="s-ok"/><rect x="149" y="210.5" width="30" height="15" rx="2" class="s-ok"/><rect x="181" y="210.5" width="30" height="15" rx="2" class="s-ok"/><rect x="213.5" y="211" width="29" height="14" rx="2" class="h0"/>
+</svg>
+<details class="dg-words">
+<summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>The diagram in words</summary>
+<div class="table-wrap" role="region" aria-label="The states of the status grid" tabindex="0"><table><thead><tr><td></td><th scope="col">Mon</th><th scope="col">Tue</th><th scope="col">Wed</th><th scope="col">Thu</th><th scope="col">Fri</th><th scope="col">Sat</th><th scope="col">Sun</th></tr></thead><tbody><tr><th scope="row">Server</th><td>Passed</td><td>Passed</td><td>Passed</td><td>Passed</td><td>Passed</td><td>Passed</td><td>Passed</td></tr><tr><th scope="row">Web app</th><td>Passed</td><td>Passed</td><td>Passed</td><td>Passed</td><td>Passed</td><td>Passed</td><td>Passed</td></tr><tr><th scope="row">Mobile app</th><td>Passed</td><td>Failed</td><td>Failed</td><td>Passed</td><td>Passed</td><td>Passed</td><td>Passed</td></tr><tr><th scope="row">Docs</th><td>Passed</td><td>Passed</td><td>Passed</td><td>Passed</td><td>Passed</td><td>Passed</td><td>no data</td></tr></tbody></table></div>
+<ul><li>25 cells are Passed and 2 are Failed. 1 cell has no data.</li><li>Failed: Mobile app, Tue; Mobile app, Wed.</li></ul>
+</details>

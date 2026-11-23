@@ -51,6 +51,18 @@ function fitWarnings(kind, model, scene) {
     if (empty * 2 > model.boxes.length) out.push(`${empty} of ${model.boxes.length} boxes have no data; a plan, with the numbers of the other boxes in a table, may say this better`);
     if (model.boxes.length === 2) out.push("the heat plan has 2 boxes; a sentence says where they sit and how much each got");
   }
+  if (kind === "statusgrid") {
+    const cells = model.rows.flatMap((r) => r.cells), full = cells.filter(Boolean), empty = cells.length - full.length, { names, thresholds } = model;
+    const states = new Set(full.map((c) => c.state));
+    if (states.size === 1) { const only = [...states][0]; out.push(`every cell is "${names[only]}"; a sentence says this more simply${only === "ok" ? ', such as "every part was up every day"' : ""}`); }
+    if (cells.length < 12) out.push(`the status grid has ${cells.length} cells; a table with a state column says this more simply`);
+    // More than half not OK: a threshold is wrong, or the data is an amount.
+    const bad = full.filter((c) => c.state !== "ok").length;
+    if (thresholds && bad * 2 > full.length) out.push(`${bad} of ${full.length} cells are ${thresholds.warn === null ? names.err : `${names.warn} or ${names.err}`}; check the thresholds, or use a heat map when the question is how much, not which cells failed`);
+    if (empty * 2 > cells.length) out.push(`${empty} of ${cells.length} cells have no data; a table of the cells that have data may say this better`);
+    // A calendar's columns are weeks, a series, so turning the grid would not help.
+    if (!model.calendar && scene && scene.labels && scene.labels.every > 1) out.push(`only every ${scene.labels.every}${scene.labels.every === 2 ? "nd" : scene.labels.every === 3 ? "rd" : "th"} column label fits on a desktop; when the columns are names, not a series such as days, turn the grid so that the names are rows`);
+  }
   if (kind === "range" && model.rows.length < 3) out.push(`the range chart has ${model.rows.length} rows; a sentence says this more simply`);
   return out;
 }

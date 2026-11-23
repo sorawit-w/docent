@@ -969,6 +969,61 @@ This is not the blurred glow over a screenshot that analytics tools draw. A glow
 - `render` says which forms are not to scale, as for a plan, such as `drawn as heatplan; not to scale; stacked on a phone`.
 - `render` also writes the boxes as a table under the drawing, the plan's table with a Value column, and lines on the steps, the highest number, the lowest and the boxes with no data. On a narrow screen the table scrolls inside itself, so no word breaks.
 
+## Status grids
+
+A status grid shows the state of each pair of a row and a column, such as the uptime of each part of a service on each day, or the nightly builds of each project. Write it with `"kind": "statusgrid"` when there is one state for each cell, 1 to 12 rows and 3 to 24 columns, and the reader needs to find the failures more than to read each number. Each cell is OK, Warning or Error. For how much, such as errors by day, where 30 and 38 both matter, write a heat map. For the state of a few things right now, write a status note for each, or a table with a state column. When every cell is OK, write a sentence: "Every part was up every day of the month."
+
+```json
+{
+  "id": "tracker-uptime",
+  "kind": "statusgrid",
+  "label": "Uptime of the bug tracker's parts from 3 to 16 November. On 11 November the API and Search were down for part of the day, and Sign-in was slow. Every other day was OK, except three short slow periods. Email alerts has no data for 14 November.",
+  "thresholds": {"better": "higher", "ok": 99.9, "warn": 99, "unit": "%"},
+  "columns": ["3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16"],
+  "rows": [
+    {
+      "name": "Website",
+      "values": [100, 100, 99.98, 100, 100, 100, 100, 100, 99.95, 100, 100, 100, 100, 100]
+    },
+    {
+      "name": "Sign-in",
+      "values": [100, 100, 100, 100, 100, 100, 100, 100, 99.4, 100, 100, 100, 100, 100]
+    },
+    {
+      "name": "API",
+      "values": [100, 99.99, 100, 100, 100, 100, 100, 100, 98.6, 99.7, 100, 100, 100, 100]
+    },
+    {
+      "name": "Email alerts",
+      "values": [100, 100, 100, 99.6, 100, 100, 100, 100, 100, 100, 100, null, 100, 100]
+    },
+    {
+      "name": "Search",
+      "values": [100, 100, 100, 100, 100, 99.97, 100, 100, 97.9, 100, 100, 100, 100, 100]
+    }
+  ]
+}
+```
+
+| Field | What it is |
+|---|---|
+| `thresholds` | When the values are numbers: `better` (`"higher"` or `"lower"`), `ok` (the edge of the OK state), `unit` (at most 12 characters), and optionally `warn` (the edge of the Warning state). Without `warn` there are two states, OK and Error. |
+| `columns` | 3 to 24 labels, left to right, each at most 10 characters, all different, as in a heat map. |
+| `rows` | 1 to 12 rows, top to bottom. Each has a `name` (at most 20 characters, all different) and `values`: one for each column. With `thresholds`, a value is a number or `null` for no data. Without `thresholds`, a value is `"ok"`, `"warn"`, `"err"` or `null`. At least one value is not `null`. |
+| `names` | Optional words for the states, such as `{"ok": "Up", "warn": "Degraded", "err": "Down"}`, each at most 12 characters and all different. The default words are "OK", "Warning" and "Error". The colors and marks never change with the names. |
+| `calendar` | Optional. `true` says the grid is a calendar: 7 rows, one for each day of the week, and each column a week, labelled with its first day, such as `"31 Aug"`. |
+
+- **Two ways to give the states.** Numbers with `thresholds`, for anything measured, such as uptime, error rate or response time: the renderer finds each state, and the table keeps each number. Or each state written directly, for anything with no number, such as a build that passed or failed. One grid uses one way; a mix is refused.
+- **`better` says which way is good.** With `"higher"`, a value of `ok` or more is OK, a value of `warn` or more is Warning, and a lower value is Error; `"lower"` is the mirror, for an error rate. A value exactly on a threshold takes the better state, because a target is written "at least" or "at most". `better` is needed, so a swap of `ok` and `warn` is refused instead of turning every good day red.
+- **The look.** On screen each cell is filled in its status color: green for OK, the warning color for Warning, and red for Error. On paper only the failures stand out: OK and Warning cells take the outline color, and an Error cell keeps its red fill. A Warning cell always has a slash and an Error cell a cross, so a reader who cannot tell the colors apart, or a gray printer, still sees each state. An OK cell has no mark.
+- **A cell with no data is hollow,** as in a heat map, and the legend adds a hollow key, "No data". No data is not a state: a monitor that was off is not a service that was down.
+- **A legend above the grid** shows each state as a small cell with its mark, its name and its range, such as "Warning: 99% to below 99.9%". With states written directly it shows OK and Error, and Warning when a cell has it. The keys flow into lines, and a key too wide for a line wraps its words, so a legend is never refused.
+- **Cells never show numbers.** The state is the answer; the table in words gives every number.
+- **A long strip of one thing,** such as 90 days of one service, is a calendar: write the weekdays as 7 rows and the weeks as columns, from the oldest week at the left, with `"calendar": true`. Label each column with the first day of its week. The words then name a cell "Friday, week of 31 Aug", so a label never reads as that day's date. Use whole weeks: the renderer reads no dates, and a day that has not happened is not "no data". End with the last whole week, and say the dates in the label.
+- The forms are a heat map's: 640px on a desktop and on paper, and 264px on a phone, where each row name stands on its own line above its row of cells. The column labels follow the heat map's rules.
+- `render` also writes the states as a table under the drawing, with the same rows and columns. A cell holds its number, and its state word when it is not OK, such as "98.6 Error"; with states written directly, the state word. Lines under the table say the thresholds, count the cells of each state, name each Error cell (up to 6), and give the worst value. A table too wide for paper is split, as for a heat map.
+- `render` says how the column labels came out, such as `drawn as statusgrid; column labels on two lines on a phone`.
+
 ## Optional legs
 
 A leg with `"optional": true` is a path that only some readers take, or that happens only in some cases. It is drawn as a dashed arrow:
@@ -1043,6 +1098,11 @@ An icon may hold only these shapes and attributes: `path` (`d`), `circle` (`cx`,
   - `... warning: 6 of 7 boxes are in the lowest step; one large number may set the scale. Check "to", or say the large number in the text` — four boxes in five, or more, have the palest shade.
   - `... warning: 5 of 8 boxes have no data; a plan, with the numbers of the other boxes in a table, may say this better` — more than half of the boxes have no number.
   - `... warning: the heat plan has 2 boxes; a sentence says where they sit and how much each got` — two areas read better in a sentence.
+  - `... warning: every cell is "OK"; a sentence says this more simply, such as "every part was up every day"` — every cell of a status grid has one state; the same for any one state.
+  - `... warning: the status grid has 9 cells; a table with a state column says this more simply` — fewer than 12 cells.
+  - `... warning: 47 of 72 cells are Warning or Error; check the thresholds, or use a heat map when the question is how much, not which cells failed` — more than half of the cells with a number are not OK: a threshold is wrong, or the data is an amount.
+  - `... warning: 40 of 72 cells have no data; a table of the cells that have data may say this better` — as for a heat map.
+  - `... warning: only every 3rd column label fits on a desktop; when the columns are names, not a series such as days, turn the grid so that the names are rows` — as for a heat map; a calendar never gets it, because its columns are weeks.
 
 `check` also reports a figure well that holds a drawing no diagram block made: `check doc.html: error: Figure 2, ... holds a drawing that no diagram block made; write its data in a block and run render`. A hand-drawn SVG cannot be drawn again or checked against data. Icons outside figure wells are not touched.
 

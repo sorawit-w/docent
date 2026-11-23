@@ -122,6 +122,12 @@ function styles(scene, id, mode, swap) {
   // Text on a step reads --heat-text and --heat-page, the kit's own text and page colors: with the reader's high contrast mode
   // the kit gives --text and --bg the system colors, and only its own colors are tested against the steps.
   if (scene.form === "heatmap") css.push(`${s} .row{font-size:14px;fill:${v("text")}}`, `${s} .val{font-size:12px;fill:${v("muted")};font-variant-numeric:tabular-nums}`, ...[1, 2, 3, 4, 5].map((k) => `${s} .h${k}{fill:${v(`heat-${k}`)}}`), `${s} .h0{fill:${v("bg")};stroke:${v("muted")};stroke-width:1}`, `${s} .hv{font-size:12px;fill:${v("heat-text")};font-variant-numeric:tabular-nums}`, `${s} .hv.hi{fill:${v("heat-page")}}`);
+  // A status grid: the row names and labels of a heat map. On screen each cell is filled in its status color, and the mark of
+  // a Warning or an Error cell (a slash or a cross, 1.5px with round ends) takes the kit's own page color, --heat-page: the
+  // reader's high contrast mode gives --bg a system color but keeps the status fills, and only the kit's own page color is
+  // tested against them. On paper (below) only the failures stand out: OK and Warning cells take the outline color, and the
+  // slash takes the warning color.
+  if (scene.form === "statusgrid") css.push(`${s} .row{font-size:14px;fill:${v("text")}}`, `${s} .val{font-size:12px;fill:${v("muted")};font-variant-numeric:tabular-nums}`, `${s} .h0{fill:${v("bg")};stroke:${v("muted")};stroke-width:1}`, ...["ok", "warn", "err"].map((k) => `${s} .s-${k}{fill:${v(k)}}`), `${s} .sm{fill:none;stroke:${v("heat-page")};stroke-width:1.5;stroke-linecap:round}`);
   if (scene.form === "layout") css.push(`${s} .row{font-size:14px;fill:${v("text")}}`, `${s} .val{font-size:12px;fill:${v("muted")};font-variant-numeric:tabular-nums}`, `${s} .box{fill:${v("bg")};stroke:${v("text")};stroke-width:1.5}`, `${s} .tick{fill:none;stroke:${v("text")};stroke-width:1}`, `${s} .r-ref{stroke:${v("muted")}}`);
   // A part with a state: its outline takes the status color, and a status dot sits on the outline. A drawing with no state carries none of these rules.
   for (const state of new Set(scene.parts.map((part) => part.state).filter(Boolean))) css.push(`${s} .stop.is-${state},${s} .card.is-${state}{stroke:${v(state)};stroke-width:1.5}`, `${s} .flag.is-${state}{fill:${v(state)};stroke:${v("bg")};stroke-width:2}`);
@@ -144,6 +150,7 @@ function styles(scene, id, mode, swap) {
   // On paper nothing scrolls: a drawing that is still wider than the page shrinks to fit it.
   const print = [`${s}{max-width:100%;height:auto}`, `${s} .pulse{display:none!important}`];
   const still = [`${s} .pulse{animation:none!important}`];
+  if (scene.form === "statusgrid") print.push(`${s} .s-ok,${s} .s-warn{fill:${v("line")}}`, `${s} .sm-warn{stroke:${v("warn")}}`);
   if (mode === "walk") {
     // The current step: its leg takes the ink color and its dot travels the leg.
     const now = `.js ${s} .leg.is-current`;
