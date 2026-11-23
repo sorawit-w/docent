@@ -953,6 +953,139 @@ footer .shell { display: flex; align-items: center; justify-content: space-betwe
         </tbody>
       </table>
     </div>
+    <p>Most reports that stop do so before the maintainers can see the bug.</p>
+    <figure>
+      <div class="fig" role="region" aria-label="Figure 4, where last month's reports stopped" tabindex="0">
+        <!-- docent:diagram
+{
+  "id": "reports-month",
+  "kind": "funnel",
+  "label": "Of 480 bug reports filed last month, 196 reached a release: 41%. The most reports, 180, stopped before the maintainers could reproduce the bug: 38% of the reports filed.",
+  "unit": "reports",
+  "steps": [
+    {"name": "Filed", "count": 480},
+    {"name": "Reproduced", "count": 300},
+    {"name": "Fixed", "count": 210},
+    {"name": "Released", "count": 196}
+  ]
+}
+-->
+<svg id="dg-reports-month" class="dg dg-funnel dg-auto" xmlns="http://www.w3.org/2000/svg" width="640" height="252" viewBox="0 0 640 252" role="img" aria-label="Of 480 bug reports filed last month, 196 reached a release: 41%. The most reports, 180, stopped before the maintainers could reproduce the bug: 38% of the reports filed.">
+<style>
+#dg-reports-month{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-reports-month .ground{fill:var(--fig,#f2f3f9)}
+#dg-reports-month .band{fill:var(--bg,#fbfbfe)}
+#dg-reports-month .track{stroke:var(--line,#d3d6e3)}
+#dg-reports-month .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-reports-month .head{fill:var(--text,#1c1f2e)}
+#dg-reports-month .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-reports-month .stop.end{fill:var(--text,#1c1f2e)}
+#dg-reports-month .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-reports-month .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-reports-month .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-reports-month .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-reports-month .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-reports-month .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-reports-month .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-reports-month .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-reports-month .sub,#dg-reports-month .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-reports-month .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-reports-month .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-reports-month .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-reports-month .r-bar{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-reports-month .f-lost{fill:var(--line,#d3d6e3)}
+@media (prefers-reduced-motion:reduce){#dg-reports-month .pulse{animation:none!important}#dg-reports-month .pulse{display:none!important}}
+@media print{#dg-reports-month{max-width:100%;height:auto}#dg-reports-month .pulse{display:none!important}}
+#dg-reports-month-phone{display:none}
+</style>
+<rect width="640" height="252" class="ground"/>
+<rect x="8" y="52" width="624" height="192" rx="10" class="band"/>
+<text x="20" y="24" class="sub" text-anchor="start">Reports at each step, bars from 0.</text>
+<text x="20" y="40" class="sub" text-anchor="start">Beside each count, its share of the first step; in each drop, its share of the step before.</text>
+<text x="20" y="81" class="row" text-anchor="start">Filed</text>
+<text x="141.76" y="80" class="val" text-anchor="end">480</text>
+<text x="190.52" y="80" class="val" text-anchor="end">100%</text>
+<text x="465.13" y="104" class="val" text-anchor="start">−180 (38%)</text>
+<text x="20" y="129" class="row" text-anchor="start">Reproduced</text>
+<text x="141.76" y="128" class="val" text-anchor="end">300</text>
+<text x="190.52" y="128" class="val" text-anchor="end">63%</text>
+<text x="387.69" y="152" class="val" text-anchor="start">−90 (30%)</text>
+<text x="20" y="177" class="row" text-anchor="start">Fixed</text>
+<text x="141.76" y="176" class="val" text-anchor="end">210</text>
+<text x="190.52" y="176" class="val" text-anchor="end">44%</text>
+<text x="375.64" y="200" class="val" text-anchor="start">−14 (7%)</text>
+<text x="20" y="225" class="row" text-anchor="start">Released</text>
+<text x="141.76" y="224" class="val" text-anchor="end">196</text>
+<text x="190.52" y="224" class="val" text-anchor="end">41%</text>
+<rect x="207" y="68" width="413" height="16" rx="4" class="r-bar"/>
+<rect x="461.13" y="116" width="158.88" height="16" rx="4" class="f-lost"/><rect x="207" y="116" width="258.13" height="16" rx="4" class="r-bar"/>
+<rect x="383.69" y="164" width="81.44" height="16" rx="4" class="f-lost"/><rect x="207" y="164" width="180.69" height="16" rx="4" class="r-bar"/>
+<rect x="371.64" y="212" width="16.05" height="16" rx="4" class="f-lost"/><rect x="207" y="212" width="168.64" height="16" rx="4" class="r-bar"/>
+</svg>
+<svg id="dg-reports-month-phone" class="dg dg-funnel dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="324" viewBox="0 0 264 324" role="img" aria-label="Of 480 bug reports filed last month, 196 reached a release: 41%. The most reports, 180, stopped before the maintainers could reproduce the bug: 38% of the reports filed.">
+<style>
+#dg-reports-month-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-reports-month-phone .ground{fill:var(--fig,#f2f3f9)}
+#dg-reports-month-phone .band{fill:var(--bg,#fbfbfe)}
+#dg-reports-month-phone .track{stroke:var(--line,#d3d6e3)}
+#dg-reports-month-phone .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-reports-month-phone .head{fill:var(--text,#1c1f2e)}
+#dg-reports-month-phone .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-reports-month-phone .stop.end{fill:var(--text,#1c1f2e)}
+#dg-reports-month-phone .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-reports-month-phone .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-reports-month-phone .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-reports-month-phone .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-reports-month-phone .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-reports-month-phone .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-reports-month-phone .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-reports-month-phone .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-reports-month-phone .sub,#dg-reports-month-phone .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-reports-month-phone .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-reports-month-phone .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-reports-month-phone .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-reports-month-phone .r-bar{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-reports-month-phone .f-lost{fill:var(--line,#d3d6e3)}
+@media (prefers-reduced-motion:reduce){#dg-reports-month-phone .pulse{animation:none!important}#dg-reports-month-phone .pulse{display:none!important}}
+@media print{#dg-reports-month-phone{max-width:100%;height:auto}#dg-reports-month-phone .pulse{display:none!important}}
+@media (max-width:736px){#dg-reports-month{display:none}#dg-reports-month-phone{display:block}}
+@media print{#dg-reports-month{display:block!important}#dg-reports-month-phone{display:none!important}}
+</style>
+<rect width="264" height="324" class="ground"/>
+<rect x="8" y="84" width="248" height="232" rx="10" class="band"/>
+<text x="20" y="24" class="sub" text-anchor="start">Reports at each step, bars from 0.</text>
+<text x="20" y="40" class="sub" text-anchor="start">Beside each count, its share of the first</text>
+<text x="20" y="56" class="sub" text-anchor="start">step; in each drop, its share of the</text>
+<text x="20" y="72" class="sub" text-anchor="start">step before.</text>
+<text x="20" y="108" class="row" text-anchor="start">Filed</text>
+<text x="199.24" y="108" class="val" text-anchor="end">480</text>
+<text x="244" y="108" class="val" text-anchor="end">100%</text>
+<text x="160" y="148" class="val" text-anchor="start">−180 (38%)</text>
+<text x="20" y="166" class="row" text-anchor="start">Reproduced</text>
+<text x="199.24" y="166" class="val" text-anchor="end">300</text>
+<text x="244" y="166" class="val" text-anchor="end">63%</text>
+<text x="118" y="206" class="val" text-anchor="start">−90 (30%)</text>
+<text x="20" y="224" class="row" text-anchor="start">Fixed</text>
+<text x="199.24" y="224" class="val" text-anchor="end">210</text>
+<text x="244" y="224" class="val" text-anchor="end">44%</text>
+<text x="111.47" y="264" class="val" text-anchor="start">−14 (7%)</text>
+<text x="20" y="282" class="row" text-anchor="start">Released</text>
+<text x="199.24" y="282" class="val" text-anchor="end">196</text>
+<text x="244" y="282" class="val" text-anchor="end">41%</text>
+<rect x="20" y="116" width="224" height="16" rx="4" class="r-bar"/>
+<rect x="156" y="174" width="88" height="16" rx="4" class="f-lost"/><rect x="20" y="174" width="140" height="16" rx="4" class="r-bar"/>
+<rect x="114" y="232" width="46" height="16" rx="4" class="f-lost"/><rect x="20" y="232" width="98" height="16" rx="4" class="r-bar"/>
+<rect x="107.47" y="290" width="10.53" height="16" rx="4" class="f-lost"/><rect x="20" y="290" width="91.47" height="16" rx="4" class="r-bar"/>
+</svg>
+<details class="dg-words">
+<summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>The diagram in words</summary>
+<table><thead><tr><th scope="col">Step</th><th scope="col">Reports</th><th scope="col">Share of the first step</th><th scope="col">Left since the step before</th><th scope="col">Share of the step before</th></tr></thead><tbody><tr><th scope="row">Filed</th><td>480</td><td>100%</td><td colspan="2">first step</td></tr><tr><th scope="row">Reproduced</th><td>300</td><td>63%</td><td>180</td><td>38%</td></tr><tr><th scope="row">Fixed</th><td>210</td><td>44%</td><td>90</td><td>30%</td></tr><tr><th scope="row">Released</th><td>196</td><td>41%</td><td>14</td><td>7%</td></tr></tbody></table>
+<ul><li>Of 480 reports at the first step, 196 reached the last step: 41%.</li><li>The most reports, and the largest share, left between "Filed" and "Reproduced": 180, 38% of the step before.</li><li>The bars are to scale, from 0.</li></ul>
+</details>
+<!-- /docent:diagram -->
+      </div>
+      <figcaption><strong>Figure 4</strong>Where last month's bug reports stopped, from filed to released.</figcaption>
+    </figure>
     <div class="status">
       <span class="state warn">Warning</span>
       <p>A report with no steps often waits a long time. Send the steps with the first report when you can.</p>
