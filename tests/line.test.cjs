@@ -155,6 +155,16 @@ test("a slopegraph draws two upright axes and a line for each series, named at b
   const plain = slope(); plain.series = plain.series.filter((s) => ["Search", "Checkout", "Settings"].includes(s.name)).map((s) => ({ ...s, values: s.name === "Search" ? [12, 11] : s.values }));
   const run = (sc) => sc.tracks[1][0] - sc.tracks[0][0];
   assert.equal(Math.round(run(renderDiagram(plain).phone)), 105);
+  // Wide point labels stay 12px inside the drawing; two that would meet are refused.
+  const wide = slope(); wide.scale = { from: 0, to: 100 }; wide.points = ["2025年第一季度", "2026年第一季度"];
+  wide.series = [{ name: "Help", focus: true, values: [20, 80] }, { name: "Search", values: [70, 30] }];
+  for (const sc of [renderDiagram(wide).scene, renderDiagram(wide).phone]) assert.deepEqual(clashes(sc), []);
+  assert.ok(renderDiagram(wide).phone.notes.find((n) => n.s === "2025年第一季度").x > renderDiagram(wide).phone.tracks[0][0], "moved right, off its axis, to stay inside");
+  const narrow = slope(); narrow.scale = { from: 0, to: 100 }; narrow.points = ["2025年第一季度", "2026年第一季度"];
+  narrow.series = [{ name: "Checkout status", focus: true, values: [20, 80] }, { name: "Search", values: [70, 30] }];
+  assert.throws(() => renderDiagram(narrow), /the point labels "2025年第一季度" and "2026年第一季度" meet over the axes on a phone; shorten them, such as "2025" and "2026"/);
+  narrow.points = ["Q1 2025", "Q1 2026"];
+  for (const sc of [renderDiagram(narrow).scene, renderDiagram(narrow).phone]) assert.deepEqual(clashes(sc), []);
   const w = words(slope());
   assert.match(w, /<tr><th scope="col">Series<\/th><th scope="col">2025<\/th><th scope="col">2026<\/th><th scope="col">Change, in days<\/th><\/tr>/);
   assert.match(w, /<th scope="row">Checkout<\/th><td>6<\/td><td>8<\/td><td>\+2<\/td>/);
@@ -184,6 +194,14 @@ test("small multiples give each series its own panel on one scale, with the othe
   assert.deepEqual(rows(5), [3, 2]);
   assert.deepEqual(rows(6), [3, 3]);
   assert.deepEqual(rows(3), [3]);
+  // A long panel name wraps within its panel, also without spaces, and the plots of its row move down together.
+  const long = panels(); long.series[0].name = "国際事業部門月次報告受付件数推移状況";
+  for (const sc of [renderDiagram(long).scene, renderDiagram(long).phone]) {
+    const lines = sc.notes.filter((n) => n.cls === "name" && /\p{Script=Han}/u.test(n.s));
+    assert.ok(lines.length >= 2, "the name takes two lines or more");
+    assert.deepEqual(clashes(sc), []);
+    if (sc === renderDiagram(long).scene) assert.equal(texts(sc).filter((t) => t.s === "150")[0].y, texts(sc).filter((t) => t.s === "150")[1].y, "one height in a row");
+  }
 });
 
 test("the table in words has a row for each point and a column for each series, and a line for each series", () => {

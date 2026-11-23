@@ -167,16 +167,20 @@ function drawPanels(model, s, phone, top, where) {
   const { series, points } = model;
   const W = s.w, n = points.length, PW = phone ? PANEL.phone : PANEL.wide;
   const rows = phone ? series.length : Math.ceil(series.length / 3), cols = Math.ceil(series.length / rows);
+  // A panel's name wraps within the panel, also in a script written without spaces. The plots of one row start under the
+  // longest name of that row, so they stand side by side at one height.
+  const titles = series.map((sr) => wrapName(sr.name, PW));
   let py = top;
   for (let r = 0; r < rows; r++) {
     let bottom = 0;
+    const extra = Math.max(...titles.slice(r * cols, r * cols + cols).map((t) => t.length)) - 1;
     for (let c = 0; c < cols && r * cols + c < series.length; c++) {
       const i = r * cols + c, sr = series[i], px = 20 + c * (PW + PANEL.gap);
-      const y0 = py + 40, y1 = y0 + PLOT.panel; // the top value label stands clear of the panel's name
+      const y0 = py + 40 + extra * 18, y1 = y0 + PLOT.panel; // the top value label stands clear of the panel's name
       const ax = upAxis(model.scale, y1, y0);
       const x0 = px + Math.ceil(Math.max(0, ...ax.ticks.map((t) => valueWidth(t.label))) + 8), x1 = px + PW;
       const step = (x1 - x0) / (n - 1), x = (k) => x0 + k * step;
-      s.notes.push({ x: px, y: py + 20, s: sr.name, cls: "name", anchor: "start" });
+      titles[i].forEach((line, k) => s.notes.push({ x: px, y: py + 20 + k * 18, s: line, cls: "name", anchor: "start" }));
       for (const t of ax.ticks) s.notes.push({ x: x0 - 8, y: t.y + 4, s: t.label, cls: "val", anchor: "end" });
       grid(s, model, ax, x0, x1);
       bottom = timeAxis(s, model, x, y1, W, where, px - 4, x1 + 4);
@@ -209,7 +213,10 @@ function drawSlope(model, s, phone, top, where) {
   if (run < 60) fail(`the slopegraph has ${Math.max(0, Math.floor(run))}px between its axes ${where}, and needs 60; shorten the series names, or write the values with fewer digits`);
   const xL = Math.round(20 + (W - 40 - leftW - run - rightW) / 2 + leftW), xR = xL + run;
   for (const xa of [xL, xR]) s.tracks.push([xa, y0, xa, y1]);
-  points.forEach((p, k) => s.notes.push({ x: k ? xR : xL, y: top + 20, s: p, cls: "val", anchor: "middle" }));
+  // The point labels stand centred over their axes, kept 12px inside the drawing; two that would meet are refused.
+  const heads = points.map((p, k) => { const w = valueWidth(p), x = Math.min(Math.max(k ? xR : xL, 12 + w / 2), W - 12 - w / 2); return { p, w, x }; });
+  if (heads[1].x - heads[1].w / 2 - (heads[0].x + heads[0].w / 2) < 8) fail(`the point labels "${points[0]}" and "${points[1]}" meet over the axes ${where}; shorten them, such as "2025" and "2026"`);
+  for (const h of heads) s.notes.push({ x: h.x, y: top + 20, s: h.p, cls: "val", anchor: "middle" });
   const order = series.map((_, i) => i).filter((i) => i !== focus).concat(focus >= 0 ? [focus] : []);
   for (const i of order) {
     const sr = series[i], main = i === focus, [a, b] = sr.values.map((v) => ax.y(v));

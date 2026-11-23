@@ -993,7 +993,7 @@ A line chart shows how an amount changed over time, and when it rose or fell: ho
 
 With `"multiples": true`, each series gets its own small panel. All panels share one scale and one set of points, so they compare. Each panel names its series above it, at 14px weight 600, and draws its series in the text color; the other series stand behind it as thin lines in the outline color, so the reader sees where this series stands among the others. Those lines have low contrast on purpose: they repeat data that another panel draws in the text color.
 
-- 2 to 6 panels. `focus` is refused with `multiples`.
+- 2 to 6 panels. `focus` is refused with `multiples`. A long series name wraps within its panel, and the plots of its row move down together.
 - On a desktop and on paper up to 3 panels stand in a row, each 184px wide; 4 panels make two rows of 2. On a phone each panel has a row, 224px wide.
 
 ### Two points in time: the slopegraph
@@ -1018,7 +1018,7 @@ When `points` has exactly two labels, the line chart draws a slopegraph: two upr
 ```
 
 - 2 to 10 series. The focus rule and the rule for names that would meet are as above. Both values of each series are needed: a slopegraph refuses a `null`, so leave such a series out and say why in the text.
-- Each line is named at both ends, with its value: name, then value, on the left; value, then name, on the right. On a phone the names stand on the right only, and the left axis shows the values alone. The two point labels stand above their axes.
+- Each line is named at both ends, with its value: name, then value, on the left; value, then name, on the right. On a phone the names stand on the right only, and the left axis shows the values alone. The two point labels stand above their axes, kept 12px inside the drawing; two that would meet are refused, so keep them short, such as `2025` and `2026`.
 - The run between the axes is no wider than the plot is tall, so the slopes keep their angle. A slopegraph draws no grid, so its scale needs no `step`. The scale may start above 0: the slopes do not change when both axes move together.
 - The table in words has a row for each series, a column for each point, and a column for the change, such as `−9` or `+2`. When every series matters equally, a dumbbell (a bar chart with `series`) compares the two times row by row.
 
