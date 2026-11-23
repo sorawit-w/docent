@@ -117,6 +117,10 @@ function styles(scene, id, mode, swap) {
   // A funnel: step names in weight 400, numbers with tabular figures, a kept bar as the bar of a range chart, and the lost part filled in the line color,
   // with no outline: a thin outline at that contrast almost disappears in dark mode, and an area does not.
   if (scene.form === "funnel") css.push(`${s} .row{font-size:14px;fill:${v("text")}}`, `${s} .val{font-size:12px;fill:${v("muted")};font-variant-numeric:tabular-nums}`, `${s} .r-bar{fill:${v("bg")};stroke:${v("text")};stroke-width:1.5}`, `${s} .f-lost{fill:${v("line")}}`);
+  // A bar chart: row names in weight 400, values and ticks with tabular figures, a bar as the bar of a range chart, and the 0 line
+  // in the muted color. A dumbbell: the first value a ring, the second a dot in the text color, the gap between them a 2px muted
+  // line, and a thin muted line from a moved series name to its mark.
+  if (scene.form === "bar") css.push(`${s} .row{font-size:14px;fill:${v("text")}}`, `${s} .val{font-size:12px;fill:${v("muted")};font-variant-numeric:tabular-nums}`, `${s} .r-bar{fill:${v("bg")};stroke:${v("text")};stroke-width:1.5}`, `${s} .r-ref{stroke:${v("muted")}}`, `${s} .r-pt{fill:${v("text")}}`, `${s} .d-ring{fill:${v("bg")};stroke:${v("text")};stroke-width:1.5}`, `${s} .d-gap{stroke:${v("muted")};stroke-width:2}`, `${s} .d-lead{stroke:${v("muted")};stroke-width:1}`);
   // A heat map: row names in weight 400, column labels and legend numbers with tabular figures, each cell in its heat step, and a
   // cell with no data hollow in a muted outline. A number takes the text color on steps 1 to 3 and the page color on 4 and 5.
   // Text on a step reads --heat-text and --heat-page, the kit's own text and page colors: with the reader's high contrast mode

@@ -1,6 +1,7 @@
 // The chart core: the parts that every scale chart shares, so each kind holds only what is its own. It gives the two forms'
 // widths, text escaped for SVG, names that wrap (also in scripts written without spaces), counts and shares as written,
-// column labels that keep apart, and the table in words that splits for paper. The numeric scale stays in scale.cjs, and
+// column labels that keep apart, the line above a chart, labels that move apart from their points, and the table in words
+// that splits for paper. The numeric scale stays in scale.cjs, and
 // this file passes it on, so a chart kind needs this one file for its scale, its ticks and the places of its labels.
 const { fail } = require("./blocks.cjs");
 const { textWidth } = require("./text.cjs");
@@ -89,6 +90,41 @@ function labelsOf(labels, center, W, where) {
   fail(`the column labels do not fit ${where}, even on two lines or with every 12th label; the widest is "${widest.s}", ${Math.ceil(widest.w)}px. Shorten the labels to about 7 characters, or use fewer columns`);
 }
 
+/** The line above a chart: what the numbers count and how to read them. Each sentence starts a line and wraps at its spaces,
+ * in 12px muted text from x 20. Returns the y under it, where the chart starts. */
+function headLines(s, sentences, W) {
+  const lines = sentences.flatMap((t) => wrapName(t, W - 40, { size: 12, weight: 400, every: false }));
+  lines.forEach((line, i) => s.notes.push({ x: 20, y: 24 + i * 16, s: line, cls: "sub", anchor: "start" }));
+  return 24 + (lines.length - 1) * 16 + 12;
+}
+
+/**
+ * A label moves; a point never moves. Labels on one axis, each wanting to stand centred on its point (`at`) and `size` px
+ * long, are moved apart until each two keep `gap` px between them, and kept between lo and hi. Labels that would meet move
+ * as one group, centred where its labels want to be, so each moves as little as it can. Returns the centres in the order of
+ * the items, or null when the labels do not fit between lo and hi. The chart draws a thin line from a moved label to its point.
+ */
+function apart(items, lo, hi, gap) {
+  if (items.reduce((t, it) => t + it.size + gap, -gap) > hi - lo) return null;
+  const groups = [];
+  for (const i of items.map((_, k) => k).sort((a, b) => items[a].at - items[b].at)) {
+    // want: where each label of the group wants the group to start
+    let g = { ids: [i], size: items[i].size, want: [items[i].at - items[i].size / 2] };
+    for (;;) {
+      g.start = Math.min(Math.max(g.want.reduce((t, w) => t + w, 0) / g.want.length, lo), hi - g.size);
+      const before = groups[groups.length - 1];
+      if (!before || before.start + before.size + gap <= g.start) break;
+      groups.pop();
+      const shift = before.size + gap;
+      g = { ids: [...before.ids, ...g.ids], size: shift + g.size, want: [...before.want, ...g.want.map((w) => w - shift)] };
+    }
+    groups.push(g);
+  }
+  const out = [];
+  for (const g of groups) g.ids.reduce((x, i) => { out[i] = x + items[i].size / 2; return x + items[i].size + gap; }, g.start);
+  return out;
+}
+
 // On paper a grid in words takes 0.875rem text, the smallest the page allows (12.8px in print, headers too), and cannot scroll.
 // A grid whose estimate passes 580px is split into tables of fewer columns, each with the row names, so every cell prints.
 // The sheet leaves 626px.
@@ -124,7 +160,7 @@ function gridTables(model, text, name) {
 }
 
 module.exports = {
-  WIDE, PHONE, esc, graphemes, NO_SPACES, wrapName, comma, share, EVERY, onLines, labelsOf, PAPER, tablesOf, gridTables,
+  WIDE, PHONE, esc, graphemes, NO_SPACES, wrapName, comma, share, EVERY, onLines, labelsOf, headLines, apart, PAPER, tablesOf, gridTables,
   // The numeric scale, from scale.cjs.
   readScale, makeScale, tickAt, drawHead, drawGrid, linesIn, placeLabel, valueWidth, fmt, isNum, num, diff,
 };

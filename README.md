@@ -8,12 +8,12 @@ Docent is packaged as an agent skill. An agent that writes a document loads the 
 
 ## Status
 
-Version 0.4.0. The design is settled, and the three scripts exist with tests.
+Version 0.16.0. The design is settled, and the three scripts exist with tests.
 
 | Part | State |
 |---|---|
 | Design rules ([`DESIGN.md`](skills/docent/references/DESIGN.md)) | Written |
-| `render`: draws diagrams from data | Built: Route wide, Route tall, Plates, a single-track form for phones, a column form for phones for data that is not a route, sequence diagrams and flowcharts, and UML diagrams: sequence (UML notation), activity, state machine, interaction overview, timing, use case, class, object, package, profile, component, composite structure, deployment and communication |
+| `render`: draws diagrams from data | Built: Route wide, Route tall, Plates, a single-track form for phones, a column form for phones for data that is not a route, sequence diagrams and flowcharts, and UML diagrams: sequence (UML notation), activity, state machine, interaction overview, timing, use case, class, object, package, profile, component, composite structure, deployment and communication; and charts on a numeric scale: range chart, layout to scale, plan, funnel, bar chart (with the dumbbell form), heat map, heat plan and status grid |
 | `render`: builds widgets from data | Built: chooser, value picker, checklist, decision helper. Each is readable with scripts off and on paper |
 | `stamp`: puts the styles and the page script into a document | Built |
 | `check`: tests a document against the rules | Built. It reads the source only; it does not open a browser |

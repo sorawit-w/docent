@@ -271,5 +271,5 @@ test("check accepts a status grid that render drew, and reports one that was cha
   assert.deepEqual(checkDocument(page).errors, []);
   const at = page.lastIndexOf('class="s-err"/>'); // an Error cell of the grid added here, not of the sample page's own grid
   const edited = `${page.slice(0, at)}class="s-ok"/>${page.slice(at + 'class="s-err"/>'.length)}`;
-  assert.deepEqual(checkDocument(edited).errors, ['diagram 7 ("tracker-uptime"): the drawing does not match its data; run render']);
+  assert.deepEqual(checkDocument(edited).errors, ['diagram 8 ("tracker-uptime"): the drawing does not match its data; run render']);
 });

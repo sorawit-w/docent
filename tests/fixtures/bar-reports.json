@@ -1,0 +1,16 @@
+{
+  "id": "reports-by-area",
+  "kind": "bar",
+  "label": "Sign-in had the most bug reports in the third quarter, 412. Search and Checkout had about 250 each. Help pages had the fewest, 18. Notifications has no count, because reports had no area label for it before April.",
+  "scale": {"from": 0, "to": 500, "step": 100, "unit": "reports"},
+  "order": "largest",
+  "rows": [
+    {"name": "Sign-in", "value": 412},
+    {"name": "Search", "value": 268},
+    {"name": "Checkout", "value": 231},
+    {"name": "Settings", "value": 97},
+    {"name": "Profile", "value": 64},
+    {"name": "Help pages", "value": 18},
+    {"name": "Notifications", "value": null}
+  ]
+}
