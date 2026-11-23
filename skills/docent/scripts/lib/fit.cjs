@@ -34,6 +34,12 @@ function fitWarnings(kind, model, scene) {
     if (last.count === first) out.push("no step loses anyone; a sentence says this more simply");
     else if (last.count * 100 >= first * 95) out.push(`the last step keeps ${last.ofFirst} of the first, so the bars look almost the same; a table shows small drops better`);
   }
+  if (kind === "bar") {
+    const known = model.rows.flatMap((r) => r.values).filter((v) => v !== null), pairs = model.rows.filter((r) => !r.values.includes(null));
+    if (model.rows.length === 2) out.push("the bar chart has 2 rows; a sentence says this more simply");
+    if (model.series) { if (pairs.length && pairs.every((r) => r.values[0] === r.values[1])) out.push("no row changes; a sentence says this more simply"); }
+    else if (known.length > 1 && known.every((v) => v === known[0])) out.push("every value is the same; a sentence says this more simply");
+  }
   if (kind === "heatmap") {
     const cells = model.rows.flatMap((r) => r.cells), full = cells.filter(Boolean), empty = cells.length - full.length;
     const steps = new Set(full.map((c) => c.step)), lowest = full.filter((c) => c.step === 0).length;

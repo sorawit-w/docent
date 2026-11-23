@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex">
 <title>Report a bug and get a fix — Example project</title>
 <style>
-/* docent:kit 0.15.0 */
+/* docent:kit 0.16.0 */
 /* Docent page styles. Tokens come from references/DESIGN.md. One file, no network. */
 :root {
   color-scheme: light;
@@ -1159,9 +1159,192 @@ footer p { margin: 0; }
       <span class="state warn">Warning</span>
       <p>A report with no steps often waits a long time. Send the steps with the first report when you can.</p>
     </div>
+    <p>Some parts of the program get more reports than others. Before you file a report about Install, search the list: the bug may be there already.</p>
+    <figure>
+      <div class="fig" role="region" aria-label="Figure 5, last month's reports by part" tabindex="0">
+        <!-- docent:diagram
+{
+  "id": "reports-by-part",
+  "kind": "bar",
+  "label": "Of last month's bug reports, Install had the most, 152, and Settings had 117. Help pages had the fewest, 18. Sync has no count, because its reports had no part label until this month.",
+  "scale": {"from": 0, "to": 200, "step": 50, "unit": "reports"},
+  "order": "largest",
+  "rows": [
+    {"name": "Install", "value": 152},
+    {"name": "Settings", "value": 117},
+    {"name": "Search", "value": 84},
+    {"name": "Export", "value": 51},
+    {"name": "Help pages", "value": 18},
+    {"name": "Sync", "value": null}
+  ]
+}
+-->
+<svg id="dg-reports-by-part" class="dg dg-bar dg-auto" xmlns="http://www.w3.org/2000/svg" width="640" height="276" viewBox="0 0 640 276" role="img" aria-label="Of last month's bug reports, Install had the most, 152, and Settings had 117. Help pages had the fewest, 18. Sync has no count, because its reports had no part label until this month.">
+<style>
+#dg-reports-by-part{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-reports-by-part .ground{fill:var(--fig,#f2f3f9)}
+#dg-reports-by-part .band{fill:var(--bg,#fbfbfe)}
+#dg-reports-by-part .track{stroke:var(--line,#d3d6e3)}
+#dg-reports-by-part .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-reports-by-part .head{fill:var(--text,#1c1f2e)}
+#dg-reports-by-part .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-reports-by-part .stop.end{fill:var(--text,#1c1f2e)}
+#dg-reports-by-part .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-reports-by-part .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-reports-by-part .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-reports-by-part .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-reports-by-part .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-reports-by-part .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-reports-by-part .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-reports-by-part .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-reports-by-part .sub,#dg-reports-by-part .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-reports-by-part .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-reports-by-part .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-reports-by-part .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-reports-by-part .r-bar{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-reports-by-part .r-ref{stroke:var(--muted,#575d75)}
+#dg-reports-by-part .r-pt{fill:var(--text,#1c1f2e)}
+#dg-reports-by-part .d-ring{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-reports-by-part .d-gap{stroke:var(--muted,#575d75);stroke-width:2}
+#dg-reports-by-part .d-lead{stroke:var(--muted,#575d75);stroke-width:1}
+@media (prefers-reduced-motion:reduce){#dg-reports-by-part .pulse{animation:none!important}#dg-reports-by-part .pulse{display:none!important}}
+@media print{#dg-reports-by-part{max-width:100%;height:auto}#dg-reports-by-part .pulse{display:none!important}}
+#dg-reports-by-part-phone{display:none}
+</style>
+<rect width="640" height="276" class="ground"/>
+<rect x="8" y="60" width="624" height="208" rx="10" class="band"/>
+<line x1="111" y1="60" x2="111" y2="268" class="track"/>
+<line x1="230.25" y1="60" x2="230.25" y2="268" class="track"/>
+<line x1="349.5" y1="60" x2="349.5" y2="268" class="track"/>
+<line x1="468.75" y1="60" x2="468.75" y2="268" class="track"/>
+<line x1="588" y1="60" x2="588" y2="268" class="track"/>
+<text x="20" y="24" class="sub" text-anchor="start">Reports, bars from 0. Largest first.</text>
+<text x="111" y="48" class="val" text-anchor="middle">0</text>
+<text x="230.25" y="48" class="val" text-anchor="middle">50</text>
+<text x="349.5" y="48" class="val" text-anchor="middle">100</text>
+<text x="468.75" y="48" class="val" text-anchor="middle">150</text>
+<text x="588" y="48" class="val" text-anchor="middle">200</text>
+<text x="20" y="89" class="row" text-anchor="start">Install</text>
+<rect x="477.52" y="76" width="31.76" height="16" class="band"/><text x="481.52" y="88" class="val" text-anchor="start">152</text>
+<text x="20" y="121" class="row" text-anchor="start">Settings</text>
+<rect x="394.04" y="108" width="31.76" height="16" class="band"/><text x="398.04" y="120" class="val" text-anchor="start">117</text>
+<text x="20" y="153" class="row" text-anchor="start">Search</text>
+<rect x="315.34" y="140" width="23.84" height="16" class="band"/><text x="319.34" y="152" class="val" text-anchor="start">84</text>
+<text x="20" y="185" class="row" text-anchor="start">Export</text>
+<rect x="236.64" y="172" width="23.84" height="16" class="band"/><text x="240.64" y="184" class="val" text-anchor="start">51</text>
+<text x="20" y="217" class="row" text-anchor="start">Help pages</text>
+<rect x="157.93" y="204" width="23.84" height="16" class="band"/><text x="161.93" y="216" class="val" text-anchor="start">18</text>
+<text x="20" y="249" class="row" text-anchor="start">Sync</text>
+<rect x="107" y="236" width="52" height="16" class="band"/><text x="111" y="248" class="sub" text-anchor="start">no data</text>
+<rect x="111" y="76" width="362.52" height="16" rx="4" class="r-bar"/><line x1="230.25" y1="76.75" x2="230.25" y2="91.25" class="track"/><line x1="349.5" y1="76.75" x2="349.5" y2="91.25" class="track"/><line x1="468.75" y1="76.75" x2="468.75" y2="91.25" class="track"/>
+<rect x="111" y="108" width="279.04" height="16" rx="4" class="r-bar"/><line x1="230.25" y1="108.75" x2="230.25" y2="123.25" class="track"/><line x1="349.5" y1="108.75" x2="349.5" y2="123.25" class="track"/>
+<rect x="111" y="140" width="200.34" height="16" rx="4" class="r-bar"/><line x1="230.25" y1="140.75" x2="230.25" y2="155.25" class="track"/>
+<rect x="111" y="172" width="121.64" height="16" rx="4" class="r-bar"/><line x1="230.25" y1="172.75" x2="230.25" y2="187.25" class="track"/>
+<rect x="111" y="204" width="42.93" height="16" rx="4" class="r-bar"/>
+
+</svg>
+<svg id="dg-reports-by-part-phone" class="dg dg-bar dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="384" viewBox="0 0 264 384" role="img" aria-label="Of last month's bug reports, Install had the most, 152, and Settings had 117. Help pages had the fewest, 18. Sync has no count, because its reports had no part label until this month.">
+<style>
+#dg-reports-by-part-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-reports-by-part-phone .ground{fill:var(--fig,#f2f3f9)}
+#dg-reports-by-part-phone .band{fill:var(--bg,#fbfbfe)}
+#dg-reports-by-part-phone .track{stroke:var(--line,#d3d6e3)}
+#dg-reports-by-part-phone .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-reports-by-part-phone .head{fill:var(--text,#1c1f2e)}
+#dg-reports-by-part-phone .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-reports-by-part-phone .stop.end{fill:var(--text,#1c1f2e)}
+#dg-reports-by-part-phone .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-reports-by-part-phone .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-reports-by-part-phone .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-reports-by-part-phone .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-reports-by-part-phone .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-reports-by-part-phone .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-reports-by-part-phone .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-reports-by-part-phone .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-reports-by-part-phone .sub,#dg-reports-by-part-phone .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-reports-by-part-phone .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-reports-by-part-phone .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-reports-by-part-phone .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-reports-by-part-phone .r-bar{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-reports-by-part-phone .r-ref{stroke:var(--muted,#575d75)}
+#dg-reports-by-part-phone .r-pt{fill:var(--text,#1c1f2e)}
+#dg-reports-by-part-phone .d-ring{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-reports-by-part-phone .d-gap{stroke:var(--muted,#575d75);stroke-width:2}
+#dg-reports-by-part-phone .d-lead{stroke:var(--muted,#575d75);stroke-width:1}
+@media (prefers-reduced-motion:reduce){#dg-reports-by-part-phone .pulse{animation:none!important}#dg-reports-by-part-phone .pulse{display:none!important}}
+@media print{#dg-reports-by-part-phone{max-width:100%;height:auto}#dg-reports-by-part-phone .pulse{display:none!important}}
+@media (max-width:736px){#dg-reports-by-part{display:none}#dg-reports-by-part-phone{display:block}}
+@media print{#dg-reports-by-part{display:block!important}#dg-reports-by-part-phone{display:none!important}}
+</style>
+<rect width="264" height="384" class="ground"/>
+<rect x="8" y="60" width="248" height="316" rx="10" class="band"/>
+<line x1="20" y1="88" x2="20" y2="116" class="track"/>
+<line x1="68" y1="88" x2="68" y2="116" class="track"/>
+<line x1="116" y1="88" x2="116" y2="116" class="track"/>
+<line x1="164" y1="88" x2="164" y2="116" class="track"/>
+<line x1="212" y1="88" x2="212" y2="116" class="track"/>
+<line x1="20" y1="138" x2="20" y2="166" class="track"/>
+<line x1="68" y1="138" x2="68" y2="166" class="track"/>
+<line x1="116" y1="138" x2="116" y2="166" class="track"/>
+<line x1="164" y1="138" x2="164" y2="166" class="track"/>
+<line x1="212" y1="138" x2="212" y2="166" class="track"/>
+<line x1="20" y1="188" x2="20" y2="216" class="track"/>
+<line x1="68" y1="188" x2="68" y2="216" class="track"/>
+<line x1="116" y1="188" x2="116" y2="216" class="track"/>
+<line x1="164" y1="188" x2="164" y2="216" class="track"/>
+<line x1="212" y1="188" x2="212" y2="216" class="track"/>
+<line x1="20" y1="238" x2="20" y2="266" class="track"/>
+<line x1="68" y1="238" x2="68" y2="266" class="track"/>
+<line x1="116" y1="238" x2="116" y2="266" class="track"/>
+<line x1="164" y1="238" x2="164" y2="266" class="track"/>
+<line x1="212" y1="238" x2="212" y2="266" class="track"/>
+<line x1="20" y1="288" x2="20" y2="316" class="track"/>
+<line x1="68" y1="288" x2="68" y2="316" class="track"/>
+<line x1="116" y1="288" x2="116" y2="316" class="track"/>
+<line x1="164" y1="288" x2="164" y2="316" class="track"/>
+<line x1="212" y1="288" x2="212" y2="316" class="track"/>
+<line x1="20" y1="338" x2="20" y2="366" class="track"/>
+<line x1="68" y1="338" x2="68" y2="366" class="track"/>
+<line x1="116" y1="338" x2="116" y2="366" class="track"/>
+<line x1="164" y1="338" x2="164" y2="366" class="track"/>
+<line x1="212" y1="338" x2="212" y2="366" class="track"/>
+<text x="20" y="24" class="sub" text-anchor="start">Reports, bars from 0. Largest first.</text>
+<text x="20" y="48" class="val" text-anchor="middle">0</text>
+<text x="68" y="48" class="val" text-anchor="middle">50</text>
+<text x="116" y="48" class="val" text-anchor="middle">100</text>
+<text x="164" y="48" class="val" text-anchor="middle">150</text>
+<text x="212" y="48" class="val" text-anchor="middle">200</text>
+<text x="20" y="84" class="row" text-anchor="start">Install</text>
+<rect x="169.92" y="94" width="31.76" height="16" class="band"/><text x="173.92" y="106" class="val" text-anchor="start">152</text>
+<text x="20" y="134" class="row" text-anchor="start">Settings</text>
+<rect x="136.32" y="144" width="31.76" height="16" class="band"/><text x="140.32" y="156" class="val" text-anchor="start">117</text>
+<text x="20" y="184" class="row" text-anchor="start">Search</text>
+<rect x="104.64" y="194" width="23.84" height="16" class="band"/><text x="108.64" y="206" class="val" text-anchor="start">84</text>
+<text x="20" y="234" class="row" text-anchor="start">Export</text>
+<rect x="72.96" y="244" width="23.84" height="16" class="band"/><text x="76.96" y="256" class="val" text-anchor="start">51</text>
+<text x="20" y="284" class="row" text-anchor="start">Help pages</text>
+<rect x="41.28" y="294" width="23.84" height="16" class="band"/><text x="45.28" y="306" class="val" text-anchor="start">18</text>
+<text x="20" y="334" class="row" text-anchor="start">Sync</text>
+<rect x="16" y="344" width="52" height="16" class="band"/><text x="20" y="356" class="sub" text-anchor="start">no data</text>
+<rect x="20" y="94" width="145.92" height="16" rx="4" class="r-bar"/><line x1="68" y1="94.75" x2="68" y2="109.25" class="track"/><line x1="116" y1="94.75" x2="116" y2="109.25" class="track"/><line x1="164" y1="94.75" x2="164" y2="109.25" class="track"/>
+<rect x="20" y="144" width="112.32" height="16" rx="4" class="r-bar"/><line x1="68" y1="144.75" x2="68" y2="159.25" class="track"/><line x1="116" y1="144.75" x2="116" y2="159.25" class="track"/>
+<rect x="20" y="194" width="80.64" height="16" rx="4" class="r-bar"/><line x1="68" y1="194.75" x2="68" y2="209.25" class="track"/>
+<rect x="20" y="244" width="48.96" height="16" rx="4" class="r-bar"/>
+<rect x="20" y="294" width="17.28" height="16" rx="4" class="r-bar"/>
+
+</svg>
+<details class="dg-words">
+<summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>The diagram in words</summary>
+<div class="table-wrap is-text" role="region" aria-label="The rows of the bar chart" tabindex="0"><table><thead><tr><th scope="col">Row</th><th scope="col">Value, in reports</th></tr></thead><tbody><tr><th scope="row">Install</th><td>152</td></tr><tr><th scope="row">Settings</th><td>117</td></tr><tr><th scope="row">Search</th><td>84</td></tr><tr><th scope="row">Export</th><td>51</td></tr><tr><th scope="row">Help pages</th><td>18</td></tr><tr><th scope="row">Sync</th><td>no data</td></tr></tbody></table></div>
+<ul><li>Reports, bars from 0. Largest first.</li><li>No data: Sync.</li></ul>
+</details>
+<!-- /docent:diagram -->
+      </div>
+      <figcaption><strong>Figure 5</strong>Last month's bug reports by the part of the program they were about.</figcaption>
+    </figure>
     <p>The time of day matters too. The maintainers answer in their working hours, and few answer on a weekend.</p>
     <figure>
-      <div class="fig" role="region" aria-label="Figure 5, when the maintainers reply" tabindex="0">
+      <div class="fig" role="region" aria-label="Figure 6, when the maintainers reply" tabindex="0">
         <!-- docent:diagram
 {
   "id": "replies-by-hour",
@@ -1336,7 +1519,7 @@ footer p { margin: 0; }
 </details>
 <!-- /docent:diagram -->
       </div>
-      <figcaption><strong>Figure 5</strong>When the maintainers replied last month, by weekday and hour in their time zone.</figcaption>
+      <figcaption><strong>Figure 6</strong>When the maintainers replied last month, by weekday and hour in their time zone.</figcaption>
     </figure>
     <div class="status">
       <span class="state plan">Planned</span>
@@ -1344,7 +1527,7 @@ footer p { margin: 0; }
     </div>
     <p>The bug tracker can fail too. Each day its parts are measured, and a day counts as OK when a part was up for 99.9% of it.</p>
     <figure>
-      <div class="fig" role="region" aria-label="Figure 6, uptime of the bug tracker" tabindex="0">
+      <div class="fig" role="region" aria-label="Figure 7, uptime of the bug tracker" tabindex="0">
         <!-- docent:diagram
 {
   "id": "bug-tracker-uptime",
@@ -1511,7 +1694,7 @@ footer p { margin: 0; }
 </details>
 <!-- /docent:diagram -->
       </div>
-      <figcaption><strong>Figure 6</strong>Uptime of the bug tracker's parts, day by day, from 3 to 16 November.</figcaption>
+      <figcaption><strong>Figure 7</strong>Uptime of the bug tracker's parts, day by day, from 3 to 16 November.</figcaption>
     </figure>
     <div class="status">
       <span class="state warn">Warning</span>
@@ -1701,7 +1884,7 @@ grep -i password bug.log</code></pre>
 </footer>
 
 <script>
-// docent:kit 0.15.0
+// docent:kit 0.16.0
 (() => {
   const root = document.documentElement;
   root.classList.add('js');

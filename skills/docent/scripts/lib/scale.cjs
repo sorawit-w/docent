@@ -104,11 +104,11 @@ function diff(a, b) {
 }
 
 /**
- * The head of a scale chart, from the top y: the names of the marks, then the tick labels, with the unit at the left of the
+ * The head of a scale chart, from the top y (12, or under the line above a chart): the names of the marks, then the tick labels, with the unit at the left of the
  * ticks (on its own line on a phone). A scale with no ticks shows no unit here; its measures carry it. Returns the y below.
  */
-function drawHead(s, scale, sc, { W, x0, phone, where }) {
-  let y = 12;
+function drawHead(s, scale, sc, { W, x0, phone, where, top = 12 }) {
+  let y = top;
   if (scale.marks.length) {
     const boxes = scale.marks.map((m) => {
       const w = textWidth(m.name, 12), cx = Math.min(Math.max(sc.x(m.at), 12 + w / 2), W - 12 - w / 2);

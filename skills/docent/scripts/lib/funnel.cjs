@@ -5,7 +5,7 @@
 // has no color, and no drop is marked as the largest. The author writes the counts; every drop and share is computed here.
 const { fail, words, id } = require("./blocks.cjs");
 const { textWidth } = require("./text.cjs");
-const { WIDE, PHONE, esc, wrapName, NO_SPACES, comma, share, valueWidth, num } = require("./chart.cjs");
+const { WIDE, PHONE, esc, wrapName, NO_SPACES, comma, share, headLines, valueWidth, num } = require("./chart.cjs");
 
 const MOST = { steps: 8, name: 28, unit: 20, word: 200, count: 999999999 };
 const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
@@ -60,9 +60,7 @@ function drawFunnel(model, phone = false) {
   // One line above the bars says what they count and the base of each share: the share beside a count is of the first step,
   // and the share in a drop is of the step before. It wraps at its spaces.
   // Two sentences, each on lines of its own. A no-break space keeps "from 0" together.
-  const head = [`${cap(model.unit)} at each step, bars from\u00a00.`, "Beside each count, its share of the first step; in each drop, its share of the step before."].flatMap((t) => wrapName(t, W - 40, { size: 12, weight: 400, every: false }));
-  head.forEach((line, i) => s.notes.push({ x: 20, y: 24 + i * 16, s: line, cls: "sub", anchor: "start" }));
-  const top = 24 + (head.length - 1) * 16 + 12;
+  const top = headLines(s, [`${cap(model.unit)} at each step, bars from\u00a00.`, "Beside each count, its share of the first step; in each drop, its share of the step before."], W);
 
   let x0, x1, countX, shareX, room;
   if (phone) {

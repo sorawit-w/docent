@@ -53,7 +53,7 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
   {
     const { page, context } = await open({ width: 1280 });
     const sizes = await page.evaluate(() => [...document.querySelectorAll("svg.dg")].filter((s) => s.getBoundingClientRect().width).map((s) => ({ id: s.id, shown: Math.round(s.getBoundingClientRect().width), real: s.viewBox.baseVal.width })));
-    ok("six drawings, each at its real size (names 14px, notes 12px)", sizes.length === 6 && sizes.every((s) => s.shown === s.real), sizes);
+    ok("seven drawings, each at its real size (names 14px, notes 12px)", sizes.length === 7 && sizes.every((s) => s.shown === s.real), sizes);
     const texts = await page.evaluate(() => [...document.querySelectorAll("svg.dg text:not(.num)")].filter((t) => t.getBoundingClientRect().width).map((t) => ({ s: t.textContent, cls: t.getAttribute("class"), px: t.getComputedTextLength(), size: getComputedStyle(t).fontSize })));
     const font = { name: [14, 600], lane: [14, 600], sub: [12, 400], verb: [12, 400], row: [14, 400], val: [12, 400] };
     const { valueWidth } = require(path.join(root, "skills", "docent", "scripts", "lib", "scale.cjs"));
@@ -61,7 +61,7 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     const wider = texts.filter((t) => t.px > assumed(t) + 0.5).map((t) => `${t.s}: ${t.px.toFixed(1)} > ${assumed(t)}`);
     ok("no text in a drawing is wider than the renderer assumed", wider.length === 0, wider);
     ok("text sizes in the drawings are 14px and 12px", texts.every((t) => t.size === `${font[t.cls][0]}px`), [...new Set(texts.map((t) => `${t.cls}:${t.size}`))]);
-    const icons = await page.evaluate(() => ({ perDrawing: [...document.querySelectorAll("svg.dg:not(.dg-funnel):not(.dg-heatmap):not(.dg-statusgrid)")].filter((s) => s.getBoundingClientRect().width).map((s) => s.querySelectorAll(".icon").length), leftovers: document.querySelectorAll("animateMotion, [filter], svg.dg image, svg.dg script").length }));
+    const icons = await page.evaluate(() => ({ perDrawing: [...document.querySelectorAll("svg.dg:not(.dg-funnel):not(.dg-bar):not(.dg-heatmap):not(.dg-statusgrid)")].filter((s) => s.getBoundingClientRect().width).map((s) => s.querySelectorAll(".icon").length), leftovers: document.querySelectorAll("animateMotion, [filter], svg.dg image, svg.dg script").length }));
     ok("seven icons in each drawing, made of plain shapes", icons.perDrawing.join() === "7,7,7" && icons.leftovers === 0, icons);
 
     const current = () => page.evaluate(() => {
@@ -130,7 +130,7 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     const paper = await open({ width: 794, height: 1123, theme: "dark", media: "print" });
     const print = await paper.page.evaluate(() => ({ bg: getComputedStyle(document.body).backgroundColor, text: getComputedStyle(document.body).color, topbar: [".route", ".theme", ".route-dot"].map((sel) => getComputedStyle(document.querySelector(sel)).display).join(), dots: [...new Set([...document.querySelectorAll("svg.dg .pulse")].map((p) => getComputedStyle(p).display))].join(), lines: [...new Set([...document.querySelectorAll("svg.dg .line")].map((l) => getComputedStyle(l).stroke))].join() }));
     const cut = await paper.page.evaluate(() => [...document.querySelectorAll("svg.dg")].filter((s) => s.getBoundingClientRect().width).map((s) => ({ id: s.id, over: Math.round(s.getBoundingClientRect().right - s.closest(".fig").getBoundingClientRect().right) })));
-    ok("on paper no drawing is cut off", cut.length === 6 && cut.every((d) => d.over <= 0), cut);
+    ok("on paper no drawing is cut off", cut.length === 7 && cut.every((d) => d.over <= 0), cut);
     await paper.page.screenshot({ path: `${out}/print.png`, fullPage: true });
     await paper.context.close();
     ok("print is light on a dark system, without the links and the switch of the top bar, without dots or a colored leg", print.bg === "rgb(255, 255, 255)" && print.text === LIGHT.text && print.topbar === "none,none,none" && print.dots === "none" && print.lines === LIGHT.text, print);
@@ -245,14 +245,14 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     const flow = await page.evaluate(() => ({ scrollWidth: document.documentElement.scrollWidth, clientWidth: document.documentElement.clientWidth, inner: [...document.querySelectorAll(".fig, .table-wrap, pre")].filter((e) => e.scrollWidth > e.clientWidth + 1).length }));
     ok("at 320px the page does not scroll sideways", flow.scrollWidth === flow.clientWidth, flow);
     const wells = await page.evaluate(() => [...document.querySelectorAll(".fig")].map((e) => ({ id: [...e.querySelectorAll("svg.dg")].find((s) => s.getBoundingClientRect().width).id, scrolls: e.scrollWidth > e.clientWidth + 1 })));
-    ok("at 320px every drawing fits its well", wells.map((w) => `${w.id}:${w.scrolls}`).join() === "dg-path-phone:false,dg-steps-phone:false,dg-parts-phone:false,dg-reports-month-phone:false,dg-replies-by-hour-phone:false,dg-bug-tracker-uptime-phone:false", wells);
+    ok("at 320px every drawing fits its well", wells.map((w) => `${w.id}:${w.scrolls}`).join() === "dg-path-phone:false,dg-steps-phone:false,dg-parts-phone:false,dg-reports-month-phone:false,dg-reports-by-part-phone:false,dg-replies-by-hour-phone:false,dg-bug-tracker-uptime-phone:false", wells);
     await context.close();
   }
 
   // On a phone each route shows its single-track form, at real size, and it fits its well.
   {
     const { page, context } = await open({ width: 390, height: 844 });
-    const phone = await page.evaluate(() => [...document.querySelectorAll("svg.dg:not(.dg-funnel):not(.dg-heatmap):not(.dg-statusgrid)")].filter((s) => s.getBoundingClientRect().width).map((s) => ({ id: s.id, cls: s.getAttribute("class"), shown: Math.round(s.getBoundingClientRect().width), real: s.viewBox.baseVal.width, fits: s.closest(".fig").scrollWidth <= s.closest(".fig").clientWidth + 1 })));
+    const phone = await page.evaluate(() => [...document.querySelectorAll("svg.dg:not(.dg-funnel):not(.dg-bar):not(.dg-heatmap):not(.dg-statusgrid)")].filter((s) => s.getBoundingClientRect().width).map((s) => ({ id: s.id, cls: s.getAttribute("class"), shown: Math.round(s.getBoundingClientRect().width), real: s.viewBox.baseVal.width, fits: s.closest(".fig").scrollWidth <= s.closest(".fig").clientWidth + 1 })));
     ok("on a phone each route shows its single-track form, at real size, with no sideways scroll", phone.length === 3 && phone.every((d) => d.id.endsWith("-phone") && d.cls.includes("dg-track") && d.fits && d.shown === d.real), phone);
     const lit = [];
     for (let i = 0; i < 4; i++) {
@@ -582,10 +582,10 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     ok(`a UML ${name} diagram shows its drawing on a desktop, its column on a phone, and its words with a key on paper, in both themes with no contrast problem`, desk.main > 0 && !desk.column && !desk.words && (desk.main <= 264 ? [phone, narrow].every((r) => r.main === desk.main && !r.column) : !phone.main && phone.column === 264 && narrow.column === 264) && paper.words && paper.key > 0 && [phone, narrow].every((r) => r.page === r.view) && results.deskAxe.length === 0 && results.darkAxe.length === 0, results);
   }
 
-  // The scale charts (a range chart, two layouts to scale, three plans, a funnel, two heat maps, two heat plans and three status grids): the 640px form on a desktop and on paper (at its real size,
+  // The scale charts (a range chart, two layouts to scale, three plans, a funnel, two bar charts, two heat maps, two heat plans and three status grids): the 640px form on a desktop and on paper (at its real size,
   // no shrink), the 264px form on a phone, the rows as a table in words, text no wider than the renderer assumed, and no
   // contrast problem in either theme.
-  for (const [file, id, rows, what] of [["range", "line-lengths", 8, "a range chart"], ["layout-screen", "wide-layouts", 12, "a layout to scale with two tracks"], ["layout-a4", "a4-notes", 4, "a measured layout to scale"], ["plan-docs", "docs-page", 5, "a plan that grows a column on a phone"], ["plan-editor", "editor-screen", 5, "a plan with a box across two rows"], ["plan-dashboard", "dashboard", 5, "a plan stacked on a phone"], ["funnel", "signup-may", 5, "a funnel"], ["heatmap-signups", "signups-by-hour", 7, "a heat map of 24 columns"], ["heatmap-errors", "errors-by-day", 6, "a heat map with numbers and a cell with no data"], ["heatplan-product", "product-clicks", 8, "a heat plan with a box with no data"], ["heatplan-help", "help-clicks", 6, "a heat plan stacked on a phone"], ["statusgrid-uptime", "tracker-uptime", 5, "a status grid with a cell with no data"], ["statusgrid-calendar", "website-13-weeks", 7, "a status grid written as a calendar"], ["statusgrid-builds", "nightly-builds", 4, "a status grid with states written directly"]]) {
+  for (const [file, id, rows, what] of [["range", "line-lengths", 8, "a range chart"], ["layout-screen", "wide-layouts", 12, "a layout to scale with two tracks"], ["layout-a4", "a4-notes", 4, "a measured layout to scale"], ["plan-docs", "docs-page", 5, "a plan that grows a column on a phone"], ["plan-editor", "editor-screen", 5, "a plan with a box across two rows"], ["plan-dashboard", "dashboard", 5, "a plan stacked on a phone"], ["funnel", "signup-may", 5, "a funnel"], ["bar-reports", "reports-by-area", 7, "a bar chart with a row with no data"], ["bar-days", "days-to-fix", 5, "a dumbbell"], ["heatmap-signups", "signups-by-hour", 7, "a heat map of 24 columns"], ["heatmap-errors", "errors-by-day", 6, "a heat map with numbers and a cell with no data"], ["heatplan-product", "product-clicks", 8, "a heat plan with a box with no data"], ["heatplan-help", "help-clicks", 6, "a heat plan stacked on a phone"], ["statusgrid-uptime", "tracker-uptime", 5, "a status grid with a cell with no data"], ["statusgrid-calendar", "website-13-weeks", 7, "a status grid written as a calendar"], ["statusgrid-builds", "nightly-builds", 4, "a status grid with states written directly"]]) {
     const data = fs.readFileSync(path.join(root, "tests", "fixtures", `${file}.json`), "utf8");
     const content = renderDocument(html.replace('<section id="report"', `<section id="rng" aria-labelledby="rng-h"><h2 id="rng-h">Range</h2><figure><div class="fig" role="region" aria-label="Figure 9, line lengths" tabindex="0">\n<!-- docent:diagram\n${data}\n-->\n<!-- /docent:diagram -->\n</div><figcaption><strong>Figure 9</strong>Line lengths.</figcaption></figure></section>\n<section id="report"`)).html;
     const look = (page) => page.evaluate((id) => {

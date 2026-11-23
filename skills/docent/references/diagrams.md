@@ -730,7 +730,7 @@ A communication diagram shows who is linked to whom, and the numbered messages t
 
 ## Range charts
 
-A range chart shows values and ranges on one numeric scale, one row each, so the reader sees where each one falls and whether one range sits inside another: line lengths that studies recommend, and the line length of a page. Write it with `"kind": "range"` when there are 3 to 12 values in one unit. For one or two values, write a sentence. For values over time, use a timing diagram or a table. For amounts compared by size from zero, use a table. Docent has one bar chart, the funnel, for the steps of one flow.
+A range chart shows values and ranges on one numeric scale, one row each, so the reader sees where each one falls and whether one range sits inside another: line lengths that studies recommend, and the line length of a page. Write it with `"kind": "range"` when there are 3 to 12 values in one unit. For one or two values, write a sentence. For values over time, use a timing diagram or a table. For amounts compared by size from zero, use a bar chart (see "Bar charts" below).
 
 ```json
 {
@@ -882,6 +882,77 @@ A funnel shows how many people reach each step of one flow, and how many leave b
 - The forms: 640px on a desktop and on paper, with the names, the counts and the shares in columns at the left; and 264px on a phone, where each name stands on its own line with its numbers at the right, and its bar runs under it. When a name needs more than two lines beside its numbers, the numbers go on their own line under it. Within the limits, a funnel is never refused for its width.
 - To compare two groups, such as phone and desktop, write two funnels, or a table. Each funnel has its own scale, so their shares compare and their bar lengths do not.
 - `render` also writes the steps as a table under the drawing, with both shares, and three lines: how many reached the last step, where the most people left, and where the largest share left.
+
+## Bar charts
+
+A bar chart shows how large each amount is, and which is largest: how many bug reports each area of the app got last quarter. Write it with `"kind": "bar"` when there are 2 to 16 amounts in one unit, each for one named thing. For one or two amounts, write a sentence. For the steps of one flow, use a funnel. For values or ranges on a scale that does not start at 0, use a range chart. For amounts over time, or when each exact number matters more than the picture, use a table.
+
+```json
+{
+  "id": "reports-by-area",
+  "kind": "bar",
+  "label": "Sign-in had the most bug reports in the third quarter, 412. Search and Checkout had about 250 each. Help pages had the fewest, 18. Notifications has no count, because reports had no area label for it before April.",
+  "scale": {"from": 0, "to": 500, "step": 100, "unit": "reports"},
+  "order": "largest",
+  "rows": [
+    {"name": "Sign-in", "value": 412},
+    {"name": "Search", "value": 268},
+    {"name": "Checkout", "value": 231},
+    {"name": "Settings", "value": 97},
+    {"name": "Profile", "value": 64},
+    {"name": "Help pages", "value": 18},
+    {"name": "Notifications", "value": null}
+  ]
+}
+```
+
+| Field | What it is |
+|---|---|
+| `scale` | `from`, `to`, `step` and an optional `unit`, as in a range chart, with no `marks`. **`from` is 0** when no value is below 0. With values below 0, `from` is below 0 and `to` is 0 or more, so 0 lies on the scale. |
+| `order` | `"largest"` (the default), `"smallest"` or `"written"`. `render` sorts the rows and says the order in the line above the chart. `"written"` needs `orderNote`, at most 32 characters, such as `"oldest release first"`, which the line above repeats. Rows with the same value keep the order they were written in. |
+| `rows` | 2 to 16. Each has a `name` (at most 28 characters) and a `value`: a number on the scale, or `null` when the number is not known. An optional `group` works as in a range chart, at most 3: the rows are sorted inside each group. |
+
+- **A bar starts at 0.** `render` refuses a scale from above 0, because it cuts every bar short and their lengths no longer compare. A bar below 0 runs to the left of a solid muted line at 0.
+- **Write a missing number as `null`, never leave the row out.** The row stays in the chart with `no data` where its bar would start, and a line under the table names it: "No data: Notifications." A row with no `value` at all is refused, so that a missing number is a choice and not a typing mistake. A row with no number goes last when the rows are sorted.
+- A bar is the bar of a range chart. Its value stands 8px after its end, in tabular figures, written as the scale's ticks are. Room is kept beside the scale for the widest value, so every value fits. A bar above or below 0 that would be narrower than 2px is drawn 2px wide, and the words say so. A value of 0 has no bar.
+- No bar is marked as the largest: the order already puts it first. A bar chart has no legend, no `state`, no color and no dot, and nothing in it is dashed.
+- One line above the chart says the unit, where the scale starts, and the order: "Reports, bars from 0. Largest first." The ticks do not repeat the unit.
+- The forms are those of a range chart: 640px on a desktop and on paper, with the row names in a column at the left; and 264px on a phone, where each name stands on its own line above its bar. It prints at 640px, with no shrink.
+- `render` also writes the rows as a table under the drawing, in the order of the drawing, with the line above the chart and the lines on rows with no data.
+
+### Two values in each row: the dumbbell
+
+When the reader compares two values for each thing, such as last year and this year, name the two in `series`. Each row then has `values`, a list of two numbers or `null`s, in place of `value`.
+
+```json
+{
+  "id": "days-to-fix",
+  "kind": "bar",
+  "label": "The median time to fix a bug fell in three of five areas from 2025 to 2026. Settings fell most, from 15 days to 6. Checkout rose from 6 to 8. Profile stayed at 5.",
+  "scale": {"from": 0, "to": 20, "step": 5, "unit": "days"},
+  "series": ["2025", "2026"],
+  "order": "written",
+  "orderNote": "as in the app's menu",
+  "rows": [
+    {"name": "Sign-in", "values": [9, 4]},
+    {"name": "Search", "values": [12, 7]},
+    {"name": "Checkout", "values": [6, 8]},
+    {"name": "Settings", "values": [15, 6]},
+    {"name": "Profile", "values": [5, 5]}
+  ]
+}
+```
+
+- `series` names the two values, each at most 16 characters. The first value is a ring, the second a filled dot, joined by a 2px muted line. Shape tells them apart, not color, so they stay apart in gray print. The line shows the gap, not a path: it says nothing about the values between.
+- The series names stand above the ring and the dot of the first row that has both, as the only key. When the two names would meet, they move apart, and a thin muted line joins each to its mark. The marks never move.
+- The smaller value stands left of the left mark, the larger right of the right mark. Two equal values are a smaller dot inside the ring, with the value written once. When the marks touch, the dot lies over the ring, and both values are still written.
+- A dumbbell's scale may start above 0, because a gap does not change when the scale moves. The line above the chart says where it starts: "Days, scale from 0."
+- `order` may also be `"change"`: the largest change first, rise or fall. `"largest"` and `"smallest"` sort by the second value, and the line above says so: "Sorted by 2026, largest first."
+- A row with one `null` draws the known mark alone, with its value and the words for the other: `9; no data for 2026`. A row with two `null`s writes `no data`. Lines under the table name each series' missing rows.
+- The table in words has a column for each series and a column for the change, such as `−5` or `+2`.
+- Grouped and stacked bars are not offered. Two bars side by side in a row say what a dumbbell says with more ink, and only the first part of a stacked bar starts at 0. Use a table for both.
+
+The rules against a cut scale, for a stated order, for rows with no data and for the dumbbell's line follow the chart guides of diagram-design by Cathryn Lavery (MIT).
 
 ## Heat maps
 
@@ -1089,6 +1160,8 @@ An icon may hold only these shapes and attributes: `path` (`d`), `circle` (`cx`,
   - `... warning: the funnel has 2 steps; a sentence says this more simply` — two counts read better in a sentence: "1,860 of 12,480 people finished".
   - `... warning: no step loses anyone; a sentence says this more simply` — every count is the same, so the bars show nothing.
   - `... warning: the last step keeps 96% of the first, so the bars look almost the same; a table shows small drops better` — when the last count is at least 95% of the first, the loss is too short to see on a phone.
+  - `... warning: the bar chart has 2 rows; a sentence says this more simply` — two amounts read better in a sentence.
+  - `... warning: every value is the same; a sentence says this more simply` — every bar has the same length. For a dumbbell: `no row changes; a sentence says this more simply`.
   - `... warning: every number is in one step, so the shades show nothing; a sentence or a table says this more simply` — every cell has the same shade.
   - `... warning: 61 of 72 cells are in the lowest step; one large number may set the scale. Check "to", or say the large number in the text` — four cells in five, or more, have the palest shade.
   - `... warning: the heat map has 9 cells; a table with the numbers says this more simply` — fewer than 12 cells.

@@ -114,3 +114,26 @@ test("the table in words splits for paper into the fewest tables of equal size, 
   assert.deepEqual(tablesOf(small, text), [[0, 1, 2]]);
   assert.equal(gridTables(small, text, "The grid"), '<div class="table-wrap" role="region" aria-label="The grid" tabindex="0"><table><thead><tr><td></td><th scope="col">A</th><th scope="col">B</th><th scope="col">C</th></tr></thead><tbody><tr><th scope="row">R &amp; D</th><td>1</td><td>2</td><td>no data</td></tr></tbody></table></div>');
 });
+
+test("the line above a chart starts each sentence on a line, wraps at its spaces, and returns the y under it", () => {
+  const s = { notes: [] };
+  assert.equal(chart.headLines(s, ["Reports, bars from 0. Largest first."], WIDE), 36);
+  assert.deepEqual(s.notes, [{ x: 20, y: 24, s: "Reports, bars from 0. Largest first.", cls: "sub", anchor: "start" }]);
+  const t = { notes: [] };
+  assert.equal(chart.headLines(t, ["Days, scale from 0. As in the app's menu.", "Second."], PHONE), 68);
+  assert.deepEqual(t.notes.map((n) => [n.s, n.y]), [["Days, scale from 0. As in the app's", 24], ["menu.", 40], ["Second.", 56]]);
+});
+
+test("labels move apart and keep their order; their points never move", () => {
+  const { apart } = chart;
+  // Far apart: no label moves.
+  assert.deepEqual(apart([{ at: 100, size: 30 }, { at: 300, size: 30 }], 12, 628, 8), [100, 300]);
+  // At one point: they move apart evenly around it, the first written on the left.
+  assert.deepEqual(apart([{ at: 100, size: 30 }, { at: 100, size: 30 }], 12, 252, 8), [81, 119]);
+  // Near an edge: the group moves inside, and keeps the gap.
+  assert.deepEqual(apart([{ at: 20, size: 30 }, { at: 22, size: 30 }], 12, 252, 8), [27, 65]);
+  // Three labels where two meet: only those two move.
+  assert.deepEqual(apart([{ at: 200, size: 20 }, { at: 50, size: 20 }, { at: 205, size: 20 }], 0, 400, 8), [188.5, 50, 216.5]);
+  // Too long for the room: null, so the chart can refuse with a plain reason.
+  assert.equal(apart([{ at: 50, size: 60 }, { at: 60, size: 60 }], 0, 100, 8), null);
+});

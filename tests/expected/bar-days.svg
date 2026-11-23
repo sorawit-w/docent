@@ -1,0 +1,149 @@
+<svg id="dg-days-to-fix" class="dg dg-bar dg-auto" xmlns="http://www.w3.org/2000/svg" width="640" height="266" viewBox="0 0 640 266" role="img" aria-label="The median time to fix a bug fell in three of five areas from 2025 to 2026. Settings fell most, from 15 days to 6. Checkout rose from 6 to 8. Profile stayed at 5.">
+<style>
+#dg-days-to-fix{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-days-to-fix .ground{fill:var(--fig,#f2f3f9)}
+#dg-days-to-fix .band{fill:var(--bg,#fbfbfe)}
+#dg-days-to-fix .track{stroke:var(--line,#d3d6e3)}
+#dg-days-to-fix .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-days-to-fix .head{fill:var(--text,#1c1f2e)}
+#dg-days-to-fix .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-days-to-fix .stop.end{fill:var(--text,#1c1f2e)}
+#dg-days-to-fix .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-days-to-fix .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-days-to-fix .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-days-to-fix .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-days-to-fix .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-days-to-fix .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-days-to-fix .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-days-to-fix .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-days-to-fix .sub,#dg-days-to-fix .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-days-to-fix .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-days-to-fix .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-days-to-fix .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-days-to-fix .r-bar{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-days-to-fix .r-ref{stroke:var(--muted,#575d75)}
+#dg-days-to-fix .r-pt{fill:var(--text,#1c1f2e)}
+#dg-days-to-fix .d-ring{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-days-to-fix .d-gap{stroke:var(--muted,#575d75);stroke-width:2}
+#dg-days-to-fix .d-lead{stroke:var(--muted,#575d75);stroke-width:1}
+@media (prefers-reduced-motion:reduce){#dg-days-to-fix .pulse{animation:none!important}#dg-days-to-fix .pulse{display:none!important}}
+@media print{#dg-days-to-fix{max-width:100%;height:auto}#dg-days-to-fix .pulse{display:none!important}}
+#dg-days-to-fix-phone{display:none}
+</style>
+<rect width="640" height="266" class="ground"/>
+<rect x="8" y="60" width="624" height="198" rx="10" class="band"/>
+<line x1="128" y1="60" x2="128" y2="258" class="track"/>
+<line x1="243.75" y1="60" x2="243.75" y2="258" class="track"/>
+<line x1="359.5" y1="60" x2="359.5" y2="258" class="track"/>
+<line x1="475.25" y1="60" x2="475.25" y2="258" class="track"/>
+<line x1="591" y1="60" x2="591" y2="258" class="track"/>
+<text x="20" y="24" class="sub" text-anchor="start">Days, scale from 0. As in the app's menu.</text>
+<text x="128" y="48" class="val" text-anchor="middle">0</text>
+<text x="243.75" y="48" class="val" text-anchor="middle">5</text>
+<text x="359.5" y="48" class="val" text-anchor="middle">10</text>
+<text x="475.25" y="48" class="val" text-anchor="middle">15</text>
+<text x="591" y="48" class="val" text-anchor="middle">20</text>
+<text x="20" y="111" class="row" text-anchor="start">Sign-in</text>
+<rect x="195.68" y="98" width="15.92" height="16" class="band"/><text x="207.6" y="110" class="val" text-anchor="end">4</text>
+<rect x="345.35" y="98" width="15.92" height="16" class="band"/><text x="349.35" y="110" class="val" text-anchor="start">9</text>
+<rect x="318.35" y="76" width="36" height="16" class="band"/><text x="336.35" y="88" class="sub" text-anchor="middle">2025</text>
+<rect x="202.6" y="76" width="36" height="16" class="band"/><text x="220.6" y="88" class="sub" text-anchor="middle">2026</text>
+<text x="20" y="143" class="row" text-anchor="start">Search</text>
+<rect x="265.13" y="130" width="15.92" height="16" class="band"/><text x="277.05" y="142" class="val" text-anchor="end">7</text>
+<rect x="414.8" y="130" width="23.84" height="16" class="band"/><text x="418.8" y="142" class="val" text-anchor="start">12</text>
+<text x="20" y="175" class="row" text-anchor="start">Checkout</text>
+<rect x="241.98" y="162" width="15.92" height="16" class="band"/><text x="253.9" y="174" class="val" text-anchor="end">6</text>
+<rect x="322.2" y="162" width="15.92" height="16" class="band"/><text x="326.2" y="174" class="val" text-anchor="start">8</text>
+<text x="20" y="207" class="row" text-anchor="start">Settings</text>
+<rect x="241.98" y="194" width="15.92" height="16" class="band"/><text x="253.9" y="206" class="val" text-anchor="end">6</text>
+<rect x="484.25" y="194" width="23.84" height="16" class="band"/><text x="488.25" y="206" class="val" text-anchor="start">15</text>
+<text x="20" y="239" class="row" text-anchor="start">Profile</text>
+<rect x="252.75" y="226" width="15.92" height="16" class="band"/><text x="256.75" y="238" class="val" text-anchor="start">5</text>
+<line x1="336.35" y1="106" x2="220.6" y2="106" class="d-gap"/><circle cx="336.35" cy="106" r="4.25" class="d-ring"/><circle cx="220.6" cy="106" r="5" class="r-pt"/>
+<line x1="405.8" y1="138" x2="290.05" y2="138" class="d-gap"/><circle cx="405.8" cy="138" r="4.25" class="d-ring"/><circle cx="290.05" cy="138" r="5" class="r-pt"/>
+<line x1="266.9" y1="170" x2="313.2" y2="170" class="d-gap"/><circle cx="266.9" cy="170" r="4.25" class="d-ring"/><circle cx="313.2" cy="170" r="5" class="r-pt"/>
+<line x1="475.25" y1="202" x2="266.9" y2="202" class="d-gap"/><circle cx="475.25" cy="202" r="4.25" class="d-ring"/><circle cx="266.9" cy="202" r="5" class="r-pt"/>
+<circle cx="243.75" cy="234" r="4.25" class="d-ring"/><circle cx="243.75" cy="234" r="3" class="r-pt"/>
+</svg>
+<svg id="dg-days-to-fix-phone" class="dg dg-bar dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="372" viewBox="0 0 264 372" role="img" aria-label="The median time to fix a bug fell in three of five areas from 2025 to 2026. Settings fell most, from 15 days to 6. Checkout rose from 6 to 8. Profile stayed at 5.">
+<style>
+#dg-days-to-fix-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-days-to-fix-phone .ground{fill:var(--fig,#f2f3f9)}
+#dg-days-to-fix-phone .band{fill:var(--bg,#fbfbfe)}
+#dg-days-to-fix-phone .track{stroke:var(--line,#d3d6e3)}
+#dg-days-to-fix-phone .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-days-to-fix-phone .head{fill:var(--text,#1c1f2e)}
+#dg-days-to-fix-phone .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-days-to-fix-phone .stop.end{fill:var(--text,#1c1f2e)}
+#dg-days-to-fix-phone .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-days-to-fix-phone .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-days-to-fix-phone .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-days-to-fix-phone .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-days-to-fix-phone .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-days-to-fix-phone .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-days-to-fix-phone .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-days-to-fix-phone .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-days-to-fix-phone .sub,#dg-days-to-fix-phone .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-days-to-fix-phone .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-days-to-fix-phone .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-days-to-fix-phone .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-days-to-fix-phone .r-bar{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-days-to-fix-phone .r-ref{stroke:var(--muted,#575d75)}
+#dg-days-to-fix-phone .r-pt{fill:var(--text,#1c1f2e)}
+#dg-days-to-fix-phone .d-ring{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-days-to-fix-phone .d-gap{stroke:var(--muted,#575d75);stroke-width:2}
+#dg-days-to-fix-phone .d-lead{stroke:var(--muted,#575d75);stroke-width:1}
+@media (prefers-reduced-motion:reduce){#dg-days-to-fix-phone .pulse{animation:none!important}#dg-days-to-fix-phone .pulse{display:none!important}}
+@media print{#dg-days-to-fix-phone{max-width:100%;height:auto}#dg-days-to-fix-phone .pulse{display:none!important}}
+@media (max-width:736px){#dg-days-to-fix{display:none}#dg-days-to-fix-phone{display:block}}
+@media print{#dg-days-to-fix{display:block!important}#dg-days-to-fix-phone{display:none!important}}
+</style>
+<rect width="264" height="372" class="ground"/>
+<rect x="8" y="76" width="248" height="288" rx="10" class="band"/>
+<line x1="49" y1="126" x2="49" y2="154" class="track"/>
+<line x1="132" y1="126" x2="132" y2="154" class="track"/>
+<line x1="215" y1="126" x2="215" y2="154" class="track"/>
+<line x1="49" y1="176" x2="49" y2="204" class="track"/>
+<line x1="132" y1="176" x2="132" y2="204" class="track"/>
+<line x1="215" y1="176" x2="215" y2="204" class="track"/>
+<line x1="49" y1="226" x2="49" y2="254" class="track"/>
+<line x1="132" y1="226" x2="132" y2="254" class="track"/>
+<line x1="215" y1="226" x2="215" y2="254" class="track"/>
+<line x1="49" y1="276" x2="49" y2="304" class="track"/>
+<line x1="132" y1="276" x2="132" y2="304" class="track"/>
+<line x1="215" y1="276" x2="215" y2="304" class="track"/>
+<line x1="49" y1="326" x2="49" y2="354" class="track"/>
+<line x1="132" y1="326" x2="132" y2="354" class="track"/>
+<line x1="215" y1="326" x2="215" y2="354" class="track"/>
+<text x="20" y="24" class="sub" text-anchor="start">Days, scale from 0. As in the app's</text>
+<text x="20" y="40" class="sub" text-anchor="start">menu.</text>
+<text x="49" y="64" class="val" text-anchor="middle">0</text>
+<text x="132" y="64" class="val" text-anchor="middle">10</text>
+<text x="215" y="64" class="val" text-anchor="middle">20</text>
+<text x="20" y="100" class="row" text-anchor="start">Sign-in</text>
+<rect x="57.28" y="132" width="15.92" height="16" class="band"/><text x="69.2" y="144" class="val" text-anchor="end">4</text>
+<rect x="132.7" y="132" width="15.92" height="16" class="band"/><text x="136.7" y="144" class="val" text-anchor="start">9</text>
+<rect x="105.7" y="110" width="36" height="16" class="band"/><text x="123.7" y="122" class="sub" text-anchor="middle">2025</text>
+<rect x="64.2" y="110" width="36" height="16" class="band"/><text x="82.2" y="122" class="sub" text-anchor="middle">2026</text>
+<text x="20" y="172" class="row" text-anchor="start">Search</text>
+<rect x="82.18" y="182" width="15.92" height="16" class="band"/><text x="94.1" y="194" class="val" text-anchor="end">7</text>
+<rect x="157.6" y="182" width="23.84" height="16" class="band"/><text x="161.6" y="194" class="val" text-anchor="start">12</text>
+<text x="20" y="222" class="row" text-anchor="start">Checkout</text>
+<rect x="73.88" y="232" width="15.92" height="16" class="band"/><text x="85.8" y="244" class="val" text-anchor="end">6</text>
+<rect x="124.4" y="232" width="15.92" height="16" class="band"/><text x="128.4" y="244" class="val" text-anchor="start">8</text>
+<text x="20" y="272" class="row" text-anchor="start">Settings</text>
+<rect x="73.88" y="282" width="15.92" height="16" class="band"/><text x="85.8" y="294" class="val" text-anchor="end">6</text>
+<rect x="182.5" y="282" width="23.84" height="16" class="band"/><text x="186.5" y="294" class="val" text-anchor="start">15</text>
+<text x="20" y="322" class="row" text-anchor="start">Profile</text>
+<rect x="99.5" y="332" width="15.92" height="16" class="band"/><text x="103.5" y="344" class="val" text-anchor="start">5</text>
+<line x1="123.7" y1="140" x2="82.2" y2="140" class="d-gap"/><circle cx="123.7" cy="140" r="4.25" class="d-ring"/><circle cx="82.2" cy="140" r="5" class="r-pt"/>
+<line x1="148.6" y1="190" x2="107.1" y2="190" class="d-gap"/><circle cx="148.6" cy="190" r="4.25" class="d-ring"/><circle cx="107.1" cy="190" r="5" class="r-pt"/>
+<line x1="98.8" y1="240" x2="115.4" y2="240" class="d-gap"/><circle cx="98.8" cy="240" r="4.25" class="d-ring"/><circle cx="115.4" cy="240" r="5" class="r-pt"/>
+<line x1="173.5" y1="290" x2="98.8" y2="290" class="d-gap"/><circle cx="173.5" cy="290" r="4.25" class="d-ring"/><circle cx="98.8" cy="290" r="5" class="r-pt"/>
+<circle cx="90.5" cy="340" r="4.25" class="d-ring"/><circle cx="90.5" cy="340" r="3" class="r-pt"/>
+</svg>
+<details class="dg-words">
+<summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>The diagram in words</summary>
+<div class="table-wrap is-text" role="region" aria-label="The rows of the bar chart" tabindex="0"><table><thead><tr><th scope="col">Row</th><th scope="col">2025</th><th scope="col">2026</th><th scope="col">Change, in days</th></tr></thead><tbody><tr><th scope="row">Sign-in</th><td>9</td><td>4</td><td>−5</td></tr><tr><th scope="row">Search</th><td>12</td><td>7</td><td>−5</td></tr><tr><th scope="row">Checkout</th><td>6</td><td>8</td><td>+2</td></tr><tr><th scope="row">Settings</th><td>15</td><td>6</td><td>−9</td></tr><tr><th scope="row">Profile</th><td>5</td><td>5</td><td>0</td></tr></tbody></table></div>
+<ul><li>Days, scale from 0. As in the app's menu.</li></ul>
+</details>
