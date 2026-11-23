@@ -300,6 +300,9 @@ test("check warns about personal data in the page text, in a link, and in the da
   assert.deepEqual(warned(specimen), [], "the sample page uses reserved example names only");
   assert.match(warned(specimen.replace("</main>", "<p>Ask Jane at jane.doe@company.com or (415) 555-2671.</p></main>")).join(), /the page text holds what looks like personal data: an email address j\*\*\*@company\.com, a phone number \(\*\*\*\) \*\*\*-\*\*71\. Remove it or mask it, or use a reserved example such as name@example\.com or 555-0100/);
   assert.match(warned(specimen.replace("</main>", '<p><a href="mailto:jane.doe@company.com">Write to Jane</a>, or <a href="tel:+14155552671">call her</a>.</p></main>')).join(), /an email address j\*\*\*@company\.com, a phone number \+\*{9}71/);
+  const bare = checkDocument(specimen.replace("</main>", '<p><a href="mailto:ops@company.com?subject=100% done">Write to ops</a>.</p></main>'));
+  assert.deepEqual(bare.errors, [], "a bare % in a mailto link does not stop the check");
+  assert.match(bare.warnings.join(), /an email address o\*\*\*@company\.com/);
   assert.equal(warned(specimen.replace("</main>", "<p>Write to bugs@example.com, call 555-0142, or see 2026-11-23 10:42.</p></main>")).length, 0, "reserved names and a date pass");
   const inData = renderDocument(specimen.replace('"note": "what went wrong"', '"note": "ask ops@company.com"')).html;
   assert.match(warned(inData).join("\n"), /the data of diagram 1 \("path"\) holds what looks like personal data: an email address o\*\*\*@company\.com/);

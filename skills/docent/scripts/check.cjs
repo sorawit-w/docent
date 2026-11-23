@@ -38,6 +38,8 @@ const textOf = (s) => plain(s.replace(/</g, " <"));
 const NUMBER = /^[−+-]?[$€£¥]?(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?\s?(?:%|[kKMB]|ms|s|px|x)?$/;
 const BLANK = /^(?:|—|–|-|n\/a)$/i; // an empty cell in a column of numbers
 const hasClass = (attrs, name) => new RegExp(`\\bclass="(?:[^"]*\\s)?${name}(?:\\s[^"]*)?"`).test(attrs);
+/** A link address with its %-escapes decoded; a bare % (as in "100% done") leaves it as it is. */
+const decoded = (s) => { try { return decodeURIComponent(s); } catch { return s; } };
 /** Every string in a diagram's or a widget's data, except the SVG of an icon. */
 const strings = (value, key) => (key === "icons" ? [] : typeof value === "string" ? [value] : value && typeof value === "object" ? Object.entries(value).flatMap(([k, v]) => strings(v, Array.isArray(value) ? key : k)) : []);
 const local = (value) => /^(#|data:)/i.test(value.trim()) || value.trim() === "";
@@ -310,7 +312,7 @@ function checkDocument(html) {
   // 11. Personal data: email addresses and phone numbers, in the page text and in the data of each diagram and widget. A warning only:
   // the author decides. Reserved example names (example.com, .test, 555-0100 to 555-0199) pass. Names and postal addresses are not found.
   const pageText = [textOf(markup), ...[...markup.matchAll(/\b(?:alt|title|aria-label)="([^"]*)"/gi)].map((m) => m[1])].join(" \n ");
-  const places = [["the page text", [...findPersonal(pageText), ...[...markup.matchAll(/\bhref="(mailto:[^"]*|tel:[^"]*)"/gi)].flatMap(([, href]) => (/^tel:/i.test(href) ? findTel(href) : findPersonal(decodeURIComponent(href.slice(7)))))]]];
+  const places = [["the page text", [...findPersonal(pageText), ...[...markup.matchAll(/\bhref="(mailto:[^"]*|tel:[^"]*)"/gi)].flatMap(([, href]) => (/^tel:/i.test(href) ? findTel(href) : findPersonal(decoded(href.slice(7)))))]]];
   for (const [kind, list] of [["diagram", diagrams], ["widget", widgets]]) list.forEach((found, n) => {
     let data;
     try { data = JSON.parse(found.json); } catch { return; } // an error above already names it
