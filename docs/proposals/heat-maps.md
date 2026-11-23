@@ -1,6 +1,6 @@
 # Proposal: heat maps — numbers shown as steps of gray
 
-Status: **proposed on 2026-11-23, with each open question decided** (see "Decisions" at the end). It waits for review. No code is written yet. An earlier talk settled four things: the grid heat map comes first; a page heat map would use the plan's grid; 3D is rejected, because it hides data, skews sizes and needs scripts; and the color rule must change through this proposal.
+Status: **items 1 to 3 are built** (PRs 36, 37 and 38). On 2026-11-23 the color of the heat steps on screen changed from gray to teal (decision 10 and item 4), because Docent pages are read mainly online; paper keeps the grays. An earlier talk settled four things: the grid heat map comes first; a page heat map would use the plan's grid; 3D is rejected, because it hides data, skews sizes and needs scripts; and the color rule must change through this proposal.
 
 ## The answer first
 
@@ -17,6 +17,7 @@ The page heat map (counts for each area of a page) comes later, as its **own kin
 | 1 | The heat steps and the grid heat map: the tokens, the `DESIGN.md` change, the kind, both forms, the table in words, the fit warnings, the docs | Medium |
 | 2 | One heat map on a real page: the specimen page, in its "Report a bug" topic | Small |
 | 3 | The page heat map, `"kind": "heatplan"`, on the plan's grid, only after item 2 | Medium |
+| 4 | The heat steps in teal on screen, and gray on paper (decision 10): the tokens in `kit.css` and `svg.cjs`, the `DESIGN.md` text, the contrast pairs, and the stored drawings | Small |
 
 ## The obvious answers that would be wrong
 
@@ -592,6 +593,17 @@ Decided on 2026-11-23, so that the work can go on while the user is away. Each c
 7. **Raw points: not in the renderer.** The author counts the points into cells with the rules in section 9, and says the cell size in the label. A `points` field would put thousands of numbers in a one-file page, and it would hide the choice of cell size, which changes the picture.
 8. **A cell with no data: hollow, with a muted outline.** In a report, "no data" and "the least" mean different things, such as "the service was down" and "almost no errors". The first draft gave the empty cell an outline in the line color, 1.40:1 against the page, which a reader could not tell from the pale step 1 (1.25:1) in a phone cell or on a poor printer. The muted outline (6.30:1) makes the empty cell a hollow square beside filled ones, a difference of shape that holds at any size and in gray print. A mark in the middle of the cell was not needed: the outline alone reads at 8.3px, and the table in words says "no data" for each such cell.
 9. **Column labels: two lines before fewer labels, and never fewer than three.** The review found that a label of the full 10 characters could stand outside a phone drawing, and that the first draft promised every label would fit. Now a label moves inward at an edge, and the renderer tries every label on one line, then on two lines, then every second to twelfth label, and refuses only after that. Two lines keep every name for the reader, as the widths above a plan do. Three labels or more keep a thinned row of labels useful. Labels of up to 43px fit a phone at any column count, and the refusal says which label to shorten.
+10. **The heat steps on screen: one hue, teal, instead of gray (changed on 2026-11-23).** Docent pages are read mainly online, and paper is the second case, so the screen gets color and paper keeps the grays. A heat map shows density, so one hue in five steps from light to dark is enough. The hue is teal (CIELAB hue 215°), because it means nothing else on the page: it is 70° from the status green and 85° from the accent, so it never reads as "succeeded" or as "the current step", and it does not change with a host's accent. Each step keeps the lightness of its gray, so a number on it keeps its contrast: the text color on steps 1 to 3 and the page color on steps 4 and 5, 5.14:1 or more. The kit's print block keeps the five grays, so paper is unchanged.
+
+    | Step | Light | L\* | Number on it | Contrast | Dark | L\* | Number on it | Contrast |
+    |---|---|---|---|---|---|---|---|---|
+    | 1, the least | `#c6e9ef` | 90 | text | 12.69 | `#093339` | 19 | text | 11.23 |
+    | 2 | `#86c9d5` | 77 | text | 8.82 | `#054e58` | 30 | text | 7.75 |
+    | 3 | `#3da6b6` | 63 | text | 5.70 | `#006b78` | 41 | text | 5.14 |
+    | 4 | `#00707e` | 43 | page | 5.62 | `#36a0b1` | 61 | page | 5.95 |
+    | 5, the most | `#004a53` | 28 | page | 9.66 | `#80cad7` | 77 | page | 9.91 |
+
+    Neighbouring steps are 16.1 to 20.5 apart (CIE76) in light and 12.4 to 20.4 in dark; with a deuteranopia simulation, 11.4 or more. Chroma rises from 12 to 30 and falls again at the darkest steps, where a screen cannot show more. The heat plan uses the same tokens, so its boxes turn teal too. A built-in palette from the white-label proposal (`docs/proposals/white-label.md`) sets its own five steps and measures them. The `DESIGN.md` bullet "Heat steps" changes from "Five more of Docent's grays" to "Five steps of one teal on screen, and five grays on paper", and the palette sentence gains the heat steps. The script that measured these values is not part of the kit; its output is the table above.
 
 ## Not in this proposal
 

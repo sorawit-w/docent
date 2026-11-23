@@ -1,6 +1,6 @@
 # Proposal: status grids — the state of each cell, set by thresholds
 
-Status: **proposed on 2026-11-23, with each open question decided** (see "Decisions" at the end). The user accepted decisions 1 and 6 for now (decision 6 with one change), and will confirm them on the built result. No code is written yet. An earlier talk settled the direction: data such as server uptime is a status question ("when was it down?"), not an amount, so it needs its own kind and not a green-to-red heat map. The author sets thresholds, each cell takes a state, and each state has a sign that is not color.
+Status: **proposed on 2026-11-23, with each open question decided** (see "Decisions" at the end). Decision 1 was changed on 2026-11-23, because Docent pages are read mainly online: look A on screen, look D on paper. The user accepted decision 6 for now, with one change, and will confirm both on the built result. No code is written yet. An earlier talk settled the direction: data such as server uptime is a status question ("when was it down?"), not an amount, so it needs its own kind and not a green-to-red heat map. The author sets thresholds, each cell takes a state, and each state has a sign that is not color.
 
 ## The answer first
 
@@ -199,6 +199,16 @@ A dash was the first idea for Warning, but tables use a dash for "nothing here",
 D is the only option where the failures stand out in color, in gray print and for readers with red-green color blindness, and it needs no new token. Its cost is a deliberate change to the color rule: the error color fills a cell. And OK is gray, not green. A reader who expects a status page will see fewer colors than they are used to; the legend names each state, and the table in words says each one.
 
 **The risk:** the light-mode warning color (`#7d4e00`) is a dark brown, chosen for text. As a slash on gray it reads well (4.89:1), but it is less bright than the amber that readers expect. It is never a fill in D, which avoids the worse problem: a brown Warning fill would print darker than the red Error fill (63% against 55% ink).
+
+### Changed on 2026-11-23: A on screen, D on paper
+
+Docent pages are read mainly online, as HTML; paper is the second case. So on screen a status grid takes **look A**: every cell filled in its status color, with the mark in the page color (none on OK, a slash on Warning, a cross on Error). A row of green reads "all good" at a glance, as readers know from status pages. On paper it takes **look D**, through the kit's print colors: OK and Warning cells in the outline color, the Warning slash in the warning color, and the Error cell filled in the error color with its cross. The author writes nothing for this.
+
+The marks matter more in look A than in D. In dark mode, OK and Error fills are only 8.2 apart (ΔE) for a reader with deuteranopia, and OK and Warning fills differ by 0.2 L\* in gray. Only the marks tell those cells apart, so the marks stay in every cell that is not OK, at every size. The light-mode warning color (`#7d4e00`) is a dark brown, chosen for text; as a fill it reads as brown, not amber. The building PR shows it beside the other states, so the user can judge it on the result.
+
+The `DESIGN.md` text below describes look D. The building PR writes it for A on screen and D on paper instead:
+
+> In a status grid, each cell shows its state. On screen an OK cell is filled in the success color, a Warning cell in the warning color with a slash in the page color, and an Error cell in the error color with a cross in the page color. On paper an OK cell and a Warning cell take the outline color, the Warning slash takes the warning color, and the Error cell keeps its fill and cross. This is the one place where the status colors fill a shape. The marks, not the colors, tell the states apart for readers who cannot see the colors.
 
 ### The change to `DESIGN.md`
 
@@ -624,7 +634,7 @@ The "numbers in cells" lines test a mark of 10px, 4px, the number and 8px agains
 
 Decided on 2026-11-23, so that the work can go on while the user is away. Each choice puts the report reader first: the failures found without searching, the states readable without color, and the page working on a phone, on paper and with a screen reader. Each one can be changed in review, because no code exists yet.
 
-1. **The look: D, only the failures stand out.** OK is a plain gray cell, Warning a gray cell with a slash, Error a red cell with a cross, and no data a hollow cell. It is the only option where OK and Error stay far apart in gray print (40.7 L\*) and for readers with deuteranopia (ΔE 63.0 in light, 74.1 in dark), and it needs no new token. **This differs from the agreed direction in one point:** an OK cell is gray, not green. The user accepted gray OK cells for now (2026-11-23), and will confirm them on the built result, which the PR for item 1 shows beside option A. Green fills would make most cells loud, and green and red print as the same gray. If the user wants green OK cells, option A is the way, and its marks must then carry the states alone in print. If the color rule must not change at all, option C is the fallback.
+1. **The look: A on screen, D on paper (changed on 2026-11-23).** First decided as D, only the failures stand out, because it keeps OK and Error far apart in gray print (40.7 L\*) and for readers with deuteranopia (ΔE 63.0 in light, 74.1 in dark). The user then made clear that Docent pages are read mainly online, and that print is the second case. So on screen every cell takes its status color, green for OK, as on a service's status page; on paper the kit's print colors give look D. The marks (a slash for Warning, a cross for Error) stay, because readers with color blindness read online too: in dark mode the OK and Error fills are only 8.2 apart for them. The user will confirm the look on the built result.
 2. **The name: `"statusgrid"`.** One word, like `"heatmap"`. `"status"` collides with the status note and the `state` field; `"uptime"` fits only one kind of data.
 3. **The data: numbers with thresholds, or states written directly, one way per grid.** Builds and checks have no number; uptime and error rates do. A mixed grid is refused, so the reader can trust that every state came the same way.
 4. **The edges: a value on a threshold takes the better state.** Targets are written "at least" or "at most", so meeting one exactly is meeting it.
