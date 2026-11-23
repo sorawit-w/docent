@@ -40,15 +40,16 @@ test("a funnel matches the stored drawing", () => {
 });
 
 test("the worked example has the numbers and the sizes of the proposal, in both forms", () => {
+  // The desktop sizes are 1px right of the proposal's (x0 299, not 298): the hyphen in "sign-up" is measured as San Francisco draws it at 14px.
   const { scene, phone } = renderDiagram(fixture());
   const drops = (sc) => sc.notes.filter((n) => n.s.startsWith("−")).map((n) => [n.s, Math.round(n.x)]);
-  assert.deepEqual(drops(scene), [["−4,240 (34%)", 511], ["−4,120 (50%)", 404], ["−1,220 (30%)", 373], ["−1,040 (36%)", 346]]);
+  assert.deepEqual(drops(scene), [["−4,240 (34%)", 511], ["−4,120 (50%)", 405], ["−1,220 (30%)", 374], ["−1,040 (36%)", 347]]);
   // On a phone the first drop would pass the right edge, so it moves left until it fits.
   assert.deepEqual(drops(phone), [["−4,240 (34%)", 162], ["−4,120 (50%)", 94], ["−1,220 (30%)", 72], ["−1,040 (36%)", 53]]);
   const bars = rects(scene);
-  assert.deepEqual(bars.filter((b) => b.cls === "r-bar").map((b) => [b.x0, Math.round(b.w * 10) / 10]), [[298, 322], [298, 212.6], [298, 106.3], [298, 74.8], [298, 48]]);
+  assert.deepEqual(bars.filter((b) => b.cls === "r-bar").map((b) => [b.x0, Math.round(b.w * 10) / 10]), [[299, 321], [299, 211.9], [299, 106], [299, 74.6], [299, 47.8]]);
   // Each lost part starts 4px under its kept bar, so the part that shows is 4px shorter than the rect.
-  assert.deepEqual(bars.filter((b) => b.cls === "f-lost").map((b) => Math.round((b.w - 4) * 10) / 10), [109.4, 106.3, 31.5, 26.8]);
+  assert.deepEqual(bars.filter((b) => b.cls === "f-lost").map((b) => Math.round((b.w - 4) * 10) / 10), [109.1, 106, 31.4, 26.8]);
   assert.deepEqual(scene.notes.filter((n) => /%$/.test(n.s)).map((n) => n.s), ["100%", "66%", "33%", "23%", "15%"]);
   assert.deepEqual(phone.notes.filter((n) => n.cls === "row").map((n) => n.s), ["Open the sign-up", "page", "Fill in the form", "Confirm the email", "Choose a plan", "Finish the sign-up"]);
   // The text above the bars names the base of each share, in both forms.
