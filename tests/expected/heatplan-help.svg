@@ -26,9 +26,10 @@
 #dg-help-clicks .h3{fill:var(--heat-3,#3da6b6)}
 #dg-help-clicks .h4{fill:var(--heat-4,#00707e)}
 #dg-help-clicks .h5{fill:var(--heat-5,#004a53)}
-#dg-help-clicks .hv{font-size:12px;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
-#dg-help-clicks .hn{font-size:12px;fill:var(--text,#1c1f2e)}
-#dg-help-clicks .row.hi,#dg-help-clicks .hv.hi,#dg-help-clicks .hn.hi{fill:var(--bg,#fbfbfe)}
+#dg-help-clicks .hv{font-size:12px;font-variant-numeric:tabular-nums}
+#dg-help-clicks .hn{font-size:12px}
+#dg-help-clicks .hr,#dg-help-clicks .hv,#dg-help-clicks .hn{fill:var(--heat-text,#1c1f2e)}
+#dg-help-clicks .row.hi,#dg-help-clicks .hv.hi,#dg-help-clicks .hn.hi{fill:var(--heat-page,#fbfbfe)}
 @media (prefers-reduced-motion:reduce){#dg-help-clicks .pulse{animation:none!important}#dg-help-clicks .pulse{display:none!important}}
 @media print{#dg-help-clicks{max-width:100%;height:auto}#dg-help-clicks .pulse{display:none!important}}
 #dg-help-clicks-phone{display:none}
@@ -45,23 +46,23 @@
 <text x="12" y="62" class="sub" text-anchor="start">Not to scale</text>
 <rect x="16" y="12" width="32" height="12" rx="2" class="h1"/><rect x="50" y="12" width="32" height="12" rx="2" class="h2"/><rect x="84" y="12" width="32" height="12" rx="2" class="h3"/><rect x="118" y="12" width="32" height="12" rx="2" class="h4"/><rect x="152" y="12" width="32" height="12" rx="2" class="h5"/>
 <rect x="14" y="76" width="612" height="52" rx="4" class="box h5"/>
-<text x="22" y="98" class="row hi" text-anchor="start">Search</text>
+<text x="22" y="98" class="row hr hi" text-anchor="start">Search</text>
 <text x="22" y="116" class="hv hi" text-anchor="start">460</text>
 <rect x="14" y="132" width="150" height="124" rx="4" class="box h3"/>
-<text x="22" y="154" class="row" text-anchor="start">Topics</text>
+<text x="22" y="154" class="row hr" text-anchor="start">Topics</text>
 <text x="22" y="172" class="hv" text-anchor="start">210</text>
 <rect x="168" y="132" width="304" height="68" rx="4" class="box h1"/>
-<text x="176" y="154" class="row" text-anchor="start">Article</text>
+<text x="176" y="154" class="row hr" text-anchor="start">Article</text>
 <text x="176" y="172" class="hv" text-anchor="start">90</text>
 <text x="176" y="188" class="hn" text-anchor="start">links in the text</text>
 <rect x="476" y="132" width="150" height="124" rx="4" class="box h2"/>
-<text x="484" y="154" class="row" text-anchor="start">Related articles</text>
+<text x="484" y="154" class="row hr" text-anchor="start">Related articles</text>
 <text x="484" y="172" class="hv" text-anchor="start">130</text>
 <rect x="168" y="204" width="150" height="52" rx="4" class="box h4"/>
-<text x="176" y="226" class="row hi" text-anchor="start">Was this helpful?</text>
+<text x="176" y="226" class="row hr hi" text-anchor="start">Was this helpful?</text>
 <text x="176" y="244" class="hv hi" text-anchor="start">320</text>
 <rect x="322" y="204" width="150" height="52" rx="4" class="box h2"/>
-<text x="330" y="226" class="row" text-anchor="start">Contact support</text>
+<text x="330" y="226" class="row hr" text-anchor="start">Contact support</text>
 <text x="330" y="244" class="hv" text-anchor="start">180</text>
 </svg>
 <svg id="dg-help-clicks-phone" class="dg dg-heatplan dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="474" viewBox="0 0 264 474" role="img" aria-label="Clicks on each area of a help page in one week. Search got the most, 460, and the question 'Was this helpful?' the next most, 320. Links inside the article got the fewest, 90.">
@@ -93,11 +94,12 @@
 #dg-help-clicks-phone .h3{fill:var(--heat-3,#3da6b6)}
 #dg-help-clicks-phone .h4{fill:var(--heat-4,#00707e)}
 #dg-help-clicks-phone .h5{fill:var(--heat-5,#004a53)}
-#dg-help-clicks-phone .hv{font-size:12px;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
-#dg-help-clicks-phone .hn{font-size:12px;fill:var(--text,#1c1f2e)}
-#dg-help-clicks-phone .row.hi,#dg-help-clicks-phone .hv.hi,#dg-help-clicks-phone .hn.hi{fill:var(--bg,#fbfbfe)}
-#dg-help-clicks-phone .m-box.m-at{stroke:var(--text,#1c1f2e);stroke-width:2}
-#dg-help-clicks-phone .m-in{fill:none;stroke:var(--bg,#fbfbfe);stroke-width:1}
+#dg-help-clicks-phone .hv{font-size:12px;font-variant-numeric:tabular-nums}
+#dg-help-clicks-phone .hn{font-size:12px}
+#dg-help-clicks-phone .hr,#dg-help-clicks-phone .hv,#dg-help-clicks-phone .hn{fill:var(--heat-text,#1c1f2e)}
+#dg-help-clicks-phone .row.hi,#dg-help-clicks-phone .hv.hi,#dg-help-clicks-phone .hn.hi{fill:var(--heat-page,#fbfbfe)}
+#dg-help-clicks-phone .m-box.m-at{stroke:var(--heat-text,#1c1f2e);stroke-width:2}
+#dg-help-clicks-phone .m-in{fill:none;stroke:var(--heat-page,#fbfbfe);stroke-width:1}
 @media (prefers-reduced-motion:reduce){#dg-help-clicks-phone .pulse{animation:none!important}#dg-help-clicks-phone .pulse{display:none!important}}
 @media print{#dg-help-clicks-phone{max-width:100%;height:auto}#dg-help-clicks-phone .pulse{display:none!important}}
 @media (max-width:736px){#dg-help-clicks{display:none}#dg-help-clicks-phone{display:block}}

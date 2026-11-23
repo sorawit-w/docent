@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex">
 <title>Report a bug and get a fix — Example project</title>
 <style>
-/* docent:kit 0.9.0 */
+/* docent:kit 0.10.0 */
 /* Docent page styles. Tokens come from references/DESIGN.md. One file, no network. */
 :root {
   color-scheme: light;
@@ -16,6 +16,8 @@
   --ok: #1a7f37; --warn: #7d4e00; --err: #cf222e;
   /* The heat steps fill the cells of a heat map and the boxes of a heat plan, and nothing else: from the least (1) to the most (5). One teal on screen; the print block sets five grays for paper. */
   --heat-1: #c6e9ef; --heat-2: #86c9d5; --heat-3: #3da6b6; --heat-4: #00707e; --heat-5: #004a53;
+  /* The text on a heat step: the kit's own text and page colors. They equal --text and --bg, except with the reader's high contrast mode, where the kit gives those two the system colors and only its own are tested against the steps. */
+  --heat-text: #1c1f2e; --heat-page: #fbfbfe;
   /* A host project sets its own accent, heading color and fonts with the --host-* tokens. The kit never sets them, so they hold in every theme and in print. */
   --serif: var(--host-serif, Charter, "Bitstream Charter", "Sitka Heading", "Sitka Text", Cambria, Georgia, serif);
   --sans: var(--host-sans, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif);
@@ -39,7 +41,7 @@ html[data-text="large"] { font-size: 112.5%; }
     --text: #e7e9f3; --muted: #959bb3; --line: #2d3146;
     --primary: var(--host-accent-dark, #8e9bff); --ink: #e7e9f3; --dot: #f2b824;
     --ok: #3fb950; --warn: #d29922; --err: #f85149;
-    --heat-1: #093339; --heat-2: #054e58; --heat-3: #006b78; --heat-4: #36a0b1; --heat-5: #80cad7;
+    --heat-1: #093339; --heat-2: #054e58; --heat-3: #006b78; --heat-4: #36a0b1; --heat-5: #80cad7; --heat-text: #e7e9f3; --heat-page: #12141f;
   }
 }
 :root[data-theme="dark"] {
@@ -48,7 +50,7 @@ html[data-text="large"] { font-size: 112.5%; }
   --text: #e7e9f3; --muted: #959bb3; --line: #2d3146;
   --primary: var(--host-accent-dark, #8e9bff); --ink: #e7e9f3; --dot: #f2b824;
   --ok: #3fb950; --warn: #d29922; --err: #f85149;
-  --heat-1: #093339; --heat-2: #054e58; --heat-3: #006b78; --heat-4: #36a0b1; --heat-5: #80cad7;
+  --heat-1: #093339; --heat-2: #054e58; --heat-3: #006b78; --heat-4: #36a0b1; --heat-5: #80cad7; --heat-text: #e7e9f3; --heat-page: #12141f;
 }
 *, *::before, *::after { box-sizing: border-box; }
 html { scroll-padding-top: 88px; -webkit-text-size-adjust: 100%; }
@@ -317,8 +319,18 @@ footer .shell { display: flex; align-items: center; justify-content: space-betwe
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; }
 }
+/* The reader's high contrast mode (forced colors, as in Windows): the browser gives the page the few colors the reader chose. The kit gives
+   its tokens the same system colors, so the drawings follow, and the marks that are backgrounds (dots, the rail) stay visible. The heat
+   steps and the status colors keep their own values, because there the color is the content; the text on a step keeps --heat-text. */
+@media (forced-colors: active) {
+  html:root:not([data-never]) { --bg: Canvas; --fig: Canvas; --text: CanvasText; --muted: CanvasText; --line: CanvasText; --primary: Highlight; --dot: Highlight; }
+  /* A status dot takes the color of its word, which the browser forces; a background in that color would turn into the page color. */
+  .state::before { background: CanvasText; }
+  /* All borders take the text color, so the chosen option takes the highlight color, as its dot does. */
+  input:checked + .opt { border-color: Highlight; }
+}
 @media print {
-  html:root:not([data-never]) { color-scheme: light; --bg: #ffffff; --panel: #f2f3f9; --fig: #f2f3f9; --text: #1c1f2e; --muted: #575d75; --line: #d3d6e3; --primary: var(--host-accent, #2f3fd0); --ink: var(--host-ink, #1b2260); --dot: var(--host-accent, #2f3fd0); --ok: #1a7f37; --warn: #7d4e00; --err: #cf222e; --heat-1: #dee2f0; --heat-2: #babecb; --heat-3: #9498a5; --heat-4: #616571; --heat-5: #3e424d; }
+  html:root:not([data-never]) { color-scheme: light; --bg: #ffffff; --panel: #f2f3f9; --fig: #f2f3f9; --text: #1c1f2e; --muted: #575d75; --line: #d3d6e3; --primary: var(--host-accent, #2f3fd0); --ink: var(--host-ink, #1b2260); --dot: var(--host-accent, #2f3fd0); --ok: #1a7f37; --warn: #7d4e00; --err: #cf222e; --heat-1: #dee2f0; --heat-2: #babecb; --heat-3: #9498a5; --heat-4: #616571; --heat-5: #3e424d; --heat-text: #1c1f2e; --heat-page: #ffffff; }
   /* Paper: 11pt text, the page margin as the edge, and the notes beside the text again. An A4 page holds the text (112mm), a gap and the notes (50mm). */
   html { font-size: 11pt; } html[data-text="large"] { font-size: 12pt; }
   html:root:not([data-never]) { --measure: 112mm; --gap: 8mm; --margin-col: 50mm; --block: 100%; }
@@ -1155,8 +1167,8 @@ footer .shell { display: flex; align-items: center; justify-content: space-betwe
 #dg-replies-by-hour .h4{fill:var(--heat-4,#00707e)}
 #dg-replies-by-hour .h5{fill:var(--heat-5,#004a53)}
 #dg-replies-by-hour .h0{fill:var(--bg,#fbfbfe);stroke:var(--muted,#575d75);stroke-width:1}
-#dg-replies-by-hour .hv{font-size:12px;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
-#dg-replies-by-hour .hv.hi{fill:var(--bg,#fbfbfe)}
+#dg-replies-by-hour .hv{font-size:12px;fill:var(--heat-text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-replies-by-hour .hv.hi{fill:var(--heat-page,#fbfbfe)}
 @media (prefers-reduced-motion:reduce){#dg-replies-by-hour .pulse{animation:none!important}#dg-replies-by-hour .pulse{display:none!important}}
 @media print{#dg-replies-by-hour{max-width:100%;height:auto}#dg-replies-by-hour .pulse{display:none!important}}
 #dg-replies-by-hour-phone{display:none}
@@ -1237,8 +1249,8 @@ footer .shell { display: flex; align-items: center; justify-content: space-betwe
 #dg-replies-by-hour-phone .h4{fill:var(--heat-4,#00707e)}
 #dg-replies-by-hour-phone .h5{fill:var(--heat-5,#004a53)}
 #dg-replies-by-hour-phone .h0{fill:var(--bg,#fbfbfe);stroke:var(--muted,#575d75);stroke-width:1}
-#dg-replies-by-hour-phone .hv{font-size:12px;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
-#dg-replies-by-hour-phone .hv.hi{fill:var(--bg,#fbfbfe)}
+#dg-replies-by-hour-phone .hv{font-size:12px;fill:var(--heat-text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-replies-by-hour-phone .hv.hi{fill:var(--heat-page,#fbfbfe)}
 @media (prefers-reduced-motion:reduce){#dg-replies-by-hour-phone .pulse{animation:none!important}#dg-replies-by-hour-phone .pulse{display:none!important}}
 @media print{#dg-replies-by-hour-phone{max-width:100%;height:auto}#dg-replies-by-hour-phone .pulse{display:none!important}}
 @media (max-width:736px){#dg-replies-by-hour{display:none}#dg-replies-by-hour-phone{display:block}}
@@ -1477,7 +1489,7 @@ grep -i password bug.log</code></pre>
 </footer>
 
 <script>
-// docent:kit 0.9.0
+// docent:kit 0.10.0
 (() => {
   const root = document.documentElement;
   root.classList.add('js');

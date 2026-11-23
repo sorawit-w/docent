@@ -47,7 +47,7 @@ test("each box is filled with the heat step of its value, and its texts take the
     assert.ok(texts(s, "cart").every((t) => t.endsWith(" hi")), "on step 5 the name, the value and the note take the page color");
     assert.ok(texts(s, "details").every((t) => !t.endsWith(" hi")), "on step 2 they take the text color");
   }
-  assert.deepEqual(texts(scene, "cart"), ["Add to cart:row hi", "870:hv hi", "price and size:hn hi"]);
+  assert.deepEqual(texts(scene, "cart"), ["Add to cart:row hr hi", "870:hv hi", "price and size:hn hi"]);
 });
 
 test("a box with no data keeps the plan's look and says so under its name, and the legend has no no-data key", () => {
@@ -124,8 +124,8 @@ test("a heat plan whose grid does not fit a phone is stacked: each map shows eve
   }
   assert.match(part(phone, "search").svg, /class="m-box h5 m-at"/, "Search, on step 5, is the box with the ring in its own band");
   assert.deepEqual(texts(phone, "article"), ["Article:name", "90 clicks:hv", "links in the text:sub"], "the value with its unit, under the name");
-  assert.match(svg, /\.m-box\.m-at\{stroke:var\(--text,#1c1f2e\);stroke-width:2\}/);
-  assert.match(svg, /\.m-in\{fill:none;stroke:var\(--bg,#fbfbfe\);stroke-width:1\}/);
+  assert.match(svg, /\.m-box\.m-at\{stroke:var\(--heat-text,#1c1f2e\);stroke-width:2\}/);
+  assert.match(svg, /\.m-in\{fill:none;stroke:var\(--heat-page,#fbfbfe\);stroke-width:1\}/);
   assert.doesNotMatch(svg, /\.m-on\{/, "the plan's filled map box is not used");
   // A box with no data in a stack says so, and its map box is hollow.
   const d = fixture("help");
@@ -197,8 +197,8 @@ test("a heat plan takes every color from the page tokens, and has no state, no d
     assert.doesNotMatch(svg, /is-(ok|warn|err)|class="pulse|dasharray|--primary/);
   }
   const { svg } = renderDiagram(fixture());
-  assert.match(svg, /\.row\.hi,#dg-product-clicks \.hv\.hi,#dg-product-clicks \.hn\.hi\{fill:var\(--bg,#fbfbfe\)\}/);
-  assert.match(svg, /\.hn\{font-size:12px;fill:var\(--text,#1c1f2e\)\}/, "a note on a step takes the text color, not the muted one");
+  assert.match(svg, /\.row\.hi,#dg-product-clicks \.hv\.hi,#dg-product-clicks \.hn\.hi\{fill:var\(--heat-page,#fbfbfe\)\}/);
+  assert.match(svg, /\.hr,#dg-product-clicks \.hv,#dg-product-clicks \.hn\{fill:var\(--heat-text,#1c1f2e\)\}/, "a name, a value and a note on a step take the kit's text color, not the muted one");
 });
 
 test("render reports the form, and check accepts a heat plan that render drew and reports one changed by hand", () => {

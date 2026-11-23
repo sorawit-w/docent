@@ -204,7 +204,7 @@ function gridForm(model, phone, top = 12) {
     // steps 4 and 5; a note is not muted there, because the muted color is too faint on the darker steps. A plan's box, and a
     // heat plan's box with no data, keep the plan's look.
     const on = b.heat > 0, hi = b.heat >= 4 ? " hi" : "";
-    t.name.forEach((line, k) => lines.push({ x: x + 8, y: by + 8 + 14 + k * NAME, s: line, cls: on ? `row${hi}` : "row", anchor: "start" }));
+    t.name.forEach((line, k) => lines.push({ x: x + 8, y: by + 8 + 14 + k * NAME, s: line, cls: on ? `row hr${hi}` : "row", anchor: "start" }));
     const small = [...(b.shown != null ? [[b.shown, on ? `hv${hi}` : "sub"]] : []), ...t.note.map((line) => [line, on ? `hn${hi}` : "sub"])];
     const smallTop = by + 8 + t.name.length * NAME + 2;
     small.forEach(([line, cls], k) => lines.push({ x: x + 8, y: smallTop + 12 + k * NOTE, s: line, cls, anchor: "start" }));
