@@ -34,6 +34,12 @@ for name, (t, steps) in HEAT.items():
         rows.append((f"{name} {fg} on heat-{k}", t[fg], step, 4.5))
     rows.append((f"{name} no-data outline on page", t["muted"], t["page"], 3.0))
 
+# More contrast (the reader's system setting): the line takes the muted value, and muted text the text value, on the page and the well.
+for name, t in (("light", L), ("dark", D)):
+    for bg in ("page", "well"):
+        rows.append((f"{name} more: line on {bg} (non-text)", t["muted"], t[bg], 3.0))
+        rows.append((f"{name} more: muted text on {bg}", t["text"], t[bg], 4.5))
+
 fails = 0
 for label, fg, bg, need in rows:
     r = ratio(fg, bg)

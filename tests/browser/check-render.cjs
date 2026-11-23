@@ -24,13 +24,13 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
 
 (async () => {
   const browser = await chromium.launch(process.env.DOCENT_BROWSER_CHANNEL ? { channel: process.env.DOCENT_BROWSER_CHANNEL } : {});
-  const open = async ({ width, height = 900, theme = "light", media = "screen", reducedMotion = "no-preference", forcedColors = "none", content = html }) => {
+  const open = async ({ width, height = 900, theme = "light", media = "screen", reducedMotion = "no-preference", forcedColors = "none", contrast = "no-preference", content = html }) => {
     const context = await browser.newContext({ viewport: { width, height }, colorScheme: theme, reducedMotion });
     const page = await context.newPage();
     const errors = [];
     page.on("console", (m) => m.type() === "error" && errors.push(m.text()));
     page.on("pageerror", (e) => errors.push(String(e)));
-    await page.emulateMedia({ media, colorScheme: theme, reducedMotion, forcedColors });
+    await page.emulateMedia({ media, colorScheme: theme, reducedMotion, forcedColors, contrast });
     await page.setContent(content, { waitUntil: "load" });
     await page.waitForTimeout(400);
     return { page, context, errors };
@@ -190,6 +190,34 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
       await page.screenshot({ path: `${out}/forced-${theme}.png`, fullPage: true });
       await context.close();
     }
+  }
+
+  // More contrast (emulated prefers-contrast: more): outlines, tracks and rules take the muted color, and muted text the text color,
+  // in light, in dark by the system and in dark by the switch. Forced colors and paper keep their own colors.
+  {
+    const MORE = { light: { line: "rgb(87, 93, 117)", muted: LIGHT.text }, dark: { line: "rgb(149, 155, 179)", muted: DARK.text } };
+    const look = (page) => page.evaluate(() => {
+      const css = (sel, pseudo) => getComputedStyle([...document.querySelectorAll(sel)].find((e) => e.getBoundingClientRect().width) || document.querySelector(sel), pseudo);
+      return { note: css(".note").color, sub: css("svg.dg .sub").fill, rule: css("tbody tr").borderBottomColor, card: css(".cards > li").borderTopColor, track: css("svg.dg .track").stroke, topbar: css(".topbar").borderBottomColor };
+    });
+    const same = (got, want) => got.note === want.muted && got.sub === want.muted && [got.rule, got.card, got.track, got.topbar].every((c) => c === want.line);
+    for (const [name, opts, setup, want] of [["light", { theme: "light" }, null, MORE.light], ["dark by the system", { theme: "dark" }, null, MORE.dark], ["dark by the switch", { theme: "light" }, "dark", MORE.dark], ["light by the switch on a dark system", { theme: "dark" }, "light", MORE.light]]) {
+      const { page, context } = await open({ width: 1280, contrast: "more", ...opts });
+      if (setup) await page.evaluate((t) => { document.documentElement.dataset.theme = t; }, setup);
+      const got = await look(page);
+      ok(`more contrast, ${name}: outlines, tracks and rules take the muted color, and muted text the text color`, same(got, want), got);
+      if (name === "light") await page.screenshot({ path: `${out}/contrast-more.png`, fullPage: true });
+      await context.close();
+    }
+    const forced = await open({ width: 1280, theme: "dark", contrast: "more", forcedColors: "active" });
+    const sysText = await forced.page.evaluate(() => { const p = document.body.appendChild(document.createElement("i")); p.style.color = "CanvasText"; const c = getComputedStyle(p).color; p.remove(); return c; });
+    const withForced = await look(forced.page);
+    await forced.context.close();
+    ok("more contrast with forced colors: the reader's system colors still decide", withForced.track === sysText && withForced.sub === sysText, { sysText, withForced });
+    const paper = await open({ width: 794, height: 1123, theme: "dark", contrast: "more", media: "print" });
+    const onPaper = await look(paper.page);
+    await paper.context.close();
+    ok("more contrast on paper: the print colors hold", onPaper.track === "rgb(211, 214, 227)" && onPaper.note === "rgb(87, 93, 117)", onPaper);
   }
 
   // A diagram outside the walkthrough: it waits until it is in view, runs twice, and runs again on pointer.
