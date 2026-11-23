@@ -1,6 +1,6 @@
 # Proposal: charts on two levels — built-in kinds from data, and hand-drawn figures under a contract
 
-Status: **proposed**. Its open questions are in "Decisions" near the end, each with a recommended answer, for the user to approve. No code is written. It follows the approved proposals [`scale-charts.md`](scale-charts.md) and [`funnels.md`](funnels.md), and it reuses their numeric scale and their two forms. The sample numbers in this proposal are invented.
+Status: **approved on 2026-11-23**, as written, with the recommended answer to each decision (see "Decided" near the end). No code is written yet. The items are built in the order of section 7, each in its own pull request. It follows the approved proposals [`scale-charts.md`](scale-charts.md) and [`funnels.md`](funnels.md), and it reuses their numeric scale and their two forms. The sample numbers in this proposal are invented.
 
 ## The answer first
 
@@ -437,7 +437,7 @@ Each item is its own pull request. Each starts after the one before it is merged
 5. **A date scale in the core,** so a range chart draws a timeline or a Gantt chart. A short proposal first. Medium.
 6. **The scatter plot,** with the strip form. A short proposal first. Medium.
 7. **The tree,** with the org chart. A short proposal first. Medium.
-8. **The database schema.** A short proposal first. It is last because it is the largest, and its audience is the narrowest of the four. Large.
+8. **The database schema.** A short proposal first. That proposal must say which marks for "how many" business readers understand, because many of them do not know UML marks such as `0..*`. It is last because it is the largest, and its audience is the narrowest of the four. Large.
 
 Items 5 to 8 do not depend on each other, so their order can change when a real document needs one of them sooner.
 
@@ -538,9 +538,21 @@ Each decision has a recommended answer, which the proposal above follows, and th
 5. **ER as a class diagram, not a new kind.** Recommended: yes (section 6, "Why ER moved"). The other choice: an ER kind in a notation that business readers know better, such as crow's feet. It would draw the same picture as the class diagram in a second notation.
 6. **The hand-drawn contract after the bar and line charts.** Recommended: yes (section 7, item 4). The other choice: the contract first, because it is smaller and opens all seven rare types sooner. Then agents may hand-draw bar and line charts until items 2 and 3 land.
 
+## Decided
+
+Approved on 2026-11-23, each with the recommended answer:
+
+1. **Hand-drawn figures are allowed under the contract,** for the seven types in the hand-drawn list only.
+2. **A dumbbell's scale may start above 0,** as a range chart's may, and the line above the chart says where it starts.
+3. **Bars are horizontal only.**
+4. **A line chart has at most one focus series.** Several series that matter equally get small multiples.
+5. **ER is drawn as a class diagram,** not as a new kind. The database schema stays a new kind.
+6. **The hand-drawn contract lands after the bar chart and the line chart.**
+
 ## Not in this proposal
 
 - Code, and changes to `SKILL.md`, `check.cjs`, `kit.css` or the template. Each build item comes in its own pull request.
 - A hand-drawn sample page. It can be added if the user wants to see the forms before approving.
 - The detailed data and forms of the scatter plot, the date scale, the tree and the database schema. Each gets a short proposal first.
 - Pie and donut charts, a second value axis, area charts, and charts that move.
+- A diverging bar for survey answers (agree and disagree, centered on the middle). It is the main chart in customer research, so it may be proposed once test documents show the need. It differs from the stacked bars that section 3 leaves out, because its parts start from a shared middle.
