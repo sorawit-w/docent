@@ -72,6 +72,10 @@ test("the diagram in words has both shares, and names where the most people and 
   const tie = fixture();
   tie.steps = [{ name: "A", count: 1000 }, { name: "B", count: 800 }, { name: "C", count: 600 }];
   assert.match(words(tie), /<li>The most people left between "A" and "B", and between "B" and "C": 200\.<\/li><li>The largest share left between "B" and "C": 25% of the step before\.<\/li>/);
+  // Counts near the limit: the shares differ by 1 in a cross-product of about 10^17, and only the second drop is the largest.
+  const big = fixture();
+  big.steps = [{ name: "A", count: 701408733 }, { name: "B", count: 433494437 }, { name: "C", count: 267914296 }];
+  assert.match(words(big), /<li>The largest share left between "B" and "C": 38% of the step before\.<\/li>/);
   const none = fixture();
   none.steps = [{ name: "A", count: 50 }, { name: "B", count: 50 }, { name: "C", count: 50 }];
   assert.match(words(none), /<li>No one left between two steps\.<\/li>/);

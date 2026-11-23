@@ -160,8 +160,9 @@ function wordsOf(model, scene, phone) {
   const most = Math.max(...later.map((i) => steps[i].drop));
   if (!most) lines.push("No one left between two steps.");
   else {
-    // The largest share is compared exactly, as drop ÷ count before, in whole-number arithmetic.
-    const larger = (i, j) => steps[i].drop * steps[j - 1].count - steps[j].drop * steps[i - 1].count;
+    // The largest share is compared exactly, as drop ÷ count before, by cross-products. They reach about 10^18, past the safe
+    // range of a number, so they are BigInts.
+    const larger = (i, j) => { const d = BigInt(steps[i].drop) * BigInt(steps[j - 1].count) - BigInt(steps[j].drop) * BigInt(steps[i - 1].count); return d > 0n ? 1 : d < 0n ? -1 : 0; };
     const byCount = later.filter((i) => steps[i].drop === most);
     const top = later.reduce((best, i) => (larger(i, best) > 0 ? i : best), later[0]);
     const byShare = later.filter((i) => larger(i, top) === 0);
