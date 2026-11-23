@@ -1,0 +1,13 @@
+{
+  "id": "signup-may",
+  "kind": "funnel",
+  "label": "Of 12,480 people who opened the sign-up page in May, 1,860 finished the sign-up: 15%. The largest number left before the form: 4,240. The largest share left at the email check: half of the people who filled in the form did not confirm their email.",
+  "unit": "people",
+  "steps": [
+    {"name": "Open the sign-up page", "count": 12480},
+    {"name": "Fill in the form", "count": 8240},
+    {"name": "Confirm the email", "count": 4120},
+    {"name": "Choose a plan", "count": 2900},
+    {"name": "Finish the sign-up", "count": 1860}
+  ]
+}

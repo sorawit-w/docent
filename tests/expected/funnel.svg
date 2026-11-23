@@ -1,0 +1,123 @@
+<svg id="dg-signup-may" class="dg dg-funnel dg-auto" xmlns="http://www.w3.org/2000/svg" width="640" height="300" viewBox="0 0 640 300" role="img" aria-label="Of 12,480 people who opened the sign-up page in May, 1,860 finished the sign-up: 15%. The largest number left before the form: 4,240. The largest share left at the email check: half of the people who filled in the form did not confirm their email.">
+<style>
+#dg-signup-may{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-signup-may .ground{fill:var(--fig,#f2f3f9)}
+#dg-signup-may .band{fill:var(--bg,#fbfbfe)}
+#dg-signup-may .track{stroke:var(--line,#d3d6e3)}
+#dg-signup-may .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-signup-may .head{fill:var(--text,#1c1f2e)}
+#dg-signup-may .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-signup-may .stop.end{fill:var(--text,#1c1f2e)}
+#dg-signup-may .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-signup-may .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-signup-may .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-signup-may .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-signup-may .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-signup-may .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-signup-may .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-signup-may .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-signup-may .sub,#dg-signup-may .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-signup-may .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-signup-may .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-signup-may .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-signup-may .r-bar{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-signup-may .f-lost{fill:var(--line,#d3d6e3)}
+@media (prefers-reduced-motion:reduce){#dg-signup-may .pulse{animation:none!important}#dg-signup-may .pulse{display:none!important}}
+@media print{#dg-signup-may{max-width:100%;height:auto}#dg-signup-may .pulse{display:none!important}}
+#dg-signup-may-phone{display:none}
+</style>
+<rect width="640" height="300" class="ground"/>
+<rect x="8" y="52" width="624" height="240" rx="10" class="band"/>
+<text x="20" y="24" class="sub" text-anchor="start">People at each step, bars from 0.</text>
+<text x="20" y="40" class="sub" text-anchor="start">Beside each count, its share of the first step; in each drop, its share of the step before.</text>
+<text x="20" y="81" class="row" text-anchor="start">Open the sign-up page</text>
+<text x="232.6" y="80" class="val" text-anchor="end">12,480</text>
+<text x="281.36" y="80" class="val" text-anchor="end">100%</text>
+<text x="510.6" y="104" class="val" text-anchor="start">−4,240 (34%)</text>
+<text x="20" y="129" class="row" text-anchor="start">Fill in the form</text>
+<text x="232.6" y="128" class="val" text-anchor="end">8,240</text>
+<text x="281.36" y="128" class="val" text-anchor="end">66%</text>
+<text x="404.3" y="152" class="val" text-anchor="start">−4,120 (50%)</text>
+<text x="20" y="177" class="row" text-anchor="start">Confirm the email</text>
+<text x="232.6" y="176" class="val" text-anchor="end">4,120</text>
+<text x="281.36" y="176" class="val" text-anchor="end">33%</text>
+<text x="372.82" y="200" class="val" text-anchor="start">−1,220 (30%)</text>
+<text x="20" y="225" class="row" text-anchor="start">Choose a plan</text>
+<text x="232.6" y="224" class="val" text-anchor="end">2,900</text>
+<text x="281.36" y="224" class="val" text-anchor="end">23%</text>
+<text x="345.99" y="248" class="val" text-anchor="start">−1,040 (36%)</text>
+<text x="20" y="273" class="row" text-anchor="start">Finish the sign-up</text>
+<text x="232.6" y="272" class="val" text-anchor="end">1,860</text>
+<text x="281.36" y="272" class="val" text-anchor="end">15%</text>
+<rect x="298" y="68" width="322" height="16" rx="4" class="r-bar"/>
+<rect x="506.6" y="116" width="113.4" height="16" rx="4" class="f-lost"/><rect x="298" y="116" width="212.6" height="16" rx="4" class="r-bar"/>
+<rect x="400.3" y="164" width="110.3" height="16" rx="4" class="f-lost"/><rect x="298" y="164" width="106.3" height="16" rx="4" class="r-bar"/>
+<rect x="368.82" y="212" width="35.48" height="16" rx="4" class="f-lost"/><rect x="298" y="212" width="74.82" height="16" rx="4" class="r-bar"/>
+<rect x="341.99" y="260" width="30.83" height="16" rx="4" class="f-lost"/><rect x="298" y="260" width="47.99" height="16" rx="4" class="r-bar"/>
+</svg>
+<svg id="dg-signup-may-phone" class="dg dg-funnel dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="400" viewBox="0 0 264 400" role="img" aria-label="Of 12,480 people who opened the sign-up page in May, 1,860 finished the sign-up: 15%. The largest number left before the form: 4,240. The largest share left at the email check: half of the people who filled in the form did not confirm their email.">
+<style>
+#dg-signup-may-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-signup-may-phone .ground{fill:var(--fig,#f2f3f9)}
+#dg-signup-may-phone .band{fill:var(--bg,#fbfbfe)}
+#dg-signup-may-phone .track{stroke:var(--line,#d3d6e3)}
+#dg-signup-may-phone .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-signup-may-phone .head{fill:var(--text,#1c1f2e)}
+#dg-signup-may-phone .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-signup-may-phone .stop.end{fill:var(--text,#1c1f2e)}
+#dg-signup-may-phone .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-signup-may-phone .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-signup-may-phone .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-signup-may-phone .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-signup-may-phone .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-signup-may-phone .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-signup-may-phone .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-signup-may-phone .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-signup-may-phone .sub,#dg-signup-may-phone .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-signup-may-phone .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-signup-may-phone .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-signup-may-phone .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-signup-may-phone .r-bar{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-signup-may-phone .f-lost{fill:var(--line,#d3d6e3)}
+@media (prefers-reduced-motion:reduce){#dg-signup-may-phone .pulse{animation:none!important}#dg-signup-may-phone .pulse{display:none!important}}
+@media print{#dg-signup-may-phone{max-width:100%;height:auto}#dg-signup-may-phone .pulse{display:none!important}}
+@media (max-width:736px){#dg-signup-may{display:none}#dg-signup-may-phone{display:block}}
+@media print{#dg-signup-may{display:block!important}#dg-signup-may-phone{display:none!important}}
+</style>
+<rect width="264" height="400" class="ground"/>
+<rect x="8" y="84" width="248" height="308" rx="10" class="band"/>
+<text x="20" y="24" class="sub" text-anchor="start">People at each step, bars from 0.</text>
+<text x="20" y="40" class="sub" text-anchor="start">Beside each count, its share of the first</text>
+<text x="20" y="56" class="sub" text-anchor="start">step; in each drop, its share of the</text>
+<text x="20" y="72" class="sub" text-anchor="start">step before.</text>
+<text x="20" y="108" class="row" text-anchor="start">Open the sign-up</text>
+<text x="20" y="126" class="row" text-anchor="start">page</text>
+<text x="199.24" y="108" class="val" text-anchor="end">12,480</text>
+<text x="244" y="108" class="val" text-anchor="end">100%</text>
+<text x="162.48" y="166" class="val" text-anchor="start">−4,240 (34%)</text>
+<text x="20" y="184" class="row" text-anchor="start">Fill in the form</text>
+<text x="199.24" y="184" class="val" text-anchor="end">8,240</text>
+<text x="244" y="184" class="val" text-anchor="end">66%</text>
+<text x="93.95" y="224" class="val" text-anchor="start">−4,120 (50%)</text>
+<text x="20" y="242" class="row" text-anchor="start">Confirm the email</text>
+<text x="199.24" y="242" class="val" text-anchor="end">4,120</text>
+<text x="244" y="242" class="val" text-anchor="end">33%</text>
+<text x="72.05" y="282" class="val" text-anchor="start">−1,220 (30%)</text>
+<text x="20" y="300" class="row" text-anchor="start">Choose a plan</text>
+<text x="199.24" y="300" class="val" text-anchor="end">2,900</text>
+<text x="244" y="300" class="val" text-anchor="end">23%</text>
+<text x="53.38" y="340" class="val" text-anchor="start">−1,040 (36%)</text>
+<text x="20" y="358" class="row" text-anchor="start">Finish the sign-up</text>
+<text x="199.24" y="358" class="val" text-anchor="end">1,860</text>
+<text x="244" y="358" class="val" text-anchor="end">15%</text>
+<rect x="20" y="134" width="224" height="16" rx="4" class="r-bar"/>
+<rect x="163.9" y="192" width="80.1" height="16" rx="4" class="f-lost"/><rect x="20" y="192" width="147.9" height="16" rx="4" class="r-bar"/>
+<rect x="89.95" y="250" width="77.95" height="16" rx="4" class="f-lost"/><rect x="20" y="250" width="73.95" height="16" rx="4" class="r-bar"/>
+<rect x="68.05" y="308" width="25.9" height="16" rx="4" class="f-lost"/><rect x="20" y="308" width="52.05" height="16" rx="4" class="r-bar"/>
+<rect x="49.38" y="366" width="22.67" height="16" rx="4" class="f-lost"/><rect x="20" y="366" width="33.38" height="16" rx="4" class="r-bar"/>
+</svg>
+<details class="dg-words">
+<summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>The diagram in words</summary>
+<table><thead><tr><th scope="col">Step</th><th scope="col">People</th><th scope="col">Share of the first step</th><th scope="col">Left since the step before</th><th scope="col">Share of the step before</th></tr></thead><tbody><tr><th scope="row">Open the sign-up page</th><td>12,480</td><td>100%</td><td colspan="2">first step</td></tr><tr><th scope="row">Fill in the form</th><td>8,240</td><td>66%</td><td>4,240</td><td>34%</td></tr><tr><th scope="row">Confirm the email</th><td>4,120</td><td>33%</td><td>4,120</td><td>50%</td></tr><tr><th scope="row">Choose a plan</th><td>2,900</td><td>23%</td><td>1,220</td><td>30%</td></tr><tr><th scope="row">Finish the sign-up</th><td>1,860</td><td>15%</td><td>1,040</td><td>36%</td></tr></tbody></table>
+<ul><li>Of 12,480 people at the first step, 1,860 reached the last step: 15%.</li><li>The most people left between "Open the sign-up page" and "Fill in the form": 4,240.</li><li>The largest share left between "Fill in the form" and "Confirm the email": 50% of the step before.</li><li>The bars are to scale, from 0.</li></ul>
+</details>

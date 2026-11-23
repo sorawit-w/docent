@@ -104,6 +104,9 @@ function styles(scene, id, mode, swap) {
   if (scene.form === "plan") css.push(`${s} .row{font-size:14px;fill:${v("text")}}`, `${s} .val{font-size:12px;fill:${v("muted")};font-variant-numeric:tabular-nums}`, `${s} .box{fill:${v("bg")};stroke:${v("text")};stroke-width:1.5}`);
   // A plan stacked on a phone: a small map beside each box, its boxes in thin muted outlines, the band's own box filled in the text color.
   if (scene.stack) css.push(`${s} .m-box{fill:${v("bg")};stroke:${v("muted")};stroke-width:1}`, `${s} .m-on{fill:${v("text")};stroke:${v("text")};stroke-width:1}`);
+  // A funnel: step names in weight 400, numbers with tabular figures, a kept bar as the bar of a range chart, and the lost part filled in the line color,
+  // with no outline: a thin outline at that contrast almost disappears in dark mode, and an area does not.
+  if (scene.form === "funnel") css.push(`${s} .row{font-size:14px;fill:${v("text")}}`, `${s} .val{font-size:12px;fill:${v("muted")};font-variant-numeric:tabular-nums}`, `${s} .r-bar{fill:${v("bg")};stroke:${v("text")};stroke-width:1.5}`, `${s} .f-lost{fill:${v("line")}}`);
   if (scene.form === "layout") css.push(`${s} .row{font-size:14px;fill:${v("text")}}`, `${s} .val{font-size:12px;fill:${v("muted")};font-variant-numeric:tabular-nums}`, `${s} .box{fill:${v("bg")};stroke:${v("text")};stroke-width:1.5}`, `${s} .tick{fill:none;stroke:${v("text")};stroke-width:1}`, `${s} .r-ref{stroke:${v("muted")}}`);
   // A part with a state: its outline takes the status color, and a status dot sits on the outline. A drawing with no state carries none of these rules.
   for (const state of new Set(scene.parts.map((part) => part.state).filter(Boolean))) css.push(`${s} .stop.is-${state},${s} .card.is-${state}{stroke:${v(state)};stroke-width:1.5}`, `${s} .flag.is-${state}{fill:${v(state)};stroke:${v("bg")};stroke-width:2}`);
