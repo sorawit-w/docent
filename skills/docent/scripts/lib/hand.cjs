@@ -45,7 +45,9 @@ const RULE = {
   1: "rule 1, a marker", 2: "rule 2, page tokens only", 3: "rule 3, no text under 12px", 4: "rule 4, real size", 5: "rule 5, system fonts and two weights",
   6: "rule 6, no network and no script", 7: "rule 7, nothing dashed", 8: "rule 8, an accessible name", 9: "rule 9, the diagram in words", 0: "the markup",
 };
-const COLOR_PROPS = new Set(["fill", "stroke", "color", "stop-color", "flood-color", "lighting-color"]);
+const COLOR_PROPS = new Set(["fill", "stroke", "color", "stop-color", "flood-color", "lighting-color", "background", "background-color", "border-color", "outline-color"]);
+// A color written in any other property, such as border: 1px solid #000: a hex value or a color function.
+const LITERAL = /(^|[\s,(])#[0-9a-f]{3,8}\b|\b(rgba?|hsla?|hwb|lab|lch|oklab|oklch|color|color-mix|light-dark)\(/i;
 const OPACITY = new Set(["opacity", "fill-opacity", "stroke-opacity", "stop-opacity"]);
 const TOKEN_LIST = "var(--text), var(--muted), var(--line), var(--bg) or var(--fig)";
 
@@ -84,11 +86,14 @@ const declarations = (css) => css.split(";").map((d) => d.trim()).filter(Boolean
 /** Tests one property and its value, in an attribute or in a style. Calls fail(rule, why) for each break. */
 function testProperty(prop, value, where, fail, palette) {
   const shown = `${where} has ${prop}="${value.length > 48 ? `${value.slice(0, 48)}…` : value}"`;
+  if (prop.startsWith("--")) return fail(2, `${shown}; a drawing sets no token of its own, so var(--text) and the others keep the page's tested colors in every theme`);
+  if (/gradient\s*\(/i.test(value)) return fail(2, `${shown}; the page is flat, with no gradient`);
   if (/url\s*\(/i.test(value)) {
     for (const [, target] of value.matchAll(/url\(\s*["']?([^"')]*)/gi)) if (!target.trim().startsWith("#")) fail(6, `${shown}; a url() points inside the drawing, such as url(#arrow)`);
     if (COLOR_PROPS.has(prop)) return fail(2, `${shown}; a color is ${TOKEN_LIST}, not a url()`);
   }
   if (COLOR_PROPS.has(prop)) { const why = badColor(value, palette); if (why) fail(2, `${shown}; ${why}: ${TOKEN_LIST}, none or currentColor`); return; }
+  if (LITERAL.test(value.replace(/url\([^)]*\)|var\([^)]*\)/gi, ""))) return fail(2, `${shown}; a color in a hand-drawn figure is a drawing token: ${TOKEN_LIST}`);
   if (OPACITY.has(prop)) return fail(2, `${shown}; each color shows as its token, so its contrast holds; use var(--muted) or var(--line) for a fainter mark`);
   if (prop === "font-size") {
     const size = value.match(/^([\d.]+)(px)?$/);

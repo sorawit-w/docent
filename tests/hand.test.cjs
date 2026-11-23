@@ -102,6 +102,15 @@ test("a comment in a drawing is a note, and a style rule cannot reach past the d
   assert.equal(errs(swap("</style>", "#hd-repeat .group ~ .note{font-size:14px}\n#hd-repeat>.box{stroke-width:2}\n</style>")), "", "a sibling inside the drawing stays inside it");
 });
 
+test("a drawing cannot set its own tokens, a gradient or a color in another property", () => {
+  const errs = (rule) => hand(checkDocument(page(swap("</style>", `${rule}\n</style>`))).errors).join("\n");
+  assert.match(errs("#hd-repeat{--text:#fbfbfe;--muted:#fbfbfe}"), /rule 2, page tokens only: a <style> rule for "#hd-repeat" has --text="#fbfbfe"; a drawing sets no token of its own, .* \(and 1 more like it\)/);
+  assert.match(errs("#hd-repeat{background:linear-gradient(red,blue)}"), /rule 2, page tokens only: .* has background="linear-gradient\(red,blue\)"; the page is flat, with no gradient/);
+  assert.match(errs("#hd-repeat{background-color:#fff}"), /has background-color="#fff"; a color in a hand-drawn figure is a drawing token/);
+  assert.match(errs("#hd-repeat .box{border:1px solid rgb(0 0 0)}"), /has border="1px solid rgb\(0 0 0\)"; a color in a hand-drawn figure is a drawing token/);
+  assert.equal(errs("#hd-repeat{background:var(--fig,#f2f3f9)}\n#hd-repeat .box{outline:1px solid var(--line,#d3d6e3)}"), "", "a token with its light value is fine in these properties too");
+});
+
 test("a hand-drawn drawing outside a figure well is refused", () => {
   const svg = figure.match(/<svg id="hd-repeat"[\s\S]*?<\/svg>/)[0];
   assert.match(checkDocument(specimen.replace('<section id="report"', `<p>${svg}</p><section id="report"`)).errors.join("\n"), /a hand-drawn drawing stands outside a figure well/);
