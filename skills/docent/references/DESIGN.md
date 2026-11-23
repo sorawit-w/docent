@@ -391,6 +391,8 @@ Docent calls these palettes, not themes, because a theme in Docent is light or d
 
 **With host tokens.** A host may use a palette with its own accent, heading color or fonts; the host tokens win over the palette's. `check` then tests the host's colors on the palette's page and well.
 
+**A branded page.** [`../assets/specimen-branded.html`](../assets/specimen-branded.html) shows the sample page with a host's logo in two versions, a tagline, the credit and the Harbor palette.
+
 **Each drawing** carries the palette's light values as its fallback colors, so a drawing copied out of the page keeps the palette. `stamp` writes only the palette that the page names.
 
 ## Logo, tagline and credit

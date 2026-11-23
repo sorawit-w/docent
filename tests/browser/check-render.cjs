@@ -799,6 +799,20 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     }
   }
 
+  // The branded sample page: a logo in two versions, a tagline, the credit and the Harbor palette, read on a desktop, a phone and the narrowest screen.
+  {
+    const branded = stampHtml(renderDocument(fs.readFileSync(path.join(root, "skills", "docent", "assets", "specimen-branded.html"), "utf8")).html).html;
+    for (const [name, opts] of [["branded light", { width: 1280 }], ["branded dark", { width: 1280, theme: "dark" }], ["branded phone", { width: 375, height: 812, theme: "dark" }], ["branded narrowest", { width: 320, height: 700 }]]) {
+      const { page, context, errors } = await open({ ...opts, content: branded });
+      await page.addScriptTag({ path: axePath });
+      const result = await page.evaluate(async () => await window.axe.run(document, { runOnly: { type: "tag", values: ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa", "best-practice"] } }));
+      const look = await page.evaluate(() => ({ logo: [...document.querySelectorAll(".host .logo")].filter((l) => l.getBoundingClientRect().width).map((l) => l.dataset.for).join(), side: document.documentElement.scrollWidth > document.documentElement.clientWidth, tagline: !!document.querySelector("footer .tagline").getBoundingClientRect().height }));
+      ok(`${name}: 0 axe violations, no script errors, the ${opts.theme === "dark" ? "dark" : "light"} logo, the tagline, and no sideways scroll`, result.violations.length === 0 && errors.length === 0 && look.logo === (opts.theme === "dark" ? "dark" : "light") && look.tagline && !look.side, { violations: result.violations.map((v) => `${v.id}(${v.nodes.length}) ${v.nodes[0].target.join(" ")}`), errors, look });
+      await page.screenshot({ path: `${out}/${name.replace(" ", "-")}.png`, fullPage: name !== "branded light" });
+      await context.close();
+    }
+  }
+
   // A theme written on <html> is fixed: a dark system and a saved dark choice do not change it, and the switch is hidden.
   {
     // Opened from a file, so the page has storage: a saved choice of "dark" is stored first, then the page loads again.
