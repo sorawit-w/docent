@@ -26,10 +26,10 @@
 #dg-product-clicks .h3{fill:var(--heat-3,#3da6b6)}
 #dg-product-clicks .h4{fill:var(--heat-4,#00707e)}
 #dg-product-clicks .h5{fill:var(--heat-5,#004a53)}
-#dg-product-clicks .hv{font-size:12px;font-variant-numeric:tabular-nums}
+#dg-product-clicks .hv{font-size:12px;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
 #dg-product-clicks .hn{font-size:12px}
-#dg-product-clicks .hr,#dg-product-clicks .hv,#dg-product-clicks .hn{fill:var(--heat-text,#1c1f2e)}
-#dg-product-clicks .row.hi,#dg-product-clicks .hv.hi,#dg-product-clicks .hn.hi{fill:var(--heat-page,#fbfbfe)}
+#dg-product-clicks .hs{fill:var(--heat-text,#1c1f2e)}
+#dg-product-clicks .hs.hi{fill:var(--heat-page,#fbfbfe)}
 @media (prefers-reduced-motion:reduce){#dg-product-clicks .pulse{animation:none!important}#dg-product-clicks .pulse{display:none!important}}
 @media print{#dg-product-clicks{max-width:100%;height:auto}#dg-product-clicks .pulse{display:none!important}}
 #dg-product-clicks-phone{display:none}
@@ -49,28 +49,28 @@
 <text x="525.33" y="82" class="val" text-anchor="middle">480</text>
 <rect x="16" y="12" width="40" height="12" rx="2" class="h1"/><rect x="58" y="12" width="40" height="12" rx="2" class="h2"/><rect x="100" y="12" width="40" height="12" rx="2" class="h3"/><rect x="142" y="12" width="40" height="12" rx="2" class="h4"/><rect x="184" y="12" width="40" height="12" rx="2" class="h5"/>
 <rect x="14" y="96" width="612" height="68" rx="4" class="box h3"/>
-<text x="22" y="118" class="row hr" text-anchor="start">Header</text>
-<text x="22" y="136" class="hv" text-anchor="start">420</text>
-<text x="22" y="152" class="hn" text-anchor="start">search and menu</text>
+<text x="22" y="118" class="row hs" text-anchor="start">Header</text>
+<text x="22" y="136" class="hv hs" text-anchor="start">420</text>
+<text x="22" y="152" class="hn hs" text-anchor="start">search and menu</text>
 <rect x="14" y="168" width="201.33" height="68" rx="4" class="box h4"/>
-<text x="22" y="190" class="row hr hi" text-anchor="start">Photo gallery</text>
-<text x="22" y="208" class="hv hi" text-anchor="start">610</text>
+<text x="22" y="190" class="row hs hi" text-anchor="start">Photo gallery</text>
+<text x="22" y="208" class="hv hs hi" text-anchor="start">610</text>
 <rect x="219.33" y="168" width="201.33" height="68" rx="4" class="box h2"/>
-<text x="227.33" y="190" class="row hr" text-anchor="start">Product details</text>
-<text x="227.33" y="208" class="hv" text-anchor="start">240</text>
+<text x="227.33" y="190" class="row hs" text-anchor="start">Product details</text>
+<text x="227.33" y="208" class="hv hs" text-anchor="start">240</text>
 <rect x="424.67" y="168" width="201.33" height="68" rx="4" class="box h5"/>
-<text x="432.67" y="190" class="row hr hi" text-anchor="start">Add to cart</text>
-<text x="432.67" y="208" class="hv hi" text-anchor="start">870</text>
-<text x="432.67" y="224" class="hn hi" text-anchor="start">price and size</text>
+<text x="432.67" y="190" class="row hs hi" text-anchor="start">Add to cart</text>
+<text x="432.67" y="208" class="hv hs hi" text-anchor="start">870</text>
+<text x="432.67" y="224" class="hn hs hi" text-anchor="start">price and size</text>
 <rect x="14" y="240" width="406.67" height="52" rx="4" class="box h3"/>
-<text x="22" y="262" class="row hr" text-anchor="start">Reviews</text>
-<text x="22" y="280" class="hv" text-anchor="start">430</text>
+<text x="22" y="262" class="row hs" text-anchor="start">Reviews</text>
+<text x="22" y="280" class="hv hs" text-anchor="start">430</text>
 <rect x="424.67" y="240" width="201.33" height="52" rx="4" class="box h1"/>
-<text x="432.67" y="262" class="row hr" text-anchor="start">Related items</text>
-<text x="432.67" y="280" class="hv" text-anchor="start">150</text>
+<text x="432.67" y="262" class="row hs" text-anchor="start">Related items</text>
+<text x="432.67" y="280" class="hv hs" text-anchor="start">150</text>
 <rect x="14" y="296" width="406.67" height="68" rx="4" class="box h1"/>
-<text x="22" y="318" class="row hr" text-anchor="start">Footer</text>
-<text x="22" y="336" class="hv" text-anchor="start">60</text>
+<text x="22" y="318" class="row hs" text-anchor="start">Footer</text>
+<text x="22" y="336" class="hv hs" text-anchor="start">60</text>
 <rect x="424.67" y="296" width="201.33" height="68" rx="4" class="box"/>
 <text x="432.67" y="318" class="row" text-anchor="start">Help chat</text>
 <text x="432.67" y="336" class="sub" text-anchor="start">no data</text>
@@ -104,10 +104,10 @@
 #dg-product-clicks-phone .h3{fill:var(--heat-3,#3da6b6)}
 #dg-product-clicks-phone .h4{fill:var(--heat-4,#00707e)}
 #dg-product-clicks-phone .h5{fill:var(--heat-5,#004a53)}
-#dg-product-clicks-phone .hv{font-size:12px;font-variant-numeric:tabular-nums}
+#dg-product-clicks-phone .hv{font-size:12px;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
 #dg-product-clicks-phone .hn{font-size:12px}
-#dg-product-clicks-phone .hr,#dg-product-clicks-phone .hv,#dg-product-clicks-phone .hn{fill:var(--heat-text,#1c1f2e)}
-#dg-product-clicks-phone .row.hi,#dg-product-clicks-phone .hv.hi,#dg-product-clicks-phone .hn.hi{fill:var(--heat-page,#fbfbfe)}
+#dg-product-clicks-phone .hs{fill:var(--heat-text,#1c1f2e)}
+#dg-product-clicks-phone .hs.hi{fill:var(--heat-page,#fbfbfe)}
 @media (prefers-reduced-motion:reduce){#dg-product-clicks-phone .pulse{animation:none!important}#dg-product-clicks-phone .pulse{display:none!important}}
 @media print{#dg-product-clicks-phone{max-width:100%;height:auto}#dg-product-clicks-phone .pulse{display:none!important}}
 @media (max-width:736px){#dg-product-clicks{display:none}#dg-product-clicks-phone{display:block}}
@@ -128,33 +128,33 @@
 <text x="212" y="104" class="val" text-anchor="middle">480</text>
 <rect x="16" y="12" width="40" height="12" rx="2" class="h1"/><rect x="58" y="12" width="40" height="12" rx="2" class="h2"/><rect x="100" y="12" width="40" height="12" rx="2" class="h3"/><rect x="142" y="12" width="40" height="12" rx="2" class="h4"/><rect x="184" y="12" width="40" height="12" rx="2" class="h5"/>
 <rect x="14" y="118" width="236" height="68" rx="4" class="box h3"/>
-<text x="22" y="140" class="row hr" text-anchor="start">Header</text>
-<text x="22" y="158" class="hv" text-anchor="start">420</text>
-<text x="22" y="174" class="hn" text-anchor="start">search and menu</text>
+<text x="22" y="140" class="row hs" text-anchor="start">Header</text>
+<text x="22" y="158" class="hv hs" text-anchor="start">420</text>
+<text x="22" y="174" class="hn hs" text-anchor="start">search and menu</text>
 <rect x="14" y="190" width="76" height="102" rx="4" class="box h4"/>
-<text x="22" y="212" class="row hr hi" text-anchor="start">Photo</text>
-<text x="22" y="230" class="row hr hi" text-anchor="start">gallery</text>
-<text x="22" y="248" class="hv hi" text-anchor="start">610</text>
+<text x="22" y="212" class="row hs hi" text-anchor="start">Photo</text>
+<text x="22" y="230" class="row hs hi" text-anchor="start">gallery</text>
+<text x="22" y="248" class="hv hs hi" text-anchor="start">610</text>
 <rect x="94" y="190" width="76" height="102" rx="4" class="box h2"/>
-<text x="102" y="212" class="row hr" text-anchor="start">Product</text>
-<text x="102" y="230" class="row hr" text-anchor="start">details</text>
-<text x="102" y="248" class="hv" text-anchor="start">240</text>
+<text x="102" y="212" class="row hs" text-anchor="start">Product</text>
+<text x="102" y="230" class="row hs" text-anchor="start">details</text>
+<text x="102" y="248" class="hv hs" text-anchor="start">240</text>
 <rect x="174" y="190" width="76" height="102" rx="4" class="box h5"/>
-<text x="182" y="212" class="row hr hi" text-anchor="start">Add to</text>
-<text x="182" y="230" class="row hr hi" text-anchor="start">cart</text>
-<text x="182" y="248" class="hv hi" text-anchor="start">870</text>
-<text x="182" y="264" class="hn hi" text-anchor="start">price and</text>
-<text x="182" y="280" class="hn hi" text-anchor="start">size</text>
+<text x="182" y="212" class="row hs hi" text-anchor="start">Add to</text>
+<text x="182" y="230" class="row hs hi" text-anchor="start">cart</text>
+<text x="182" y="248" class="hv hs hi" text-anchor="start">870</text>
+<text x="182" y="264" class="hn hs hi" text-anchor="start">price and</text>
+<text x="182" y="280" class="hn hs hi" text-anchor="start">size</text>
 <rect x="14" y="296" width="156" height="70" rx="4" class="box h3"/>
-<text x="22" y="318" class="row hr" text-anchor="start">Reviews</text>
-<text x="22" y="336" class="hv" text-anchor="start">430</text>
+<text x="22" y="318" class="row hs" text-anchor="start">Reviews</text>
+<text x="22" y="336" class="hv hs" text-anchor="start">430</text>
 <rect x="174" y="296" width="76" height="70" rx="4" class="box h1"/>
-<text x="182" y="318" class="row hr" text-anchor="start">Related</text>
-<text x="182" y="336" class="row hr" text-anchor="start">items</text>
-<text x="182" y="354" class="hv" text-anchor="start">150</text>
+<text x="182" y="318" class="row hs" text-anchor="start">Related</text>
+<text x="182" y="336" class="row hs" text-anchor="start">items</text>
+<text x="182" y="354" class="hv hs" text-anchor="start">150</text>
 <rect x="14" y="370" width="156" height="102" rx="4" class="box h1"/>
-<text x="22" y="392" class="row hr" text-anchor="start">Footer</text>
-<text x="22" y="410" class="hv" text-anchor="start">60</text>
+<text x="22" y="392" class="row hs" text-anchor="start">Footer</text>
+<text x="22" y="410" class="hv hs" text-anchor="start">60</text>
 <rect x="174" y="370" width="76" height="102" rx="4" class="box"/>
 <text x="182" y="392" class="row" text-anchor="start">Help</text>
 <text x="182" y="410" class="row" text-anchor="start">chat</text>

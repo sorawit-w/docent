@@ -142,7 +142,7 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
   {
     const fixture = (name) => fs.readFileSync(path.join(root, "tests", "fixtures", `${name}.json`), "utf8");
     const figure = (id, name) => `<figure><div class="fig" role="region" aria-label="Figure, ${id}" tabindex="0">\n<!-- docent:diagram\n${fixture(name)}\n-->\n<!-- /docent:diagram -->\n</div><figcaption><strong>Figure</strong>${id}.</figcaption></figure>`;
-    const content = renderDocument(html.replace('<section id="report"', `<section id="heat" aria-labelledby="heat-h"><h2 id="heat-h">Heat</h2>${figure("errors", "heatmap-errors")}${figure("clicks", "heatplan-product")}</section>\n<section id="report"`)).html;
+    const content = renderDocument(html.replace('<section id="report"', `<section id="heat" aria-labelledby="heat-h"><h2 id="heat-h">Heat</h2>${figure("errors", "heatmap-errors")}${figure("clicks", "heatplan-product")}${figure("help", "heatplan-help")}</section>\n<section id="report"`)).html;
     const KIT = { light: { text: LIGHT.text, page: LIGHT.bg, steps: ["#c6e9ef", "#86c9d5", "#3da6b6", "#00707e", "#004a53"] }, dark: { text: DARK.text, page: DARK.bg, steps: ["#093339", "#054e58", "#006b78", "#36a0b1", "#80cad7"] } };
     const rgb = (hex) => `rgb(${[1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)).join(", ")})`;
     for (const theme of ["light", "dark"]) {
@@ -171,9 +171,9 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
           words: all("svg.dg:not(.dg-heatmap):not(.dg-heatplan) :is(.name, .lane, .sub, .verb), #heat svg.dg .val", (e) => css(e).fill),
           grounds: all("svg.dg :is(.ground, .band)", (e) => css(e).fill),
           steps: [1, 2, 3, 4, 5].map((k) => all(`#heat svg.dg .h${k}`, (e) => css(e).fill).join()),
-          onStep: all("#heat svg.dg :is(.hv, .hn, .hr):not(.hi)", (e) => css(e).fill),
+          onStep: all("#dg-errors-by-day .hv:not(.hi), #dg-product-clicks .hs:not(.hi)", (e) => css(e).fill),
           onDark: all("#heat svg.dg .hi", (e) => css(e).fill),
-          noData: [...new Set([...all("#dg-errors-by-day .h0", (e) => css(e).stroke), ...all("#dg-product-clicks .row:not(.hr)", (e) => css(e).fill)])],
+          noData: [...new Set([...all("#dg-errors-by-day .h0", (e) => css(e).stroke), ...all("#dg-product-clicks .row:not(.hs)", (e) => css(e).fill)])],
           chosen: css(document.querySelector(".choose > input:checked + .opt")).borderTopColor,
         };
       });
@@ -183,6 +183,10 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
       ok(`forced colors, ${theme}: a drawing's tracks, outlines, lines and words take the text color, and its ground and bands the page color`, seen.lines.join() === sys.text && seen.words.join() === sys.text && seen.grounds.join() === sys.canvas, seen);
       ok(`forced colors, ${theme}: the heat steps keep their own colors, the text on them keeps the kit's text and page colors, and a cell or box with no data takes the system colors`, seen.steps.join("|") === kit.steps.map(rgb).join("|") && seen.onStep.join() === kit.text && seen.onDark.join() === kit.page && seen.noData.join() === sys.text, seen);
       ok(`forced colors, ${theme}: the chosen option takes the highlight color`, seen.chosen === sys.hi, seen);
+      // A heat plan stacked on a phone: the value beside each map sits on the band, so it takes the system text color, and so does the ring.
+      await page.setViewportSize({ width: 390, height: 844 });
+      const stack = await page.evaluate(() => ({ values: [...new Set([...document.querySelectorAll("#dg-help-clicks-phone .hv")].map((e) => getComputedStyle(e).fill))], ring: getComputedStyle(document.querySelector("#dg-help-clicks-phone .m-at")).stroke, shown: document.getElementById("dg-help-clicks-phone").getBoundingClientRect().width }));
+      ok(`forced colors, ${theme}: a stacked heat plan's values beside the maps, and its ring, take the system text color`, stack.shown > 0 && stack.values.join() === sys.text && stack.ring === sys.text, { sys, stack });
       await page.screenshot({ path: `${out}/forced-${theme}.png`, fullPage: true });
       await context.close();
     }
