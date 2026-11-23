@@ -10,6 +10,7 @@ const { renderWidget, PLACE, esc } = require("./lib/widget.cjs");
 const { findBlocks, block } = require("./lib/blocks.cjs");
 const { PROFILES, suggestProfile } = require("./lib/profile.cjs");
 const { checkLogos } = require("./lib/logo.cjs");
+const { checkFigures } = require("./lib/hand.cjs");
 const { lab, darkAccent, nearestStatus } = require("./lib/color.cjs");
 const { NAMES: PALETTES, paletteOf, paint, grounds } = require("./lib/palettes.cjs");
 const { findPersonal, findTel } = require("./lib/personal.cjs");
@@ -113,10 +114,12 @@ function checkDocument(html) {
   let rest = html;
   for (const found of [...diagrams].reverse()) rest = rest.slice(0, found.start) + rest.slice(found.end);
   if (/<svg\b[^>]*\bclass="[^"]*\bdg\b/.test(rest)) errors.push("a diagram sits outside a diagram block; put its data in a block and run render");
-  // Every drawing in a figure well comes from a diagram block: a hand-drawn SVG there cannot be drawn again or checked.
-  for (const { attrs, inner } of wells(rest)) {
-    if (/<svg\b/i.test(inner.replace(/<!--[\s\S]*?-->/g, ""))) errors.push(`${(attrs.match(/aria-label="([^"]*)"/) || [])[1] || "a figure"} holds a drawing that no diagram block made; write its data in a block and run render`);
-  }
+  // Every drawing in a figure well comes from a diagram block, or is hand-drawn under the contract of "Hand-drawn figures" in diagrams.md.
+  const hand = checkFigures(wells(rest), { html, palette });
+  errors.push(...hand.errors);
+  warnings.push(...hand.warnings);
+  for (const svg of hand.drawn) rest = rest.replace(svg, ""); // like a drawing that render made, it is not the author's own content
+  if (/<svg\b[^>]*\bdata-drawn\s*=\s*["']hand["']/i.test(rest.replace(/<!--[\s\S]*?-->/g, ""))) errors.push('a hand-drawn drawing stands outside a figure well; put it in a <div class="fig">, with its words, as "Hand-drawn figures" in diagrams.md shows');
 
   // 2b. Widgets: each widget must be the one that render makes from its data.
   const widgets = findBlocks(rest, "widget"), widgetIds = new Set(), kinds = new Set(), defaults = {};
