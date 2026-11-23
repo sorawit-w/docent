@@ -104,13 +104,21 @@ function testProperty(prop, value, where, fail, palette) {
   if (/^(filter|box-shadow|text-shadow|mask)$/.test(prop)) fail(2, `${shown}; the page is flat`);
 }
 
+/** True when a selector picks the drawing or what is inside it: it starts with the drawing's id, and no + or ~ leads from the drawing to its siblings. */
+function inside(sel, id) {
+  if (!sel.startsWith(`#${id}`)) return false;
+  const rest = sel.slice(id.length + 1);
+  if (rest && !/^[\s.:[>+~#]/.test(rest)) return false; // #hd-repeat-2 is another id
+  return !/^[+~]/.test(rest.replace(/^[^\s>+~]*/, "").trim());
+}
+
 /** Tests the rules of a <style> element: each one starts with the drawing's id, because a style element applies to the whole page. */
 function testStyle(css, id, fail, palette) {
   const body = css.replace(/\/\*[\s\S]*?\*\//g, "");
   if (/@/.test(body)) { fail(/@(import|font-face)/i.test(body) ? (/@import/i.test(body) ? 6 : 5) : 0, `a <style> holds ${(body.match(/@[\w-]+/) || ["@"])[0]}; a drawing's style holds plain rules only`); return; }
   for (const [, selectors, decls] of body.matchAll(/([^{}]*)\{([^{}]*)\}/g)) {
     for (const sel of selectors.split(",").map((s) => s.trim()).filter(Boolean)) {
-      if (!id || !(sel === `#${id}` || sel.startsWith(`#${id} `) || sel.startsWith(`#${id}.`) || sel.startsWith(`#${id}>`) || sel.startsWith(`#${id}:`))) fail(0, `a <style> rule "${sel.slice(0, 40)}" does not start with the drawing's id${id ? ` (#${id})` : ", and the <svg> has no id"}; a style element applies to the whole page, so each rule starts with the id, such as #${id || "hd-causes"} .note`);
+      if (!id || !inside(sel, id)) fail(0, `a <style> rule "${sel.slice(0, 40)}" reaches past the drawing${id ? "" : ", and the <svg> has no id"}; a style element applies to the whole page, so each rule starts with the drawing's id, such as #${id || "hd-causes"} .note, and no + or ~ leads from the drawing to the page`);
     }
     for (const [prop, value] of declarations(decls)) testProperty(prop, value, `a <style> rule for "${selectors.trim().slice(0, 30)}"`, fail, palette);
   }
@@ -133,7 +141,8 @@ function typeOf(type) {
 }
 
 /** Checks one hand-drawn <svg>. Returns { type, errors }, each error a sentence that names its rule and its element. */
-function checkDrawing(svg, { html = "", palette = null } = {}) {
+function checkDrawing(source, { html = "", palette = null } = {}) {
+  const svg = blank(source); // a comment is a note for the author: neither text nor tags
   const found = new Map(); // one message for each rule and reason, with the first element that breaks it and a count of the others
   const fail = (rule, why) => { const key = `${rule}|${why.slice(why.indexOf(";") + 1)}`, had = found.get(key); if (had) had[2] += 1; else found.set(key, [rule, why, 1]); };
   const errors = () => [...found.values()].map(([rule, why, n]) => `${RULE[rule]}: ${why}${n > 1 ? ` (and ${n - 1} more like it)` : ""}`);

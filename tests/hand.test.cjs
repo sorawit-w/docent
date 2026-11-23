@@ -67,7 +67,7 @@ test("the rest of the contract: size, opacity, dashes, scope of a style, fill, t
   assert.match(one(swap("font-weight:400;", "font-weight:700;")), /rule 5, system fonts and two weights: .* has font-weight="700"; a drawing has two weights, 400 and 600/);
   assert.match(one(swap("stroke:var(--muted,#575d75);stroke-width:1", "stroke:var(--primary);stroke-width:1")), /rule 2, page tokens only: .* --primary has its own meaning, the current leg/);
   assert.match(one(swap("stroke:var(--muted,#575d75);stroke-width:1", "stroke:var(--muted,#000000);stroke-width:1")), /its fallback #000000 is not the light value of --muted \(#575d75\)/);
-  assert.match(one(swap("#hd-repeat .cause{", ".cause{")), /the markup: a <style> rule "\.cause" does not start with the drawing's id \(#hd-repeat\); a style element applies to the whole page/);
+  assert.match(one(swap("#hd-repeat .cause{", ".cause{")), /the markup: a <style> rule "\.cause" reaches past the drawing; a style element applies to the whole page/);
   assert.match(one(swap('<rect class="box"', '<script>alert(1)</script><rect class="box"')), /rule 6, no network and no script: <script> is not allowed: a script runs code/);
   assert.match(one(swap('role="img" ', "")), /rule 8, an accessible name: the <svg> has no role; it has role="img"/);
   assert.match(one(swap('aria-labelledby="hd-repeat-t hd-repeat-d"', 'aria-labelledby="hd-repeat-t"')), /rule 8, an accessible name: the <svg> has aria-labelledby="hd-repeat-t"; it names the title and the desc: aria-labelledby="hd-repeat-t hd-repeat-d"/);
@@ -91,6 +91,15 @@ test("a drawing with no style element: each shape and text needs a fill from its
   const harbor = require("../skills/docent/scripts/lib/palettes.cjs").PALETTES.harbor.light.text;
   assert.deepEqual(checkDrawing(svg(`<rect width="9" height="9" fill="var(--text,${harbor})"/>`), { palette: "harbor" }).errors, []);
   assert.match(checkDrawing(svg(`<rect width="9" height="9" fill="var(--text,${harbor})"/>`)).errors.join(), /fallback/, "without the palette, its value is not a light value");
+});
+
+test("a comment in a drawing is a note, and a style rule cannot reach past the drawing", () => {
+  const errs = (change) => hand(checkDocument(page(change)).errors).join("\n");
+  assert.equal(errs(swap('<line class="spine"', '<!-- the spine, <rect width="9" height="9"/> -->\n<line class="spine"')), "", "a comment holds no text and no tags");
+  for (const sel of ["#hd-repeat + details", "#hd-repeat ~ figcaption", "#hd-repeat.x+details", "#hd-repeat-2 .note"]) {
+    assert.match(errs(swap("</style>", `${sel}{display:none}\n</style>`)), /reaches past the drawing; a style element applies to the whole page, so each rule starts with the drawing's id, such as #hd-repeat \.note, and no \+ or ~ leads from the drawing to the page/, sel);
+  }
+  assert.equal(errs(swap("</style>", "#hd-repeat .group ~ .note{font-size:14px}\n#hd-repeat>.box{stroke-width:2}\n</style>")), "", "a sibling inside the drawing stays inside it");
 });
 
 test("a hand-drawn drawing outside a figure well is refused", () => {
