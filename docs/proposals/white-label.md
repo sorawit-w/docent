@@ -1,6 +1,6 @@
 # Proposal: white label and palettes — the host's logo, tagline and colors
 
-Status: **proposed on 2026-11-23, with each open question decided** (see "Decisions" at the end). The user accepted decisions 4, 8 and 9 for now, and will confirm them on the built result. No code is written yet. A talk on 2026-11-23 settled three things before this proposal: a "Made with Docent" credit stays, as a link by default with an opt-out to plain text; a host's `DESIGN.md` is read into the host tokens only; and diagram colors keep their meaning (green, amber and red mean status, the accent means the current step, the heat steps mean how much).
+Status: **proposed on 2026-11-23, with each open question decided** (see "Decisions" at the end). **Built** in PRs 47, 51, 52, 53 and 54; the branded sample page is `skills/docent/assets/specimen-branded.html`. The user confirmed decisions 4, 8 and 9 on the built result on 2026-11-23. A talk on 2026-11-23 settled three things before this proposal: a "Made with Docent" credit stays, as a link by default with an opt-out to plain text; a host's `DESIGN.md` is read into the host tokens only; and diagram colors keep their meaning (green, amber and red mean status, the accent means the current step, the heat steps mean how much).
 
 ## The answer first
 
@@ -495,7 +495,7 @@ Decided on 2026-11-23, so that the work can go on while the user is away. Each c
 10. **Color: palettes that turn Docent's own tokens to a hue (T2); no accent tint on bands (T1).** T1 reverses the order of the layers in light mode and makes the accent a fill. T2 gives more color across the page with every pair tested in advance.
 11. **Three palettes: Harbor, Plum and Sepia.** They cover a cool, a warm-violet and a warm-paper mood. Each hue is far from green, amber and red (68.8 or more), so no accent reads as a status. All 64 pairs of each pass.
 
-**The user's view, 2026-11-23: accepted for now, to be confirmed on the built result.** The user accepted the three points below as written, and will confirm them after seeing them built. Each PR that builds one of them shows the result before and after, so the user can still choose the alternative.
+**The user's view, 2026-11-23: confirmed on the built result.** The user first accepted the three points below for now, then saw them on the branded sample page and kept all three as built.
 
 - **Decision 8** changes the dark dot of pages that already set `--host-accent-dark`. The alternative is D1, which keeps the lamp everywhere and changes no existing page. Shown in PR 2.
 - **Decision 4** turns the footer's tile mark into a one-color mark. The alternative keeps the tile, so Docent's color shows on every page. Shown in PR 1.
