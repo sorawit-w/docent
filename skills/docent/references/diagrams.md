@@ -883,6 +883,46 @@ A funnel shows how many people reach each step of one flow, and how many leave b
 - To compare two groups, such as phone and desktop, write two funnels, or a table. Each funnel has its own scale, so their shares compare and their bar lengths do not.
 - `render` also writes the steps as a table under the drawing, with both shares, and three lines: how many reached the last step, where the most people left, and where the largest share left.
 
+## Heat maps
+
+A heat map shows one number for each pair of a row and a column, such as sign-ups by weekday and hour, or errors by service and day. Write it with `"kind": "heatmap"` when there are 2 to 12 rows and 3 to 24 columns, one number in each cell, and the reader needs the pattern more than each number: the busy hours, the bad day, the one service that differs. For fewer than 12 cells, or when each exact number matters, write a table. For values on one scale, one row each, use a range chart. For change over time in one or two series, or for numbers above and below a middle (such as change against last week), use a table.
+
+```json
+{
+  "id": "errors-by-day",
+  "kind": "heatmap",
+  "label": "Errors of a web service in one week, by part and day. Checkout and Payments had most errors on Wednesday and Thursday, after a release. Image upload rose through the weekend. Email has no data for Thursday.",
+  "scale": {"from": 0, "to": 40, "step": 10, "unit": "errors"},
+  "columns": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+  "rows": [
+    {"name": "Sign-in",      "values": [3, 2, 4, 3, 5, 1, 1]},
+    {"name": "Search",       "values": [6, 7, 5, 9, 8, 4, 3]},
+    {"name": "Checkout",     "values": [12, 14, 38, 31, 11, 6, 5]},
+    {"name": "Payments",     "values": [4, 5, 22, 17, 4, 2, 2]},
+    {"name": "Email",        "values": [1, 0, 2, null, 1, 0, 0]},
+    {"name": "Image upload", "values": [9, 8, 10, 12, 15, 19, 21]}
+  ]
+}
+```
+
+| Field | What it is |
+|---|---|
+| `scale` | `from`, `to`, `step` and `unit`, as in a range chart. `to` minus `from` is 3, 4 or 5 steps, and each step is one shade. `unit` is needed (at most 12 characters), because the legend names what is counted. A heat map has no `marks`. |
+| `columns` | 3 to 24 labels, left to right, each at most 10 characters, all different. A label is text, also when it is a number: `"0"` to `"23"` for hours, `"Mon"` for a day. |
+| `rows` | 2 to 12 rows, top to bottom. Each has a `name` (at most 20 characters, all different) and `values`: one for each column, in the order of `columns`. A value is a number from `from` to `to`, or `null` for a cell with no data. At least one value is a number. |
+
+- **You fix the scale.** The renderer never picks its own edges, so two weekly reports of the same data show the same steps. Each step holds the values from its lower edge up to its upper edge; a value on an edge takes the higher step, and `to` takes the top step. A value outside the scale is refused: widen the scale, or say the large value in the text.
+- **Five shades of gray, the heat steps.** With 5 steps the cells take all five; with 4 they take steps 1, 2, 4 and 5; with 3, steps 1, 3 and 5. So the least and the most look the same in every heat map. In light mode the most is the darkest, and in dark mode the lightest, so the most always stands out from the page. A heat map has no ultramarine, no green, amber or red, and no field for a color.
+- **A legend above the grid** shows each step, with the numbers at its edges and the unit. When the unit does not fit at the right of the swatches, it takes a second line.
+- **A cell with no data is hollow:** the page color inside a thin muted outline. It never looks like the palest step. The legend then adds a hollow key, "no data".
+- **Numbers in the cells.** When every number fits inside its cell, each cell shows it; when one does not fit, no cell does, so a cell without a number never looks empty. The table in words always gives every number.
+- **Column labels** are kept whole. When they do not all fit on one line, they take two lines; when two are not enough, every second, third, fourth, sixth or twelfth label stands, never fewer than three. These divide 24 and 12, so hours and months keep their round labels. A label of up to 7 characters (about 43px) fits a phone at any number of columns.
+- The forms: 640px on a desktop and on paper, with the row names in a column at the left; and 264px on a phone, where each row name stands on its own line above its row of cells, and the columns still line up. The grid always fits a phone; only a legend whose edge numbers are too wide, or column labels that are too long, are refused, and the message says what to shorten.
+- Numbers are written as you write them, with a minus sign below zero and no thousands separator. Write large counts in a larger unit, such as `thousands of visits`, when the legend needs it.
+- `render` also writes the numbers as a table under the drawing, with the same rows and columns, and lines on the steps, the highest number, the lowest and the cells with no data. A grid too wide for a sheet of paper is written as several tables of fewer columns, each with the row names, so every number prints; on a narrow screen each table scrolls inside itself.
+- `render` says how the cells and labels came out, such as `drawn as heatmap; every 3rd column label on a phone`, or `numbers in the cells on a desktop only`.
+- **The areas of a page** (clicks on the header, the sidebar and the footer) are not a heat map yet: write a plan, and the counts in a table. Raw click points do not go into the data: count them into cells first, and say the size of a cell in the label.
+
 ## Optional legs
 
 A leg with `"optional": true` is a path that only some readers take, or that happens only in some cases. It is drawn as a dashed arrow:
@@ -948,6 +988,11 @@ An icon may hold only these shapes and attributes: `path` (`d`), `circle` (`cx`,
   - `... warning: the funnel has 2 steps; a sentence says this more simply` — two counts read better in a sentence: "1,860 of 12,480 people finished".
   - `... warning: no step loses anyone; a sentence says this more simply` — every count is the same, so the bars show nothing.
   - `... warning: the last step keeps 96% of the first, so the bars look almost the same; a table shows small drops better` — when the last count is at least 95% of the first, the loss is too short to see on a phone.
+  - `... warning: every number is in one step, so the shades show nothing; a sentence or a table says this more simply` — every cell has the same shade.
+  - `... warning: 61 of 72 cells are in the lowest step; one large number may set the scale. Check "to", or say the large number in the text` — four cells in five, or more, have the palest shade.
+  - `... warning: the heat map has 9 cells; a table with the numbers says this more simply` — fewer than 12 cells.
+  - `... warning: 40 of 72 cells have no data; a table of the cells that have data may say this better` — more than half of the cells are hollow.
+  - `... warning: only every 3rd column label fits on a desktop; when the columns are names, not a series such as hours, turn the grid so that the names are rows` — names need every label; a series such as hours does not.
 
 `check` also reports a figure well that holds a drawing no diagram block made: `check doc.html: error: Figure 2, ... holds a drawing that no diagram block made; write its data in a block and run render`. A hand-drawn SVG cannot be drawn again or checked against data. Icons outside figure wells are not touched.
 

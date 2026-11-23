@@ -14,6 +14,11 @@ colors:
   success: "#1a7f37"
   warning: "#7d4e00"
   error: "#cf222e"
+  heat-1: "#dee2f0"             # Heat steps — the cells of a heat map only, from the least (1) to the most (5)
+  heat-2: "#babecb"
+  heat-3: "#9498a5"
+  heat-4: "#616571"
+  heat-5: "#3e424d"
   dark-surface: "#12141f"       # Dark page; one step lighter than the dark well
   dark-neutral: "#0b0d15"       # Dark well; one step darker than the dark page
   dark-on-surface: "#e7e9f3"
@@ -23,6 +28,11 @@ colors:
   dark-success: "#3fb950"
   dark-warning: "#d29922"
   dark-error: "#f85149"
+  dark-heat-1: "#2a2e38"
+  dark-heat-2: "#434751"
+  dark-heat-3: "#5d616c"
+  dark-heat-4: "#8f939f"
+  dark-heat-5: "#babecb"
 typography:
   h1:
     fontFamily: Charter, "Bitstream Charter", "Sitka Heading", "Sitka Text", Cambria, Georgia, serif
@@ -110,12 +120,13 @@ The palette is one ink, one light, and Docent's own grays. Every gray leans slig
 - **Tertiary — Lamp (#f2b824):** The docent's lamp, and always a dot. It is the dot in the mark, and the route dot, the rail dot and the dot of a chosen option in dark mode. Lamp on the light page has a contrast of 1.74:1, so it is not used there; the dots in light mode are ultramarine.
 - **Neutral — Well (#f2f3f9):** The ground of figures and code. A well is one step darker than the page in both themes, and it has no outline.
 - **Status:** `success`, `warning` and `error` are for status only, as a small dot with a word beside it. Two more kinds of status note have no status color: plain information has a muted dot, and a thing that is planned, or not turned on yet, has a muted ring. The ring differs from the dot by its shape, so it does not need a color. A status label wraps on a narrow screen. In a diagram, a part that carries a state takes the status color on its outline and gets the same small dot; its note says the status in words.
+- **Heat steps (heat-1 to heat-5):** Five more of Docent's grays, for the cells of a heat map and nothing else. Step 1 holds the least and step 5 the most. In light the steps grow darker, and in dark they grow lighter, so the most is always the step that stands out most from the page. A step is a fill, but it is not a mark and not a status: a heat map has no ultramarine, no lamp, and no green, amber or red. A number on steps 1 to 3 takes the text color, and a number on steps 4 and 5 takes the page color. Every heat map has a legend, and its exact numbers are in the table in words.
 
-**Diagrams.** Docent draws its own diagrams, in three forms (see Layout). A diagram uses the page's tokens and nothing else: lines, parts and names in the text color, notes in the muted color, tracks in the outline color, lane bands in the page color, and the well as its ground. Because it reads the tokens, one drawing serves both themes. Each drawing carries its own styles, with the light values as a fallback, so a drawing that is copied out of the page keeps the light colors. Ultramarine marks the current leg, and the dot on it is ultramarine in light and lamp in dark. The one other color in a diagram is a status color, on the outline of a part that carries a state (see Status above). An author cannot give a diagram any other color. Docent does not use a third-party diagram renderer.
+**Diagrams.** Docent draws its own diagrams, in three forms (see Layout). A diagram uses the page's tokens and nothing else: lines, parts and names in the text color, notes in the muted color, tracks in the outline color, lane bands in the page color, and the well as its ground. Because it reads the tokens, one drawing serves both themes. Each drawing carries its own styles, with the light values as a fallback, so a drawing that is copied out of the page keeps the light colors. Ultramarine marks the current leg, and the dot on it is ultramarine in light and lamp in dark. Two other colors can appear in a diagram: a status color, on the outline of a part that carries a state (see Status above), and the heat steps, in the cells of a heat map (see Heat steps above). An author cannot give a diagram any other color. Docent does not use a third-party diagram renderer.
 
 **Themes.** A document follows the reader's system setting: light on a light system, dark on a dark one. A switch lets the reader choose the other theme. That choice wins over the system and is remembered. Every `dark-*` token is the dark value of the token with the same name. The page is never pure white and never pure black.
 
-**Contrast.** All text pairs meet WCAG AA (4.5:1). Checked values on the page: body text 15.82 (light) and 15.14 (dark); muted text 6.30 and 6.65; primary 7.41 and 7.23; status colors 4.59 or higher on every surface they use.
+**Contrast.** All text pairs meet WCAG AA (4.5:1). Checked values on the page: body text 15.82 (light) and 15.14 (dark); muted text 6.30 and 6.65; primary 7.41 and 7.23; status colors 4.59 or higher on every surface they use. The number on a heat step: 5.63 or higher in light, 5.11 or higher in dark, and 5.68 or higher on paper.
 
 ## Typography
 
@@ -167,6 +178,8 @@ A page for the public or for older readers also has `data-text="large"`: the bod
 **Plans.** A plan shows where the parts of a page or a screen sit, on both axes, as a grid of named areas. It uses the look of a layout to scale: one band in the page color for the page itself, and on it boxes that all look the same, 4px apart, with the name at the upper left at 14px and weight 400, and a note under it, muted. One line above the plan says how to read it ("Widths in px", or "not to scale"), and each column's width stands above it in 12px muted tabular figures. A plan has no ticks, no lines between boxes, no state and no dot. On a phone it keeps its grid, because "next to" and "above" are its message: a narrow column grows until its names fit, and the drawing then says it is not to scale. Only when the grid still cannot fit does a phone get a stack: one band per box, with a 40px map of the plan where that box is filled in the text color and the other boxes have thin muted outlines. Its boxes are also written as a table under the drawing.
 
 **Funnels.** A funnel shows how many people reach each step of one flow, and how many leave between two steps. Each step is a row with a bar that starts at 0, on one scale that ends at the first step's count, so every bar starts at the same left edge and the lengths can be compared. A funnel is never drawn as a funnel shape or as bands that split: a narrowing shape makes a drop look larger than it is. A kept bar is the bar of a range chart. The part that a step lost follows it on the same row, up to the length of the bar above, filled in the line color with no outline: a soft gray block that shows what the step lost, and stays visible in dark mode. The drop is written above that part in numbers: the count, and its share of the step before. The counts and their shares of the first step stand in two columns of tabular figures beside the names. A drop is not a status, so a funnel has no color, no state and no dot, and the renderer marks no drop as the largest. Two short lines above the bars say what they count and what each share is of. It keeps the range chart's two forms, 640px and 264px, and its steps are also written as a table under the drawing.
+
+**Heat maps.** A heat map shows one number for each pair of a row and a column, such as sign-ups by weekday and hour, as a grid of cells on one band. Each cell is filled with the heat step of its number: 3 to 5 steps of equal size on one scale that the author fixes. A legend above the grid shows each step, with the numbers at its edges and the unit; the unit, and a "no data" key, take a second line when they do not fit at the right. Cells are 2px apart (1px when they are narrower than 16px), with corners of 2px. A cell with no data has no fill: it shows the band inside a 1px outline in the muted color, so a hollow cell never looks like the palest step. When every number fits inside its cell, each cell shows its number at 12px with tabular figures; when one does not fit, no cell shows one. Row names are 14px at weight 400 in a column at the left. Column labels are 12px, muted, just above the grid, further from the legend than from the grid so the two never read as one, and stay 12px inside the drawing. When they do not all fit on one line, they take two lines; when two lines are not enough, every second, third, fourth, sixth or twelfth label stands, and never fewer than three. Nothing moves, and nothing is dashed. It has the two forms of a range chart: 640px on a desktop and on paper, and 264px on a phone, where each row name stands on its own line above its row of cells and the columns still line up. Its numbers are also written as a table under the drawing; a table too wide for paper is split into tables of fewer columns, each with the row names, and on a narrow screen each table scrolls inside itself.
 
 **UML diagrams.** A UML kind is a diagram kind named after one of the 14 diagram types of UML 2.5.1. Every mark it draws follows the UML notation, and it draws a chosen subset of the notation, never a look-alike (`docs/proposals/uml.md` lists the subset for each kind). Inside a UML kind:
 
@@ -241,6 +254,7 @@ Corners are soft and consistent. Controls use `sm` (6px). Code blocks use `md` (
 - Don't use gradients, drop shadows or glass effects. The page is flat.
 - Don't use `tertiary` (lamp) for status, links or body text.
 - Don't use green, amber or red for anything except status. They mean the same thing inside the diagrams.
+- Don't use a heat step outside the cells of a heat map, and don't use a step to make a part stand out. A heat step says how much, and nothing else.
 - Don't add a host project's colors to these tokens. A project that needs its own accent, heading color or fonts sets the `--host-*` tokens (see Host tokens). There is no token for the page, the text or the status colors.
 - Don't color a short code or a label. A code is `code`, in its small well; a status is a state, a dot and a word. A colored badge is a fill, and green, amber and red mean status only.
 - Don't color the words of code by kind. A code block has two colors: the text color, and the muted color for a comment line. More colors would add a palette that the page does not have.

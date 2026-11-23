@@ -1,0 +1,216 @@
+<svg id="dg-errors-by-day" class="dg dg-heatmap dg-auto" xmlns="http://www.w3.org/2000/svg" width="640" height="254" viewBox="0 0 640 254" role="img" aria-label="Errors of a web service in one week, by part and day. Checkout and Payments had most errors on Wednesday and Thursday, after a release. Image upload rose through the weekend. Email has no data for Thursday.">
+<style>
+#dg-errors-by-day{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-errors-by-day .ground{fill:var(--fig,#f2f3f9)}
+#dg-errors-by-day .band{fill:var(--bg,#fbfbfe)}
+#dg-errors-by-day .track{stroke:var(--line,#d3d6e3)}
+#dg-errors-by-day .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-errors-by-day .head{fill:var(--text,#1c1f2e)}
+#dg-errors-by-day .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-errors-by-day .stop.end{fill:var(--text,#1c1f2e)}
+#dg-errors-by-day .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-errors-by-day .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-errors-by-day .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-errors-by-day .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-errors-by-day .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-errors-by-day .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-errors-by-day .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-errors-by-day .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-errors-by-day .sub,#dg-errors-by-day .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-errors-by-day .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-errors-by-day .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-errors-by-day .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-errors-by-day .h1{fill:var(--heat-1,#dee2f0)}
+#dg-errors-by-day .h2{fill:var(--heat-2,#babecb)}
+#dg-errors-by-day .h3{fill:var(--heat-3,#9498a5)}
+#dg-errors-by-day .h4{fill:var(--heat-4,#616571)}
+#dg-errors-by-day .h5{fill:var(--heat-5,#3e424d)}
+#dg-errors-by-day .h0{fill:var(--bg,#fbfbfe);stroke:var(--muted,#575d75);stroke-width:1}
+#dg-errors-by-day .hv{font-size:12px;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-errors-by-day .hv.hi{fill:var(--bg,#fbfbfe)}
+@media (prefers-reduced-motion:reduce){#dg-errors-by-day .pulse{animation:none!important}#dg-errors-by-day .pulse{display:none!important}}
+@media print{#dg-errors-by-day{max-width:100%;height:auto}#dg-errors-by-day .pulse{display:none!important}}
+#dg-errors-by-day-phone{display:none}
+</style>
+<rect width="640" height="254" class="ground"/>
+<rect x="8" y="78" width="624" height="160" rx="10" class="band"/>
+<text x="20" y="38" class="val" text-anchor="middle">0</text>
+<text x="53" y="38" class="val" text-anchor="middle">10</text>
+<text x="87" y="38" class="val" text-anchor="middle">20</text>
+<text x="121" y="38" class="val" text-anchor="middle">30</text>
+<text x="154" y="38" class="val" text-anchor="middle">40</text>
+<text x="162" y="22" class="sub" text-anchor="start">errors</text>
+<text x="234" y="22" class="sub" text-anchor="start">no data</text>
+<text x="163.14" y="70" class="val" text-anchor="middle">Mon</text>
+<text x="233.43" y="70" class="val" text-anchor="middle">Tue</text>
+<text x="303.71" y="70" class="val" text-anchor="middle">Wed</text>
+<text x="374" y="70" class="val" text-anchor="middle">Thu</text>
+<text x="444.29" y="70" class="val" text-anchor="middle">Fri</text>
+<text x="514.57" y="70" class="val" text-anchor="middle">Sat</text>
+<text x="584.86" y="70" class="val" text-anchor="middle">Sun</text>
+<text x="20" y="103" class="row" text-anchor="start">Sign-in</text>
+<text x="20" y="127" class="row" text-anchor="start">Search</text>
+<text x="20" y="151" class="row" text-anchor="start">Checkout</text>
+<text x="20" y="175" class="row" text-anchor="start">Payments</text>
+<text x="20" y="199" class="row" text-anchor="start">Email</text>
+<text x="20" y="223" class="row" text-anchor="start">Image upload</text>
+<rect x="20" y="12" width="32" height="12" rx="2" class="h1"/><rect x="54" y="12" width="32" height="12" rx="2" class="h2"/><rect x="88" y="12" width="32" height="12" rx="2" class="h4"/><rect x="122" y="12" width="32" height="12" rx="2" class="h5"/><rect x="212.5" y="12.5" width="15" height="11" rx="2" class="h0"/>
+<rect x="129" y="87" width="68.29" height="22" rx="2" class="h1"/><rect x="199.29" y="87" width="68.29" height="22" rx="2" class="h1"/><rect x="269.57" y="87" width="68.29" height="22" rx="2" class="h1"/><rect x="339.86" y="87" width="68.29" height="22" rx="2" class="h1"/><rect x="410.14" y="87" width="68.29" height="22" rx="2" class="h1"/><rect x="480.43" y="87" width="68.29" height="22" rx="2" class="h1"/><rect x="550.71" y="87" width="68.29" height="22" rx="2" class="h1"/>
+<text x="163.14" y="102" class="hv" text-anchor="middle">3</text>
+<text x="233.43" y="102" class="hv" text-anchor="middle">2</text>
+<text x="303.71" y="102" class="hv" text-anchor="middle">4</text>
+<text x="374" y="102" class="hv" text-anchor="middle">3</text>
+<text x="444.29" y="102" class="hv" text-anchor="middle">5</text>
+<text x="514.57" y="102" class="hv" text-anchor="middle">1</text>
+<text x="584.86" y="102" class="hv" text-anchor="middle">1</text>
+<rect x="129" y="111" width="68.29" height="22" rx="2" class="h1"/><rect x="199.29" y="111" width="68.29" height="22" rx="2" class="h1"/><rect x="269.57" y="111" width="68.29" height="22" rx="2" class="h1"/><rect x="339.86" y="111" width="68.29" height="22" rx="2" class="h1"/><rect x="410.14" y="111" width="68.29" height="22" rx="2" class="h1"/><rect x="480.43" y="111" width="68.29" height="22" rx="2" class="h1"/><rect x="550.71" y="111" width="68.29" height="22" rx="2" class="h1"/>
+<text x="163.14" y="126" class="hv" text-anchor="middle">6</text>
+<text x="233.43" y="126" class="hv" text-anchor="middle">7</text>
+<text x="303.71" y="126" class="hv" text-anchor="middle">5</text>
+<text x="374" y="126" class="hv" text-anchor="middle">9</text>
+<text x="444.29" y="126" class="hv" text-anchor="middle">8</text>
+<text x="514.57" y="126" class="hv" text-anchor="middle">4</text>
+<text x="584.86" y="126" class="hv" text-anchor="middle">3</text>
+<rect x="129" y="135" width="68.29" height="22" rx="2" class="h2"/><rect x="199.29" y="135" width="68.29" height="22" rx="2" class="h2"/><rect x="269.57" y="135" width="68.29" height="22" rx="2" class="h5"/><rect x="339.86" y="135" width="68.29" height="22" rx="2" class="h5"/><rect x="410.14" y="135" width="68.29" height="22" rx="2" class="h2"/><rect x="480.43" y="135" width="68.29" height="22" rx="2" class="h1"/><rect x="550.71" y="135" width="68.29" height="22" rx="2" class="h1"/>
+<text x="163.14" y="150" class="hv" text-anchor="middle">12</text>
+<text x="233.43" y="150" class="hv" text-anchor="middle">14</text>
+<text x="303.71" y="150" class="hv hi" text-anchor="middle">38</text>
+<text x="374" y="150" class="hv hi" text-anchor="middle">31</text>
+<text x="444.29" y="150" class="hv" text-anchor="middle">11</text>
+<text x="514.57" y="150" class="hv" text-anchor="middle">6</text>
+<text x="584.86" y="150" class="hv" text-anchor="middle">5</text>
+<rect x="129" y="159" width="68.29" height="22" rx="2" class="h1"/><rect x="199.29" y="159" width="68.29" height="22" rx="2" class="h1"/><rect x="269.57" y="159" width="68.29" height="22" rx="2" class="h4"/><rect x="339.86" y="159" width="68.29" height="22" rx="2" class="h2"/><rect x="410.14" y="159" width="68.29" height="22" rx="2" class="h1"/><rect x="480.43" y="159" width="68.29" height="22" rx="2" class="h1"/><rect x="550.71" y="159" width="68.29" height="22" rx="2" class="h1"/>
+<text x="163.14" y="174" class="hv" text-anchor="middle">4</text>
+<text x="233.43" y="174" class="hv" text-anchor="middle">5</text>
+<text x="303.71" y="174" class="hv hi" text-anchor="middle">22</text>
+<text x="374" y="174" class="hv" text-anchor="middle">17</text>
+<text x="444.29" y="174" class="hv" text-anchor="middle">4</text>
+<text x="514.57" y="174" class="hv" text-anchor="middle">2</text>
+<text x="584.86" y="174" class="hv" text-anchor="middle">2</text>
+<rect x="129" y="183" width="68.29" height="22" rx="2" class="h1"/><rect x="199.29" y="183" width="68.29" height="22" rx="2" class="h1"/><rect x="269.57" y="183" width="68.29" height="22" rx="2" class="h1"/><rect x="340.36" y="183.5" width="67.29" height="21" rx="2" class="h0"/><rect x="410.14" y="183" width="68.29" height="22" rx="2" class="h1"/><rect x="480.43" y="183" width="68.29" height="22" rx="2" class="h1"/><rect x="550.71" y="183" width="68.29" height="22" rx="2" class="h1"/>
+<text x="163.14" y="198" class="hv" text-anchor="middle">1</text>
+<text x="233.43" y="198" class="hv" text-anchor="middle">0</text>
+<text x="303.71" y="198" class="hv" text-anchor="middle">2</text>
+<text x="444.29" y="198" class="hv" text-anchor="middle">1</text>
+<text x="514.57" y="198" class="hv" text-anchor="middle">0</text>
+<text x="584.86" y="198" class="hv" text-anchor="middle">0</text>
+<rect x="129" y="207" width="68.29" height="22" rx="2" class="h1"/><rect x="199.29" y="207" width="68.29" height="22" rx="2" class="h1"/><rect x="269.57" y="207" width="68.29" height="22" rx="2" class="h2"/><rect x="339.86" y="207" width="68.29" height="22" rx="2" class="h2"/><rect x="410.14" y="207" width="68.29" height="22" rx="2" class="h2"/><rect x="480.43" y="207" width="68.29" height="22" rx="2" class="h2"/><rect x="550.71" y="207" width="68.29" height="22" rx="2" class="h4"/>
+<text x="163.14" y="222" class="hv" text-anchor="middle">9</text>
+<text x="233.43" y="222" class="hv" text-anchor="middle">8</text>
+<text x="303.71" y="222" class="hv" text-anchor="middle">10</text>
+<text x="374" y="222" class="hv" text-anchor="middle">12</text>
+<text x="444.29" y="222" class="hv" text-anchor="middle">15</text>
+<text x="514.57" y="222" class="hv" text-anchor="middle">19</text>
+<text x="584.86" y="222" class="hv hi" text-anchor="middle">21</text>
+</svg>
+<svg id="dg-errors-by-day-phone" class="dg dg-heatmap dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="414" viewBox="0 0 264 414" role="img" aria-label="Errors of a web service in one week, by part and day. Checkout and Payments had most errors on Wednesday and Thursday, after a release. Image upload rose through the weekend. Email has no data for Thursday.">
+<style>
+#dg-errors-by-day-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-errors-by-day-phone .ground{fill:var(--fig,#f2f3f9)}
+#dg-errors-by-day-phone .band{fill:var(--bg,#fbfbfe)}
+#dg-errors-by-day-phone .track{stroke:var(--line,#d3d6e3)}
+#dg-errors-by-day-phone .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-errors-by-day-phone .head{fill:var(--text,#1c1f2e)}
+#dg-errors-by-day-phone .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-errors-by-day-phone .stop.end{fill:var(--text,#1c1f2e)}
+#dg-errors-by-day-phone .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-errors-by-day-phone .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-errors-by-day-phone .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-errors-by-day-phone .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-errors-by-day-phone .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-errors-by-day-phone .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-errors-by-day-phone .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-errors-by-day-phone .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-errors-by-day-phone .sub,#dg-errors-by-day-phone .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-errors-by-day-phone .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-errors-by-day-phone .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-errors-by-day-phone .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-errors-by-day-phone .h1{fill:var(--heat-1,#dee2f0)}
+#dg-errors-by-day-phone .h2{fill:var(--heat-2,#babecb)}
+#dg-errors-by-day-phone .h3{fill:var(--heat-3,#9498a5)}
+#dg-errors-by-day-phone .h4{fill:var(--heat-4,#616571)}
+#dg-errors-by-day-phone .h5{fill:var(--heat-5,#3e424d)}
+#dg-errors-by-day-phone .h0{fill:var(--bg,#fbfbfe);stroke:var(--muted,#575d75);stroke-width:1}
+#dg-errors-by-day-phone .hv{font-size:12px;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-errors-by-day-phone .hv.hi{fill:var(--bg,#fbfbfe)}
+@media (prefers-reduced-motion:reduce){#dg-errors-by-day-phone .pulse{animation:none!important}#dg-errors-by-day-phone .pulse{display:none!important}}
+@media print{#dg-errors-by-day-phone{max-width:100%;height:auto}#dg-errors-by-day-phone .pulse{display:none!important}}
+@media (max-width:736px){#dg-errors-by-day{display:none}#dg-errors-by-day-phone{display:block}}
+@media print{#dg-errors-by-day{display:block!important}#dg-errors-by-day-phone{display:none!important}}
+</style>
+<rect width="264" height="414" class="ground"/>
+<rect x="8" y="100" width="248" height="298" rx="10" class="band"/>
+<text x="20" y="38" class="val" text-anchor="middle">0</text>
+<text x="53" y="38" class="val" text-anchor="middle">10</text>
+<text x="87" y="38" class="val" text-anchor="middle">20</text>
+<text x="121" y="38" class="val" text-anchor="middle">30</text>
+<text x="154" y="38" class="val" text-anchor="middle">40</text>
+<text x="162" y="22" class="sub" text-anchor="start">errors</text>
+<text x="42" y="56" class="sub" text-anchor="start">no data</text>
+<text x="36" y="92" class="val" text-anchor="middle">Mon</text>
+<text x="68" y="92" class="val" text-anchor="middle">Tue</text>
+<text x="100" y="92" class="val" text-anchor="middle">Wed</text>
+<text x="132" y="92" class="val" text-anchor="middle">Thu</text>
+<text x="164" y="92" class="val" text-anchor="middle">Fri</text>
+<text x="196" y="92" class="val" text-anchor="middle">Sat</text>
+<text x="228" y="92" class="val" text-anchor="middle">Sun</text>
+<text x="20" y="122" class="row" text-anchor="start">Sign-in</text>
+<text x="20" y="170" class="row" text-anchor="start">Search</text>
+<text x="20" y="218" class="row" text-anchor="start">Checkout</text>
+<text x="20" y="266" class="row" text-anchor="start">Payments</text>
+<text x="20" y="314" class="row" text-anchor="start">Email</text>
+<text x="20" y="362" class="row" text-anchor="start">Image upload</text>
+<rect x="20" y="12" width="32" height="12" rx="2" class="h1"/><rect x="54" y="12" width="32" height="12" rx="2" class="h2"/><rect x="88" y="12" width="32" height="12" rx="2" class="h4"/><rect x="122" y="12" width="32" height="12" rx="2" class="h5"/><rect x="20.5" y="46.5" width="15" height="11" rx="2" class="h0"/>
+<rect x="21" y="127" width="30" height="22" rx="2" class="h1"/><rect x="53" y="127" width="30" height="22" rx="2" class="h1"/><rect x="85" y="127" width="30" height="22" rx="2" class="h1"/><rect x="117" y="127" width="30" height="22" rx="2" class="h1"/><rect x="149" y="127" width="30" height="22" rx="2" class="h1"/><rect x="181" y="127" width="30" height="22" rx="2" class="h1"/><rect x="213" y="127" width="30" height="22" rx="2" class="h1"/>
+<text x="36" y="142" class="hv" text-anchor="middle">3</text>
+<text x="68" y="142" class="hv" text-anchor="middle">2</text>
+<text x="100" y="142" class="hv" text-anchor="middle">4</text>
+<text x="132" y="142" class="hv" text-anchor="middle">3</text>
+<text x="164" y="142" class="hv" text-anchor="middle">5</text>
+<text x="196" y="142" class="hv" text-anchor="middle">1</text>
+<text x="228" y="142" class="hv" text-anchor="middle">1</text>
+<rect x="21" y="175" width="30" height="22" rx="2" class="h1"/><rect x="53" y="175" width="30" height="22" rx="2" class="h1"/><rect x="85" y="175" width="30" height="22" rx="2" class="h1"/><rect x="117" y="175" width="30" height="22" rx="2" class="h1"/><rect x="149" y="175" width="30" height="22" rx="2" class="h1"/><rect x="181" y="175" width="30" height="22" rx="2" class="h1"/><rect x="213" y="175" width="30" height="22" rx="2" class="h1"/>
+<text x="36" y="190" class="hv" text-anchor="middle">6</text>
+<text x="68" y="190" class="hv" text-anchor="middle">7</text>
+<text x="100" y="190" class="hv" text-anchor="middle">5</text>
+<text x="132" y="190" class="hv" text-anchor="middle">9</text>
+<text x="164" y="190" class="hv" text-anchor="middle">8</text>
+<text x="196" y="190" class="hv" text-anchor="middle">4</text>
+<text x="228" y="190" class="hv" text-anchor="middle">3</text>
+<rect x="21" y="223" width="30" height="22" rx="2" class="h2"/><rect x="53" y="223" width="30" height="22" rx="2" class="h2"/><rect x="85" y="223" width="30" height="22" rx="2" class="h5"/><rect x="117" y="223" width="30" height="22" rx="2" class="h5"/><rect x="149" y="223" width="30" height="22" rx="2" class="h2"/><rect x="181" y="223" width="30" height="22" rx="2" class="h1"/><rect x="213" y="223" width="30" height="22" rx="2" class="h1"/>
+<text x="36" y="238" class="hv" text-anchor="middle">12</text>
+<text x="68" y="238" class="hv" text-anchor="middle">14</text>
+<text x="100" y="238" class="hv hi" text-anchor="middle">38</text>
+<text x="132" y="238" class="hv hi" text-anchor="middle">31</text>
+<text x="164" y="238" class="hv" text-anchor="middle">11</text>
+<text x="196" y="238" class="hv" text-anchor="middle">6</text>
+<text x="228" y="238" class="hv" text-anchor="middle">5</text>
+<rect x="21" y="271" width="30" height="22" rx="2" class="h1"/><rect x="53" y="271" width="30" height="22" rx="2" class="h1"/><rect x="85" y="271" width="30" height="22" rx="2" class="h4"/><rect x="117" y="271" width="30" height="22" rx="2" class="h2"/><rect x="149" y="271" width="30" height="22" rx="2" class="h1"/><rect x="181" y="271" width="30" height="22" rx="2" class="h1"/><rect x="213" y="271" width="30" height="22" rx="2" class="h1"/>
+<text x="36" y="286" class="hv" text-anchor="middle">4</text>
+<text x="68" y="286" class="hv" text-anchor="middle">5</text>
+<text x="100" y="286" class="hv hi" text-anchor="middle">22</text>
+<text x="132" y="286" class="hv" text-anchor="middle">17</text>
+<text x="164" y="286" class="hv" text-anchor="middle">4</text>
+<text x="196" y="286" class="hv" text-anchor="middle">2</text>
+<text x="228" y="286" class="hv" text-anchor="middle">2</text>
+<rect x="21" y="319" width="30" height="22" rx="2" class="h1"/><rect x="53" y="319" width="30" height="22" rx="2" class="h1"/><rect x="85" y="319" width="30" height="22" rx="2" class="h1"/><rect x="117.5" y="319.5" width="29" height="21" rx="2" class="h0"/><rect x="149" y="319" width="30" height="22" rx="2" class="h1"/><rect x="181" y="319" width="30" height="22" rx="2" class="h1"/><rect x="213" y="319" width="30" height="22" rx="2" class="h1"/>
+<text x="36" y="334" class="hv" text-anchor="middle">1</text>
+<text x="68" y="334" class="hv" text-anchor="middle">0</text>
+<text x="100" y="334" class="hv" text-anchor="middle">2</text>
+<text x="164" y="334" class="hv" text-anchor="middle">1</text>
+<text x="196" y="334" class="hv" text-anchor="middle">0</text>
+<text x="228" y="334" class="hv" text-anchor="middle">0</text>
+<rect x="21" y="367" width="30" height="22" rx="2" class="h1"/><rect x="53" y="367" width="30" height="22" rx="2" class="h1"/><rect x="85" y="367" width="30" height="22" rx="2" class="h2"/><rect x="117" y="367" width="30" height="22" rx="2" class="h2"/><rect x="149" y="367" width="30" height="22" rx="2" class="h2"/><rect x="181" y="367" width="30" height="22" rx="2" class="h2"/><rect x="213" y="367" width="30" height="22" rx="2" class="h4"/>
+<text x="36" y="382" class="hv" text-anchor="middle">9</text>
+<text x="68" y="382" class="hv" text-anchor="middle">8</text>
+<text x="100" y="382" class="hv" text-anchor="middle">10</text>
+<text x="132" y="382" class="hv" text-anchor="middle">12</text>
+<text x="164" y="382" class="hv" text-anchor="middle">15</text>
+<text x="196" y="382" class="hv" text-anchor="middle">19</text>
+<text x="228" y="382" class="hv hi" text-anchor="middle">21</text>
+</svg>
+<details class="dg-words">
+<summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>The diagram in words</summary>
+<div class="table-wrap" role="region" aria-label="The numbers of the heat map" tabindex="0"><table><thead><tr><td></td><th scope="col">Mon</th><th scope="col">Tue</th><th scope="col">Wed</th><th scope="col">Thu</th><th scope="col">Fri</th><th scope="col">Sat</th><th scope="col">Sun</th></tr></thead><tbody><tr><th scope="row">Sign-in</th><td>3</td><td>2</td><td>4</td><td>3</td><td>5</td><td>1</td><td>1</td></tr><tr><th scope="row">Search</th><td>6</td><td>7</td><td>5</td><td>9</td><td>8</td><td>4</td><td>3</td></tr><tr><th scope="row">Checkout</th><td>12</td><td>14</td><td>38</td><td>31</td><td>11</td><td>6</td><td>5</td></tr><tr><th scope="row">Payments</th><td>4</td><td>5</td><td>22</td><td>17</td><td>4</td><td>2</td><td>2</td></tr><tr><th scope="row">Email</th><td>1</td><td>0</td><td>2</td><td>no data</td><td>1</td><td>0</td><td>0</td></tr><tr><th scope="row">Image upload</th><td>9</td><td>8</td><td>10</td><td>12</td><td>15</td><td>19</td><td>21</td></tr></tbody></table></div>
+<ul><li>Each cell is shaded by its number, in 4 steps of 10 errors from 0 to 40. A number on the edge of two steps takes the higher step.</li><li>The highest number is 38 (Checkout, Wed). The lowest is 0, in 3 cells.</li><li>1 cell has no data.</li></ul>
+</details>

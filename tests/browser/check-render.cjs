@@ -498,16 +498,17 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     ok(`a UML ${name} diagram shows its drawing on a desktop, its column on a phone, and its words with a key on paper, in both themes with no contrast problem`, desk.main > 0 && !desk.column && !desk.words && (desk.main <= 264 ? [phone, narrow].every((r) => r.main === desk.main && !r.column) : !phone.main && phone.column === 264 && narrow.column === 264) && paper.words && paper.key > 0 && [phone, narrow].every((r) => r.page === r.view) && results.deskAxe.length === 0 && results.darkAxe.length === 0, results);
   }
 
-  // The scale charts (a range chart, two layouts to scale, three plans and a funnel): the 640px form on a desktop and on paper (at its real size,
+  // The scale charts (a range chart, two layouts to scale, three plans, a funnel and two heat maps): the 640px form on a desktop and on paper (at its real size,
   // no shrink), the 264px form on a phone, the rows as a table in words, text no wider than the renderer assumed, and no
   // contrast problem in either theme.
-  for (const [file, id, rows, what] of [["range", "line-lengths", 8, "a range chart"], ["layout-screen", "wide-layouts", 12, "a layout to scale with two tracks"], ["layout-a4", "a4-notes", 4, "a measured layout to scale"], ["plan-docs", "docs-page", 5, "a plan that grows a column on a phone"], ["plan-editor", "editor-screen", 5, "a plan with a box across two rows"], ["plan-dashboard", "dashboard", 5, "a plan stacked on a phone"], ["funnel", "signup-may", 5, "a funnel"]]) {
+  for (const [file, id, rows, what] of [["range", "line-lengths", 8, "a range chart"], ["layout-screen", "wide-layouts", 12, "a layout to scale with two tracks"], ["layout-a4", "a4-notes", 4, "a measured layout to scale"], ["plan-docs", "docs-page", 5, "a plan that grows a column on a phone"], ["plan-editor", "editor-screen", 5, "a plan with a box across two rows"], ["plan-dashboard", "dashboard", 5, "a plan stacked on a phone"], ["funnel", "signup-may", 5, "a funnel"], ["heatmap-signups", "signups-by-hour", 7, "a heat map of 24 columns"], ["heatmap-errors", "errors-by-day", 6, "a heat map with numbers and a cell with no data"]]) {
     const data = fs.readFileSync(path.join(root, "tests", "fixtures", `${file}.json`), "utf8");
     const content = renderDocument(html.replace('<section id="report"', `<section id="rng" aria-labelledby="rng-h"><h2 id="rng-h">Range</h2><figure><div class="fig" role="region" aria-label="Figure 9, line lengths" tabindex="0">\n<!-- docent:diagram\n${data}\n-->\n<!-- /docent:diagram -->\n</div><figcaption><strong>Figure 9</strong>Line lengths.</figcaption></figure></section>\n<section id="report"`)).html;
     const look = (page) => page.evaluate((id) => {
       const shown = (id) => { const svg = document.getElementById(id); return { w: Math.round(svg.getBoundingClientRect().width), real: svg.viewBox.baseVal.width }; };
-      const words = document.querySelector("#rng .dg-words"), table = words.querySelector("table");
-      return { main: shown(`dg-${id}`), phone: shown(`dg-${id}-phone`), words: words.open, rows: [...table.querySelectorAll("tbody tr")].filter((r) => r.getBoundingClientRect().height).length, table: Math.round(table.getBoundingClientRect().width), well: Math.round(document.querySelector("#rng .fig").getBoundingClientRect().width), page: document.documentElement.scrollWidth, view: innerWidth };
+      const words = document.querySelector("#rng .dg-words"), table = words.querySelector("table"), box = table.closest(".table-wrap") || table;
+      // On a screen a wide grid in words scrolls inside its wrapper, so the wrapper must fit; on paper the table itself must.
+      return { main: shown(`dg-${id}`), phone: shown(`dg-${id}-phone`), words: words.open, rows: [...table.querySelectorAll("tbody tr")].filter((r) => r.getBoundingClientRect().height).length, table: Math.round(table.getBoundingClientRect().width), box: Math.round(box.getBoundingClientRect().width), well: Math.round(document.querySelector("#rng .fig").getBoundingClientRect().width), page: document.documentElement.scrollWidth, view: innerWidth };
     }, id);
     const results = {};
     for (const [form, opts] of [["desk", { width: 1280 }], ["phone", { width: 390, height: 844 }], ["narrow", { width: 320, height: 700 }], ["paper", { width: 658, height: 1123, media: "print" }], ["dark", { width: 1280, theme: "dark" }]]) {
@@ -522,13 +523,14 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
         const texts = await view.page.evaluate(() => [...document.querySelectorAll("#rng svg.dg text")].filter((t) => t.getBoundingClientRect().width).map((t) => ({ s: t.textContent, cls: t.getAttribute("class"), px: t.getComputedTextLength() })));
         const font = { row: [14, 400], name: [14, 600], val: [12, 400], sub: [12, 400] };
         const { valueWidth } = require(path.join(root, "skills", "docent", "scripts", "lib", "scale.cjs"));
-        results[`${form}Wider`] = texts.filter((t) => t.px > (t.cls === "val" ? valueWidth(t.s) : textWidth(t.s, ...font[t.cls])) + 0.5).map((t) => `${t.s}: ${t.px.toFixed(1)}`);
+        // Values, labels and the numbers in heat map cells (hv) have tabular figures.
+        results[`${form}Wider`] = texts.filter((t) => t.px > (["val", "hv"].includes(t.cls.split(" ")[0]) ? valueWidth(t.s) : textWidth(t.s, ...font[t.cls])) + 0.5).map((t) => `${t.s}: ${t.px.toFixed(1)}`);
       }
       await view.context.close();
     }
     const { desk, phone, narrow, paper } = results;
     const real = (f) => f.w === f.real;
-    ok(`${what} shows its 640px form at real size on a desktop and on paper, its 264px form on a phone, its rows as a table in words, and its text fits the renderer's widths`, desk.main.w === 640 && real(desk.main) && !desk.phone.w && !desk.words && !phone.main.w && phone.phone.w === 264 && narrow.phone.w === 264 && paper.main.w === 640 && !paper.phone.w && paper.words && paper.rows === rows && [phone, narrow, paper].every((r) => r.table <= r.well - 16) && [phone, narrow].every((r) => r.page === r.view) && results.deskWider.length === 0 && results.phoneWider.length === 0 && results.deskAxe.length === 0 && results.darkAxe.length === 0, results);
+    ok(`${what} shows its 640px form at real size on a desktop and on paper, its 264px form on a phone, its rows as a table in words, and its text fits the renderer's widths`, desk.main.w === 640 && real(desk.main) && !desk.phone.w && !desk.words && !phone.main.w && phone.phone.w === 264 && narrow.phone.w === 264 && paper.main.w === 640 && !paper.phone.w && paper.words && paper.rows === rows && [phone, narrow].every((r) => r.box <= r.well - 16) && paper.table <= paper.well - 16 && [phone, narrow].every((r) => r.page === r.view) && results.deskWider.length === 0 && results.phoneWider.length === 0 && results.deskAxe.length === 0 && results.darkAxe.length === 0, results);
   }
 
   // Two drawings in one figure: side by side when both fit, one below the other when they do not.

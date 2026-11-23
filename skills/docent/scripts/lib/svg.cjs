@@ -8,7 +8,7 @@ const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replac
 const at = (p) => `transform:translate(${num(p[0])}px,${num(p[1])}px)`;
 const pct = (v) => `${Math.round(v * 100) / 100}%`;
 
-const LIGHT = { bg: "#fbfbfe", fig: "#f2f3f9", text: "#1c1f2e", muted: "#575d75", line: "#d3d6e3", primary: "#2f3fd0", dot: "#2f3fd0", ok: "#1a7f37", warn: "#7d4e00", err: "#cf222e" };
+const LIGHT = { bg: "#fbfbfe", fig: "#f2f3f9", text: "#1c1f2e", muted: "#575d75", line: "#d3d6e3", primary: "#2f3fd0", dot: "#2f3fd0", ok: "#1a7f37", warn: "#7d4e00", err: "#cf222e", "heat-1": "#dee2f0", "heat-2": "#babecb", "heat-3": "#9498a5", "heat-4": "#616571", "heat-5": "#3e424d" };
 const v = (name) => `var(--${name},${LIGHT[name]})`;
 const SANS = 'system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif';
 const CROSS = 1.6, PAUSE = 1.2; // seconds for one leg, and the rest before the run starts again
@@ -107,6 +107,9 @@ function styles(scene, id, mode, swap) {
   // A funnel: step names in weight 400, numbers with tabular figures, a kept bar as the bar of a range chart, and the lost part filled in the line color,
   // with no outline: a thin outline at that contrast almost disappears in dark mode, and an area does not.
   if (scene.form === "funnel") css.push(`${s} .row{font-size:14px;fill:${v("text")}}`, `${s} .val{font-size:12px;fill:${v("muted")};font-variant-numeric:tabular-nums}`, `${s} .r-bar{fill:${v("bg")};stroke:${v("text")};stroke-width:1.5}`, `${s} .f-lost{fill:${v("line")}}`);
+  // A heat map: row names in weight 400, column labels and legend numbers with tabular figures, each cell in its heat step, and a
+  // cell with no data hollow in a muted outline. A number takes the text color on steps 1 to 3 and the page color on 4 and 5.
+  if (scene.form === "heatmap") css.push(`${s} .row{font-size:14px;fill:${v("text")}}`, `${s} .val{font-size:12px;fill:${v("muted")};font-variant-numeric:tabular-nums}`, ...[1, 2, 3, 4, 5].map((k) => `${s} .h${k}{fill:${v(`heat-${k}`)}}`), `${s} .h0{fill:${v("bg")};stroke:${v("muted")};stroke-width:1}`, `${s} .hv{font-size:12px;fill:${v("text")};font-variant-numeric:tabular-nums}`, `${s} .hv.hi{fill:${v("bg")}}`);
   if (scene.form === "layout") css.push(`${s} .row{font-size:14px;fill:${v("text")}}`, `${s} .val{font-size:12px;fill:${v("muted")};font-variant-numeric:tabular-nums}`, `${s} .box{fill:${v("bg")};stroke:${v("text")};stroke-width:1.5}`, `${s} .tick{fill:none;stroke:${v("text")};stroke-width:1}`, `${s} .r-ref{stroke:${v("muted")}}`);
   // A part with a state: its outline takes the status color, and a status dot sits on the outline. A drawing with no state carries none of these rules.
   for (const state of new Set(scene.parts.map((part) => part.state).filter(Boolean))) css.push(`${s} .stop.is-${state},${s} .card.is-${state}{stroke:${v(state)};stroke-width:1.5}`, `${s} .flag.is-${state}{fill:${v(state)};stroke:${v("bg")};stroke-width:2}`);
