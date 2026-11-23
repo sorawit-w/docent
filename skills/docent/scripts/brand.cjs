@@ -3,6 +3,7 @@
 // Usage: node brand.cjs <DESIGN.md>
 // It reads the front matter only, and of that only "colors" and "typography". Six host tokens come out, and nothing else:
 // a host's page, text and status colors would break dark mode, print and the contrast that Docent tests (see DESIGN.md, Host tokens).
+require("./lib/node.cjs").warnOldNode(); // first, so that an old Node is named before anything else can fail
 const fs = require("node:fs");
 const { PAGE, contrast, lab, atLightness, darkAccent, nearestStatus } = require("./lib/color.cjs");
 

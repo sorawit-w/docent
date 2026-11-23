@@ -51,7 +51,7 @@ Open [`skills/docent/assets/specimen.html`](skills/docent/assets/specimen.html) 
 
 ## Use it
 
-The scripts need Node 18 or newer and no packages.
+The scripts need Node 24 or newer and no packages.
 
 ```bash
 node skills/docent/scripts/render.cjs document.html

@@ -2,6 +2,7 @@
 // check: tests a Docent document against the rules that can be tested from its source.
 // Usage: node check.cjs <document.html> [more.html ...]
 // It does not open a browser. So it cannot test contrast, the phone layout, print or motion as a reader sees them.
+require("./lib/node.cjs").warnOldNode(); // first, so that an old Node is named before anything else can fail
 const fs = require("node:fs");
 const { VERSION, cssBlock, jsBlock, findKit } = require("./lib/kit.cjs");
 const { renderDiagram } = require("./lib/diagram.cjs");

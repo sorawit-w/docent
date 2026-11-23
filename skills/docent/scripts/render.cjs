@@ -2,6 +2,7 @@
 // render: draws Docent diagrams as inline SVG and builds Docent widgets as markup, both from data.
 // Usage: node render.cjs <document.html> [more.html ...]   makes every diagram block and widget block of a document in place
 //        node render.cjs --data <data.json>                prints one drawing or one widget
+require("./lib/node.cjs").warnOldNode(); // first, so that an old Node is named before anything else can fail
 const fs = require("node:fs");
 const { renderDiagram, renderDocument } = require("./lib/diagram.cjs");
 const { renderWidget, KINDS } = require("./lib/widget.cjs");

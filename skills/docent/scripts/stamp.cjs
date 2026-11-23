@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // stamp: puts the Docent page styles and page script into a document, between markers, with the kit version.
 // Usage: node stamp.cjs <document.html> [more.html ...]
+require("./lib/node.cjs").warnOldNode(); // first, so that an old Node is named before anything else can fail
 const fs = require("node:fs");
 const { VERSION, stampHtml } = require("./lib/kit.cjs");
 
