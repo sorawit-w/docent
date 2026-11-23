@@ -200,14 +200,15 @@ test("a heat map takes every color from the page tokens, and has no state, no do
     assert.doesNotMatch(svg, /is-(ok|warn|err)|class="pulse|dasharray|--primary/);
   }
   const { svg } = renderDiagram(fixture());
-  assert.match(svg, /\.h1\{fill:var\(--heat-1,#dee2f0\)\}[\s\S]*\.h5\{fill:var\(--heat-5,#3e424d\)\}/);
+  assert.match(svg, /\.h1\{fill:var\(--heat-1,#c6e9ef\)\}[\s\S]*\.h5\{fill:var\(--heat-5,#004a53\)\}/);
   assert.match(svg, /\.hv\.hi\{fill:var\(--bg,#fbfbfe\)\}/);
 });
 
 test("the kit sets the heat steps in its four places, and check warns when a page sets one", () => {
   const css = fs.readFileSync(path.join(__dirname, "..", "skills", "docent", "assets", "kit.css"), "utf8");
-  assert.equal((css.match(/--heat-1: #dee2f0;/g) || []).length, 2, "light and print");
-  assert.equal((css.match(/--heat-1: #2a2e38;/g) || []).length, 2, "dark by the system and dark by the switch");
+  assert.equal((css.match(/--heat-1: #c6e9ef;/g) || []).length, 1, "teal on a light screen");
+  assert.equal((css.match(/--heat-1: #093339;/g) || []).length, 2, "teal on a dark screen: dark by the system and dark by the switch");
+  assert.equal((css.match(/--heat-1: #dee2f0;/g) || []).length, 1, "gray on paper");
   const specimen = fs.readFileSync(path.join(__dirname, "..", "skills", "docent", "assets", "specimen.html"), "utf8");
   assert.match(checkDocument(specimen.replace("</head>", "<style>:root{--heat-3:#888888}</style></head>")).warnings.join("\n"), /a style sets --heat-3; the kit sets it in four places/);
 });

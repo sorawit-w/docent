@@ -27,7 +27,7 @@ rows.append(("light primary dot on page", L["primary"], L["page"], 3.0))
 rows.append(("mark: white on primary", "#ffffff", L["primary"], 3.0))
 # The heat steps: a number on steps 1 to 3 takes the text color, on steps 4 and 5 the page color. The outline of a cell with no data is muted.
 # A heat plan adds no new pair: the name, the value and the note of a box on a step take these same two colors.
-HEAT = dict(light=(L, ["#dee2f0", "#babecb", "#9498a5", "#616571", "#3e424d"]), dark=(D, ["#2a2e38", "#434751", "#5d616c", "#8f939f", "#babecb"]), paper=(dict(L, page="#ffffff"), ["#dee2f0", "#babecb", "#9498a5", "#616571", "#3e424d"]))
+HEAT = dict(light=(L, ["#c6e9ef", "#86c9d5", "#3da6b6", "#00707e", "#004a53"]), dark=(D, ["#093339", "#054e58", "#006b78", "#36a0b1", "#80cad7"]), paper=(dict(L, page="#ffffff"), ["#dee2f0", "#babecb", "#9498a5", "#616571", "#3e424d"]))
 for name, (t, steps) in HEAT.items():
     for k, step in enumerate(steps, 1):
         fg = "text" if k <= 3 else "page"
