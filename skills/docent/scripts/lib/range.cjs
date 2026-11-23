@@ -182,7 +182,7 @@ function wordsOf(model) {
   const head = `<tr><th scope="col">Row</th><th scope="col">${scale.unit ? `Value, in ${esc(scale.unit)}` : "Value"}</th>${groups.length ? '<th scope="col">Group</th>' : ""}</tr>`;
   const body = model.rows.map((r) => `<tr><th scope="row">${esc(r.name)}</th><td>${esc(r.value)}</td>${groups.length ? `<td>${esc(r.group.name)}</td>` : ""}</tr>`).join("");
   const marks = scale.marks.map((m) => `<li>A line at ${esc(fmt(m.at))}${esc(unit)}: ${esc(m.name)}.</li>`).join("");
-  return `<table><thead>${head}</thead><tbody>${body}</tbody></table>${marks ? `\n<ul>${marks}</ul>` : ""}`;
+  return `<div class="table-wrap is-text" role="region" aria-label="The rows of the range chart" tabindex="0"><table><thead>${head}</thead><tbody>${body}</tbody></table></div>${marks ? `\n<ul>${marks}</ul>` : ""}`;
 }
 
 module.exports = { readRange, layoutRange, wordsOf, wrapName, graphemes, NO_SPACES, MOST, WIDE, PHONE };

@@ -170,7 +170,7 @@ function wordsOf(model, scene, phone) {
     else lines.push(`The most ${esc(model.unit)} left between ${pairs(model, byCount)}: ${comma(most)}.`, `The largest share left between ${pairs(model, byShare)}: ${steps[byShare[0]].dropShare} of the step before.`);
   }
   lines.push(scene && (scene.clamped || (phone && phone.clamped)) ? "The bars are to scale, from 0, except that a bar narrower than 2px is drawn 2px wide, so it shows." : "The bars are to scale, from 0.");
-  return `<table><thead>${head}</thead><tbody>${body}</tbody></table>\n<ul>${lines.map((l) => `<li>${l}</li>`).join("")}</ul>`;
+  return `<div class="table-wrap is-text" role="region" aria-label="The steps of the funnel" tabindex="0"><table><thead>${head}</thead><tbody>${body}</tbody></table></div>\n<ul>${lines.map((l) => `<li>${l}</li>`).join("")}</ul>`;
 }
 
 module.exports = { readFunnel, drawFunnel, wordsOf, share, comma, MOST };

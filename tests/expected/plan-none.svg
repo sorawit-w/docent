@@ -84,6 +84,6 @@
 </svg>
 <details class="dg-words">
 <summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>The diagram in words</summary>
-<table><thead><tr><th scope="col">Box</th><th scope="col">Row</th><th scope="col">Column</th></tr></thead><tbody><tr><th scope="row">Header</th><td>top</td><td>full width</td></tr><tr><th scope="row">Navigation</th><td>middle</td><td>left</td></tr><tr><th scope="row">Text</th><td>middle</td><td>middle</td></tr><tr><th scope="row">On this page</th><td>middle</td><td>right</td></tr><tr><th scope="row">Footer</th><td>bottom</td><td>full width</td></tr></tbody></table>
+<div class="table-wrap is-text" role="region" aria-label="The boxes of the plan" tabindex="0"><table><thead><tr><th scope="col">Box</th><th scope="col">Row</th><th scope="col">Column</th></tr></thead><tbody><tr><th scope="row">Header</th><td>top</td><td>full width</td></tr><tr><th scope="row">Navigation</th><td>middle</td><td>left</td></tr><tr><th scope="row">Text</th><td>middle</td><td>middle</td></tr><tr><th scope="row">On this page</th><td>middle</td><td>right</td></tr><tr><th scope="row">Footer</th><td>bottom</td><td>full width</td></tr></tbody></table></div>
 <p>The plan is not drawn to scale.</p>
 </details>
