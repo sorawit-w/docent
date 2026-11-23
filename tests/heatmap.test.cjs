@@ -217,5 +217,5 @@ test("check accepts a heat map that render drew, and reports one that was change
   const specimen = fs.readFileSync(path.join(__dirname, "..", "skills", "docent", "assets", "specimen.html"), "utf8");
   const page = renderDocument(specimen.replace("</main>", `${block}</main>`)).html;
   assert.deepEqual(checkDocument(page).errors, []);
-  assert.match(checkDocument(page.replace('class="h5"/>', 'class="h4"/>')).errors.join("\n"), /\("errors-by-day"\): the drawing does not match its data; run render/);
+  assert.match(checkDocument(page.replace('class="hv hi" text-anchor="middle">38</text>', 'class="hv hi" text-anchor="middle">39</text>')).errors.join("\n"), /\("errors-by-day"\): the drawing does not match its data; run render/);
 });
