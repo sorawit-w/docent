@@ -51,7 +51,9 @@ test("the worked example has the numbers and the sizes of the proposal, in both 
   assert.deepEqual(bars.filter((b) => b.cls === "f-lost").map((b) => Math.round((b.w - 4) * 10) / 10), [109.4, 106.3, 31.5, 26.8]);
   assert.deepEqual(scene.notes.filter((n) => /%$/.test(n.s)).map((n) => n.s), ["100%", "66%", "33%", "23%", "15%"]);
   assert.deepEqual(phone.notes.filter((n) => n.cls === "row").map((n) => n.s), ["Open the sign-up", "page", "Fill in the form", "Confirm the email", "Choose a plan", "Finish the sign-up"]);
-  assert.deepEqual(phone.notes.filter((n) => n.cls === "sub").length, 2, "the line above the bars takes 2 lines on a phone");
+  // The text above the bars names the base of each share, in both forms.
+  assert.deepEqual(scene.notes.filter((n) => n.cls === "sub").map((n) => n.s), ["People at each step, bars from\u00a00.", "Beside each count, its share of the first step; in each drop, its share of the step before."]);
+  assert.equal(phone.notes.filter((n) => n.cls === "sub").length, 4, "the text above the bars takes 4 lines on a phone");
   for (const sc of [scene, phone]) assert.deepEqual(clashes(sc), []);
 });
 
@@ -110,7 +112,7 @@ test("long names wrap in both forms; on a phone they push their numbers to their
   // On a phone, with 999,999,999 beside it, the name has no room for 2 lines, so the numbers stand under it.
   const name = phone.notes.filter((n) => n.cls === "row" && n.s === "WWWWWWWW")[0], count = phone.notes.find((n) => n.s === "999,999,999");
   assert.ok(count.y > name.y, "the numbers stand under the last line of the name");
-  assert.equal(phone.notes.filter((n) => n.cls === "sub").length, 3, "the line above the bars takes 3 lines on a phone with a long unit");
+  assert.equal(phone.notes.filter((n) => n.cls === "sub").length, 5, "the text above the bars takes 5 lines on a phone with a long unit");
   for (const sc of [scene, phone]) assert.deepEqual(clashes(sc), []);
 });
 

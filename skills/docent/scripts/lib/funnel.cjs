@@ -76,8 +76,10 @@ function drawFunnel(model, phone = false) {
   const countW = Math.max(...steps.map((st) => valueWidth(st.written)));
   const shareW = Math.max(...steps.map((st) => valueWidth(st.ofFirst)));
 
-  // One line above the bars says what they count and how to read the shares; it wraps at its spaces.
-  const head = wrapName(`${cap(model.unit)} at each step, bars from 0. Each drop is a share of the step before.`, W - 40, { size: 12, weight: 400, every: false });
+  // One line above the bars says what they count and the base of each share: the share beside a count is of the first step,
+  // and the share in a drop is of the step before. It wraps at its spaces.
+  // Two sentences, each on lines of its own. A no-break space keeps "from 0" together.
+  const head = [`${cap(model.unit)} at each step, bars from\u00a00.`, "Beside each count, its share of the first step; in each drop, its share of the step before."].flatMap((t) => wrapName(t, W - 40, { size: 12, weight: 400, every: false }));
   head.forEach((line, i) => s.notes.push({ x: 20, y: 24 + i * 16, s: line, cls: "sub", anchor: "start" }));
   const top = 24 + (head.length - 1) * 16 + 12;
 
