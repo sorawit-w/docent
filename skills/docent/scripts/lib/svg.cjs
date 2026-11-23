@@ -8,7 +8,7 @@ const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replac
 const at = (p) => `transform:translate(${num(p[0])}px,${num(p[1])}px)`;
 const pct = (v) => `${Math.round(v * 100) / 100}%`;
 
-const LIGHT = { bg: "#fbfbfe", fig: "#f2f3f9", text: "#1c1f2e", muted: "#575d75", line: "#d3d6e3", primary: "#2f3fd0", dot: "#2f3fd0", ok: "#1a7f37", warn: "#7d4e00", err: "#cf222e", "heat-1": "#dee2f0", "heat-2": "#babecb", "heat-3": "#9498a5", "heat-4": "#616571", "heat-5": "#3e424d" };
+const LIGHT = { bg: "#fbfbfe", fig: "#f2f3f9", text: "#1c1f2e", muted: "#575d75", line: "#d3d6e3", primary: "#2f3fd0", dot: "#2f3fd0", ok: "#1a7f37", warn: "#7d4e00", err: "#cf222e", "heat-1": "#c6e9ef", "heat-2": "#86c9d5", "heat-3": "#3da6b6", "heat-4": "#00707e", "heat-5": "#004a53" };
 const v = (name) => `var(--${name},${LIGHT[name]})`;
 const SANS = 'system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif';
 const CROSS = 1.6, PAUSE = 1.2; // seconds for one leg, and the rest before the run starts again

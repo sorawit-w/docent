@@ -21,11 +21,11 @@
 #dg-help-clicks .row{font-size:14px;fill:var(--text,#1c1f2e)}
 #dg-help-clicks .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
 #dg-help-clicks .box{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
-#dg-help-clicks .h1{fill:var(--heat-1,#dee2f0)}
-#dg-help-clicks .h2{fill:var(--heat-2,#babecb)}
-#dg-help-clicks .h3{fill:var(--heat-3,#9498a5)}
-#dg-help-clicks .h4{fill:var(--heat-4,#616571)}
-#dg-help-clicks .h5{fill:var(--heat-5,#3e424d)}
+#dg-help-clicks .h1{fill:var(--heat-1,#c6e9ef)}
+#dg-help-clicks .h2{fill:var(--heat-2,#86c9d5)}
+#dg-help-clicks .h3{fill:var(--heat-3,#3da6b6)}
+#dg-help-clicks .h4{fill:var(--heat-4,#00707e)}
+#dg-help-clicks .h5{fill:var(--heat-5,#004a53)}
 #dg-help-clicks .hv{font-size:12px;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
 #dg-help-clicks .hn{font-size:12px;fill:var(--text,#1c1f2e)}
 #dg-help-clicks .row.hi,#dg-help-clicks .hv.hi,#dg-help-clicks .hn.hi{fill:var(--bg,#fbfbfe)}
@@ -88,11 +88,11 @@
 #dg-help-clicks-phone .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
 #dg-help-clicks-phone .box{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
 #dg-help-clicks-phone .m-box{fill:var(--bg,#fbfbfe);stroke:var(--muted,#575d75);stroke-width:1}
-#dg-help-clicks-phone .h1{fill:var(--heat-1,#dee2f0)}
-#dg-help-clicks-phone .h2{fill:var(--heat-2,#babecb)}
-#dg-help-clicks-phone .h3{fill:var(--heat-3,#9498a5)}
-#dg-help-clicks-phone .h4{fill:var(--heat-4,#616571)}
-#dg-help-clicks-phone .h5{fill:var(--heat-5,#3e424d)}
+#dg-help-clicks-phone .h1{fill:var(--heat-1,#c6e9ef)}
+#dg-help-clicks-phone .h2{fill:var(--heat-2,#86c9d5)}
+#dg-help-clicks-phone .h3{fill:var(--heat-3,#3da6b6)}
+#dg-help-clicks-phone .h4{fill:var(--heat-4,#00707e)}
+#dg-help-clicks-phone .h5{fill:var(--heat-5,#004a53)}
 #dg-help-clicks-phone .hv{font-size:12px;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
 #dg-help-clicks-phone .hn{font-size:12px;fill:var(--text,#1c1f2e)}
 #dg-help-clicks-phone .row.hi,#dg-help-clicks-phone .hv.hi,#dg-help-clicks-phone .hn.hi{fill:var(--bg,#fbfbfe)}

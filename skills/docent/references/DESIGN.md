@@ -14,11 +14,11 @@ colors:
   success: "#1a7f37"
   warning: "#7d4e00"
   error: "#cf222e"
-  heat-1: "#dee2f0"             # Heat steps — the cells of a heat map and the boxes of a heat plan only, from the least (1) to the most (5)
-  heat-2: "#babecb"
-  heat-3: "#9498a5"
-  heat-4: "#616571"
-  heat-5: "#3e424d"
+  heat-1: "#c6e9ef"             # Heat steps — the cells of a heat map and the boxes of a heat plan only, from the least (1) to the most (5)
+  heat-2: "#86c9d5"
+  heat-3: "#3da6b6"
+  heat-4: "#00707e"
+  heat-5: "#004a53"
   dark-surface: "#12141f"       # Dark page; one step lighter than the dark well
   dark-neutral: "#0b0d15"       # Dark well; one step darker than the dark page
   dark-on-surface: "#e7e9f3"
@@ -28,11 +28,16 @@ colors:
   dark-success: "#3fb950"
   dark-warning: "#d29922"
   dark-error: "#f85149"
-  dark-heat-1: "#2a2e38"
-  dark-heat-2: "#434751"
-  dark-heat-3: "#5d616c"
-  dark-heat-4: "#8f939f"
-  dark-heat-5: "#babecb"
+  dark-heat-1: "#093339"
+  dark-heat-2: "#054e58"
+  dark-heat-3: "#006b78"
+  dark-heat-4: "#36a0b1"
+  dark-heat-5: "#80cad7"
+  paper-heat-1: "#dee2f0"       # On paper the heat steps are five grays
+  paper-heat-2: "#babecb"
+  paper-heat-3: "#9498a5"
+  paper-heat-4: "#616571"
+  paper-heat-5: "#3e424d"
 typography:
   h1:
     fontFamily: Charter, "Bitstream Charter", "Sitka Heading", "Sitka Text", Cambria, Georgia, serif
@@ -113,20 +118,20 @@ Docent belongs to no single project. It carries no host brand colors. The sample
 
 ## Colors
 
-The palette is one ink, one light, and Docent's own grays. Every gray leans slightly toward ultramarine, so the grays and the ink read as one family.
+The palette is one ink, one light, and Docent's own grays, with one teal for the heat steps on screen. Every gray leans slightly toward ultramarine, so the grays and the ink read as one family.
 
 - **Primary — Ultramarine (#2f3fd0):** A mark, never a fill. Use it for links, the underline of a highlighted term, the route dot, the rail dot, the dot of a chosen option and the focus ring. Two or three marks in one view are enough. It is never a button, banner or block background.
 - **Secondary — Ink (#1b2260):** The title and section headings, as text only. It is the dark form of the primary.
 - **Tertiary — Lamp (#f2b824):** The docent's lamp, and always a dot. It is the dot in the mark, and the route dot, the rail dot and the dot of a chosen option in dark mode. Lamp on the light page has a contrast of 1.74:1, so it is not used there; the dots in light mode are ultramarine.
 - **Neutral — Well (#f2f3f9):** The ground of figures and code. A well is one step darker than the page in both themes, and it has no outline.
 - **Status:** `success`, `warning` and `error` are for status only, as a small dot with a word beside it. Two more kinds of status note have no status color: plain information has a muted dot, and a thing that is planned, or not turned on yet, has a muted ring. The ring differs from the dot by its shape, so it does not need a color. A status label wraps on a narrow screen. In a diagram, a part that carries a state takes the status color on its outline and gets the same small dot; its note says the status in words.
-- **Heat steps (heat-1 to heat-5):** Five more of Docent's grays, for the cells of a heat map and the boxes of a heat plan, and nothing else. Step 1 holds the least and step 5 the most. In light the steps grow darker, and in dark they grow lighter, so the most is always the step that stands out most from the page. A step is a fill, but it is not a mark and not a status: a heat map has no ultramarine, no lamp, and no green, amber or red. A number on steps 1 to 3 takes the text color, and a number on steps 4 and 5 takes the page color; so do the name and the note of a heat plan's box. Every heat map and heat plan has a legend, and its exact numbers are in the table in words.
+- **Heat steps (heat-1 to heat-5):** Five steps of one teal on screen, and five of Docent's grays on paper, for the cells of a heat map and the boxes of a heat plan, and nothing else. Teal means nothing else on the page: it is far from the status green (70°) and from the ultramarine (85°), and it does not change with a host's accent. Each teal step has the lightness of its gray, so the contrast of a number on it stays the same. Step 1 holds the least and step 5 the most. In light the steps grow darker, and in dark they grow lighter, so the most is always the step that stands out most from the page. A step is a fill, but it is not a mark and not a status: a heat map has no ultramarine, no lamp, and no green, amber or red. A number on steps 1 to 3 takes the text color, and a number on steps 4 and 5 takes the page color; so do the name and the note of a heat plan's box. Every heat map and heat plan has a legend, and its exact numbers are in the table in words.
 
 **Diagrams.** Docent draws its own diagrams, in three forms (see Layout). A diagram uses the page's tokens and nothing else: lines, parts and names in the text color, notes in the muted color, tracks in the outline color, lane bands in the page color, and the well as its ground. Because it reads the tokens, one drawing serves both themes. Each drawing carries its own styles, with the light values as a fallback, so a drawing that is copied out of the page keeps the light colors. Ultramarine marks the current leg, and the dot on it is ultramarine in light and lamp in dark. Two other colors can appear in a diagram: a status color, on the outline of a part that carries a state (see Status above), and the heat steps, in the cells of a heat map and the boxes of a heat plan (see Heat steps above). An author cannot give a diagram any other color. Docent does not use a third-party diagram renderer.
 
 **Themes.** A document follows the reader's system setting: light on a light system, dark on a dark one. A switch lets the reader choose the other theme. That choice wins over the system and is remembered. Every `dark-*` token is the dark value of the token with the same name. The page is never pure white and never pure black.
 
-**Contrast.** All text pairs meet WCAG AA (4.5:1). Checked values on the page: body text 15.82 (light) and 15.14 (dark); muted text 6.30 and 6.65; primary 7.41 and 7.23; status colors 4.59 or higher on every surface they use. The number on a heat step: 5.63 or higher in light, 5.11 or higher in dark, and 5.68 or higher on paper.
+**Contrast.** All text pairs meet WCAG AA (4.5:1). Checked values on the page: body text 15.82 (light) and 15.14 (dark); muted text 6.30 and 6.65; primary 7.41 and 7.23; status colors 4.59 or higher on every surface they use. The number on a heat step: 5.62 or higher in light, 5.14 or higher in dark, and 5.68 or higher on paper.
 
 ## Typography
 

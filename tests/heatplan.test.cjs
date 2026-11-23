@@ -57,7 +57,7 @@ test("a box with no data keeps the plan's look and says so under its name, and t
     assert.deepEqual(part(s, "chat").texts.filter((t) => t.cls === "sub").map((t) => t.s)[0], "no data");
     assert.equal(s.notes.filter((n) => n.s === "no data").length, 0, "the box says it in words, so the legend needs no key");
   }
-  assert.match(svg, /\.box\{fill:var\(--bg,#fbfbfe\);stroke:var\(--text,#1c1f2e\);stroke-width:1\.5\}[\s\S]*\.h1\{fill:var\(--heat-1,#dee2f0\)\}/, "the step rules come after the box rule, so a step wins");
+  assert.match(svg, /\.box\{fill:var\(--bg,#fbfbfe\);stroke:var\(--text,#1c1f2e\);stroke-width:1\.5\}[\s\S]*\.h1\{fill:var\(--heat-1,#c6e9ef\)\}/, "the step rules come after the box rule, so a step wins");
 });
 
 test("the legend stands above the plan, at the left edge of its boxes, with the edge numbers and the unit", () => {
