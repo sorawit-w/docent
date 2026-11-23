@@ -140,3 +140,17 @@ test("a logo stands in the top bar only", () => {
   const page = `${bar("")}<footer>${svg('<path d="M0 0h1" fill="currentColor"/>')}</footer>`;
   assert.match(checkLogos(page).errors.join(), /a logo stands outside the top bar/);
 });
+
+test("a <use> takes the colors of the shapes it points at, which inherit up to that element and then from the <use>", () => {
+  const dark = (inner) => checkLogos(bar(svg(inner, 'width="24" height="24" aria-hidden="true" data-for="dark"'))).errors;
+  assert.deepEqual(dark('<defs><path id="p" d="M0 0h1" fill="#ffffff"/></defs><use href="#p"/>'), [], "a white path drawn through a use is white, not black");
+  assert.deepEqual(dark('<defs><g id="g" fill="#ffffff"><path d="M0 0h1"/></g></defs><use href="#g"/>'), [], "a shape inherits from the group that the use points at");
+  assert.deepEqual(dark('<defs><path id="p" d="M0 0h1"/></defs><use href="#p" fill="#ffffff"/>'), [], "a shape with no fill of its own takes the fill of the use");
+  assert.match(dark('<defs><path id="p" d="M0 0h1" fill="#000000"/></defs><use href="#p" fill="#ffffff"/>').join(), /no color with 3:1 on the dark page/, "the shape's own fill wins over the use's");
+  assert.deepEqual([...svgLogo(svg('<g id="a" fill="currentColor"><path d="M0 0h1"/><use href="#a"/></g>')).colors], ["currentColor"], "a use that points at its own group draws nothing more, and check does not loop");
+});
+
+test("a url() may stand in fill, stroke and clip-path only, so a gradient cannot point at itself through a stop", () => {
+  assert.match(why('<defs><linearGradient id="g"><stop offset="0" stop-color="url(#g)"/></linearGradient></defs><path d="M0 0h1" fill="url(#g)"/>'), /<stop> has stop-color="url\(#g\)"; only fill, stroke and clip-path may hold a url\(\)/);
+  assert.match(why('<path id="p" d="M0 0h1" transform="url(#p)"/>'), /only fill, stroke and clip-path may hold a url\(\)/);
+});

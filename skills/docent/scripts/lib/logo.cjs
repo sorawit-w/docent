@@ -19,6 +19,7 @@ const ATTRIBUTES = new Set([
 ]);
 const FIXED = { xmlns: "http://www.w3.org/2000/svg", "xmlns:xlink": "http://www.w3.org/1999/xlink" }; // allowed with this value only
 const COLORS = new Set(["fill", "stroke", "stop-color"]);
+const URLS = new Set(["fill", "stroke", "clip-path"]); // the attributes that may point at a gradient or a clip path inside the logo
 const WHY = {
   script: "a script runs code",
   style: "a style element can load files and change the page",
@@ -64,7 +65,7 @@ function attributes(text) {
 /** Checks one inline SVG logo. Returns { error } or { colors, viewBox, width, height, label, hidden, forTheme }. */
 function svgLogo(markup) {
   if (markup.length > MOST) return { error: `it has ${markup.length} characters; a logo has at most ${MOST}` };
-  const stack = [], ids = new Set(), refs = new Set(), stops = new Map(), uses = [];
+  const stack = [], ids = new Set(), refs = new Set(), stops = new Map(), nodes = [], byId = new Map();
   let root = null, at = 0, gradient = null;
   for (const m of markup.matchAll(TAG)) {
     const between = markup.slice(at, m.index);
@@ -99,6 +100,7 @@ function svgLogo(markup) {
       if (attr === "aria-label") { if (/[<>]/.test(value)) return { error: `<${name}> has an aria-label with markup in it` }; continue; }
       if (attr === "id") { if (!ID.test(value)) return { error: `the id "${value}" holds characters that an id does not need` }; if (ids.has(value)) return { error: `the id "${value}" is used twice` }; ids.add(value); continue; }
       if (/url\s*\(/i.test(value)) {
+        if (!URLS.has(attr)) return { error: `<${name}> has ${attr}="${value.slice(0, 40)}"; only fill, stroke and clip-path may hold a url()` };
         const target = value.match(/^url\(#([A-Za-z][\w-]*)\)$/);
         if (!target) return { error: `<${name}> has ${attr}="${value.slice(0, 40)}"; a url() in a logo points at an id inside the same logo, such as url(#shade)` };
         refs.add(target[1]);
@@ -107,12 +109,13 @@ function svgLogo(markup) {
       if (COLORS.has(attr) && !/^(#[0-9a-fA-F]{3}|#[0-9a-fA-F]{6}|currentColor|none|transparent)$/.test(value)) return { error: `<${name}> has ${attr}="${value}"; write a color as a hex value, such as #0b6e4f, or as currentColor` };
       if (!/^[\w .,#%()+-]*$/.test(value)) return { error: `the value of "${attr}" holds characters that a shape does not need` };
     }
-    const parent = stack.at(-1) || { fill: null, stroke: null, hidden: false };
-    const node = { name, fill: attrs.fill ?? parent.fill, stroke: attrs.stroke ?? parent.stroke, hidden: parent.hidden || ["defs", "clipPath"].includes(name) };
+    const parent = stack.at(-1) || null;
+    const node = { name, parent, own: { fill: attrs.fill, stroke: attrs.stroke }, href: name === "use" ? (attrs.href || attrs["xlink:href"] || "").slice(1) : null, hidden: !!parent?.hidden || ["defs", "clipPath"].includes(name) };
+    nodes.push(node);
+    if (attrs.id) byId.set(attrs.id, node);
     if (name === "svg") root = attrs;
     if (name === "linearGradient" || name === "radialGradient") { gradient = { name, id: attrs.id }; if (attrs.id) stops.set(attrs.id, []); }
     if (name === "stop" && gradient?.id && attrs["stop-color"]) stops.get(gradient.id).push(attrs["stop-color"]);
-    if (SHAPES.has(name) && !node.hidden) uses.push(node);
     if (!selfClose) stack.push(node);
   }
   if (markup.slice(at).trim()) return { error: "it holds something after </svg>, or markup that check cannot read" };
@@ -122,14 +125,30 @@ function svgLogo(markup) {
   const box = (root.viewBox || "").trim().split(/[\s,]+/).map(Number);
   if (box.length !== 4 || box.some((n) => !Number.isFinite(n)) || box[2] <= 0 || box[3] <= 0) return { error: "the <svg> has no viewBox, such as viewBox=\"0 0 96 24\"" };
   // The colors that show: the fill of each shape (black when none is set), its stroke, and the stops of a gradient it uses.
+  // A shape inherits fill and stroke from the elements around it. A <use> draws the element it points at and all inside it,
+  // which inherit up to that element and then from the <use>.
   const colors = new Set();
   const add = (value) => {
     if (!value || value === "none" || value === "transparent") return;
     const ref = value.match(/^url\(#([\w-]+)\)$/);
-    if (ref) return (stops.get(ref[1]) || []).forEach(add);
+    if (ref) return (stops.get(ref[1]) || []).forEach((stop) => /^url/.test(stop) || add(stop)); // a stop is a color, never a url()
     colors.add(value === "currentColor" ? value : hex6(value));
   };
-  for (const node of uses) { add(node.fill ?? (node.name === "line" ? null : "#000000")); add(node.stroke); }
+  const up = (node, key, stop = null) => { for (let n = node; n && n !== stop?.parent; n = n.parent) if (n.own[key] != null) return n.own[key]; return null; };
+  const inside = (node, target) => { for (let n = node; n; n = n.parent) if (n === target) return true; return false; };
+  const paint = (node, inherited, seen) => {
+    const fill = node.own.fill ?? inherited.fill, stroke = node.own.stroke ?? inherited.stroke;
+    if (node.name !== "use") { add(fill ?? (node.name === "line" ? null : "#000000")); add(stroke); return; }
+    const target = byId.get(node.href);
+    if (!target || seen.has(target)) return; // a use that points at itself, directly or through another use, draws nothing more
+    const next = new Set(seen).add(target);
+    for (const shape of nodes) {
+      if (!SHAPES.has(shape.name) || !inside(shape, target)) continue;
+      const from = shape === target ? null : shape.parent;
+      paint(shape, { fill: (from && up(from, "fill", target)) ?? fill, stroke: (from && up(from, "stroke", target)) ?? stroke }, next);
+    }
+  };
+  for (const node of nodes) if (SHAPES.has(node.name) && !node.hidden) paint(node, { fill: up(node.parent, "fill"), stroke: up(node.parent, "stroke") }, new Set());
   return { colors, ratio: box[2] / box[3], width: Number(root.width), height: Number(root.height), label: root["aria-label"], role: root.role, hidden: root["aria-hidden"] === "true", forTheme: root["data-for"] };
 }
 
