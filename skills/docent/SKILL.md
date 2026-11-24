@@ -104,19 +104,19 @@ A profile tells the kit how much space the page has and how wide code and tables
 
 | Profile | For | Write first | On the page |
 |---|---|---|---|
-| `standard` | An explanation, a tutorial, a policy, a guide | What the reader will understand, then the parts, with figures | Code and tables end at the right edge of the notes |
+| `standard` | An explanation, a tutorial, a policy, a guide, a decision record (ADR), a research report, a customer research summary | What the reader will understand, then the parts, with figures | Code and tables end at the right edge of the notes |
 | `task` | A how-to, a runbook, troubleshooting | What the reader needs, then the numbered steps, then what to do when a step fails | Like Standard, with less space between steps and sections |
 | `reference` | Commands, options, an API, settings, a log or a trace | One section for each item, its facts in a margin note, and tables | Code and tables up to 1120px, and tighter table rows |
-| `brief` | A report for managers, an incident report, release notes | The outcome and its impact, then a timeline table and the actions | Code and tables up to 1120px |
+| `brief` | A report for managers, such as a business analysis report; an incident report, release notes | The outcome and its impact, then a timeline table and the actions | Code and tables up to 1120px |
 
 Choose in this order:
 
 1. The profile that the author names.
 2. The kind of document that the user asks for, or the readers that they name.
-3. The content. `check` names a profile when the page clearly looks like one: code blocks and tables that hold more text than the paragraphs, numbered steps, or many times of day.
+3. The content. `check` names a profile when the page clearly looks like one: code blocks and tables that hold more text than the paragraphs, numbered steps, many times of day, or the kind of document in the title block's margin note. A timeline table counts toward Brief, not Reference.
 4. Standard.
 
-Choose on your own. Ask the author only when two profiles fit equally and the choice matters, such as a page that will be printed or read on phones. Code alone does not make a Reference page: a tutorial and a runbook hold code too, and they are Standard and Task.
+Choose on your own. Ask the author only when two profiles fit equally and the choice matters, such as a page that will be printed or read on phones. Code alone does not make a Reference page: a tutorial and a runbook hold code too, and they are Standard and Task. A word in the name does not choose either: a research report, a customer research summary and a decision record explain a result or a choice, so they are Standard, although they are called a report, a summary or a record. A business analysis report is Brief, because its readers are managers who want the outcome first, and its tables of segments and plans need the wider block.
 
 **A page for the public.** When the readers are the public or older readers, also write `data-text="large"`: `<html lang="en" data-profile="standard" data-text="large">`. The body text is then 18px on screen and 12pt on paper, and the text column grows with it.
 
@@ -161,6 +161,10 @@ A host project may set its accent, its heading color and its fonts, with these t
 ## Ask about the brand once
 
 When you create the first Docent page in a repo, ask about the brand once. When the repo already has a Docent page (it carries the `docent:kit` marker), copy the brand from the newest one: the logo, the host tokens, the tagline and the credit. Then ask one question only: "Use the same brand as `docs/onboarding.html`?" The page is the record of the choices; write no other file into the host repo.
+
+**When the document is about another product.** The host is the product that the document is about. When that is not the repo's own project, such as a report on a customer's product, the host is that product: use its name in the top bar and the `<title>`, and show no logo and no tagline unless the user gives them. Take nothing from the repo's own brand or from its other Docent pages: their logo, colors and tagline belong to another host.
+
+**When no user can be asked,** such as an agent that works alone, do not wait for an answer. When the repo's newest Docent page is for the same host, copy its brand: a user chose it. Otherwise use the defaults in the column "When the user skips it" below: the name found, no logo, Docent's own colors, no tagline, and the credit as a link. In your report, name each default you used: "No one could be asked about the brand, so the page uses the name from `package.json`, no logo, Docent's own colors, no tagline, and the credit as a link." Never invent a brand: draw no logo, pick no color by eye, and write no tagline.
 
 **First, read the repo, and change nothing:**
 

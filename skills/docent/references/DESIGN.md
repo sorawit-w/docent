@@ -157,10 +157,10 @@ Docent uses system fonts only, because every document is one file with nothing t
 
 **Profiles.** A page names its profile on `<html>` (`data-profile`), from what the reader does with it. The profile sets the block width and the space; it never changes the text column, the type or the colors.
 
-- **Standard** (the default): an explanation, a tutorial, a policy or a guide. The block ends at the right edge of the notes, so the page is balanced around the text.
+- **Standard** (the default): an explanation, a tutorial, a policy, a guide, a decision record, a research report or a customer research summary. The block ends at the right edge of the notes, so the page is balanced around the text.
 - **Task**: a how-to, a runbook or troubleshooting. The block ends at the right edge of the notes. Sections and steps are closer together.
 - **Reference**: commands, options, an API, settings, a log or a trace. The block is up to 1120px wide, and table rows are tighter, so more fits on a screen.
-- **Brief**: a report for managers, an incident report or release notes. The block is up to 1120px wide, for timeline tables.
+- **Brief**: a report for managers, such as a business analysis report, an incident report or release notes. The block is up to 1120px wide, for timeline tables.
 
 A page for the public or for older readers also has `data-text="large"`: the body is 18px, and every size grows with it.
 
@@ -250,7 +250,7 @@ A page for the public or for older readers also has `data-text="large"`: the bod
 
 **Columns of numbers.** A column that holds numbers (counts, amounts, shares, durations) lines up on the right, with tabular figures, so the digits of the same place sit under each other; its heading lines up on the right too. Text, dates, codes and the row headings stay on the left. In the last column the numbers end at the edge of the table.
 
-**Tables use the block width.** On a phone a figure, a table or a code block scrolls sideways inside itself; the page never scrolls sideways. Code in a table cell may break at any character, so a long path does not make the table wider. A closed section that holds a table, a code block or a figure takes the block width, like those blocks do outside it; its text keeps the text column.
+**Tables use the block width.** On a phone a figure, a table or a code block scrolls sideways inside itself; the page never scrolls sideways. Code in a table cell may break at any character, so a long path does not make the table wider. In the text, a word that cannot fit on a line by itself, such as a long web address, breaks inside; every other word wraps at its spaces. A closed section that holds a table, a code block or a figure takes the block width, like those blocks do outside it; its text keeps the text column.
 
 **Spacing.** More space goes above a heading than below it: 72px above a section (less on Task, Reference and Brief pages), 16px below its heading. Blocks inside a section are 24px to 32px apart, and two paragraphs are 16px apart. A block heading (h3) in the text flow has 32px above it and 8px below it. No block touches the block before it.
 

@@ -26,6 +26,16 @@ test("a table cell lets code break, and a closed section that holds a table take
   assert.match(rule("details:has(> .table-wrap, > pre, > .code, > figure)"), /max-width: none/);
 });
 
+test("a long word breaks only when it cannot fit a line, so a long address does not make a phone page scroll sideways", () => {
+  assert.match(rule("body"), /overflow-wrap: break-word/, "break-word, not anywhere: a table keeps the widths of its columns");
+  assert.ok(!/hyphens|word-break/.test(css), "normal words wrap and hyphenate as before");
+});
+
+test("every block after a card grid stands at least 24px below it", () => {
+  assert.match(rule(".cards"), /margin: 24px 0;/, "the bottom margin overlaps the next block's own, so a heading keeps its 32px");
+  assert.match(rule(".cards:last-child"), /margin-bottom: 0/);
+});
+
 test("text sizes are in rem, so a reader who sets a larger text size gets larger text, not longer lines", () => {
   // A drawing keeps its real size in px, as every drawing does: the rules for a hand-drawn figure are the one place.
   assert.deepEqual(css.split("\n").filter((l) => !l.startsWith('svg[data-drawn="hand"]')).join("\n").match(/font(-size)?:[^;}]*\b\d+px/g), null);

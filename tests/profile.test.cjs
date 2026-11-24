@@ -52,3 +52,30 @@ test("the reference sample is Reference, and the sample page and the template ar
   assert.equal(suggestProfile(read("skills", "docent", "assets", "specimen.html")).profile, "standard");
   assert.equal(suggestProfile(read("skills", "docent", "assets", "template.html")).profile, "standard");
 });
+
+test("a timeline table is not Reference text, so an incident page with a long timeline does not look like Reference", () => {
+  const timeline = `<table><thead><tr><th>Time</th><th>What happened</th></tr></thead><tbody>${Array.from({ length: 12 }, (_, i) => `<tr><td>09:${String(10 + i * 3).padStart(2, "0")}</td><td>The team saw the queue grow, and the on-call engineer opened the dashboard of the service</td></tr>`).join("")}</tbody></table>`;
+  const s = suggestProfile(page(para(2) + pre(1) + table(2) + timeline));
+  assert.equal(s.signals.timelines, 1); assert.equal(s.signals.tables, 1);
+  assert.notEqual(s.profile, "reference");
+  assert.equal(suggestProfile(page(para(2) + pre(1) + table(2) + timeline, "Incident review")).profile, "brief");
+  assert.equal(suggestProfile(page(para(1) + pre(4) + table(6) + table(6))).signals.timelines, 0, "a table with no times of day is not a timeline");
+});
+
+test("a research or decision document is Standard, also when it is called a report or a summary; an analysis or an incident is Brief", () => {
+  for (const kind of ["Research report", "Research summary", "Customer research summary", "Interview summary", "Decision record", "ADR 12"]) {
+    const s = suggestProfile(page(para(4), kind));
+    assert.deepEqual([s.profile, s.sure], ["standard", true], kind);
+  }
+  for (const kind of ["Business analysis report", "Customer analysis", "Incident review", "Postmortem", "Release notes"]) assert.equal(suggestProfile(page(para(4), kind)).profile, "brief", kind);
+});
+
+test("check names no wrong profile for any of the five test documents", () => {
+  const dir = path.join(__dirname, "..", "docs", "research", "test-documents");
+  for (const file of fs.readdirSync(dir).filter((f) => f.endsWith(".html"))) {
+    const source = fs.readFileSync(path.join(dir, file), "utf8");
+    const chosen = source.match(/<html\b[^>]*\bdata-profile="([^"]*)"/)[1];
+    const s = suggestProfile(source);
+    assert.ok(!s.sure || s.profile === "standard" || s.profile === chosen, `${file} has ${chosen}; the guess is ${s.profile}: ${s.reasons}`);
+  }
+});

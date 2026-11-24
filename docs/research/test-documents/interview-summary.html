@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>What eight teams told us about planning — Example Planner</title>
 <style>
-/* docent:kit 0.18.0 */
+/* docent:kit 0.19.0 */
 /* Docent page styles. Tokens come from references/DESIGN.md. One file, no network. */
 :root {
   color-scheme: light;
@@ -58,7 +58,8 @@ html[data-text="large"] { font-size: 112.5%; }
 }
 *, *::before, *::after { box-sizing: border-box; }
 html { scroll-padding-top: 88px; -webkit-text-size-adjust: 100%; }
-body { margin: 0; background: var(--bg); color: var(--text); font: 400 1rem/1.65 var(--sans); caret-color: var(--primary); }
+/* A word that cannot fit on a line by itself, such as a long web address, breaks inside, so no page scrolls sideways on a phone. Other words wrap as before. */
+body { margin: 0; background: var(--bg); color: var(--text); font: 400 1rem/1.65 var(--sans); caret-color: var(--primary); overflow-wrap: break-word; }
 ::selection { background: color-mix(in srgb, var(--primary) 22%, transparent); }
 :focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
 a { color: var(--primary); text-decoration-thickness: 1px; text-underline-offset: 0.2em; }
@@ -214,12 +215,13 @@ figcaption { margin-top: 12px; font-size: 0.875rem; line-height: 1.5; color: var
 figcaption strong { font-weight: 600; color: var(--text); margin-right: 8px; }
 
 /* Card grid: 3 to 8 short items side by side, each a heading or a large number and a line of text. A card is a label, like a margin note: a line above it, and no box. At most four in a row. */
-.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(max(160px, calc((100% - 72px) / 4)), 1fr)); gap: 24px; margin: 24px 0 0; padding: 0; list-style: none; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(max(160px, calc((100% - 72px) / 4)), 1fr)); gap: 24px; margin: 24px 0; padding: 0; list-style: none; }
 .cards > li { min-width: 0; padding-top: 12px; border-top: 1px solid var(--line); }
 .cards h3 { margin: 0 0 4px; font-size: 1rem; line-height: 1.5; }
 .cards p { margin: 0; font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
 .cards .big { margin-bottom: 4px; font: 700 1.875rem/1.2 var(--serif); font-weight: var(--heading-weight, 700); color: var(--ink); font-variant-numeric: tabular-nums; }
-.cards + :is(p, ul, ol, dl) { margin-top: 24px; }
+/* Every block after a card grid stands 24px below it, or more when its own space is larger: the two margins overlap. */
+.cards:last-child { margin-bottom: 0; }
 
 /* Code, tables and cards end at the profile's block width. */
 :is(pre, .code, .table-wrap, .cards) { max-width: var(--block); }
@@ -1044,7 +1046,7 @@ footer p { margin: 0; }
   </div>
 </footer>
 <script>
-// docent:kit 0.18.0
+// docent:kit 0.19.0
 (() => {
   const root = document.documentElement;
   root.classList.add('js');

@@ -68,6 +68,10 @@ function attributes(text) {
   return { list: out };
 }
 
+/** The first attribute written twice in a tag, in any case, or null. The browser keeps the first copy, so check must not read another. */
+const twice = (list) => list.find(([name], i) => list.findIndex(([other]) => other.toLowerCase() === name.toLowerCase()) !== i)?.[0] ?? null;
+const TWICE = (name, attr) => `<${name}> has the attribute "${attr}" twice; the browser keeps the first, so write it once`;
+
 /** Checks one inline SVG logo. Returns { error } or { colors, ids, ratio, width, height, label, role, hidden, forTheme }. */
 function svgLogo(markup) {
   if (markup.length > MOST) return { error: `it has ${markup.length} characters; a logo has at most ${MOST}` };
@@ -93,6 +97,7 @@ function svgLogo(markup) {
     if (name === "stop" && !gradient) return { error: "a <stop> stands outside a gradient" };
     const read = attributes(rawAttrs);
     if (read.error) return { error: `<${name}>: ${read.error}` };
+    if (twice(read.list)) return { error: TWICE(name, twice(read.list)) };
     const attrs = Object.fromEntries(read.list);
     for (const [attr, value] of read.list) {
       const low = attr.toLowerCase();
@@ -163,6 +168,7 @@ function rasterSize(kind, bytes) {
 function rasterLogo(tag) {
   const read = attributes(tag.replace(/^<img\b/i, "").replace(/\/?>$/, ""));
   if (read.error) return { error: `<img>: ${read.error}` };
+  if (twice(read.list)) return { error: TWICE("img", twice(read.list)) };
   const attrs = Object.fromEntries(read.list);
   for (const [attr] of read.list) {
     if (attr.toLowerCase().startsWith("on")) return { error: `the <img> has the event attribute "${attr}", which runs code` };
