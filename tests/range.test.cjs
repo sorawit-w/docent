@@ -348,6 +348,8 @@ test("an estimate row: render refuses an estimate outside its interval, and an i
   const shown = renderDiagram(decimals);
   assert.ok(shown.scene.notes.some((n) => n.s === "14.25 (11.50–18.00)") && shown.scene.notes.some((n) => n.s === "23.00 (18.00–28.00)"), "the estimates of one chart keep the same decimals");
   assert.match(shown.svg, /<td class="num">14\.25<\/td><td class="num">11\.50<\/td><td class="num">18\.00<\/td>/);
+  const tiny = { id: "tiny", kind: "range", label: "Tiny values.", scale: { from: 0, to: 1e-6, step: 2e-7 }, rows: [{ name: "A", at: 4e-7, from: 2e-7, to: 6e-7 }, { name: "B", at: 5e-7, from: 3e-7, to: 8e-7 }] };
+  assert.ok(renderDiagram(tiny).scene.notes.some((n) => n.s === "0.0000004 (0.0000002–0.0000006)"), "a number written with an exponent keeps its digits");
   const mixed = estimate(); mixed.rows[1] = { name: "Search", from: 18, to: 28 };
   assert.match(renderDiagram(mixed).svg.split('<details class="dg-words">')[1], /<th scope="col">Value, in %<\/th>[\s\S]*<tr><th scope="row">Sign-in<\/th><td>14 \(11–18\)<\/td><\/tr>/, "a chart with other rows keeps one Value column");
 });

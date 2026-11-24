@@ -26,8 +26,10 @@ function readRange(data) {
   if (!Array.isArray(data.rows)) fail(`"rows" must be a list`);
   if (data.rows.length < 2 || data.rows.length > MOST.rows) fail(`a range chart has 2 to ${MOST.rows} rows; this one has ${data.rows.length}`);
   // The estimates of one chart keep the same decimals, as a column of numbers does: 0.20 beside 0.25, not 0.2.
-  const places = Math.max(0, ...data.rows.filter((r) => r && isNum(r.at) && isNum(r.from) && isNum(r.to)).flatMap((r) => [r.at, r.from, r.to]).map((v) => (String(v).split(".")[1] || "").length));
-  const est = (v) => fmt(v.toFixed(places));
+  // A number written with an exponent (4e-7) has as many decimals as its digits after the point, plus the exponent's size.
+  const decimals = (v) => { const [m, e = 0] = String(v).toLowerCase().split("e"); return Math.max(0, (m.split(".")[1] || "").length - Number(e)); };
+  const places = Math.max(0, ...data.rows.filter((r) => r && isNum(r.at) && isNum(r.from) && isNum(r.to)).flatMap((r) => [r.at, r.from, r.to]).map(decimals));
+  const est = (v) => (places > 20 ? fmt(v) : fmt(v.toFixed(places))); // shortcut: past 20 decimals, each number keeps its own form
   const rows = data.rows.map((r, i) => {
     if (!r || typeof r !== "object") fail(`row ${i + 1} must be an object with a "name" and its numbers`);
     const name = words(r.name, `the name of row ${i + 1}`, MOST.name);
