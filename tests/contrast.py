@@ -120,6 +120,17 @@ for key, pal in PALETTES.items():
     gaps += [(f"{n} {mode} muted vs accent (CIE76)", de(t["muted"], t["primary"]), 25) for mode, t in (("light", lt), ("dark", dk))]
     gaps += [(f"{n} {mode} accent vs {st} (CIE76)", de(t["primary"], t[st]), 25) for mode, t in (("light", lt), ("dark", dk)) for st in ("ok", "warn", "err")]
 
+# A deck in present mode (docs/proposals/decks.md, section 4): always light, with the "more contrast" tokens, so muted text takes the text
+# color and the line the muted color. Every text pair on a slide reaches 7:1 (AAA) on the page; a status word takes the text color, and its
+# dot is a mark that needs 3:1. A palette may give a darker accent for present mode ("present" in palettes.json).
+present = [("docent", L, L["primary"])] + [(pal["name"].lower(), dict(page=pal["light"]["bg"], text=pal["light"]["text"], muted=pal["light"]["muted"], ink=pal["light"]["ink"]), pal.get("present", {}).get("primary", pal["light"]["primary"])) for pal in PALETTES.values()]
+for n, t, accent in present:
+    for label, fg in (("text", t["text"]), ("muted text (text color)", t["text"]), ("heading (ink)", t["ink"]), ("accent", accent)):
+        rows.append((f"{n} present: {label} on page", fg, t["page"], 7.0))
+    rows.append((f"{n} present: line (muted) on page", t["muted"], t["page"], 3.0))
+    for st in ("ok", "warn", "err"):
+        rows.append((f"{n} present: {st} dot on page", L[st], t["page"], 3.0))
+
 fails = 0
 for label, value, need in gaps:
     good = value >= need

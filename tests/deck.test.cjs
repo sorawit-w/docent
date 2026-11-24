@@ -165,3 +165,28 @@ test("elements reads the children of a piece of markup, skipping text and empty 
   assert.deepEqual(elements('<h2 id="a">A <b>b</b></h2> text <img src="x"><ul><li>1</li></ul>').map((e) => e.tag), ["h2", "img", "ul"]);
   assert.equal(elements("<p>open <em>end</em>").length, 1);
 });
+
+test("present mode is light with the more-contrast tokens; a palette adds its own block, with Harbor's darker accent", () => {
+  assert.match(deckCss, /html:root\.presenting:not\(\[data-never\]\) \{ color-scheme: light; [^}]*--text: #1c1f2e; --muted: #1c1f2e; --line: #575d75;/, "muted text takes the text color and the line the muted color");
+  assert.match(deckCss, /@media screen and \(forced-colors: none\) \{\s*html:root\.presenting/, "screen only, and not with forced colors");
+  const harbor = cssBlock("harbor", true);
+  assert.match(harbor, /html:root\[data-palette="harbor"\]\.presenting:not\(\[data-never\]\) \{[^}]*--primary: var\(--host-accent, #025c87\)/);
+  assert.ok(!cssBlock("harbor").includes(".presenting"), "an ordinary page with a palette has no present block");
+  const named = build(source.replace('data-profile="deck"', 'data-profile="deck" data-palette="plum"'));
+  assert.deepEqual(checkDocument(named), { errors: [], warnings: [] });
+});
+
+test("in a deck, check warns when the host's accent has less than 7:1 on the page", () => {
+  const host = (accent) => checkDocument(deck.replace("</head>", `<style>:root { --host-accent: ${accent}; --host-accent-dark: #8e9bff; }</style></head>`)).warnings;
+  assert.ok(host("#0a6a5c").includes("in a deck the accent should have 7:1 on the page, because a projector lowers contrast; #0a6a5c has 6.3:1"), host("#0a6a5c").join("\n"));
+  assert.ok(!host("#2f3fd0").some((w) => w.includes("in a deck")), "Docent's ultramarine has 7.41:1");
+  const page = checkDocument(specimen.replace("</head>", "<style>:root { --host-accent: #0a6a5c; --host-accent-dark: #8e9bff; }</style></head>")).warnings;
+  assert.ok(!page.some((w) => w.includes("in a deck")), "an ordinary page needs 4.5:1 only");
+});
+
+test("the deck script parses, and adds the Present button and the slide number only with scripts on", () => {
+  assert.doesNotThrow(() => new Function(deckJs));
+  assert.ok(!/class="present"|class="deck-nav"/.test(source), "the source has neither: the script adds them");
+  assert.match(deckJs, /history\.replaceState/, "the address is replaced, not added to the history");
+  assert.match(deckJs, /aria-roledescription', 'slide'/);
+});

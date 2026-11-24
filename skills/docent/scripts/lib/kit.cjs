@@ -9,7 +9,7 @@ const read = (name) => fs.readFileSync(path.join(SKILL, "assets", name), "utf8")
 const CSS_BLOCK = /\/\* docent:kit ([^ *]+) \*\/[\s\S]*?\/\* \/docent:kit \*\//g;
 const JS_BLOCK = /\/\/ docent:kit ([^\s]+)\n[\s\S]*?\/\/ \/docent:kit/g;
 
-const { paletteOf, paletteCss } = require("./palettes.cjs");
+const { paletteOf, paletteCss, presentCss } = require("./palettes.cjs");
 /** The profile that <html> names, or null. */
 function profileOf(html) {
   const tag = (html.match(/<html\b[^>]*>/i) || [""])[0];
@@ -18,7 +18,7 @@ function profileOf(html) {
 }
 const isDeck = (html) => profileOf(html) === "deck";
 /** The kit styles, with the one palette that the page names, if any, and the deck part only in a deck. */
-const cssBlock = (palette = null, deck = false) => `/* docent:kit ${VERSION} */\n${read("kit.css")}${palette ? `\n${paletteCss(palette)}` : ""}${deck ? `\n${read("deck.css")}` : ""}\n/* /docent:kit */`;
+const cssBlock = (palette = null, deck = false) => `/* docent:kit ${VERSION} */\n${read("kit.css")}${palette ? `\n${paletteCss(palette)}` : ""}${deck ? `\n${read("deck.css")}${palette ? `\n${presentCss(palette)}` : ""}` : ""}\n/* /docent:kit */`;
 const jsBlock = (deck = false) => `// docent:kit ${VERSION}\n${read("kit.js")}${deck ? `\n${read("deck.js")}` : ""}\n// /docent:kit`;
 
 /** The kit blocks found in a document: [{ kind, version, text }]. */

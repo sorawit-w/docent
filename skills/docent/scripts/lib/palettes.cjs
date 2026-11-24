@@ -46,6 +46,17 @@ function paletteCss(name) {
   ].join("\n");
 }
 
+/** Present mode of a deck, with a palette: always light, with the "more contrast" tokens (the line takes the muted color, and muted
+    text the text color), so every text pair reaches 7:1 on the page. A palette whose accent has less than 7:1 on its light page gives
+    a darker accent of the same hue for present mode ("present" in palettes.json). Screen only, and not with forced colors. */
+function presentCss(name) {
+  const p = PALETTES[name];
+  if (!p) throw new Error(`"${name}" is not a palette; the palettes are ${NAMES.map((n) => `"${n}"`).join(", ")}`);
+  const t = p.light, accent = (p.present && p.present.primary) || t.primary;
+  const heat = [1, 2, 3, 4, 5].map((i) => `--heat-${i}: ${t[`heat-${i}`]};`).join(" ");
+  return `@media screen and (forced-colors: none) { html:root[data-palette="${name}"].presenting:not([data-never]) { color-scheme: light; --bg: ${t.bg}; --panel: ${t.panel}; --fig: ${t.fig}; --text: ${t.text}; --muted: ${t.text}; --line: ${t.muted}; --primary: var(--host-accent, ${accent}); --ink: var(--host-ink, ${t.ink}); --dot: var(--host-accent, ${accent}); ${heat} --heat-text: ${t.text}; --heat-page: ${t.bg}; } }`;
+}
+
 /** A drawing with the palette's light values as its fallback colors in place of Docent's. */
 function paint(svg, name) {
   const p = name && PALETTES[name];
@@ -60,4 +71,4 @@ function grounds(name) {
   return p ? { light: [p.light.bg, p.light.panel], dark: [p.dark.bg, p.dark.panel] } : { light: ["#fbfbfe", "#f2f3f9"], dark: ["#12141f", "#0b0d15"] };
 }
 
-module.exports = { PALETTES, NAMES, DOCENT, PAPER_HEAT, paletteOf, paletteCss, paint, grounds };
+module.exports = { PALETTES, NAMES, DOCENT, PAPER_HEAT, paletteOf, paletteCss, presentCss, paint, grounds };

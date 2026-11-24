@@ -103,7 +103,7 @@ function measureBody(el, room) {
     if (count > LIMIT.rows) problems.push(`its table has ${count} rows under the heading row; a table on a slide has at most ${LIMIT.rows}. A larger table belongs in the report`);
     // Each row is as tall as its tallest cell: the columns share the width equally here, less 24px of space after each cell.
     const cell = Math.max(1, INNER.width / Math.max(1, columns) - CELL_GAP);
-    return all.reduce((sum, row) => sum + Math.max(1, ...row.map((text) => (text ? lines(text, SIZE.small, cell) : 1))) * LINE.small + ROW_PAD, 0);
+    return all.reduce((sum, row) => sum + Math.max(1, ...row.map((text) => (text ? lines(text, SIZE.small, cell) : 1))) * LINE.small + ROW_PAD + 1, 0); // + its 1px rule
   };
   const { tag, attrs, inner } = el;
   if ((tag === "ul" || tag === "ol") && hasClass(attrs, "cards")) {
