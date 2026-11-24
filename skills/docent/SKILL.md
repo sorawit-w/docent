@@ -24,7 +24,7 @@ Docent is a design kit for documents: single HTML files that open without a netw
 | `scripts/render.cjs` | Draws every diagram and builds every widget of a document, each from its data. |
 | `scripts/stamp.cjs` | Puts the page styles and the page script into a document. |
 | `scripts/check.cjs` | Tests a document against the rules. Each error and warning names its rule, such as `[cards.count]`; `check.cjs --rules` lists every rule and its group. |
-| `scripts/brand.cjs` | Reads a host project's `DESIGN.md` and prints its host tokens. It writes nothing. |
+| `scripts/brand.cjs` | Reads a host project's `DESIGN.md` and prints its host tokens. It writes nothing. With no argument, it reads the `DESIGN.md` that the repo file `.docent/config.json` names, and that file's tokens win. |
 
 The scripts need Node 24 or newer and nothing else. They install no packages and use no network. Before the first script, run `node --version`. When it is older than 24, tell the user once, in one sentence, which version you found and that Docent needs 24 or newer. Then run the scripts anyway, and report their results as not tested on that version. When Node is missing, see "When a script cannot run" below.
 
