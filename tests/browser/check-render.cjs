@@ -419,7 +419,7 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     const content = html.replace('<section id="report"', '<section id="lists" aria-labelledby="lists-h"><h2 id="lists-h">Lists</h2><ul id="points"><li>One.</li><li>Two.</li></ul><ol id="numbers"><li>One.</li><li>Two.</li></ol></section>\n<section id="report"');
     const { page, context } = await open({ width: 1280, content });
     const lists = await page.evaluate(() => { const of = (sel) => { const c = getComputedStyle(document.querySelector(sel)); return `${c.paddingLeft} ${c.maxWidth} ${c.marginTop} ${c.listStyleType}`; }; return { points: of("#points"), numbers: of("#numbers"), line: of("#points li + li"), steps: of(".steps"), step: of(".steps li + li"), facts: of(".facts"), ticks: of("#wd-ready ul"), tick: of("#wd-ready li + li") }; });
-    ok("a plain list has the kit style, and the steps, the facts and the checklist keep theirs", lists.points === "24px 496px 0px disc" && lists.numbers === "24px 496px 0px decimal" && lists.line.startsWith("0px none 4px") && lists.steps === "0px none 0px none" && lists.step.startsWith("32px none 0px") && lists.facts === "0px none 0px none" && lists.ticks === "0px 496px 0px none" && lists.tick.startsWith("0px none 12px"), lists);
+    ok("a plain list has the kit style, and the steps, the facts and the checklist keep theirs", lists.points === "24px 560px 0px disc" && lists.numbers === "24px 560px 0px decimal" && lists.line.startsWith("0px none 4px") && lists.steps === "0px none 0px none" && lists.step.startsWith("32px none 0px") && lists.facts === "0px none 0px none" && lists.ticks === "0px 560px 0px none" && lists.tick.startsWith("0px none 12px"), lists);
     await context.close();
   }
 
@@ -495,8 +495,8 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     }
     const { phone, narrow, desk, paper } = results;
     ok("a long status label wraps, so the page does not scroll sideways at 390px or 320px", phone.page === phone.view && narrow.page === narrow.view && phone.label <= phone.main, { phone, narrow });
-    // On a Standard page both end at the right edge of the notes: 764px.
-    ok("a closed section that holds a table is as wide as a table outside it", desk.inner === desk.flow && desk.flow === 764, desk);
+    // On a Standard page both end at the right edge of the notes: 828px.
+    ok("a closed section that holds a table is as wide as a table outside it", desk.inner === desk.flow && desk.flow === 828, desk);
     ok("on paper a table with long code in its cells stays inside the page", paper.page === paper.view && paper.wide.every((r) => r <= paper.view), paper);
   }
 
@@ -921,10 +921,10 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
       await context.close();
     }
 
-    // A page for the public: 18px text, and a text column that grows with it.
+    // A page for the public: every size grows by an eighth (body 20.25px), and the text column grows with it.
     const large = await open({ width: 1440, content: build("skills/docent/assets/specimen.html", (h) => h.replace('data-profile="standard"', 'data-profile="standard" data-text="large"')) });
     const big = await large.page.evaluate(() => ({ body: getComputedStyle(document.body).fontSize, text: Math.round(document.querySelector("main section .row > div > p").getBoundingClientRect().width), side: document.documentElement.scrollWidth > document.documentElement.clientWidth }));
-    ok("a page for the public: 18px text and a 558px text column, with no sideways scroll", big.body === "18px" && big.text === 558 && !big.side, big);
+    ok("a page for the public: 20.25px text and a 630px text column, with no sideways scroll", big.body === "20.25px" && big.text === 630 && !big.side, big);
     await large.context.close();
 
     // Paper: an A4 page is 174mm wide inside its margins. The text is 11pt, each note sits beside its text, and nothing is wider than the paper.

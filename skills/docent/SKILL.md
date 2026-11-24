@@ -161,7 +161,7 @@ Choose on your own. Ask the author only when two profiles fit equally and the ch
 
 It is not an appendix of raw data: long tables go in a closed section, or in a separate file named under "Data". One per page. Release notes with one chart of counts need none; that is your judgment, so `check` does not ask for one. When a page has one, `check` warns when its four headings are missing or out of order.
 
-**A page for the public.** When the readers are the public or older readers, also write `data-text="large"`: `<html lang="en" data-profile="standard" data-text="large">`. The body text is then 18px on screen and 12pt on paper, and the text column grows with it.
+**A page for the public.** When the readers are the public or older readers, also write `data-text="large"`: `<html lang="en" data-profile="standard" data-text="large">`. The body text is then about 20px on screen and 12pt on paper, and the text column grows with it.
 
 When the user asks for something that a design rule forbids, follow the rule, say which rule it is, and offer the user's way. Do it the user's way when the user confirms. This holds for design rules only. When the user asks for an app screen or a marketing page, say that Docent is not made for it, and write nothing with Docent.
 

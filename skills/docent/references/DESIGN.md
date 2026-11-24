@@ -73,7 +73,7 @@ typography:
     lineHeight: 1.5
   body-md:
     fontFamily: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif
-    fontSize: 1rem
+    fontSize: 1.125rem
     fontWeight: 400
     lineHeight: 1.65
   label-sm:
@@ -140,7 +140,7 @@ Docent uses system fonts only, because every document is one file with nothing t
 - **Six sizes, no more:** 52, 30, 21, 18, 16 and 14 pixels at the browser's usual text size. On a phone the title is 32 and section headings are 26. The kit writes them in rem (52px is 3.25rem), as it writes the text column. A reader who sets a larger text size in the browser then gets larger text, and each line keeps its length in characters.
 - **Title and section headings (h1, h2):** A serif — Charter on Apple devices, Sitka on Windows, Cambria or Georgia elsewhere — at weight 700, in ink. A title is at most two lines.
 - **Opening paragraph (body-lg):** The same serif at 21px, regular weight. It says what the document is for.
-- **Step and block headings (h3) and body (body-md):** The system sans-serif. Body text is 16px with a line height of 1.65. The text column is 31rem wide, which gives about 65 to 70 characters in a line.
+- **Step and block headings (h3) and body (body-md):** The system sans-serif. Body text is 18px with a line height of 1.65, and a step or block heading is the same size in weight 600. The text column is 35rem wide, which gives about 64 to 74 characters in a line (67 in the middle). The text of a walkthrough step is narrower, beside its figure: about 62 characters. On paper the body stays at 11pt.
 - **Small text (label-sm):** 14px sans-serif, for notes, captions, table headings and the top bar. A label is written in sentence case. Docent uses no uppercase letter-spaced labels and no text below 14px on screen. The one exception is inside a diagram, where notes and step numbers are 12px. On paper the body is 11pt, so small text is about 9.6pt.
 - **Code (code):** Monospace, for code and commands only. Step numbers, captions and labels are never monospace.
 - **Numbers** in tables, step counters and dates use tabular figures.
@@ -151,7 +151,7 @@ Docent uses system fonts only, because every document is one file with nothing t
 
 **The window title.** The `<title>` of a document is `Document title — Host project`. It does not name Docent. When the title is long, the window title may be a shorter form of it, made of the title's own words in the same order: "Report a bug — Host project" for the title "How to report a bug and get a fix".
 
-**Two widths.** A block is either as wide as the text column (31rem) or as wide as the block width of the profile (see Profiles). Text, notes in the flow and warnings use the text column. Wells, tables and card grids use the block width, so their edges line up down the page. A drawing sits in the middle of its well at its real size. A drawing that is wider than the block keeps its size, and its well grows with it.
+**Two widths.** A block is either as wide as the text column (35rem) or as wide as the block width of the profile (see Profiles). Text, notes in the flow and warnings use the text column. Wells, tables and card grids use the block width, so their edges line up down the page. A drawing sits in the middle of its well at its real size. A drawing that is wider than the block keeps its size, and its well grows with it.
 
 **One left edge.** Every block starts at the same left edge, so the eye returns to one line down the page. On a wide screen the text column and its margin notes sit in the middle of the screen as a group, and a wide block grows to the right of them, up to the block width of the profile. On a narrower screen the page keeps 40px on each side, and 20px on a phone.
 
@@ -163,7 +163,7 @@ Docent uses system fonts only, because every document is one file with nothing t
 - **Brief**: a report for managers, such as a business analysis report, an incident report or release notes. The block is up to 1120px wide, for timeline tables.
 - **Deck**: slides to present a report's findings in a meeting, in a file of their own (see Slides). It reads as a stack of short sections, like any page.
 
-A page for the public or for older readers also has `data-text="large"`: the body is 18px, and every size grows with it.
+A page for the public or for older readers also has `data-text="large"`: every size grows by an eighth, so the body is about 20px.
 
 **Text column and margin column.** A margin column of 220px sits beside the text column. The margin holds the guide's remarks: a note, or the facts about the document. A margin label starts with one line above it and a short bold word. On narrow screens the margin label moves below its paragraph.
 
@@ -247,7 +247,7 @@ A page for the public or for older readers also has `data-text="large"`: the bod
 
 **Key findings.** A report finds its answer by place and type, not by a box: the opening paragraph ends with it, and the first section holds the key findings, a numbered list in the text column. Each item opens with one sentence in the text color at weight 600, on its own line, so the eye reads the findings down the page like headings; one or two sentences in weight 400 support it on the next line. The number is the list's own marker, in the muted color with tabular figures. 12px stand between two items, as between two pairs of a definition list, so each finding stands apart. There is no box, no line, no fill and no accent: a tinted box would tell the reader that the rest of the page matters less. Recommendations use the same list. On paper an item does not break across two pages. With the reader's high contrast mode, the weight and the line break carry the lead sentence; neither rests on color.
 
-**Quotes.** A quote is text, so its figure stands in the text column with no well, indented 24px like a list, with 24px above it. The words are set in the serif at 16px, weight 400, in the text color: the serif tells a person's voice apart from the author's text with no color, no line and no box, and it adds no type size. The kit draws curly quotation marks before the first paragraph and after the last, so every page has the same marks. The speaker stands 4px below, at 14px in the muted color, like a caption. A quote is not a pull quote: it has no large type and no ornament, and it never repeats a sentence of the page. On paper a quote does not break across two pages.
+**Quotes.** A quote is text, so its figure stands in the text column with no well, indented 24px like a list, with 24px above it. The words are set in the serif at body size (18px), weight 400, in the text color: the serif tells a person's voice apart from the author's text with no color, no line and no box, and it adds no type size. The kit draws curly quotation marks before the first paragraph and after the last, so every page has the same marks. The speaker stands 4px below, at 14px in the muted color, like a caption. A quote is not a pull quote: it has no large type and no ornament, and it never repeats a sentence of the page. On paper a quote does not break across two pages.
 
 **Small headings and definitions.** A small heading (h4) names a part inside a block heading's part: 16px, weight 600, with 24px above it and 4px below it. A definition list holds terms and their meanings, in the text column: each term in weight 600, its meaning on the next line, and 12px between two pairs. Use it for a glossary or for fields and what they mean; use a table when each term has more than one fact.
 

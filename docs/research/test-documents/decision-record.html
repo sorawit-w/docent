@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Decision record 14: a queue for reminder jobs — Example Planner</title>
 <style>
-/* docent:kit 0.36.0 */
+/* docent:kit 0.37.0 */
 /* Docent page styles. Tokens come from references/DESIGN.md. One file, no network. */
 :root {
   color-scheme: light;
@@ -25,7 +25,7 @@
   --sans: var(--host-sans, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif);
   --mono: var(--host-mono, ui-monospace, "SF Mono", "Cascadia Code", Consolas, Menlo, monospace);
   --ease: cubic-bezier(0.23, 1, 0.32, 1);
-  --measure: 31rem; --margin-col: 220px; --gap: 48px; --wide: 1120px;
+  --measure: 35rem; --margin-col: 220px; --gap: 48px; --wide: 1120px;
   /* The profile of a page sets these. Standard is the default: code and tables end at the right edge of the notes. */
   --block: calc(var(--measure) + var(--gap) + var(--margin-col)); --section-space: 72px; --cell-y: 12px; --step-space: 36px;
 }
@@ -59,7 +59,7 @@ html[data-text="large"] { font-size: 112.5%; }
 *, *::before, *::after { box-sizing: border-box; }
 html { scroll-padding-top: 88px; -webkit-text-size-adjust: 100%; }
 /* A word that cannot fit on a line by itself, such as a long web address, breaks inside, so no page scrolls sideways on a phone. Other words wrap as before. */
-body { margin: 0; background: var(--bg); color: var(--text); font: 400 1rem/1.65 var(--sans); caret-color: var(--primary); overflow-wrap: break-word; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 400 1.125rem/1.65 var(--sans); caret-color: var(--primary); overflow-wrap: break-word; }
 ::selection { background: color-mix(in srgb, var(--primary) 22%, transparent); }
 :focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
 a { color: var(--primary); text-decoration-thickness: 1px; text-underline-offset: 0.2em; }
@@ -112,7 +112,7 @@ section { padding-top: var(--section-space); }
 h2 { font-size: 1.875rem; line-height: 1.2; margin-bottom: 16px; }
 h3 { font: 600 1.125rem/1.35 var(--sans); margin: 0; text-wrap: balance; }
 /* A small heading inside a part of a section: body size, weight 600. */
-h4 { font: 600 1rem/1.5 var(--sans); margin: 24px 0 4px; }
+h4 { font: 600 1.125rem/1.5 var(--sans); margin: 24px 0 4px; }
 /* A definition list: each term in weight 600, its meaning below it. */
 dl { max-width: var(--measure); margin: 0 0 16px; }
 dt { font-weight: 600; }
@@ -222,7 +222,7 @@ figcaption strong { font-weight: 600; color: var(--text); margin-right: 8px; }
    size, which tells a person's voice from the author's text with no color, line or box. The kit draws the curly quotation marks, so every
    page has the same marks. The speaker stands 4px below, like a caption. */
 figure.quote { min-width: 0; width: auto; max-width: var(--measure); margin-top: 24px; padding-left: 24px; }
-figure.quote blockquote { margin: 0; font: 400 1rem/1.65 var(--serif); color: var(--text); }
+figure.quote blockquote { margin: 0; font: 400 1.125rem/1.65 var(--serif); color: var(--text); }
 figure.quote blockquote > :last-child { margin-bottom: 0; }
 figure.quote blockquote > :first-child::before { content: "\201C"; }
 figure.quote blockquote > :last-child::after { content: "\201D"; }
@@ -421,6 +421,8 @@ footer p { margin: 0; }
   html:root:not([data-never]) { color-scheme: light; --bg: #ffffff; --panel: #f2f3f9; --fig: #f2f3f9; --text: #1c1f2e; --muted: #575d75; --line: #d3d6e3; --primary: var(--host-accent, #2f3fd0); --ink: var(--host-ink, #1b2260); --dot: var(--host-accent, #2f3fd0); --ok: #1a7f37; --warn: #7d4e00; --err: #cf222e; --heat-1: #dee2f0; --heat-2: #babecb; --heat-3: #9498a5; --heat-4: #616571; --heat-5: #3e424d; --heat-text: #1c1f2e; --heat-page: #ffffff; --logo-light: block; --logo-dark: none; --tile-light: transparent; --tile-dark: #12141f; }
   /* Paper: 11pt text, the page margin as the edge, and the notes beside the text again. An A4 page holds the text (112mm), a gap and the notes (50mm). */
   html { font-size: 11pt; } html[data-text="large"] { font-size: 12pt; }
+  /* On paper the body and the two rules at body size stay at the root size (11pt, or 12pt for large text): 18px is for the screen. */
+  body, h4, figure.quote blockquote { font-size: 1rem; }
   html:root:not([data-never]) { --measure: 112mm; --gap: 8mm; --margin-col: 50mm; --block: 100%; }
   .shell { padding: 0; }
   .row { grid-template-columns: minmax(0, var(--measure)) var(--margin-col); }
@@ -1181,7 +1183,7 @@ footer p { margin: 0; }
   </div>
 </footer>
 <script>
-// docent:kit 0.36.0
+// docent:kit 0.37.0
 (() => {
   const root = document.documentElement;
   root.classList.add('js');
