@@ -112,7 +112,8 @@ function typeOf(type) {
     return { stop: true, id: "hand.built", error: [1, `it is a hand-drawn ${type}, which Docent draws from data; write its data in a block ${kind ? `with "kind": "${kind}"` : 'with no "kind" (a workflow diagram)'} and run render`] };
   }
   if (Object.hasOwn(PLANNED, look)) return { stop: true, id: "hand.planned", error: [1, `it is a hand-drawn ${type}; Docent plans a built-in kind for ${PLANNED[look]}, so until it is built, write its data as a table or in words`] };
-  if (Object.hasOwn(LEFT_OUT, look)) return { stop: true, id: `hand.left-out.${look}`, error: [1, `it is a hand-drawn ${type}, which Docent leaves out: ${LEFT_OUT[look]} ("Position and length" in DESIGN.md). Use that instead. If the user asks for it after you name this rule, it is the user's call, and check still reports it (see SKILL.md on a design rule the user asks to break)`] };
+  // A type left out is house style, which a repo file may turn off, so its drawing still goes through the whole contract (no stop).
+  if (Object.hasOwn(LEFT_OUT, look)) return { id: `hand.left-out.${look}`, error: [1, `it is a hand-drawn ${type}, which Docent leaves out: ${LEFT_OUT[look]} ("Position and length" in DESIGN.md). Use that instead. If the user asks for it after you name this rule, it is the user's call, and check still reports it (see SKILL.md on a design rule the user asks to break)`] };
   return { error: [1, `data-type="${type}" is not in the hand-drawn list; the types are ${TYPES.map((t) => `"${t}"`).join(", ")}, written as they are here`] };
 }
 
@@ -120,8 +121,8 @@ function typeOf(type) {
 function checkDrawing(source, { html = "" } = {}) {
   const svg = blank(source); // a comment is a note for the author: neither text nor tags
   const found = new Map(); // one message for each rule and reason, with the first element that breaks it and a count of the others
-  const fail = (rule, why) => { const key = `${rule}|${why.slice(why.indexOf(";") + 1)}`, had = found.get(key); if (had) had[2] += 1; else found.set(key, [rule, why, 1]); };
-  const errors = () => [...found.values()].map(([rule, why, n]) => say(RULE_ID[rule], `${RULE[rule]}: ${why}${n > 1 ? ` (and ${n - 1} more like it)` : ""}`));
+  const fail = (rule, why, id = RULE_ID[rule]) => { const key = `${rule}|${why.slice(why.indexOf(";") + 1)}`, had = found.get(key); if (had) had[2] += 1; else found.set(key, [rule, why, 1, id]); };
+  const errors = () => [...found.values()].map(([rule, why, n, id]) => say(id, `${RULE[rule]}: ${why}${n > 1 ? ` (and ${n - 1} more like it)` : ""}`));
   const stack = [], ids = [], children = [];
   let root = null, at = 0, type = null;
   for (const m of svg.matchAll(TAG)) {
@@ -168,7 +169,7 @@ function checkDrawing(source, { html = "" } = {}) {
   // Rule 1: the type.
   const kind = typeOf(type);
   if (kind.stop) return { type, errors: [say(kind.id, `${RULE[kind.error[0]]}: ${kind.error[1]}`)] };
-  if (kind.error) fail(...kind.error);
+  if (kind.error) fail(...kind.error, kind.id);
 
   // Rule 4: real size, on screen and on paper.
   const box = (root.viewBox || "").trim().split(/[\s,]+/).map(Number);
@@ -234,7 +235,7 @@ function checkFigures(wells, { html = "" } = {}) {
       const name = label || `figure ${n + 1}`;
       const result = checkDrawing(s.text, { html });
       result.errors.forEach((e) => errors.push(relabel(e, `${name}, hand-drawn: `)));
-      if (!result.errors.some((e) => split(e).text.startsWith(RULE[1]))) warnings.push(say("hand.look", `${name} is hand-drawn (${result.type}); check cannot see its layout, so open the page in a browser in light and in dark, at 375px and in print preview, and look at it. Tell the user this figure is hand-drawn`));
+      if (!result.errors.some((e) => ["hand.marker", "hand.built", "hand.planned"].includes(split(e).id))) warnings.push(say("hand.look", `${name} is hand-drawn (${result.type}); check cannot see its layout, so open the page in a browser in light and in dark, at 375px and in print preview, and look at it. Tell the user this figure is hand-drawn`));
     }
     if (hand) { const why = wordsProblem(inner); if (why) errors.push(say("hand.words", `${label || `figure ${n + 1}`}, hand-drawn: ${RULE[9]}: ${why}`)); }
   });

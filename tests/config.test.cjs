@@ -173,3 +173,16 @@ test("check reports a rule that the file turns off as one note for each page, wi
   assert.match(out, /check docs\/a\.html: 0 errors, 2 warnings, 2 notes/);
   assert.match(run("check.cjs", ["--no-config", "docs/a.html"], root).out, /error \[flat\.gradient\][\s\S]*warning \[cards\.count\]/, "without the file, the rules hold");
 });
+
+test("a chart type that the file lets through still keeps the whole contract of a hand-drawn figure", () => {
+  const { checkDocument } = require("../skills/docent/scripts/check.cjs");
+  const figure = fs.readFileSync(path.join(__dirname, "fixtures", "hand-fishbone.html"), "utf8").replace('data-type="fishbone"', 'data-type="pie"');
+  const page = (f) => specimen.replace('<section id="report"', `${f}<section id="report"`);
+  const config = { label: ".docent/config.json", lines: {}, data: { version: 1, rules: { "hand.left-out.pie": OFF("The board asks for the budget split as a pie each quarter.") } } };
+  const good = checkDocument(page(figure), { config });
+  assert.deepEqual(good.errors, [], "with the rule off, a pie that keeps the contract passes");
+  assert.match(good.notes.join("\n"), /\[hand\.left-out\.pie\] off in \.docent\/config\.json/);
+  assert.ok(good.warnings.some((w) => /^\[hand\.look\]/.test(w)), "and check still asks for a look in a browser");
+  const bad = checkDocument(page(figure.replace(' role="img"', "").replace('<rect class="hd-box"', '<rect class="hd-box" fill="#cf222e"')), { config });
+  assert.deepEqual(bad.errors.map((e) => e.match(/^\[([\w.-]+)\]/)[1]).sort(), ["hand.classes", "hand.name"], "the guarantees of the contract still hold");
+});
