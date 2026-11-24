@@ -290,6 +290,42 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     await context.close();
   }
 
+  // Paper: one slide to a landscape page, the frame scaled to the sheet, the number at the lower right, and a figure's words on the page
+  // after its slide. A4 and Letter, each with the page margin of 18mm. The browser makes the PDF, so beforeprint runs as in print.
+  for (const [format, w, h] of [["A4", 297, 210], ["Letter", 279.4, 215.9]]) {
+    const { page, context } = await open({ width: Math.round(((w - 36) / 25.4) * 96), height: Math.round(((h - 36) / 25.4) * 96) });
+    const pdf = (await page.pdf({ format, preferCSSPageSize: true })).toString("latin1");
+    const pages = (pdf.match(/\/Type\s*\/Page[^s]/g) || []).length, box = (pdf.match(/\/MediaBox\s*\[([^\]]*)\]/) || [, ""])[1].trim().split(/\s+/).map(Number);
+    ok(`${format}: 10 landscape pages, one for each of the 9 slides and one for the words of slide 3`, pages === 10 && box[2] > box[3], { pages, box });
+    await page.emulateMedia({ media: "print" });
+    await page.evaluate(() => dispatchEvent(new Event("beforeprint")));
+    const paper = await page.evaluate(() => {
+      const width = document.querySelector("main").clientWidth;
+      return {
+        width,
+        slides: [...document.querySelectorAll(".slide")].map((sl) => { const r = sl.getBoundingClientRect(), kids = [...sl.children].filter((k) => getComputedStyle(k).display !== "none"); return { w: Math.round(r.width), h: Math.round(r.height), n: getComputedStyle(sl, "::after").content, over: Math.round(Math.max(...kids.map((k) => k.getBoundingClientRect().bottom)) - (r.bottom - (64 * r.width) / 1280)), heading: parseFloat(getComputedStyle(sl.querySelector("h1, h2")).fontSize) }; }),
+        words: [...document.querySelectorAll(".slide-words")].map((x) => [x.previousElementSibling.id, x.querySelector("h2").textContent, x.querySelectorAll(".dg-words").length, getComputedStyle(x).breakBefore]),
+        hidden: [".topbar", ".deck-nav", ".present", "footer"].map((q) => document.querySelector(q) && document.querySelector(q).getClientRects().length),
+      };
+    });
+    const wrong = paper.slides.filter((x, i) => Math.abs(x.w - paper.width) > 1 || Math.abs(x.h - (paper.width * 720) / 1280) > 1 || x.n !== `"${i + 1} / 9"` || x.over > 1 || Math.abs(x.heading - (52 * paper.width) / 1280) > 0.5);
+    ok(`${format}: each slide is the frame scaled to the sheet (${paper.width}px wide), its content inside, its number "n / 9" at the lower right`, wrong.length === 0, wrong);
+    ok(`${format}: slide 3's words print on the page after it, under "Slide 3 in words"`, JSON.stringify(paper.words) === JSON.stringify([["s3", "Slide 3 in words", 1, "page"]]), paper.words);
+    ok(`${format}: the top bar, the footer, the Present button and the slide buttons do not print`, paper.hidden.every((n) => !n), paper.hidden);
+    await page.evaluate(() => dispatchEvent(new Event("afterprint")));
+    const back = await page.evaluate(() => ({ printing: document.documentElement.classList.contains("printing"), words: document.querySelectorAll(".slide .fig .dg-words").length, pages: document.querySelectorAll(".slide-words").length }));
+    ok(`${format}: after printing, the words are back under their drawing`, !back.printing && back.words === 1 && back.pages === 0, back);
+    await context.close();
+  }
+  // With scripts off, the deck prints as the stack: portrait pages, no slide form.
+  {
+    const { page, context } = await open({ js: false });
+    const pdf = (await page.pdf({ format: "A4", preferCSSPageSize: true })).toString("latin1");
+    const box = (pdf.match(/\/MediaBox\s*\[([^\]]*)\]/) || [, ""])[1].trim().split(/\s+/).map(Number);
+    ok("scripts off: the deck prints as the stack, on the reader's own page", box[2] < box[3], box);
+    await context.close();
+  }
+
   // Inline code takes the slide's text size; a page saved while presenting reopens as the full stack; printing while presenting prints
   // every slide.
   {
