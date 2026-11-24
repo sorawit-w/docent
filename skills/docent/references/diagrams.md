@@ -1184,6 +1184,7 @@ Every other type is refused, with a message that says what to do:
 - **A type that Docent draws from data,** such as `bar`, `line`, `flowchart`, `sequence`, `swimlane` or `funnel`: write its data in a block with the kind that the message names, and run `render`.
 - **A type that Docent plans as a kind:** `scatter`, `timeline`, `gantt`, `roadmap`, `tree`, `org-chart` and `schema`. Until the kind is built, write the data as a table or in words.
 - **A type that Docent leaves out:** `pie`, `donut`, `radar`, `polar`, `pyramid`, `treemap`, `bubble`, `sankey` and `ridgeline`. These show an amount by an angle or an area, or claim more than the data says (see "Position and length" in `DESIGN.md`). Use a bar chart, small multiples or a table. If the user asks for one after you name the rule, it is their call, and `check` still reports it.
+  When the user wants one as a separate picture, outside the document, see "When another skill fits better" in `SKILL.md`.
 - **Any other name** is not in the list.
 
 ### The contract
