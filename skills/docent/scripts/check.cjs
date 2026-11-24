@@ -615,7 +615,9 @@ function checkDocument(html, options = {}) {
     const pageLogos = logo.logos.length ? Object.fromEntries(logo.logos.map((l) => [l.forTheme || "both", l.raster ? (l.text.match(/\bsrc\s*=\s*["']([^"']*)/i) || [])[1] : logoShapes(l.text)])) : null;
     if (JSON.stringify(pageLogos && Object.entries(pageLogos).sort()) !== JSON.stringify(fileLogos && Object.entries(fileLogos).sort())) differs.push(!pageLogos ? "the logo (the page has none)" : !fileLogos ? "the logo (the file names none)" : "the logo");
     const tagline = (((footer || "").match(/<p\b[^>]*\bclass="(?:[^"]*\s)?tagline(?:\s[^"]*)?"[^>]*>([\s\S]*?)<\/p>/i) || [])[1]);
-    if ((tagline == null ? null : plain(tagline)) !== (file.tagline ?? null)) differs.push(`the tagline (the page has ${q(tagline == null ? null : plain(tagline))}, the file ${q(file.tagline ?? null)})`);
+    // The text a reader sees: a character written as a reference, such as &#46; or &nbsp;, is the character itself.
+    const seen = tagline == null ? null : plain(tagline.replace(/&#(\d+);/g, (m, n) => String.fromCodePoint(Number(n))).replace(/&#x([0-9a-f]+);/gi, (m, n) => String.fromCodePoint(parseInt(n, 16))).replace(/&nbsp;/g, " "));
+    if (seen !== (file.tagline == null ? null : plain(file.tagline))) differs.push(`the tagline (the page has ${q(seen)}, the file ${q(file.tagline ?? null)})`);
     const credit = ((footer || "").match(/<p\b[^>]*\bclass="(?:[^"]*\s)?credit(?:\s[^"]*)?"[^>]*>([\s\S]*?)<\/p>/i) || [])[1];
     const pageCredit = credit == null || !/Made with Docent/.test(plain(credit)) ? "none" : /<a\b/i.test(credit) ? "link" : "text";
     if (pageCredit !== (file.credit ?? "link")) differs.push(`the credit (the page has ${q(pageCredit)}, the file ${q(file.credit ?? "link")})`);

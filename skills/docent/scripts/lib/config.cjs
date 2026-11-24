@@ -125,7 +125,7 @@ function logoShapes(svg) {
     const list = [...attrs.matchAll(/([^\s"'=]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'))?/g)].filter(([, a]) => !(root && name.toLowerCase() === "svg" && PAGE_ONLY.test(a))).map(([, a, d, q]) => { const v = d ?? q ?? ""; return `${a}="${a === "id" ? ids.get(v) || v : local(v)}"`; }).sort();
     root = false;
     return `<${name}${list.length ? ` ${list.join(" ")}` : ""}${self ? "/" : ""}>`;
-  }).replace(/>\s+</g, "><").replace(/>\s+/g, ">").replace(/\s+</g, "<");
+  }).replace(/>\s+</g, "><").replace(/>\s+/g, ">").replace(/\s+</g, "<").replace(/<([A-Za-z][\w:.-]*)([^>]*?)><\/\1>/g, "<$1$2/>"); // an empty element, closed or self-closed
 }
 
 /** The logos that a good repo file names, as a page carries them: { both | light | dark: shapes of an SVG, or a data URI }. */
