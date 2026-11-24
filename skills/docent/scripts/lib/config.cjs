@@ -117,7 +117,8 @@ function logoShapes(svg) {
   // A file may start with an XML declaration, a comment or a doctype: none of them is drawn.
   const text = svg.replace(/<!--[\s\S]*?-->/g, "").replace(/^(?:\s|<\?xml[\s\S]*?\?>|<!DOCTYPE[^>]*>)+/i, "").trim();
   const ids = new Map();
-  for (const [, id] of text.matchAll(/\sid\s*=\s*["']([^"']+)["']/g)) if (!ids.has(id)) ids.set(id, `id${ids.size + 1}`);
+  const inside = text.replace(/^<svg\b[^>]*>/i, ""); // an id on the <svg> itself belongs to the page, and is left out
+  for (const [, id] of inside.matchAll(/\sid\s*=\s*["']([^"']+)["']/g)) if (!ids.has(id)) ids.set(id, `id${ids.size + 1}`);
   const local = (value) => value.replace(/url\(\s*#([^)\s]+)\s*\)/g, (m, id) => (ids.has(id) ? `url(#${ids.get(id)})` : m)).replace(/^#(.+)$/, (m, id) => (ids.has(id) ? `#${ids.get(id)}` : m));
   let root = true;
   return text.replace(/<(\/?)([A-Za-z][\w:.-]*)((?:\s+[^\s"'>/=]+(?:\s*=\s*(?:"[^"]*"|'[^']*'))?)*)\s*(\/?)>/g, (all, close, name, attrs, self) => {
