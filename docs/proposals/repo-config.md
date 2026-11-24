@@ -51,7 +51,7 @@ The file changes one confirmed decision: white-label decision 5 said that the ne
 | 1 | An ID for each rule in `check`, a list of the IDs in `scripts/lib/rules.cjs`, and `check --rules` to print them | Medium |
 | 2 | The repo file: find it, read it, and refuse a bad one; `brand` reads the `DESIGN.md` that the file names, and applies the file's host-token values | Small |
 | 3 | Rule changes: `check` turns a listed house-style rule into a note, and refuses a guarantee | Small |
-| 4 | The brand from the file: the interview writes the file; `stamp` writes the host tokens; `render` uses the file's palette | Medium |
+| 4 | The brand from the file: the interview writes the file; `stamp` writes the host tokens; the agent writes the file's palette into each new page | Medium |
 | 5 | `check` notes a page whose brand differs from the file | Small |
 
 The user's own case, a heading color and a page background, needs PRs 2 and 4 only. PRs 1, 3 and 5 serve the rule changes. A palette from the host's own hue is not in these five; section 2 gives its cost.
@@ -337,11 +337,11 @@ Two flags, for tests and for special cases: `--config <path>` reads that file, a
 | Script | Reads | What it does with it |
 |---|---|---|
 | `brand` | `design`, `tokens` | With no argument, it finds the repo file, reads the `DESIGN.md` that it names, and puts the file's `tokens` over the result. It prints the tokens as it does today, and names each one that came from the file. A path given as an argument still wins. |
-| `render` | `palette` | When the page names no palette, each drawing takes the file's palette as its fallback colors. |
+| `render` | Nothing | It keeps reading the page's own `data-palette`, as today. `stamp` and `check` read the same attribute, so the drawings, the kit and the check always agree. The file's palette reaches a page only when the agent writes `data-palette` into a new page (below), so an existing page never gets drawings in one palette and a kit in another. |
 | `stamp` | `design`, `tokens` | It runs `brand` as above, and writes the host tokens between `docent:host` markers in the `<head>`, as it writes the kit. A page with `data-brand="off"` gets no host block. |
 | `check` | Everything | It refuses a bad file (section 5), tests each value in `tokens` as a host color, turns each house-style rule in `rules` into a note, and notes a page whose brand differs from the file (section 8). |
 
-The agent reads the file too, when it creates a page: it writes the logo, the tagline, the credit, the palette and the profile from the file into the new page, in the places the template has for them. It finds the host's name as today.
+The agent reads the file too, when it creates a page: it writes the logo, the tagline, the credit, the palette and the profile from the file into the new page, in the places the template has for them, with the palette as `data-palette` on `<html>`. It finds the host's name as today.
 
 ---
 
@@ -382,7 +382,7 @@ It changes no rule, and no page that passes today fails after it.
 1. **Rule IDs** (PR 1, medium): section 9.
 2. **The repo file** (PR 2, small): the search of section 7, the two flags, reading and refusing the file (section 5, without `rules`), `brand` with no argument, the file's `tokens` over `DESIGN.md`, each tested as a host color, and the closest tested palette printed beside an unused page color. Tests: a heading color in the file that wins over `DESIGN.md`, one that fails 4.5:1, a file in the page's folder, a file two folders up, a file outside the repo that is not used, invalid JSON, a missing `version`, a path outside the repo, and `--no-config`.
 3. **Rule changes** (PR 3, small): the note level in `check`, a guarantee refused, a missing reason refused, an unknown ID refused, and one note for each rule on each page. `DESIGN.md` and `SKILL.md`: the two groups and the note.
-4. **The brand from the file** (PR 4, medium): the interview's last question and the file it writes; `stamp`'s `docent:host` block in `:where(:root)`; `render`'s palette from the file; `data-brand="off"`. `SKILL.md`: "Ask about the brand once" changes from "copy the newest page" to "read the repo file; without one, copy the newest page", and gets the message about a page color (section 2). One branded sample page built from a sample repo file, in the "Report a bug" topic.
+4. **The brand from the file** (PR 4, medium): the interview's last question and the file it writes; `stamp`'s `docent:host` block in `:where(:root)`; the file's palette written as `data-palette` into a new page, while `render`, `stamp` and `check` keep reading the page's attribute; `data-brand="off"`. `SKILL.md`: "Ask about the brand once" changes from "copy the newest page" to "read the repo file; without one, copy the newest page", and gets the message about a page color (section 2). One branded sample page built from a sample repo file, in the "Report a bug" topic.
 5. **Differences from the file** (PR 5, small): the `brand.differs` note for the palette, the logo, the tagline, the credit and the profile.
 
 **Out of scope:**
