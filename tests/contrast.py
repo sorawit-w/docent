@@ -132,6 +132,25 @@ for n, t, accent in present:
         rows.append((f"{n} present: {st} dot on page", L[st], t["page"], 3.0))
 
 fails = 0
+# The scripts test a palette in Node (skills/docent/scripts/lib/pairs.cjs), so a palette that is not in palettes.json can be tested when a
+# page is built. Its pairs must be these: the same labels, colors and minimums for each palette, and the same distances.
+import subprocess
+here = os.path.dirname(os.path.abspath(__file__))
+node = subprocess.run(["node", "-e", "const {palettePairs}=require(process.argv[1]); const P=require(process.argv[2]); console.log(JSON.stringify(Object.values(P).map(palettePairs)))",
+                       os.path.join(here, "..", "skills", "docent", "scripts", "lib", "pairs.cjs"), os.path.join(here, "..", "skills", "docent", "assets", "palettes.json")],
+                      capture_output=True, text=True, check=True)
+names = tuple(pal["name"].lower() + " " for pal in PALETTES.values())
+mine_rows = [(l, fg, bg, float(need)) for l, fg, bg, need in rows if l.startswith(names)]
+mine_gaps = [(l, round(v, 1), float(need)) for l, v, need in gaps if l.startswith(names)]
+theirs = json.loads(node.stdout)
+node_rows = [(r[0], r[1], r[2], float(r[3])) for p in theirs for r in p["rows"]]
+node_gaps = [(g[0], round(g[1], 1), float(g[2])) for p in theirs for g in p["gaps"]]
+agree = sorted(mine_rows) == sorted(node_rows) and sorted(mine_gaps) == sorted(node_gaps)
+fails += not agree
+print(f"{'node pairs agree with contrast.py':44} {len(node_rows)} pairs, {len(node_gaps)} distances  {'ok' if agree else 'FAIL'}")
+if not agree:
+    for row in sorted(set(mine_rows) ^ set(node_rows)) + sorted(set(mine_gaps) ^ set(node_gaps)):
+        print("  differs:", row)
 for label, value, need in gaps:
     good = value >= need
     fails += not good
