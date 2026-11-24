@@ -59,9 +59,11 @@
   const enter = () => {
     if (on) return;
     on = true;
-    // Start at the slide the reader is at: the first one whose heading shows below the top bar. Measured in the stack, before the frame.
-    const line = document.querySelector('.topbar')?.getBoundingClientRect().bottom || 0;
-    const start = Math.max(0, slides.findIndex((slide) => (slide.firstElementChild || slide).getBoundingClientRect().bottom > line));
+    // Start at the slide the reader is at: the first one that still shows at least 40px below the top bar, so a slide whose heading has
+    // scrolled away but whose body shows counts, and the space above the next slide's heading does not. Measured in the stack.
+    const line = (document.querySelector('.topbar')?.getBoundingClientRect().bottom || 0) + 40;
+    const found = slides.findIndex((slide) => slide.getBoundingClientRect().bottom > line);
+    const start = found < 0 ? slides.length - 1 : found;
     // Each slide is a group named as a slide, "4 of 12", the pattern of a carousel; the slides that do not show are hidden.
     slides.forEach((slide, i) => {
       labels.set(slide, slide.getAttribute('aria-labelledby'));
@@ -93,6 +95,16 @@
     slides[at].scrollIntoView({ block: 'start' });
     present.focus({ preventScroll: true });
   };
+  // A link to a slide, or to a place on it, shows that slide in present mode, as it scrolls to it in the stack.
+  const slideOf = (hash) => { const el = hash.length > 1 && document.getElementById(decodeURIComponent(hash.slice(1))); return el ? slides.indexOf(el.closest('main > section.slide')) : -1; };
+  document.addEventListener('click', (event) => {
+    const link = on && event.target instanceof Element && event.target.closest('a[href^="#"]');
+    const n = link ? slideOf(link.getAttribute('href')) : -1;
+    if (n < 0) return;
+    event.preventDefault();
+    show(n);
+  });
+  addEventListener('hashchange', () => { const n = on ? slideOf(location.hash) : -1; if (n >= 0 && n !== at) show(n); });
   present.addEventListener('click', enter);
   prev.addEventListener('click', () => show(at - 1));
   next.addEventListener('click', () => show(at + 1));

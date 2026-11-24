@@ -220,6 +220,30 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     await context.close();
   }
 
+  // Present starts at the slide the reader is at: one whose heading has scrolled away but whose body shows, or the last one at the end.
+  // A link to another slide shows that slide in present mode.
+  {
+    const content = build(source.replace("<p>A report form that asks for the steps gets them in most reports.</p>", '<p>See <a href="#s9">the questions</a> at the end.</p>'));
+    const { page, context } = await open({ width: 1280, height: 900, content });
+    await page.evaluate(() => { const fig = document.querySelector("#s3 figure"); scrollTo(0, fig.getBoundingClientRect().top + scrollY - 120); });
+    await page.evaluate(() => document.querySelector(".present").click());
+    let s = await state(page);
+    ok("Present starts at the slide whose body shows, though its heading has scrolled away", s.id === "s3", s);
+    await page.keyboard.press("Escape");
+    await page.setViewportSize({ width: 1280, height: 240 }); // a short window: at the end only the footer shows under the top bar
+    await page.evaluate(() => scrollTo(0, document.documentElement.scrollHeight));
+    await page.evaluate(() => document.querySelector(".present").click());
+    s = await state(page);
+    ok("Present starts at the last slide when the reader is past it, at the footer", s.id === "s9", s);
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.keyboard.press("Home");
+    await page.evaluate(() => { const n = [...document.querySelectorAll(".slide")].findIndex((x) => x.querySelector('a[href="#s9"]')); for (let i = 0; i < n; i++) document.querySelector(".deck-next").click(); });
+    await page.click('.slide.is-current a[href="#s9"]');
+    s = await state(page);
+    ok("a link to another slide shows that slide, with the address and the focus on it", s.id === "s9" && s.hash === "#s9" && s.focus && s.shown === 1, s);
+    await context.close();
+  }
+
   // Inline code takes the slide's text size; a page saved while presenting reopens as the full stack; printing while presenting prints
   // every slide.
   {
