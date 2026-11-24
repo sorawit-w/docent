@@ -9,6 +9,11 @@ html[data-profile="deck"] main { counter-reset: slide; }
 /* With scripts on, the deck script writes the number as text (is-numbered), so that a screen reader reads it. It looks the same as the counted number. */
 .slide-n { font-weight: 400; color: var(--muted); font-variant-numeric: tabular-nums; }
 .slide.title .standfirst, .slide.title .facts { margin-top: 24px; }
+/* Speaker notes: a closed section at the end of a slide, in the reading form, with scripts on or off. They never show on the shared
+   screen or on paper, also when the section is open; the kit's script does not open them for printing. */
+.slide > details.notes { margin-top: 24px; }
+html.presenting .slide > details.notes { display: none; }
+@media print { .slide > details.notes { display: none !important; } }
 /* The Present button: a control like the theme switch. The deck script adds it, so with scripts off there is none. */
 .present { display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px; border: 1px solid var(--line); border-radius: 6px; background: none; color: var(--text); font: 400 0.875rem/1 var(--sans); cursor: pointer; }
 .present:hover { border-color: var(--muted); }

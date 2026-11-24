@@ -216,7 +216,17 @@ function checkDeck(html) {
     if (!id) errors.push(`${name} has no id; give each slide an id, such as id="s${n}", so a link and the address can open it`);
     else if (ids.has(id)) errors.push(`${name} has the id "${id}", as slide ${ids.get(id)} has; each slide has its own id`);
     else ids.set(id, n);
-    const parts = elements(slide.inner).filter((el) => !(el.tag === "details" && hasClass(el.attrs, "notes")));
+    // Speaker notes (decks.md, section 8): at most one closed section per slide, as its last child, holding text only.
+    const all = elements(slide.inner), isNotes = (el) => el.tag === "details" && hasClass(el.attrs, "notes");
+    const notes = all.filter(isNotes), nested = (slide.inner.match(/<details\b[^>]*\bclass="(?:[^"]*\s)?notes(?:\s[^"]*)?"/gi) || []).length - notes.length;
+    if (notes.length > 1) errors.push(`${name} has ${notes.length} sections of speaker notes; a slide has at most one, at its end`);
+    else if (notes.length && all[all.length - 1] !== notes[0]) errors.push(`${name}: the speaker notes are not the slide's last part; put <details class="notes"> at the end of the slide`);
+    if (nested > 0) errors.push(`${name} has speaker notes inside another part; the notes are a <details class="notes"> directly inside the slide, at its end`);
+    for (const note of notes) {
+      const odd = elements(note.inner).filter((el) => el.tag !== "summary" && (!["p", "ul", "ol"].includes(el.tag) || /<(?:figure|table|pre|svg|img|details|div|input|form)\b/i.test(el.inner))); // the summary holds its arrow
+      if (odd.length) errors.push(`${name}: the speaker notes hold ${describe(odd[0])}; notes hold text only, in paragraphs and lists, with no figure, table, widget or code block`);
+    }
+    const parts = all.filter((el) => !isNotes(el));
     const headings = parts.filter((el) => /^h[1-6]$/.test(el.tag)), want = title ? "h1" : "h2";
     const heading = parts[0] && /^h[1-6]$/.test(parts[0].tag) ? parts[0] : null;
     if (!heading) errors.push(`${name} does not start with its heading; a slide starts with one <${want}> that says its point`);
