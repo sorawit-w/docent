@@ -182,6 +182,13 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     await page.keyboard.press("ArrowRight");
     const fig = await page.evaluate(() => { const sl = document.querySelector(".slide.is-current"), v = sl.querySelector("svg[data-drawn]"), k = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--deck-scale")); return { scale: Math.round((v.getBoundingClientRect().width / k / 640) * 1000) / 1000, bottom: Math.round((sl.querySelector("figure").getBoundingClientRect().bottom - sl.getBoundingClientRect().top) / k), words: getComputedStyle(sl.querySelector(".dg-words")).display }; });
     ok("a hand-drawn figure on a slide stands at 1.25 to 1.5 times, inside the frame, with no words", fig.scale >= 1.25 && fig.scale <= 1.5 && fig.bottom <= 656 && fig.words === "none", fig);
+    // Printed while presenting, the drawing keeps its frame size and scales with the sheet: it stays inside the printed slide.
+    await page.emulateMedia({ media: "print" });
+    await page.evaluate(() => dispatchEvent(new Event("beforeprint")));
+    const paper = await page.evaluate(() => { const sl = document.querySelector("#s3"), r = sl.getBoundingClientRect(), u = r.width / 1280; return { scale: Math.round((sl.querySelector("svg[data-drawn]").getBoundingClientRect().width / u / 640) * 1000) / 1000, bottom: Math.round((sl.querySelector("figure").getBoundingClientRect().bottom - r.top) / u) }; });
+    ok("printed while presenting, the hand-drawn figure keeps its frame scale and stays inside the slide", Math.abs(paper.scale - fig.scale) < 0.01 && paper.bottom <= 656, { paper, present: fig });
+    await page.evaluate(() => dispatchEvent(new Event("afterprint")));
+    await page.emulateMedia({ media: "screen" });
     await page.keyboard.press("Escape");
     const real = await page.evaluate(() => Math.round(document.querySelector("svg[data-drawn]").getBoundingClientRect().width));
     ok("back in the stack, the hand-drawn figure has its real size", real === 640, real);

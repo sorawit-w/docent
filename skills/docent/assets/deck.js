@@ -43,25 +43,23 @@
   const labels = new Map();
   const fit = () => root.style.setProperty('--deck-scale', String(Math.min(innerWidth / 1280, innerHeight / 720)));
   // A drawing on a slide stands at 1.5 times, or less when the room under the heading and above the caption needs it. render writes the
-  // size of a drawing it made (--fw and --fh); for a hand-drawn figure or a picture the real room is measured here, on the frame.
+  // size of a drawing it made on the frame (--fw and --fh, in frame pixels). For a hand-drawn figure or a picture the script writes it:
+  // 1.25 times at first, the scale check guarantees, and in present mode the real room is measured for more. The same frame size serves
+  // present mode and paper, because both lay the slide out on the same frame.
   const drawings = (slide) => [...slide.querySelectorAll('.fig > svg[data-drawn="hand"], .fig > img')];
-  const scale = (slide) => drawings(slide).forEach((art) => {
+  const size = (art, s) => { art.style.setProperty('--fw', String(Number(art.getAttribute('width')) * s)); art.style.setProperty('--fh', String(Number(art.getAttribute('height')) * s)); };
+  const sized = (art) => Number(art.getAttribute('width')) > 0 && Number(art.getAttribute('height')) > 0;
+  const scale = (slide) => drawings(slide).filter(sized).forEach((art) => {
     const w = Number(art.getAttribute('width')), h = Number(art.getAttribute('height')), fig = art.closest('.fig'), figure = fig.closest('figure') || fig;
-    if (!(w > 0 && h > 0)) return;
-    art.style.width = `${w}px`;
-    art.style.height = `${h}px`;
+    size(art, 1);
     const below = figure.offsetTop + figure.offsetHeight - (fig.offsetTop + fig.offsetHeight); // the caption under the well
     const room = { w: slide.clientWidth - 128 - 8, h: slide.clientHeight - 64 - fig.offsetTop - below - 8 };
-    const s = Math.min(1.5, room.w / w, room.h / h);
-    art.style.width = `${w * s}px`;
-    art.style.height = `${h * s}px`;
+    size(art, Math.min(1.5, room.w / w, room.h / h));
   });
-  const unscale = () => slides.forEach((slide) => drawings(slide).forEach((art) => { art.style.width = ''; art.style.height = ''; }));
-  unscale(); // a page saved in present mode keeps the sizes of the last visit
-  // A hand-drawn figure or a picture fits its slide at 1.25 times, as check tests. That is its size on paper; present mode measures for more.
   slides.forEach((slide) => drawings(slide).forEach((art) => {
-    const w = Number(art.getAttribute('width')), h = Number(art.getAttribute('height'));
-    if (w > 0 && h > 0) { art.style.setProperty('--fw', String(w * 1.25)); art.style.setProperty('--fh', String(h * 1.25)); }
+    art.style.removeProperty('width'); // a page saved by an earlier kit may hold a size in pixels
+    art.style.removeProperty('height');
+    if (sized(art)) size(art, 1.25);
   }));
   const show = (n) => {
     at = Math.max(0, Math.min(slides.length - 1, n));
@@ -107,7 +105,6 @@
     full = false;
     root.classList.remove('presenting');
     root.style.removeProperty('--deck-scale');
-    unscale();
     slides.forEach((slide) => {
       slide.hidden = false;
       slide.classList.remove('is-current');
