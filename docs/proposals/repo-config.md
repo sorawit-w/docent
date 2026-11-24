@@ -1,6 +1,6 @@
 # Proposal: a repo file for Docent — the brand and the author's rule changes, kept once for every page
 
-Status: **proposed on 2026-11-25, with each open question decided** (see "Decisions" at the end). No code is written yet. **Three points wait for the user:** the open question at the top of "Decisions", the reversal of white-label decision 5, and the list of rules that the file may change. A talk on 2026-11-25 set the direction: a file in the host repo holds a pointer to the host's `DESIGN.md` and the author's changes to Docent's rules, each with a reason, and no copy of the tokens that come from `DESIGN.md`. Later that day the user named the real need: **a page background color and a heading color that differ from the host's `DESIGN.md`.** The proposal is built around that case (section 2).
+Status: **proposed on 2026-11-25, with each open question decided** (see "Decisions" at the end). No code is written yet. **Four points wait for the user:** the open question at the top of "Decisions", the reversal of white-label decision 5, the list of rules that the file may change, and what the agent does when an author insists on an exact page color. A talk on 2026-11-25 set the direction: a file in the host repo holds a pointer to the host's `DESIGN.md` and the author's changes to Docent's rules, each with a reason, and no copy of the tokens that come from `DESIGN.md`. Later that day the user named the real need: **a page background color and a heading color that differ from the host's `DESIGN.md`.** The proposal is built around that case (section 2).
 
 ## The answer first
 
@@ -10,7 +10,7 @@ A host repo may hold one file, `.docent/config.json`. It holds three kinds of th
 - **Host-token values that win over `DESIGN.md`,** each with a reason. The user's case is the heading color: `--host-ink` in the file wins over the heading color that `brand.cjs` works out from `DESIGN.md`. `check` tests it at 4.5:1, as it tests every host color today.
 - **The author's changes to Docent's house style,** each with a reason. An example is "allow 10 cards in a card grid, because our weekly review shows 10 service numbers side by side".
 
-**The page background is set by a palette, not by a color.** The file can name Harbor, Plum or Sepia. It cannot set `--bg`, because a page color alone breaks dark mode, print and the tested contrast (section 2). A palette built from the host's own hue is a later item of its own.
+**The page background is set by a palette, not by a color.** The file can name Harbor, Plum or Sepia. It cannot set `--bg`, because a page color alone breaks dark mode, print and the tested contrast (section 2). A palette built from the host's own hue is a later item of its own. When a page color comes up, the agent gives one plain reason and offers the closest tested palette as a choice, picked by a script (section 2).
 
 Every page stays one file that works alone. The scripts read the repo file when they run and write what it says into the page. The page never reads the repo file.
 
@@ -61,6 +61,10 @@ The user's own case, a heading color and a page background, needs PRs 2 and 4 on
 **A generated `tokens.json` that copies the host's `DESIGN.md`.** It looks tidy: one file with every value, ready to read. But a copy goes out of date as soon as someone changes `DESIGN.md`, and nothing tells the reader of the copy. `brand.cjs` already works out the same six tokens from `DESIGN.md` every time, with fixed rules, so the same file always gives the same tokens. A copy saves no work. And the name `tokens.json` reads as a design-tokens file, a kind of file that other tools read and write, while this file also holds rule changes. So the file stores the path to `DESIGN.md`, and the scripts run `brand` again each time.
 
 **Let the file set the page color, `--bg`.** It is the shortest answer to "a background that differs from `DESIGN.md`". White-label section 4 ("Why not the whole palette") measured what breaks. The page color has no dark form. The print block sets Docent's light values again, so paper loses it. Each drawing carries Docent's light values as its fallback, so a drawing copied out of the page no longer matches. And the tested pairs fail: Docent's green status text falls to 4.33:1 on a beige page (`#f3ece0`) and to 4.19:1 on a light gray page (`#e9e9ec`), below 4.5:1, and the palest heat step stands at 1.10:1 and 1.07:1 against those pages, so it merges with them. The guarantee is the result, every tested pair passing in light, dark and print, not a fixed color. So the page color changes only through a palette, whose pairs are tested (section 2).
+
+**Refuse the beige page with a list of contrast numbers.** It is correct, and the author gets nothing to act on: "4.33:1 on the well" does not say what to do next. The agent gives one plain reason and a tested choice instead.
+
+**Swap in the closest palette without asking.** It looks helpful, and the page even looks close. But the author finds out later that the page is not what they asked for, and stops trusting what the agent did to it. The agent offers the palette as a choice, and the author picks it.
 
 **Keep the newest page as the record (decision 5 as it is).** A page records values: the colors, the logo, the tagline. It does not record why a rule was broken, so the next page starts again from zero. It also cannot tell an agent which page to copy. `SKILL.md` already has a case where the newest page is the wrong one: a page about a customer's product carries the customer's name and no logo, and an agent that copies it gives the next page the wrong host. Two people's agents may also pick two different "newest" pages, one by the file's date and one by the last commit.
 
@@ -146,6 +150,39 @@ What (b) costs:
 - **Size:** two medium PRs (the derivation with the pairs in Node; then the kit, `stamp`, `render` and `check`), each about as large as the palette PR of the white-label work.
 
 **Recommendation: build (a) now, and (b) only when a host's page color is far from all three palettes.** A palette may already be close enough, and (a) needs no new code. (b) is listed under "Not in this proposal"; the open question in "Decisions" asks whether it is needed first.
+
+### How the agent raises a palette with the author
+
+**When it comes up.** In two cases:
+
+- **During the brand interview,** when the host's `DESIGN.md` has a page color: `colors.surface` or `colors.neutral`. `brand.cjs` already lists those keys under "not used" today.
+- **When the author asks directly,** such as "make the background beige".
+
+**What the agent says.** One short message in three parts: what the file (or the request) has, one plain reason with no contrast numbers, and the closest tested palette as a choice.
+
+> Your DESIGN.md has a beige page color, #f3ece0. Docent keeps its own page color, because some text would become hard to read in dark mode and on paper. The closest tested palette is Sepia (warm paper).
+>
+> [Use Sepia] [Keep Docent's white page]
+
+Before the author answers, the agent offers to open the page with the palette in light and in dark mode, so the author decides on what they see.
+
+**The closest palette is picked by a script, never by eye.** `brand` prints it, next to its list of keys not used: the CIE76 distance (`distance` in `scripts/lib/color.cjs`) from the host's page color to the light page of each tested palette, with Docent's own page as one of the choices. The distance is better than the hue alone, because a near-gray has almost no hue to compare. Measured (see "Measured"):
+
+| Host page color | Closest | Distance | The others |
+|---|---|---|---|
+| Beige `#f3ece0` | Sepia `#fffbf6` | 6.4 (hue 6° apart) | Docent 9.5, Plum 9.7, Harbor 9.8 |
+| Light gray `#e9e9ec` | Docent's own `#fbfbfe` | 6.3 (hue 0° apart) | Plum 6.4, Harbor 6.5, Sepia 7.7 |
+
+So for a gray page, the closest choice is Docent's own page, and the message offers that first. The second row also shows that the distances can be close: the message names one palette, and the author can still ask for the others.
+
+**When the custom palette exists** (item b), the message gets a third choice: [Build a palette from #f3ece0]. When the script refuses, the agent names the failing pair in plain words, with the one number that matters, and the closest color that passes: "Green status text is too light on this page (4.33:1, needs 4.5:1). The closest color that passes is #…".
+
+**After the choice:**
+
+- The agent saves the answer in the repo file and says so in one line: "I saved this in `.docent/config.json`, so new pages use Sepia too." (The interview asks once whether it may write the file; see section 3.)
+- Later pages do not ask again.
+
+**When the author insists on the exact color** before the custom palette exists, the page can set its own `--bg` today, and `check` only warns: "a style sets --bg; the kit sets it in four places, so your value is lost in dark mode or in print". The color then shows in light mode on the screen, and dark mode and paper keep Docent's page. The agent allows it **on that one page,** after it says in one sentence what breaks (dark mode and print), and **never saves it in the repo file**, so the risk stays on one page. The stricter choice is to refuse it. This is a point the user must confirm (see "Decisions").
 
 ---
 
@@ -343,9 +380,9 @@ It changes no rule, and no page that passes today fails after it.
 ## 10. Phases, and what is out of scope
 
 1. **Rule IDs** (PR 1, medium): section 9.
-2. **The repo file** (PR 2, small): the search of section 7, the two flags, reading and refusing the file (section 5, without `rules`), `brand` with no argument, and the file's `tokens` over `DESIGN.md`, each tested as a host color. Tests: a heading color in the file that wins over `DESIGN.md`, one that fails 4.5:1, a file in the page's folder, a file two folders up, a file outside the repo that is not used, invalid JSON, a missing `version`, a path outside the repo, and `--no-config`.
+2. **The repo file** (PR 2, small): the search of section 7, the two flags, reading and refusing the file (section 5, without `rules`), `brand` with no argument, the file's `tokens` over `DESIGN.md`, each tested as a host color, and the closest tested palette printed beside an unused page color. Tests: a heading color in the file that wins over `DESIGN.md`, one that fails 4.5:1, a file in the page's folder, a file two folders up, a file outside the repo that is not used, invalid JSON, a missing `version`, a path outside the repo, and `--no-config`.
 3. **Rule changes** (PR 3, small): the note level in `check`, a guarantee refused, a missing reason refused, an unknown ID refused, and one note for each rule on each page. `DESIGN.md` and `SKILL.md`: the two groups and the note.
-4. **The brand from the file** (PR 4, medium): the interview's last question and the file it writes; `stamp`'s `docent:host` block in `:where(:root)`; `render`'s palette from the file; `data-brand="off"`. `SKILL.md`: "Ask about the brand once" changes from "copy the newest page" to "read the repo file; without one, copy the newest page". One branded sample page built from a sample repo file, in the "Report a bug" topic.
+4. **The brand from the file** (PR 4, medium): the interview's last question and the file it writes; `stamp`'s `docent:host` block in `:where(:root)`; `render`'s palette from the file; `data-brand="off"`. `SKILL.md`: "Ask about the brand once" changes from "copy the newest page" to "read the repo file; without one, copy the newest page", and gets the message about a page color (section 2). One branded sample page built from a sample repo file, in the "Report a bug" topic.
 5. **Differences from the file** (PR 5, small): the `brand.differs` note for the palette, the logo, the tagline, the credit and the profile.
 
 **Out of scope:**
@@ -401,6 +438,33 @@ console.log("#3b2a5c sepia page", contrast("#3b2a5c","#fffbf6").toFixed(2), "wel
 #3b2a5c sepia page 12.19 well 11.37
 ```
 
+The closest palette in section 2, by CIE76 distance and by hue, from the host's page color to each tested light page:
+
+```bash
+node -e '
+const {lab}=require("./skills/docent/scripts/lib/color.cjs");
+const P=require("./skills/docent/assets/palettes.json");
+const pages={docent:"#fbfbfe",...Object.fromEntries(Object.entries(P).map(([k,v])=>[k,v.light.bg]))};
+for (const want of ["#f3ece0","#e9e9ec"]) { const w=lab(want);
+ const rows=Object.entries(pages).map(([k,c])=>{const l=lab(c); let dh=Math.abs(l.h-w.h); dh=Math.min(dh,360-dh); return [k,c,l.h.toFixed(0),dh.toFixed(0),Math.hypot(l.L-w.L,l.a-w.a,l.b-w.b).toFixed(1)]});
+ console.log(want,"hue",w.h.toFixed(0),"C",w.C.toFixed(1)); rows.forEach(r=>console.log("  ",r.join("  ")));}'
+```
+
+```text
+#f3ece0 hue 87 C 6.7
+   docent  #fbfbfe  290  157  9.5
+   harbor  #f6fcfe  226  138  9.8
+   plum  #fefafe  325  123  9.7
+   sepia  #fffbf6  81  6  6.4
+#e9e9ec hue 290 C 1.5
+   docent  #fbfbfe  290  0  6.3
+   harbor  #f6fcfe  226  65  6.5
+   plum  #fefafe  325  34  6.4
+   sepia  #fffbf6  81  150  7.7
+```
+
+The columns are: the page, its color, its hue, the hue distance from the host's color, and the CIE76 distance.
+
 The numbers on a page color alone (4.33:1, 4.19:1, 1.10:1 and 1.07:1) come from white-label section 4 and its "Measured" output, not from a new run.
 
 A place that reports is not always one rule: some places report one of several problems from a list (the four kinds of a flat page), and some rules report from several places (the six messages about the kit). The estimate of 120 to 140 rules and about 55 house-style rules comes from reading each place, as the tables in section 4 sort them. Rule 8 of "Numbers" is tested in the change line of a card (section 10d of `check.cjs`), not in `numbers.cjs`, so it does not show in the list of numbered rules.
@@ -413,10 +477,11 @@ A place that reports is not always one rule: some places report one of several p
 
 **The open question for the user now: does a named palette (Harbor, Plum or Sepia) cover the background for now, or is a palette from the host's own hue needed first?** If a named palette is enough, PRs 2 and 4 cover the whole need. If not, the custom palette (section 2, item b, two medium PRs) comes before or beside them, and the user's need waits for it.
 
-**The user must confirm two more points:**
+**The user must confirm three more points:**
 
 - **The reversal of white-label decision 5** (decision 6 below). The other choice keeps the newest page as the record, and adds the repo file for rule changes only.
 - **The list of rules that the file may change** (decision 7 and the tables of section 4), and most of all the rules marked with a question mark.
+- **An author who insists on an exact page color before the custom palette exists** (decision 15 below). Recommended: allow it on that one page, after the agent says what breaks, and never save it in the repo file. The stricter choice is to refuse it.
 
 Decided on 2026-11-25, so that the work can go on. Each one can be changed in review, because no code exists yet.
 
@@ -434,6 +499,7 @@ Decided on 2026-11-25, so that the work can go on. Each one can be changed in re
 12. **`data-brand="off"` for a page about another product.** It keeps a rule that `SKILL.md` has today: such a page takes nothing from the repo's brand, but still follows the team's house style.
 13. **Existing pages: the host tokens change on the next `stamp`; the other brand fields stay, with a note.** The tokens have one source and live in `stamp`'s own block. The logo, tagline, credit, palette and profile are the page's content, so the author decides.
 14. **An ID for every rule, listed in `scripts/lib/rules.cjs`, printed by `check --rules`.** IDs for the house-style rules alone would be enough for the file, but an ID on every line makes the refusals clearer and the output easier to search.
+15. **The page color with the author: one plain reason and the closest tested palette as a choice, picked by `brand`.** The author gets a choice to act on, never a list of numbers and never a quiet swap. The answer goes into the repo file, so later pages do not ask. An author who insists on an exact color gets it on that one page only, after the agent says that dark mode and print keep Docent's page; it is never saved in the repo file, so the risk stays on one page. **The user must confirm this point;** the stricter choice refuses the color.
 
 ## Not in this proposal
 
