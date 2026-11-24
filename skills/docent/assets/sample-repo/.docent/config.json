@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "design": "DESIGN.md",
+  "palette": "sepia",
+  "tokens": {
+    "host-ink": {
+      "value": "#3b2a5c",
+      "reason": "Our docs use the violet of the product's headings, not the darker color that brand works out from the accent."
+    }
+  },
+  "logo": ".docent/logo.svg",
+  "tagline": "Small tools for careful teams.",
+  "credit": "text",
+  "profile": "standard"
+}

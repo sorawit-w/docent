@@ -44,6 +44,7 @@ const LIST = [
   G("frame.title", D("Layout")),
   G("frame.profile", S("Choose a profile")),
   G("frame.text", S("Choose a profile")),
+  G("frame.brand", S("Ask about the brand once")),
   G("skip.link", D("Layout")),
   H("title.format", D("Layout")),
   H("title.h1", D("Layout")),

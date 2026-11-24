@@ -8,7 +8,7 @@ require("./lib/node.cjs").warnOldNode(); // first, so that an old Node is named 
 const fs = require("node:fs");
 const path = require("node:path");
 const { findConfig, readConfig } = require("./lib/config.cjs");
-const { VERSION, cssBlock, jsBlock, findKit, isDeck } = require("./lib/kit.cjs");
+const { VERSION, cssBlock, jsBlock, findKit, isDeck, htmlAttr } = require("./lib/kit.cjs");
 const { checkDeck, roomAt } = require("./lib/slide.cjs");
 const { renderDiagram, slideRoomsOf } = require("./lib/diagram.cjs");
 const { renderWidget, PLACE, esc } = require("./lib/widget.cjs");
@@ -257,7 +257,8 @@ function checkDocument(html, options = {}) {
   const hosts = {};
   // The page's own host colors, then each one of the repo file that the page does not set itself: the page's own value wins.
   const own = [...css.matchAll(/--(host-accent-dark|host-accent|host-ink|host-dot-dark)\s*:\s*([^;}]+)/g)].map(([, name, value]) => [name, value.trim(), ""]);
-  const fileTokens = (options.config && options.config.data && options.config.data.tokens) || {};
+  const brandValue = htmlAttr(html, "data-brand"); // "off": a page about another product takes no brand field of the repo file
+  const fileTokens = (brandValue !== "off" && options.config && options.config.data && options.config.data.tokens) || {};
   for (const name of Object.keys(HOST)) if (Object.hasOwn(fileTokens, name) && !own.some(([n]) => n === name)) own.push([name, fileTokens[name].value.toLowerCase(), ` from ${options.config.label}`]);
   for (const [name, color, from] of own) {
     if (!/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(color)) { warn("host.hex", `--${name} is "${color}"; check tests the contrast of a hex color only, such as #2f3fd0`); hosts[name] = null; continue; }
@@ -317,6 +318,7 @@ function checkDocument(html, options = {}) {
   if (!/<html\b[^>]*\blang="[^"]+"/i.test(markup)) error("frame.lang", '<html> has no lang attribute');
   const fixed = (markup.match(/<html\b[^>]*\bdata-theme="([^"]*)"/i) || [])[1];
   if (fixed != null && !["light", "dark"].includes(fixed)) error("frame.theme", `<html> has data-theme="${fixed}"; a fixed theme is "light" or "dark"`);
+  if (brandValue != null && brandValue !== "off") error("frame.brand", `<html> has data-brand="${brandValue}"; the only value is "off", for a page about another product, which takes nothing from the repo's brand`);
   if (!/<meta\b[^>]*name="viewport"/i.test(markup)) error("frame.viewport", 'the document has no <meta name="viewport">');
   const h1 = [...markup.matchAll(/<h1\b[^>]*>([\s\S]*?)<\/h1>/gi)];
   if (h1.length !== 1) error("frame.h1", `the document has ${h1.length} <h1> headings; it must have one`);

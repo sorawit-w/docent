@@ -20,9 +20,10 @@ Docent is a design kit for documents: single HTML files that open without a netw
 | [`assets/specimen.html`](assets/specimen.html) | The sample page: a full, built document that follows every rule. Open it in a browser to see the look. Do not read its source: it is long, and the starting page shows every block. |
 | [`assets/specimen-branded.html`](assets/specimen-branded.html) | The same sample page for a host with a brand: a logo in a light and a dark version, a tagline, and the Harbor palette. Open it in a browser; do not read its source. |
 | [`assets/deck.html`](assets/deck.html) | The starting page of a deck: a title slide and one slide of each common body, with comments. It is not built yet. Read all of it before you write a deck. |
+| [`assets/sample-repo/`](assets/sample-repo/) | A sample host repo: a repo file `.docent/config.json`, the `DESIGN.md` it names, a worked logo, and `docs/report-a-bug.html`, the sample page built from them. Read the repo file; open the page in a browser. |
 | [`assets/specimen-deck.html`](assets/specimen-deck.html) | The sample deck, on the "Report a bug" topic: a built deck with one slide of each body and speaker notes. Open it in a browser and press Present; do not read its source. |
 | `scripts/render.cjs` | Draws every diagram and builds every widget of a document, each from its data. |
-| `scripts/stamp.cjs` | Puts the page styles and the page script into a document. |
+| `scripts/stamp.cjs` | Puts the page styles and the page script into a document, and the host tokens from the repo file. |
 | `scripts/check.cjs` | Tests a document against the rules. Each error and warning names its rule, such as `[cards.count]`; `check.cjs --rules` lists every rule and its group. |
 | `scripts/brand.cjs` | Reads a host project's `DESIGN.md` and prints its host tokens. It writes nothing. With no argument, it reads the `DESIGN.md` that the repo file `.docent/config.json` names, and that file's tokens win. |
 
@@ -233,13 +234,22 @@ A host project may set its accent, its heading color and its fonts, with these t
 
 ## Ask about the brand once
 
-When you create the first Docent page in a repo, ask about the brand once. When the repo already has a Docent page (it carries the `docent:kit` marker), copy the brand from the newest one: the logo, the host tokens, the tagline and the credit. Then ask one question only: "Use the same brand as `docs/onboarding.html`?" The page is the record of the choices; write no other file into the host repo.
+**First, read the repo file.** A repo may hold `.docent/config.json`, the record of its brand: the `DESIGN.md` it names, host-token values that win over that file, the palette, the logo, the tagline, the credit and the default profile, kept once for every page. The scripts read the nearest one above the page, up to the root of the repo. When it exists, ask nothing, and write what it says into each new page:
 
-**When the document is about another product.** The host is the product that the document is about. When that is not the repo's own project, such as a report on a customer's product, the host is that product: use its name in the top bar and the `<title>`, and show no logo and no tagline unless the user gives them. Take nothing from the repo's own brand or from its other Docent pages: their logo, colors and tagline belong to another host.
+- its `palette` as `data-palette` on `<html>`, and its `profile` as `data-profile` when the content does not choose another (see "Choose a profile");
+- its `logo` in the top bar: paste an SVG file as inline SVG, with `class="logo"` and the size that `check` names, or a PNG or WebP as a data URI; with `{ "light": …, "dark": … }`, both versions with `data-for`;
+- its `tagline` in the footer, and its `credit`: `"text"` takes out the link, `"none"` takes out the credit;
+- then run `stamp`: it writes the host tokens, from the `DESIGN.md` the file names and the file's own `tokens`, between `docent:host` markers. Do not copy a style block from `brand` as well.
 
-**When no user can be asked,** such as an agent that works alone, do not wait for an answer. When the repo's newest Docent page is for the same host, copy its brand: a user chose it. Otherwise use the defaults in the column "When the user skips it" below: the name found, no logo, Docent's own colors, no tagline, and the credit as a link. In your report, name each default you used: "No one could be asked about the brand, so the page uses the name from `package.json`, no logo, Docent's own colors, no tagline, and the credit as a link." Never invent a brand: draw no logo, pick no color by eye, and write no tagline.
+Find the host's name as below; the file does not keep it. An existing page keeps its palette, logo, tagline, credit and profile when the file changes; only the host tokens change, on its next `stamp`.
 
-**First, read the repo, and change nothing:**
+**Without a repo file,** when the repo already has a Docent page (it carries the `docent:kit` marker), copy the brand from the newest one: the logo, the host tokens, the tagline and the credit. Then ask one question only: "Use the same brand as `docs/onboarding.html`?" When the repo has no Docent page yet, ask about the brand once, as below.
+
+**When the document is about another product.** The host is the product that the document is about. When that is not the repo's own project, such as a report on a customer's product, the host is that product: use its name in the top bar and the `<title>`, and show no logo and no tagline unless the user gives them. Take nothing from the repo's own brand, its repo file or its other Docent pages: their logo, colors and tagline belong to another host. Write `data-brand="off"` on `<html>`: `stamp` then writes no host tokens, and `check` uses no brand field of the repo file. The file's rule changes still hold, because the house style belongs to the team that writes.
+
+**When no user can be asked,** such as an agent that works alone, do not wait for an answer, and write no file. Use the repo file when one exists. Otherwise, when the repo's newest Docent page is for the same host, copy its brand: a user chose it. Otherwise use the defaults in the column "When the user skips it" below: the name found, no logo, Docent's own colors, no tagline, and the credit as a link. In your report, name each default you used: "No one could be asked about the brand, so the page uses the name from `package.json`, no logo, Docent's own colors, no tagline, and the credit as a link." Never invent a brand: draw no logo, pick no color by eye, and write no tagline.
+
+**For the interview, first read the repo, and change nothing:**
 
 - a `DESIGN.md` at the root or in `docs/`;
 - logo files: `logo*.svg`, `*-logo.svg`, `favicon.svg`, and SVG files in folders named `brand`, `logo`, `public`, `static` or `assets`, but not in `node_modules` or a build folder. Offer a PNG only when there is no SVG;
@@ -256,7 +266,19 @@ When you create the first Docent page in a repo, ask about the brand once. When 
 | 3 | "Which tagline should the footer show?" | Each line found, word for word, then "No tagline". The user may type their own. | No tagline. Never write one. |
 | 4 | "The footer says 'Made with Docent'. Keep 'Docent' as a link to the public repo, or plain text?" | "A link (Recommended)", "Plain text". | A link. |
 
-**Colors from a `DESIGN.md`.** Run `node SKILL/scripts/brand.cjs DESIGN.md` and copy its style block into the page's `<head>`. Never pick a color by eye. `brand` fills the six host tokens and nothing else: it darkens a light accent that fails contrast, works out a missing dark accent and heading color with fixed rules, and keeps a brand font by name with Docent's fonts after it. It names every key it does not use, such as the page, status and spacing values: those would break dark mode, print and the tested contrast.
+**The last question.** After the answers, ask one more: "May I save these answers in `.docent/config.json`, so that every page and every agent uses them?" On a yes, write the file with `"version": 1` and the answers that are house style: the path to the `DESIGN.md` (`"design"`), the palette, the logo path, the tagline, the credit and the profile, if the user chose one. Never the host's name, which the scripts find again, and never a copy of a token that `brand` works out. A logo that needed work (below) goes beside the file, as `.docent/logo.svg`, or `.docent/logo-dark.svg` for a dark version; a logo that needed none is a path to the file that exists. Then say in one line: "I saved this in `.docent/config.json`, so new pages use it too." On a no, write nothing: later pages copy the newest page. [`assets/sample-repo/`](assets/sample-repo/) shows a repo file, the `DESIGN.md` it names, a worked logo, and the page built from them.
+
+**A heading color that differs from the `DESIGN.md`.** Put it in the repo file's `tokens`, with the reason in the user's words: `"tokens": { "host-ink": { "value": "#3b2a5c", "reason": "Our docs use the violet of the product's headings." } }`. It wins over the value `brand` works out, and `check` tests its contrast. The accents, the dark dot and the fonts work the same way (see "Host tokens" in `references/DESIGN.md`).
+
+**A page color.** It comes up in two cases: the host's `DESIGN.md` has one (`brand` then prints a line about `colors.surface` or `colors.neutral`), or the user asks, such as "make the background beige". Docent keeps its own page color, and offers a tested palette. Send one short message in three parts: what the file or the request has, one plain reason with no contrast numbers, and the closest tested palette as a choice, the one `brand` names, never one picked by eye:
+
+> Your DESIGN.md has a beige page color, #f3ece0. Docent keeps its own page color, because some text would become hard to read in dark mode and on paper. The closest tested palette is Sepia (warm paper).
+>
+> [Use Sepia] [Keep Docent's white page]
+
+Before the user answers, offer to open the page with the palette in light and in dark mode, so they decide on what they see. The user may ask for another palette. Save the answer in the repo file (with the user's OK, as above), and say so in one line; later pages do not ask again. Never swap a palette in without asking. When the user insists on the exact color, say in one sentence what breaks: dark mode and print keep Docent's page. Then set it on that one page only, as `--bg` in the page's own `<style>`, and never save it in the repo file: `check` warns, and the risk stays on one page.
+
+**Colors from a `DESIGN.md`.** With a repo file that names it, `stamp` writes its host tokens. Without one, run `node SKILL/scripts/brand.cjs DESIGN.md` and copy its style block into the page's `<head>`. Never pick a color by eye. `brand` fills the six host tokens and nothing else: it darkens a light accent that fails contrast, works out a missing dark accent and heading color with fixed rules, and keeps a brand font by name with Docent's fonts after it. It names every key it does not use, such as the page, status and spacing values: those would break dark mode, print and the tested contrast.
 
 **When there is no `DESIGN.md`** and the host wants its own colors, three other skills can propose one, if they are installed. Offer each only in its case, and say first what it writes:
 
