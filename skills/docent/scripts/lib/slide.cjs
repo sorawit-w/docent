@@ -139,6 +139,9 @@ function measureBody(el, room) {
   if (tag === "figure" && /<table\b/i.test(inner) && !/\bclass="(?:[^"]*\s)?fig(?:\s[^"]*)?"/.test(inner)) return { kind: "a small table", height: table(inner) + captionHeight(inner), problems };
   if (tag === "figure") {
     const size = drawingSize(inner), caption = captionHeight(inner);
+    // One drawing: a desktop form (not a phone form), a hand-drawn figure or a picture.
+    const drawings = [...inner.matchAll(/<svg\b([^>]*)>/gi)].filter(([, a]) => (/\bclass="dg\b/.test(a) && !/\bid="[^"]*-phone"/.test(a)) || /\bdata-drawn="hand"/.test(a)).length + (inner.match(/<img\b/gi) || []).length;
+    if (drawings > 1) problems.push(`its figure holds ${drawings} drawings; a figure on a slide holds one. Two charts on one slide are two points: give each its own slide`);
     if (!size) return { kind: "one figure", height: caption, problems };
     const fit = Math.min(SCALE.most, (INNER.width - WELL) / size.w, (room - caption - WELL) / size.h), scale = Math.max(SCALE.least, fit);
     // A drawing that does not fit at the least scale is refused with its size and the room; the slide is not called too tall as well.
@@ -184,7 +187,7 @@ function checkDeck(html) {
     if (title) {
       for (const el of body) {
         if (el.tag === "p" && hasClass(el.attrs, "standfirst")) height += 24 + lines(plain(el.inner), SIZE.large, INNER.width) * LINE.large;
-        else if (el.tag === "ul" && hasClass(el.attrs, "facts")) height += 24 + (el.inner.match(/<li\b/gi) || []).length * LINE.small;
+        else if (el.tag === "ul" && hasClass(el.attrs, "facts")) height += 24 + [...el.inner.matchAll(/<li\b[^>]*>([\s\S]*?)(?=<li\b|$)/gi)].reduce((sum, [, fact]) => sum + lines(plain(fact.replace(/<\/li>\s*$/i, "")), SIZE.small, INNER.width) * LINE.small, 0);
         else errors.push(`slide 1, the title slide, holds ${describe(el)}; it holds the <h1>, the opening paragraph (<p class="standfirst">) and a facts list (<ul class="facts">)`);
       }
     } else {

@@ -96,6 +96,13 @@ test("a slide holds one body from the list, within its limits", () => {
   assert.ok(errorsOf(slide(9, `<h2>Questions</h2>\n<figure class="quote"><blockquote><p>${"I could not find the bug until the report told me which page to open. ".repeat(3)}</p></blockquote><figcaption>P3, tester</figcaption></figure>`)).some((e) => e.startsWith("slide 9: its quote is about 3 lines at 30px")));
 });
 
+test("a figure on a slide holds one drawing, and a title slide's facts count every line", () => {
+  const two = errorsOf(slide(3, '<h2>Sign-in gets the most bug reports</h2>\n<figure><div class="fig" role="region" aria-label="Two" tabindex="0"><img src="data:image/png;base64,AA==" alt="One" width="300" height="100"><img src="data:image/png;base64,AA==" alt="Two" width="300" height="100"></div><figcaption>Two drawings.</figcaption></figure>'));
+  assert.ok(two.includes("slide 3: its figure holds 2 drawings; a figure on a slide holds one. Two charts on one slide are two points: give each its own slide"), two.join("\n"));
+  const facts = errorsOf((h) => h.replace("<li>Support team review, 1 October 2026</li>", `<li>${"Support team<br>".repeat(20)}</li>`));
+  assert.ok(facts.some((e) => /^slide 1 is about \d+px tall, and a slide holds 592px/.test(e)), facts.join("\n"));
+});
+
 test("a slide that is taller than the frame is refused, with its height", () => {
   const table = (rows, text) => `<h2>Ask for three things in every bug report, and say why each one matters</h2>\n<div class="table-wrap"><table><thead><tr><th>Part</th><th>Why</th><th>Who</th><th>When</th></tr></thead><tbody>${`<tr><td>${text}</td><td>${text}</td><td>${text}</td><td>${text}</td></tr>`.repeat(rows)}</tbody></table></div>`;
   // Two heading lines and a table of five short rows: fits, as the proposal measured.
