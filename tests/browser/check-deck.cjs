@@ -135,10 +135,46 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     }
     const over = real.filter((r) => r.height > INNER.height);
     ok(`every slide fits inside the frame's ${INNER.width} × ${INNER.height}`, over.length === 0, over);
-    const under = real.map((r, i) => ({ ...r, estimate: estimate[i].height })).filter((r) => !/^s3$/.test(r.id) && r.height > r.estimate + 2);
-    ok("check's height estimate is within 2px of the real height or above it, on every slide but the figure (scaled in a later item)", under.length === 0, under);
+    const under = real.map((r, i) => ({ ...r, estimate: estimate[i].height })).filter((r) => r.height > r.estimate + 2);
+    ok("check's height estimate is within 2px of the real height or above it, on every slide", under.length === 0, under);
     const serif = real.map((r) => ({ ...r, estimated: Math.round(textWidth(r.text.replace(/^\d+ /, ""), 52, 600)) })).filter((r) => r.widest > Math.min(r.estimated, INNER.width) + 1);
     ok("every heading in the serif is no wider than the sans-serif estimate at weight 600", serif.length === 0, serif);
+    await context.close();
+  }
+
+  // A figure on a slide: the drawing at 1.5 times, or less down to 1.25 times, the desktop form on every screen, and no words.
+  for (const [width, height] of [[1920, 1080], [844, 390]]) {
+    const { page, context } = await open({ width, height });
+    await page.click(".present");
+    await page.keyboard.press("ArrowRight");
+    await page.keyboard.press("ArrowRight");
+    const fig = await page.evaluate(() => {
+      const sl = document.querySelector(".slide.is-current"), k = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--deck-scale"));
+      const shown = [...sl.querySelectorAll(".fig > svg")].filter((v) => getComputedStyle(v).display !== "none");
+      const svg = shown[0], r = svg.getBoundingClientRect(), name = svg.querySelector("text.row, text.name");
+      return { id: sl.id, forms: shown.map((v) => v.id), scale: Math.round((r.width / k / svg.viewBox.baseVal.width) * 1000) / 1000, words: getComputedStyle(sl.querySelector(".dg-words")).display, name: Math.round((name.getBoundingClientRect().height / k) * 10) / 10, bottom: Math.round((sl.querySelector("figure").getBoundingClientRect().bottom - sl.getBoundingClientRect().top) / k) };
+    });
+    ok(`${width}px screen: the figure slide shows the desktop form only, at 1.25 to 1.5 times, inside the frame, with no words`, fig.id === "s3" && fig.forms.join() === "dg-reports-by-area" && fig.scale >= 1.25 && fig.scale <= 1.5 && fig.words === "none" && fig.bottom <= 656, fig);
+    const written = await page.evaluate(() => { const v = document.getElementById("dg-reports-by-area"); return Math.round((parseFloat(getComputedStyle(v).getPropertyValue("--fw")) / v.viewBox.baseVal.width) * 1000) / 1000; });
+    ok(`${width}px screen: the drawing stands at the scale render wrote (${written})`, Math.abs(written - fig.scale) < 0.01, { written, shown: fig.scale });
+    await page.keyboard.press("Escape");
+    const after = await page.evaluate(() => { const v = document.getElementById("dg-reports-by-area"); return { width: Math.round(v.getBoundingClientRect().width), words: getComputedStyle(document.querySelector(".dg-words")).display }; });
+    ok(`${width}px screen: back in the stack, the drawing keeps its real size and its words`, (width < 737 || after.width === 640) && after.words !== "none", after);
+    await context.close();
+  }
+  // A hand-drawn figure: the deck script measures the room and sets its size, from 1.25 to 1.5 times; back in the stack it has its real size.
+  {
+    const hand = fs.readFileSync(path.join(root, "tests", "fixtures", "hand-fishbone.html"), "utf8").match(/<figure>[\s\S]*<\/figure>/)[0];
+    const content = build(source.replace(/(<section class="slide" id="s3"[^>]*>)[\s\S]*?(<\/section>)/, `$1\n<h2>Why a report cannot be repeated</h2>\n${hand}\n$2`));
+    const { page, context } = await open({ content });
+    await page.click(".present");
+    await page.keyboard.press("ArrowRight");
+    await page.keyboard.press("ArrowRight");
+    const fig = await page.evaluate(() => { const sl = document.querySelector(".slide.is-current"), v = sl.querySelector("svg[data-drawn]"), k = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--deck-scale")); return { scale: Math.round((v.getBoundingClientRect().width / k / 640) * 1000) / 1000, bottom: Math.round((sl.querySelector("figure").getBoundingClientRect().bottom - sl.getBoundingClientRect().top) / k), words: getComputedStyle(sl.querySelector(".dg-words")).display }; });
+    ok("a hand-drawn figure on a slide stands at 1.25 to 1.5 times, inside the frame, with no words", fig.scale >= 1.25 && fig.scale <= 1.5 && fig.bottom <= 656 && fig.words === "none", fig);
+    await page.keyboard.press("Escape");
+    const real = await page.evaluate(() => Math.round(document.querySelector("svg[data-drawn]").getBoundingClientRect().width));
+    ok("back in the stack, the hand-drawn figure has its real size", real === 640, real);
     await context.close();
   }
 

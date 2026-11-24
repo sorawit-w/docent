@@ -26,7 +26,7 @@ const findBlocks = (html, kind) => [...html.matchAll(marker(kind))].map((m) => (
 const block = (kind, json, out) => `<!-- docent:${kind}\n${json}\n-->\n${out}\n<!-- /docent:${kind} -->`;
 
 /**
- * Makes every block of one kind again, in place. make(data) returns { id, out, ...more } or throws.
+ * Makes every block of one kind again, in place. make(data, found) returns { id, out, ...more } or throws; found says where the block stands.
  * A block that fails stays as it was. Returns { html, results: [{ id, error, warnings, ...more }] }.
  */
 function replaceBlocks(html, kind, make) {
@@ -38,7 +38,7 @@ function replaceBlocks(html, kind, make) {
       let data;
       try { data = JSON.parse(found.json); } catch (error) { fail(`the data is not valid JSON: ${error.message}`); }
       result.id = data?.id ?? null;
-      const { out: made, ...more } = make(data);
+      const { out: made, ...more } = make(data, found);
       if (seen.has(more.id)) fail(`two ${kind}s have the id "${more.id}"`);
       seen.add(more.id);
       result = { ...result, ...more };

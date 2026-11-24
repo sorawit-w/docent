@@ -72,6 +72,10 @@ When the text has two separate chains (two flows that do not meet), write two di
 </figure>
 ```
 
+## A drawing on a slide
+
+In a deck (`data-profile="deck"`), a figure on a slide holds one drawing and one caption, which ends with its source line. In present mode the drawing stands at 1.5 times its real size, so its 14px names show at 21px, or less down to 1.25 times when the room under the heading needs it. `render` knows that a block is on a slide from the `<section class="slide">` around it: it draws a route as Route wide before Route tall, because Route wide is low, and it refuses a drawing that does not fit at 1.25 times, with the numbers: `slide 6: the sequence diagram is 746 × 496px; a slide holds 915 × 369px at 1.25 times. Show fewer messages on the slide, and the full diagram in the report`. A scale chart keeps its 640px form; its height comes from its rows, so fit it by the number of rows. A hand-drawn figure must fit the same room; `check` tests it. Show a part of a large drawing on the slide, such as three messages instead of eleven, and the whole drawing in the report. In present mode the diagram in words does not show; in the reading form it stays under the drawing.
+
 ## Route or Plates
 
 - A **route** is data in which each leg starts where the leg before it ended, and every part is visited once. A route can be drawn in any form, and it also gets a single-track form for phones.

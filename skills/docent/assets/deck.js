@@ -42,6 +42,22 @@
   let at = 0, on = false, full = false;
   const labels = new Map();
   const fit = () => root.style.setProperty('--deck-scale', String(Math.min(innerWidth / 1280, innerHeight / 720)));
+  // A drawing on a slide stands at 1.5 times, or less when the room under the heading and above the caption needs it. render writes the
+  // size of a drawing it made (--fw and --fh); for a hand-drawn figure or a picture the real room is measured here, on the frame.
+  const drawings = (slide) => [...slide.querySelectorAll('.fig > svg[data-drawn="hand"], .fig > img')];
+  const scale = (slide) => drawings(slide).forEach((art) => {
+    const w = Number(art.getAttribute('width')), h = Number(art.getAttribute('height')), fig = art.closest('.fig'), figure = fig.closest('figure') || fig;
+    if (!(w > 0 && h > 0)) return;
+    art.style.width = `${w}px`;
+    art.style.height = `${h}px`;
+    const below = figure.offsetTop + figure.offsetHeight - (fig.offsetTop + fig.offsetHeight); // the caption under the well
+    const room = { w: slide.clientWidth - 128 - 8, h: slide.clientHeight - 64 - fig.offsetTop - below - 8 };
+    const s = Math.min(1.5, room.w / w, room.h / h);
+    art.style.width = `${w * s}px`;
+    art.style.height = `${h * s}px`;
+  });
+  const unscale = () => slides.forEach((slide) => drawings(slide).forEach((art) => { art.style.width = ''; art.style.height = ''; }));
+  unscale(); // a page saved in present mode keeps the sizes of the last visit
   const show = (n) => {
     at = Math.max(0, Math.min(slides.length - 1, n));
     slides.forEach((slide, i) => { slide.hidden = i !== at; slide.classList.toggle('is-current', i === at); });
@@ -50,6 +66,7 @@
     next.disabled = at === slides.length - 1;
     if (slides[at].id) history.replaceState(history.state, '', `#${slides[at].id}`);
     slides[at].focus({ preventScroll: true });
+    scale(slides[at]);
     // A diagram's dot travels its route twice when its slide shows, as when a diagram comes into view on a page.
     requestAnimationFrame(() => slides[at].querySelectorAll('svg.dg-auto').forEach((svg) => {
       svg.classList.add('is-playing');
@@ -85,6 +102,7 @@
     full = false;
     root.classList.remove('presenting');
     root.style.removeProperty('--deck-scale');
+    unscale();
     slides.forEach((slide) => {
       slide.hidden = false;
       slide.classList.remove('is-current');
