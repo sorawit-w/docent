@@ -1,0 +1,11 @@
+/* Deck: written only into a page with data-profile="deck". With scripts off, and before Present, a deck is the stack: a title slide
+   and a column of short sections at reading sizes, like any page. Each slide's number stands before its heading in the muted color,
+   as the number of a step does, so a reader can follow "on slide 4" in an email. */
+html[data-profile="deck"] .topbar .host { flex: 1; }
+html[data-profile="deck"] main { counter-reset: slide; }
+.slide { counter-increment: slide; }
+/* The title slide counts as slide 1 but shows no number: a "1" before the title reads as part of it. */
+.slide:not(.title) > h2:first-child:not(.is-numbered)::before { content: counter(slide); margin-right: 0.25em; font-weight: 400; color: var(--muted); font-variant-numeric: tabular-nums; }
+/* With scripts on, the deck script writes the number as text (is-numbered), so that a screen reader reads it. It looks the same as the counted number. */
+.slide-n { font-weight: 400; color: var(--muted); font-variant-numeric: tabular-nums; }
+.slide.title .standfirst, .slide.title .facts { margin-top: 24px; }

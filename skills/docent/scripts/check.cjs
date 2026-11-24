@@ -4,7 +4,8 @@
 // It does not open a browser. So it cannot test contrast, the phone layout, print or motion as a reader sees them.
 require("./lib/node.cjs").warnOldNode(); // first, so that an old Node is named before anything else can fail
 const fs = require("node:fs");
-const { VERSION, cssBlock, jsBlock, findKit } = require("./lib/kit.cjs");
+const { VERSION, cssBlock, jsBlock, findKit, isDeck } = require("./lib/kit.cjs");
+const { checkDeck } = require("./lib/slide.cjs");
 const { renderDiagram } = require("./lib/diagram.cjs");
 const { renderWidget, PLACE, esc } = require("./lib/widget.cjs");
 const { findBlocks, block } = require("./lib/blocks.cjs");
@@ -94,15 +95,17 @@ function checkDocument(html) {
   // A palette turns Docent's own tokens to one hue. A host color is tested on the palette's pages, and each drawing carries its light values.
   const named = paletteOf(html), palette = PALETTES.includes(named) ? named : null;
   if (named != null && !palette) errors.push(`<html> has data-palette="${named}"; the palettes are ${PALETTES.map((n) => `"${n}"`).join(", ")} (see "Palettes" in DESIGN.md)`);
-  const carried = (text) => [null, ...PALETTES].findIndex((p) => text === cssBlock(p)); // 0: no palette, n: the nth palette, -1: neither
+  const deck = isDeck(html); // a deck carries the deck part of the kit, and only a deck does
+  const carried = (text) => [null, ...PALETTES].findIndex((p) => text === cssBlock(p, deck)); // 0: no palette, n: the nth palette, -1: neither
   const GROUNDS = grounds(palette); // the pages that the kit draws on, light and dark: a host color must read on both the page and the well
 
   // 1. The kit: the same styles and script in every document.
-  for (const [kind, current] of [["styles", cssBlock(palette)], ["script", jsBlock()]]) {
+  for (const [kind, current, other] of [["styles", cssBlock(palette), cssBlock(palette, true)], ["script", jsBlock(), jsBlock(true)]].map(([k, plainKit, deckKit]) => (deck ? [k, deckKit, plainKit] : [k, plainKit, deckKit]))) {
     const found = findKit(html).filter((k) => k.kind === kind);
     if (!found.length) errors.push(`the document has no kit ${kind}; run stamp`);
     else if (found.length > 1) errors.push(`the document has ${found.length} kit ${kind} blocks; it must have one`);
     else if (found[0].version !== VERSION) errors.push(`the kit ${kind} are version ${found[0].version}; this skill has ${VERSION}; run stamp`);
+    else if (found[0].text === other) errors.push(deck ? `the kit ${kind} have no deck part, but <html> has data-profile="deck"; run stamp` : `the kit ${kind} carry the deck part, but <html> does not have data-profile="deck"; run stamp`);
     else if (found[0].text !== current && kind === "styles" && carried(found[0].text) >= 0) errors.push(`the kit styles carry ${carried(found[0].text) ? `the palette "${PALETTES[carried(found[0].text) - 1]}"` : "no palette"}, but <html> names ${palette ? `"${palette}"` : "none"}; run stamp`);
     else if (found[0].text !== current) errors.push(`the kit ${kind} were changed by hand or by a code formatter; run stamp, keep your own styles outside the markers, and keep the document out of the formatter (see SKILL.md)`);
   }
@@ -196,6 +199,13 @@ function checkDocument(html) {
   }
   for (const key of Object.keys(defaults)) if (!used.has(key)) warnings.push(`the value "${key}" of a value picker is shown in no place; mark each place with <var data-v="${key}"></var>, or take the value out`);
 
+  // A deck: every child of <main> is a slide, and each slide is one heading and one body that fits the frame (decks.md, section 3).
+  // A deck has no widget, no walkthrough and no closed section other than a figure's words and the speaker notes.
+  if (deck) {
+    errors.push(...checkDeck(unlit).errors);
+    if (widgets.length) errors.push(`the deck has ${widgets.length} widget${widgets.length === 1 ? "" : "s"}; a slide shows one point to a room, so a deck has no widget. Put it in the report`);
+  }
+
   // A card grid holds a few short items.
   for (const [, inner] of rest.matchAll(/<ul\b[^>]*\bclass="[^"]*\bcards\b[^"]*"[^>]*>([\s\S]*?)<\/ul>/g)) {
     const n = (inner.match(/<li\b/g) || []).length;
@@ -204,6 +214,7 @@ function checkDocument(html) {
 
   // A walkthrough lights leg n for step n, so the numbers must agree.
   const lists = [...rest.matchAll(/<ol\b[^>]*\bclass="[^"]*\bsteps\b[^"]*"[^>]*>([\s\S]*?)<\/ol>/g)].map((m) => m[1]);
+  if (deck && (lists.length || walks.length)) errors.push("the deck has a walkthrough; a slide does not scroll, so a deck has no walkthrough yet. Show the diagram alone, with its steps in the speaker notes, or put the walkthrough in the report");
   if (lists.length !== walks.length) errors.push(`the document has ${lists.length} walkthrough step lists and ${walks.length} diagrams with "place": "walk"; each walkthrough needs one`);
   lists.forEach((list, i) => {
     const steps = (list.match(/<li\b/g) || []).length;
@@ -220,6 +231,7 @@ function checkDocument(html) {
   const css = [...noComments.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/g)].map((m) => m[1]).concat([...noComments.matchAll(/\bstyle="([^"]*)"/g)].map((m) => m[1])).join("\n");
   const scripts = [...noComments.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/g)].map((m) => m[1]).join("\n");
   const markup = noComments.replace(/<(style|script)\b[^>]*>[\s\S]*?<\/\1>/g, (m) => m.slice(0, m.indexOf(">") + 1));
+  if (deck) for (const [, attrs] of markup.matchAll(/<details\b([^>]*)>/gi)) if (!hasClass(attrs, "notes") && !hasClass(attrs, "dg-words")) errors.push(`the deck has a closed section${attrs.trim() ? ` (<details${attrs}>)` : ""}; a deck has no closed section other than a figure's words and the speaker notes (<details class="notes">), because a closed section cannot open on a shared screen`);
 
   // 3. One file, no network.
   for (const [, tag, attrs] of markup.matchAll(/<([A-Za-z][\w:-]*)\b([^>]*)>/g)) {
@@ -329,7 +341,7 @@ function checkDocument(html) {
   const suggested = suggestProfile(markup);
   const looks = suggested.sure && suggested.profile !== "standard" ? `; the page looks like "${suggested.profile}": ${suggested.reasons[0]}` : "";
   if (profile == null) warnings.push(`<html> has no data-profile, so the page uses "standard"${looks}; write the profile on <html> (see "Choose a profile" in SKILL.md)`);
-  else if (PROFILES.includes(profile) && looks && suggested.profile !== profile) warnings.push(`<html> has data-profile="${profile}"${looks}; keep the profile only if the readers need it (see "Choose a profile" in SKILL.md)`);
+  else if (PROFILES.includes(profile) && profile !== "deck" && looks && suggested.profile !== profile) warnings.push(`<html> has data-profile="${profile}"${looks}; keep the profile only if the readers need it (see "Choose a profile" in SKILL.md)`);
 
   // 9. A skip link: the first thing a keyboard reaches, so the reader can jump past the top bar to <main>.
   const mainId = ((markup.match(/<main\b[^>]*>/i) || [""])[0].match(/\bid="([^"]+)"/) || [])[1];

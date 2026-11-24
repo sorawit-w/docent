@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en" data-profile="deck">
+<!-- A DECK: slides to present findings in a meeting. Keep data-profile="deck". Add data-palette="harbor", "plum" or "sepia" for a palette. -->
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- THIS STARTING PAGE IS NOT BUILT YET. It holds content and data only: no page styles, no page script, no drawing.
+     Copy it, replace its content, then run render, stamp and check. The scripts put in the rest. -->
+<!-- The window title: "Deck title — Host project". It does not name Docent. -->
+<title>Better bug reports — Host project</title>
+</head>
+<body>
+<a class="skip" href="#content">Skip to the content</a>
+<!-- TOP BAR. The host's logo and name, and the theme switch. A deck has no section links: it has many short sections. -->
+<header class="topbar">
+  <div class="shell">
+    <span class="host">Host project</span>
+    <button class="theme" type="button">
+      <svg class="icon-moon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13.5 9.6A5.8 5.8 0 0 1 6.4 2.5a5.8 5.8 0 1 0 7.1 7.1Z"/></svg>
+      <svg class="icon-sun" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="8" cy="8" r="3"/><path d="M8 1.5v1.6M8 12.9v1.6M1.5 8h1.6M12.9 8h1.6M3.4 3.4l1.1 1.1M11.5 11.5l1.1 1.1M3.4 12.6l1.1-1.1M11.5 4.5l1.1-1.1"/></svg>
+      <span class="theme-text">Dark</span>
+    </button>
+  </div>
+</header>
+<!-- SLIDES. Every child of <main> is a <section class="slide"> with its own id. One point per slide.
+     The heading is one sentence that says the point, at most two lines (about 80 characters).
+     The body is ONE of: one figure; at most 3 points, each one line (about 75 characters); a card grid of at most 3 large numbers,
+     each with one line; one table of at most 4 columns and 5 rows; a paragraph of at most two lines; a code block of at most 8 lines.
+     A slide may have no body: a heading alone starts a new part of the talk. check estimates each slide's height and refuses a slide
+     that would not fit the screen. -->
+<main class="shell" id="content">
+  <!-- THE TITLE SLIDE comes first: the h1, the opening paragraph, and a facts list with who presents, the date and a link to the report. -->
+  <section class="slide title" id="s1" aria-labelledby="s1-h">
+    <h1 id="s1-h">Better bug reports</h1>
+    <p class="standfirst">What a good bug report holds, and why it is fixed sooner.</p>
+    <ul class="facts">
+      <li>Support team review, 1 October 2026</li>
+      <li>The full report: <a href="report-a-bug.html">report-a-bug.html</a></li>
+    </ul>
+  </section>
+
+  <!-- POINTS: at most three, each one line. -->
+  <section class="slide" id="s2" aria-labelledby="s2-h">
+    <h2 id="s2-h">Ask for three things in every bug report</h2>
+    <ul>
+      <li>What you did, step by step</li>
+      <li>What you expected to happen</li>
+      <li>What happened instead, with the error text</li>
+    </ul>
+  </section>
+
+  <!-- ONE FIGURE. Copy the chart's data block from the report, with the same id, so both files draw the same chart. The caption ends with
+       its source line. Change the data, then run render. Never edit the drawing. -->
+  <section class="slide" id="s3" aria-labelledby="s3-h">
+    <h2 id="s3-h">Sign-in gets the most bug reports</h2>
+    <figure>
+      <div class="fig" role="region" aria-label="Bug reports by area" tabindex="0">
+<!-- docent:diagram
+{
+  "id": "reports-by-area",
+  "kind": "bar",
+  "label": "Sign-in had the most bug reports in the third quarter, 412. Search and Checkout had about 250 each. Help pages had the fewest, 18. Notifications has no count, because reports had no area label for it before April.",
+  "scale": {"from": 0, "to": 500, "step": 100, "unit": "reports"},
+  "order": "largest",
+  "rows": [
+    {"name": "Sign-in", "value": 412},
+    {"name": "Search", "value": 268},
+    {"name": "Checkout", "value": 231},
+    {"name": "Settings", "value": 97},
+    {"name": "Profile", "value": 64},
+    {"name": "Help pages", "value": 18},
+    {"name": "Notifications", "value": null}
+  ]
+}
+-->
+<!-- /docent:diagram -->
+      </div>
+      <figcaption>Bug reports in the third quarter, by area. <span class="source">Source: invented sample data.</span></figcaption>
+    </figure>
+  </section>
+
+  <!-- LARGE NUMBERS: a card grid of at most three cards, each a number and one line. -->
+  <section class="slide" id="s4" aria-labelledby="s4-h">
+    <h2 id="s4-h">Reports with steps are fixed in fewer days</h2>
+    <ul class="cards">
+      <li><p class="big">2 days</p><p>To fix a report with steps</p></li>
+      <li><p class="big">5 days</p><p>To fix a report without steps</p></li>
+      <li><p class="big">38%</p><p>Of reports have steps</p></li>
+    </ul>
+  </section>
+
+  <!-- A SMALL TABLE: at most 4 columns and 5 rows under the heading row. A larger table belongs in the report. -->
+  <section class="slide" id="s5" aria-labelledby="s5-h">
+    <h2 id="s5-h">Each area has one owner</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th scope="col">Area</th><th scope="col">Owner</th><th scope="col" class="num">Reports</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Sign-in</th><td>Accounts team</td><td class="num">412</td></tr>
+          <tr><th scope="row">Search</th><td>Search team</td><td class="num">268</td></tr>
+          <tr><th scope="row">Checkout</th><td>Payments team</td><td class="num">231</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- A HEADING ALONE starts a new part of the talk, or ends it. -->
+  <section class="slide" id="s6" aria-labelledby="s6-h">
+    <h2 id="s6-h">Questions, and what we ask of each team</h2>
+  </section>
+</main>
+<footer>
+  <div class="shell">
+    <p class="tagline">The host's tagline, in its own words.</p>
+    <p class="credit"><svg viewBox="13 13 38 38" aria-hidden="true"><path d="M20 37V18H30A14 14 0 0 1 30 46H29" fill="none" stroke="currentColor" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="20" cy="46" r="4" fill="currentColor"/></svg>Made with <a href="https://github.com/sorawit-w/docent">Docent</a></p>
+  </div>
+</footer>
+</body>
+</html>

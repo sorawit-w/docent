@@ -1,5 +1,5 @@
 // profile: counts what a page holds and suggests the profile that fits it. The agent chooses the profile; check names a suggestion only when one rule wins clearly.
-const PROFILES = ["standard", "task", "reference", "brief"];
+const PROFILES = ["standard", "task", "reference", "brief", "deck"]; // a deck is chosen when the user asks for slides, never suggested
 
 const plain = (s) => s.replace(/<[^>]*>/g, " ").replace(/&[a-z#0-9]+;/gi, " ").replace(/\s+/g, " ").trim();
 const all = (s, re) => [...s.matchAll(re)].map((m) => m[1] || m[0]);
