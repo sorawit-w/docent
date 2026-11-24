@@ -161,6 +161,7 @@ Docent uses system fonts only, because every document is one file with nothing t
 - **Task**: a how-to, a runbook or troubleshooting. The block ends at the right edge of the notes. Sections and steps are closer together.
 - **Reference**: commands, options, an API, settings, a log or a trace. The block is up to 1120px wide, and table rows are tighter, so more fits on a screen.
 - **Brief**: a report for managers, such as a business analysis report, an incident report or release notes. The block is up to 1120px wide, for timeline tables.
+- **Deck**: slides to present a report's findings in a meeting, in a file of their own (see Slides). It reads as a stack of short sections, like any page.
 
 A page for the public or for older readers also has `data-text="large"`: the body is 18px, and every size grows with it.
 
@@ -401,6 +402,25 @@ A document has few widgets. More than four is a sign that some are not needed.
 A card grid shows 3 to 8 short items side by side, when the reader should see them together: the parts of a good report, or three numbers that sum up a result. Each card is a heading (16px, weight 600) or a large number (30px serif, in ink), and one line of small muted text. A card has a line above it and no box, like a margin note. At most four cards stand in a row; on a phone two, and on the narrowest screen one. A card grid uses the block width. When the items need more than one line each, or the reader must compare facts across them, use a list or a table.
 
 **A number with its change.** A card with a large number may take a third line, its change against an earlier period: the direction as a word ("Up", "Down" or "No change"), the amount (a percent, percentage points, or a count with its unit), the word "against", the period, and the earlier value in brackets, so the reader can check it: "Up 12% against Q2 2026 (973)". The line is 14px, like the card's other line; the direction word is in the text color at weight 600, so it can be found at a glance, and the rest is muted. It has no arrow, no color and no fill, because up is not always good (more bug reports is bad news), and green, amber and red mean status only. Whether the change is good news is the author's sentence beside the cards; when the change crosses a target, a status note says so in words. A card has at most one change, against one period: two comparisons, such as against last quarter and last year, are a table. A card with a change keeps the line that says what its number counts. In a sentence the change takes the same parts in the same order, with no markup: "Reports rose to 1,090 in Q3 2026, up 12% against Q2 (973)." On paper it prints as text, and a screen reader reads the card in its order, so the direction is heard as a word.
+
+## Slides
+
+A deck (`data-profile="deck"`) is a file of its own, made from a report to present its findings. Each slide is a `<section class="slide">` with an `id`, directly inside `<main>`: one heading, a sentence that says the point of the slide, and one body that shows the evidence for it. The first slide is the title slide (`class="slide title"`): the `<h1>`, the opening paragraph, and a facts list with who presents, the date and a link to the report. Each body uses the block a document already uses:
+
+| Body | Limit |
+|---|---|
+| One figure | One drawing that fits the slide, and one source line under it |
+| Points | At most 3, each one line at 30px (about 75 characters) |
+| Large numbers | A card grid of at most 3 cards: the number, and one line |
+| A small table | At most 4 columns and 5 rows under the heading row |
+| A short paragraph, or a quote | At most two lines at 30px |
+| A code block | At most 8 lines |
+
+A slide may also have no body: a heading alone starts a new part of the talk. A deck has no widget, no walkthrough and no closed section other than a figure's words.
+
+**The frame.** A slide is laid out on a frame of 1280 × 720 CSS pixels with 64px margins, so 1152 × 592 inside. It uses three of the six sizes: the heading at the `h1` size (52px), points and a short paragraph at the `h2` size (30px), and small text at the `body-lg` size (21px). The heading has at most two lines. `check` estimates the height of each slide on the frame, with the renderer's text widths, and refuses a slide that would not fit.
+
+**The stack.** With scripts off, and before the slides are presented, a deck is a column of short sections at reading sizes. Each slide's number stands before its heading in the muted color, as the number of a step does, so a reader can follow "on slide 4" in an email. The title slide counts as slide 1 and shows no number. The top bar holds the host's logo and name and the theme switch, and no section links.
 
 ## Host tokens
 

@@ -10,9 +10,16 @@ const CSS_BLOCK = /\/\* docent:kit ([^ *]+) \*\/[\s\S]*?\/\* \/docent:kit \*\//g
 const JS_BLOCK = /\/\/ docent:kit ([^\s]+)\n[\s\S]*?\/\/ \/docent:kit/g;
 
 const { paletteOf, paletteCss } = require("./palettes.cjs");
-/** The kit styles, with the one palette that the page names, if any. */
-const cssBlock = (palette = null) => `/* docent:kit ${VERSION} */\n${read("kit.css")}${palette ? `\n${paletteCss(palette)}` : ""}\n/* /docent:kit */`;
-const jsBlock = () => `// docent:kit ${VERSION}\n${read("kit.js")}\n// /docent:kit`;
+/** The profile that <html> names, or null. */
+function profileOf(html) {
+  const tag = (html.match(/<html\b[^>]*>/i) || [""])[0];
+  const m = tag.match(/\sdata-profile\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'>]+))/i);
+  return m ? m[1] ?? m[2] ?? m[3] : null;
+}
+const isDeck = (html) => profileOf(html) === "deck";
+/** The kit styles, with the one palette that the page names, if any, and the deck part only in a deck. */
+const cssBlock = (palette = null, deck = false) => `/* docent:kit ${VERSION} */\n${read("kit.css")}${palette ? `\n${paletteCss(palette)}` : ""}${deck ? `\n${read("deck.css")}` : ""}\n/* /docent:kit */`;
+const jsBlock = (deck = false) => `// docent:kit ${VERSION}\n${read("kit.js")}${deck ? `\n${read("deck.js")}` : ""}\n// /docent:kit`;
 
 /** The kit blocks found in a document: [{ kind, version, text }]. */
 function findKit(html) {
@@ -39,9 +46,10 @@ function stampHtml(html) {
     html = html.slice(0, at) + wrap(block) + html.slice(at);
     actions.push(`${kind} added`);
   };
-  put("styles", CSS_BLOCK, cssBlock(paletteOf(html)), (b) => `<style>\n${b}\n</style>\n`, "</head>");
-  put("script", JS_BLOCK, jsBlock(), (b) => `<script>\n${b}\n</script>\n`, "</body>");
+  const deck = isDeck(html);
+  put("styles", CSS_BLOCK, cssBlock(paletteOf(html), deck), (b) => `<style>\n${b}\n</style>\n`, "</head>");
+  put("script", JS_BLOCK, jsBlock(deck), (b) => `<script>\n${b}\n</script>\n`, "</body>");
   return { html, actions };
 }
 
-module.exports = { VERSION, cssBlock, jsBlock, findKit, stampHtml };
+module.exports = { VERSION, cssBlock, jsBlock, findKit, stampHtml, profileOf, isDeck };
