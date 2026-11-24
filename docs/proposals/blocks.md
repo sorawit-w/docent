@@ -83,7 +83,7 @@ A page has one answer place at the top. The findings list does not repeat the ca
 <section id="summary" aria-labelledby="summary-h">
   <h2 id="summary-h">What we found</h2>
   <ol class="findings" aria-label="Key findings">
-    <li><strong>Sign-in had the most bug reports.</strong> 412 of 1,090 reports, more than the next two areas together.</li>
+    <li><strong>Sign-in had the most bug reports.</strong> 412 of 1,090 reports, 38%, more than any other area.</li>
     <li><strong>About one report in five could not be repeated.</strong> 196 of 1,090, and the share is about the same in most areas.</li>
     <li><strong>Reports are fixed faster than last quarter.</strong> 46% were fixed within 7 days, up 6 percentage points against Q2 2026 (40%).</li>
   </ol>
@@ -543,6 +543,7 @@ Notes on the numbers:
 - "Price change announced" is 22 characters, over the 20-character limit, so the churn example uses "Price announced" (15 characters, 96px). These are the kit's estimates; the build measures the real text.
 - The distances between event lines are the gap between points times the number of steps: May to July is 2 steps (90px on a desktop, 28px on a phone), and 08:45 to 09:20 is 7 steps (151px and 47px).
 - The plot widths, 497px and 153px, are those of the `charts.md` line chart example. A chart with other names has a slightly different plot; the build measures it.
+- The share in section 1: 412 of 1,090 is 37.8%, written 38%. Search and Checkout together have 268 + 231 = 499, more than Sign-in, so the finding says "more than any other area".
 - The sums in section 3: 5,310 + 2,640 + 470 = 8,420; 968 + 201 + 43 = 1,212; 22,600 + 12,100 + 6,600 = 41,300; 412 + 268 + 231 + 97 + 64 + 18 = 1,090; 58 + 61 + 49 + 22 + 6 + 0 = 196; 3 + 2 + 2 + 2 + 1 = 10.
 
 ---
