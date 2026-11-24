@@ -49,7 +49,7 @@ test("on a wide screen the text and its notes sit in the middle, and wide blocks
 });
 
 test("h4 and definition lists have kit styles within the six sizes and two weights", () => {
-  assert.match(rule("h4"), /font: 600 1rem\/1\.5 var\(--sans\)/);
+  assert.match(rule("h4"), /font: 600 1\.125rem\/1\.5 var\(--sans\)/);
   assert.match(rule("dt"), /font-weight: 600/);
   assert.match(rule("dl"), /max-width: var\(--measure\)/);
 });
