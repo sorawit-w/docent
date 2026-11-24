@@ -94,8 +94,9 @@ function withClass(markup, name) {
 // to scale and a plan describe a design, not data (decision 2 in docs/proposals/sources.md).
 const MEASURED = { range: "range chart", bar: "bar chart", line: "line chart", funnel: "funnel", heatmap: "heat map", heatplan: "heat plan", statusgrid: "status grid" };
 
-/** Returns { errors, warnings }: two lists of plain sentences, each starting with the ID of its rule, as "[cards.count] …".
-    options.config is the repo file that holds for the page, { data, label }; its host colors are tested as the page's own. */
+/** Returns { errors, warnings, notes }: lists of plain sentences, each starting with the ID of its rule, as "[cards.count] …".
+    options.config is the repo file that holds for the page, { data, label, lines }: its host colors are tested as the page's own, and
+    each rule that it turns off is reported as a note, not as an error or a warning. */
 function checkDocument(html, options = {}) {
   const errors = [], warnings = [];
   const error = (id, text) => errors.push(say(id, text)), warn = (id, text) => warnings.push(say(id, text));
@@ -583,7 +584,17 @@ function checkDocument(html, options = {}) {
     const named = unique.slice(0, 3).map((f) => `${f.kind === "email" ? "an email address" : "a phone number"} ${f.masked}`).join(", ");
     warn("personal.data", `${where} holds what looks like personal data: ${named}${unique.length > 3 ? `, and ${unique.length - 3} more` : ""}. Remove it or mask it, or use a reserved example such as name@example.com or 555-0100`);
   }
-  return { errors, warnings };
+  // 12. Rule changes in the repo file: each house-style rule that the file turns off becomes one note for the page, with the line of the
+  // file, its reason, and how many places the rule would have reported. A rule that finds nothing says nothing.
+  const changed = [], off = (options.config && options.config.data && options.config.data.rules) || {};
+  for (const [id, change] of Object.entries(off)) {
+    const found = [...errors, ...warnings].filter((e) => split(e).id === id);
+    if (!found.length) continue;
+    const line = options.config.lines && options.config.lines[id] ? `, line ${options.config.lines[id]}` : "";
+    changed.push(say(id, `off in ${options.config.label}${line} (${JSON.stringify(change.reason)}); ${found.length === 1 ? "1 place" : `${found.length} places`} on the page, the first: ${split(found[0]).text}`));
+    for (const list of [errors, warnings]) for (let i = list.length - 1; i >= 0; i -= 1) if (split(list[i]).id === id) list.splice(i, 1);
+  }
+  return { errors, warnings, notes: changed };
 }
 
 /** The list of rules, one line each: the ID, the group, and the part of the docs that explains it. */
@@ -598,7 +609,7 @@ const USAGE = "usage: node check.cjs [--config <path> | --no-config] <document.h
 
 function main(args) {
   if (args[0] === "--rules" && args.length === 1) {
-    console.log(`${RULES.size} rules. A guarantee is a promise to the reader of every page; house style is Docent's own choice, which a team may make differently.`);
+    console.log(`${RULES.size} rules. A guarantee is a promise to the reader of every page; house style is Docent's own choice, which a team may turn off in .docent/config.json, with a reason (see "Rule changes" in DESIGN.md).`);
     console.log(listRules());
     return 0;
   }
@@ -624,8 +635,9 @@ function main(args) {
     try { result = checkDocument(fs.readFileSync(file, "utf8"), { config: configOf.get(file) }); } catch (error) { result = { errors: [say("check.file", error.message)], warnings: [] }; }
     result.errors.forEach((e) => console.log(line(file, "error", e)));
     result.warnings.forEach((w) => console.log(line(file, "warning", w)));
+    (result.notes || []).forEach((n) => console.log(line(file, "note", n)));
     const count = (n, word) => `${n} ${word}${n === 1 ? "" : "s"}`;
-    console.log(`check ${file}: ${count(result.errors.length, "error")}, ${count(result.warnings.length, "warning")}`);
+    console.log(`check ${file}: ${count(result.errors.length, "error")}, ${count(result.warnings.length, "warning")}${result.notes && result.notes.length ? `, ${count(result.notes.length, "note")}` : ""}`);
     if (result.errors.length) failed += 1;
   }
   console.log("check reads the source only. It does not open a browser, so it does not test contrast, the phone layout, print or motion.");

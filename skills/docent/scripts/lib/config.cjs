@@ -3,6 +3,7 @@
 // what it says into a page; a page never reads it. The nearest file above the page's folder wins, up to the root of the repo.
 const fs = require("node:fs");
 const path = require("node:path");
+const { RULES, GUARANTEE } = require("./rules.cjs");
 
 const NAME = path.join(".docent", "config.json");
 const VERSION = 1;
@@ -94,7 +95,26 @@ function readConfig(file, { palettes = [], profiles = [] } = {}) {
   if ("credit" in data && !CREDITS.includes(data.credit)) at('"credit"', `is ${shown(data.credit)}; it is ${CREDITS.map(shown).join(", ")}`);
   if ("profile" in data && data.profile !== null && !profiles.includes(data.profile)) at('"profile"', `is ${shown(data.profile)}; a profile is ${profiles.map(shown).join(", ")}`);
   if ("rules" in data && !isPlain(data.rules)) at('"rules"', 'is not an object; each key is a rule ID, and each value is { "off": true, "reason": "…" }');
-  return { file: abs, base, data: errors.length ? null : data, errors };
+  else if ("rules" in data) for (const [id, entry] of Object.entries(data.rules)) {
+    const field = `"rules".${shown(id)}`, rule = RULES.get(id);
+    if (!rule) { at(field, "no rule has this ID; node check.cjs --rules lists them"); continue; }
+    if (rule.group === GUARANTEE) { at(field, 'a guarantee, which the repo file cannot change; it is a promise to the reader of every page (see "Rule changes" in DESIGN.md)'); continue; }
+    if (!isPlain(entry)) { at(field, 'is not { "off": true, "reason": "…" }'); continue; }
+    for (const key of Object.keys(entry)) if (!["off", "reason"].includes(key)) at(`${field}.${shown(key)}`, 'no field has this name; a rule change holds "off": true and "reason", and a rule is on or off');
+    if (entry.off !== true) at(field, `"off" is ${shown(entry.off)}; a rule change is "off": true, and a rule that stays on has no entry`);
+    if (typeof entry.reason !== "string" || !entry.reason.trim()) at(field, 'no "reason"; write why the team changes this rule');
+  }
+  return { file: abs, base, data: errors.length ? null : data, errors, lines: errors.length ? {} : linesOf(fs.readFileSync(abs, "utf8"), data) };
+}
+
+/** The line of the file where each rule change stands, so a note can name it: { id: line }. */
+function linesOf(text, data) {
+  const out = {}, rows = text.split(/\r?\n/), start = rows.findIndex((r) => /"rules"\s*:/.test(r));
+  for (const id of Object.keys((data && data.rules) || {})) {
+    const at = rows.findIndex((r, i) => i >= Math.max(start, 0) && r.includes(JSON.stringify(id)));
+    if (at >= 0) out[id] = at + 1;
+  }
+  return out;
 }
 
 module.exports = { NAME, VERSION, COLORS, FONTS, FIELDS, repoRoot, findConfig, readConfig };

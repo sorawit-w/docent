@@ -163,7 +163,7 @@ It is not an appendix of raw data: long tables go in a closed section, or in a s
 
 **A page for the public.** When the readers are the public or older readers, also write `data-text="large"`: `<html lang="en" data-profile="standard" data-text="large">`. The body text is then about 20px on screen and 12pt on paper, and the text column grows with it.
 
-When the user asks for something that a design rule forbids, follow the rule, say which rule it is, and offer the user's way. Do it the user's way when the user confirms. This holds for design rules only. When the user asks for an app screen or a marketing page, say that Docent is not made for it, and write nothing with Docent.
+When the user asks for something that a design rule forbids, follow the rule, say which rule it is, and offer the user's way. Do it the user's way when the user confirms. This holds for design rules only. When the team wants that choice on every page, and the rule is house style (`check.cjs --rules` names the group), offer a rule change in the repo file `.docent/config.json`, with the reason in the user's words, and write it only with the user's OK. `check` then reports the rule as a note. A guarantee, such as contrast, no network or dark mode, cannot change (see "Rule changes" in `references/DESIGN.md`). When the user asks for an app screen or a marketing page, say that Docent is not made for it, and write nothing with Docent.
 
 ## Write a deck
 
@@ -311,7 +311,7 @@ The starting page has a place for each one. See "Logo, tagline and credit" in `r
 
 Say what was tested and what was not. Use these words:
 
-- When `check` ends with 0 errors: "`check` reports 0 errors." Add the number of warnings and what they say.
+- When `check` ends with 0 errors: "`check` reports 0 errors." Add the number of warnings and what they say, and each note: a rule that the repo file turns off, with its reason.
 - `check` reads the source only. It does not open a browser. So do not say that the contrast, the phone layout, print or motion were checked, unless you looked yourself. Say which views you opened.
 - When `render` refused a diagram or a widget, say which one and why.
 - Report each hand-drawn figure as hand-drawn, every time, with its type: "Figure 3 is a hand-drawn fishbone. `check` tested its contract; I looked at it in light, dark, at 375px and in print preview." Say which of those views you did not open. `check` names each one in a warning.

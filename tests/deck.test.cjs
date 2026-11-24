@@ -174,7 +174,7 @@ test("present mode is light with the more-contrast tokens; a palette adds its ow
   assert.match(harbor, /html:root\[data-palette="harbor"\]\.presenting:not\(\[data-never\]\) \{[^}]*--primary: var\(--host-accent, #025c87\)/);
   assert.ok(!cssBlock("harbor").includes(".presenting"), "an ordinary page with a palette has no present block");
   const named = build(source.replace('data-profile="deck"', 'data-profile="deck" data-palette="plum"'));
-  assert.deepEqual(checkDocument(named), { errors: [], warnings: [] });
+  assert.deepEqual(checkDocument(named), { errors: [], warnings: [], notes: [] });
 });
 
 test("in a deck, check warns when the host's accent has less than 7:1 on the page", () => {
@@ -290,7 +290,7 @@ test("SKILL.md offers decks, and no longer names slide decks among what Docent i
 test("the sample deck is the output of render and stamp, and passes check with no error and no warning", () => {
   const sample = fs.readFileSync(path.join(assets, "specimen-deck.html"), "utf8");
   assert.equal(build(sample), sample, "run render and stamp on specimen-deck.html, then commit it");
-  assert.deepEqual(checkDocument(sample), { errors: [], warnings: [] });
+  assert.deepEqual(checkDocument(sample), { errors: [], warnings: [], notes: [] });
   assert.match(sample, /data-profile="deck"/);
   assert.match(sample, /"kind": "bar"/, "the bar chart of charts.md");
 });

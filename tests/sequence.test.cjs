@@ -119,6 +119,6 @@ test("check tests a sequence diagram in a document like any other diagram", () =
   const template = fs.readFileSync(path.join(__dirname, "..", "skills", "docent", "assets", "template.html"), "utf8");
   const page = template.replace("</main>", `<figure><div class="fig" role="region" aria-label="Figure 9" tabindex="0">\n<!-- docent:diagram\n${JSON.stringify(fixture(), null, 2)}\n-->\n<!-- /docent:diagram -->\n</div></figure></main>`);
   const built = stampHtml(renderDocument(page).html).html;
-  assert.deepEqual(checkDocument(built), { errors: [], warnings: [] });
+  assert.deepEqual(checkDocument(built), { errors: [], warnings: [], notes: [] });
   assert.match(checkDocument(built.replace("check the session.</li>", "check it.</li>")).errors.join(), /diagram 3 \("page"\): the drawing does not match its data; run render/, "the words are part of the drawing");
 });

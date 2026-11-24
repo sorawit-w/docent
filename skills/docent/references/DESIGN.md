@@ -512,6 +512,25 @@ The logo appears once, in the top bar. A second copy would repeat it, and two co
 
 **The credit.** Docent's mark in the footer is drawn in one color, in the muted color of the words beside it, so a page in the host's colors carries no spot of Docent's color. The tile stays the favicon, the mark on Docent's own pages, and the cover of a deck. A link loads nothing, so the credit works offline; it simply does not open. Docent is MIT-licensed, so a host may remove the credit; `check` warns, so that the removal is a choice and not a mistake.
 
+## Rule changes
+
+Every rule that `check` tests has an ID, and each error and warning names it, such as `[cards.count]`. `node check.cjs --rules` lists them, each in one of two groups:
+
+- **A guarantee** is a promise to the reader: the page opens with no network, reads in light, in dark and on paper, meets the contrast rules, and works with a screen reader and a keyboard. A page often travels outside its repo, by mail, in a chat or on paper, and its reader never sees the repo's choices. So no file can change a guarantee.
+- **House style** is a choice Docent made for its own pages, such as 3 to 8 cards in a card grid, no pie chart, or no gradient. Another team may choose differently without hurting a reader.
+
+A team may turn a house-style rule off for every page in its repo, in the repo file `.docent/config.json`, with the reason:
+
+```json
+"rules": {
+  "cards.count": { "off": true, "reason": "The weekly review shows 10 service numbers side by side, in the same order every week." }
+}
+```
+
+A rule is on or off; there are no values. `check` refuses a file that names a guarantee, an ID that does not exist, or a change with no reason. A rule that is off is never hidden: `check` reports it as a **note**, one for each rule on each page, with the line of the file, its reason, and how many places on the page the rule would have reported. A note does not fail the page, so an error of a house-style rule, such as a gradient, also becomes a note. A rule change that the page does not use says nothing. The file is reviewed like code, so the next reviewer sees each change and why.
+
+A rule broken on one page only, with the user's OK, is still reported as a warning or an error: a page has no way to record a rule change of its own.
+
 ## Icons
 
 An icon lets the reader tell the parts of a diagram apart before reading a word. Icons are used inside diagrams only: one for each part and one for each lane.

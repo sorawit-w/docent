@@ -29,7 +29,7 @@ test("the starting page holds content and data only; render and stamp build it i
   assert.deepEqual(made.places, { count: 2, unknown: [], clash: [] }, "render fills both places of the value picker");
   const stamped = stampHtml(made.html);
   assert.deepEqual(stamped.actions, ["styles added", "script added"]);
-  assert.deepEqual(checkDocument(stamped.html), { errors: [], warnings: [] });
+  assert.deepEqual(checkDocument(stamped.html), { errors: [], warnings: [], notes: [] });
   assert.equal(stampHtml(renderDocument(stamped.html).html).html, stamped.html, "building it again changes nothing");
   assert.match(checkDocument(template).errors.join("\n"), /the document has no kit styles; run stamp/, "check says what an unbuilt page still needs");
 });
@@ -148,7 +148,7 @@ test("check warns about facts joined into one line of text; they go in a margin 
 
 test("check tests the host tokens: contrast for a hex color, and a warning for a kit token set by hand", () => {
   const style = (css) => checkDocument(specimen.replace("</head>", `<style>${css}</style></head>`));
-  assert.deepEqual(style(":root { --host-accent: #a21caf; --host-accent-dark: #ec6cf7; --host-ink: #4d0055; }"), { errors: [], warnings: style("").warnings });
+  assert.deepEqual(style(":root { --host-accent: #a21caf; --host-accent-dark: #ec6cf7; --host-ink: #4d0055; }"), { errors: [], warnings: style("").warnings, notes: [] });
   assert.match(style(":root { --host-accent: #f2b824; }").errors.join(), /--host-accent #f2b824 has a contrast of 1\.\d\d:1 on #fbfbfe and 1\.\d\d:1 on #f2f3f9; text needs 4\.5:1/);
   assert.match(style(":root { --host-accent-dark: #2f3fd0; }").errors.join(), /--host-accent-dark #2f3fd0 has a contrast of/);
   assert.match(style(":root { --host-accent: rebeccapurple; }").warnings.join(), /check tests the contrast of a hex color only/);
@@ -194,7 +194,7 @@ test("check tests the profile: a known value, a warning when it is missing, and 
   assert.equal(checkDocument(html(' data-profile="task" data-text="large"')).errors.length, 0);
   assert.match(checkDocument(html("")).warnings.join("\n"), /no data-profile, so the page uses "standard"/);
   const reference = stampHtml(renderDocument(fs.readFileSync(path.join(__dirname, "fixtures", "reference-page.html"), "utf8")).html).html;
-  assert.deepEqual(checkDocument(reference), { errors: [], warnings: [] }, "the reference sample passes check");
+  assert.deepEqual(checkDocument(reference), { errors: [], warnings: [], notes: [] }, "the reference sample passes check");
   assert.match(checkDocument(reference.replace('data-profile="reference"', 'data-profile="task"')).warnings.join("\n"), /data-profile="task"; the page looks like "reference": 3 code blocks and 3 tables/);
 });
 
@@ -229,10 +229,10 @@ test("the logo, the tagline and the credit: a logo may hold a gradient, the titl
   const built = stampHtml(renderDocument(template).html).html;
   const result = (change) => checkDocument(change(built));
   const shaded = '<svg class="logo" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><defs><linearGradient id="host-g"><stop offset="0" stop-color="#0a5f8a"/><stop offset="1" stop-color="#72c2ee"/></linearGradient></defs><path d="M2 2h20v20H2z" fill="url(#host-g)"/></svg>';
-  assert.deepEqual(result((h) => h.replace('<span class="host">', `<span class="host">${shaded}`)), { errors: [], warnings: [] }, "a host's logo is the one place where a gradient is allowed");
+  assert.deepEqual(result((h) => h.replace('<span class="host">', `<span class="host">${shaded}`)), { errors: [], warnings: [], notes: [] }, "a host's logo is the one place where a gradient is allowed");
   assert.match(result((h) => h.replace("</main>", `<p>${shaded}</p></main>`)).errors.join("\n"), /a logo stands outside the top bar[\s\S]*<linearGradient> is used; the page is flat/);
   const word = '<svg class="logo" viewBox="0 0 96 24" width="96" height="24" role="img" aria-label="Example project"><path d="M0 0h96v24H0z" fill="currentColor"/></svg>';
-  assert.deepEqual(result((h) => h.replace('<span class="host">Host project</span>', `<span class="host">${word}</span>`).replace("<title>Document title — Host project", "<title>Document title — Example project")), { errors: [], warnings: [] }, "the title ends with the name the wordmark carries");
+  assert.deepEqual(result((h) => h.replace('<span class="host">Host project</span>', `<span class="host">${word}</span>`).replace("<title>Document title — Host project", "<title>Document title — Example project")), { errors: [], warnings: [], notes: [] }, "the title ends with the name the wordmark carries");
   assert.match(result((h) => h.replace('<span class="host">Host project</span>', `<span class="host">${word}</span>`)).warnings.join(), /the <title> ends with "Host project", but the host project in the top bar is "Example project"/);
   assert.match(result((h) => h.replace(/<p class="credit">[\s\S]*?<\/p>/, "")).warnings.join(), /the footer has no "Made with Docent"/);
   assert.deepEqual(result((h) => h.replace('Made with <a href="https://github.com/sorawit-w/docent">Docent</a>', "Made with Docent")).warnings, [], "plain text is the host's choice");

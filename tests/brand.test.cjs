@@ -72,7 +72,7 @@ test("the printed style block passes check on the starting page, and the script 
   const template = fs.readFileSync(path.join(__dirname, "..", "skills", "docent", "assets", "template.html"), "utf8");
   const style = print(brand(design('  primary: "#d946ef"', '  h1:\n    fontFamily: "Brand Serif"')));
   const page = stampHtml(renderDocument(template).html).html.replace("</head>", `${style}\n</head>`);
-  assert.deepEqual(checkDocument(page), { errors: [], warnings: [] }, "the values that brand gives pass check's contrast and warnings");
+  assert.deepEqual(checkDocument(page), { errors: [], warnings: [], notes: [] }, "the values that brand gives pass check's contrast and warnings");
   const tmp = path.join(require("node:os").tmpdir(), `docent-brand-${process.pid}.md`);
   fs.writeFileSync(tmp, "# no front matter\n");
   assert.throws(() => execFileSync(process.execPath, [path.join(__dirname, "..", "skills", "docent", "scripts", "brand.cjs"), tmp], { stdio: "pipe" }), (e) => e.status === 1 && /no front matter/.test(e.stderr));
