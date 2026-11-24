@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Why customers left in the third quarter — Example Planner</title>
 <style>
-/* docent:kit 0.28.0 */
+/* docent:kit 0.29.0 */
 /* Docent page styles. Tokens come from references/DESIGN.md. One file, no network. */
 :root {
   color-scheme: light;
@@ -257,6 +257,12 @@ th, td { text-align: left; vertical-align: top; padding: var(--cell-y) 24px var(
 thead th { border-bottom: 1px solid var(--text); padding-bottom: 10px; font-size: 0.875rem; line-height: 1.5; font-weight: 600; color: var(--muted); }
 tbody th { font-weight: 600; white-space: nowrap; }
 tbody tr { border-bottom: 1px solid var(--line); }
+/* A total row (tfoot): a 1px rule in the text color above it, the rule that stands under the headings, and every cell in weight 600; no fill.
+   The last body row loses its own line, so two rules never stand together. A second row, such as an average, has the line of a body row. */
+tbody:has(+ tfoot) > tr:last-child { border-bottom: 0; }
+tfoot tr:first-child { border-top: 1px solid var(--text); }
+tfoot tr + tr { border-top: 1px solid var(--line); }
+tfoot :is(th, td) { font-weight: 600; }
 /* A column of numbers (class "num" on its th and td cells): the numbers line up on the right, in tabular figures. The last column ends at the table's edge. */
 :is(th, td).num { text-align: right; font-variant-numeric: tabular-nums; }
 :is(th, td).num:last-child { padding-right: 0; }
@@ -427,6 +433,8 @@ footer p { margin: 0; }
   table { min-width: 0; } .table-wrap { overflow: visible; }
   /* Paper cannot scroll: a long row heading wraps, as the other cells do. On screen it stays on one line, and the table scrolls inside itself. */
   tbody th { white-space: normal; }
+  /* A browser may repeat a tfoot at the foot of each printed page; a total under half of the rows would mislead, so it prints once, at the end. */
+  tfoot { display: table-row-group; }
   /* Paper cannot scroll, so a wide grid in words, such as the numbers of a heat map, takes the smallest text size and tighter cells; render splits a grid that is still too wide into several tables. */
   .dg-words > .table-wrap table { font-size: 0.875rem; } .dg-words > .table-wrap thead th { font-size: inherit; } .dg-words > .table-wrap :is(th, td) { padding: 4px 6px 4px 0; }
   /* A browser leaves out backgrounds on paper. These carry meaning, so they print: status dots, the rail of the steps, and the ground of figures and code. */
@@ -880,8 +888,10 @@ footer p { margin: 0; }
           <tr><th scope="row">Starter</th><td class="num">5,310</td><td class="num">968</td><td class="num">18.2%</td><td class="num">11.9%</td><td class="num">+6.3</td><td class="num">$22,600</td></tr>
           <tr><th scope="row">Team</th><td class="num">2,640</td><td class="num">201</td><td class="num">7.6%</td><td class="num">6.4%</td><td class="num">+1.2</td><td class="num">$12,100</td></tr>
           <tr><th scope="row">Business</th><td class="num">470</td><td class="num">43</td><td class="num">9.1%</td><td class="num">8.8%</td><td class="num">+0.3</td><td class="num">$6,600</td></tr>
-          <tr><th scope="row">All plans</th><td class="num">8,420</td><td class="num">1,212</td><td class="num">14.4%</td><td class="num">10.1%</td><td class="num">+4.3</td><td class="num">$41,300</td></tr>
         </tbody>
+        <tfoot>
+          <tr><th scope="row">All plans</th><td class="num" data-sum>8,420</td><td class="num" data-sum>1,212</td><td class="num">14.4%</td><td class="num">10.1%</td><td class="num">+4.3</td><td class="num" data-sum>$41,300</td></tr>
+        </tfoot>
       </table>
     </div>
     <p>Inside each plan, the rate differs by the size of the account. Figure 3 compares the second and the third quarter for five groups. The smallest Starter accounts moved most.</p>
@@ -1612,7 +1622,7 @@ footer p { margin: 0; }
   </div>
 </footer>
 <script>
-// docent:kit 0.28.0
+// docent:kit 0.29.0
 (() => {
   const root = document.documentElement;
   root.classList.add('js');

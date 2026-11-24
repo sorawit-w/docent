@@ -49,6 +49,8 @@ const textOf = (s) => plain(s.replace(/</g, " <"));
 /** A cell that holds a number only: a sign, a currency, thousands separators, decimals, and a percent or a short unit. */
 const NUMBER = /^[−+-]?[$€£¥]?(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?\s?(?:%|[kKMB]|ms|s|px|x)?$/;
 const BLANK = /^(?:|—|–|-|n\/a)$/i; // an empty cell in a column of numbers
+/** The value of a cell for a sum, with no commas, currency sign or unit; null when the cell is not one number. */
+const sumValue = (text) => { const m = text.match(/^([−+-]?)[$€£¥]?((?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?)\s?(?:%|[a-zA-Z]+)?$/); return m ? (m[1] && m[1] !== "+" ? -1 : 1) * Number(m[2].replace(/,/g, "")) : null; };
 const hasClass = (attrs, name) => new RegExp(`\\bclass="(?:[^"]*\\s)?${name}(?:\\s[^"]*)?"`).test(attrs);
 /** A link address with its %-escapes decoded; a bare % (as in "100% done") leaves it as it is. */
 const decoded = (s) => { try { return decodeURIComponent(s); } catch { return s; } };
@@ -490,6 +492,34 @@ function checkDocument(html) {
       if (count > LEAD_WORDS) warnings.push(`the lead sentence of ${item} (${quoted}) has ${count} words; it has at most ${LEAD_WORDS}. Move the detail into the sentences after it`);
       if (/<a\b/i.test(lead) || /\bclass="(?:[^"]*\s)?state(?:\s[^"]*)?"/.test(lead)) warnings.push(`the lead sentence of ${item} (${quoted}) holds a link or a state; put it in the sentences after the <strong>, so a list of links names each link once`);
     });
+  }
+
+  // 10j. A total row: one or two rows in a <tfoot>, each named by a row heading in words. A cell with data-sum is the sum of the body cells
+  // in its column: exact, or within half a unit of its last digit for each body row with data-sum="rounded". A weighted sum, an average or
+  // a rate is not a sum, and check does not work it out.
+  for (const table of markup.matchAll(/<table\b[^>]*>([\s\S]*?)<\/table>/gi)) {
+    const label = (markup.slice(0, table.index).match(/aria-label="([^"]*)"[^>]*>\s*$/) || [])[1], name = label ? `the table "${label}"` : "a table";
+    const part = (tag) => (table[1].match(new RegExp(`<${tag}\\b[^>]*>([\\s\\S]*?)<\\/${tag}>`, "i")) || [])[1];
+    const rowsOf = (rows) => [...(rows || "").matchAll(/<tr\b[^>]*>([\s\S]*?)<\/tr>/gi)].map(([, row]) => [...row.matchAll(/<(td|th)\b([^>]*)>([\s\S]*?)<\/\1>/gi)].map(([, tag, attrs, inner]) => ({ tag: tag.toLowerCase(), attrs, text: plain(inner) })));
+    const names = (rowsOf(part("thead"))[0] || []).map((c) => c.text), body = rowsOf(table[1].replace(/<(thead|tfoot)\b[^>]*>[\s\S]*?<\/\1>/gi, "")), foot = rowsOf(part("tfoot"));
+    const last = (body[body.length - 1] || [])[0];
+    if (part("tfoot") == null && last && last.tag === "th" && /^(?:total\b|all )/i.test(last.text)) warnings.push(`${name}: the last body row "${last.text}" reads as a total; put it in a <tfoot> after the <tbody>, so it stands under a rule and prints once`);
+    if (foot.length > 2) warnings.push(`${name} has ${foot.length} rows in its <tfoot>; it holds one or two, such as a total and an average`);
+    for (const row of foot) {
+      if (!row[0] || row[0].tag !== "th" || !/\bscope="row"/.test(row[0].attrs) || !row[0].text) warnings.push(`${name}: a row of its <tfoot> has no row heading in words; start it with <th scope="row">, such as "Total" or "All areas", because a screen reader reads that heading with each cell`);
+      row.forEach((cell, c) => {
+        const mode = attrOf(cell.attrs, "data-sum") ?? (/\bdata-sum\b/.test(cell.attrs) ? "" : null);
+        if (mode == null) return;
+        if (/\b(?:colspan|rowspan)=/i.test(table[1])) return; // the columns of a merged cell are not clear from the source
+        const column = names[c] ? `"${names[c]}"` : c + 1, total = sumValue(cell.text);
+        if (total == null) return warnings.push(`${name}: the total "${cell.text}" in column ${column} is not a number, so check cannot add up its column`);
+        const parts = body.map((r) => r[c]).filter(Boolean), bad = parts.find((p) => sumValue(p.text) == null);
+        if (bad) return warnings.push(`${name}: the cell "${bad.text}" in column ${column} is not a number, so check cannot add up the column for its total ${cell.text}`);
+        const decimals = (cell.text.match(/\.(\d+)/) || ["", ""])[1].length, sum = parts.reduce((a, p) => a + sumValue(p.text), 0);
+        const allowed = mode === "rounded" ? (parts.length * 10 ** -decimals) / 2 : 0;
+        if (Math.abs(sum - total) > allowed + 1e-9) warnings.push(`${name}: the total ${cell.text} in column ${column} is not the sum of its column, ${sum.toLocaleString("en-US", { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}${mode === "rounded" ? `, within ${Number(allowed.toFixed(decimals + 1))} for rounded parts` : ""}`);
+      });
+    }
   }
 
   // 11. Personal data: email addresses and phone numbers, in the page text and in the data of each diagram and widget. A warning only:
