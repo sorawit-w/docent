@@ -112,6 +112,13 @@ test("every text on a slide is measured with its wrapped lines: a card's number,
   assert.ok(code.some((e) => /^slide 9: line 1 of its code block has \d+ characters; a line of code on a slide has at most 88/.test(e)), code.join("\n"));
 });
 
+test("the edge of a paragraph starts a new line, and a figure's drawing states its size", () => {
+  const quote = errorsOf(slide(9, `<h2>Questions</h2>\n<figure class="quote"><blockquote>${"<p>Ask.</p>".repeat(20)}</blockquote><figcaption>P3, tester</figcaption></figure>`));
+  assert.ok(quote.some((e) => e.startsWith("slide 9: its quote is about 20 lines")), quote.join("\n"));
+  const sizeless = errorsOf(slide(9, '<h2>Questions</h2>\n<figure><div class="fig" role="region" aria-label="A picture" tabindex="0"><img src="data:image/png;base64,AA==" alt="A picture"></div><figcaption>A caption.</figcaption></figure>'));
+  assert.ok(sizeless.includes("slide 9: its drawing has no width and height, so check cannot test that it fits the slide; give the <img> or <svg> its width and height in pixels"), sizeless.join("\n"));
+});
+
 test("a slide that is taller than the frame is refused, with its height", () => {
   const table = (rows, text) => `<h2>Ask for three things in every bug report, and say why each one matters</h2>\n<div class="table-wrap"><table><thead><tr><th>Part</th><th>Why</th><th>Who</th><th>When</th></tr></thead><tbody>${`<tr><td>${text}</td><td>${text}</td><td>${text}</td><td>${text}</td></tr>`.repeat(rows)}</tbody></table></div>`;
   // Two heading lines and a table of five short rows: fits, as the proposal measured.

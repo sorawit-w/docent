@@ -23,8 +23,10 @@ const SCALE = { most: 1.5, least: 1.25 }; // a drawing on a slide stands at 1.5 
 const LIMIT = { headingLines: 2, points: 3, cards: 3, columns: 4, rows: 5, paragraphLines: 2, codeLines: 8 };
 
 const VOID = new Set(["area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "source", "track", "wbr"]);
-// The text of markup. A <br> stays a line break ("\n"), because it starts a new line on the slide; other white space is one space.
-const plain = (s) => s.replace(/\s+/g, " ").replace(/<br\b[^>]*>/gi, "\n").replace(/<[^>]*>/g, " ").replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#39;|&apos;/g, "'").replace(/&nbsp;/g, " ").replace(/[^\S\n]+/g, " ").replace(/ *\n */g, "\n").trim();
+// The text of markup. A <br>, and the edge of a block such as a paragraph or a list item, starts a new line on the slide, so each stays a
+// line break ("\n"); other white space is one space. Several block edges in a row are one break.
+const BLOCK = /<\/?(?:p|div|li|ul|ol|dl|dt|dd|blockquote|h[1-6]|pre|table|tr|figure|figcaption|section)\b[^>]*>/gi;
+const plain = (s) => s.replace(/\s+/g, " ").replace(/<br\b[^>]*>/gi, "\n").replace(BLOCK, "\u2029").replace(/<[^>]*>/g, " ").replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#39;|&apos;/g, "'").replace(/&nbsp;/g, " ").replace(/[^\S\n\u2029]+/g, " ").replace(/ *\u2029[\u2029 ]*/g, "\u2029").replace(/^\u2029|\u2029$/g, "").replace(/\u2029/g, "\n").replace(/ *\n */g, "\n").trim();
 const hasClass = (attrs, name) => new RegExp(`\\bclass="(?:[^"]*\\s)?${name}(?:\\s[^"]*)?"`).test(attrs);
 const attrOf = (attrs, name) => (attrs.match(new RegExp(`\\b${name}="([^"]*)"`)) || [])[1];
 const px = (n) => Math.round(n);
@@ -156,6 +158,7 @@ function measureBody(el, room) {
     // One drawing: a desktop form (not a phone form), a hand-drawn figure or a picture.
     const drawings = [...inner.matchAll(/<svg\b([^>]*)>/gi)].filter(([, a]) => (/\bclass="dg\b/.test(a) && !/\bid="[^"]*-phone"/.test(a)) || /\bdata-drawn="hand"/.test(a)).length + (inner.match(/<img\b/gi) || []).length;
     if (drawings > 1) problems.push(`its figure holds ${drawings} drawings; a figure on a slide holds one. Two charts on one slide are two points: give each its own slide`);
+    if (!size && /<(?:img|svg)\b/i.test(inner)) problems.push("its drawing has no width and height, so check cannot test that it fits the slide; give the <img> or <svg> its width and height in pixels");
     if (!size) return { kind: "one figure", height: caption, problems };
     const fit = Math.min(SCALE.most, (INNER.width - WELL) / size.w, (room - caption - WELL) / size.h), scale = Math.max(SCALE.least, fit);
     // A drawing that does not fit at the least scale is refused with its size and the room; the slide is not called too tall as well.
