@@ -412,6 +412,8 @@ footer p { margin: 0; }
   .steps li h3, .steps li p { color: var(--text) !important; }
   .walk { grid-template-columns: minmax(0, 1fr); row-gap: 32px; } .walk figure { position: static; order: -1; }
   table { min-width: 0; } .table-wrap { overflow: visible; }
+  /* Paper cannot scroll: a long row heading wraps, as the other cells do. On screen it stays on one line, and the table scrolls inside itself. */
+  tbody th { white-space: normal; }
   /* Paper cannot scroll, so a wide grid in words, such as the numbers of a heat map, takes the smallest text size and tighter cells; render splits a grid that is still too wide into several tables. */
   .dg-words > .table-wrap table { font-size: 0.875rem; } .dg-words > .table-wrap thead th { font-size: inherit; } .dg-words > .table-wrap :is(th, td) { padding: 4px 6px 4px 0; }
   /* A browser leaves out backgrounds on paper. These carry meaning, so they print: status dots, the rail of the steps, and the ground of figures and code. */

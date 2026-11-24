@@ -1100,6 +1100,28 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     }
   }
 
+  // A table whose row headings are whole sentences: on paper, which cannot scroll, the row headings wrap and the table fits the text
+  // width of an A4 page (658px); on screen they stay on one line, and the table scrolls inside its wrapper, as before.
+  {
+    const long = (s) => `<tr><th scope="row">${s}</th><td>Calendar sync is the second reason to leave and the step where setup fails.</td><td>Product, plans team</td><td>Starter monthly churn back under 4.5% by December</td></tr>`;
+    const table = `<section id="wide" aria-labelledby="wide-h"><h2 id="wide-h">Actions</h2><div class="table-wrap" role="region" aria-label="Proposed changes" tabindex="0"><table><thead><tr><th scope="col">Change</th><th scope="col">Why</th><th scope="col">Owner</th><th scope="col">We expect</th></tr></thead><tbody>${long("Give Starter accounts with 1 to 5 seats calendar sync for one calendar")}${long("Add a setup email on day 3 that asks to connect a calendar")}</tbody></table></div></section>`;
+    const content = html.replace("</main>", `${table}</main>`);
+    const measure = (page) => page.evaluate(() => {
+      const wrap = document.querySelector("#wide .table-wrap"), th = wrap.querySelector("tbody th");
+      const tables = [...document.querySelectorAll("main .table-wrap:not(.is-text) > table")].map((t) => Math.round(t.getBoundingClientRect().width - t.parentElement.getBoundingClientRect().width));
+      return { table: Math.round(wrap.querySelector("table").getBoundingClientRect().width), room: Math.round(wrap.getBoundingClientRect().width), wrap: getComputedStyle(th).whiteSpace, lines: (() => { const r = document.createRange(); r.selectNodeContents(th); return new Set([...r.getClientRects()].filter((x) => x.width > 0).map((x) => Math.round(x.top))).size; })(), over: Math.max(...tables), scroll: getComputedStyle(wrap).overflowX };
+    });
+    const paper = await open({ width: 658, media: "print", content });
+    const onPaper = await measure(paper.page);
+    await paper.page.locator("#wide .table-wrap").screenshot({ path: `${out}/row-headings-print.png` });
+    await paper.context.close();
+    ok("on paper, long row headings wrap and every table fits the text width of an A4 page (658px)", onPaper.wrap === "normal" && onPaper.lines >= 2 && onPaper.table <= onPaper.room && onPaper.over <= 0, onPaper);
+    const screen = await open({ width: 1280, content });
+    const onScreen = await measure(screen.page);
+    await screen.context.close();
+    ok("on screen, a row heading stays on one line, as before, and a wide table scrolls inside its wrapper", onScreen.wrap === "nowrap" && onScreen.lines === 1 && onScreen.table > onScreen.room && onScreen.scroll === "auto", onScreen);
+  }
+
   // A hand-drawn figure (a fishbone under the contract in diagrams.md): no accessibility problem in either theme, its real size on a
   // desktop and on paper (no shrink), the drawing tokens in dark, forced colors and more contrast, and at 320px it scrolls inside its
   // well while the page does not scroll sideways.
