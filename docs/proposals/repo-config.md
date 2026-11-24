@@ -1,6 +1,6 @@
 # Proposal: a repo file for Docent — the brand and the author's rule changes, kept once for every page
 
-Status: **proposed on 2026-11-25, with each open question decided** (see "Decisions" at the end). No code is written yet. **Four points wait for the user:** the open question at the top of "Decisions", the reversal of white-label decision 5, the list of rules that the file may change, and what the agent does when an author insists on an exact page color. A talk on 2026-11-25 set the direction: a file in the host repo holds a pointer to the host's `DESIGN.md` and the author's changes to Docent's rules, each with a reason, and no copy of the tokens that come from `DESIGN.md`. Later that day the user named the real need: **a page background color and a heading color that differ from the host's `DESIGN.md`.** The proposal is built around that case (section 2).
+Status: **proposed on 2026-11-25, with each open question decided** (see "Decisions" at the end). No code is written yet. **The user decided three of the four open points on 2026-11-25:** the custom palette comes as PRs 6 and 7, the reversal of white-label decision 5 is confirmed, and an exact page color stays on one page. **One point still waits:** the list of rules that the file may change. A talk on 2026-11-25 set the direction: a file in the host repo holds a pointer to the host's `DESIGN.md` and the author's changes to Docent's rules, each with a reason, and no copy of the tokens that come from `DESIGN.md`. Later that day the user named the real need: **a page background color and a heading color that differ from the host's `DESIGN.md`.** The proposal is built around that case (section 2).
 
 ## The answer first
 
@@ -10,7 +10,7 @@ A host repo may hold one file, `.docent/config.json`. It holds three kinds of th
 - **Host-token values that win over `DESIGN.md`,** each with a reason. The user's case is the heading color: `--host-ink` in the file wins over the heading color that `brand.cjs` works out from `DESIGN.md`. `check` tests it at 4.5:1, as it tests every host color today.
 - **The author's changes to Docent's house style,** each with a reason. An example is "allow 10 cards in a card grid, because our weekly review shows 10 service numbers side by side".
 
-**The page background is set by a palette, not by a color.** The file can name Harbor, Plum or Sepia. It cannot set `--bg`, because a page color alone breaks dark mode, print and the tested contrast (section 2). A palette built from the host's own hue is a later item of its own. When a page color comes up, the agent gives one plain reason and offers the closest tested palette as a choice, picked by a script (section 2).
+**The page background is set by a palette, not by a color.** The file can name Harbor, Plum or Sepia. It cannot set `--bg`, because a page color alone breaks dark mode, print and the tested contrast (section 2). A palette built from the host's own hue comes later, in PRs 6 and 7: `"palette": { "hue": "#f3ece0" }`. When a page color comes up, the agent gives one plain reason and offers the closest tested palette as a choice, picked by a script (section 2).
 
 Every page stays one file that works alone. The scripts read the repo file when they run and write what it says into the page. The page never reads the repo file.
 
@@ -53,8 +53,10 @@ The file changes one confirmed decision: white-label decision 5 said that the ne
 | 3 | Rule changes: `check` turns a listed house-style rule into a note, and refuses a guarantee | Small |
 | 4 | The brand from the file: the interview writes the file; `stamp` writes the host tokens; the agent writes the file's palette into each new page | Medium |
 | 5 | `check` notes a page whose brand differs from the file | Small |
+| 6 | A palette from the host's own hue: the script that works it out, with the contrast pairs in Node | Medium |
+| 7 | The custom palette in the kit, `stamp`, `render`, `check` and the interview | Medium |
 
-The user's own case, a heading color and a page background, needs PRs 2 and 4 only. PRs 1, 3 and 5 serve the rule changes. A palette from the host's own hue is not in these five; section 2 gives its cost.
+The user's own case, a heading color and a page background from a named palette, needs PRs 2 and 4 only. PRs 1, 3 and 5 serve the rule changes. PRs 6 and 7 add a palette from the host's own hue, for a page color that no named palette comes close to (section 2).
 
 ## The obvious answers that would be wrong
 
@@ -99,7 +101,7 @@ If the worked logo stayed inside each page and nowhere else, one `docent.json` a
 | `version` | `1`, so that a later Docent can read an older file | `check` refuses the file |
 | `design` | The path to the host's `DESIGN.md`. `null` means "use none" | No `DESIGN.md` is used |
 | `tokens` | Host-token values that win over `DESIGN.md`: each key is a host token without its dashes (`host-ink`, `host-accent`, `host-accent-dark`, `host-dot-dark`, `host-serif`, `host-sans`, `host-mono`), and each value is `{ "value": "…", "reason": "…" }` | The tokens come from `DESIGN.md`, or Docent's own |
-| `palette` | `"harbor"`, `"plum"`, `"sepia"` or `null` | Docent's own colors |
+| `palette` | `"harbor"`, `"plum"`, `"sepia"`, `null`, or, after PRs 6 and 7, `{ "hue": "#f3ece0" }` for a palette from the host's own hue | Docent's own colors |
 | `logo` | One path, or `{ "light": …, "dark": … }`. Each path is an SVG, PNG or WebP file inside the repo | No logo |
 | `tagline` | The host's own line, at most 90 characters | No tagline |
 | `credit` | `"link"`, `"text"` or `"none"` | `"link"` |
@@ -140,16 +142,22 @@ The file cannot set `--bg`. The obvious answers above give the numbers from whit
 
 **(a) Now: the file names a palette.** `"palette": "sepia"` gives every page Sepia's warm page, its grays, its dark forms and its heat steps, with all pairs tested in `tests/contrast.py`. Harbor gives a cool blue-green page, Plum a violet-red one. This is house style, and it costs nothing new: a page can name a palette today, and the file only names it for every page.
 
-**(b) Later, as its own item: a palette from the host's own hue.** A script takes one hue and works out the page, the well, the line, the muted and text colors, the dark forms and the five heat steps, by the rules that made Harbor, Plum and Sepia (white-label section 6: the same CIELAB lightness as Docent's grays, a little more chroma, the heat hue furthest from the accent and the status colors). Then it runs the contrast pairs, and refuses the palette when any pair fails, naming the pair, such as "the muted color stands 8.4 from the accent; it needs 25". The file would store the hue only, and the script would work out the rest each time, so nothing is copied.
+**(b) Later, in PRs 6 and 7: a palette from the host's own hue.** A script takes one hue and works out the page, the well, the line, the muted and text colors, the dark forms and the five heat steps, by the rules that made Harbor, Plum and Sepia (white-label section 6: the same CIELAB lightness as Docent's grays, a little more chroma, the heat hue furthest from the accent and the status colors). Then it runs the contrast pairs, and refuses the palette when any pair fails, naming the pair, such as "the muted color stands 8.4 from the accent; it needs 25". The file names it next to the named palettes, and stores the input only:
+
+```json
+"palette": { "hue": "#f3ece0" }
+```
+
+The script works out the rest each time, so nothing is copied. It takes the color's CIELAB hue, not the color itself: the page keeps the lightness of Docent's page, so `#f3ece0` gives a light page of that hue, not `#f3ece0` exactly. A page names the same input on `<html>`, as `data-palette="custom" data-palette-hue="#f3ece0"`, so that `stamp`, `render` and `check` read it from the page, as they read a named palette today, and an existing page keeps its palette when the file changes (section 8).
 
 What (b) costs:
 
 - **The pairs move to Node.** They live in `tests/contrast.py` today (144 lines), which runs in the tests, not in the scripts. `check` and `stamp` run in Node with no packages, so the pairs need a Node copy in `scripts/lib/`, and the Python test then checks that both agree, or moves to Node.
 - **The derivation becomes code.** The three palettes were worked out by a script that is not part of the kit, and then picked by hand: Harbor's first accent failed the distance from its muted gray (8.4, where 25 is needed) and was changed. A script must make that choice alone, or refuse. Some hues will be refused: white-label section 6 found that a teal cannot be both dark enough for text and strongly colored.
 - **The kit carries a palette that is not in `assets/palettes.json`.** `stamp` writes its four blocks of tokens and its deck block, `render` its light values as each drawing's fallback, and `check` works it out again to test that the page matches.
-- **Size:** two medium PRs (the derivation with the pairs in Node; then the kit, `stamp`, `render` and `check`), each about as large as the palette PR of the white-label work.
+- **Size:** two medium PRs, 6 and 7 (the derivation with the pairs in Node; then the kit, `stamp`, `render`, `check` and the interview), each about as large as the palette PR of the white-label work.
 
-**Recommendation: build (a) now, and (b) only when a host's page color is far from all three palettes.** A palette may already be close enough, and (a) needs no new code. (b) is listed under "Not in this proposal"; the open question in "Decisions" asks whether it is needed first.
+**Decided: (a) now, and (b) as PRs 6 and 7, after the first five.** The user wants both: a named palette needs no new code and may already be close enough, and the custom palette covers a page color that none of the three comes close to.
 
 ### How the agent raises a palette with the author
 
@@ -175,14 +183,14 @@ Before the author answers, the agent offers to open the page with the palette in
 
 So for a gray page, the closest choice is Docent's own page, and the message offers that first. The second row also shows that the distances can be close: the message names one palette, and the author can still ask for the others.
 
-**When the custom palette exists** (item b), the message gets a third choice: [Build a palette from #f3ece0]. When the script refuses, the agent names the failing pair in plain words, with the one number that matters, and the closest color that passes: "Green status text is too light on this page (4.33:1, needs 4.5:1). The closest color that passes is #…".
+**Once PRs 6 and 7 land,** the message gets a third choice: [Build a palette from #f3ece0]. Before then the agent does not show it. When the script refuses, the agent names the failing pair in plain words, with the one number that matters, and the closest color that passes: "Green status text is too light on this page (4.33:1, needs 4.5:1). The closest color that passes is #…".
 
 **After the choice:**
 
 - The agent saves the answer in the repo file and says so in one line: "I saved this in `.docent/config.json`, so new pages use Sepia too." (The interview asks once whether it may write the file; see section 3.)
 - Later pages do not ask again.
 
-**When the author insists on the exact color** before the custom palette exists, the page can set its own `--bg` today, and `check` only warns: "a style sets --bg; the kit sets it in four places, so your value is lost in dark mode or in print". The color then shows in light mode on the screen, and dark mode and paper keep Docent's page. The agent allows it **on that one page,** after it says in one sentence what breaks (dark mode and print), and **never saves it in the repo file**, so the risk stays on one page. The stricter choice is to refuse it. This is a point the user must confirm (see "Decisions").
+**When the author insists on the exact color,** the page can set its own `--bg` today, and `check` only warns: "a style sets --bg; the kit sets it in four places, so your value is lost in dark mode or in print". The color then shows in light mode on the screen, and dark mode and paper keep Docent's page. The agent allows it **on that one page,** after it says in one sentence what breaks (dark mode and print), and **never saves it in the repo file**, so the risk stays on one page. The user confirmed this on 2026-11-25. It holds after PRs 6 and 7 too, because a custom palette keeps the lightness of Docent's page and so never gives one exact color.
 
 ---
 
@@ -384,12 +392,12 @@ It changes no rule, and no page that passes today fails after it.
 3. **Rule changes** (PR 3, small): the note level in `check`, a guarantee refused, a missing reason refused, an unknown ID refused, and one note for each rule on each page. `DESIGN.md` and `SKILL.md`: the two groups and the note.
 4. **The brand from the file** (PR 4, medium): the interview's last question and the file it writes; `stamp`'s `docent:host` block in `:where(:root)`; the file's palette written as `data-palette` into a new page, while `render`, `stamp` and `check` keep reading the page's attribute; `data-brand="off"`. `SKILL.md`: "Ask about the brand once" changes from "copy the newest page" to "read the repo file; without one, copy the newest page", and gets the message about a page color (section 2). One branded sample page built from a sample repo file, in the "Report a bug" topic.
 5. **Differences from the file** (PR 5, small): the `brand.differs` note for the palette, the logo, the tagline, the credit and the profile.
+6. **A palette from the host's own hue: the script** (PR 6, medium): a script in `scripts/lib/` that works out a palette from one color by the rules of white-label section 6, and the contrast pairs of `tests/contrast.py` in Node, so the scripts can run them. It refuses a palette when a pair fails, names the pair in plain words, and gives the closest color that passes. `tests/contrast.py` checks that its pairs and the Node pairs agree. Tests: the three named palettes worked out again from their hues come close to their picked values, a teal that is refused, and the closest color that passes.
+7. **The custom palette in the pages** (PR 7, medium): `"palette": { "hue": … }` in the file; `data-palette="custom"` with `data-palette-hue` on `<html>`, written by the agent into a new page; `stamp` writes the palette's four blocks and its deck block, `render` its light values as each drawing's fallback, and `check` works it out again from the page's attribute and tests that the page matches. The interview's third choice, [Build a palette from #…]. `SKILL.md` and `DESIGN.md`: the custom palette.
 
 **Out of scope:**
 
-- A palette from the host's own hue (section 2, item b): two medium PRs. Recommended only when a host's page color is far from Harbor, Plum and Sepia.
 - A page color (`--bg`) or any other kit token in the file (section 2).
-
 - A rule change for one page only (section 5).
 - A rule change with a value, such as `"cards.count": { "max": 10 }`. A rule is on or off in this first version. A value waits until a real repo needs one.
 - A file for the user, such as one in the home folder. A Docent page belongs to a repo, and its readers see that repo's choices only.
@@ -475,22 +483,18 @@ A place that reports is not always one rule: some places report one of several p
 
 **The user answered the first open question on 2026-11-25:** the need is a page background color and a heading color that differ from the host's `DESIGN.md`. The heading color is a host token in the file (section 2). The page color comes from a palette.
 
-**The open question for the user now: does a named palette (Harbor, Plum or Sepia) cover the background for now, or is a palette from the host's own hue needed first?** If a named palette is enough, PRs 2 and 4 cover the whole need. If not, the custom palette (section 2, item b, two medium PRs) comes before or beside them, and the user's need waits for it.
+**The user decided three more points on 2026-11-25:** the custom palette comes as PRs 6 and 7 (decision 4), the reversal of white-label decision 5 is confirmed (decision 6), and an exact page color stays on one page (decision 15).
 
-**The user must confirm three more points:**
-
-- **The reversal of white-label decision 5** (decision 6 below). The other choice keeps the newest page as the record, and adds the repo file for rule changes only.
-- **The list of rules that the file may change** (decision 7 and the tables of section 4), and most of all the rules marked with a question mark.
-- **An author who insists on an exact page color before the custom palette exists** (decision 15 below). Recommended: allow it on that one page, after the agent says what breaks, and never save it in the repo file. The stricter choice is to refuse it.
+**One point still waits for the user:** the list of rules that the file may change (decision 7 and the tables of section 4), and most of all the rules marked with a question mark.
 
 Decided on 2026-11-25, so that the work can go on. Each one can be changed in review, because no code exists yet.
 
 1. **The file: `.docent/config.json`, in a folder.** The folder keeps a worked logo beside the file, because that work is done by hand and no script can do it again. A logo that needs no work is a path to the file that already exists.
 2. **JSON, with a required `reason` on each rule change.** Node reads JSON with no extra code, and the scripts have no dependencies. A required field cannot be left out, as a comment can.
 3. **A pointer to `DESIGN.md`, and no copy of its tokens; a host-token value in the file wins over it, with a reason.** `brand` works out the same tokens each time, so a copy saves nothing and goes out of date. A value the team chose on purpose, such as a heading color that differs from `DESIGN.md`, is not a copy, and its reason says why.
-4. **The page color comes from a palette only; a palette from the host's own hue is a later item.** The guarantee is that every tested pair passes in light, dark and print, so the page color changes only together with the grays, the dark forms and the heat steps, after a test. The three named palettes need no new code.
+4. **The page color comes from a palette only: the named palettes now, and a palette from the host's own hue in PRs 6 and 7.** Decided by the user on 2026-11-25. The guarantee is that every tested pair passes in light, dark and print, so the page color changes only together with the grays, the dark forms and the heat steps, after a test. The three named palettes need no new code; the custom palette stores its input only, `{ "hue": "#…" }`, and a script works out the rest and refuses it when a pair fails.
 5. **The file saves only the interview's answers that are house style:** the palette, the logo path, the tagline, the credit and the default profile. The user agreed to this limit. The host's name is found again each time.
-6. **The repo file is the record, and white-label decision 5 changes.** A page records values but not reasons, and the newest page can be the wrong one. The interview stays once per repo; its answers go into the file, but only with the user's OK. Without it, the agent copies the newest page, as today.
+6. **The repo file is the record, and white-label decision 5 changes.** Confirmed by the user on 2026-11-25. A page records values but not reasons, and the newest page can be the wrong one. The interview stays once per repo; its answers go into the file, but only with the user's OK. Without it, the agent copies the newest page, as today.
 7. **Two groups: house style can change; guarantees cannot.** A guarantee is a promise to a reader who never sees the repo file. A file that names a guarantee is refused with an error.
 8. **A rule change is on or off.** No values in this first version: a value form is more code and more tests, and no real repo has asked for one yet.
 9. **`check` reports each rule change as a note:** one for each rule on each page, with the line of the file and its reason. A rule change stays visible to the next reviewer.
@@ -499,11 +503,11 @@ Decided on 2026-11-25, so that the work can go on. Each one can be changed in re
 12. **`data-brand="off"` for a page about another product.** It keeps a rule that `SKILL.md` has today: such a page takes nothing from the repo's brand, but still follows the team's house style.
 13. **Existing pages: the host tokens change on the next `stamp`; the other brand fields stay, with a note.** The tokens have one source and live in `stamp`'s own block. The logo, tagline, credit, palette and profile are the page's content, so the author decides.
 14. **An ID for every rule, listed in `scripts/lib/rules.cjs`, printed by `check --rules`.** IDs for the house-style rules alone would be enough for the file, but an ID on every line makes the refusals clearer and the output easier to search.
-15. **The page color with the author: one plain reason and the closest tested palette as a choice, picked by `brand`.** The author gets a choice to act on, never a list of numbers and never a quiet swap. The answer goes into the repo file, so later pages do not ask. An author who insists on an exact color gets it on that one page only, after the agent says that dark mode and print keep Docent's page; it is never saved in the repo file, so the risk stays on one page. **The user must confirm this point;** the stricter choice refuses the color.
+15. **The page color with the author: one plain reason and the closest tested palette as a choice, picked by `brand`.** The author gets a choice to act on, never a list of numbers and never a quiet swap. The answer goes into the repo file, so later pages do not ask. An author who insists on an exact color gets it on that one page only, after the agent says that dark mode and print keep Docent's page; it is never saved in the repo file, so the risk stays on one page. Confirmed by the user on 2026-11-25; the stricter choice, a refusal, was not taken.
 
 ## Not in this proposal
 
-- Code. PR 1 comes in its own pull request, after the user's answers.
+- Code. PR 1 comes in its own pull request, after the user's answer on the rule list.
 - A change to any rule. The file can turn a house-style rule off, but each rule stays as it is.
 - A rule change for one page, a rule change with a value, a file for the user, merged files in a monorepo, and a JSON Schema (section 10).
-- A palette from the host's own hue (section 2, item b), and a page color set by the file.
+- A page color set by the file.
