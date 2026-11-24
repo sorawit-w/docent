@@ -7,6 +7,7 @@ const { stampHtml, cssBlock, jsBlock } = require("../skills/docent/scripts/lib/k
 const { renderDocument } = require("../skills/docent/scripts/lib/diagram.cjs");
 const { checkDocument } = require("../skills/docent/scripts/check.cjs");
 const { checkDeck, elements, INNER } = require("../skills/docent/scripts/lib/slide.cjs");
+const { split } = require("../skills/docent/scripts/lib/rules.cjs");
 
 const assets = path.join(__dirname, "..", "skills", "docent", "assets");
 const build = (html) => stampHtml(renderDocument(html).html).html;
@@ -15,8 +16,8 @@ const deck = build(source);
 const specimen = fs.readFileSync(path.join(assets, "specimen.html"), "utf8");
 const deckCss = fs.readFileSync(path.join(assets, "deck.css"), "utf8").trim();
 const deckJs = fs.readFileSync(path.join(assets, "deck.js"), "utf8").trim();
-/** check's errors for the fixture deck after a change to its source; the page is built again, so only the change can fail. */
-const errorsOf = (change) => checkDocument(build(change(source))).errors;
+/** check's errors for the fixture deck after a change to its source, without their rule IDs; the page is built again, so only the change can fail. */
+const errorsOf = (change) => checkDocument(build(change(source))).errors.map((e) => split(e).text);
 const slide = (n, inner) => (html) => html.replace(new RegExp(`(<section class="slide" id="s${n}"[^>]*>)[\\s\\S]*?(</section>)`), `$1\n${inner}\n$2`);
 
 test("the fixture deck, one slide of each body, passes check with no error and no warning", () => {
@@ -178,7 +179,7 @@ test("present mode is light with the more-contrast tokens; a palette adds its ow
 
 test("in a deck, check warns when the host's accent has less than 7:1 on the page", () => {
   const host = (accent) => checkDocument(deck.replace("</head>", `<style>:root { --host-accent: ${accent}; --host-accent-dark: #8e9bff; }</style></head>`)).warnings;
-  assert.ok(host("#0a6a5c").includes("in a deck the accent should have 7:1 on the page, because a projector lowers contrast; #0a6a5c has 6.3:1"), host("#0a6a5c").join("\n"));
+  assert.ok(host("#0a6a5c").includes("[deck.accent] in a deck the accent should have 7:1 on the page, because a projector lowers contrast; #0a6a5c has 6.3:1"), host("#0a6a5c").join("\n"));
   assert.ok(!host("#2f3fd0").some((w) => w.includes("in a deck")), "Docent's ultramarine has 7.41:1");
   const page = checkDocument(specimen.replace("</head>", "<style>:root { --host-accent: #0a6a5c; --host-accent-dark: #8e9bff; }</style></head>")).warnings;
   assert.ok(!page.some((w) => w.includes("in a deck")), "an ordinary page needs 4.5:1 only");

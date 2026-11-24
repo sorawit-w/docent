@@ -23,7 +23,7 @@ Docent is a design kit for documents: single HTML files that open without a netw
 | [`assets/specimen-deck.html`](assets/specimen-deck.html) | The sample deck, on the "Report a bug" topic: a built deck with one slide of each body and speaker notes. Open it in a browser and press Present; do not read its source. |
 | `scripts/render.cjs` | Draws every diagram and builds every widget of a document, each from its data. |
 | `scripts/stamp.cjs` | Puts the page styles and the page script into a document. |
-| `scripts/check.cjs` | Tests a document against the rules. |
+| `scripts/check.cjs` | Tests a document against the rules. Each error and warning names its rule, such as `[cards.count]`; `check.cjs --rules` lists every rule and its group. |
 | `scripts/brand.cjs` | Reads a host project's `DESIGN.md` and prints its host tokens. It writes nothing. |
 
 The scripts need Node 24 or newer and nothing else. They install no packages and use no network. Before the first script, run `node --version`. When it is older than 24, tell the user once, in one sentence, which version you found and that Docent needs 24 or newer. Then run the scripts anyway, and report their results as not tested on that version. When Node is missing, see "When a script cannot run" below.
