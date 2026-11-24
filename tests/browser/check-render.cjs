@@ -1014,6 +1014,48 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     ok(`a number with its change, ${name}: each of ${lines.length} change lines has the card line's size and muted color, 4px below it, the direction word in the text color at weight 600, and no arrow or fill`, lines.length >= 2 && lines.every((l) => l.size && l.muted && l.gap === 4 && l.dir && l.marks === 0 && /^(transparent|rgba\(.*, 0\))$/.test(l.fill)), lines);
   }
 
+  // Footnotes: the mark [n] has the size of its line and the link color; the notes are 14px and muted like a caption, in tabular figures,
+  // 32px or more under the last block; "Back" does not print; the page does not scroll sideways at 320px.
+  for (const [name, opts] of [["desktop light", { width: 1280 }], ["desktop dark", { width: 1280, theme: "dark" }], ["320px", { width: 320 }], ["print", { width: 794, media: "print" }], ["forced colors", { width: 1280, forcedColors: "active" }]]) {
+    const { page, context } = await open(opts);
+    const fn = await page.evaluate(() => {
+      const link = getComputedStyle(document.querySelector('main a[href="#results"]')), cap = getComputedStyle(document.querySelector("figcaption"));
+      const marks = [...document.querySelectorAll("a.fn")].map((a) => { const [m, p] = [a, a.parentElement].map((e) => getComputedStyle(e)); return { size: m.fontSize === p.fontSize, color: m.color === link.color, line: m.textDecorationLine, wrap: m.whiteSpace }; });
+      const lists = [...document.querySelectorAll("ol.notes")].map((ol) => { const s = getComputedStyle(ol); return { size: s.fontSize === cap.fontSize, color: s.color === cap.color, nums: s.fontVariantNumeric, gap: Math.round(ol.getBoundingClientRect().top - ol.previousElementSibling.getBoundingClientRect().bottom), back: [...ol.querySelectorAll(".back")].map((b) => getComputedStyle(b).display) }; });
+      return { marks, lists, page: document.documentElement.scrollWidth, view: innerWidth };
+    });
+    if (name === "desktop light" || name === "320px") await page.locator("ol.notes").first().screenshot({ path: `${out}/notes-${name.split(" ")[0]}.png` });
+    await context.close();
+    const back = name === "print" ? "none" : "inline";
+    ok(`footnotes, ${name}: ${fn.marks.length} marks at the size of their line, in the link color, underlined, on one line; ${fn.lists.length} notes lists at the caption's size and color, tabular, 32px or more under the last block; "Back" ${name === "print" ? "does not print" : "shows"}`, fn.marks.length >= 2 && fn.marks.every((m) => m.size && m.color && m.line === "underline" && m.wrap === "nowrap") && fn.lists.length >= 2 && fn.lists.every((l) => l.size && l.color && l.nums === "tabular-nums" && l.gap >= 32 && l.back.every((d) => d === back)) && (name !== "320px" || fn.page === fn.view), fn);
+  }
+  // With the keyboard only: Enter on a mark jumps to its note below the top bar, and the next Tab reaches that note's "Back"; Enter on
+  // "Back" puts focus on the mark again, below the top bar. A screen reader hears "Note 2, link" and "Back to the text of note 2, link".
+  for (const [name, opts] of [["desktop", { width: 1280 }], ["320px", { width: 320 }]]) {
+    const { page, context } = await open(opts);
+    const below = (id) => page.evaluate((i) => { const bar = document.querySelector(".topbar").getBoundingClientRect(), top = document.getElementById(i).getBoundingClientRect().top; return { top: Math.round(top), clear: top >= Math.max(0, bar.bottom) - 1 && top < innerHeight / 2 }; }, id);
+    await page.focus("#fn-2-ref"); await page.keyboard.press("Enter"); await page.waitForTimeout(200);
+    const there = { hash: await page.evaluate(() => location.hash), ...(await below("fn-2")) };
+    await page.keyboard.press("Tab");
+    const next = await page.evaluate(() => document.activeElement.getAttribute("aria-label"));
+    await page.keyboard.press("Enter"); await page.waitForTimeout(200);
+    const home = { focus: await page.evaluate(() => document.activeElement.id), ...(await below("fn-2-ref")) };
+    const names = { mark: await page.getByRole("link", { name: "Note 2", exact: true }).count(), back: await page.getByRole("link", { name: "Back to the text of note 2", exact: true }).count(), lists: await page.getByRole("list", { name: "Notes to this section" }).count() };
+    await context.close();
+    ok(`footnotes with the keyboard, ${name}: Enter on mark 2 shows note 2 below the top bar, Tab reaches its "Back", and Enter there puts focus on the mark below the top bar; the screen reader names are "Note 2" and "Back to the text of note 2"`, there.hash === "#fn-2" && there.clear && next === "Back to the text of note 2" && home.focus === "fn-2-ref" && home.clear && names.mark === 1 && names.back === 1 && names.lists >= 2, { there, next, home, names });
+  }
+  {
+    const context = await browser.newContext({ viewport: { width: 1280, height: 900 }, javaScriptEnabled: false });
+    const page = await context.newPage();
+    await page.setContent(html, { waitUntil: "load" });
+    await page.click("#fn-1-ref"); await page.waitForTimeout(200);
+    const there = await page.evaluate(() => ({ hash: location.hash, top: Math.round(document.getElementById("fn-1").getBoundingClientRect().top) }));
+    await page.click("#fn-1 .back"); await page.waitForTimeout(200);
+    const home = await page.evaluate(() => ({ hash: location.hash, top: Math.round(document.getElementById("fn-1-ref").getBoundingClientRect().top) }));
+    await context.close();
+    ok("footnotes with scripts off: a mark jumps to its note and Back jumps to the mark, each 88px from the top, below the top bar", there.hash === "#fn-1" && there.top === 88 && home.hash === "#fn-1-ref" && home.top === 88, { there, home });
+  }
+
   // A hand-drawn figure (a fishbone under the contract in diagrams.md): no accessibility problem in either theme, its real size on a
   // desktop and on paper (no shrink), the drawing tokens in dark, forced colors and more contrast, and at 320px it scrolls inside its
   // well while the page does not scroll sideways.

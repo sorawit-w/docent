@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Decision record 14: a queue for reminder jobs — Example Planner</title>
 <style>
-/* docent:kit 0.22.0 */
+/* docent:kit 0.23.0 */
 /* Docent page styles. Tokens come from references/DESIGN.md. One file, no network. */
 :root {
   color-scheme: light;
@@ -217,6 +217,12 @@ figcaption strong { font-weight: 600; color: var(--text); margin-right: 8px; }
    stands in a figure too, with "Table n" in its caption, so the figure's own space is the only space above it. */
 figcaption .source { display: block; margin-top: 4px; }
 figure > .table-wrap { margin-top: 0; }
+/* Footnotes: a mark in the line, [1], at full size with the link look, and the notes at the end of the section: 14px, muted, 32px under
+   the last block, with no heading, box or line. The note a jump lands on takes the text color; "Back" does not print. */
+.fn { white-space: nowrap; }
+ol.notes { margin: 32px 0 0; font-size: 0.875rem; line-height: 1.5; color: var(--muted); font-variant-numeric: tabular-nums; }
+.notes li:target { color: var(--text); }
+.fn:target { text-decoration-thickness: 2px; }
 
 /* Card grid: 3 to 8 short items side by side, each a heading or a large number and a line of text. A card is a label, like a margin note: a line above it, and no box. At most four in a row. */
 .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(max(160px, calc((100% - 72px) / 4)), 1fr)); gap: 24px; margin: 24px 0; padding: 0; list-style: none; }
@@ -403,7 +409,7 @@ footer p { margin: 0; }
   .logo { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   /* Paper has no link: the credit prints as text. */
   .credit a { color: inherit; text-decoration: none; }
-  .skip, .route, .theme, .route-dot, .rail-dot, .choose > .opt, .values > .opt, .decide-ask, .wd-foot, .copy, .fig-more { display: none !important; }
+  .skip, .route, .theme, .route-dot, .rail-dot, .choose > .opt, .values > .opt, .decide-ask, .wd-foot, .copy, .fig-more, .notes .back { display: none !important; }
   .choose > .case { display: block !important; margin-top: 16px; } .case-t { display: block; }
   .checks input:checked + label, .decide tr.is-out { color: var(--text) !important; }
   .steps li h3, .steps li p { color: var(--text) !important; }
@@ -486,7 +492,7 @@ footer p { margin: 0; }
   <section id="context" aria-labelledby="context-h">
     <h2 id="context-h">Context</h2>
     <p>Each reminder is a job: "send this push message to this person at 09:00 in their time zone". A scheduler writes the jobs into the <code>reminder_jobs</code> table. Eight workers read the table every second, take the jobs that are due, and send them.</p>
-    <p>Most reminders are set for the full hour, so each time zone has a peak at 09:00. The largest peak today is 900 jobs a second. At that rate the workers fight over the same rows, and some reminders arrive 14 seconds late. Customers notice a reminder that comes after the meeting started.</p>
+    <p>Most reminders are set for the full hour, so each time zone has a peak at 09:00. The largest peak today is 900 jobs a second.<a class="fn" id="fn-1-ref" href="#fn-1" aria-label="Note 1">[1]</a> At that rate the workers fight over the same rows, and some reminders arrive 14 seconds late. Customers notice a reminder that comes after the meeting started.</p>
     <p>The number of reminders grew 70% this year. We expect twice today's peak by the end of 2027.</p>
     <h3>What the choice must meet</h3>
     <ul>
@@ -495,6 +501,10 @@ footer p { margin: 0; }
       <li>The platform team of five can run it, with the on-call skills it has today.</li>
       <li>It is in production before 1 December 2026.</li>
     </ul>
+    <ol class="notes" aria-label="Notes to this section">
+      <li id="fn-1">The busiest second of any day in October 2026, from the database's job log.
+        <a class="back" href="#fn-1-ref" aria-label="Back to the text of note 1">Back</a></li>
+    </ol>
   </section>
 
   <section id="options" aria-labelledby="options-h">
@@ -511,7 +521,7 @@ footer p { margin: 0; }
     <h2 id="compare-h">How the options compare</h2>
     <div class="row">
       <div>
-        <p>We ran a load test of each option for two hours, at today's peak and at twice the peak, with copies of real reminders. Figure 1 shows the delay between a reminder's time and the moment a worker sent it, for options B and C: from the median (50%) to the 99th percentile (99%).</p>
+        <p>We ran a load test of each option for two hours, at today's peak and at twice the peak, with copies of real reminders. Figure 1 shows the delay between a reminder's time and the moment a worker sent it, for options B and C: from the median (50%) to the 99th percentile (99%).<a class="fn" id="fn-2-ref" href="#fn-2" aria-label="Note 2">[2]</a></p>
       </div>
       <div class="note" role="note">
         <strong>Load test</strong>
@@ -845,7 +855,7 @@ footer p { margin: 0; }
     </figure>
 
     <h3>Each criterion</h3>
-    <p>The table compares the options on every criterion we agreed before the test. A score runs from 1 (poor) to 5 (good). The weight says how much a criterion counts; the weights add up to 10.</p>
+    <p>The table compares the options on every criterion we agreed before the test. A score runs from 1 (poor) to 5 (good). The weight says how much a criterion counts; the weights add up to 10.<a class="fn" id="fn-3-ref" href="#fn-3" aria-label="Note 3">[3]</a></p>
     <div class="table-wrap" role="region" aria-label="Options scored on each criterion" tabindex="0">
       <table>
         <thead>
@@ -862,6 +872,12 @@ footer p { margin: 0; }
       </table>
     </div>
     <p>A and C are close, for different reasons. A is cheap and known, but too slow. C is fast, but the team cannot run it yet. B is second on most criteria and last on none.</p>
+    <ol class="notes" start="2" aria-label="Notes to this section">
+      <li id="fn-2">The 99th percentile is the delay that 99 of 100 reminders stayed under. The slowest 1 in 100 took longer.
+        <a class="back" href="#fn-2-ref" aria-label="Back to the text of note 2">Back</a></li>
+      <li id="fn-3">Each score is multiplied by its weight, and the five results are added. For B: 3 × 5 + 2 × 4 + 2 × 4 + 2 × 3 + 1 × 4 = 41.
+        <a class="back" href="#fn-3-ref" aria-label="Back to the text of note 3">Back</a></li>
+    </ol>
   </section>
 
   <section id="design" aria-labelledby="design-h">
@@ -1134,7 +1150,7 @@ footer p { margin: 0; }
   </div>
 </footer>
 <script>
-// docent:kit 0.22.0
+// docent:kit 0.23.0
 (() => {
   const root = document.documentElement;
   root.classList.add('js');

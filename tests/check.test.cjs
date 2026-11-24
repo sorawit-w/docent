@@ -364,3 +364,31 @@ test("a number with its change: the third line of a card, with the direction as 
   for (const bad of ['<p class="change warn">', '<p class="change" style="color: #1a7f37">']) assert.match(warned(cards(`${bad}<span class="dir">Up</span> 12% against Q2 2026 (973)</p>`)).join("\n"), /takes a status or a color; the direction is not a status/, bad);
   assert.match(warned(cards('<p class="change"><span class="state err">Up</span> 12% against Q2 2026 (973)</p>')).join("\n"), /takes a status or a color/);
 });
+
+test("footnotes: each mark links to its note, each note links back, and the notes run 1, 2, 3 down the page", () => {
+  const mark = (n, extra = "") => `<a class="fn" id="fn-${n}-ref" href="#fn-${n}" aria-label="Note ${n}"${extra}>[${n}]</a>`;
+  const note = (n, text = "A detail that most readers skip.") => `<li id="fn-${n}">${text} <a class="back" href="#fn-${n}-ref" aria-label="Back to the text of note ${n}">Back</a></li>`;
+  const notes = (start, ...items) => `<ol class="notes"${start > 1 ? ` start="${start}"` : ""} aria-label="Notes to this section">${items.join("")}</ol>`;
+  const section = (id, body) => `<section id="${id}" aria-labelledby="${id}-h"><h2 id="${id}-h">Part ${id}</h2>${body}</section>`;
+  const page = (...parts) => specimen.replace(/<a class="fn"[^>]*>\[\d\]<\/a>/g, "").replace(/<ol class="notes"[\s\S]*?<\/ol>/g, "").replace("</main>", `${parts.join("")}</main>`);
+  const result = (...parts) => { const r = checkDocument(page(...parts)); return { errors: r.errors.join("\n"), warnings: r.warnings.filter((w) => /footnote|note \d|notes run/.test(w)).join("\n") }; };
+  const good = [section("a", `<p>One.${mark(1)} Two.${mark(2)}</p>${notes(1, note(1), note(2))}`), section("b", `<p>Three.${mark(3)}</p>${notes(3, note(3))}`)];
+  assert.ok(/<ol class="notes" start="2"/.test(specimen) && /<a class="fn" id="fn-1-ref"/.test(specimen), "the sample page shows footnotes in two sections");
+  assert.deepEqual(checkDocument(specimen).errors, []);
+  assert.deepEqual(result(...good), { errors: "", warnings: "" }, "marks and notes in two sections, with start, pass");
+  assert.match(result(section("a", `<p>One.${mark(1)} Two.${mark(2)}</p>${notes(1, note(1))}`)).errors, /the footnote mark "\[2\]" links to "#fn-2", which is no note in a notes list/, "a missing note");
+  assert.match(result(section("a", `<p>One.${mark(1)}</p>${notes(1, `<li id="fn-1">A detail.</li>`)}`)).errors, /note 1 has no link back to its mark; end it with <a class="back" href="#fn-1-ref"/, "a missing link back");
+  assert.match(result(section("a", `<p>One.${mark(1)}</p>${notes(1, note(1).replace('href="#fn-1-ref"', 'href="#top"'))}`)).errors, /the link back of note 1 points at "#top", but its mark has id="fn-1-ref"/);
+  assert.match(result(good[0], section("b", `<p>Three.${mark(3)}</p>${notes(1, note(3))}`)).errors, /the notes run 1, 2, 1 down the page; they run 1, 2, 3 … with no gap and no repeat/, "a second list with no start");
+  assert.match(result(good[0], section("b", `<p>Three.${mark(3)}</p>${notes(1, note(3))}`)).errors, /the footnote mark "\[3\]" links to note 1; write "\[1\]"/, "the mark's text names the note's number");
+  assert.match(result(section("a", `<p>Two.${mark(2)} One.${mark(1)}</p>${notes(1, note(1), note(2))}`)).warnings, /the footnote marks run 2, 1 down the page/, "numbers out of order");
+  assert.match(result(section("a", `<p>One.${mark(1)} Again.<a class="fn" href="#fn-1" aria-label="Note 1">[1]</a></p>${notes(1, note(1))}`)).errors, /note 1 has 2 marks; a note has one mark/);
+  assert.match(result(section("a", `<p>Text.</p>${notes(1, note(1))}`)).errors, /note 1 has no mark in the text that links to it \(href="#fn-1"\)/);
+  const heading = result(section("a", `<h3>A heading${mark(1)}</h3><p>Text.</p>${notes(1, note(1))}`));
+  assert.equal(heading.errors, "");
+  assert.match(heading.warnings, /the footnote mark "\[1\]" stands in a heading/, "a mark in a heading");
+  assert.match(result(section("a", `<p>One.${mark(1)}</p>`), section("b", `<p>Text.</p>${notes(1, note(1))}`)).warnings, /"\[1\]" and its note stand in different sections/);
+  assert.match(result(section("a", `<p>One.<a class="fn" id="fn-1-ref" href="#fn-1">[1]</a></p>${notes(1, `<li id="fn-1">A detail. <a class="back" href="#fn-1-ref">Back</a></li>`)}`)).warnings, /has no aria-label; give it aria-label="Note 1"[\s\S]*the link back of note 1 has no aria-label/, "the names a screen reader hears");
+  assert.match(result(section("a", `<p>One.${mark(1)}</p>${notes(1, note(1, "word ".repeat(61)))}`)).warnings, /note 1 has 61 words; a note is one to three sentences/);
+  assert.match(checkDocument(page(section("a", `<p>One.<sup>${mark(1)}</sup></p>${notes(1, note(1))}`))).errors.join("\n"), /<sup> makes text smaller than its line/, "a raised mark stays refused");
+});
