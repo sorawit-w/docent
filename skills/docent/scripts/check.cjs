@@ -68,7 +68,7 @@ function withClass(markup, name) {
     tag.lastIndex = open.lastIndex;
     let depth = 1, t;
     while (depth && (t = tag.exec(markup))) depth += t[1] ? -1 : 1;
-    out.push({ index: m.index, tag: m[1].toLowerCase(), inner: markup.slice(open.lastIndex, t ? t.index : markup.length) });
+    out.push({ index: m.index, tag: m[1].toLowerCase(), attrs: m[2], inner: markup.slice(open.lastIndex, t ? t.index : markup.length) });
   }
   return out;
 }
@@ -367,6 +367,20 @@ function checkDocument(html) {
   for (const list of [...byRule.values()].sort((a, b) => a[0].rule - b[0].rule)) {
     const more = list.length > 3 ? `, and ${list.length - 3} more` : "";
     warnings.push(`numbers, rule ${list[0].rule} (${list[0].name}): ${list.slice(0, 3).map((i) => i.found).join(", ")}${more}; ${list[0].fix} (see "Numbers" in DESIGN.md)`);
+  }
+
+  // 10d. A number with its change: the third line of a card, after the line that says what the number counts. The direction is a word,
+  // and the period it is compared with follows "against" (rule 8 of "Numbers"). It never takes a status or a color.
+  const grids = [...markup.matchAll(/<ul\b[^>]*\bclass="(?:[^"]*\s)?cards(?:\s[^"]*)?"[^>]*>[\s\S]*?<\/ul>/g)].map((m) => [m.index, m.index + m[0].length]);
+  for (const { index, attrs, inner } of withClass(markup, "change")) {
+    const line = plain(inner), quoted = `"${line.length > 60 ? `${line.slice(0, 60)}…` : line}"`, grid = grids.find(([a, b]) => a < index && index < b);
+    if (!grid) warnings.push(`a change line (${quoted}) stands outside a card grid; in a sentence, write the same parts with no markup, such as "up 12% against Q2 2026 (973)"`);
+    else {
+      const before = markup.slice(grid[0], index), card = before.slice(Math.max(before.lastIndexOf("<li>"), before.lastIndexOf("<li ")));
+      if (![...card.matchAll(/<p\b([^>]*)>/g)].some(([, a]) => !hasClass(a, "big") && !hasClass(a, "change"))) warnings.push(`a change line (${quoted}) comes before the line that says what the card's number counts; put it third, after that line`);
+    }
+    if (!/^(?:Up|Down|No change)\b/.test(line) || !/\bagainst\b/.test(line)) warnings.push(`a change line (${quoted}) starts with the direction as a word ("Up", "Down" or "No change") and names the period it is compared with after "against"; write it as "Up 12% against Q2 2026 (973)"`);
+    if (/\b(?:state|ok|warn|err|info|plan)\b/.test((attrs.match(/\bclass="([^"]*)"/) || [])[1] || "") || /\bstyle="[^"]*(?:color|background)/i.test(attrs) || /\bclass="(?:[^"]*\s)?state(?:\s[^"]*)?"/.test(inner)) warnings.push(`a change line (${quoted}) takes a status or a color; the direction is not a status, because up is not always good. Say in the text whether the change is good news`);
   }
 
   // 11. Personal data: email addresses and phone numbers, in the page text and in the data of each diagram and widget. A warning only:
