@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Incident review: sync errors on 12 November — Example Planner</title>
 <style>
-/* docent:kit 0.26.0 */
+/* docent:kit 0.27.0 */
 /* Docent page styles. Tokens come from references/DESIGN.md. One file, no network. */
 :root {
   color-scheme: light;
@@ -258,7 +258,7 @@ tbody tr { border-bottom: 1px solid var(--line); }
 .state { display: inline-flex; align-items: baseline; gap: 8px; font-weight: 600; }
 .state::before { content: ""; flex: none; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
 .state.ok { color: var(--ok); } .state.warn { color: var(--warn); } .state.err { color: var(--err); }
-/* Two states with no status color: plain information takes a muted dot, and a thing that is planned or not on yet takes a muted ring. */
+/* Two states with no status color: a fact with no judgment (plain information, work under way, a closed item) takes a muted dot, and "not yet" (planned, proposed, not decided) takes a muted ring. */
 .state.info, .state.plan { color: var(--text); }
 .state.info::before { background: var(--muted); }
 .state.plan::before { background: none; border: 1.5px solid var(--muted); }
@@ -1169,11 +1169,11 @@ database:
         </thead>
         <tbody>
           <tr><th scope="row">Show the produced configuration in every template review</th><td>Output not reviewed</td><td>Platform team</td><td>27 Nov 2026</td><td><span class="state ok">Done</span></td></tr>
-          <tr><th scope="row">Fail the build when a known key is set to a default it did not have before</th><td>Hidden pool limit</td><td>Platform team</td><td>4 Dec 2026</td><td><span class="state warn">In progress</span></td></tr>
+          <tr><th scope="row">Fail the build when a known key is set to a default it did not have before</th><td>Hidden pool limit</td><td>Platform team</td><td>4 Dec 2026</td><td><span class="state info">In progress</span></td></tr>
           <tr><th scope="row">Send configuration changes through the canary region first</th><td>All regions at once; no canary step</td><td>Deploy team</td><td>11 Dec 2026</td><td><span class="state plan">Planned</span></td></tr>
           <tr><th scope="row">Alert when the pool is more than 80% in use for 2 minutes</th><td>No alert on the pool</td><td>Sync API team</td><td>27 Nov 2026</td><td><span class="state ok">Done</span></td></tr>
           <tr><th scope="row">Lower the error alert's wait from 3 minutes to 1</th><td>Alert after 4 min</td><td>Sync API team</td><td>27 Nov 2026</td><td><span class="state ok">Done</span></td></tr>
-          <tr><th scope="row">Add the pool to the sync errors runbook, as the second thing to check</th><td>Runbook lacks pool; first guess wrong</td><td>On-call leads</td><td>4 Dec 2026</td><td><span class="state warn">In progress</span></td></tr>
+          <tr><th scope="row">Add the pool to the sync errors runbook, as the second thing to check</th><td>Runbook lacks pool; first guess wrong</td><td>On-call leads</td><td>4 Dec 2026</td><td><span class="state info">In progress</span></td></tr>
           <tr><th scope="row">Practise this failure in the January game day</th><td>First guess wrong</td><td>On-call leads</td><td>20 Jan 2027</td><td><span class="state plan">Planned</span></td></tr>
         </tbody>
       </table>
@@ -1191,7 +1191,7 @@ database:
   </div>
 </footer>
 <script>
-// docent:kit 0.26.0
+// docent:kit 0.27.0
 (() => {
   const root = document.documentElement;
   root.classList.add('js');

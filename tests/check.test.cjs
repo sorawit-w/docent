@@ -423,3 +423,17 @@ test("\"Method and limits\" holds its four parts in order; a page without it get
   assert.match(warned(["Method", "Data", "How sure the result is"]).join("\n"), /it holds four, in this order/, "a part missing");
   assert.deepEqual(checkDocument(specimen).warnings.filter((w) => /Method and limits/.test(w)), [], "no section, no warning");
 });
+
+test("status words: each listed word in its own state passes; a listed word in another state warns, unless its label adds words", () => {
+  const page = (...states) => specimen.replace("</main>", `<section id="w" aria-labelledby="w-h"><h2 id="w-h">W</h2><p>${states.map(([s, l]) => `<span class="state ${s}">${l}</span>`).join(" ")}</p></section></main>`);
+  const warned = (...states) => checkDocument(page(...states)).warnings.filter((w) => /takes the state/.test(w));
+  const right = [["ok", "Done"], ["ok", "Fixed"], ["ok", "Accepted"], ["ok", "Approved"], ["info", "In progress"], ["info", "Superseded"], ["info", "Superseded by record 15"], ["info", "Rejected"], ["plan", "Planned"], ["plan", "Proposed"], ["plan", "Open question"], ["plan", "Not decided yet"], ["err", "Blocked"]];
+  assert.deepEqual(warned(...right), [], "every word of the table in its right state");
+  const wrong = warned(["warn", "In progress"], ["err", "Rejected"]);
+  assert.equal(wrong.length, 2);
+  assert.match(wrong[0], /^"In progress" takes the state info \(under way, nothing is wrong\), not warn; write warn with words that say why, such as "In progress, late"/);
+  assert.match(wrong[1], /^"Rejected" takes the state info \(closed; nothing is broken\), not err/);
+  assert.deepEqual(warned(["warn", "In progress, late"]), [], "a longer label may hold a judgment");
+  assert.match(warned(["err", "Superseded by this record"]).join("\n"), /"Superseded by this record" takes the state info/, "the word then by …");
+  assert.match(warned(["ok", "open question"]).join("\n"), /takes the state plan \(not yet\), not ok/, "a word in lowercase");
+});
