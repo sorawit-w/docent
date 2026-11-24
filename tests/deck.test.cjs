@@ -85,7 +85,10 @@ test("a slide holds one body from the list, within its limits", () => {
   assert.ok(errorsOf(slide(9, `<h2>Questions</h2>\n<p>${"A report form that asks for the steps gets them in most reports. ".repeat(3)}</p>`)).some((e) => e.startsWith("slide 9: its paragraph is about 3 lines at 30px; a short paragraph on a slide is at most 2 lines")));
   assert.ok(errorsOf(slide(9, `<h2>Questions</h2>\n<ul class="cards">${'<li><p class="big">2</p><p>Days</p></li>'.repeat(4)}</ul>`)).some((e) => e.startsWith("slide 9: its card grid has 4 cards; a slide holds at most 3 large numbers")));
   assert.ok(errorsOf(slide(9, '<h2>Questions</h2>\n<ul class="cards"><li><p class="big">2</p><p>Days</p><p class="change">Up 1 against Q2 2026 (1)</p></li></ul>')).some((e) => e.startsWith("slide 9: card 1 has 2 lines under its number; a card on a slide has one")));
-  assert.ok(errorsOf(slide(9, '<h2>Questions</h2>\n<ul class="cards"><li><p class="big">2</p><p>Days to fix a report that has its steps and the error text</p></li></ul>')).some((e) => /^slide 9: the line of card 1 .* is longer than one line of a card at 21px/.test(e)));
+  const cards = (n, line) => `<h2>Questions</h2>\n<ul class="cards">${`<li><p class="big">2</p><p>${line}</p></li>`.repeat(n)}</ul>`;
+  const long = "Days to fix a report that has its steps and the error text";
+  assert.ok(errorsOf(slide(9, cards(3, long))).some((e) => /^slide 9: the line of card 1 .* is longer than one line of a card at 21px \(368px\)/.test(e)), "three cards take a third each");
+  assert.ok(!errorsOf(slide(9, cards(2, long))).some((e) => e.includes("line of card")), "two cards take half each, so the same line fits");
   const table = (cols, rows) => `<h2>Questions</h2>\n<div class="table-wrap"><table><thead><tr>${"<th>A</th>".repeat(cols)}</tr></thead><tbody>${`<tr>${"<td>1</td>".repeat(cols)}</tr>`.repeat(rows)}</tbody></table></div>`;
   assert.ok(errorsOf(slide(9, table(5, 2))).some((e) => e.startsWith("slide 9: its table has 5 columns; a table on a slide has at most 4")));
   assert.ok(errorsOf(slide(9, table(2, 6))).some((e) => e.startsWith("slide 9: its table has 6 rows under the heading row; a table on a slide has at most 5")));

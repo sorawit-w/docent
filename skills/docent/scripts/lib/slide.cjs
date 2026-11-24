@@ -92,7 +92,8 @@ function measureBody(el, room) {
   const { tag, attrs, inner } = el;
   if ((tag === "ul" || tag === "ol") && hasClass(attrs, "cards")) {
     const raw = [...inner.matchAll(/<li\b[^>]*>([\s\S]*?)(?=<li\b|$)/gi)].map((m) => m[1]), cards = raw;
-    const width = (INNER.width - (LIMIT.cards - 1) * CARD_GAP) / LIMIT.cards;
+    // The cards share the width of the slide equally: three cards take a third each, two take half each.
+    const across = Math.max(1, Math.min(cards.length, LIMIT.cards)), width = (INNER.width - (across - 1) * CARD_GAP) / across;
     if (cards.length > LIMIT.cards) problems.push(`its card grid has ${cards.length} cards; a slide holds at most ${LIMIT.cards} large numbers`);
     raw.forEach((card, i) => {
       const said = [...card.matchAll(/<p\b([^>]*)>([\s\S]*?)<\/p>/gi)].filter(([, a]) => !hasClass(a, "big")).map(([, , t]) => plain(t));
