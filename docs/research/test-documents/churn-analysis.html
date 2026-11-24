@@ -1,0 +1,1796 @@
+<!doctype html>
+<html lang="en" data-profile="brief">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Why customers left in the third quarter — Example Planner</title>
+<style>
+/* docent:kit 0.18.0 */
+/* Docent page styles. Tokens come from references/DESIGN.md. One file, no network. */
+:root {
+  color-scheme: light;
+  --bg: #fbfbfe; --panel: #f2f3f9; --fig: #f2f3f9;
+  --text: #1c1f2e; --muted: #575d75; --line: #d3d6e3;
+  --primary: var(--host-accent, #2f3fd0); --ink: var(--host-ink, #1b2260); --dot: var(--host-accent, #2f3fd0);
+  --ok: #1a7f37; --warn: #7d4e00; --err: #cf222e;
+  /* The heat steps fill the cells of a heat map and the boxes of a heat plan, and nothing else: from the least (1) to the most (5). One teal on screen; the print block sets five grays for paper. */
+  --heat-1: #c6e9ef; --heat-2: #86c9d5; --heat-3: #3da6b6; --heat-4: #00707e; --heat-5: #004a53;
+  /* The text on a heat step: the kit's own text and page colors. They equal --text and --bg, except with the reader's high contrast mode, where the kit gives those two the system colors and only its own are tested against the steps. */
+  --heat-text: #1c1f2e; --heat-page: #fbfbfe;
+  /* A host's logo for one theme (data-for) shows in that theme. A logo with no version for this theme stands on a tile in the page color of its own theme. */
+  --logo-light: block; --logo-dark: none; --tile-light: transparent; --tile-dark: #12141f;
+  /* A host project sets its own accent, heading color and fonts with the --host-* tokens. The kit never sets them, so they hold in every theme and in print.
+     In dark mode the dot follows the host's dark accent, or --host-dot-dark; on Docent's own pages it is the lamp. */
+  --serif: var(--host-serif, Charter, "Bitstream Charter", "Sitka Heading", "Sitka Text", Cambria, Georgia, serif);
+  --sans: var(--host-sans, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif);
+  --mono: var(--host-mono, ui-monospace, "SF Mono", "Cascadia Code", Consolas, Menlo, monospace);
+  --ease: cubic-bezier(0.23, 1, 0.32, 1);
+  --measure: 31rem; --margin-col: 220px; --gap: 48px; --wide: 1120px;
+  /* The profile of a page sets these. Standard is the default: code and tables end at the right edge of the notes. */
+  --block: calc(var(--measure) + var(--gap) + var(--margin-col)); --section-space: 72px; --cell-y: 12px; --step-space: 36px;
+}
+/* Profiles: one attribute on <html> sets the width of code and tables, and the spacing. A profile never changes the text column. */
+html[data-profile="task"] { --section-space: 56px; --step-space: 28px; }
+html[data-profile="reference"] { --block: var(--wide); --section-space: 56px; --cell-y: 8px; }
+html[data-profile="brief"] { --block: var(--wide); --section-space: 64px; }
+/* A page for the public: every size is in rem, so the text and the text column grow together, on top of the reader's own setting. */
+html[data-text="large"] { font-size: 112.5%; }
+/* Dark: the reader's system setting decides, unless the reader chose a theme with the switch. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #12141f; --panel: #0b0d15; --fig: #0b0d15;
+    --text: #e7e9f3; --muted: #959bb3; --line: #2d3146;
+    --primary: var(--host-accent-dark, #8e9bff); --ink: #e7e9f3; --dot: var(--host-dot-dark, var(--host-accent-dark, #f2b824));
+    --ok: #3fb950; --warn: #d29922; --err: #f85149;
+    --heat-1: #093339; --heat-2: #054e58; --heat-3: #006b78; --heat-4: #36a0b1; --heat-5: #80cad7; --heat-text: #e7e9f3; --heat-page: #12141f;
+    --logo-light: none; --logo-dark: block; --tile-light: #fbfbfe; --tile-dark: transparent;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #12141f; --panel: #0b0d15; --fig: #0b0d15;
+  --text: #e7e9f3; --muted: #959bb3; --line: #2d3146;
+  --primary: var(--host-accent-dark, #8e9bff); --ink: #e7e9f3; --dot: var(--host-dot-dark, var(--host-accent-dark, #f2b824));
+  --ok: #3fb950; --warn: #d29922; --err: #f85149;
+  --heat-1: #093339; --heat-2: #054e58; --heat-3: #006b78; --heat-4: #36a0b1; --heat-5: #80cad7; --heat-text: #e7e9f3; --heat-page: #12141f;
+  --logo-light: none; --logo-dark: block; --tile-light: #fbfbfe; --tile-dark: transparent;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-padding-top: 88px; -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 400 1rem/1.65 var(--sans); caret-color: var(--primary); }
+::selection { background: color-mix(in srgb, var(--primary) 22%, transparent); }
+:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
+a { color: var(--primary); text-decoration-thickness: 1px; text-underline-offset: 0.2em; }
+a:hover { text-decoration-thickness: 2px; }
+/* The skip link: the first thing a keyboard reaches. It is hidden until it has focus; then it stands at the upper left, over the top bar, and jumps to the main element. */
+.skip { position: absolute; top: 12px; left: 12px; z-index: 3; display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); font-size: 0.875rem; }
+.skip:not(:focus) { width: 1px; height: 1px; padding: 0; border: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+/* One left edge for the whole page. On a wide screen the text and its notes sit in the middle as a group; wide blocks start at the same edge and grow to the right, up to --wide. */
+.shell {
+  --left: max(40px, min((100% - var(--measure) - var(--gap) - var(--margin-col)) / 2, 100% - var(--wide) - 40px));
+  padding: 0 max(40px, 100% - var(--left) - var(--wide)) 0 var(--left);
+}
+
+/* Top bar. Its bottom line is the route; the dot marks the current section. */
+.topbar { position: sticky; top: 0; z-index: 2; background: var(--bg); border-bottom: 1px solid var(--line); }
+.topbar .shell { position: relative; display: flex; align-items: center; gap: 32px; height: 56px; }
+.host { display: inline-flex; align-items: center; gap: 10px; font-weight: 600; font-size: 0.875rem; white-space: nowrap; }
+/* The host's logo: 24px high and at most 160px wide; its width and height are written on it. One color (currentColor) takes the heading color. */
+.logo { display: block; flex: none; box-sizing: content-box; color: var(--ink); }
+.host:has(> .logo[data-for="dark"]) > .logo[data-for="light"] { display: var(--logo-light); }
+.host:has(> .logo[data-for="light"]) > .logo[data-for="dark"] { display: var(--logo-dark); }
+/* A logo for one theme only stands on a tile in the other theme: corners of 6px, 4px around it. The outline takes no space, so nothing moves. */
+/* A logo in one color (currentColor) keeps the ink of its own theme, so it reads on its tile too. */
+.host:not(:has(> .logo[data-for="dark"])) > .logo[data-for="light"] { background: var(--tile-light); outline: 4px solid var(--tile-light); border-radius: 2px; color: var(--host-ink, #1b2260); }
+.host:not(:has(> .logo[data-for="light"])) > .logo[data-for="dark"] { background: var(--tile-dark); outline: 4px solid var(--tile-dark); border-radius: 2px; color: #e7e9f3; }
+.route { flex: 1; min-width: 0; }
+.route ol { display: flex; gap: 28px; margin: 0; padding: 0; list-style: none; }
+.route a { display: block; padding: 6px 0; font-size: 0.875rem; color: var(--muted); text-decoration: none; white-space: nowrap; }
+.route a:hover, .route a[aria-current] { color: var(--text); }
+.route-dot { position: absolute; left: 0; bottom: -4px; width: 7px; height: 7px; border-radius: 50%; background: var(--dot); opacity: 0; transform: translateX(var(--x, 0px)); }
+.ready .route-dot, .ready .rail-dot { transition: transform 320ms var(--ease); }
+.js .route-dot { opacity: 1; }
+.theme, .wd-btn { display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px; border: 1px solid var(--line); border-radius: 6px; background: none; color: var(--text); font: 400 0.875rem/1 var(--sans); cursor: pointer; }
+.theme:hover, .wd-btn:hover { border-color: var(--muted); }
+.theme:active, .wd-btn:active { transform: translateY(1px); }
+.theme svg { width: 15px; height: 15px; }
+html:not(.js) .theme, .theme[hidden] { display: none; }
+.theme[data-next="dark"] .icon-sun, .theme[data-next="light"] .icon-moon { display: none; }
+
+/* Title block: the title leads; facts about the document sit below it. */
+.title { padding: 80px 0 8px; }
+.title .row { margin-top: 24px; }
+/* The serif headings take weight 700. A palette with sans-serif headings sets 600, so the sans-serif keeps two weights. */
+h1, h2 { font-family: var(--serif); font-weight: var(--heading-weight, 700); color: var(--ink); text-wrap: balance; margin: 0; }
+h1 { font-size: 3.25rem; line-height: 1.06; letter-spacing: -0.02em; }
+.standfirst { font: 400 1.3125rem/1.5 var(--serif); margin: 0; text-wrap: pretty; }
+.facts { margin: 0; padding-left: 0; list-style: none; font-variant-numeric: tabular-nums; }
+
+section { padding-top: var(--section-space); }
+h2 { font-size: 1.875rem; line-height: 1.2; margin-bottom: 16px; }
+h3 { font: 600 1.125rem/1.35 var(--sans); margin: 0; text-wrap: balance; }
+/* A small heading inside a part of a section: body size, weight 600. */
+h4 { font: 600 1rem/1.5 var(--sans); margin: 24px 0 4px; }
+/* A definition list: each term in weight 600, its meaning below it. */
+dl { max-width: var(--measure); margin: 0 0 16px; }
+dt { font-weight: 600; }
+dd { margin: 0 0 12px; }
+dd:last-child { margin-bottom: 0; }
+p { margin: 0 0 16px; max-width: var(--measure); text-wrap: pretty; }
+.term { text-decoration: underline; text-decoration-color: var(--primary); text-decoration-thickness: 2px; text-underline-offset: 0.22em; }
+/* A place that shows a value of a value picker. A dotted line under it says that it changes with the choice. */
+var { font-style: normal; }
+var[data-v] { text-decoration: underline dotted var(--muted); text-decoration-thickness: 1px; text-underline-offset: 0.25em; }
+code { font: 0.875rem/1.55 var(--mono); background: var(--panel); padding: 0.1em 0.38em; border-radius: 6px; }
+.standfirst code { font-size: 1.125rem; }
+
+/* Lists in the text flow: points, or numbers for steps that one actor does. The rules are weak on purpose, so the lists of the kit's own blocks keep their styles. */
+:where(main) :where(ul, ol):not(.steps, .facts, .cards) { max-width: var(--measure); margin: 0 0 16px; padding-left: 24px; }
+:where(main) :where(ul, ol):not(.steps, .facts, .cards) > :where(li + li) { margin-top: 4px; }
+/* A block heading in the text flow has more space above it than below it. A step heading of a walkthrough has none. */
+:where(main) h3 { margin: 32px 0 8px; }
+h2 + h3, h3 + h4 { margin-top: 0; }
+.steps h3 { margin: 0; }
+/* A numbered block heading: one of several steps that one actor does, where a step holds a code block, a table or a widget. The kit writes the number, and the count starts again in each section. */
+section { counter-reset: block-step; }
+h3.step { counter-increment: block-step; }
+h3.step::before { content: counter(block-step); font-weight: 400; color: var(--muted); margin-right: 10px; font-variant-numeric: tabular-nums; }
+/* With scripts on, the page script writes the number as text, so that a screen reader reads it. It looks the same as the counted number. */
+h3.is-numbered::before { content: none !important; }
+.step-n { font-weight: 400; color: var(--muted); margin-right: 6px; font-variant-numeric: tabular-nums; }
+/* A code block, a table, a closed section, a walkthrough, a status note and a figure bring no space below them. Text that follows brings it. */
+:is(pre, .code, .table-wrap, details, .walk, .status, figure) + :is(p, ul, ol, dl) { margin-top: 24px; }
+
+/* Margin notes: the guide's remarks sit beside the text, like a wall label. */
+.row { display: grid; grid-template-columns: minmax(0, var(--measure)) var(--margin-col); column-gap: var(--gap); align-items: start; }
+.note { margin: 6px 0 16px; padding-top: 12px; border-top: 1px solid var(--line); font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
+.note strong { display: block; margin-bottom: 4px; font-weight: 600; color: var(--text); }
+/* A heading may stand in the text column, with the facts about its item beside it. The row brings the space above the heading, so the note lines up with the heading. */
+.row:has(> h3:first-child) { margin-top: 32px; }
+.row > h3:first-child { margin-top: 0; }
+
+/* Walkthrough: a rail with a node per step; one dot travels along it. */
+.walk { display: grid; grid-template-columns: minmax(0, 1fr) 536px; column-gap: 40px; align-items: start; margin-top: 24px; }
+.rail { position: relative; }
+.steps { position: relative; margin: 0; padding: 0; list-style: none; counter-reset: step; }
+.steps::before { content: ""; position: absolute; left: 4px; top: 10px; bottom: 10px; width: 1px; background: var(--line); }
+.steps li { position: relative; padding: 0 0 var(--step-space) 32px; counter-increment: step; }
+.steps li:last-child { padding-bottom: 0; }
+.steps li::before { content: ""; position: absolute; left: 0; top: 8px; width: 9px; height: 9px; border-radius: 50%; border: 1px solid var(--muted); background: var(--bg); }
+.steps h3::before { content: counter(step); font-weight: 400; color: var(--muted); margin-right: 10px; font-variant-numeric: tabular-nums; }
+.steps p { margin: 6px 0 0; }
+.js .steps li:not(.is-current) h3, .js .steps li:not(.is-current) p { color: var(--muted); }
+.ready .steps h3, .ready .steps p { transition: color 120ms; }
+.rail-dot { position: absolute; left: 0; top: 8px; width: 9px; height: 9px; border-radius: 50%; background: var(--dot); opacity: 0; transform: translateY(var(--y, 0px)); }
+.js .rail-dot { opacity: 1; }
+.walk figure { position: sticky; top: 88px; }
+
+/* Figures: a well that holds a Docent diagram, with a plain caption. A diagram carries its own styles. */
+/* A well is as wide as the profile's block. A wider drawing keeps its real size, and its well grows with it. */
+figure { margin: 0; min-width: min(100%, var(--block)); width: fit-content; max-width: 100%; }
+section > figure { margin-top: 24px; }
+/* Every drawing in a well keeps its real size and sits in the middle; a wider one scrolls inside the well. */
+.fig > svg { flex: none; margin-inline: auto; }
+.fig { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 16px 24px; background: var(--fig); border-radius: 12px; padding: 8px; overflow-x: auto; scrollbar-color: var(--line) transparent; }
+/* A well may hold two drawings, for two separate chains: side by side when both fit, else one below the other. */
+/* A drawing that is wider than its well scrolls sideways. The page script shows this line under it, because the part that shows can look complete. */
+.fig-more { margin: 8px 0 0; max-width: none; font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
+/* The steps of a diagram in words: a closed section in the well, under the drawing. It takes the width of the well, so a table
+   of several columns, such as the boxes of a heat plan, keeps its words whole; its sentences and lists keep the width of the text. */
+.dg-words { flex-basis: 100%; max-width: none; margin: 0; padding: 0 8px 4px; }
+.dg-words ol { margin: 8px 0 0; padding-left: 28px; }
+.dg-words li + li { margin-top: 4px; }
+.dg-words p { margin: 12px 0 0; font-weight: 600; }
+/* The rows of a range chart in words: a small table, as wide as its content, so it fits a phone. */
+.dg-words table { width: auto; min-width: 0; margin-top: 8px; }
+.dg-words :is(th, td) { padding-right: 16px; }
+/* A long name with no spaces breaks inside its cell, so the table never runs past a phone screen. */
+.dg-words tbody th { white-space: normal; }
+.dg-words :is(th, td) { overflow-wrap: anywhere; }
+/* A wide grid in words, such as the numbers of a heat map: each cell stays on one line, numbers line up on the right, and the
+   table scrolls inside its wrapper on a narrow screen. The lines under it keep the width of the text. */
+.dg-words > .table-wrap { margin-top: 8px; max-width: none; }
+.dg-words > .table-wrap :is(th, td) { white-space: nowrap; overflow-wrap: normal; padding-right: 12px; }
+.dg-words > .table-wrap :is(td, thead th) { text-align: right; font-variant-numeric: tabular-nums; }
+/* A wide table of words, such as the boxes of a heat plan: its cells wrap at spaces but never inside a word, and keep to the left. */
+.dg-words > .table-wrap.is-text :is(th, td) { white-space: normal; }
+.dg-words > .table-wrap.is-text :is(td, thead th) { text-align: left; }
+.dg-words:has(> .table-wrap) { min-width: 0; } /* a flex item: without this it grows to the table, and the wrapper never scrolls */
+/* A hand-drawn figure holds no colors and no styles of its own, only these classes, so the tokens give it every theme, print and the
+   reader's settings. A shape with no class is a 1.5px line in the text color, and a text with no class is 14px. No class is under 12px. */
+svg[data-drawn="hand"] { display: block; flex: none; margin-inline: auto; }
+svg[data-drawn="hand"] :is(path, line, polyline, polygon, rect, circle, ellipse), svg[data-drawn="hand"] .hd-line { fill: none; stroke: var(--text); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+svg[data-drawn="hand"] text, svg[data-drawn="hand"] .hd-text { fill: var(--text); stroke: none; font-size: 14px; font-weight: 400; }
+svg[data-drawn="hand"] .hd-strong { stroke-width: 2.5; }
+svg[data-drawn="hand"] .hd-muted { stroke: var(--muted); stroke-width: 1; }
+svg[data-drawn="hand"] .hd-rule { stroke: var(--line); stroke-width: 1; }
+svg[data-drawn="hand"] .hd-fill { fill: var(--text); stroke: none; }
+svg[data-drawn="hand"] .hd-box { fill: var(--bg); stroke: var(--text); }
+svg[data-drawn="hand"] .hd-band { fill: var(--bg); stroke: none; }
+svg[data-drawn="hand"] .hd-name { font-weight: 600; }
+svg[data-drawn="hand"] .hd-note { font-size: 12px; fill: var(--muted); }
+figcaption { margin-top: 12px; font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
+figcaption strong { font-weight: 600; color: var(--text); margin-right: 8px; }
+
+/* Card grid: 3 to 8 short items side by side, each a heading or a large number and a line of text. A card is a label, like a margin note: a line above it, and no box. At most four in a row. */
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(max(160px, calc((100% - 72px) / 4)), 1fr)); gap: 24px; margin: 24px 0 0; padding: 0; list-style: none; }
+.cards > li { min-width: 0; padding-top: 12px; border-top: 1px solid var(--line); }
+.cards h3 { margin: 0 0 4px; font-size: 1rem; line-height: 1.5; }
+.cards p { margin: 0; font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
+.cards .big { margin-bottom: 4px; font: 700 1.875rem/1.2 var(--serif); font-weight: var(--heading-weight, 700); color: var(--ink); font-variant-numeric: tabular-nums; }
+.cards + :is(p, ul, ol, dl) { margin-top: 24px; }
+
+/* Code, tables and cards end at the profile's block width. */
+:is(pre, .code, .table-wrap, .cards) { max-width: var(--block); }
+
+/* Tables: rules only, no boxes. */
+.table-wrap { overflow-x: auto; margin: 24px 0 0; scrollbar-color: var(--line) transparent; }
+table { width: 100%; min-width: 640px; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; vertical-align: top; padding: var(--cell-y) 24px var(--cell-y) 0; }
+thead th { border-bottom: 1px solid var(--text); padding-bottom: 10px; font-size: 0.875rem; line-height: 1.5; font-weight: 600; color: var(--muted); }
+tbody th { font-weight: 600; white-space: nowrap; }
+tbody tr { border-bottom: 1px solid var(--line); }
+/* A column of numbers (class "num" on its th and td cells): the numbers line up on the right, in tabular figures. The last column ends at the table's edge. */
+:is(th, td).num { text-align: right; font-variant-numeric: tabular-nums; }
+:is(th, td).num:last-child { padding-right: 0; }
+.state { display: inline-flex; align-items: baseline; gap: 8px; font-weight: 600; }
+.state::before { content: ""; flex: none; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.state.ok { color: var(--ok); } .state.warn { color: var(--warn); } .state.err { color: var(--err); }
+/* Two states with no status color: plain information takes a muted dot, and a thing that is planned or not on yet takes a muted ring. */
+.state.info, .state.plan { color: var(--text); }
+.state.info::before { background: var(--muted); }
+.state.plan::before { background: none; border: 1.5px solid var(--muted); }
+/* Code and links in a cell may break anywhere, so a long path, command or address does not make the table wider than its place. */
+:is(td, th) :is(code, a) { overflow-wrap: anywhere; }
+
+/* Status note: a dot and a word carry the status. */
+.status { max-width: var(--measure); margin: 32px 0 0; }
+.status p { margin: 4px 0 0; }
+
+pre { margin: 20px 0 0; padding: 16px 20px; background: var(--panel); border-radius: 10px; overflow-x: auto; font: 0.875rem/1.6 var(--mono); scrollbar-color: var(--line) transparent; }
+pre code { background: none; padding: 0; font-size: inherit; }
+/* With scripts on, a code block sits in a holder with a button that copies the code. The holder takes the place and the space of the code block. */
+.code { position: relative; margin: 20px 0 0; }
+.code > pre { margin: 0; }
+.copy { position: absolute; top: 0; right: 0; height: 30px; padding: 0 12px; border: solid var(--line); border-width: 0 0 1px 1px; border-radius: 0 10px 0 6px; background: var(--panel); color: var(--muted); font: 400 0.875rem/1 var(--sans); cursor: pointer; }
+.copy:hover { color: var(--text); }
+/* A line of code that reaches the button would sit under it. Then the code starts below the button. */
+.code.is-long > pre { padding-top: 40px; }
+.cm { color: var(--muted); }
+
+details { max-width: var(--measure); margin: 24px 0 0; }
+/* A closed section that holds a table, a code block or a figure takes the full width, like those blocks do outside it. Its text keeps the text column. */
+details:has(> .table-wrap, > pre, > .code, > figure) { max-width: none; }
+summary { display: flex; align-items: center; gap: 10px; padding: 4px 0; font-weight: 600; cursor: pointer; list-style: none; }
+summary::-webkit-details-marker { display: none; }
+summary svg { width: 12px; height: 12px; color: var(--muted); transition: transform 150ms var(--ease); }
+details[open] summary svg { transform: rotate(90deg); }
+details > p { margin: 8px 0 0 22px; }
+
+/* Widgets: the reader chooses, ticks or decides. A widget is plain controls and text, with no box. render makes its markup from data. */
+.choose, .checks, .decide, .values { position: relative; margin: 24px 0 0; }
+:is(.choose, .checks, .decide, .values) + * { margin-top: 24px; }
+.choose > input, .checks input, .decide input, .values > input { position: absolute; width: 1px; height: 1px; margin: 0; opacity: 0; pointer-events: none; }
+.wd-t { margin: 0; max-width: none; font-size: 0.875rem; line-height: 1.5; font-weight: 600; color: var(--muted); }
+.opt { display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px; border: 1px solid var(--line); border-radius: 6px; font-size: 0.875rem; line-height: 1; cursor: pointer; }
+.opt::before { content: ""; width: 9px; height: 9px; border-radius: 50%; border: 1px solid var(--muted); }
+.opt:hover { border-color: var(--muted); }
+input:checked + .opt { border-color: var(--text); }
+input:checked + .opt::before { border-color: var(--dot); background: var(--dot); }
+input:focus-visible + .opt, .checks input:focus-visible + label::before { outline: 2px solid var(--primary); outline-offset: 3px; }
+/* Chooser: radio buttons and one panel for each case. The styles alone show the chosen case, so it works with scripts off. */
+.choose { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.choose > .wd-t { margin-right: 4px; }
+.choose > .case { display: none; flex-basis: 100%; min-width: 0; margin-top: 8px; }
+.choose > input:nth-of-type(1):checked ~ div:nth-of-type(1), .choose > input:nth-of-type(2):checked ~ div:nth-of-type(2), .choose > input:nth-of-type(3):checked ~ div:nth-of-type(3), .choose > input:nth-of-type(4):checked ~ div:nth-of-type(4), .choose > input:nth-of-type(5):checked ~ div:nth-of-type(5) { display: block; }
+.case-t { display: none; margin: 0 0 4px; font-weight: 600; }
+.case > .case-t + * { margin-top: 0; }
+.case > :last-child { margin-bottom: 0; }
+/* Checklist: a box and a line of text. A ticked line takes the muted color. */
+.checks ul { max-width: var(--measure); margin: 0; padding: 0; list-style: none; }
+.checks li { position: relative; margin-top: 12px; }
+.checks label { display: block; position: relative; padding-left: 32px; cursor: pointer; }
+.checks label::before { content: ""; position: absolute; left: 0; top: 4px; width: 18px; height: 18px; border: 1.5px solid var(--muted); border-radius: 6px; }
+.checks label::after { content: ""; position: absolute; left: 6.5px; top: 7px; width: 5px; height: 9px; border: solid var(--text); border-width: 0 2px 2px 0; transform: rotate(45deg); opacity: 0; }
+.checks input:checked + label { color: var(--muted); }
+.checks input:checked + label::before { border-color: var(--text); }
+.checks input:checked + label::after { opacity: 1; }
+.checks .sub { display: block; font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
+.wd-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin: 16px 0 0; max-width: none; font-size: 0.875rem; line-height: 1.5; color: var(--muted); font-variant-numeric: tabular-nums; }
+.wd-foot[hidden] { display: none; }
+/* Decision helper: questions, the one answer that fits, and the table of all cases. The table is the still form. */
+.decide fieldset { position: relative; display: flex; flex-wrap: wrap; gap: 8px; min-width: 0; margin: 16px 0 0; padding: 0; border: 0; }
+.decide legend { margin-bottom: 8px; padding: 0; font-weight: 600; }
+.decide-out { display: block; max-width: var(--measure); margin-top: 16px; }
+.decide-out:empty { display: none; }
+.decide-out strong { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+.decide-out strong::before { content: ""; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--dot); }
+.decide details { max-width: none; margin-top: 16px; }
+.decide .table-wrap { margin-top: 8px; }
+.decide td strong { display: block; font-weight: 600; }
+.decide tr.is-out { color: var(--muted); }
+html:not(.js) .decide-ask, html:not(.js) .wd-foot output { display: none; }
+/* Value picker: options like a chooser, a line that names the chosen option, and the table of all values. With scripts off the options do nothing, so they are hidden, and the text shows the values of the first option. */
+.values { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.values > .wd-t { margin-right: 4px; }
+.values-now { flex-basis: 100%; max-width: none; margin: 4px 0 0; font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
+.values-now strong { font-weight: 600; color: var(--text); }
+.values details { flex-basis: 100%; min-width: 0; max-width: none; margin-top: 8px; }
+.values .table-wrap { margin-top: 8px; }
+html:not(.js) .values > input + .opt { display: none; }
+
+footer { margin-top: 96px; border-top: 1px solid var(--line); }
+footer .shell { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding-top: 24px; padding-bottom: 40px; font-size: 0.875rem; color: var(--muted); }
+footer p { margin: 0; }
+/* The credit: a one-color mark and "Made with Docent", at the right. The mark takes the muted color of the words beside it. */
+.credit { margin-left: auto; }
+.credit svg { width: 16px; height: 16px; margin-right: 8px; vertical-align: -3px; }
+/* Docent's own pages carry the mark's tile in the footer. */
+.brand { display: inline-flex; align-items: center; gap: 10px; font: 700 1rem/1 var(--serif); color: var(--text); }
+.brand svg { width: 24px; height: 24px; }
+
+@media (max-width: 1100px) {
+  .walk { grid-template-columns: minmax(0, 1fr); row-gap: 32px; }
+  .walk figure { position: static; order: -1; }
+}
+@media (max-width: 900px) {
+  .row { grid-template-columns: minmax(0, 1fr); }
+  .note { max-width: var(--measure); }
+  .title .note { margin-top: 28px; }
+}
+@media (max-width: 720px) {
+  .shell { padding: 0 20px; }
+  .topbar { position: static; }
+  .topbar .shell { flex-wrap: wrap; gap: 4px 16px; height: auto; padding-top: 10px; padding-bottom: 8px; }
+  .host { flex: 1; }
+  .route { flex: none; order: 3; width: 100%; }
+  .route ol { flex-wrap: wrap; gap: 0 20px; }
+  .route a[aria-current] { text-decoration: underline; text-decoration-color: var(--dot); text-decoration-thickness: 2px; text-underline-offset: 0.4em; }
+  .route-dot { display: none; }
+  .title { padding-top: 48px; }
+  h1 { font-size: 2rem; } h2 { font-size: 1.625rem; }
+  section { padding-top: 56px; }
+  footer .shell { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .credit { margin-left: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; }
+}
+/* More contrast (the reader's system setting): outlines, tracks and rules take the muted color, and muted text takes the text color. Screen
+   only, so paper keeps the print block; and not with forced colors, where the reader's system colors already decide. */
+@media screen and (prefers-contrast: more) and (forced-colors: none) {
+  html:root:not([data-never]) { --line: #575d75; --muted: #1c1f2e; }
+  html:root:not([data-never])[data-theme="dark"] { --line: #959bb3; --muted: #e7e9f3; }
+}
+@media screen and (prefers-contrast: more) and (forced-colors: none) and (prefers-color-scheme: dark) {
+  html:root:not([data-never]):not([data-theme="light"]) { --line: #959bb3; --muted: #e7e9f3; }
+}
+/* The reader's high contrast mode (forced colors, as in Windows): the browser gives the page the few colors the reader chose. The kit gives
+   its tokens the same system colors, so the drawings follow, and the marks that are backgrounds (dots, the rail) stay visible. The heat
+   steps and the status colors keep their own values, because there the color is the content; the text on a step keeps --heat-text. */
+@media (forced-colors: active) {
+  html:root:not([data-never]) { --bg: Canvas; --fig: Canvas; --text: CanvasText; --muted: CanvasText; --line: CanvasText; --primary: Highlight; --dot: Highlight; }
+  /* A status dot takes the color of its word, which the browser forces; a background in that color would turn into the page color. */
+  .state::before { background: CanvasText; }
+  /* All borders take the text color, so the chosen option takes the highlight color, as its dot does. */
+  input:checked + .opt { border-color: Highlight; }
+}
+@media print {
+  html:root:not([data-never]) { color-scheme: light; --bg: #ffffff; --panel: #f2f3f9; --fig: #f2f3f9; --text: #1c1f2e; --muted: #575d75; --line: #d3d6e3; --primary: var(--host-accent, #2f3fd0); --ink: var(--host-ink, #1b2260); --dot: var(--host-accent, #2f3fd0); --ok: #1a7f37; --warn: #7d4e00; --err: #cf222e; --heat-1: #dee2f0; --heat-2: #babecb; --heat-3: #9498a5; --heat-4: #616571; --heat-5: #3e424d; --heat-text: #1c1f2e; --heat-page: #ffffff; --logo-light: block; --logo-dark: none; --tile-light: transparent; --tile-dark: #12141f; }
+  /* Paper: 11pt text, the page margin as the edge, and the notes beside the text again. An A4 page holds the text (112mm), a gap and the notes (50mm). */
+  html { font-size: 11pt; } html[data-text="large"] { font-size: 12pt; }
+  html:root:not([data-never]) { --measure: 112mm; --gap: 8mm; --margin-col: 50mm; --block: 100%; }
+  .shell { padding: 0; }
+  .row { grid-template-columns: minmax(0, var(--measure)) var(--margin-col); }
+  .title .note { margin-top: 6px; }
+  p, li { orphans: 2; widows: 2; }
+  /* A browser may leave out the ground of a code well on paper. A thin line keeps it a well. */
+  /* Paper cannot scroll: a long line of code wraps. */
+  pre { border: 1px solid var(--line); white-space: pre-wrap; overflow-wrap: anywhere; }
+  /* The top bar prints as one line above the title: the logo and the host's name, with no links and no switch. */
+  .topbar { position: static; border-bottom: 0; } .topbar .shell { height: auto; } .title { padding-top: 32px; }
+  .logo { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  /* Paper has no link: the credit prints as text. */
+  .credit a { color: inherit; text-decoration: none; }
+  .skip, .route, .theme, .route-dot, .rail-dot, .choose > .opt, .values > .opt, .decide-ask, .wd-foot, .copy, .fig-more { display: none !important; }
+  .choose > .case { display: block !important; margin-top: 16px; } .case-t { display: block; }
+  .checks input:checked + label, .decide tr.is-out { color: var(--text) !important; }
+  .steps li h3, .steps li p { color: var(--text) !important; }
+  .walk { grid-template-columns: minmax(0, 1fr); row-gap: 32px; } .walk figure { position: static; order: -1; }
+  table { min-width: 0; } .table-wrap { overflow: visible; }
+  /* Paper cannot scroll, so a wide grid in words, such as the numbers of a heat map, takes the smallest text size and tighter cells; render splits a grid that is still too wide into several tables. */
+  .dg-words > .table-wrap table { font-size: 0.875rem; } .dg-words > .table-wrap thead th { font-size: inherit; } .dg-words > .table-wrap :is(th, td) { padding: 4px 6px 4px 0; }
+  /* A browser leaves out backgrounds on paper. These carry meaning, so they print: status dots, the rail of the steps, and the ground of figures and code. */
+  .state::before, .steps::before, .fig, pre, code { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  /* Paper cannot scroll, and a drawing cannot split across pages. So a drawing that is wider than the paper, or taller than a page, shrinks to fit, under its caption, on A4 and on Letter. */
+  .fig > svg { width: auto; height: auto; max-width: 100%; max-height: 220mm; }
+  figure, tr, .status, pre, .checks li, .cards > li { break-inside: avoid; }
+  h2, h3 { break-after: avoid; }
+  /* Page numbers: Chrome and Edge print them; other browsers print their own footer. */
+  @page { margin: 18mm; @bottom-right { content: counter(page) " / " counter(pages); font: 9pt system-ui, sans-serif; color: #575d75; } }
+}
+/* /docent:kit */
+</style>
+</head>
+<body>
+<a class="skip" href="#content">Skip to the content</a>
+<header class="topbar">
+  <div class="shell">
+    <span class="host">Example Planner</span>
+    <nav class="route" aria-label="On this page">
+      <ol>
+        <li><a href="#summary">Summary</a></li>
+        <li><a href="#trend">Trend</a></li>
+        <li><a href="#segments">Segments</a></li>
+        <li><a href="#reasons">Reasons</a></li>
+        <li><a href="#setup">Setup</a></li>
+        <li><a href="#actions">What to do</a></li>
+        <li><a href="#method">Method</a></li>
+      </ol>
+    </nav>
+    <button class="theme" type="button">
+      <svg class="icon-moon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13.5 9.6A5.8 5.8 0 0 1 6.4 2.5a5.8 5.8 0 1 0 7.1 7.1Z"/></svg>
+      <svg class="icon-sun" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="8" cy="8" r="3"/><path d="M8 1.5v1.6M8 12.9v1.6M1.5 8h1.6M12.9 8h1.6M3.4 3.4l1.1 1.1M11.5 11.5l1.1 1.1M3.4 12.6l1.1-1.1M11.5 4.5l1.1-1.1"/></svg>
+      <span class="theme-text">Dark</span>
+    </button>
+    <span class="route-dot" aria-hidden="true"></span>
+  </div>
+</header>
+
+<main class="shell" id="content">
+  <div class="title">
+    <h1>Why customers left in the third quarter</h1>
+    <div class="row">
+      <p class="standfirst">In the third quarter of 2026, 1,212 paying accounts cancelled Example Planner, up from 812 in the second quarter. Almost all of the rise came from small Starter accounts after the price change on 1 July. This report shows where the losses came from and proposes three changes.</p>
+      <div class="note" role="note" aria-label="About this document">
+        <strong>Customer analysis</strong>
+        <ul class="facts">
+          <li>8 minutes to read</li>
+          <li>Covers 1 July to 30 September 2026</li>
+          <li>Updated 9 October 2026</li>
+          <li>Owner: Customer insights team</li>
+          <li>Every name and number in this report is invented</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <section id="summary" aria-labelledby="summary-h">
+    <h2 id="summary-h">The short version</h2>
+    <ul class="cards">
+      <li><p class="big">14.4%</p><p>of paying accounts cancelled in Q3, up from 10.1% in Q2.</p></li>
+      <li><p class="big">1,212</p><p>accounts cancelled, 400 more than in Q2.</p></li>
+      <li><p class="big">$41,300</p><p>of monthly revenue lost, up from $27,900 in Q2.</p></li>
+      <li><p class="big">80%</p><p>of the accounts that left were on the Starter plan.</p></li>
+    </ul>
+    <div class="row">
+      <div>
+        <p>Starter accounts with 1 to 5 seats drove the rise. Their quarterly churn went from 13.0% to 21.4%. Team and Business accounts stayed close to their usual rates.</p>
+        <p>Two changes on 1 July explain most of it. The Starter price went from $8 to $12 for each seat, and calendar sync moved from Starter to Team. In the exit survey, 54% of the answers named one of these two changes.</p>
+        <p>Accounts that left also set up less. Only 31% of them connected a calendar in their first month, against 68% of the accounts that stayed.</p>
+      </div>
+      <div class="note" role="note">
+        <strong>Churn</strong>
+        In this report, churn means paying accounts that cancelled. A paused account is not counted. See <a href="#method">Method</a>.
+      </div>
+    </div>
+  </section>
+
+  <section id="trend" aria-labelledby="trend-h">
+    <h2 id="trend-h">The trend by month</h2>
+    <div class="row">
+      <div>
+        <p>Monthly churn on the Starter plan stayed between 3.0% and 3.5% from October to April. It started to rise in May, when the price change was announced, and reached 6.4% in September. Team and Business did not move in the same way.</p>
+      </div>
+      <div class="note" role="note">
+        <strong>Source</strong>
+        Billing system export of 2 October 2026. Rates are cancellations in the month divided by paying accounts on the first day of the month.
+      </div>
+    </div>
+    <figure>
+      <div class="fig" role="region" aria-label="Figure 1, monthly churn by plan" tabindex="0">
+<!-- docent:diagram
+{
+  "id": "monthly-churn",
+  "kind": "line",
+  "label": "Monthly churn on the Starter plan stayed between 3.0% and 3.5% from October 2025 to April 2026, then rose to 6.4% in September 2026. Team stayed near 2% and Business near 1% all year.",
+  "scale": {"from": 0, "to": 8, "step": 2, "unit": "% churn"},
+  "points": ["Oct", "Nov", "Dec", "2026", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep"],
+  "series": [
+    {"name": "Starter", "focus": true, "values": [3.2, 3.1, 3.4, 3.0, 3.3, 3.2, 3.5, 3.9, 4.4, 5.6, 6.1, 6.4]},
+    {"name": "Team", "values": [2.1, 2.0, 2.2, 2.1, 1.9, 2.0, 2.2, 2.1, 2.3, 2.4, 2.3, 2.5]},
+    {"name": "Business", "values": [0.9, 1.0, 0.8, 0.9, 1.1, 0.9, 1.0, 0.8, 0.9, 1.0, 1.2, 1.1]}
+  ]
+}
+-->
+<svg id="dg-monthly-churn" class="dg dg-line dg-auto" xmlns="http://www.w3.org/2000/svg" width="640" height="296" viewBox="0 0 640 296" role="img" aria-label="Monthly churn on the Starter plan stayed between 3.0% and 3.5% from October 2025 to April 2026, then rose to 6.4% in September 2026. Team stayed near 2% and Business near 1% all year.">
+<style>
+#dg-monthly-churn{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-monthly-churn .ground{fill:var(--fig,#f2f3f9)}
+#dg-monthly-churn .band{fill:var(--bg,#fbfbfe)}
+#dg-monthly-churn .track{stroke:var(--line,#d3d6e3)}
+#dg-monthly-churn .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-monthly-churn .head{fill:var(--text,#1c1f2e)}
+#dg-monthly-churn .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-monthly-churn .stop.end{fill:var(--text,#1c1f2e)}
+#dg-monthly-churn .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-monthly-churn .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-monthly-churn .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-monthly-churn .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-monthly-churn .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-monthly-churn .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-monthly-churn .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-monthly-churn .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-monthly-churn .sub,#dg-monthly-churn .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-monthly-churn .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-monthly-churn .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-monthly-churn .dim{font-size:14px;fill:var(--muted,#575d75)}
+#dg-monthly-churn .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-monthly-churn .ln{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}#dg-monthly-churn .pt{fill:var(--text,#1c1f2e)}
+#dg-monthly-churn .ln-o{fill:none;stroke:var(--muted,#575d75);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}#dg-monthly-churn .pt-o{fill:var(--muted,#575d75)}
+#dg-monthly-churn .ln-g{fill:none;stroke:var(--line,#d3d6e3);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}#dg-monthly-churn .pt-g{fill:var(--line,#d3d6e3)}
+#dg-monthly-churn .ld{stroke:var(--muted,#575d75);stroke-width:1}
+#dg-monthly-churn .r-ref{stroke:var(--muted,#575d75)}
+@media (prefers-reduced-motion:reduce){#dg-monthly-churn .pulse{animation:none!important}#dg-monthly-churn .pulse{display:none!important}}
+@media print{#dg-monthly-churn{max-width:100%;height:auto}#dg-monthly-churn .pulse{display:none!important}}
+#dg-monthly-churn-phone{display:none}
+</style>
+<rect width="640" height="296" class="ground"/>
+<rect x="8" y="36" width="624" height="252" rx="10" class="band"/>
+<line x1="36" y1="260" x2="553" y2="260" class="track"/>
+<line x1="36" y1="210" x2="553" y2="210" class="track"/>
+<line x1="36" y1="160" x2="553" y2="160" class="track"/>
+<line x1="36" y1="110" x2="553" y2="110" class="track"/>
+<line x1="36" y1="60" x2="553" y2="60" class="track"/>
+<text x="20" y="24" class="sub" text-anchor="start">% churn, scale from 0.</text>
+<text x="36" y="278" class="val" text-anchor="middle">Oct</text>
+<text x="83" y="278" class="val" text-anchor="middle">Nov</text>
+<text x="130" y="278" class="val" text-anchor="middle">Dec</text>
+<text x="177" y="278" class="val" text-anchor="middle">2026</text>
+<text x="224" y="278" class="val" text-anchor="middle">Feb</text>
+<text x="271" y="278" class="val" text-anchor="middle">Mar</text>
+<text x="318" y="278" class="val" text-anchor="middle">Apr</text>
+<text x="365" y="278" class="val" text-anchor="middle">May</text>
+<text x="412" y="278" class="val" text-anchor="middle">Jun</text>
+<text x="459" y="278" class="val" text-anchor="middle">Jul</text>
+<text x="506" y="278" class="val" text-anchor="middle">Aug</text>
+<text x="553" y="278" class="val" text-anchor="middle">Sep</text>
+<text x="561" y="202.5" class="dim" text-anchor="start">Team</text>
+<text x="561" y="237.5" class="dim" text-anchor="start">Business</text>
+<text x="561" y="105" class="row" text-anchor="start">Starter</text>
+<text x="28" y="264" class="val" text-anchor="end">0</text>
+<text x="28" y="214" class="val" text-anchor="end">2</text>
+<text x="28" y="164" class="val" text-anchor="end">4</text>
+<text x="28" y="114" class="val" text-anchor="end">6</text>
+<text x="28" y="64" class="val" text-anchor="end">8</text>
+<path d="M36,207.5 L83,210 L130,205 L177,207.5 L224,212.5 L271,210 L318,205 L365,207.5 L412,202.5 L459,200 L506,202.5 L553,197.5" class="ln-o"/>
+<path d="M36,237.5 L83,235 L130,240 L177,237.5 L224,232.5 L271,237.5 L318,235 L365,240 L412,237.5 L459,235 L506,230 L553,232.5" class="ln-o"/>
+<path d="M36,180 L83,182.5 L130,175 L177,185 L224,177.5 L271,180 L318,172.5 L365,162.5 L412,150 L459,120 L506,107.5 L553,100" class="ln"/><circle cx="36" cy="180" r="3" class="pt"/><circle cx="83" cy="182.5" r="3" class="pt"/><circle cx="130" cy="175" r="3" class="pt"/><circle cx="177" cy="185" r="3" class="pt"/><circle cx="224" cy="177.5" r="3" class="pt"/><circle cx="271" cy="180" r="3" class="pt"/><circle cx="318" cy="172.5" r="3" class="pt"/><circle cx="365" cy="162.5" r="3" class="pt"/><circle cx="412" cy="150" r="3" class="pt"/><circle cx="459" cy="120" r="3" class="pt"/><circle cx="506" cy="107.5" r="3" class="pt"/><circle cx="553" cy="100" r="3" class="pt"/>
+</svg>
+<svg id="dg-monthly-churn-phone" class="dg dg-line dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="236" viewBox="0 0 264 236" role="img" aria-label="Monthly churn on the Starter plan stayed between 3.0% and 3.5% from October 2025 to April 2026, then rose to 6.4% in September 2026. Team stayed near 2% and Business near 1% all year.">
+<style>
+#dg-monthly-churn-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-monthly-churn-phone .ground{fill:var(--fig,#f2f3f9)}
+#dg-monthly-churn-phone .band{fill:var(--bg,#fbfbfe)}
+#dg-monthly-churn-phone .track{stroke:var(--line,#d3d6e3)}
+#dg-monthly-churn-phone .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-monthly-churn-phone .head{fill:var(--text,#1c1f2e)}
+#dg-monthly-churn-phone .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-monthly-churn-phone .stop.end{fill:var(--text,#1c1f2e)}
+#dg-monthly-churn-phone .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-monthly-churn-phone .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-monthly-churn-phone .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-monthly-churn-phone .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-monthly-churn-phone .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-monthly-churn-phone .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-monthly-churn-phone .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-monthly-churn-phone .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-monthly-churn-phone .sub,#dg-monthly-churn-phone .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-monthly-churn-phone .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-monthly-churn-phone .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-monthly-churn-phone .dim{font-size:14px;fill:var(--muted,#575d75)}
+#dg-monthly-churn-phone .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-monthly-churn-phone .ln{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}#dg-monthly-churn-phone .pt{fill:var(--text,#1c1f2e)}
+#dg-monthly-churn-phone .ln-o{fill:none;stroke:var(--muted,#575d75);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}#dg-monthly-churn-phone .pt-o{fill:var(--muted,#575d75)}
+#dg-monthly-churn-phone .ln-g{fill:none;stroke:var(--line,#d3d6e3);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}#dg-monthly-churn-phone .pt-g{fill:var(--line,#d3d6e3)}
+#dg-monthly-churn-phone .ld{stroke:var(--muted,#575d75);stroke-width:1}
+#dg-monthly-churn-phone .r-ref{stroke:var(--muted,#575d75)}
+@media (prefers-reduced-motion:reduce){#dg-monthly-churn-phone .pulse{animation:none!important}#dg-monthly-churn-phone .pulse{display:none!important}}
+@media print{#dg-monthly-churn-phone{max-width:100%;height:auto}#dg-monthly-churn-phone .pulse{display:none!important}}
+@media (max-width:736px){#dg-monthly-churn{display:none}#dg-monthly-churn-phone{display:block}}
+@media print{#dg-monthly-churn{display:block!important}#dg-monthly-churn-phone{display:none!important}}
+</style>
+<rect width="264" height="236" class="ground"/>
+<rect x="8" y="36" width="248" height="192" rx="10" class="band"/>
+<line x1="20" y1="200" x2="177" y2="200" class="track"/>
+<line x1="20" y1="165" x2="177" y2="165" class="track"/>
+<line x1="20" y1="130" x2="177" y2="130" class="track"/>
+<line x1="20" y1="95" x2="177" y2="95" class="track"/>
+<line x1="20" y1="60" x2="177" y2="60" class="track"/>
+<text x="20" y="24" class="sub" text-anchor="start">% churn, scale from 0.</text>
+<text x="22.5" y="218" class="val" text-anchor="middle">Oct</text>
+<text x="48.55" y="218" class="val" text-anchor="middle">Dec</text>
+<text x="77.09" y="218" class="val" text-anchor="middle">Feb</text>
+<text x="105.64" y="218" class="val" text-anchor="middle">Apr</text>
+<text x="134.18" y="218" class="val" text-anchor="middle">Jun</text>
+<text x="162.73" y="218" class="val" text-anchor="middle">Aug</text>
+<text x="185" y="161.25" class="dim" text-anchor="start">Team</text>
+<text x="185" y="185.75" class="dim" text-anchor="start">Business</text>
+<text x="185" y="93" class="row" text-anchor="start">Starter</text>
+<text x="20" y="196" class="val" text-anchor="start">0</text>
+<text x="20" y="161" class="val" text-anchor="start">2</text>
+<text x="20" y="126" class="val" text-anchor="start">4</text>
+<text x="20" y="91" class="val" text-anchor="start">6</text>
+<text x="20" y="56" class="val" text-anchor="start">8</text>
+<path d="M20,163.25 L34.27,165 L48.55,161.5 L62.82,163.25 L77.09,166.75 L91.36,165 L105.64,161.5 L119.91,163.25 L134.18,159.75 L148.45,158 L162.73,159.75 L177,156.25" class="ln-o"/>
+<path d="M20,184.25 L34.27,182.5 L48.55,186 L62.82,184.25 L77.09,180.75 L91.36,184.25 L105.64,182.5 L119.91,186 L134.18,184.25 L148.45,182.5 L162.73,179 L177,180.75" class="ln-o"/>
+<path d="M20,144 L34.27,145.75 L48.55,140.5 L62.82,147.5 L77.09,142.25 L91.36,144 L105.64,138.75 L119.91,131.75 L134.18,123 L148.45,102 L162.73,93.25 L177,88" class="ln"/><circle cx="20" cy="144" r="3" class="pt"/><circle cx="34.27" cy="145.75" r="3" class="pt"/><circle cx="48.55" cy="140.5" r="3" class="pt"/><circle cx="62.82" cy="147.5" r="3" class="pt"/><circle cx="77.09" cy="142.25" r="3" class="pt"/><circle cx="91.36" cy="144" r="3" class="pt"/><circle cx="105.64" cy="138.75" r="3" class="pt"/><circle cx="119.91" cy="131.75" r="3" class="pt"/><circle cx="134.18" cy="123" r="3" class="pt"/><circle cx="148.45" cy="102" r="3" class="pt"/><circle cx="162.73" cy="93.25" r="3" class="pt"/><circle cx="177" cy="88" r="3" class="pt"/>
+</svg>
+<details class="dg-words">
+<summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>The diagram in words</summary>
+<div class="table-wrap" role="region" aria-label="The values of the line chart" tabindex="0"><table><thead><tr><td></td><th scope="col">Starter</th><th scope="col">Team</th><th scope="col">Business</th></tr></thead><tbody><tr><th scope="row">Oct</th><td>3.2</td><td>2.1</td><td>0.9</td></tr><tr><th scope="row">Nov</th><td>3.1</td><td>2</td><td>1</td></tr><tr><th scope="row">Dec</th><td>3.4</td><td>2.2</td><td>0.8</td></tr><tr><th scope="row">2026</th><td>3</td><td>2.1</td><td>0.9</td></tr><tr><th scope="row">Feb</th><td>3.3</td><td>1.9</td><td>1.1</td></tr><tr><th scope="row">Mar</th><td>3.2</td><td>2</td><td>0.9</td></tr><tr><th scope="row">Apr</th><td>3.5</td><td>2.2</td><td>1</td></tr><tr><th scope="row">May</th><td>3.9</td><td>2.1</td><td>0.8</td></tr><tr><th scope="row">Jun</th><td>4.4</td><td>2.3</td><td>0.9</td></tr><tr><th scope="row">Jul</th><td>5.6</td><td>2.4</td><td>1</td></tr><tr><th scope="row">Aug</th><td>6.1</td><td>2.3</td><td>1.2</td></tr><tr><th scope="row">Sep</th><td>6.4</td><td>2.5</td><td>1.1</td></tr></tbody></table></div>
+<ul><li>% churn, scale from 0.</li><li>Starter: 3.2 in Oct, 6.4 in Sep; highest 6.4 in Sep; lowest 3 in 2026.</li><li>Team: 2.1 in Oct, 2.5 in Sep; highest 2.5 in Sep; lowest 1.9 in Feb.</li><li>Business: 0.9 in Oct, 1.1 in Sep; highest 1.2 in Aug; lowest 0.8 in Dec.</li></ul>
+</details>
+<!-- /docent:diagram -->
+      </div>
+      <figcaption><strong>Figure 1</strong>Monthly churn by plan, October 2025 to September 2026. The price change was announced in May and took effect on 1 July.</figcaption>
+    </figure>
+
+    <h3>Cohorts: how long new accounts keep paying</h3>
+    <p>Each row is a group of accounts that started to pay in the same month. Each column is a month after the start. Accounts that started in July and August, after the price change, lost more in their first months than earlier groups. An empty cell is a month that has not happened yet.</p>
+    <figure>
+      <div class="fig" role="region" aria-label="Figure 2, share of accounts still paying, by start month" tabindex="0">
+<!-- docent:diagram
+{
+  "id": "cohorts",
+  "kind": "heatmap",
+  "label": "Share of new accounts still paying after each month, by start month. Accounts that started in March kept 71% after six months. Accounts that started in July kept 80% after two months, and those that started in August kept 88% after one month, both lower than earlier groups. Later months have not happened yet for the newer groups.",
+  "scale": {"from": 60, "to": 100, "step": 10, "unit": "% paying"},
+  "columns": ["M1", "M2", "M3", "M4", "M5", "M6"],
+  "rows": [
+    {"name": "Started Mar", "values": [94, 89, 85, 82, 76, 71]},
+    {"name": "Started Apr", "values": [93, 88, 84, 78, 72, null]},
+    {"name": "Started May", "values": [95, 89, 82, 75, null, null]},
+    {"name": "Started Jun", "values": [94, 85, 77, null, null, null]},
+    {"name": "Started Jul", "values": [90, 80, null, null, null, null]},
+    {"name": "Started Aug", "values": [88, null, null, null, null, null]}
+  ]
+}
+-->
+<svg id="dg-cohorts" class="dg dg-heatmap dg-auto" xmlns="http://www.w3.org/2000/svg" width="640" height="254" viewBox="0 0 640 254" role="img" aria-label="Share of new accounts still paying after each month, by start month. Accounts that started in March kept 71% after six months. Accounts that started in July kept 80% after two months, and those that started in August kept 88% after one month, both lower than earlier groups. Later months have not happened yet for the newer groups.">
+<style>
+#dg-cohorts{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-cohorts .ground{fill:var(--fig,#f2f3f9)}
+#dg-cohorts .band{fill:var(--bg,#fbfbfe)}
+#dg-cohorts .track{stroke:var(--line,#d3d6e3)}
+#dg-cohorts .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-cohorts .head{fill:var(--text,#1c1f2e)}
+#dg-cohorts .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-cohorts .stop.end{fill:var(--text,#1c1f2e)}
+#dg-cohorts .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-cohorts .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-cohorts .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-cohorts .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-cohorts .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-cohorts .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-cohorts .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-cohorts .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-cohorts .sub,#dg-cohorts .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-cohorts .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-cohorts .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-cohorts .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-cohorts .h1{fill:var(--heat-1,#c6e9ef)}
+#dg-cohorts .h2{fill:var(--heat-2,#86c9d5)}
+#dg-cohorts .h3{fill:var(--heat-3,#3da6b6)}
+#dg-cohorts .h4{fill:var(--heat-4,#00707e)}
+#dg-cohorts .h5{fill:var(--heat-5,#004a53)}
+#dg-cohorts .h0{fill:var(--bg,#fbfbfe);stroke:var(--muted,#575d75);stroke-width:1}
+#dg-cohorts .hv{font-size:12px;fill:var(--heat-text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-cohorts .hv.hi{fill:var(--heat-page,#fbfbfe)}
+@media (prefers-reduced-motion:reduce){#dg-cohorts .pulse{animation:none!important}#dg-cohorts .pulse{display:none!important}}
+@media print{#dg-cohorts{max-width:100%;height:auto}#dg-cohorts .pulse{display:none!important}}
+#dg-cohorts-phone{display:none}
+</style>
+<rect width="640" height="254" class="ground"/>
+<rect x="8" y="78" width="624" height="160" rx="10" class="band"/>
+<text x="20" y="38" class="val" text-anchor="middle">60</text>
+<text x="53" y="38" class="val" text-anchor="middle">70</text>
+<text x="87" y="38" class="val" text-anchor="middle">80</text>
+<text x="121" y="38" class="val" text-anchor="middle">90</text>
+<text x="154" y="38" class="val" text-anchor="middle">100</text>
+<text x="162" y="22" class="sub" text-anchor="start">% paying</text>
+<text x="254" y="22" class="sub" text-anchor="start">no data</text>
+<text x="159.83" y="70" class="val" text-anchor="middle">M1</text>
+<text x="243.5" y="70" class="val" text-anchor="middle">M2</text>
+<text x="327.17" y="70" class="val" text-anchor="middle">M3</text>
+<text x="410.83" y="70" class="val" text-anchor="middle">M4</text>
+<text x="494.5" y="70" class="val" text-anchor="middle">M5</text>
+<text x="578.17" y="70" class="val" text-anchor="middle">M6</text>
+<text x="20" y="103" class="row" text-anchor="start">Started Mar</text>
+<text x="20" y="127" class="row" text-anchor="start">Started Apr</text>
+<text x="20" y="151" class="row" text-anchor="start">Started May</text>
+<text x="20" y="175" class="row" text-anchor="start">Started Jun</text>
+<text x="20" y="199" class="row" text-anchor="start">Started Jul</text>
+<text x="20" y="223" class="row" text-anchor="start">Started Aug</text>
+<rect x="20" y="12" width="32" height="12" rx="2" class="h1"/><rect x="54" y="12" width="32" height="12" rx="2" class="h2"/><rect x="88" y="12" width="32" height="12" rx="2" class="h4"/><rect x="122" y="12" width="32" height="12" rx="2" class="h5"/><rect x="232.5" y="12.5" width="15" height="11" rx="2" class="h0"/>
+<rect x="119" y="87" width="81.67" height="22" rx="2" class="h5"/><rect x="202.67" y="87" width="81.67" height="22" rx="2" class="h4"/><rect x="286.33" y="87" width="81.67" height="22" rx="2" class="h4"/><rect x="370" y="87" width="81.67" height="22" rx="2" class="h4"/><rect x="453.67" y="87" width="81.67" height="22" rx="2" class="h2"/><rect x="537.33" y="87" width="81.67" height="22" rx="2" class="h2"/>
+<text x="159.83" y="102" class="hv hi" text-anchor="middle">94</text>
+<text x="243.5" y="102" class="hv hi" text-anchor="middle">89</text>
+<text x="327.17" y="102" class="hv hi" text-anchor="middle">85</text>
+<text x="410.83" y="102" class="hv hi" text-anchor="middle">82</text>
+<text x="494.5" y="102" class="hv" text-anchor="middle">76</text>
+<text x="578.17" y="102" class="hv" text-anchor="middle">71</text>
+<rect x="119" y="111" width="81.67" height="22" rx="2" class="h5"/><rect x="202.67" y="111" width="81.67" height="22" rx="2" class="h4"/><rect x="286.33" y="111" width="81.67" height="22" rx="2" class="h4"/><rect x="370" y="111" width="81.67" height="22" rx="2" class="h2"/><rect x="453.67" y="111" width="81.67" height="22" rx="2" class="h2"/><rect x="537.83" y="111.5" width="80.67" height="21" rx="2" class="h0"/>
+<text x="159.83" y="126" class="hv hi" text-anchor="middle">93</text>
+<text x="243.5" y="126" class="hv hi" text-anchor="middle">88</text>
+<text x="327.17" y="126" class="hv hi" text-anchor="middle">84</text>
+<text x="410.83" y="126" class="hv" text-anchor="middle">78</text>
+<text x="494.5" y="126" class="hv" text-anchor="middle">72</text>
+<rect x="119" y="135" width="81.67" height="22" rx="2" class="h5"/><rect x="202.67" y="135" width="81.67" height="22" rx="2" class="h4"/><rect x="286.33" y="135" width="81.67" height="22" rx="2" class="h4"/><rect x="370" y="135" width="81.67" height="22" rx="2" class="h2"/><rect x="454.17" y="135.5" width="80.67" height="21" rx="2" class="h0"/><rect x="537.83" y="135.5" width="80.67" height="21" rx="2" class="h0"/>
+<text x="159.83" y="150" class="hv hi" text-anchor="middle">95</text>
+<text x="243.5" y="150" class="hv hi" text-anchor="middle">89</text>
+<text x="327.17" y="150" class="hv hi" text-anchor="middle">82</text>
+<text x="410.83" y="150" class="hv" text-anchor="middle">75</text>
+<rect x="119" y="159" width="81.67" height="22" rx="2" class="h5"/><rect x="202.67" y="159" width="81.67" height="22" rx="2" class="h4"/><rect x="286.33" y="159" width="81.67" height="22" rx="2" class="h2"/><rect x="370.5" y="159.5" width="80.67" height="21" rx="2" class="h0"/><rect x="454.17" y="159.5" width="80.67" height="21" rx="2" class="h0"/><rect x="537.83" y="159.5" width="80.67" height="21" rx="2" class="h0"/>
+<text x="159.83" y="174" class="hv hi" text-anchor="middle">94</text>
+<text x="243.5" y="174" class="hv hi" text-anchor="middle">85</text>
+<text x="327.17" y="174" class="hv" text-anchor="middle">77</text>
+<rect x="119" y="183" width="81.67" height="22" rx="2" class="h5"/><rect x="202.67" y="183" width="81.67" height="22" rx="2" class="h4"/><rect x="286.83" y="183.5" width="80.67" height="21" rx="2" class="h0"/><rect x="370.5" y="183.5" width="80.67" height="21" rx="2" class="h0"/><rect x="454.17" y="183.5" width="80.67" height="21" rx="2" class="h0"/><rect x="537.83" y="183.5" width="80.67" height="21" rx="2" class="h0"/>
+<text x="159.83" y="198" class="hv hi" text-anchor="middle">90</text>
+<text x="243.5" y="198" class="hv hi" text-anchor="middle">80</text>
+<rect x="119" y="207" width="81.67" height="22" rx="2" class="h4"/><rect x="203.17" y="207.5" width="80.67" height="21" rx="2" class="h0"/><rect x="286.83" y="207.5" width="80.67" height="21" rx="2" class="h0"/><rect x="370.5" y="207.5" width="80.67" height="21" rx="2" class="h0"/><rect x="454.17" y="207.5" width="80.67" height="21" rx="2" class="h0"/><rect x="537.83" y="207.5" width="80.67" height="21" rx="2" class="h0"/>
+<text x="159.83" y="222" class="hv hi" text-anchor="middle">88</text>
+</svg>
+<svg id="dg-cohorts-phone" class="dg dg-heatmap dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="414" viewBox="0 0 264 414" role="img" aria-label="Share of new accounts still paying after each month, by start month. Accounts that started in March kept 71% after six months. Accounts that started in July kept 80% after two months, and those that started in August kept 88% after one month, both lower than earlier groups. Later months have not happened yet for the newer groups.">
+<style>
+#dg-cohorts-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-cohorts-phone .ground{fill:var(--fig,#f2f3f9)}
+#dg-cohorts-phone .band{fill:var(--bg,#fbfbfe)}
+#dg-cohorts-phone .track{stroke:var(--line,#d3d6e3)}
+#dg-cohorts-phone .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-cohorts-phone .head{fill:var(--text,#1c1f2e)}
+#dg-cohorts-phone .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-cohorts-phone .stop.end{fill:var(--text,#1c1f2e)}
+#dg-cohorts-phone .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-cohorts-phone .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-cohorts-phone .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-cohorts-phone .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-cohorts-phone .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-cohorts-phone .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-cohorts-phone .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-cohorts-phone .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-cohorts-phone .sub,#dg-cohorts-phone .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-cohorts-phone .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-cohorts-phone .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-cohorts-phone .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-cohorts-phone .h1{fill:var(--heat-1,#c6e9ef)}
+#dg-cohorts-phone .h2{fill:var(--heat-2,#86c9d5)}
+#dg-cohorts-phone .h3{fill:var(--heat-3,#3da6b6)}
+#dg-cohorts-phone .h4{fill:var(--heat-4,#00707e)}
+#dg-cohorts-phone .h5{fill:var(--heat-5,#004a53)}
+#dg-cohorts-phone .h0{fill:var(--bg,#fbfbfe);stroke:var(--muted,#575d75);stroke-width:1}
+#dg-cohorts-phone .hv{font-size:12px;fill:var(--heat-text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-cohorts-phone .hv.hi{fill:var(--heat-page,#fbfbfe)}
+@media (prefers-reduced-motion:reduce){#dg-cohorts-phone .pulse{animation:none!important}#dg-cohorts-phone .pulse{display:none!important}}
+@media print{#dg-cohorts-phone{max-width:100%;height:auto}#dg-cohorts-phone .pulse{display:none!important}}
+@media (max-width:736px){#dg-cohorts{display:none}#dg-cohorts-phone{display:block}}
+@media print{#dg-cohorts{display:block!important}#dg-cohorts-phone{display:none!important}}
+</style>
+<rect width="264" height="414" class="ground"/>
+<rect x="8" y="100" width="248" height="298" rx="10" class="band"/>
+<text x="20" y="38" class="val" text-anchor="middle">60</text>
+<text x="53" y="38" class="val" text-anchor="middle">70</text>
+<text x="87" y="38" class="val" text-anchor="middle">80</text>
+<text x="121" y="38" class="val" text-anchor="middle">90</text>
+<text x="154" y="38" class="val" text-anchor="middle">100</text>
+<text x="162" y="22" class="sub" text-anchor="start">% paying</text>
+<text x="42" y="56" class="sub" text-anchor="start">no data</text>
+<text x="38.67" y="92" class="val" text-anchor="middle">M1</text>
+<text x="76" y="92" class="val" text-anchor="middle">M2</text>
+<text x="113.33" y="92" class="val" text-anchor="middle">M3</text>
+<text x="150.67" y="92" class="val" text-anchor="middle">M4</text>
+<text x="188" y="92" class="val" text-anchor="middle">M5</text>
+<text x="225.33" y="92" class="val" text-anchor="middle">M6</text>
+<text x="20" y="122" class="row" text-anchor="start">Started Mar</text>
+<text x="20" y="170" class="row" text-anchor="start">Started Apr</text>
+<text x="20" y="218" class="row" text-anchor="start">Started May</text>
+<text x="20" y="266" class="row" text-anchor="start">Started Jun</text>
+<text x="20" y="314" class="row" text-anchor="start">Started Jul</text>
+<text x="20" y="362" class="row" text-anchor="start">Started Aug</text>
+<rect x="20" y="12" width="32" height="12" rx="2" class="h1"/><rect x="54" y="12" width="32" height="12" rx="2" class="h2"/><rect x="88" y="12" width="32" height="12" rx="2" class="h4"/><rect x="122" y="12" width="32" height="12" rx="2" class="h5"/><rect x="20.5" y="46.5" width="15" height="11" rx="2" class="h0"/>
+<rect x="21" y="127" width="35.33" height="22" rx="2" class="h5"/><rect x="58.33" y="127" width="35.33" height="22" rx="2" class="h4"/><rect x="95.67" y="127" width="35.33" height="22" rx="2" class="h4"/><rect x="133" y="127" width="35.33" height="22" rx="2" class="h4"/><rect x="170.33" y="127" width="35.33" height="22" rx="2" class="h2"/><rect x="207.67" y="127" width="35.33" height="22" rx="2" class="h2"/>
+<text x="38.67" y="142" class="hv hi" text-anchor="middle">94</text>
+<text x="76" y="142" class="hv hi" text-anchor="middle">89</text>
+<text x="113.33" y="142" class="hv hi" text-anchor="middle">85</text>
+<text x="150.67" y="142" class="hv hi" text-anchor="middle">82</text>
+<text x="188" y="142" class="hv" text-anchor="middle">76</text>
+<text x="225.33" y="142" class="hv" text-anchor="middle">71</text>
+<rect x="21" y="175" width="35.33" height="22" rx="2" class="h5"/><rect x="58.33" y="175" width="35.33" height="22" rx="2" class="h4"/><rect x="95.67" y="175" width="35.33" height="22" rx="2" class="h4"/><rect x="133" y="175" width="35.33" height="22" rx="2" class="h2"/><rect x="170.33" y="175" width="35.33" height="22" rx="2" class="h2"/><rect x="208.17" y="175.5" width="34.33" height="21" rx="2" class="h0"/>
+<text x="38.67" y="190" class="hv hi" text-anchor="middle">93</text>
+<text x="76" y="190" class="hv hi" text-anchor="middle">88</text>
+<text x="113.33" y="190" class="hv hi" text-anchor="middle">84</text>
+<text x="150.67" y="190" class="hv" text-anchor="middle">78</text>
+<text x="188" y="190" class="hv" text-anchor="middle">72</text>
+<rect x="21" y="223" width="35.33" height="22" rx="2" class="h5"/><rect x="58.33" y="223" width="35.33" height="22" rx="2" class="h4"/><rect x="95.67" y="223" width="35.33" height="22" rx="2" class="h4"/><rect x="133" y="223" width="35.33" height="22" rx="2" class="h2"/><rect x="170.83" y="223.5" width="34.33" height="21" rx="2" class="h0"/><rect x="208.17" y="223.5" width="34.33" height="21" rx="2" class="h0"/>
+<text x="38.67" y="238" class="hv hi" text-anchor="middle">95</text>
+<text x="76" y="238" class="hv hi" text-anchor="middle">89</text>
+<text x="113.33" y="238" class="hv hi" text-anchor="middle">82</text>
+<text x="150.67" y="238" class="hv" text-anchor="middle">75</text>
+<rect x="21" y="271" width="35.33" height="22" rx="2" class="h5"/><rect x="58.33" y="271" width="35.33" height="22" rx="2" class="h4"/><rect x="95.67" y="271" width="35.33" height="22" rx="2" class="h2"/><rect x="133.5" y="271.5" width="34.33" height="21" rx="2" class="h0"/><rect x="170.83" y="271.5" width="34.33" height="21" rx="2" class="h0"/><rect x="208.17" y="271.5" width="34.33" height="21" rx="2" class="h0"/>
+<text x="38.67" y="286" class="hv hi" text-anchor="middle">94</text>
+<text x="76" y="286" class="hv hi" text-anchor="middle">85</text>
+<text x="113.33" y="286" class="hv" text-anchor="middle">77</text>
+<rect x="21" y="319" width="35.33" height="22" rx="2" class="h5"/><rect x="58.33" y="319" width="35.33" height="22" rx="2" class="h4"/><rect x="96.17" y="319.5" width="34.33" height="21" rx="2" class="h0"/><rect x="133.5" y="319.5" width="34.33" height="21" rx="2" class="h0"/><rect x="170.83" y="319.5" width="34.33" height="21" rx="2" class="h0"/><rect x="208.17" y="319.5" width="34.33" height="21" rx="2" class="h0"/>
+<text x="38.67" y="334" class="hv hi" text-anchor="middle">90</text>
+<text x="76" y="334" class="hv hi" text-anchor="middle">80</text>
+<rect x="21" y="367" width="35.33" height="22" rx="2" class="h4"/><rect x="58.83" y="367.5" width="34.33" height="21" rx="2" class="h0"/><rect x="96.17" y="367.5" width="34.33" height="21" rx="2" class="h0"/><rect x="133.5" y="367.5" width="34.33" height="21" rx="2" class="h0"/><rect x="170.83" y="367.5" width="34.33" height="21" rx="2" class="h0"/><rect x="208.17" y="367.5" width="34.33" height="21" rx="2" class="h0"/>
+<text x="38.67" y="382" class="hv hi" text-anchor="middle">88</text>
+</svg>
+<details class="dg-words">
+<summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>The diagram in words</summary>
+<div class="table-wrap" role="region" aria-label="The numbers of the heat map" tabindex="0"><table><thead><tr><td></td><th scope="col">M1</th><th scope="col">M2</th><th scope="col">M3</th><th scope="col">M4</th><th scope="col">M5</th><th scope="col">M6</th></tr></thead><tbody><tr><th scope="row">Started Mar</th><td>94</td><td>89</td><td>85</td><td>82</td><td>76</td><td>71</td></tr><tr><th scope="row">Started Apr</th><td>93</td><td>88</td><td>84</td><td>78</td><td>72</td><td>no data</td></tr><tr><th scope="row">Started May</th><td>95</td><td>89</td><td>82</td><td>75</td><td>no data</td><td>no data</td></tr><tr><th scope="row">Started Jun</th><td>94</td><td>85</td><td>77</td><td>no data</td><td>no data</td><td>no data</td></tr><tr><th scope="row">Started Jul</th><td>90</td><td>80</td><td>no data</td><td>no data</td><td>no data</td><td>no data</td></tr><tr><th scope="row">Started Aug</th><td>88</td><td>no data</td><td>no data</td><td>no data</td><td>no data</td><td>no data</td></tr></tbody></table></div>
+<ul><li>Each cell is shaded by its number, in 4 steps of 10 % paying from 60 to 100. A number on the edge of two steps takes the higher step.</li><li>The highest number is 95 (Started May, M1). The lowest is 71 (Started Mar, M6).</li><li>15 cells have no data.</li></ul>
+</details>
+<!-- /docent:diagram -->
+      </div>
+      <figcaption><strong>Figure 2</strong>Share of new accounts still paying, by the month they started. M1 is the first month after the start.</figcaption>
+    </figure>
+  </section>
+
+  <section id="segments" aria-labelledby="segments-h">
+    <h2 id="segments-h">Which accounts left</h2>
+    <p>The table gives each plan's numbers for the quarter. The rate is the share of the accounts at the start of the quarter that cancelled during it.</p>
+    <div class="table-wrap" role="region" aria-label="Churn by plan in Q3 2026" tabindex="0">
+      <table>
+        <thead>
+          <tr><th scope="col">Plan</th><th scope="col" class="num">Accounts on 1 July</th><th scope="col" class="num">Cancelled in Q3</th><th scope="col" class="num">Q3 rate</th><th scope="col" class="num">Q2 rate</th><th scope="col" class="num">Change</th><th scope="col" class="num">Monthly revenue lost</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">Starter</th><td class="num">5,310</td><td class="num">968</td><td class="num">18.2%</td><td class="num">11.9%</td><td class="num">+6.3 pts</td><td class="num">$22,600</td></tr>
+          <tr><th scope="row">Team</th><td class="num">2,640</td><td class="num">201</td><td class="num">7.6%</td><td class="num">6.4%</td><td class="num">+1.2 pts</td><td class="num">$12,100</td></tr>
+          <tr><th scope="row">Business</th><td class="num">470</td><td class="num">43</td><td class="num">9.1%</td><td class="num">8.8%</td><td class="num">+0.3 pts</td><td class="num">$6,600</td></tr>
+          <tr><th scope="row">All plans</th><td class="num">8,420</td><td class="num">1,212</td><td class="num">14.4%</td><td class="num">10.1%</td><td class="num">+4.3 pts</td><td class="num">$41,300</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Inside each plan, the rate differs by the size of the account. Figure 3 compares the second and the third quarter for five groups. The smallest Starter accounts moved most.</p>
+    <figure>
+      <div class="fig" role="region" aria-label="Figure 3, quarterly churn by group, Q2 and Q3" tabindex="0">
+<!-- docent:diagram
+{
+  "id": "segment-change",
+  "kind": "bar",
+  "label": "Quarterly churn rose most for Starter accounts with 1 to 5 seats, from 13.0% in Q2 to 21.4% in Q3. Starter accounts with 6 to 20 seats rose from 9.8% to 15.1%. Team without the discount rose from 6.2% to 7.4%. Business and Education stayed within half a point.",
+  "scale": {"from": 0, "to": 25, "step": 5, "unit": "% churn"},
+  "series": ["Q2 2026", "Q3 2026"],
+  "order": "change",
+  "rows": [
+    {"name": "Starter, 1 to 5 seats", "values": [13.0, 21.4]},
+    {"name": "Starter, 6 to 20 seats", "values": [9.8, 15.1]},
+    {"name": "Team, no discount", "values": [6.2, 7.4]},
+    {"name": "Business", "values": [8.8, 9.1]},
+    {"name": "Education discount", "values": [8.1, 8.4]}
+  ]
+}
+-->
+<svg id="dg-segment-change" class="dg dg-bar dg-auto" xmlns="http://www.w3.org/2000/svg" width="640" height="266" viewBox="0 0 640 266" role="img" aria-label="Quarterly churn rose most for Starter accounts with 1 to 5 seats, from 13.0% in Q2 to 21.4% in Q3. Starter accounts with 6 to 20 seats rose from 9.8% to 15.1%. Team without the discount rose from 6.2% to 7.4%. Business and Education stayed within half a point.">
+<style>
+#dg-segment-change{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-segment-change .ground{fill:var(--fig,#f2f3f9)}
+#dg-segment-change .band{fill:var(--bg,#fbfbfe)}
+#dg-segment-change .track{stroke:var(--line,#d3d6e3)}
+#dg-segment-change .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-segment-change .head{fill:var(--text,#1c1f2e)}
+#dg-segment-change .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-segment-change .stop.end{fill:var(--text,#1c1f2e)}
+#dg-segment-change .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-segment-change .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-segment-change .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-segment-change .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-segment-change .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-segment-change .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-segment-change .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-segment-change .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-segment-change .sub,#dg-segment-change .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-segment-change .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-segment-change .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-segment-change .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-segment-change .r-bar{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-segment-change .r-ref{stroke:var(--muted,#575d75)}
+#dg-segment-change .r-pt{fill:var(--text,#1c1f2e)}
+#dg-segment-change .d-ring{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-segment-change .d-gap{stroke:var(--muted,#575d75);stroke-width:2}
+#dg-segment-change .d-lead{stroke:var(--muted,#575d75);stroke-width:1}
+@media (prefers-reduced-motion:reduce){#dg-segment-change .pulse{animation:none!important}#dg-segment-change .pulse{display:none!important}}
+@media print{#dg-segment-change{max-width:100%;height:auto}#dg-segment-change .pulse{display:none!important}}
+#dg-segment-change-phone{display:none}
+</style>
+<rect width="640" height="266" class="ground"/>
+<rect x="8" y="60" width="624" height="198" rx="10" class="band"/>
+<line x1="218" y1="60" x2="218" y2="258" class="track"/>
+<line x1="290.2" y1="60" x2="290.2" y2="258" class="track"/>
+<line x1="362.4" y1="60" x2="362.4" y2="258" class="track"/>
+<line x1="434.6" y1="60" x2="434.6" y2="258" class="track"/>
+<line x1="506.8" y1="60" x2="506.8" y2="258" class="track"/>
+<line x1="579" y1="60" x2="579" y2="258" class="track"/>
+<text x="20" y="24" class="sub" text-anchor="start">% churn, scale from 0. Largest change first.</text>
+<text x="218" y="48" class="val" text-anchor="middle">0</text>
+<text x="290.2" y="48" class="val" text-anchor="middle">5</text>
+<text x="362.4" y="48" class="val" text-anchor="middle">10</text>
+<text x="434.6" y="48" class="val" text-anchor="middle">15</text>
+<text x="506.8" y="48" class="val" text-anchor="middle">20</text>
+<text x="579" y="48" class="val" text-anchor="middle">25</text>
+<text x="20" y="111" class="row" text-anchor="start">Starter, 1 to 5 seats</text>
+<rect x="372.88" y="98" width="23.84" height="16" class="band"/><text x="392.72" y="110" class="val" text-anchor="end">13</text>
+<rect x="536.02" y="98" width="35.76" height="16" class="band"/><text x="540.02" y="110" class="val" text-anchor="start">21.4</text>
+<rect x="374.92" y="76" width="61.6" height="16" class="band"/><text x="405.72" y="88" class="val" text-anchor="middle">Q2 2026</text>
+<rect x="496.22" y="76" width="61.6" height="16" class="band"/><text x="527.02" y="88" class="val" text-anchor="middle">Q3 2026</text>
+<text x="20" y="143" class="row" text-anchor="start">Starter, 6 to 20 seats</text>
+<rect x="322.67" y="130" width="27.84" height="16" class="band"/><text x="346.51" y="142" class="val" text-anchor="end">9.8</text>
+<rect x="445.04" y="130" width="35.76" height="16" class="band"/><text x="449.04" y="142" class="val" text-anchor="start">15.1</text>
+<text x="20" y="175" class="row" text-anchor="start">Team, no discount</text>
+<rect x="270.69" y="162" width="27.84" height="16" class="band"/><text x="294.53" y="174" class="val" text-anchor="end">6.2</text>
+<rect x="333.86" y="162" width="27.84" height="16" class="band"/><text x="337.86" y="174" class="val" text-anchor="start">7.4</text>
+<text x="20" y="207" class="row" text-anchor="start">Business</text>
+<rect x="308.23" y="194" width="27.84" height="16" class="band"/><text x="332.07" y="206" class="val" text-anchor="end">8.8</text>
+<rect x="358.4" y="194" width="27.84" height="16" class="band"/><text x="362.4" y="206" class="val" text-anchor="start">9.1</text>
+<text x="20" y="239" class="row" text-anchor="start">Education discount</text>
+<rect x="298.12" y="226" width="27.84" height="16" class="band"/><text x="321.96" y="238" class="val" text-anchor="end">8.1</text>
+<rect x="348.3" y="226" width="27.84" height="16" class="band"/><text x="352.3" y="238" class="val" text-anchor="start">8.4</text>
+<line x1="405.72" y1="106" x2="527.02" y2="106" class="d-gap"/><circle cx="405.72" cy="106" r="4.25" class="d-ring"/><circle cx="527.02" cy="106" r="5" class="r-pt"/>
+<line x1="359.51" y1="138" x2="436.04" y2="138" class="d-gap"/><circle cx="359.51" cy="138" r="4.25" class="d-ring"/><circle cx="436.04" cy="138" r="5" class="r-pt"/>
+<line x1="307.53" y1="170" x2="324.86" y2="170" class="d-gap"/><circle cx="307.53" cy="170" r="4.25" class="d-ring"/><circle cx="324.86" cy="170" r="5" class="r-pt"/>
+<line x1="345.07" y1="202" x2="349.4" y2="202" class="d-gap"/><circle cx="345.07" cy="202" r="4.25" class="d-ring"/><circle cx="349.4" cy="202" r="5" class="r-pt"/>
+<line x1="334.96" y1="234" x2="339.3" y2="234" class="d-gap"/><circle cx="334.96" cy="234" r="4.25" class="d-ring"/><circle cx="339.3" cy="234" r="5" class="r-pt"/>
+</svg>
+<svg id="dg-segment-change-phone" class="dg dg-bar dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="372" viewBox="0 0 264 372" role="img" aria-label="Quarterly churn rose most for Starter accounts with 1 to 5 seats, from 13.0% in Q2 to 21.4% in Q3. Starter accounts with 6 to 20 seats rose from 9.8% to 15.1%. Team without the discount rose from 6.2% to 7.4%. Business and Education stayed within half a point.">
+<style>
+#dg-segment-change-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-segment-change-phone .ground{fill:var(--fig,#f2f3f9)}
+#dg-segment-change-phone .band{fill:var(--bg,#fbfbfe)}
+#dg-segment-change-phone .track{stroke:var(--line,#d3d6e3)}
+#dg-segment-change-phone .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-segment-change-phone .head{fill:var(--text,#1c1f2e)}
+#dg-segment-change-phone .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-segment-change-phone .stop.end{fill:var(--text,#1c1f2e)}
+#dg-segment-change-phone .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-segment-change-phone .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-segment-change-phone .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-segment-change-phone .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-segment-change-phone .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-segment-change-phone .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-segment-change-phone .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-segment-change-phone .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-segment-change-phone .sub,#dg-segment-change-phone .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-segment-change-phone .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-segment-change-phone .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-segment-change-phone .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-segment-change-phone .r-bar{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-segment-change-phone .r-ref{stroke:var(--muted,#575d75)}
+#dg-segment-change-phone .r-pt{fill:var(--text,#1c1f2e)}
+#dg-segment-change-phone .d-ring{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-segment-change-phone .d-gap{stroke:var(--muted,#575d75);stroke-width:2}
+#dg-segment-change-phone .d-lead{stroke:var(--muted,#575d75);stroke-width:1}
+@media (prefers-reduced-motion:reduce){#dg-segment-change-phone .pulse{animation:none!important}#dg-segment-change-phone .pulse{display:none!important}}
+@media print{#dg-segment-change-phone{max-width:100%;height:auto}#dg-segment-change-phone .pulse{display:none!important}}
+@media (max-width:736px){#dg-segment-change{display:none}#dg-segment-change-phone{display:block}}
+@media print{#dg-segment-change{display:block!important}#dg-segment-change-phone{display:none!important}}
+</style>
+<rect width="264" height="372" class="ground"/>
+<rect x="8" y="76" width="248" height="288" rx="10" class="band"/>
+<line x1="61" y1="126" x2="61" y2="154" class="track"/>
+<line x1="117.8" y1="126" x2="117.8" y2="154" class="track"/>
+<line x1="174.6" y1="126" x2="174.6" y2="154" class="track"/>
+<line x1="61" y1="176" x2="61" y2="204" class="track"/>
+<line x1="117.8" y1="176" x2="117.8" y2="204" class="track"/>
+<line x1="174.6" y1="176" x2="174.6" y2="204" class="track"/>
+<line x1="61" y1="226" x2="61" y2="254" class="track"/>
+<line x1="117.8" y1="226" x2="117.8" y2="254" class="track"/>
+<line x1="174.6" y1="226" x2="174.6" y2="254" class="track"/>
+<line x1="61" y1="276" x2="61" y2="304" class="track"/>
+<line x1="117.8" y1="276" x2="117.8" y2="304" class="track"/>
+<line x1="174.6" y1="276" x2="174.6" y2="304" class="track"/>
+<line x1="61" y1="326" x2="61" y2="354" class="track"/>
+<line x1="117.8" y1="326" x2="117.8" y2="354" class="track"/>
+<line x1="174.6" y1="326" x2="174.6" y2="354" class="track"/>
+<text x="20" y="24" class="sub" text-anchor="start">% churn, scale from 0. Largest</text>
+<text x="20" y="40" class="sub" text-anchor="start">change first.</text>
+<text x="61" y="64" class="val" text-anchor="middle">0</text>
+<text x="117.8" y="64" class="val" text-anchor="middle">10</text>
+<text x="174.6" y="64" class="val" text-anchor="middle">20</text>
+<text x="20" y="100" class="row" text-anchor="start">Starter, 1 to 5 seats</text>
+<rect x="102" y="132" width="23.84" height="16" class="band"/><text x="121.84" y="144" class="val" text-anchor="end">13</text>
+<rect x="191.55" y="132" width="35.76" height="16" class="band"/><text x="195.55" y="144" class="val" text-anchor="start">21.4</text>
+<rect x="97.1" y="110" width="61.6" height="16" class="band"/><text x="127.9" y="122" class="val" text-anchor="middle">Q2 2026</text>
+<rect x="158.7" y="110" width="61.6" height="16" class="band"/><text x="189.5" y="122" class="val" text-anchor="middle">Q3 2026</text>
+<text x="20" y="172" class="row" text-anchor="start">Starter, 6 to 20 seats</text>
+<rect x="79.82" y="182" width="27.84" height="16" class="band"/><text x="103.66" y="194" class="val" text-anchor="end">9.8</text>
+<rect x="155.77" y="182" width="35.76" height="16" class="band"/><text x="159.77" y="194" class="val" text-anchor="start">15.1</text>
+<text x="20" y="222" class="row" text-anchor="start">Team, no discount</text>
+<rect x="59.38" y="232" width="27.84" height="16" class="band"/><text x="83.22" y="244" class="val" text-anchor="end">6.2</text>
+<rect x="112.03" y="232" width="27.84" height="16" class="band"/><text x="116.03" y="244" class="val" text-anchor="start">7.4</text>
+<text x="20" y="272" class="row" text-anchor="start">Business</text>
+<rect x="74.14" y="282" width="27.84" height="16" class="band"/><text x="97.98" y="294" class="val" text-anchor="end">8.8</text>
+<rect x="121.69" y="282" width="27.84" height="16" class="band"/><text x="125.69" y="294" class="val" text-anchor="start">9.1</text>
+<text x="20" y="322" class="row" text-anchor="start">Education discount</text>
+<rect x="70.17" y="332" width="27.84" height="16" class="band"/><text x="94.01" y="344" class="val" text-anchor="end">8.1</text>
+<rect x="117.71" y="332" width="27.84" height="16" class="band"/><text x="121.71" y="344" class="val" text-anchor="start">8.4</text>
+<line x1="134.84" y1="140" x2="182.55" y2="140" class="d-gap"/><circle cx="134.84" cy="140" r="4.25" class="d-ring"/><circle cx="182.55" cy="140" r="5" class="r-pt"/><line x1="127.9" y1="126" x2="134.84" y2="133" class="d-lead"/><line x1="189.5" y1="126" x2="182.55" y2="133" class="d-lead"/>
+<line x1="116.66" y1="190" x2="146.77" y2="190" class="d-gap"/><circle cx="116.66" cy="190" r="4.25" class="d-ring"/><circle cx="146.77" cy="190" r="5" class="r-pt"/>
+<line x1="96.22" y1="240" x2="103.03" y2="240" class="d-gap"/><circle cx="96.22" cy="240" r="4.25" class="d-ring"/><circle cx="103.03" cy="240" r="5" class="r-pt"/>
+<line x1="110.98" y1="290" x2="112.69" y2="290" class="d-gap"/><circle cx="110.98" cy="290" r="4.25" class="d-ring"/><circle cx="112.69" cy="290" r="5" class="r-pt"/>
+<line x1="107.01" y1="340" x2="108.71" y2="340" class="d-gap"/><circle cx="107.01" cy="340" r="4.25" class="d-ring"/><circle cx="108.71" cy="340" r="5" class="r-pt"/>
+</svg>
+<details class="dg-words">
+<summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>The diagram in words</summary>
+<div class="table-wrap is-text" role="region" aria-label="The rows of the bar chart" tabindex="0"><table><thead><tr><th scope="col">Row</th><th scope="col">Q2 2026</th><th scope="col">Q3 2026</th><th scope="col">Change, in % churn</th></tr></thead><tbody><tr><th scope="row">Starter, 1 to 5 seats</th><td>13</td><td>21.4</td><td>+8.4</td></tr><tr><th scope="row">Starter, 6 to 20 seats</th><td>9.8</td><td>15.1</td><td>+5.3</td></tr><tr><th scope="row">Team, no discount</th><td>6.2</td><td>7.4</td><td>+1.2</td></tr><tr><th scope="row">Business</th><td>8.8</td><td>9.1</td><td>+0.3</td></tr><tr><th scope="row">Education discount</th><td>8.1</td><td>8.4</td><td>+0.3</td></tr></tbody></table></div>
+<ul><li>% churn, scale from 0. Largest change first.</li></ul>
+</details>
+<!-- /docent:diagram -->
+      </div>
+      <figcaption><strong>Figure 3</strong>Quarterly churn by group, Q2 and Q3 2026. The Education discount group is on the Team plan at half price.</figcaption>
+    </figure>
+    <div class="status">
+      <span class="state info">Small group</span>
+      <p>The Business plan has 470 accounts, so 43 cancellations make 9.1%. One customer with 12 accounts moved to a single contract in August; without it the Business rate is 6.6%.</p>
+    </div>
+  </section>
+
+  <section id="reasons" aria-labelledby="reasons-h">
+    <h2 id="reasons-h">Why they say they left</h2>
+    <div class="row">
+      <div>
+        <p>Of the 1,212 accounts that cancelled, 734 answered the one question in the cancel form: "What is the main reason you are leaving?" Each account gave one answer.</p>
+        <p>Price was the most common answer. The second was the move of calendar sync to the Team plan. Together they make 54% of the answers. "Other" holds the free text that fit no group; the most common words there were "invoice" and "too many tools".</p>
+      </div>
+      <div class="note" role="note">
+        <strong>Who answered</strong>
+        61% of the accounts that cancelled. Accounts that cancel through their bank do not see the form, so they are missing.
+      </div>
+    </div>
+    <figure>
+      <div class="fig" role="region" aria-label="Figure 4, main reason for leaving" tabindex="0">
+<!-- docent:diagram
+{
+  "id": "reasons",
+  "kind": "bar",
+  "label": "Main reason for leaving, from 734 answers. Price too high: 241. Calendar sync no longer in Starter: 156. Moved to another tool: 112. Team got smaller or closed: 88. Too hard to set up: 71. Other: 66.",
+  "scale": {"from": 0, "to": 250, "step": 50, "unit": "answers"},
+  "order": "largest",
+  "rows": [
+    {"name": "Price too high", "value": 241},
+    {"name": "Calendar sync not in Starter", "value": 156},
+    {"name": "Moved to another tool", "value": 112},
+    {"name": "Team smaller or closed", "value": 88},
+    {"name": "Too hard to set up", "value": 71},
+    {"name": "Other", "value": 66}
+  ]
+}
+-->
+<svg id="dg-reasons" class="dg dg-bar dg-auto" xmlns="http://www.w3.org/2000/svg" width="640" height="276" viewBox="0 0 640 276" role="img" aria-label="Main reason for leaving, from 734 answers. Price too high: 241. Calendar sync no longer in Starter: 156. Moved to another tool: 112. Team got smaller or closed: 88. Too hard to set up: 71. Other: 66.">
+<style>
+#dg-reasons{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-reasons .ground{fill:var(--fig,#f2f3f9)}
+#dg-reasons .band{fill:var(--bg,#fbfbfe)}
+#dg-reasons .track{stroke:var(--line,#d3d6e3)}
+#dg-reasons .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-reasons .head{fill:var(--text,#1c1f2e)}
+#dg-reasons .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-reasons .stop.end{fill:var(--text,#1c1f2e)}
+#dg-reasons .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-reasons .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-reasons .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-reasons .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-reasons .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-reasons .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-reasons .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-reasons .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-reasons .sub,#dg-reasons .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-reasons .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-reasons .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-reasons .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-reasons .r-bar{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-reasons .r-ref{stroke:var(--muted,#575d75)}
+#dg-reasons .r-pt{fill:var(--text,#1c1f2e)}
+#dg-reasons .d-ring{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-reasons .d-gap{stroke:var(--muted,#575d75);stroke-width:2}
+#dg-reasons .d-lead{stroke:var(--muted,#575d75);stroke-width:1}
+@media (prefers-reduced-motion:reduce){#dg-reasons .pulse{animation:none!important}#dg-reasons .pulse{display:none!important}}
+@media print{#dg-reasons{max-width:100%;height:auto}#dg-reasons .pulse{display:none!important}}
+#dg-reasons-phone{display:none}
+</style>
+<rect width="640" height="276" class="ground"/>
+<rect x="8" y="60" width="624" height="208" rx="10" class="band"/>
+<line x1="223" y1="60" x2="223" y2="268" class="track"/>
+<line x1="296" y1="60" x2="296" y2="268" class="track"/>
+<line x1="369" y1="60" x2="369" y2="268" class="track"/>
+<line x1="442" y1="60" x2="442" y2="268" class="track"/>
+<line x1="515" y1="60" x2="515" y2="268" class="track"/>
+<line x1="588" y1="60" x2="588" y2="268" class="track"/>
+<text x="20" y="24" class="sub" text-anchor="start">Answers, bars from 0. Largest first.</text>
+<text x="223" y="48" class="val" text-anchor="middle">0</text>
+<text x="296" y="48" class="val" text-anchor="middle">50</text>
+<text x="369" y="48" class="val" text-anchor="middle">100</text>
+<text x="442" y="48" class="val" text-anchor="middle">150</text>
+<text x="515" y="48" class="val" text-anchor="middle">200</text>
+<text x="588" y="48" class="val" text-anchor="middle">250</text>
+<text x="20" y="89" class="row" text-anchor="start">Price too high</text>
+<rect x="578.86" y="76" width="31.76" height="16" class="band"/><text x="582.86" y="88" class="val" text-anchor="start">241</text>
+<text x="20" y="121" class="row" text-anchor="start">Calendar sync not in Starter</text>
+<rect x="454.76" y="108" width="31.76" height="16" class="band"/><text x="458.76" y="120" class="val" text-anchor="start">156</text>
+<text x="20" y="153" class="row" text-anchor="start">Moved to another tool</text>
+<rect x="390.52" y="140" width="31.76" height="16" class="band"/><text x="394.52" y="152" class="val" text-anchor="start">112</text>
+<text x="20" y="185" class="row" text-anchor="start">Team smaller or closed</text>
+<rect x="355.48" y="172" width="23.84" height="16" class="band"/><text x="359.48" y="184" class="val" text-anchor="start">88</text>
+<text x="20" y="217" class="row" text-anchor="start">Too hard to set up</text>
+<rect x="330.66" y="204" width="23.84" height="16" class="band"/><text x="334.66" y="216" class="val" text-anchor="start">71</text>
+<text x="20" y="249" class="row" text-anchor="start">Other</text>
+<rect x="323.36" y="236" width="23.84" height="16" class="band"/><text x="327.36" y="248" class="val" text-anchor="start">66</text>
+<rect x="223" y="76" width="351.86" height="16" rx="4" class="r-bar"/><line x1="296" y1="76.75" x2="296" y2="91.25" class="track"/><line x1="369" y1="76.75" x2="369" y2="91.25" class="track"/><line x1="442" y1="76.75" x2="442" y2="91.25" class="track"/><line x1="515" y1="76.75" x2="515" y2="91.25" class="track"/>
+<rect x="223" y="108" width="227.76" height="16" rx="4" class="r-bar"/><line x1="296" y1="108.75" x2="296" y2="123.25" class="track"/><line x1="369" y1="108.75" x2="369" y2="123.25" class="track"/><line x1="442" y1="108.75" x2="442" y2="123.25" class="track"/>
+<rect x="223" y="140" width="163.52" height="16" rx="4" class="r-bar"/><line x1="296" y1="140.75" x2="296" y2="155.25" class="track"/><line x1="369" y1="140.75" x2="369" y2="155.25" class="track"/>
+<rect x="223" y="172" width="128.48" height="16" rx="4" class="r-bar"/><line x1="296" y1="172.75" x2="296" y2="187.25" class="track"/>
+<rect x="223" y="204" width="103.66" height="16" rx="4" class="r-bar"/><line x1="296" y1="204.75" x2="296" y2="219.25" class="track"/>
+<rect x="223" y="236" width="96.36" height="16" rx="4" class="r-bar"/><line x1="296" y1="236.75" x2="296" y2="251.25" class="track"/>
+</svg>
+<svg id="dg-reasons-phone" class="dg dg-bar dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="384" viewBox="0 0 264 384" role="img" aria-label="Main reason for leaving, from 734 answers. Price too high: 241. Calendar sync no longer in Starter: 156. Moved to another tool: 112. Team got smaller or closed: 88. Too hard to set up: 71. Other: 66.">
+<style>
+#dg-reasons-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-reasons-phone .ground{fill:var(--fig,#f2f3f9)}
+#dg-reasons-phone .band{fill:var(--bg,#fbfbfe)}
+#dg-reasons-phone .track{stroke:var(--line,#d3d6e3)}
+#dg-reasons-phone .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-reasons-phone .head{fill:var(--text,#1c1f2e)}
+#dg-reasons-phone .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-reasons-phone .stop.end{fill:var(--text,#1c1f2e)}
+#dg-reasons-phone .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-reasons-phone .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-reasons-phone .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-reasons-phone .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-reasons-phone .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-reasons-phone .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-reasons-phone .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-reasons-phone .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-reasons-phone .sub,#dg-reasons-phone .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-reasons-phone .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-reasons-phone .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-reasons-phone .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-reasons-phone .r-bar{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-reasons-phone .r-ref{stroke:var(--muted,#575d75)}
+#dg-reasons-phone .r-pt{fill:var(--text,#1c1f2e)}
+#dg-reasons-phone .d-ring{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-reasons-phone .d-gap{stroke:var(--muted,#575d75);stroke-width:2}
+#dg-reasons-phone .d-lead{stroke:var(--muted,#575d75);stroke-width:1}
+@media (prefers-reduced-motion:reduce){#dg-reasons-phone .pulse{animation:none!important}#dg-reasons-phone .pulse{display:none!important}}
+@media print{#dg-reasons-phone{max-width:100%;height:auto}#dg-reasons-phone .pulse{display:none!important}}
+@media (max-width:736px){#dg-reasons{display:none}#dg-reasons-phone{display:block}}
+@media print{#dg-reasons{display:block!important}#dg-reasons-phone{display:none!important}}
+</style>
+<rect width="264" height="384" class="ground"/>
+<rect x="8" y="60" width="248" height="316" rx="10" class="band"/>
+<line x1="20" y1="88" x2="20" y2="116" class="track"/>
+<line x1="96.8" y1="88" x2="96.8" y2="116" class="track"/>
+<line x1="173.6" y1="88" x2="173.6" y2="116" class="track"/>
+<line x1="20" y1="138" x2="20" y2="166" class="track"/>
+<line x1="96.8" y1="138" x2="96.8" y2="166" class="track"/>
+<line x1="173.6" y1="138" x2="173.6" y2="166" class="track"/>
+<line x1="20" y1="188" x2="20" y2="216" class="track"/>
+<line x1="96.8" y1="188" x2="96.8" y2="216" class="track"/>
+<line x1="173.6" y1="188" x2="173.6" y2="216" class="track"/>
+<line x1="20" y1="238" x2="20" y2="266" class="track"/>
+<line x1="96.8" y1="238" x2="96.8" y2="266" class="track"/>
+<line x1="173.6" y1="238" x2="173.6" y2="266" class="track"/>
+<line x1="20" y1="288" x2="20" y2="316" class="track"/>
+<line x1="96.8" y1="288" x2="96.8" y2="316" class="track"/>
+<line x1="173.6" y1="288" x2="173.6" y2="316" class="track"/>
+<line x1="20" y1="338" x2="20" y2="366" class="track"/>
+<line x1="96.8" y1="338" x2="96.8" y2="366" class="track"/>
+<line x1="173.6" y1="338" x2="173.6" y2="366" class="track"/>
+<text x="20" y="24" class="sub" text-anchor="start">Answers, bars from 0. Largest first.</text>
+<text x="20" y="48" class="val" text-anchor="middle">0</text>
+<text x="96.8" y="48" class="val" text-anchor="middle">100</text>
+<text x="173.6" y="48" class="val" text-anchor="middle">200</text>
+<text x="20" y="84" class="row" text-anchor="start">Price too high</text>
+<rect x="209.09" y="94" width="31.76" height="16" class="band"/><text x="213.09" y="106" class="val" text-anchor="start">241</text>
+<text x="20" y="134" class="row" text-anchor="start">Calendar sync not in Starter</text>
+<rect x="143.81" y="144" width="31.76" height="16" class="band"/><text x="147.81" y="156" class="val" text-anchor="start">156</text>
+<text x="20" y="184" class="row" text-anchor="start">Moved to another tool</text>
+<rect x="110.02" y="194" width="31.76" height="16" class="band"/><text x="114.02" y="206" class="val" text-anchor="start">112</text>
+<text x="20" y="234" class="row" text-anchor="start">Team smaller or closed</text>
+<rect x="91.58" y="244" width="23.84" height="16" class="band"/><text x="95.58" y="256" class="val" text-anchor="start">88</text>
+<text x="20" y="284" class="row" text-anchor="start">Too hard to set up</text>
+<rect x="78.53" y="294" width="23.84" height="16" class="band"/><text x="82.53" y="306" class="val" text-anchor="start">71</text>
+<text x="20" y="334" class="row" text-anchor="start">Other</text>
+<rect x="74.69" y="344" width="23.84" height="16" class="band"/><text x="78.69" y="356" class="val" text-anchor="start">66</text>
+<rect x="20" y="94" width="185.09" height="16" rx="4" class="r-bar"/><line x1="96.8" y1="94.75" x2="96.8" y2="109.25" class="track"/><line x1="173.6" y1="94.75" x2="173.6" y2="109.25" class="track"/>
+<rect x="20" y="144" width="119.81" height="16" rx="4" class="r-bar"/><line x1="96.8" y1="144.75" x2="96.8" y2="159.25" class="track"/>
+<rect x="20" y="194" width="86.02" height="16" rx="4" class="r-bar"/><line x1="96.8" y1="194.75" x2="96.8" y2="209.25" class="track"/>
+<rect x="20" y="244" width="67.58" height="16" rx="4" class="r-bar"/>
+<rect x="20" y="294" width="54.53" height="16" rx="4" class="r-bar"/>
+<rect x="20" y="344" width="50.69" height="16" rx="4" class="r-bar"/>
+</svg>
+<details class="dg-words">
+<summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>The diagram in words</summary>
+<div class="table-wrap is-text" role="region" aria-label="The rows of the bar chart" tabindex="0"><table><thead><tr><th scope="col">Row</th><th scope="col">Value, in answers</th></tr></thead><tbody><tr><th scope="row">Price too high</th><td>241</td></tr><tr><th scope="row">Calendar sync not in Starter</th><td>156</td></tr><tr><th scope="row">Moved to another tool</th><td>112</td></tr><tr><th scope="row">Team smaller or closed</th><td>88</td></tr><tr><th scope="row">Too hard to set up</th><td>71</td></tr><tr><th scope="row">Other</th><td>66</td></tr></tbody></table></div>
+<ul><li>Answers, bars from 0. Largest first.</li></ul>
+</details>
+<!-- /docent:diagram -->
+      </div>
+      <figcaption><strong>Figure 4</strong>Main reason for leaving, Q3 2026, from 734 answers to the cancel form.</figcaption>
+    </figure>
+    <p>The support team read 120 of the free-text answers. Three lines show what many said:</p>
+    <ul>
+      <li>"We liked it, but at twelve dollars a seat it costs more than our accounting tool." (Starter, 4 seats)</li>
+      <li>"Calendar sync was the reason we picked you. Without it we are back to two calendars." (Starter, 3 seats)</li>
+      <li>"We never got the whole team to use it." (Starter, 9 seats)</li>
+    </ul>
+  </section>
+
+  <section id="setup" aria-labelledby="setup-h">
+    <h2 id="setup-h">How far accounts got with setup</h2>
+    <p>We followed every Starter account that started to pay between 1 April and 30 June through its first month, and split them by whether they were still paying on 30 September. The accounts that left lost most at one step: connecting a calendar.</p>
+    <figure>
+      <div class="fig" role="region" aria-label="Figure 5, setup steps of Starter accounts in their first month" tabindex="0">
+<!-- docent:diagram
+{
+  "id": "setup-left",
+  "kind": "funnel",
+  "label": "Setup in the first month for 612 Starter accounts that started in Q2 and cancelled by 30 September: 444 invited a teammate, 373 made a project, 190 connected a calendar, and 119 still used it in week 4. The largest share left at the calendar step: 49% of those who made a project.",
+  "unit": "accounts",
+  "steps": [
+    {"name": "Started to pay", "count": 612},
+    {"name": "Invited a teammate", "count": 444},
+    {"name": "Made a project", "count": 373},
+    {"name": "Connected a calendar", "count": 190},
+    {"name": "Used it in week 4", "count": 119}
+  ]
+}
+-->
+<svg id="dg-setup-left" class="dg dg-funnel dg-auto" xmlns="http://www.w3.org/2000/svg" width="640" height="300" viewBox="0 0 640 300" role="img" aria-label="Setup in the first month for 612 Starter accounts that started in Q2 and cancelled by 30 September: 444 invited a teammate, 373 made a project, 190 connected a calendar, and 119 still used it in week 4. The largest share left at the calendar step: 49% of those who made a project.">
+<style>
+#dg-setup-left{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-setup-left .ground{fill:var(--fig,#f2f3f9)}
+#dg-setup-left .band{fill:var(--bg,#fbfbfe)}
+#dg-setup-left .track{stroke:var(--line,#d3d6e3)}
+#dg-setup-left .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-setup-left .head{fill:var(--text,#1c1f2e)}
+#dg-setup-left .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-setup-left .stop.end{fill:var(--text,#1c1f2e)}
+#dg-setup-left .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-setup-left .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-setup-left .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-setup-left .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-setup-left .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-setup-left .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-setup-left .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-setup-left .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-setup-left .sub,#dg-setup-left .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-setup-left .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-setup-left .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-setup-left .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-setup-left .r-bar{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-setup-left .f-lost{fill:var(--line,#d3d6e3)}
+@media (prefers-reduced-motion:reduce){#dg-setup-left .pulse{animation:none!important}#dg-setup-left .pulse{display:none!important}}
+@media print{#dg-setup-left{max-width:100%;height:auto}#dg-setup-left .pulse{display:none!important}}
+#dg-setup-left-phone{display:none}
+</style>
+<rect width="640" height="300" class="ground"/>
+<rect x="8" y="52" width="624" height="240" rx="10" class="band"/>
+<text x="20" y="24" class="sub" text-anchor="start">Accounts at each step, bars from 0.</text>
+<text x="20" y="40" class="sub" text-anchor="start">Beside each count, its share of the first step; in each drop, its share of the step before.</text>
+<text x="20" y="81" class="row" text-anchor="start">Started to pay</text>
+<text x="205.76" y="80" class="val" text-anchor="end">612</text>
+<text x="254.52" y="80" class="val" text-anchor="end">100%</text>
+<text x="524.2" y="104" class="val" text-anchor="start">−168 (27%)</text>
+<text x="20" y="129" class="row" text-anchor="start">Invited a teammate</text>
+<text x="205.76" y="128" class="val" text-anchor="end">444</text>
+<text x="254.52" y="128" class="val" text-anchor="end">73%</text>
+<text x="483.71" y="152" class="val" text-anchor="start">−71 (16%)</text>
+<text x="20" y="177" class="row" text-anchor="start">Made a project</text>
+<text x="205.76" y="176" class="val" text-anchor="end">373</text>
+<text x="254.52" y="176" class="val" text-anchor="end">61%</text>
+<text x="379.35" y="200" class="val" text-anchor="start">−183 (49%)</text>
+<text x="20" y="225" class="row" text-anchor="start">Connected a calendar</text>
+<text x="205.76" y="224" class="val" text-anchor="end">190</text>
+<text x="254.52" y="224" class="val" text-anchor="end">31%</text>
+<text x="338.86" y="248" class="val" text-anchor="start">−71 (37%)</text>
+<text x="20" y="273" class="row" text-anchor="start">Used it in week 4</text>
+<text x="205.76" y="272" class="val" text-anchor="end">119</text>
+<text x="254.52" y="272" class="val" text-anchor="end">19%</text>
+<rect x="271" y="68" width="349" height="16" rx="4" class="r-bar"/>
+<rect x="520.2" y="116" width="99.8" height="16" rx="4" class="f-lost"/><rect x="271" y="116" width="253.2" height="16" rx="4" class="r-bar"/>
+<rect x="479.71" y="164" width="44.49" height="16" rx="4" class="f-lost"/><rect x="271" y="164" width="212.71" height="16" rx="4" class="r-bar"/>
+<rect x="375.35" y="212" width="108.36" height="16" rx="4" class="f-lost"/><rect x="271" y="212" width="108.35" height="16" rx="4" class="r-bar"/>
+<rect x="334.86" y="260" width="44.49" height="16" rx="4" class="f-lost"/><rect x="271" y="260" width="67.86" height="16" rx="4" class="r-bar"/>
+</svg>
+<svg id="dg-setup-left-phone" class="dg dg-funnel dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="400" viewBox="0 0 264 400" role="img" aria-label="Setup in the first month for 612 Starter accounts that started in Q2 and cancelled by 30 September: 444 invited a teammate, 373 made a project, 190 connected a calendar, and 119 still used it in week 4. The largest share left at the calendar step: 49% of those who made a project.">
+<style>
+#dg-setup-left-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-setup-left-phone .ground{fill:var(--fig,#f2f3f9)}
+#dg-setup-left-phone .band{fill:var(--bg,#fbfbfe)}
+#dg-setup-left-phone .track{stroke:var(--line,#d3d6e3)}
+#dg-setup-left-phone .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-setup-left-phone .head{fill:var(--text,#1c1f2e)}
+#dg-setup-left-phone .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-setup-left-phone .stop.end{fill:var(--text,#1c1f2e)}
+#dg-setup-left-phone .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-setup-left-phone .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-setup-left-phone .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-setup-left-phone .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-setup-left-phone .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-setup-left-phone .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-setup-left-phone .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-setup-left-phone .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-setup-left-phone .sub,#dg-setup-left-phone .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-setup-left-phone .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-setup-left-phone .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-setup-left-phone .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-setup-left-phone .r-bar{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-setup-left-phone .f-lost{fill:var(--line,#d3d6e3)}
+@media (prefers-reduced-motion:reduce){#dg-setup-left-phone .pulse{animation:none!important}#dg-setup-left-phone .pulse{display:none!important}}
+@media print{#dg-setup-left-phone{max-width:100%;height:auto}#dg-setup-left-phone .pulse{display:none!important}}
+@media (max-width:736px){#dg-setup-left{display:none}#dg-setup-left-phone{display:block}}
+@media print{#dg-setup-left{display:block!important}#dg-setup-left-phone{display:none!important}}
+</style>
+<rect width="264" height="400" class="ground"/>
+<rect x="8" y="84" width="248" height="308" rx="10" class="band"/>
+<text x="20" y="24" class="sub" text-anchor="start">Accounts at each step, bars from 0.</text>
+<text x="20" y="40" class="sub" text-anchor="start">Beside each count, its share of the first</text>
+<text x="20" y="56" class="sub" text-anchor="start">step; in each drop, its share of the</text>
+<text x="20" y="72" class="sub" text-anchor="start">step before.</text>
+<text x="20" y="108" class="row" text-anchor="start">Started to pay</text>
+<text x="199.24" y="108" class="val" text-anchor="end">612</text>
+<text x="244" y="108" class="val" text-anchor="end">100%</text>
+<text x="174.4" y="148" class="val" text-anchor="start">−168 (27%)</text>
+<text x="20" y="166" class="row" text-anchor="start">Invited a teammate</text>
+<text x="199.24" y="166" class="val" text-anchor="end">444</text>
+<text x="244" y="166" class="val" text-anchor="end">73%</text>
+<text x="156.52" y="206" class="val" text-anchor="start">−71 (16%)</text>
+<text x="20" y="224" class="row" text-anchor="start">Made a project</text>
+<text x="199.24" y="224" class="val" text-anchor="end">373</text>
+<text x="244" y="224" class="val" text-anchor="end">61%</text>
+<text x="89.54" y="264" class="val" text-anchor="start">−183 (49%)</text>
+<text x="20" y="282" class="row" text-anchor="start">Connected a</text>
+<text x="20" y="300" class="row" text-anchor="start">calendar</text>
+<text x="199.24" y="282" class="val" text-anchor="end">190</text>
+<text x="244" y="282" class="val" text-anchor="end">31%</text>
+<text x="63.56" y="340" class="val" text-anchor="start">−71 (37%)</text>
+<text x="20" y="358" class="row" text-anchor="start">Used it in week 4</text>
+<text x="199.24" y="358" class="val" text-anchor="end">119</text>
+<text x="244" y="358" class="val" text-anchor="end">19%</text>
+<rect x="20" y="116" width="224" height="16" rx="4" class="r-bar"/>
+<rect x="178.51" y="174" width="65.49" height="16" rx="4" class="f-lost"/><rect x="20" y="174" width="162.51" height="16" rx="4" class="r-bar"/>
+<rect x="152.52" y="232" width="29.99" height="16" rx="4" class="f-lost"/><rect x="20" y="232" width="136.52" height="16" rx="4" class="r-bar"/>
+<rect x="85.54" y="308" width="70.98" height="16" rx="4" class="f-lost"/><rect x="20" y="308" width="69.54" height="16" rx="4" class="r-bar"/>
+<rect x="59.56" y="366" width="29.99" height="16" rx="4" class="f-lost"/><rect x="20" y="366" width="43.56" height="16" rx="4" class="r-bar"/>
+</svg>
+<details class="dg-words">
+<summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>The diagram in words</summary>
+<div class="table-wrap is-text" role="region" aria-label="The steps of the funnel" tabindex="0"><table><thead><tr><th scope="col">Step</th><th scope="col">Accounts</th><th scope="col">Share of the first step</th><th scope="col">Left since the step before</th><th scope="col">Share of the step before</th></tr></thead><tbody><tr><th scope="row">Started to pay</th><td>612</td><td>100%</td><td colspan="2">first step</td></tr><tr><th scope="row">Invited a teammate</th><td>444</td><td>73%</td><td>168</td><td>27%</td></tr><tr><th scope="row">Made a project</th><td>373</td><td>61%</td><td>71</td><td>16%</td></tr><tr><th scope="row">Connected a calendar</th><td>190</td><td>31%</td><td>183</td><td>49%</td></tr><tr><th scope="row">Used it in week 4</th><td>119</td><td>19%</td><td>71</td><td>37%</td></tr></tbody></table></div>
+<ul><li>Of 612 accounts at the first step, 119 reached the last step: 19%.</li><li>The most accounts, and the largest share, left between "Made a project" and "Connected a calendar": 183, 49% of the step before.</li><li>The bars are to scale, from 0.</li></ul>
+</details>
+<!-- /docent:diagram -->
+<!-- docent:diagram
+{
+  "id": "setup-stayed",
+  "kind": "funnel",
+  "label": "Setup in the first month for 1,540 Starter accounts that stayed: 1,370 invited a teammate, 1,262 made a project, 1,047 connected a calendar, and 986 still used it in week 4. The largest share left at the teammate step: 11%.",
+  "unit": "accounts",
+  "steps": [
+    {"name": "Started to pay", "count": 1540},
+    {"name": "Invited a teammate", "count": 1370},
+    {"name": "Made a project", "count": 1262},
+    {"name": "Connected a calendar", "count": 1047},
+    {"name": "Used it in week 4", "count": 986}
+  ]
+}
+-->
+<svg id="dg-setup-stayed" class="dg dg-funnel dg-auto" xmlns="http://www.w3.org/2000/svg" width="640" height="300" viewBox="0 0 640 300" role="img" aria-label="Setup in the first month for 1,540 Starter accounts that stayed: 1,370 invited a teammate, 1,262 made a project, 1,047 connected a calendar, and 986 still used it in week 4. The largest share left at the teammate step: 11%.">
+<style>
+#dg-setup-stayed{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-setup-stayed .ground{fill:var(--fig,#f2f3f9)}
+#dg-setup-stayed .band{fill:var(--bg,#fbfbfe)}
+#dg-setup-stayed .track{stroke:var(--line,#d3d6e3)}
+#dg-setup-stayed .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-setup-stayed .head{fill:var(--text,#1c1f2e)}
+#dg-setup-stayed .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-setup-stayed .stop.end{fill:var(--text,#1c1f2e)}
+#dg-setup-stayed .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-setup-stayed .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-setup-stayed .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-setup-stayed .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-setup-stayed .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-setup-stayed .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-setup-stayed .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-setup-stayed .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-setup-stayed .sub,#dg-setup-stayed .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-setup-stayed .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-setup-stayed .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-setup-stayed .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-setup-stayed .r-bar{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-setup-stayed .f-lost{fill:var(--line,#d3d6e3)}
+@media (prefers-reduced-motion:reduce){#dg-setup-stayed .pulse{animation:none!important}#dg-setup-stayed .pulse{display:none!important}}
+@media print{#dg-setup-stayed{max-width:100%;height:auto}#dg-setup-stayed .pulse{display:none!important}}
+#dg-setup-stayed-phone{display:none}
+</style>
+<rect width="640" height="300" class="ground"/>
+<rect x="8" y="52" width="624" height="240" rx="10" class="band"/>
+<text x="20" y="24" class="sub" text-anchor="start">Accounts at each step, bars from 0.</text>
+<text x="20" y="40" class="sub" text-anchor="start">Beside each count, its share of the first step; in each drop, its share of the step before.</text>
+<text x="20" y="81" class="row" text-anchor="start">Started to pay</text>
+<text x="217.68" y="80" class="val" text-anchor="end">1,540</text>
+<text x="266.44" y="80" class="val" text-anchor="end">100%</text>
+<text x="550.4" y="104" class="val" text-anchor="start">−170 (11%)</text>
+<text x="20" y="129" class="row" text-anchor="start">Invited a teammate</text>
+<text x="217.68" y="128" class="val" text-anchor="end">1,370</text>
+<text x="266.44" y="128" class="val" text-anchor="end">89%</text>
+<text x="558.32" y="152" class="val" text-anchor="start">−108 (8%)</text>
+<text x="20" y="177" class="row" text-anchor="start">Made a project</text>
+<text x="217.68" y="176" class="val" text-anchor="end">1,262</text>
+<text x="266.44" y="176" class="val" text-anchor="end">82%</text>
+<text x="512.12" y="200" class="val" text-anchor="start">−215 (17%)</text>
+<text x="20" y="225" class="row" text-anchor="start">Connected a calendar</text>
+<text x="217.68" y="224" class="val" text-anchor="end">1,047</text>
+<text x="266.44" y="224" class="val" text-anchor="end">68%</text>
+<text x="498.77" y="248" class="val" text-anchor="start">−61 (6%)</text>
+<text x="20" y="273" class="row" text-anchor="start">Used it in week 4</text>
+<text x="217.68" y="272" class="val" text-anchor="end">986</text>
+<text x="266.44" y="272" class="val" text-anchor="end">64%</text>
+<rect x="283" y="68" width="337" height="16" rx="4" class="r-bar"/>
+<rect x="578.8" y="116" width="41.2" height="16" rx="4" class="f-lost"/><rect x="283" y="116" width="299.8" height="16" rx="4" class="r-bar"/>
+<rect x="555.16" y="164" width="27.63" height="16" rx="4" class="f-lost"/><rect x="283" y="164" width="276.16" height="16" rx="4" class="r-bar"/>
+<rect x="508.12" y="212" width="51.05" height="16" rx="4" class="f-lost"/><rect x="283" y="212" width="229.12" height="16" rx="4" class="r-bar"/>
+<rect x="494.77" y="260" width="17.35" height="16" rx="4" class="f-lost"/><rect x="283" y="260" width="215.77" height="16" rx="4" class="r-bar"/>
+</svg>
+<svg id="dg-setup-stayed-phone" class="dg dg-funnel dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="400" viewBox="0 0 264 400" role="img" aria-label="Setup in the first month for 1,540 Starter accounts that stayed: 1,370 invited a teammate, 1,262 made a project, 1,047 connected a calendar, and 986 still used it in week 4. The largest share left at the teammate step: 11%.">
+<style>
+#dg-setup-stayed-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-setup-stayed-phone .ground{fill:var(--fig,#f2f3f9)}
+#dg-setup-stayed-phone .band{fill:var(--bg,#fbfbfe)}
+#dg-setup-stayed-phone .track{stroke:var(--line,#d3d6e3)}
+#dg-setup-stayed-phone .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-setup-stayed-phone .head{fill:var(--text,#1c1f2e)}
+#dg-setup-stayed-phone .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-setup-stayed-phone .stop.end{fill:var(--text,#1c1f2e)}
+#dg-setup-stayed-phone .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-setup-stayed-phone .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-setup-stayed-phone .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-setup-stayed-phone .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-setup-stayed-phone .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-setup-stayed-phone .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-setup-stayed-phone .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-setup-stayed-phone .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-setup-stayed-phone .sub,#dg-setup-stayed-phone .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-setup-stayed-phone .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-setup-stayed-phone .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-setup-stayed-phone .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-setup-stayed-phone .r-bar{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-setup-stayed-phone .f-lost{fill:var(--line,#d3d6e3)}
+@media (prefers-reduced-motion:reduce){#dg-setup-stayed-phone .pulse{animation:none!important}#dg-setup-stayed-phone .pulse{display:none!important}}
+@media print{#dg-setup-stayed-phone{max-width:100%;height:auto}#dg-setup-stayed-phone .pulse{display:none!important}}
+@media (max-width:736px){#dg-setup-stayed{display:none}#dg-setup-stayed-phone{display:block}}
+@media print{#dg-setup-stayed{display:block!important}#dg-setup-stayed-phone{display:none!important}}
+</style>
+<rect width="264" height="400" class="ground"/>
+<rect x="8" y="84" width="248" height="308" rx="10" class="band"/>
+<text x="20" y="24" class="sub" text-anchor="start">Accounts at each step, bars from 0.</text>
+<text x="20" y="40" class="sub" text-anchor="start">Beside each count, its share of the first</text>
+<text x="20" y="56" class="sub" text-anchor="start">step; in each drop, its share of the</text>
+<text x="20" y="72" class="sub" text-anchor="start">step before.</text>
+<text x="20" y="108" class="row" text-anchor="start">Started to pay</text>
+<text x="199.24" y="108" class="val" text-anchor="end">1,540</text>
+<text x="244" y="108" class="val" text-anchor="end">100%</text>
+<text x="174.4" y="148" class="val" text-anchor="start">−170 (11%)</text>
+<text x="20" y="166" class="row" text-anchor="start">Invited a teammate</text>
+<text x="199.24" y="166" class="val" text-anchor="end">1,370</text>
+<text x="244" y="166" class="val" text-anchor="end">89%</text>
+<text x="182.32" y="206" class="val" text-anchor="start">−108 (8%)</text>
+<text x="20" y="224" class="row" text-anchor="start">Made a project</text>
+<text x="199.24" y="224" class="val" text-anchor="end">1,262</text>
+<text x="244" y="224" class="val" text-anchor="end">82%</text>
+<text x="172.29" y="264" class="val" text-anchor="start">−215 (17%)</text>
+<text x="20" y="282" class="row" text-anchor="start">Connected a</text>
+<text x="20" y="300" class="row" text-anchor="start">calendar</text>
+<text x="199.24" y="282" class="val" text-anchor="end">1,047</text>
+<text x="244" y="282" class="val" text-anchor="end">68%</text>
+<text x="163.42" y="340" class="val" text-anchor="start">−61 (6%)</text>
+<text x="20" y="358" class="row" text-anchor="start">Used it in week 4</text>
+<text x="199.24" y="358" class="val" text-anchor="end">986</text>
+<text x="244" y="358" class="val" text-anchor="end">64%</text>
+<rect x="20" y="116" width="224" height="16" rx="4" class="r-bar"/>
+<rect x="215.27" y="174" width="28.73" height="16" rx="4" class="f-lost"/><rect x="20" y="174" width="199.27" height="16" rx="4" class="r-bar"/>
+<rect x="199.56" y="232" width="19.71" height="16" rx="4" class="f-lost"/><rect x="20" y="232" width="183.56" height="16" rx="4" class="r-bar"/>
+<rect x="168.29" y="308" width="35.27" height="16" rx="4" class="f-lost"/><rect x="20" y="308" width="152.29" height="16" rx="4" class="r-bar"/>
+<rect x="159.42" y="366" width="12.87" height="16" rx="4" class="f-lost"/><rect x="20" y="366" width="143.42" height="16" rx="4" class="r-bar"/>
+</svg>
+<details class="dg-words">
+<summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>The diagram in words</summary>
+<div class="table-wrap is-text" role="region" aria-label="The steps of the funnel" tabindex="0"><table><thead><tr><th scope="col">Step</th><th scope="col">Accounts</th><th scope="col">Share of the first step</th><th scope="col">Left since the step before</th><th scope="col">Share of the step before</th></tr></thead><tbody><tr><th scope="row">Started to pay</th><td>1,540</td><td>100%</td><td colspan="2">first step</td></tr><tr><th scope="row">Invited a teammate</th><td>1,370</td><td>89%</td><td>170</td><td>11%</td></tr><tr><th scope="row">Made a project</th><td>1,262</td><td>82%</td><td>108</td><td>8%</td></tr><tr><th scope="row">Connected a calendar</th><td>1,047</td><td>68%</td><td>215</td><td>17%</td></tr><tr><th scope="row">Used it in week 4</th><td>986</td><td>64%</td><td>61</td><td>6%</td></tr></tbody></table></div>
+<ul><li>Of 1,540 accounts at the first step, 986 reached the last step: 64%.</li><li>The most accounts, and the largest share, left between "Made a project" and "Connected a calendar": 215, 17% of the step before.</li><li>The bars are to scale, from 0.</li></ul>
+</details>
+<!-- /docent:diagram -->
+      </div>
+      <figcaption><strong>Figure 5</strong>Setup steps in the first month: Starter accounts that later cancelled (first) and accounts that stayed (second). Each funnel has its own scale, so compare the shares, not the bar lengths.</figcaption>
+    </figure>
+    <p>Of the accounts that left, 31% connected a calendar. Of the accounts that stayed, 68% did. This does not prove that a calendar keeps an account. Accounts that plan to stay may simply set up more. But it is the one step where the two groups differ most.</p>
+  </section>
+
+  <section id="actions" aria-labelledby="actions-h">
+    <h2 id="actions-h">What we propose</h2>
+    <p>We propose three changes, in this order. Each has an owner and a measure that tells us within one quarter whether it worked.</p>
+    <div class="table-wrap" role="region" aria-label="Proposed changes" tabindex="0">
+      <table>
+        <thead>
+          <tr><th scope="col">Change</th><th scope="col">Why</th><th scope="col">Owner</th><th scope="col">We expect</th><th scope="col">State</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">Give Starter accounts with 1 to 5 seats calendar sync for one calendar</th><td>Calendar sync is the second reason to leave and the step where setup fails.</td><td>Product, plans team</td><td>Starter monthly churn back under 4.5% by December</td><td><span class="state plan">Proposed</span></td></tr>
+          <tr><th scope="row">Offer a yearly Starter price of $9 for each seat</th><td>Price is the first reason to leave. A yearly price keeps the monthly list price.</td><td>Finance and growth</td><td>20% of Starter accounts on yearly billing by March</td><td><span class="state plan">Proposed</span></td></tr>
+          <tr><th scope="row">Add a setup email on day 3 that asks to connect a calendar</th><td>Accounts that skip this step leave more often.</td><td>Lifecycle marketing</td><td>Calendar connected in month 1 for 50% of new Starter accounts</td><td><span class="state ok">Approved</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="status">
+      <span class="state warn">Risk</span>
+      <p>Change 1 brings back part of what the price change took away. If many Team accounts move down to Starter, revenue falls. Finance will watch moves from Team to Starter every week for the first month.</p>
+    </div>
+  </section>
+
+  <section id="method" aria-labelledby="method-h">
+    <h2 id="method-h">Method and data</h2>
+    <dl>
+      <dt>Churn rate</dt>
+      <dd>Paying accounts that cancelled in a period, divided by paying accounts on the first day of the period.</dd>
+      <dt>Monthly revenue lost</dt>
+      <dd>The monthly price of every account that cancelled, before discounts, in US dollars.</dd>
+      <dt>Cohort</dt>
+      <dd>The accounts that started to pay in the same calendar month.</dd>
+      <dt>Paused account</dt>
+      <dd>An account that stopped paying for up to 3 months and kept its data. It is not counted as churn. 96 accounts paused in Q3.</dd>
+    </dl>
+    <h3>Sources</h3>
+    <ul>
+      <li>Billing system export, 2 October 2026: plans, seats, start and cancel dates, prices.</li>
+      <li>Cancel form answers, 1 July to 30 September 2026: 734 answers.</li>
+      <li>Product events, 1 April to 30 September 2026: the setup steps in Figure 5.</li>
+    </ul>
+    <details>
+      <summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>Why do the plan rates not add up to 14.4%?</summary>
+      <p>Each plan's rate uses the accounts of that plan as its base. The rate for all plans uses all 8,420 accounts. Starter has the most accounts and the highest rate, so it pulls the total up. 18.2% of 5,310, plus 7.6% of 2,640, plus 9.1% of 470, is 1,212 accounts, or 14.4% of 8,420.</p>
+    </details>
+  </section>
+</main>
+
+<footer>
+  <div class="shell">
+    <p class="credit"><svg viewBox="13 13 38 38" aria-hidden="true"><path d="M20 37V18H30A14 14 0 0 1 30 46H29" fill="none" stroke="currentColor" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="20" cy="46" r="4" fill="currentColor"/></svg>Made with <a href="https://github.com/sorawit-w/docent">Docent</a></p>
+  </div>
+</footer>
+<script>
+// docent:kit 0.18.0
+(() => {
+  const root = document.documentElement;
+  root.classList.add('js');
+  // A page saved from the browser ("Save page as") keeps what this script added. Take it out, so that the script adds each part once.
+  document.querySelectorAll('.fig-more, .step-n, button.copy').forEach((el) => el.remove());
+  document.querySelectorAll('div.code').forEach((holder) => holder.replaceWith(...holder.childNodes));
+  document.querySelectorAll('.is-numbered').forEach((h) => h.classList.remove('is-numbered'));
+  // A theme that the reader chose carries data-theme-reader. A saved page keeps it, and it is not a fixed theme.
+  if (root.hasAttribute('data-theme-reader')) { delete root.dataset.theme; delete root.dataset.themeReader; }
+  // Theme: the page follows the reader's system setting. The switch sets a choice that wins over the system and is remembered.
+  const button = document.querySelector('.theme');
+  const system = matchMedia('(prefers-color-scheme: dark)');
+  const theme = () => root.dataset.theme || (system.matches ? 'dark' : 'light');
+  const chooseTheme = (value) => { root.dataset.theme = value; root.dataset.themeReader = ''; };
+  // A theme written on <html> in the source is fixed: no saved choice and no switch.
+  const fixed = root.dataset.theme === 'light' || root.dataset.theme === 'dark';
+  if (fixed && button) button.hidden = true;
+  if (!fixed) try {
+    const saved = localStorage.getItem('docent-theme');
+    if (saved === 'dark' || saved === 'light') chooseTheme(saved);
+  } catch { /* no saved choice can be read: follow the system */ }
+  if (button && !fixed) {
+    const showSwitch = () => {
+      const next = theme() === 'dark' ? 'light' : 'dark';
+      button.dataset.next = next;
+      button.querySelector('.theme-text').textContent = next === 'dark' ? 'Dark' : 'Light';
+      button.setAttribute('aria-label', `Switch to the ${next} theme`);
+    };
+    showSwitch();
+    system.addEventListener('change', showSwitch);
+    button.addEventListener('click', () => {
+      chooseTheme(theme() === 'dark' ? 'light' : 'dark');
+      showSwitch();
+      try { localStorage.setItem('docent-theme', root.dataset.theme); } catch { /* private window: the choice lasts for this visit */ }
+    });
+  }
+  // Step numbers. The styles count the steps, but a screen reader in Chromium does not read a number that the styles count. So the script writes each number as text, in place of the counted one.
+  const number = (heading, n) => {
+    const span = document.createElement('span');
+    span.className = 'step-n';
+    span.textContent = `${n} `;
+    heading.prepend(span);
+    heading.classList.add('is-numbered');
+  };
+  const groups = new Map();
+  document.querySelectorAll('h3.step').forEach((h) => { const s = h.closest('section'); groups.set(s, [...(groups.get(s) || []), h]); });
+  groups.forEach((list) => list.forEach((h, i) => number(h, i + 1)));
+  document.querySelectorAll('.steps').forEach((ol) => [...ol.children].forEach((li, i) => { const h = li.querySelector('h3'); if (h) number(h, i + 1); }));
+  // A diagram outside a walkthrough runs its dot twice when it comes into view, then rests. Pointing at it runs it again.
+  const replay = (svg) => svg.querySelectorAll('.pulse').forEach((dot) => dot.getAnimations().forEach((run) => { run.cancel(); run.play(); }));
+  const seen = new IntersectionObserver((entries) => entries.forEach((entry) => {
+    if (!entry.isIntersecting) return;
+    entry.target.classList.add('is-playing');
+    seen.unobserve(entry.target);
+  }), { threshold: 0.6 });
+  document.querySelectorAll('svg.dg-auto').forEach((svg) => {
+    seen.observe(svg);
+    const well = svg.closest('.fig') || svg;
+    well.addEventListener('pointerenter', () => replay(svg));
+    well.addEventListener('focus', () => replay(svg));
+  });
+  // A drawing that is wider than its well scrolls sideways, and the part that shows can look complete. A line under the well says that more is to the side.
+  const wells = [...document.querySelectorAll('.fig')].map((well) => {
+    const note = document.createElement('p');
+    note.className = 'fig-more';
+    note.hidden = true;
+    note.textContent = 'The drawing is wider than the screen. Scroll it sideways to see all of it.';
+    well.after(note);
+    return { well, note };
+  });
+  // A code block gets a button that copies the code. The block moves into a holder, so the button stays in place when the code scrolls sideways.
+  const blocks = [...document.querySelectorAll('pre')].map((pre) => {
+    const holder = document.createElement('div'), button = document.createElement('button');
+    holder.className = 'code';
+    pre.before(holder);
+    holder.append(pre, button);
+    button.type = 'button';
+    button.className = 'copy';
+    button.textContent = 'Copy';
+    button.setAttribute('aria-live', 'polite');
+    button.addEventListener('click', async () => {
+      const text = (pre.querySelector('code') || pre).textContent;
+      let done = false;
+      try { await navigator.clipboard.writeText(text); done = true; } catch { /* no clipboard here: select the code and copy the selection */ }
+      if (!done) {
+        const range = document.createRange(), selection = getSelection();
+        range.selectNodeContents(pre);
+        selection.removeAllRanges();
+        selection.addRange(range);
+        try { done = document.execCommand('copy'); } catch { /* the code stays selected, so the reader can copy it by hand */ }
+        if (done) selection.removeAllRanges();
+      }
+      button.textContent = done ? 'Copied' : 'Select and copy';
+      setTimeout(() => (button.textContent = 'Copy'), 2000);
+    });
+    return { holder, pre, button };
+  });
+  const fit = () => {
+    wells.forEach(({ well, note }) => (note.hidden = well.scrollWidth <= well.clientWidth + 1));
+    // When the widest line of code reaches the button, the code starts below the button. A block that is hidden now has no size; it is measured when it shows.
+    blocks.forEach(({ holder, pre, button }) => {
+      if (!pre.clientWidth) return;
+      const code = pre.querySelector('code') || pre;
+      holder.classList.toggle('is-long', pre.scrollWidth > pre.clientWidth + 1 || code.getBoundingClientRect().right > button.getBoundingClientRect().left - 8);
+    });
+  };
+  // Measure again when a well or a code block changes its size: the window changes, a chooser shows another case, or a closed section opens.
+  if ('ResizeObserver' in window) {
+    const watch = new ResizeObserver(fit);
+    wells.forEach(({ well }) => watch.observe(well));
+    blocks.forEach(({ pre }) => watch.observe(pre));
+  }
+  addEventListener('resize', fit);
+  fit();
+  // Print: open every closed section so its text prints, then close it again.
+  let opened = [];
+  addEventListener('beforeprint', () => { opened = [...document.querySelectorAll('details:not([open])')]; opened.forEach((d) => (d.open = true)); });
+  addEventListener('afterprint', () => { opened.forEach((d) => (d.open = false)); opened = []; });
+  // The route dot marks the current section. In each walkthrough, the rail dot marks the current step and the diagram lights the leg with the same number.
+  const bar = document.querySelector('.topbar .shell');
+  const routeDot = document.querySelector('.route-dot');
+  const links = [...document.querySelectorAll('.route a[href^="#"]')].filter((a) => document.getElementById(a.getAttribute('href').slice(1)));
+  const sections = links.map((a) => document.getElementById(a.getAttribute('href').slice(1)));
+  const walks = [...document.querySelectorAll('.walk')].map((walk) => ({
+    steps: [...walk.querySelectorAll('.steps > li')],
+    legs: [...walk.querySelectorAll('svg.dg .leg')],
+    dot: walk.querySelector('.rail-dot'),
+  })).filter((walk) => walk.steps.length);
+  const nearest = (items, line) => items.reduce((best, el) => (el.getBoundingClientRect().top <= line ? el : best), items[0]);
+  const update = () => {
+    if (sections.length) {
+      const section = nearest(sections, innerHeight * 0.35);
+      links.forEach((a, i) => (sections[i] === section ? a.setAttribute('aria-current', 'true') : a.removeAttribute('aria-current')));
+      if (bar && routeDot) {
+        const link = links[sections.indexOf(section)].getBoundingClientRect();
+        routeDot.style.setProperty('--x', `${link.left + link.width / 2 - bar.getBoundingClientRect().left - 3.5}px`);
+      }
+    }
+    walks.forEach(({ steps, legs, dot }) => {
+      const step = nearest(steps, innerHeight * 0.5);
+      const number = steps.indexOf(step) + 1;
+      steps.forEach((li) => li.classList.toggle('is-current', li === step));
+      legs.forEach((leg) => leg.classList.toggle('is-current', Number(leg.dataset.leg) === number));
+      if (dot) dot.style.setProperty('--y', `${step.offsetTop}px`);
+    });
+  };
+  let queued = false;
+  const schedule = () => { if (!queued) { queued = true; requestAnimationFrame(() => { queued = false; update(); }); } };
+  addEventListener('scroll', schedule, { passive: true });
+  addEventListener('resize', schedule);
+  // Widgets. Each one is readable without this script. The script adds memory, the count of a checklist and the answer of a decision helper.
+  const load = (key) => { try { return JSON.parse(localStorage.getItem(key)); } catch { return null; } };
+  const save = (key, value) => { try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* private window: it lasts for this visit */ } };
+  // Chooser: the choice is remembered, and choosers with the same options change together.
+  const choosers = [...document.querySelectorAll('.choose')].map((el) => ({
+    inputs: [...el.querySelectorAll(':scope > input')],
+    key: `docent-choice:${[...el.querySelectorAll(':scope > .opt')].map((label) => label.textContent).join('|')}`,
+  }));
+  const choose = (key, n) => choosers.forEach((c) => { if (c.key === key && c.inputs[n]) c.inputs[n].checked = true; });
+  choosers.forEach((c) => {
+    choose(c.key, load(c.key));
+    c.inputs.forEach((input, n) => input.addEventListener('change', () => {
+      const top = input.getBoundingClientRect().top;
+      choose(c.key, n);
+      scrollBy(0, input.getBoundingClientRect().top - top); // a chooser higher on the page changed its height: keep this one in place
+      save(c.key, n);
+      schedule();
+    }));
+  });
+  // Value picker: every place <var data-v="key"> shows the value of the chosen option. The values come from the table of all values. Pickers with the same options change together, and the choice is remembered.
+  const pickers = [...document.querySelectorAll('.values')].map((el) => ({
+    el,
+    inputs: [...el.querySelectorAll(':scope > input')],
+    names: [...el.querySelectorAll(':scope > .opt')].map((label) => label.textContent),
+    rows: [...el.querySelectorAll('tbody tr[data-v]')].map((tr) => ({ key: tr.dataset.v, cells: [...tr.querySelectorAll('td')].map((td) => td.textContent) })),
+  }));
+  const pick = (names, n) => pickers.forEach((p) => {
+    if (p.names.join('|') !== names || !p.inputs[n]) return;
+    p.inputs[n].checked = true;
+    p.el.querySelector('.values-now strong').textContent = p.names[n];
+    p.rows.forEach(({ key, cells }) => document.querySelectorAll(`var[data-v="${CSS.escape(key)}"]`).forEach((v) => (v.textContent = cells[n])));
+  });
+  pickers.forEach((p) => {
+    const key = `docent-values:${p.names.join('|')}`, saved = load(key);
+    if (Number.isInteger(saved)) pick(p.names.join('|'), saved);
+    p.inputs.forEach((input, n) => input.addEventListener('change', () => { pick(p.names.join('|'), n); save(key, n); }));
+    p.el.querySelector('details').open = false;
+  });
+  // Checklist: the ticks are remembered for this document, and the line below the list counts them.
+  document.querySelectorAll('form.checks').forEach((form) => {
+    const boxes = [...form.querySelectorAll('input')], out = form.querySelector('output'), key = `docent-ticks:${location.pathname}#${form.id}`;
+    const saved = load(key);
+    if (Array.isArray(saved) && saved.length === boxes.length) boxes.forEach((box, i) => (box.checked = saved[i] === true));
+    const show = () => { out.textContent = `${boxes.filter((box) => box.checked).length} of ${boxes.length} done`; };
+    const keep = () => { show(); save(key, boxes.map((box) => box.checked)); schedule(); };
+    form.addEventListener('change', keep);
+    form.addEventListener('reset', () => setTimeout(keep));
+    show();
+  });
+  // Decision helper: a row that no longer fits the answers takes the muted color. When every question has an answer, the one row that fits is shown as the answer.
+  document.querySelectorAll('.decide').forEach((el) => {
+    const form = el.querySelector('form'), out = el.querySelector('output'), again = el.querySelector('.wd-foot'), groups = [...el.querySelectorAll('fieldset')], rows = [...el.querySelectorAll('tbody tr')];
+    el.querySelector('details').open = false;
+    const show = () => {
+      const picked = groups.map((group) => [...group.querySelectorAll('input')].findIndex((input) => input.checked) + 1);
+      const fits = rows.filter((row) => {
+        const fit = row.dataset.when.split(',').every((option, q) => option === '0' || !picked[q] || Number(option) === picked[q]);
+        row.classList.toggle('is-out', !fit);
+        return fit;
+      });
+      out.innerHTML = picked.every(Boolean) && fits.length === 1 ? fits[0].lastElementChild.innerHTML : '';
+      again.hidden = !picked.some(Boolean);
+      schedule();
+    };
+    form.addEventListener('change', show);
+    form.addEventListener('reset', () => setTimeout(show));
+    show();
+  });
+  update();
+  requestAnimationFrame(() => requestAnimationFrame(() => root.classList.add('ready')));
+})();
+// /docent:kit
+</script>
+</body>
+</html>

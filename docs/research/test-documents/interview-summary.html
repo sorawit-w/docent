@@ -1,0 +1,1272 @@
+<!doctype html>
+<html lang="en" data-profile="standard">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What eight teams told us about planning — Example Planner</title>
+<style>
+/* docent:kit 0.18.0 */
+/* Docent page styles. Tokens come from references/DESIGN.md. One file, no network. */
+:root {
+  color-scheme: light;
+  --bg: #fbfbfe; --panel: #f2f3f9; --fig: #f2f3f9;
+  --text: #1c1f2e; --muted: #575d75; --line: #d3d6e3;
+  --primary: var(--host-accent, #2f3fd0); --ink: var(--host-ink, #1b2260); --dot: var(--host-accent, #2f3fd0);
+  --ok: #1a7f37; --warn: #7d4e00; --err: #cf222e;
+  /* The heat steps fill the cells of a heat map and the boxes of a heat plan, and nothing else: from the least (1) to the most (5). One teal on screen; the print block sets five grays for paper. */
+  --heat-1: #c6e9ef; --heat-2: #86c9d5; --heat-3: #3da6b6; --heat-4: #00707e; --heat-5: #004a53;
+  /* The text on a heat step: the kit's own text and page colors. They equal --text and --bg, except with the reader's high contrast mode, where the kit gives those two the system colors and only its own are tested against the steps. */
+  --heat-text: #1c1f2e; --heat-page: #fbfbfe;
+  /* A host's logo for one theme (data-for) shows in that theme. A logo with no version for this theme stands on a tile in the page color of its own theme. */
+  --logo-light: block; --logo-dark: none; --tile-light: transparent; --tile-dark: #12141f;
+  /* A host project sets its own accent, heading color and fonts with the --host-* tokens. The kit never sets them, so they hold in every theme and in print.
+     In dark mode the dot follows the host's dark accent, or --host-dot-dark; on Docent's own pages it is the lamp. */
+  --serif: var(--host-serif, Charter, "Bitstream Charter", "Sitka Heading", "Sitka Text", Cambria, Georgia, serif);
+  --sans: var(--host-sans, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif);
+  --mono: var(--host-mono, ui-monospace, "SF Mono", "Cascadia Code", Consolas, Menlo, monospace);
+  --ease: cubic-bezier(0.23, 1, 0.32, 1);
+  --measure: 31rem; --margin-col: 220px; --gap: 48px; --wide: 1120px;
+  /* The profile of a page sets these. Standard is the default: code and tables end at the right edge of the notes. */
+  --block: calc(var(--measure) + var(--gap) + var(--margin-col)); --section-space: 72px; --cell-y: 12px; --step-space: 36px;
+}
+/* Profiles: one attribute on <html> sets the width of code and tables, and the spacing. A profile never changes the text column. */
+html[data-profile="task"] { --section-space: 56px; --step-space: 28px; }
+html[data-profile="reference"] { --block: var(--wide); --section-space: 56px; --cell-y: 8px; }
+html[data-profile="brief"] { --block: var(--wide); --section-space: 64px; }
+/* A page for the public: every size is in rem, so the text and the text column grow together, on top of the reader's own setting. */
+html[data-text="large"] { font-size: 112.5%; }
+/* Dark: the reader's system setting decides, unless the reader chose a theme with the switch. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #12141f; --panel: #0b0d15; --fig: #0b0d15;
+    --text: #e7e9f3; --muted: #959bb3; --line: #2d3146;
+    --primary: var(--host-accent-dark, #8e9bff); --ink: #e7e9f3; --dot: var(--host-dot-dark, var(--host-accent-dark, #f2b824));
+    --ok: #3fb950; --warn: #d29922; --err: #f85149;
+    --heat-1: #093339; --heat-2: #054e58; --heat-3: #006b78; --heat-4: #36a0b1; --heat-5: #80cad7; --heat-text: #e7e9f3; --heat-page: #12141f;
+    --logo-light: none; --logo-dark: block; --tile-light: #fbfbfe; --tile-dark: transparent;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #12141f; --panel: #0b0d15; --fig: #0b0d15;
+  --text: #e7e9f3; --muted: #959bb3; --line: #2d3146;
+  --primary: var(--host-accent-dark, #8e9bff); --ink: #e7e9f3; --dot: var(--host-dot-dark, var(--host-accent-dark, #f2b824));
+  --ok: #3fb950; --warn: #d29922; --err: #f85149;
+  --heat-1: #093339; --heat-2: #054e58; --heat-3: #006b78; --heat-4: #36a0b1; --heat-5: #80cad7; --heat-text: #e7e9f3; --heat-page: #12141f;
+  --logo-light: none; --logo-dark: block; --tile-light: #fbfbfe; --tile-dark: transparent;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-padding-top: 88px; -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 400 1rem/1.65 var(--sans); caret-color: var(--primary); }
+::selection { background: color-mix(in srgb, var(--primary) 22%, transparent); }
+:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
+a { color: var(--primary); text-decoration-thickness: 1px; text-underline-offset: 0.2em; }
+a:hover { text-decoration-thickness: 2px; }
+/* The skip link: the first thing a keyboard reaches. It is hidden until it has focus; then it stands at the upper left, over the top bar, and jumps to the main element. */
+.skip { position: absolute; top: 12px; left: 12px; z-index: 3; display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); font-size: 0.875rem; }
+.skip:not(:focus) { width: 1px; height: 1px; padding: 0; border: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+/* One left edge for the whole page. On a wide screen the text and its notes sit in the middle as a group; wide blocks start at the same edge and grow to the right, up to --wide. */
+.shell {
+  --left: max(40px, min((100% - var(--measure) - var(--gap) - var(--margin-col)) / 2, 100% - var(--wide) - 40px));
+  padding: 0 max(40px, 100% - var(--left) - var(--wide)) 0 var(--left);
+}
+
+/* Top bar. Its bottom line is the route; the dot marks the current section. */
+.topbar { position: sticky; top: 0; z-index: 2; background: var(--bg); border-bottom: 1px solid var(--line); }
+.topbar .shell { position: relative; display: flex; align-items: center; gap: 32px; height: 56px; }
+.host { display: inline-flex; align-items: center; gap: 10px; font-weight: 600; font-size: 0.875rem; white-space: nowrap; }
+/* The host's logo: 24px high and at most 160px wide; its width and height are written on it. One color (currentColor) takes the heading color. */
+.logo { display: block; flex: none; box-sizing: content-box; color: var(--ink); }
+.host:has(> .logo[data-for="dark"]) > .logo[data-for="light"] { display: var(--logo-light); }
+.host:has(> .logo[data-for="light"]) > .logo[data-for="dark"] { display: var(--logo-dark); }
+/* A logo for one theme only stands on a tile in the other theme: corners of 6px, 4px around it. The outline takes no space, so nothing moves. */
+/* A logo in one color (currentColor) keeps the ink of its own theme, so it reads on its tile too. */
+.host:not(:has(> .logo[data-for="dark"])) > .logo[data-for="light"] { background: var(--tile-light); outline: 4px solid var(--tile-light); border-radius: 2px; color: var(--host-ink, #1b2260); }
+.host:not(:has(> .logo[data-for="light"])) > .logo[data-for="dark"] { background: var(--tile-dark); outline: 4px solid var(--tile-dark); border-radius: 2px; color: #e7e9f3; }
+.route { flex: 1; min-width: 0; }
+.route ol { display: flex; gap: 28px; margin: 0; padding: 0; list-style: none; }
+.route a { display: block; padding: 6px 0; font-size: 0.875rem; color: var(--muted); text-decoration: none; white-space: nowrap; }
+.route a:hover, .route a[aria-current] { color: var(--text); }
+.route-dot { position: absolute; left: 0; bottom: -4px; width: 7px; height: 7px; border-radius: 50%; background: var(--dot); opacity: 0; transform: translateX(var(--x, 0px)); }
+.ready .route-dot, .ready .rail-dot { transition: transform 320ms var(--ease); }
+.js .route-dot { opacity: 1; }
+.theme, .wd-btn { display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px; border: 1px solid var(--line); border-radius: 6px; background: none; color: var(--text); font: 400 0.875rem/1 var(--sans); cursor: pointer; }
+.theme:hover, .wd-btn:hover { border-color: var(--muted); }
+.theme:active, .wd-btn:active { transform: translateY(1px); }
+.theme svg { width: 15px; height: 15px; }
+html:not(.js) .theme, .theme[hidden] { display: none; }
+.theme[data-next="dark"] .icon-sun, .theme[data-next="light"] .icon-moon { display: none; }
+
+/* Title block: the title leads; facts about the document sit below it. */
+.title { padding: 80px 0 8px; }
+.title .row { margin-top: 24px; }
+/* The serif headings take weight 700. A palette with sans-serif headings sets 600, so the sans-serif keeps two weights. */
+h1, h2 { font-family: var(--serif); font-weight: var(--heading-weight, 700); color: var(--ink); text-wrap: balance; margin: 0; }
+h1 { font-size: 3.25rem; line-height: 1.06; letter-spacing: -0.02em; }
+.standfirst { font: 400 1.3125rem/1.5 var(--serif); margin: 0; text-wrap: pretty; }
+.facts { margin: 0; padding-left: 0; list-style: none; font-variant-numeric: tabular-nums; }
+
+section { padding-top: var(--section-space); }
+h2 { font-size: 1.875rem; line-height: 1.2; margin-bottom: 16px; }
+h3 { font: 600 1.125rem/1.35 var(--sans); margin: 0; text-wrap: balance; }
+/* A small heading inside a part of a section: body size, weight 600. */
+h4 { font: 600 1rem/1.5 var(--sans); margin: 24px 0 4px; }
+/* A definition list: each term in weight 600, its meaning below it. */
+dl { max-width: var(--measure); margin: 0 0 16px; }
+dt { font-weight: 600; }
+dd { margin: 0 0 12px; }
+dd:last-child { margin-bottom: 0; }
+p { margin: 0 0 16px; max-width: var(--measure); text-wrap: pretty; }
+.term { text-decoration: underline; text-decoration-color: var(--primary); text-decoration-thickness: 2px; text-underline-offset: 0.22em; }
+/* A place that shows a value of a value picker. A dotted line under it says that it changes with the choice. */
+var { font-style: normal; }
+var[data-v] { text-decoration: underline dotted var(--muted); text-decoration-thickness: 1px; text-underline-offset: 0.25em; }
+code { font: 0.875rem/1.55 var(--mono); background: var(--panel); padding: 0.1em 0.38em; border-radius: 6px; }
+.standfirst code { font-size: 1.125rem; }
+
+/* Lists in the text flow: points, or numbers for steps that one actor does. The rules are weak on purpose, so the lists of the kit's own blocks keep their styles. */
+:where(main) :where(ul, ol):not(.steps, .facts, .cards) { max-width: var(--measure); margin: 0 0 16px; padding-left: 24px; }
+:where(main) :where(ul, ol):not(.steps, .facts, .cards) > :where(li + li) { margin-top: 4px; }
+/* A block heading in the text flow has more space above it than below it. A step heading of a walkthrough has none. */
+:where(main) h3 { margin: 32px 0 8px; }
+h2 + h3, h3 + h4 { margin-top: 0; }
+.steps h3 { margin: 0; }
+/* A numbered block heading: one of several steps that one actor does, where a step holds a code block, a table or a widget. The kit writes the number, and the count starts again in each section. */
+section { counter-reset: block-step; }
+h3.step { counter-increment: block-step; }
+h3.step::before { content: counter(block-step); font-weight: 400; color: var(--muted); margin-right: 10px; font-variant-numeric: tabular-nums; }
+/* With scripts on, the page script writes the number as text, so that a screen reader reads it. It looks the same as the counted number. */
+h3.is-numbered::before { content: none !important; }
+.step-n { font-weight: 400; color: var(--muted); margin-right: 6px; font-variant-numeric: tabular-nums; }
+/* A code block, a table, a closed section, a walkthrough, a status note and a figure bring no space below them. Text that follows brings it. */
+:is(pre, .code, .table-wrap, details, .walk, .status, figure) + :is(p, ul, ol, dl) { margin-top: 24px; }
+
+/* Margin notes: the guide's remarks sit beside the text, like a wall label. */
+.row { display: grid; grid-template-columns: minmax(0, var(--measure)) var(--margin-col); column-gap: var(--gap); align-items: start; }
+.note { margin: 6px 0 16px; padding-top: 12px; border-top: 1px solid var(--line); font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
+.note strong { display: block; margin-bottom: 4px; font-weight: 600; color: var(--text); }
+/* A heading may stand in the text column, with the facts about its item beside it. The row brings the space above the heading, so the note lines up with the heading. */
+.row:has(> h3:first-child) { margin-top: 32px; }
+.row > h3:first-child { margin-top: 0; }
+
+/* Walkthrough: a rail with a node per step; one dot travels along it. */
+.walk { display: grid; grid-template-columns: minmax(0, 1fr) 536px; column-gap: 40px; align-items: start; margin-top: 24px; }
+.rail { position: relative; }
+.steps { position: relative; margin: 0; padding: 0; list-style: none; counter-reset: step; }
+.steps::before { content: ""; position: absolute; left: 4px; top: 10px; bottom: 10px; width: 1px; background: var(--line); }
+.steps li { position: relative; padding: 0 0 var(--step-space) 32px; counter-increment: step; }
+.steps li:last-child { padding-bottom: 0; }
+.steps li::before { content: ""; position: absolute; left: 0; top: 8px; width: 9px; height: 9px; border-radius: 50%; border: 1px solid var(--muted); background: var(--bg); }
+.steps h3::before { content: counter(step); font-weight: 400; color: var(--muted); margin-right: 10px; font-variant-numeric: tabular-nums; }
+.steps p { margin: 6px 0 0; }
+.js .steps li:not(.is-current) h3, .js .steps li:not(.is-current) p { color: var(--muted); }
+.ready .steps h3, .ready .steps p { transition: color 120ms; }
+.rail-dot { position: absolute; left: 0; top: 8px; width: 9px; height: 9px; border-radius: 50%; background: var(--dot); opacity: 0; transform: translateY(var(--y, 0px)); }
+.js .rail-dot { opacity: 1; }
+.walk figure { position: sticky; top: 88px; }
+
+/* Figures: a well that holds a Docent diagram, with a plain caption. A diagram carries its own styles. */
+/* A well is as wide as the profile's block. A wider drawing keeps its real size, and its well grows with it. */
+figure { margin: 0; min-width: min(100%, var(--block)); width: fit-content; max-width: 100%; }
+section > figure { margin-top: 24px; }
+/* Every drawing in a well keeps its real size and sits in the middle; a wider one scrolls inside the well. */
+.fig > svg { flex: none; margin-inline: auto; }
+.fig { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 16px 24px; background: var(--fig); border-radius: 12px; padding: 8px; overflow-x: auto; scrollbar-color: var(--line) transparent; }
+/* A well may hold two drawings, for two separate chains: side by side when both fit, else one below the other. */
+/* A drawing that is wider than its well scrolls sideways. The page script shows this line under it, because the part that shows can look complete. */
+.fig-more { margin: 8px 0 0; max-width: none; font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
+/* The steps of a diagram in words: a closed section in the well, under the drawing. It takes the width of the well, so a table
+   of several columns, such as the boxes of a heat plan, keeps its words whole; its sentences and lists keep the width of the text. */
+.dg-words { flex-basis: 100%; max-width: none; margin: 0; padding: 0 8px 4px; }
+.dg-words ol { margin: 8px 0 0; padding-left: 28px; }
+.dg-words li + li { margin-top: 4px; }
+.dg-words p { margin: 12px 0 0; font-weight: 600; }
+/* The rows of a range chart in words: a small table, as wide as its content, so it fits a phone. */
+.dg-words table { width: auto; min-width: 0; margin-top: 8px; }
+.dg-words :is(th, td) { padding-right: 16px; }
+/* A long name with no spaces breaks inside its cell, so the table never runs past a phone screen. */
+.dg-words tbody th { white-space: normal; }
+.dg-words :is(th, td) { overflow-wrap: anywhere; }
+/* A wide grid in words, such as the numbers of a heat map: each cell stays on one line, numbers line up on the right, and the
+   table scrolls inside its wrapper on a narrow screen. The lines under it keep the width of the text. */
+.dg-words > .table-wrap { margin-top: 8px; max-width: none; }
+.dg-words > .table-wrap :is(th, td) { white-space: nowrap; overflow-wrap: normal; padding-right: 12px; }
+.dg-words > .table-wrap :is(td, thead th) { text-align: right; font-variant-numeric: tabular-nums; }
+/* A wide table of words, such as the boxes of a heat plan: its cells wrap at spaces but never inside a word, and keep to the left. */
+.dg-words > .table-wrap.is-text :is(th, td) { white-space: normal; }
+.dg-words > .table-wrap.is-text :is(td, thead th) { text-align: left; }
+.dg-words:has(> .table-wrap) { min-width: 0; } /* a flex item: without this it grows to the table, and the wrapper never scrolls */
+/* A hand-drawn figure holds no colors and no styles of its own, only these classes, so the tokens give it every theme, print and the
+   reader's settings. A shape with no class is a 1.5px line in the text color, and a text with no class is 14px. No class is under 12px. */
+svg[data-drawn="hand"] { display: block; flex: none; margin-inline: auto; }
+svg[data-drawn="hand"] :is(path, line, polyline, polygon, rect, circle, ellipse), svg[data-drawn="hand"] .hd-line { fill: none; stroke: var(--text); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+svg[data-drawn="hand"] text, svg[data-drawn="hand"] .hd-text { fill: var(--text); stroke: none; font-size: 14px; font-weight: 400; }
+svg[data-drawn="hand"] .hd-strong { stroke-width: 2.5; }
+svg[data-drawn="hand"] .hd-muted { stroke: var(--muted); stroke-width: 1; }
+svg[data-drawn="hand"] .hd-rule { stroke: var(--line); stroke-width: 1; }
+svg[data-drawn="hand"] .hd-fill { fill: var(--text); stroke: none; }
+svg[data-drawn="hand"] .hd-box { fill: var(--bg); stroke: var(--text); }
+svg[data-drawn="hand"] .hd-band { fill: var(--bg); stroke: none; }
+svg[data-drawn="hand"] .hd-name { font-weight: 600; }
+svg[data-drawn="hand"] .hd-note { font-size: 12px; fill: var(--muted); }
+figcaption { margin-top: 12px; font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
+figcaption strong { font-weight: 600; color: var(--text); margin-right: 8px; }
+
+/* Card grid: 3 to 8 short items side by side, each a heading or a large number and a line of text. A card is a label, like a margin note: a line above it, and no box. At most four in a row. */
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(max(160px, calc((100% - 72px) / 4)), 1fr)); gap: 24px; margin: 24px 0 0; padding: 0; list-style: none; }
+.cards > li { min-width: 0; padding-top: 12px; border-top: 1px solid var(--line); }
+.cards h3 { margin: 0 0 4px; font-size: 1rem; line-height: 1.5; }
+.cards p { margin: 0; font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
+.cards .big { margin-bottom: 4px; font: 700 1.875rem/1.2 var(--serif); font-weight: var(--heading-weight, 700); color: var(--ink); font-variant-numeric: tabular-nums; }
+.cards + :is(p, ul, ol, dl) { margin-top: 24px; }
+
+/* Code, tables and cards end at the profile's block width. */
+:is(pre, .code, .table-wrap, .cards) { max-width: var(--block); }
+
+/* Tables: rules only, no boxes. */
+.table-wrap { overflow-x: auto; margin: 24px 0 0; scrollbar-color: var(--line) transparent; }
+table { width: 100%; min-width: 640px; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; vertical-align: top; padding: var(--cell-y) 24px var(--cell-y) 0; }
+thead th { border-bottom: 1px solid var(--text); padding-bottom: 10px; font-size: 0.875rem; line-height: 1.5; font-weight: 600; color: var(--muted); }
+tbody th { font-weight: 600; white-space: nowrap; }
+tbody tr { border-bottom: 1px solid var(--line); }
+/* A column of numbers (class "num" on its th and td cells): the numbers line up on the right, in tabular figures. The last column ends at the table's edge. */
+:is(th, td).num { text-align: right; font-variant-numeric: tabular-nums; }
+:is(th, td).num:last-child { padding-right: 0; }
+.state { display: inline-flex; align-items: baseline; gap: 8px; font-weight: 600; }
+.state::before { content: ""; flex: none; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.state.ok { color: var(--ok); } .state.warn { color: var(--warn); } .state.err { color: var(--err); }
+/* Two states with no status color: plain information takes a muted dot, and a thing that is planned or not on yet takes a muted ring. */
+.state.info, .state.plan { color: var(--text); }
+.state.info::before { background: var(--muted); }
+.state.plan::before { background: none; border: 1.5px solid var(--muted); }
+/* Code and links in a cell may break anywhere, so a long path, command or address does not make the table wider than its place. */
+:is(td, th) :is(code, a) { overflow-wrap: anywhere; }
+
+/* Status note: a dot and a word carry the status. */
+.status { max-width: var(--measure); margin: 32px 0 0; }
+.status p { margin: 4px 0 0; }
+
+pre { margin: 20px 0 0; padding: 16px 20px; background: var(--panel); border-radius: 10px; overflow-x: auto; font: 0.875rem/1.6 var(--mono); scrollbar-color: var(--line) transparent; }
+pre code { background: none; padding: 0; font-size: inherit; }
+/* With scripts on, a code block sits in a holder with a button that copies the code. The holder takes the place and the space of the code block. */
+.code { position: relative; margin: 20px 0 0; }
+.code > pre { margin: 0; }
+.copy { position: absolute; top: 0; right: 0; height: 30px; padding: 0 12px; border: solid var(--line); border-width: 0 0 1px 1px; border-radius: 0 10px 0 6px; background: var(--panel); color: var(--muted); font: 400 0.875rem/1 var(--sans); cursor: pointer; }
+.copy:hover { color: var(--text); }
+/* A line of code that reaches the button would sit under it. Then the code starts below the button. */
+.code.is-long > pre { padding-top: 40px; }
+.cm { color: var(--muted); }
+
+details { max-width: var(--measure); margin: 24px 0 0; }
+/* A closed section that holds a table, a code block or a figure takes the full width, like those blocks do outside it. Its text keeps the text column. */
+details:has(> .table-wrap, > pre, > .code, > figure) { max-width: none; }
+summary { display: flex; align-items: center; gap: 10px; padding: 4px 0; font-weight: 600; cursor: pointer; list-style: none; }
+summary::-webkit-details-marker { display: none; }
+summary svg { width: 12px; height: 12px; color: var(--muted); transition: transform 150ms var(--ease); }
+details[open] summary svg { transform: rotate(90deg); }
+details > p { margin: 8px 0 0 22px; }
+
+/* Widgets: the reader chooses, ticks or decides. A widget is plain controls and text, with no box. render makes its markup from data. */
+.choose, .checks, .decide, .values { position: relative; margin: 24px 0 0; }
+:is(.choose, .checks, .decide, .values) + * { margin-top: 24px; }
+.choose > input, .checks input, .decide input, .values > input { position: absolute; width: 1px; height: 1px; margin: 0; opacity: 0; pointer-events: none; }
+.wd-t { margin: 0; max-width: none; font-size: 0.875rem; line-height: 1.5; font-weight: 600; color: var(--muted); }
+.opt { display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px; border: 1px solid var(--line); border-radius: 6px; font-size: 0.875rem; line-height: 1; cursor: pointer; }
+.opt::before { content: ""; width: 9px; height: 9px; border-radius: 50%; border: 1px solid var(--muted); }
+.opt:hover { border-color: var(--muted); }
+input:checked + .opt { border-color: var(--text); }
+input:checked + .opt::before { border-color: var(--dot); background: var(--dot); }
+input:focus-visible + .opt, .checks input:focus-visible + label::before { outline: 2px solid var(--primary); outline-offset: 3px; }
+/* Chooser: radio buttons and one panel for each case. The styles alone show the chosen case, so it works with scripts off. */
+.choose { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.choose > .wd-t { margin-right: 4px; }
+.choose > .case { display: none; flex-basis: 100%; min-width: 0; margin-top: 8px; }
+.choose > input:nth-of-type(1):checked ~ div:nth-of-type(1), .choose > input:nth-of-type(2):checked ~ div:nth-of-type(2), .choose > input:nth-of-type(3):checked ~ div:nth-of-type(3), .choose > input:nth-of-type(4):checked ~ div:nth-of-type(4), .choose > input:nth-of-type(5):checked ~ div:nth-of-type(5) { display: block; }
+.case-t { display: none; margin: 0 0 4px; font-weight: 600; }
+.case > .case-t + * { margin-top: 0; }
+.case > :last-child { margin-bottom: 0; }
+/* Checklist: a box and a line of text. A ticked line takes the muted color. */
+.checks ul { max-width: var(--measure); margin: 0; padding: 0; list-style: none; }
+.checks li { position: relative; margin-top: 12px; }
+.checks label { display: block; position: relative; padding-left: 32px; cursor: pointer; }
+.checks label::before { content: ""; position: absolute; left: 0; top: 4px; width: 18px; height: 18px; border: 1.5px solid var(--muted); border-radius: 6px; }
+.checks label::after { content: ""; position: absolute; left: 6.5px; top: 7px; width: 5px; height: 9px; border: solid var(--text); border-width: 0 2px 2px 0; transform: rotate(45deg); opacity: 0; }
+.checks input:checked + label { color: var(--muted); }
+.checks input:checked + label::before { border-color: var(--text); }
+.checks input:checked + label::after { opacity: 1; }
+.checks .sub { display: block; font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
+.wd-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin: 16px 0 0; max-width: none; font-size: 0.875rem; line-height: 1.5; color: var(--muted); font-variant-numeric: tabular-nums; }
+.wd-foot[hidden] { display: none; }
+/* Decision helper: questions, the one answer that fits, and the table of all cases. The table is the still form. */
+.decide fieldset { position: relative; display: flex; flex-wrap: wrap; gap: 8px; min-width: 0; margin: 16px 0 0; padding: 0; border: 0; }
+.decide legend { margin-bottom: 8px; padding: 0; font-weight: 600; }
+.decide-out { display: block; max-width: var(--measure); margin-top: 16px; }
+.decide-out:empty { display: none; }
+.decide-out strong { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+.decide-out strong::before { content: ""; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--dot); }
+.decide details { max-width: none; margin-top: 16px; }
+.decide .table-wrap { margin-top: 8px; }
+.decide td strong { display: block; font-weight: 600; }
+.decide tr.is-out { color: var(--muted); }
+html:not(.js) .decide-ask, html:not(.js) .wd-foot output { display: none; }
+/* Value picker: options like a chooser, a line that names the chosen option, and the table of all values. With scripts off the options do nothing, so they are hidden, and the text shows the values of the first option. */
+.values { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.values > .wd-t { margin-right: 4px; }
+.values-now { flex-basis: 100%; max-width: none; margin: 4px 0 0; font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
+.values-now strong { font-weight: 600; color: var(--text); }
+.values details { flex-basis: 100%; min-width: 0; max-width: none; margin-top: 8px; }
+.values .table-wrap { margin-top: 8px; }
+html:not(.js) .values > input + .opt { display: none; }
+
+footer { margin-top: 96px; border-top: 1px solid var(--line); }
+footer .shell { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding-top: 24px; padding-bottom: 40px; font-size: 0.875rem; color: var(--muted); }
+footer p { margin: 0; }
+/* The credit: a one-color mark and "Made with Docent", at the right. The mark takes the muted color of the words beside it. */
+.credit { margin-left: auto; }
+.credit svg { width: 16px; height: 16px; margin-right: 8px; vertical-align: -3px; }
+/* Docent's own pages carry the mark's tile in the footer. */
+.brand { display: inline-flex; align-items: center; gap: 10px; font: 700 1rem/1 var(--serif); color: var(--text); }
+.brand svg { width: 24px; height: 24px; }
+
+@media (max-width: 1100px) {
+  .walk { grid-template-columns: minmax(0, 1fr); row-gap: 32px; }
+  .walk figure { position: static; order: -1; }
+}
+@media (max-width: 900px) {
+  .row { grid-template-columns: minmax(0, 1fr); }
+  .note { max-width: var(--measure); }
+  .title .note { margin-top: 28px; }
+}
+@media (max-width: 720px) {
+  .shell { padding: 0 20px; }
+  .topbar { position: static; }
+  .topbar .shell { flex-wrap: wrap; gap: 4px 16px; height: auto; padding-top: 10px; padding-bottom: 8px; }
+  .host { flex: 1; }
+  .route { flex: none; order: 3; width: 100%; }
+  .route ol { flex-wrap: wrap; gap: 0 20px; }
+  .route a[aria-current] { text-decoration: underline; text-decoration-color: var(--dot); text-decoration-thickness: 2px; text-underline-offset: 0.4em; }
+  .route-dot { display: none; }
+  .title { padding-top: 48px; }
+  h1 { font-size: 2rem; } h2 { font-size: 1.625rem; }
+  section { padding-top: 56px; }
+  footer .shell { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .credit { margin-left: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; }
+}
+/* More contrast (the reader's system setting): outlines, tracks and rules take the muted color, and muted text takes the text color. Screen
+   only, so paper keeps the print block; and not with forced colors, where the reader's system colors already decide. */
+@media screen and (prefers-contrast: more) and (forced-colors: none) {
+  html:root:not([data-never]) { --line: #575d75; --muted: #1c1f2e; }
+  html:root:not([data-never])[data-theme="dark"] { --line: #959bb3; --muted: #e7e9f3; }
+}
+@media screen and (prefers-contrast: more) and (forced-colors: none) and (prefers-color-scheme: dark) {
+  html:root:not([data-never]):not([data-theme="light"]) { --line: #959bb3; --muted: #e7e9f3; }
+}
+/* The reader's high contrast mode (forced colors, as in Windows): the browser gives the page the few colors the reader chose. The kit gives
+   its tokens the same system colors, so the drawings follow, and the marks that are backgrounds (dots, the rail) stay visible. The heat
+   steps and the status colors keep their own values, because there the color is the content; the text on a step keeps --heat-text. */
+@media (forced-colors: active) {
+  html:root:not([data-never]) { --bg: Canvas; --fig: Canvas; --text: CanvasText; --muted: CanvasText; --line: CanvasText; --primary: Highlight; --dot: Highlight; }
+  /* A status dot takes the color of its word, which the browser forces; a background in that color would turn into the page color. */
+  .state::before { background: CanvasText; }
+  /* All borders take the text color, so the chosen option takes the highlight color, as its dot does. */
+  input:checked + .opt { border-color: Highlight; }
+}
+@media print {
+  html:root:not([data-never]) { color-scheme: light; --bg: #ffffff; --panel: #f2f3f9; --fig: #f2f3f9; --text: #1c1f2e; --muted: #575d75; --line: #d3d6e3; --primary: var(--host-accent, #2f3fd0); --ink: var(--host-ink, #1b2260); --dot: var(--host-accent, #2f3fd0); --ok: #1a7f37; --warn: #7d4e00; --err: #cf222e; --heat-1: #dee2f0; --heat-2: #babecb; --heat-3: #9498a5; --heat-4: #616571; --heat-5: #3e424d; --heat-text: #1c1f2e; --heat-page: #ffffff; --logo-light: block; --logo-dark: none; --tile-light: transparent; --tile-dark: #12141f; }
+  /* Paper: 11pt text, the page margin as the edge, and the notes beside the text again. An A4 page holds the text (112mm), a gap and the notes (50mm). */
+  html { font-size: 11pt; } html[data-text="large"] { font-size: 12pt; }
+  html:root:not([data-never]) { --measure: 112mm; --gap: 8mm; --margin-col: 50mm; --block: 100%; }
+  .shell { padding: 0; }
+  .row { grid-template-columns: minmax(0, var(--measure)) var(--margin-col); }
+  .title .note { margin-top: 6px; }
+  p, li { orphans: 2; widows: 2; }
+  /* A browser may leave out the ground of a code well on paper. A thin line keeps it a well. */
+  /* Paper cannot scroll: a long line of code wraps. */
+  pre { border: 1px solid var(--line); white-space: pre-wrap; overflow-wrap: anywhere; }
+  /* The top bar prints as one line above the title: the logo and the host's name, with no links and no switch. */
+  .topbar { position: static; border-bottom: 0; } .topbar .shell { height: auto; } .title { padding-top: 32px; }
+  .logo { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  /* Paper has no link: the credit prints as text. */
+  .credit a { color: inherit; text-decoration: none; }
+  .skip, .route, .theme, .route-dot, .rail-dot, .choose > .opt, .values > .opt, .decide-ask, .wd-foot, .copy, .fig-more { display: none !important; }
+  .choose > .case { display: block !important; margin-top: 16px; } .case-t { display: block; }
+  .checks input:checked + label, .decide tr.is-out { color: var(--text) !important; }
+  .steps li h3, .steps li p { color: var(--text) !important; }
+  .walk { grid-template-columns: minmax(0, 1fr); row-gap: 32px; } .walk figure { position: static; order: -1; }
+  table { min-width: 0; } .table-wrap { overflow: visible; }
+  /* Paper cannot scroll, so a wide grid in words, such as the numbers of a heat map, takes the smallest text size and tighter cells; render splits a grid that is still too wide into several tables. */
+  .dg-words > .table-wrap table { font-size: 0.875rem; } .dg-words > .table-wrap thead th { font-size: inherit; } .dg-words > .table-wrap :is(th, td) { padding: 4px 6px 4px 0; }
+  /* A browser leaves out backgrounds on paper. These carry meaning, so they print: status dots, the rail of the steps, and the ground of figures and code. */
+  .state::before, .steps::before, .fig, pre, code { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  /* Paper cannot scroll, and a drawing cannot split across pages. So a drawing that is wider than the paper, or taller than a page, shrinks to fit, under its caption, on A4 and on Letter. */
+  .fig > svg { width: auto; height: auto; max-width: 100%; max-height: 220mm; }
+  figure, tr, .status, pre, .checks li, .cards > li { break-inside: avoid; }
+  h2, h3 { break-after: avoid; }
+  /* Page numbers: Chrome and Edge print them; other browsers print their own footer. */
+  @page { margin: 18mm; @bottom-right { content: counter(page) " / " counter(pages); font: 9pt system-ui, sans-serif; color: #575d75; } }
+}
+/* /docent:kit */
+</style>
+</head>
+<body>
+<a class="skip" href="#content">Skip to the content</a>
+<header class="topbar">
+  <div class="shell">
+    <span class="host">Example Planner</span>
+    <nav class="route" aria-label="On this page">
+      <ol>
+        <li><a href="#findings">Findings</a></li>
+        <li><a href="#people">Who we asked</a></li>
+        <li><a href="#themes">Themes</a></li>
+        <li><a href="#journey">Journey</a></li>
+        <li><a href="#survey">Survey</a></li>
+        <li><a href="#next">Next steps</a></li>
+        <li><a href="#method">Method</a></li>
+      </ol>
+    </nav>
+    <button class="theme" type="button">
+      <svg class="icon-moon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13.5 9.6A5.8 5.8 0 0 1 6.4 2.5a5.8 5.8 0 1 0 7.1 7.1Z"/></svg>
+      <svg class="icon-sun" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="8" cy="8" r="3"/><path d="M8 1.5v1.6M8 12.9v1.6M1.5 8h1.6M12.9 8h1.6M3.4 3.4l1.1 1.1M11.5 11.5l1.1 1.1M3.4 12.6l1.1-1.1M11.5 4.5l1.1-1.1"/></svg>
+      <span class="theme-text">Dark</span>
+    </button>
+    <span class="route-dot" aria-hidden="true"></span>
+  </div>
+</header>
+
+<main class="shell" id="content">
+  <div class="title">
+    <h1>What eight teams told us about planning their week</h1>
+    <div class="row">
+      <p class="standfirst">In September we interviewed eight teams that use, or used, Example Planner. We asked how they plan a week, where the product helps, and where it gets in the way. This summary gives the six themes they raised, what they said in their own words, and a short survey of 167 customers that tests the themes.</p>
+      <div class="note" role="note" aria-label="About this document">
+        <strong>Research summary</strong>
+        <ul class="facts">
+          <li>10 minutes to read</li>
+          <li>Interviews 14 to 25 September 2026</li>
+          <li>Survey 29 September to 6 October 2026</li>
+          <li>Owner: Product research</li>
+          <li>Every person, quote and number is invented</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <section id="findings" aria-labelledby="findings-h">
+    <h2 id="findings-h">What we found</h2>
+    <ol>
+      <li><strong>Two calendars are the main pain.</strong> Seven of eight teams keep a work calendar beside Example Planner, and double bookings follow.</li>
+      <li><strong>The seat price hurts small teams with part-time members.</strong> Six teams pay full seats for people who plan one day a week.</li>
+      <li><strong>Setup falls on one person.</strong> Five teams said one person spent an afternoon or more to set up projects and invite the team.</li>
+      <li><strong>The weekly review is the reason to stay.</strong> The teams that stay use the Monday review every week.</li>
+    </ol>
+    <div class="row">
+      <div>
+        <p>The survey agrees with the interviews on price and on the weekly review. It agrees less on setup: most survey answers found setup easy enough.</p>
+      </div>
+      <div class="note" role="note">
+        <strong>Read with care</strong>
+        Eight interviews show what matters to some teams. They do not show how many teams feel the same. The survey gives a first count.
+      </div>
+    </div>
+  </section>
+
+  <section id="people" aria-labelledby="people-h">
+    <h2 id="people-h">Who we talked to</h2>
+    <p>We chose teams of different sizes and plans, and two teams that had left. Each person has a code, P1 to P8, which the quotes below use. Names and companies are left out.</p>
+    <div class="table-wrap" role="region" aria-label="The eight participants" tabindex="0">
+      <table>
+        <thead>
+          <tr><th scope="col">Code</th><th scope="col">Role</th><th scope="col">Kind of team</th><th scope="col">Plan</th><th scope="col" class="num">Seats</th><th scope="col" class="num">Months as customer</th><th scope="col">Status</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row"><code>P1</code></th><td>Office manager</td><td>Architecture firm</td><td>Starter</td><td class="num">6</td><td class="num">14</td><td>Customer</td></tr>
+          <tr><th scope="row"><code>P2</code></th><td>Project lead</td><td>Software agency</td><td>Team</td><td class="num">12</td><td class="num">26</td><td>Customer</td></tr>
+          <tr><th scope="row"><code>P3</code></th><td>Founder</td><td>Design studio</td><td>Starter</td><td class="num">3</td><td class="num">8</td><td>Left in August</td></tr>
+          <tr><th scope="row"><code>P4</code></th><td>Operations lead</td><td>Nonprofit</td><td>Team</td><td class="num">22</td><td class="num">19</td><td>Customer</td></tr>
+          <tr><th scope="row"><code>P5</code></th><td>Team lead</td><td>Marketing team in a larger company</td><td>Starter</td><td class="num">9</td><td class="num">5</td><td>Customer</td></tr>
+          <tr><th scope="row"><code>P6</code></th><td>Owner</td><td>Bookkeeping practice</td><td>Starter</td><td class="num">4</td><td class="num">11</td><td>Left in September</td></tr>
+          <tr><th scope="row"><code>P7</code></th><td>Engineering manager</td><td>Logistics company</td><td>Business</td><td class="num">35</td><td class="num">31</td><td>Customer</td></tr>
+          <tr><th scope="row"><code>P8</code></th><td>Coordinator</td><td>School district office</td><td>Team</td><td class="num">15</td><td class="num">7</td><td>Customer</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="themes" aria-labelledby="themes-h">
+    <h2 id="themes-h">Six themes</h2>
+    <p>We coded each interview with the same list of themes. A theme counts once for a participant, however often they raised it. Figure 1 shows how many of the eight raised each theme.</p>
+    <figure>
+      <div class="fig" role="region" aria-label="Figure 1, participants who raised each theme" tabindex="0">
+<!-- docent:diagram
+{
+  "id": "theme-counts",
+  "kind": "bar",
+  "label": "Of 8 participants, 7 raised two calendars that clash, 6 the seat price for part-time members, 5 setup that takes an afternoon, 5 the weekly review as the main use, 4 a read-only seat for clients, and 3 that they use the phone app only to check.",
+  "scale": {"from": 0, "to": 8, "step": 2, "unit": "participants"},
+  "order": "largest",
+  "rows": [
+    {"name": "Two calendars clash", "value": 7},
+    {"name": "Seat price for part-timers", "value": 6},
+    {"name": "Setup takes an afternoon", "value": 5},
+    {"name": "Weekly review is main use", "value": 5},
+    {"name": "Read-only seat for clients", "value": 4},
+    {"name": "Phone app only to check", "value": 3}
+  ]
+}
+-->
+<svg id="dg-theme-counts" class="dg dg-bar dg-auto" xmlns="http://www.w3.org/2000/svg" width="640" height="276" viewBox="0 0 640 276" role="img" aria-label="Of 8 participants, 7 raised two calendars that clash, 6 the seat price for part-time members, 5 setup that takes an afternoon, 5 the weekly review as the main use, 4 a read-only seat for clients, and 3 that they use the phone app only to check.">
+<style>
+#dg-theme-counts{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-theme-counts .ground{fill:var(--fig,#f2f3f9)}
+#dg-theme-counts .band{fill:var(--bg,#fbfbfe)}
+#dg-theme-counts .track{stroke:var(--line,#d3d6e3)}
+#dg-theme-counts .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-theme-counts .head{fill:var(--text,#1c1f2e)}
+#dg-theme-counts .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-theme-counts .stop.end{fill:var(--text,#1c1f2e)}
+#dg-theme-counts .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-theme-counts .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-theme-counts .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-theme-counts .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-theme-counts .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-theme-counts .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-theme-counts .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-theme-counts .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-theme-counts .sub,#dg-theme-counts .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-theme-counts .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-theme-counts .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-theme-counts .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-theme-counts .r-bar{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-theme-counts .r-ref{stroke:var(--muted,#575d75)}
+#dg-theme-counts .r-pt{fill:var(--text,#1c1f2e)}
+#dg-theme-counts .d-ring{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-theme-counts .d-gap{stroke:var(--muted,#575d75);stroke-width:2}
+#dg-theme-counts .d-lead{stroke:var(--muted,#575d75);stroke-width:1}
+@media (prefers-reduced-motion:reduce){#dg-theme-counts .pulse{animation:none!important}#dg-theme-counts .pulse{display:none!important}}
+@media print{#dg-theme-counts{max-width:100%;height:auto}#dg-theme-counts .pulse{display:none!important}}
+#dg-theme-counts-phone{display:none}
+</style>
+<rect width="640" height="276" class="ground"/>
+<rect x="8" y="60" width="624" height="208" rx="10" class="band"/>
+<line x1="210" y1="60" x2="210" y2="268" class="track"/>
+<line x1="308.5" y1="60" x2="308.5" y2="268" class="track"/>
+<line x1="407" y1="60" x2="407" y2="268" class="track"/>
+<line x1="505.5" y1="60" x2="505.5" y2="268" class="track"/>
+<line x1="604" y1="60" x2="604" y2="268" class="track"/>
+<text x="20" y="24" class="sub" text-anchor="start">Participants, bars from 0. Largest first.</text>
+<text x="210" y="48" class="val" text-anchor="middle">0</text>
+<text x="308.5" y="48" class="val" text-anchor="middle">2</text>
+<text x="407" y="48" class="val" text-anchor="middle">4</text>
+<text x="505.5" y="48" class="val" text-anchor="middle">6</text>
+<text x="604" y="48" class="val" text-anchor="middle">8</text>
+<text x="20" y="89" class="row" text-anchor="start">Two calendars clash</text>
+<rect x="558.75" y="76" width="15.92" height="16" class="band"/><text x="562.75" y="88" class="val" text-anchor="start">7</text>
+<text x="20" y="121" class="row" text-anchor="start">Seat price for part-timers</text>
+<rect x="509.5" y="108" width="15.92" height="16" class="band"/><text x="513.5" y="120" class="val" text-anchor="start">6</text>
+<text x="20" y="153" class="row" text-anchor="start">Setup takes an afternoon</text>
+<rect x="460.25" y="140" width="15.92" height="16" class="band"/><text x="464.25" y="152" class="val" text-anchor="start">5</text>
+<text x="20" y="185" class="row" text-anchor="start">Weekly review is main use</text>
+<rect x="460.25" y="172" width="15.92" height="16" class="band"/><text x="464.25" y="184" class="val" text-anchor="start">5</text>
+<text x="20" y="217" class="row" text-anchor="start">Read-only seat for clients</text>
+<rect x="411" y="204" width="15.92" height="16" class="band"/><text x="415" y="216" class="val" text-anchor="start">4</text>
+<text x="20" y="249" class="row" text-anchor="start">Phone app only to check</text>
+<rect x="361.75" y="236" width="15.92" height="16" class="band"/><text x="365.75" y="248" class="val" text-anchor="start">3</text>
+<rect x="210" y="76" width="344.75" height="16" rx="4" class="r-bar"/><line x1="308.5" y1="76.75" x2="308.5" y2="91.25" class="track"/><line x1="407" y1="76.75" x2="407" y2="91.25" class="track"/><line x1="505.5" y1="76.75" x2="505.5" y2="91.25" class="track"/>
+<rect x="210" y="108" width="295.5" height="16" rx="4" class="r-bar"/><line x1="308.5" y1="108.75" x2="308.5" y2="123.25" class="track"/><line x1="407" y1="108.75" x2="407" y2="123.25" class="track"/>
+<rect x="210" y="140" width="246.25" height="16" rx="4" class="r-bar"/><line x1="308.5" y1="140.75" x2="308.5" y2="155.25" class="track"/><line x1="407" y1="140.75" x2="407" y2="155.25" class="track"/>
+<rect x="210" y="172" width="246.25" height="16" rx="4" class="r-bar"/><line x1="308.5" y1="172.75" x2="308.5" y2="187.25" class="track"/><line x1="407" y1="172.75" x2="407" y2="187.25" class="track"/>
+<rect x="210" y="204" width="197" height="16" rx="4" class="r-bar"/><line x1="308.5" y1="204.75" x2="308.5" y2="219.25" class="track"/>
+<rect x="210" y="236" width="147.75" height="16" rx="4" class="r-bar"/><line x1="308.5" y1="236.75" x2="308.5" y2="251.25" class="track"/>
+</svg>
+<svg id="dg-theme-counts-phone" class="dg dg-bar dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="400" viewBox="0 0 264 400" role="img" aria-label="Of 8 participants, 7 raised two calendars that clash, 6 the seat price for part-time members, 5 setup that takes an afternoon, 5 the weekly review as the main use, 4 a read-only seat for clients, and 3 that they use the phone app only to check.">
+<style>
+#dg-theme-counts-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-theme-counts-phone .ground{fill:var(--fig,#f2f3f9)}
+#dg-theme-counts-phone .band{fill:var(--bg,#fbfbfe)}
+#dg-theme-counts-phone .track{stroke:var(--line,#d3d6e3)}
+#dg-theme-counts-phone .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-theme-counts-phone .head{fill:var(--text,#1c1f2e)}
+#dg-theme-counts-phone .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-theme-counts-phone .stop.end{fill:var(--text,#1c1f2e)}
+#dg-theme-counts-phone .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-theme-counts-phone .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-theme-counts-phone .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-theme-counts-phone .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-theme-counts-phone .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-theme-counts-phone .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-theme-counts-phone .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-theme-counts-phone .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-theme-counts-phone .sub,#dg-theme-counts-phone .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-theme-counts-phone .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-theme-counts-phone .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-theme-counts-phone .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-theme-counts-phone .r-bar{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-theme-counts-phone .r-ref{stroke:var(--muted,#575d75)}
+#dg-theme-counts-phone .r-pt{fill:var(--text,#1c1f2e)}
+#dg-theme-counts-phone .d-ring{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-theme-counts-phone .d-gap{stroke:var(--muted,#575d75);stroke-width:2}
+#dg-theme-counts-phone .d-lead{stroke:var(--muted,#575d75);stroke-width:1}
+@media (prefers-reduced-motion:reduce){#dg-theme-counts-phone .pulse{animation:none!important}#dg-theme-counts-phone .pulse{display:none!important}}
+@media print{#dg-theme-counts-phone{max-width:100%;height:auto}#dg-theme-counts-phone .pulse{display:none!important}}
+@media (max-width:736px){#dg-theme-counts{display:none}#dg-theme-counts-phone{display:block}}
+@media print{#dg-theme-counts{display:block!important}#dg-theme-counts-phone{display:none!important}}
+</style>
+<rect width="264" height="400" class="ground"/>
+<rect x="8" y="76" width="248" height="316" rx="10" class="band"/>
+<line x1="20" y1="104" x2="20" y2="132" class="track"/>
+<line x1="72" y1="104" x2="72" y2="132" class="track"/>
+<line x1="124" y1="104" x2="124" y2="132" class="track"/>
+<line x1="176" y1="104" x2="176" y2="132" class="track"/>
+<line x1="228" y1="104" x2="228" y2="132" class="track"/>
+<line x1="20" y1="154" x2="20" y2="182" class="track"/>
+<line x1="72" y1="154" x2="72" y2="182" class="track"/>
+<line x1="124" y1="154" x2="124" y2="182" class="track"/>
+<line x1="176" y1="154" x2="176" y2="182" class="track"/>
+<line x1="228" y1="154" x2="228" y2="182" class="track"/>
+<line x1="20" y1="204" x2="20" y2="232" class="track"/>
+<line x1="72" y1="204" x2="72" y2="232" class="track"/>
+<line x1="124" y1="204" x2="124" y2="232" class="track"/>
+<line x1="176" y1="204" x2="176" y2="232" class="track"/>
+<line x1="228" y1="204" x2="228" y2="232" class="track"/>
+<line x1="20" y1="254" x2="20" y2="282" class="track"/>
+<line x1="72" y1="254" x2="72" y2="282" class="track"/>
+<line x1="124" y1="254" x2="124" y2="282" class="track"/>
+<line x1="176" y1="254" x2="176" y2="282" class="track"/>
+<line x1="228" y1="254" x2="228" y2="282" class="track"/>
+<line x1="20" y1="304" x2="20" y2="332" class="track"/>
+<line x1="72" y1="304" x2="72" y2="332" class="track"/>
+<line x1="124" y1="304" x2="124" y2="332" class="track"/>
+<line x1="176" y1="304" x2="176" y2="332" class="track"/>
+<line x1="228" y1="304" x2="228" y2="332" class="track"/>
+<line x1="20" y1="354" x2="20" y2="382" class="track"/>
+<line x1="72" y1="354" x2="72" y2="382" class="track"/>
+<line x1="124" y1="354" x2="124" y2="382" class="track"/>
+<line x1="176" y1="354" x2="176" y2="382" class="track"/>
+<line x1="228" y1="354" x2="228" y2="382" class="track"/>
+<text x="20" y="24" class="sub" text-anchor="start">Participants, bars from 0. Largest</text>
+<text x="20" y="40" class="sub" text-anchor="start">first.</text>
+<text x="20" y="64" class="val" text-anchor="middle">0</text>
+<text x="72" y="64" class="val" text-anchor="middle">2</text>
+<text x="124" y="64" class="val" text-anchor="middle">4</text>
+<text x="176" y="64" class="val" text-anchor="middle">6</text>
+<text x="228" y="64" class="val" text-anchor="middle">8</text>
+<text x="20" y="100" class="row" text-anchor="start">Two calendars clash</text>
+<rect x="206" y="110" width="15.92" height="16" class="band"/><text x="210" y="122" class="val" text-anchor="start">7</text>
+<text x="20" y="150" class="row" text-anchor="start">Seat price for part-timers</text>
+<rect x="180" y="160" width="15.92" height="16" class="band"/><text x="184" y="172" class="val" text-anchor="start">6</text>
+<text x="20" y="200" class="row" text-anchor="start">Setup takes an afternoon</text>
+<rect x="154" y="210" width="15.92" height="16" class="band"/><text x="158" y="222" class="val" text-anchor="start">5</text>
+<text x="20" y="250" class="row" text-anchor="start">Weekly review is main use</text>
+<rect x="154" y="260" width="15.92" height="16" class="band"/><text x="158" y="272" class="val" text-anchor="start">5</text>
+<text x="20" y="300" class="row" text-anchor="start">Read-only seat for clients</text>
+<rect x="128" y="310" width="15.92" height="16" class="band"/><text x="132" y="322" class="val" text-anchor="start">4</text>
+<text x="20" y="350" class="row" text-anchor="start">Phone app only to check</text>
+<rect x="102" y="360" width="15.92" height="16" class="band"/><text x="106" y="372" class="val" text-anchor="start">3</text>
+<rect x="20" y="110" width="182" height="16" rx="4" class="r-bar"/><line x1="72" y1="110.75" x2="72" y2="125.25" class="track"/><line x1="124" y1="110.75" x2="124" y2="125.25" class="track"/><line x1="176" y1="110.75" x2="176" y2="125.25" class="track"/>
+<rect x="20" y="160" width="156" height="16" rx="4" class="r-bar"/><line x1="72" y1="160.75" x2="72" y2="175.25" class="track"/><line x1="124" y1="160.75" x2="124" y2="175.25" class="track"/>
+<rect x="20" y="210" width="130" height="16" rx="4" class="r-bar"/><line x1="72" y1="210.75" x2="72" y2="225.25" class="track"/><line x1="124" y1="210.75" x2="124" y2="225.25" class="track"/>
+<rect x="20" y="260" width="130" height="16" rx="4" class="r-bar"/><line x1="72" y1="260.75" x2="72" y2="275.25" class="track"/><line x1="124" y1="260.75" x2="124" y2="275.25" class="track"/>
+<rect x="20" y="310" width="104" height="16" rx="4" class="r-bar"/><line x1="72" y1="310.75" x2="72" y2="325.25" class="track"/>
+<rect x="20" y="360" width="78" height="16" rx="4" class="r-bar"/><line x1="72" y1="360.75" x2="72" y2="375.25" class="track"/>
+</svg>
+<details class="dg-words">
+<summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>The diagram in words</summary>
+<div class="table-wrap is-text" role="region" aria-label="The rows of the bar chart" tabindex="0"><table><thead><tr><th scope="col">Row</th><th scope="col">Value, in participants</th></tr></thead><tbody><tr><th scope="row">Two calendars clash</th><td>7</td></tr><tr><th scope="row">Seat price for part-timers</th><td>6</td></tr><tr><th scope="row">Setup takes an afternoon</th><td>5</td></tr><tr><th scope="row">Weekly review is main use</th><td>5</td></tr><tr><th scope="row">Read-only seat for clients</th><td>4</td></tr><tr><th scope="row">Phone app only to check</th><td>3</td></tr></tbody></table></div>
+<ul><li>Participants, bars from 0. Largest first.</li></ul>
+</details>
+<!-- /docent:diagram -->
+      </div>
+      <figcaption><strong>Figure 1</strong>Participants who raised each theme, of 8.</figcaption>
+    </figure>
+    <p>The table shows who raised which theme. Both teams that left (P3 and P6) raised price and setup.</p>
+    <div class="table-wrap" role="region" aria-label="Themes by participant" tabindex="0">
+      <table>
+        <thead>
+          <tr><th scope="col">Theme</th><th scope="col">P1</th><th scope="col">P2</th><th scope="col">P3</th><th scope="col">P4</th><th scope="col">P5</th><th scope="col">P6</th><th scope="col">P7</th><th scope="col">P8</th><th scope="col" class="num">Total</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">Two calendars clash</th><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td><td>—</td><td>Yes</td><td>Yes</td><td class="num">7</td></tr>
+          <tr><th scope="row">Seat price for part-timers</th><td>Yes</td><td>—</td><td>Yes</td><td>Yes</td><td>—</td><td>Yes</td><td>Yes</td><td>Yes</td><td class="num">6</td></tr>
+          <tr><th scope="row">Setup takes an afternoon</th><td>—</td><td>Yes</td><td>Yes</td><td>—</td><td>Yes</td><td>Yes</td><td>—</td><td>Yes</td><td class="num">5</td></tr>
+          <tr><th scope="row">Weekly review is main use</th><td>Yes</td><td>Yes</td><td>—</td><td>Yes</td><td>Yes</td><td>—</td><td>Yes</td><td>—</td><td class="num">5</td></tr>
+          <tr><th scope="row">Read-only seat for clients</th><td>—</td><td>—</td><td>Yes</td><td>Yes</td><td>—</td><td>Yes</td><td>—</td><td>Yes</td><td class="num">4</td></tr>
+          <tr><th scope="row">Phone app only to check</th><td>—</td><td>Yes</td><td>—</td><td>—</td><td>Yes</td><td>—</td><td>Yes</td><td>—</td><td class="num">3</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Two calendars clash</h3>
+    <div class="row">
+      <div>
+        <p>Seven teams keep their meetings in a work calendar and their plans in Example Planner. They copy meetings by hand, or they do not, and then a plan collides with a meeting. Three of the Starter teams lost calendar sync on 1 July.</p>
+        <p>"Every Monday I copy the week's meetings into the planner. If I forget one, someone books a client over it." — P1, office manager</p>
+        <p>"We left because of this. Paying more for sync we used to have felt wrong." — P3, founder</p>
+      </div>
+      <div class="note" role="note">
+        <strong>7 of 8</strong>
+        All but P6. P6 uses no work calendar at all.
+      </div>
+    </div>
+
+    <h3>The seat price for part-time members</h3>
+    <div class="row">
+      <div>
+        <p>Small teams often have members who plan one or two days a week: a bookkeeper, a part-time designer, a volunteer. Each needs a full seat. Teams said they removed these people to save money, and then the plan was no longer complete.</p>
+        <p>"Half my volunteers log in twice a month. I pay twelve dollars for each of them." — P4, operations lead</p>
+        <p>"We took the freelancers out. Now the plan only shows half the work." — P8, coordinator</p>
+      </div>
+      <div class="note" role="note">
+        <strong>6 of 8</strong>
+        Every team with a part-time member raised it.
+      </div>
+    </div>
+
+    <h3>Setup takes an afternoon</h3>
+    <div class="row">
+      <div>
+        <p>One person sets up the projects, the team and the first week. Five participants said it took an afternoon or more. The two teams that left both said the setup never felt finished.</p>
+        <p>"I did it on a Sunday. Nobody else on the team has opened the settings." — P5, team lead</p>
+      </div>
+      <div class="note" role="note">
+        <strong>5 of 8</strong>
+        The survey found setup easier than this. See <a href="#survey">Survey</a>.
+      </div>
+    </div>
+
+    <h3>The weekly review is the main use</h3>
+    <div class="row">
+      <div>
+        <p>The teams that stay open the Monday review with the whole team. It is the one screen they all name. Three of them said they would not pay for the product without it.</p>
+        <p>"The Monday review is our meeting now. We look at the board together and we are done in twenty minutes." — P2, project lead</p>
+      </div>
+      <div class="note" role="note">
+        <strong>5 of 8</strong>
+        None of the teams that left used the review every week.
+      </div>
+    </div>
+
+    <h3>Two smaller themes</h3>
+    <ul>
+      <li><strong>A read-only seat for clients</strong> (4 of 8). Agencies and studios want clients to see the plan without a paid seat.</li>
+      <li><strong>The phone app is for checking only</strong> (3 of 8). People look at the day on the phone, and plan on a computer.</li>
+    </ul>
+  </section>
+
+  <section id="journey" aria-labelledby="journey-h">
+    <h2 id="journey-h">How the first weeks feel</h2>
+    <p>We asked each participant to walk us through their first weeks with the product, and to say how each stage felt. Figure 2 places the stages on a line from good to bad, from what most participants said about that stage. It is a judgment from the interviews, not a measure.</p>
+    <figure>
+      <div class="fig" role="region" aria-label="Figure 2, how the first weeks feel" tabindex="0">
+<svg id="hd-journey" data-drawn="hand" data-type="user-journey" xmlns="http://www.w3.org/2000/svg" width="640" height="276" viewBox="0 0 640 276" role="img" aria-labelledby="hd-journey-t hd-journey-d">
+<title id="hd-journey-t">How the first weeks with Example Planner feel</title>
+<desc id="hd-journey-d">A user journey in five stages. Sign up feels good. Inviting the team feels mixed, because seats cost more. Connecting a calendar feels bad, because teams keep two calendars. The first weekly plan feels mixed. The weekly review feels good.</desc>
+<!-- the three feeling levels -->
+<text class="hd-note" x="16" y="84">Good</text>
+<text class="hd-note" x="16" y="144">Mixed</text>
+<text class="hd-note" x="16" y="204">Bad</text>
+<line class="hd-rule" x1="64" y1="80" x2="624" y2="80"/>
+<line class="hd-rule" x1="64" y1="140" x2="624" y2="140"/>
+<line class="hd-rule" x1="64" y1="200" x2="624" y2="200"/>
+<!-- the five stages -->
+<text class="hd-name" text-anchor="middle" x="127" y="48">Sign up</text>
+<text class="hd-name" text-anchor="middle" x="237" y="48">Invite team</text>
+<text class="hd-name" text-anchor="middle" x="347" y="30">Connect<tspan x="347" dy="18">calendar</tspan></text>
+<text class="hd-name" text-anchor="middle" x="457" y="48">First plan</text>
+<text class="hd-name" text-anchor="middle" x="567" y="48">Weekly review</text>
+<!-- the feeling line and a dot for each stage -->
+<polyline class="hd-strong" points="127,80 237,140 347,200 457,140 567,80"/>
+<circle class="hd-fill" cx="127" cy="80" r="5"/>
+<circle class="hd-fill" cx="237" cy="140" r="5"/>
+<circle class="hd-fill" cx="347" cy="200" r="5"/>
+<circle class="hd-fill" cx="457" cy="140" r="5"/>
+<circle class="hd-fill" cx="567" cy="80" r="5"/>
+<!-- what was said, and how many said it -->
+<text class="hd-note" text-anchor="middle" x="127" y="236">quick and clear</text>
+<text class="hd-note" text-anchor="middle" x="127" y="254">7 of 8 good</text>
+<text class="hd-note" text-anchor="middle" x="237" y="236">seats cost more</text>
+<text class="hd-note" text-anchor="middle" x="237" y="254">5 of 8 mixed</text>
+<text class="hd-note" text-anchor="middle" x="347" y="236">two calendars</text>
+<text class="hd-note" text-anchor="middle" x="347" y="254">6 of 8 bad</text>
+<text class="hd-note" text-anchor="middle" x="457" y="236">templates help</text>
+<text class="hd-note" text-anchor="middle" x="457" y="254">5 of 8 mixed</text>
+<text class="hd-note" text-anchor="middle" x="567" y="236">the main use</text>
+<text class="hd-note" text-anchor="middle" x="567" y="254">6 of 8 good</text>
+</svg>
+<details class="dg-words">
+<summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>The diagram in words</summary>
+<table>
+<thead><tr><th scope="col">Stage</th><th scope="col">Feeling</th><th scope="col">What most said</th><th scope="col" class="num">How many</th></tr></thead>
+<tbody>
+<tr><th scope="row">Sign up</th><td>Good</td><td>Quick and clear</td><td class="num">7 of 8</td></tr>
+<tr><th scope="row">Invite team</th><td>Mixed</td><td>Each seat costs more than they expected</td><td class="num">5 of 8</td></tr>
+<tr><th scope="row">Connect calendar</th><td>Bad</td><td>Two calendars to keep in step</td><td class="num">6 of 8</td></tr>
+<tr><th scope="row">First plan</th><td>Mixed</td><td>Templates help, but the first week takes long</td><td class="num">5 of 8</td></tr>
+<tr><th scope="row">Weekly review</th><td>Good</td><td>The main reason they use the product</td><td class="num">6 of 8</td></tr>
+</tbody>
+</table>
+</details>
+      </div>
+      <figcaption><strong>Figure 2</strong>How the first weeks feel, from the eight interviews. The feeling at each stage is our judgment of what most participants said.</figcaption>
+    </figure>
+  </section>
+
+  <section id="survey" aria-labelledby="survey-h">
+    <h2 id="survey-h">The survey</h2>
+    <div class="row">
+      <div>
+        <p>To see whether the themes hold beyond eight teams, we sent five statements to 412 customers who had used the product in the last 30 days. 167 answered (41%). Each statement had five answers, from "Strongly disagree" to "Strongly agree".</p>
+      </div>
+      <div class="note" role="note">
+        <strong>Who answered</strong>
+        Customers who answer surveys tend to be the more active ones. The teams that left are not in the survey.
+      </div>
+    </div>
+    <div class="table-wrap" role="region" aria-label="Survey answers, 167 customers" tabindex="0">
+      <table>
+        <thead>
+          <tr><th scope="col">Statement</th><th scope="col" class="num">Strongly disagree</th><th scope="col" class="num">Disagree</th><th scope="col" class="num">Neither</th><th scope="col" class="num">Agree</th><th scope="col" class="num">Strongly agree</th><th scope="col" class="num">Agree in all</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">My team uses it every week.</th><td class="num">8</td><td class="num">19</td><td class="num">26</td><td class="num">70</td><td class="num">44</td><td class="num">68%</td></tr>
+          <tr><th scope="row">I can see my whole week in one place.</th><td class="num">12</td><td class="num">25</td><td class="num">30</td><td class="num">64</td><td class="num">36</td><td class="num">60%</td></tr>
+          <tr><th scope="row">I would recommend it to another team.</th><td class="num">14</td><td class="num">22</td><td class="num">45</td><td class="num">55</td><td class="num">31</td><td class="num">51%</td></tr>
+          <tr><th scope="row">Setting it up was easy.</th><td class="num">18</td><td class="num">41</td><td class="num">37</td><td class="num">51</td><td class="num">20</td><td class="num">43%</td></tr>
+          <tr><th scope="row">The price is fair for what we use.</th><td class="num">31</td><td class="num">52</td><td class="num">40</td><td class="num">34</td><td class="num">10</td><td class="num">26%</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Figure 3 sums each statement in one number: the share that agreed minus the share that disagreed. A statement above 0 has more agreement than disagreement. The answers in the middle do not count in this number, so read it with the table.</p>
+    <figure>
+      <div class="fig" role="region" aria-label="Figure 3, agreement minus disagreement for each statement" tabindex="0">
+<!-- docent:diagram
+{
+  "id": "net-agree",
+  "kind": "bar",
+  "label": "Agreement minus disagreement, in points, from 167 answers. My team uses it every week: plus 52. I can see my whole week in one place: plus 38. I would recommend it: plus 30. Setting it up was easy: plus 7. The price is fair: minus 23.",
+  "scale": {"from": -40, "to": 60, "step": 20, "unit": "points"},
+  "order": "largest",
+  "rows": [
+    {"name": "Team uses it every week", "value": 52},
+    {"name": "Whole week in one place", "value": 38},
+    {"name": "Would recommend it", "value": 30},
+    {"name": "Easy to set up", "value": 7},
+    {"name": "Price is fair", "value": -23}
+  ]
+}
+-->
+<svg id="dg-net-agree" class="dg dg-bar dg-auto" xmlns="http://www.w3.org/2000/svg" width="640" height="244" viewBox="0 0 640 244" role="img" aria-label="Agreement minus disagreement, in points, from 167 answers. My team uses it every week: plus 52. I can see my whole week in one place: plus 38. I would recommend it: plus 30. Setting it up was easy: plus 7. The price is fair: minus 23.">
+<style>
+#dg-net-agree{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-net-agree .ground{fill:var(--fig,#f2f3f9)}
+#dg-net-agree .band{fill:var(--bg,#fbfbfe)}
+#dg-net-agree .track{stroke:var(--line,#d3d6e3)}
+#dg-net-agree .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-net-agree .head{fill:var(--text,#1c1f2e)}
+#dg-net-agree .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-net-agree .stop.end{fill:var(--text,#1c1f2e)}
+#dg-net-agree .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-net-agree .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-net-agree .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-net-agree .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-net-agree .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-net-agree .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-net-agree .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-net-agree .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-net-agree .sub,#dg-net-agree .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-net-agree .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-net-agree .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-net-agree .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-net-agree .r-bar{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-net-agree .r-ref{stroke:var(--muted,#575d75)}
+#dg-net-agree .r-pt{fill:var(--text,#1c1f2e)}
+#dg-net-agree .d-ring{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-net-agree .d-gap{stroke:var(--muted,#575d75);stroke-width:2}
+#dg-net-agree .d-lead{stroke:var(--muted,#575d75);stroke-width:1}
+@media (prefers-reduced-motion:reduce){#dg-net-agree .pulse{animation:none!important}#dg-net-agree .pulse{display:none!important}}
+@media print{#dg-net-agree{max-width:100%;height:auto}#dg-net-agree .pulse{display:none!important}}
+#dg-net-agree-phone{display:none}
+</style>
+<rect width="640" height="244" class="ground"/>
+<rect x="8" y="60" width="624" height="176" rx="10" class="band"/>
+<line x1="381.2" y1="60" x2="381.2" y2="236" class="r-ref"/>
+<line x1="238" y1="60" x2="238" y2="236" class="track"/>
+<line x1="309.6" y1="60" x2="309.6" y2="236" class="track"/>
+<line x1="452.8" y1="60" x2="452.8" y2="236" class="track"/>
+<line x1="524.4" y1="60" x2="524.4" y2="236" class="track"/>
+<line x1="596" y1="60" x2="596" y2="236" class="track"/>
+<text x="20" y="24" class="sub" text-anchor="start">Points, bars from 0. Largest first.</text>
+<text x="238" y="48" class="val" text-anchor="middle">−40</text>
+<text x="309.6" y="48" class="val" text-anchor="middle">−20</text>
+<text x="381.2" y="48" class="val" text-anchor="middle">0</text>
+<text x="452.8" y="48" class="val" text-anchor="middle">20</text>
+<text x="524.4" y="48" class="val" text-anchor="middle">40</text>
+<text x="596" y="48" class="val" text-anchor="middle">60</text>
+<text x="20" y="89" class="row" text-anchor="start">Team uses it every week</text>
+<rect x="571.36" y="76" width="23.84" height="16" class="band"/><text x="575.36" y="88" class="val" text-anchor="start">52</text>
+<text x="20" y="121" class="row" text-anchor="start">Whole week in one place</text>
+<rect x="521.24" y="108" width="23.84" height="16" class="band"/><text x="525.24" y="120" class="val" text-anchor="start">38</text>
+<text x="20" y="153" class="row" text-anchor="start">Would recommend it</text>
+<rect x="492.6" y="140" width="23.84" height="16" class="band"/><text x="496.6" y="152" class="val" text-anchor="start">30</text>
+<text x="20" y="185" class="row" text-anchor="start">Easy to set up</text>
+<rect x="410.26" y="172" width="15.92" height="16" class="band"/><text x="414.26" y="184" class="val" text-anchor="start">7</text>
+<text x="20" y="217" class="row" text-anchor="start">Price is fair</text>
+<rect x="259.02" y="204" width="35.84" height="16" class="band"/><text x="290.86" y="216" class="val" text-anchor="end">−23</text>
+<rect x="381.2" y="76" width="186.16" height="16" rx="4" class="r-bar"/><line x1="452.8" y1="76.75" x2="452.8" y2="91.25" class="track"/><line x1="524.4" y1="76.75" x2="524.4" y2="91.25" class="track"/>
+<rect x="381.2" y="108" width="136.04" height="16" rx="4" class="r-bar"/><line x1="452.8" y1="108.75" x2="452.8" y2="123.25" class="track"/>
+<rect x="381.2" y="140" width="107.4" height="16" rx="4" class="r-bar"/><line x1="452.8" y1="140.75" x2="452.8" y2="155.25" class="track"/>
+<rect x="381.2" y="172" width="25.06" height="16" rx="4" class="r-bar"/>
+<rect x="298.86" y="204" width="82.34" height="16" rx="4" class="r-bar"/><line x1="309.6" y1="204.75" x2="309.6" y2="219.25" class="track"/>
+</svg>
+<svg id="dg-net-agree-phone" class="dg dg-bar dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="334" viewBox="0 0 264 334" role="img" aria-label="Agreement minus disagreement, in points, from 167 answers. My team uses it every week: plus 52. I can see my whole week in one place: plus 38. I would recommend it: plus 30. Setting it up was easy: plus 7. The price is fair: minus 23.">
+<style>
+#dg-net-agree-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-net-agree-phone .ground{fill:var(--fig,#f2f3f9)}
+#dg-net-agree-phone .band{fill:var(--bg,#fbfbfe)}
+#dg-net-agree-phone .track{stroke:var(--line,#d3d6e3)}
+#dg-net-agree-phone .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-net-agree-phone .head{fill:var(--text,#1c1f2e)}
+#dg-net-agree-phone .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-net-agree-phone .stop.end{fill:var(--text,#1c1f2e)}
+#dg-net-agree-phone .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-net-agree-phone .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-net-agree-phone .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-net-agree-phone .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-net-agree-phone .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-net-agree-phone .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-net-agree-phone .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-net-agree-phone .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-net-agree-phone .sub,#dg-net-agree-phone .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-net-agree-phone .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-net-agree-phone .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-net-agree-phone .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-net-agree-phone .r-bar{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-net-agree-phone .r-ref{stroke:var(--muted,#575d75)}
+#dg-net-agree-phone .r-pt{fill:var(--text,#1c1f2e)}
+#dg-net-agree-phone .d-ring{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-net-agree-phone .d-gap{stroke:var(--muted,#575d75);stroke-width:2}
+#dg-net-agree-phone .d-lead{stroke:var(--muted,#575d75);stroke-width:1}
+@media (prefers-reduced-motion:reduce){#dg-net-agree-phone .pulse{animation:none!important}#dg-net-agree-phone .pulse{display:none!important}}
+@media print{#dg-net-agree-phone{max-width:100%;height:auto}#dg-net-agree-phone .pulse{display:none!important}}
+@media (max-width:736px){#dg-net-agree{display:none}#dg-net-agree-phone{display:block}}
+@media print{#dg-net-agree{display:block!important}#dg-net-agree-phone{display:none!important}}
+</style>
+<rect width="264" height="334" class="ground"/>
+<rect x="8" y="60" width="248" height="266" rx="10" class="band"/>
+<line x1="121.6" y1="88" x2="121.6" y2="116" class="r-ref"/>
+<line x1="121.6" y1="138" x2="121.6" y2="166" class="r-ref"/>
+<line x1="121.6" y1="188" x2="121.6" y2="216" class="r-ref"/>
+<line x1="121.6" y1="238" x2="121.6" y2="266" class="r-ref"/>
+<line x1="121.6" y1="288" x2="121.6" y2="316" class="r-ref"/>
+<line x1="56" y1="88" x2="56" y2="116" class="track"/>
+<line x1="187.2" y1="88" x2="187.2" y2="116" class="track"/>
+<line x1="56" y1="138" x2="56" y2="166" class="track"/>
+<line x1="187.2" y1="138" x2="187.2" y2="166" class="track"/>
+<line x1="56" y1="188" x2="56" y2="216" class="track"/>
+<line x1="187.2" y1="188" x2="187.2" y2="216" class="track"/>
+<line x1="56" y1="238" x2="56" y2="266" class="track"/>
+<line x1="187.2" y1="238" x2="187.2" y2="266" class="track"/>
+<line x1="56" y1="288" x2="56" y2="316" class="track"/>
+<line x1="187.2" y1="288" x2="187.2" y2="316" class="track"/>
+<text x="20" y="24" class="sub" text-anchor="start">Points, bars from 0. Largest first.</text>
+<text x="56" y="48" class="val" text-anchor="middle">−40</text>
+<text x="121.6" y="48" class="val" text-anchor="middle">0</text>
+<text x="187.2" y="48" class="val" text-anchor="middle">40</text>
+<text x="20" y="84" class="row" text-anchor="start">Team uses it every week</text>
+<rect x="210.88" y="94" width="23.84" height="16" class="band"/><text x="214.88" y="106" class="val" text-anchor="start">52</text>
+<text x="20" y="134" class="row" text-anchor="start">Whole week in one place</text>
+<rect x="187.92" y="144" width="23.84" height="16" class="band"/><text x="191.92" y="156" class="val" text-anchor="start">38</text>
+<text x="20" y="184" class="row" text-anchor="start">Would recommend it</text>
+<rect x="174.8" y="194" width="23.84" height="16" class="band"/><text x="178.8" y="206" class="val" text-anchor="start">30</text>
+<text x="20" y="234" class="row" text-anchor="start">Easy to set up</text>
+<rect x="137.08" y="244" width="15.92" height="16" class="band"/><text x="141.08" y="256" class="val" text-anchor="start">7</text>
+<text x="20" y="284" class="row" text-anchor="start">Price is fair</text>
+<rect x="44.04" y="294" width="35.84" height="16" class="band"/><text x="75.88" y="306" class="val" text-anchor="end">−23</text>
+<rect x="121.6" y="94" width="85.28" height="16" rx="4" class="r-bar"/><line x1="187.2" y1="94.75" x2="187.2" y2="109.25" class="track"/>
+<rect x="121.6" y="144" width="62.32" height="16" rx="4" class="r-bar"/>
+<rect x="121.6" y="194" width="49.2" height="16" rx="4" class="r-bar"/>
+<rect x="121.6" y="244" width="11.48" height="16" rx="4" class="r-bar"/>
+<rect x="83.88" y="294" width="37.72" height="16" rx="4" class="r-bar"/>
+</svg>
+<details class="dg-words">
+<summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>The diagram in words</summary>
+<div class="table-wrap is-text" role="region" aria-label="The rows of the bar chart" tabindex="0"><table><thead><tr><th scope="col">Row</th><th scope="col">Value, in points</th></tr></thead><tbody><tr><th scope="row">Team uses it every week</th><td>52</td></tr><tr><th scope="row">Whole week in one place</th><td>38</td></tr><tr><th scope="row">Would recommend it</th><td>30</td></tr><tr><th scope="row">Easy to set up</th><td>7</td></tr><tr><th scope="row">Price is fair</th><td>−23</td></tr></tbody></table></div>
+<ul><li>Points, bars from 0. Largest first.</li></ul>
+</details>
+<!-- /docent:diagram -->
+      </div>
+      <figcaption><strong>Figure 3</strong>Agreement minus disagreement, in percentage points, for each statement. 167 answers.</figcaption>
+    </figure>
+    <p>Price is the one statement with more disagreement than agreement. Setup is close to even: the survey does not confirm that setup is hard for most teams, only for some.</p>
+  </section>
+
+  <section id="next" aria-labelledby="next-h">
+    <h2 id="next-h">What we suggest next</h2>
+    <ul>
+      <li>Test calendar sync for one calendar on the Starter plan. This links to the churn report of 9 October.</li>
+      <li>Design a lower price for members who plan one day a week, and test it with five of the interview teams.</li>
+      <li>Run five more interviews with teams that left in October, to check whether setup matters more for them.</li>
+    </ul>
+    <div class="status">
+      <span class="state plan">Open question</span>
+      <p>Is a read-only seat for clients a reason to choose a plan, or only a wish? Four teams asked for it, but none said they would leave without it.</p>
+    </div>
+  </section>
+
+  <section id="method" aria-labelledby="method-h">
+    <h2 id="method-h">How we did it</h2>
+    <ul>
+      <li>Eight interviews of 45 minutes, by video call, each with one researcher and one note taker.</li>
+      <li>Participants chose a time from an email to 60 customers and 20 former customers. Each got a $50 gift card.</li>
+      <li>Two researchers coded the notes with the same theme list, and agreed on 44 of 48 codes before talking. They settled the other four together.</li>
+      <li>The survey went out by email from the product, with one reminder after three days.</li>
+    </ul>
+    <details>
+      <summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>The interview questions</summary>
+      <ol>
+        <li>Walk me through how your team planned last week.</li>
+        <li>Where does Example Planner help with that? Where does it get in the way?</li>
+        <li>Think back to your first two weeks. How did each part feel?</li>
+        <li>What would make you pay more? What would make you leave?</li>
+        <li>Is there anything we did not ask that we should have?</li>
+      </ol>
+    </details>
+  </section>
+</main>
+
+<footer>
+  <div class="shell">
+    <p class="credit"><svg viewBox="13 13 38 38" aria-hidden="true"><path d="M20 37V18H30A14 14 0 0 1 30 46H29" fill="none" stroke="currentColor" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="20" cy="46" r="4" fill="currentColor"/></svg>Made with <a href="https://github.com/sorawit-w/docent">Docent</a></p>
+  </div>
+</footer>
+<script>
+// docent:kit 0.18.0
+(() => {
+  const root = document.documentElement;
+  root.classList.add('js');
+  // A page saved from the browser ("Save page as") keeps what this script added. Take it out, so that the script adds each part once.
+  document.querySelectorAll('.fig-more, .step-n, button.copy').forEach((el) => el.remove());
+  document.querySelectorAll('div.code').forEach((holder) => holder.replaceWith(...holder.childNodes));
+  document.querySelectorAll('.is-numbered').forEach((h) => h.classList.remove('is-numbered'));
+  // A theme that the reader chose carries data-theme-reader. A saved page keeps it, and it is not a fixed theme.
+  if (root.hasAttribute('data-theme-reader')) { delete root.dataset.theme; delete root.dataset.themeReader; }
+  // Theme: the page follows the reader's system setting. The switch sets a choice that wins over the system and is remembered.
+  const button = document.querySelector('.theme');
+  const system = matchMedia('(prefers-color-scheme: dark)');
+  const theme = () => root.dataset.theme || (system.matches ? 'dark' : 'light');
+  const chooseTheme = (value) => { root.dataset.theme = value; root.dataset.themeReader = ''; };
+  // A theme written on <html> in the source is fixed: no saved choice and no switch.
+  const fixed = root.dataset.theme === 'light' || root.dataset.theme === 'dark';
+  if (fixed && button) button.hidden = true;
+  if (!fixed) try {
+    const saved = localStorage.getItem('docent-theme');
+    if (saved === 'dark' || saved === 'light') chooseTheme(saved);
+  } catch { /* no saved choice can be read: follow the system */ }
+  if (button && !fixed) {
+    const showSwitch = () => {
+      const next = theme() === 'dark' ? 'light' : 'dark';
+      button.dataset.next = next;
+      button.querySelector('.theme-text').textContent = next === 'dark' ? 'Dark' : 'Light';
+      button.setAttribute('aria-label', `Switch to the ${next} theme`);
+    };
+    showSwitch();
+    system.addEventListener('change', showSwitch);
+    button.addEventListener('click', () => {
+      chooseTheme(theme() === 'dark' ? 'light' : 'dark');
+      showSwitch();
+      try { localStorage.setItem('docent-theme', root.dataset.theme); } catch { /* private window: the choice lasts for this visit */ }
+    });
+  }
+  // Step numbers. The styles count the steps, but a screen reader in Chromium does not read a number that the styles count. So the script writes each number as text, in place of the counted one.
+  const number = (heading, n) => {
+    const span = document.createElement('span');
+    span.className = 'step-n';
+    span.textContent = `${n} `;
+    heading.prepend(span);
+    heading.classList.add('is-numbered');
+  };
+  const groups = new Map();
+  document.querySelectorAll('h3.step').forEach((h) => { const s = h.closest('section'); groups.set(s, [...(groups.get(s) || []), h]); });
+  groups.forEach((list) => list.forEach((h, i) => number(h, i + 1)));
+  document.querySelectorAll('.steps').forEach((ol) => [...ol.children].forEach((li, i) => { const h = li.querySelector('h3'); if (h) number(h, i + 1); }));
+  // A diagram outside a walkthrough runs its dot twice when it comes into view, then rests. Pointing at it runs it again.
+  const replay = (svg) => svg.querySelectorAll('.pulse').forEach((dot) => dot.getAnimations().forEach((run) => { run.cancel(); run.play(); }));
+  const seen = new IntersectionObserver((entries) => entries.forEach((entry) => {
+    if (!entry.isIntersecting) return;
+    entry.target.classList.add('is-playing');
+    seen.unobserve(entry.target);
+  }), { threshold: 0.6 });
+  document.querySelectorAll('svg.dg-auto').forEach((svg) => {
+    seen.observe(svg);
+    const well = svg.closest('.fig') || svg;
+    well.addEventListener('pointerenter', () => replay(svg));
+    well.addEventListener('focus', () => replay(svg));
+  });
+  // A drawing that is wider than its well scrolls sideways, and the part that shows can look complete. A line under the well says that more is to the side.
+  const wells = [...document.querySelectorAll('.fig')].map((well) => {
+    const note = document.createElement('p');
+    note.className = 'fig-more';
+    note.hidden = true;
+    note.textContent = 'The drawing is wider than the screen. Scroll it sideways to see all of it.';
+    well.after(note);
+    return { well, note };
+  });
+  // A code block gets a button that copies the code. The block moves into a holder, so the button stays in place when the code scrolls sideways.
+  const blocks = [...document.querySelectorAll('pre')].map((pre) => {
+    const holder = document.createElement('div'), button = document.createElement('button');
+    holder.className = 'code';
+    pre.before(holder);
+    holder.append(pre, button);
+    button.type = 'button';
+    button.className = 'copy';
+    button.textContent = 'Copy';
+    button.setAttribute('aria-live', 'polite');
+    button.addEventListener('click', async () => {
+      const text = (pre.querySelector('code') || pre).textContent;
+      let done = false;
+      try { await navigator.clipboard.writeText(text); done = true; } catch { /* no clipboard here: select the code and copy the selection */ }
+      if (!done) {
+        const range = document.createRange(), selection = getSelection();
+        range.selectNodeContents(pre);
+        selection.removeAllRanges();
+        selection.addRange(range);
+        try { done = document.execCommand('copy'); } catch { /* the code stays selected, so the reader can copy it by hand */ }
+        if (done) selection.removeAllRanges();
+      }
+      button.textContent = done ? 'Copied' : 'Select and copy';
+      setTimeout(() => (button.textContent = 'Copy'), 2000);
+    });
+    return { holder, pre, button };
+  });
+  const fit = () => {
+    wells.forEach(({ well, note }) => (note.hidden = well.scrollWidth <= well.clientWidth + 1));
+    // When the widest line of code reaches the button, the code starts below the button. A block that is hidden now has no size; it is measured when it shows.
+    blocks.forEach(({ holder, pre, button }) => {
+      if (!pre.clientWidth) return;
+      const code = pre.querySelector('code') || pre;
+      holder.classList.toggle('is-long', pre.scrollWidth > pre.clientWidth + 1 || code.getBoundingClientRect().right > button.getBoundingClientRect().left - 8);
+    });
+  };
+  // Measure again when a well or a code block changes its size: the window changes, a chooser shows another case, or a closed section opens.
+  if ('ResizeObserver' in window) {
+    const watch = new ResizeObserver(fit);
+    wells.forEach(({ well }) => watch.observe(well));
+    blocks.forEach(({ pre }) => watch.observe(pre));
+  }
+  addEventListener('resize', fit);
+  fit();
+  // Print: open every closed section so its text prints, then close it again.
+  let opened = [];
+  addEventListener('beforeprint', () => { opened = [...document.querySelectorAll('details:not([open])')]; opened.forEach((d) => (d.open = true)); });
+  addEventListener('afterprint', () => { opened.forEach((d) => (d.open = false)); opened = []; });
+  // The route dot marks the current section. In each walkthrough, the rail dot marks the current step and the diagram lights the leg with the same number.
+  const bar = document.querySelector('.topbar .shell');
+  const routeDot = document.querySelector('.route-dot');
+  const links = [...document.querySelectorAll('.route a[href^="#"]')].filter((a) => document.getElementById(a.getAttribute('href').slice(1)));
+  const sections = links.map((a) => document.getElementById(a.getAttribute('href').slice(1)));
+  const walks = [...document.querySelectorAll('.walk')].map((walk) => ({
+    steps: [...walk.querySelectorAll('.steps > li')],
+    legs: [...walk.querySelectorAll('svg.dg .leg')],
+    dot: walk.querySelector('.rail-dot'),
+  })).filter((walk) => walk.steps.length);
+  const nearest = (items, line) => items.reduce((best, el) => (el.getBoundingClientRect().top <= line ? el : best), items[0]);
+  const update = () => {
+    if (sections.length) {
+      const section = nearest(sections, innerHeight * 0.35);
+      links.forEach((a, i) => (sections[i] === section ? a.setAttribute('aria-current', 'true') : a.removeAttribute('aria-current')));
+      if (bar && routeDot) {
+        const link = links[sections.indexOf(section)].getBoundingClientRect();
+        routeDot.style.setProperty('--x', `${link.left + link.width / 2 - bar.getBoundingClientRect().left - 3.5}px`);
+      }
+    }
+    walks.forEach(({ steps, legs, dot }) => {
+      const step = nearest(steps, innerHeight * 0.5);
+      const number = steps.indexOf(step) + 1;
+      steps.forEach((li) => li.classList.toggle('is-current', li === step));
+      legs.forEach((leg) => leg.classList.toggle('is-current', Number(leg.dataset.leg) === number));
+      if (dot) dot.style.setProperty('--y', `${step.offsetTop}px`);
+    });
+  };
+  let queued = false;
+  const schedule = () => { if (!queued) { queued = true; requestAnimationFrame(() => { queued = false; update(); }); } };
+  addEventListener('scroll', schedule, { passive: true });
+  addEventListener('resize', schedule);
+  // Widgets. Each one is readable without this script. The script adds memory, the count of a checklist and the answer of a decision helper.
+  const load = (key) => { try { return JSON.parse(localStorage.getItem(key)); } catch { return null; } };
+  const save = (key, value) => { try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* private window: it lasts for this visit */ } };
+  // Chooser: the choice is remembered, and choosers with the same options change together.
+  const choosers = [...document.querySelectorAll('.choose')].map((el) => ({
+    inputs: [...el.querySelectorAll(':scope > input')],
+    key: `docent-choice:${[...el.querySelectorAll(':scope > .opt')].map((label) => label.textContent).join('|')}`,
+  }));
+  const choose = (key, n) => choosers.forEach((c) => { if (c.key === key && c.inputs[n]) c.inputs[n].checked = true; });
+  choosers.forEach((c) => {
+    choose(c.key, load(c.key));
+    c.inputs.forEach((input, n) => input.addEventListener('change', () => {
+      const top = input.getBoundingClientRect().top;
+      choose(c.key, n);
+      scrollBy(0, input.getBoundingClientRect().top - top); // a chooser higher on the page changed its height: keep this one in place
+      save(c.key, n);
+      schedule();
+    }));
+  });
+  // Value picker: every place <var data-v="key"> shows the value of the chosen option. The values come from the table of all values. Pickers with the same options change together, and the choice is remembered.
+  const pickers = [...document.querySelectorAll('.values')].map((el) => ({
+    el,
+    inputs: [...el.querySelectorAll(':scope > input')],
+    names: [...el.querySelectorAll(':scope > .opt')].map((label) => label.textContent),
+    rows: [...el.querySelectorAll('tbody tr[data-v]')].map((tr) => ({ key: tr.dataset.v, cells: [...tr.querySelectorAll('td')].map((td) => td.textContent) })),
+  }));
+  const pick = (names, n) => pickers.forEach((p) => {
+    if (p.names.join('|') !== names || !p.inputs[n]) return;
+    p.inputs[n].checked = true;
+    p.el.querySelector('.values-now strong').textContent = p.names[n];
+    p.rows.forEach(({ key, cells }) => document.querySelectorAll(`var[data-v="${CSS.escape(key)}"]`).forEach((v) => (v.textContent = cells[n])));
+  });
+  pickers.forEach((p) => {
+    const key = `docent-values:${p.names.join('|')}`, saved = load(key);
+    if (Number.isInteger(saved)) pick(p.names.join('|'), saved);
+    p.inputs.forEach((input, n) => input.addEventListener('change', () => { pick(p.names.join('|'), n); save(key, n); }));
+    p.el.querySelector('details').open = false;
+  });
+  // Checklist: the ticks are remembered for this document, and the line below the list counts them.
+  document.querySelectorAll('form.checks').forEach((form) => {
+    const boxes = [...form.querySelectorAll('input')], out = form.querySelector('output'), key = `docent-ticks:${location.pathname}#${form.id}`;
+    const saved = load(key);
+    if (Array.isArray(saved) && saved.length === boxes.length) boxes.forEach((box, i) => (box.checked = saved[i] === true));
+    const show = () => { out.textContent = `${boxes.filter((box) => box.checked).length} of ${boxes.length} done`; };
+    const keep = () => { show(); save(key, boxes.map((box) => box.checked)); schedule(); };
+    form.addEventListener('change', keep);
+    form.addEventListener('reset', () => setTimeout(keep));
+    show();
+  });
+  // Decision helper: a row that no longer fits the answers takes the muted color. When every question has an answer, the one row that fits is shown as the answer.
+  document.querySelectorAll('.decide').forEach((el) => {
+    const form = el.querySelector('form'), out = el.querySelector('output'), again = el.querySelector('.wd-foot'), groups = [...el.querySelectorAll('fieldset')], rows = [...el.querySelectorAll('tbody tr')];
+    el.querySelector('details').open = false;
+    const show = () => {
+      const picked = groups.map((group) => [...group.querySelectorAll('input')].findIndex((input) => input.checked) + 1);
+      const fits = rows.filter((row) => {
+        const fit = row.dataset.when.split(',').every((option, q) => option === '0' || !picked[q] || Number(option) === picked[q]);
+        row.classList.toggle('is-out', !fit);
+        return fit;
+      });
+      out.innerHTML = picked.every(Boolean) && fits.length === 1 ? fits[0].lastElementChild.innerHTML : '';
+      again.hidden = !picked.some(Boolean);
+      schedule();
+    };
+    form.addEventListener('change', show);
+    form.addEventListener('reset', () => setTimeout(show));
+    show();
+  });
+  update();
+  requestAnimationFrame(() => requestAnimationFrame(() => root.classList.add('ready')));
+})();
+// /docent:kit
+</script>
+</body>
+</html>
