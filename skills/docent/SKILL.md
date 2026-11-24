@@ -163,7 +163,13 @@ When the user asks for something that a design rule forbids, follow the rule, sa
 
 ## Text blocks to know
 
-- **Status notes** come in five kinds: `<span class="state ok">`, `warn` and `err` take the status colors; `info` (plain information, a muted dot) and `plan` (planned, or behind a feature flag, a muted ring) take none. Use a state in a status note, in a table cell, or in a line of text. A label may be long; it wraps.
+- **Status notes** come in five kinds: `<span class="state ok">`, `warn` and `err` take the status colors; `info` (a muted dot) and `plan` (a muted ring) take none. Use a state in a status note, in a table cell, or in a line of text. A label may be long; it wraps. Each state answers one question, and a word takes the state whose question it answers:
+  - `ok`, it is done, decided or working: "Done", "Fixed", "Accepted", "Approved".
+  - `warn`, it needs care or waits on something. `err`, it failed or stopped, such as "Blocked".
+  - `info`, a fact with no judgment: "In progress" (under way; nothing is wrong, so no amber), "Superseded" and "Rejected" (closed; nothing is broken, so no red). Name what replaced it: "Superseded by record 15".
+  - `plan`, not yet: "Planned", "Proposed", "Open question", "Not decided yet".
+
+  Any other word takes the state whose question it answers. To add a judgment, write it in the label and take the state of the judgment: "In progress, late" is `warn`. `check` warns when a label is one of the words above, alone or followed by "by …", and takes another state.
 - **A definition list** (`<dl>`, `<dt>`, `<dd>`) holds terms and their meanings, such as a glossary or the fields of a form. Use a table when each term has more than one fact.
 - **A small heading** (`<h4>`) names a part inside the part of a block heading. Do not write a bold paragraph in its place.
 - **A card grid** (`<ul class="cards">`) shows 3 to 8 short items side by side: each `<li>` holds an `<h3>` or a large number (`<p class="big">`), and one `<p>` line. A large number may take a third line, its change against an earlier period: `<p class="change"><span class="dir">Up</span> 12% against Q2 2026 (973)</p>`. Write the direction as a word (`Up`, `Down` or `No change`), the amount, "against", the period, and the earlier value in brackets. It has no arrow and no color, because up is not always good: say in the text beside the cards whether the change is good news. One change per card; two comparisons are a table. In a sentence, write the same parts with no markup. `check` warns about a change line outside a card, before the card's other line, with no direction word or no "against", or with a status or a color. Use it for a few parallel items that the reader should see together. Use a list when the items are a sequence, and a table when the reader compares facts. `check` warns about fewer than 3 or more than 8 cards.

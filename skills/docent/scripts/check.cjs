@@ -23,6 +23,13 @@ const TAGLINE = 90; // characters: the tagline is one line
 const HOST = { "host-accent": ["light", 4.5], "host-accent-dark": ["dark", 4.5], "host-ink": ["light", 4.5], "host-dot-dark": ["dark", 3] };
 const NEAR = 25; // CIE76: an accent closer than this to a status color reads as that status
 const GRAY = 10; // CIELAB chroma: an accent with less looks like the body text
+// The common status words, the state each takes, and the question it answers (docs/proposals/blocks.md, section 2).
+const DONE = "done, decided or working", CLOSED = "closed; nothing is broken", NOT_YET = "not yet";
+const STATUS_WORDS = {
+  Done: ["ok", DONE], Fixed: ["ok", DONE], Accepted: ["ok", DONE], Approved: ["ok", DONE],
+  "In progress": ["info", "under way, nothing is wrong"], Superseded: ["info", CLOSED], Rejected: ["info", CLOSED],
+  Planned: ["plan", NOT_YET], Proposed: ["plan", NOT_YET], "Open question": ["plan", NOT_YET], "Not decided yet": ["plan", NOT_YET],
+};
 
 const luminance = (hex) => {
   const full = hex.length === 4 ? hex.replace(/^#(.)(.)(.)$/, "#$1$1$2$2$3$3") : hex;
@@ -454,6 +461,16 @@ function checkDocument(html) {
     let at = 0;
     for (const h of found) if (h === want[at]) at += 1;
     if (at < want.length) warnings.push(`"Method and limits" has the block headings ${found.length ? found.map((h) => `"${h}"`).join(", ") : "none"}; it holds four, in this order: "Method", "Data", "What was left out" and "How sure the result is". A part with nothing to say keeps its heading and says so`);
+  }
+
+  // 10h. Status words: each listed word takes the state whose question it answers ("Status notes" in SKILL.md). Only a label that is the
+  // word alone, or the word then "by …", is tested: a longer label, such as "In progress, late", may add a judgment of its own.
+  for (const { attrs, inner } of withClass(markup, "state").filter((s) => s.tag === "span")) {
+    const label = plain(inner), got = (((attrs.match(/\bclass="([^"]*)"/) || [])[1] || "").match(/\b(ok|warn|err|info|plan)\b/) || [])[1];
+    const word = Object.keys(STATUS_WORDS).find((w) => new RegExp(`^${w}(?:\\s+by\\b.*)?\\.?$`, "i").test(label));
+    if (!word || !got || got === STATUS_WORDS[word][0]) continue;
+    const [want, why] = STATUS_WORDS[word];
+    warnings.push(`"${label}" takes the state ${want} (${why}), not ${got}; write ${got} with words that say why, such as "In progress, late" (see "Status notes" in SKILL.md)`);
   }
 
   // 11. Personal data: email addresses and phone numbers, in the page text and in the data of each diagram and widget. A warning only:
