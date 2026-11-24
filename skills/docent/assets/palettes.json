@@ -32,6 +32,9 @@
       "heat-3": "#785579",
       "heat-4": "#b085b1",
       "heat-5": "#d8b3d8"
+    },
+    "present": {
+      "primary": "#025c87"
     }
   },
   "plum": {

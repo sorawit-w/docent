@@ -262,6 +262,10 @@ function checkDocument(html) {
     if (near.distance < NEAR) warnings.push(`--${name} ${color} is close to the ${theme === "dark" ? "dark " : ""}status color "${near.name}" (a distance of ${near.distance.toFixed(1)}); its links and dots would read as ${{ ok: "success", warn: "a warning", err: "an error" }[near.name]}. Choose an accent further from green, amber and red`);
     if (lab(color).C < GRAY) warnings.push(`--${name} ${color} has almost no color (chroma ${lab(color).C.toFixed(1)}); it looks like the body text, so a link is told apart by its underline only`);
   }
+  // A deck in present mode is always light, and a projector lowers contrast, so its accent should reach 7:1 (AAA) on the page. A warning:
+  // brand.cjs darkens a host's accent only to 4.6:1, and the host may not want a darker one.
+  const PRESENT = 7;
+  if (deck && hosts["host-accent"] && contrast(hosts["host-accent"], GROUNDS.light[0]) < PRESENT) warnings.push(`in a deck the accent should have ${PRESENT}:1 on the page, because a projector lowers contrast; ${hosts["host-accent"]} has ${contrast(hosts["host-accent"], GROUNDS.light[0]).toFixed(1)}:1`);
   if (hosts["host-accent"] && !("host-accent-dark" in hosts)) warnings.push(`--host-accent is set and --host-accent-dark is not, so dark mode shows Docent's ultramarine links on the host's page. The same hue at 7:1 on the dark page is ${darkAccent(hosts["host-accent"])}: --host-accent-dark: ${darkAccent(hosts["host-accent"])};`);
   if (/@import\b/i.test(css)) errors.push("a style uses @import; a document is one file with no network");
   for (const [, target] of css.matchAll(/url\(\s*["']?([^"')]*)/gi)) if (!local(target)) errors.push(`a style loads url(${target.slice(0, 60)}); a document is one file with no network`);

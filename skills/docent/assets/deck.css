@@ -9,3 +9,62 @@ html[data-profile="deck"] main { counter-reset: slide; }
 /* With scripts on, the deck script writes the number as text (is-numbered), so that a screen reader reads it. It looks the same as the counted number. */
 .slide-n { font-weight: 400; color: var(--muted); font-variant-numeric: tabular-nums; }
 .slide.title .standfirst, .slide.title .facts { margin-top: 24px; }
+/* The Present button: a control like the theme switch. The deck script adds it, so with scripts off there is none. */
+.present { display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px; border: 1px solid var(--line); border-radius: 6px; background: none; color: var(--text); font: 400 0.875rem/1 var(--sans); cursor: pointer; }
+.present:hover { border-color: var(--muted); }
+.present:active { transform: translateY(1px); }
+.present svg { width: 15px; height: 15px; }
+.deck-nav { display: none; }
+/* Present mode: one slide on a frame of 1280 × 720 CSS pixels, with 64px margins, that the deck script scales to fill the screen as one
+   picture. So its sizes are in px on the frame, not rem: the reader's text size and data-text="large" do not apply, because the text is
+   already large. A slide changes at once, with no animation. */
+@media screen {
+  html.presenting, html.presenting body { overflow: hidden; }
+  html.presenting body > :not(main) { display: none !important; }
+  html.presenting main { position: fixed; left: 50%; top: 50%; width: 1280px; height: 720px; margin: 0; padding: 0; background: var(--bg); transform: translate(-50%, -50%) scale(var(--deck-scale, 1)); }
+  html.presenting .slide { display: none; position: absolute; inset: 0; padding: 64px; overflow: hidden; }
+  html.presenting .slide.is-current { display: block; }
+  html.presenting .slide:focus { outline: none; } /* the slide takes the focus so a screen reader reads it; the room sees no ring */
+  html.presenting .slide :is(p, ul, ol, dl, figure, blockquote, .table-wrap, .cards, pre, .code) { max-width: none; }
+  html.presenting .slide > :is(h1, h2) { margin: 0 0 32px; font-size: 52px; line-height: 1.06; }
+  html.presenting .slide.title > h1 { margin-bottom: 0; }
+  html.presenting .slide-n { display: none; } /* the number stands in the corner */
+  html.presenting .slide:not(.title) > :is(p, ul, ol):not(.cards) { margin: 0; font-size: 30px; line-height: 1.3; }
+  html.presenting .slide:not(.title) > :is(ul, ol):not(.cards) { padding-left: 40px; }
+  html.presenting .slide:not(.title) > :is(ul, ol):not(.cards) > li + li { margin-top: 16px; }
+  html.presenting .slide .standfirst { margin-top: 24px; font-size: 30px; line-height: 1.3; }
+  html.presenting .slide .facts { margin-top: 24px; font-size: 21px; line-height: 1.5; }
+  html.presenting .slide > .cards { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 24px; margin: 0; } /* the cards share the width: a third each for three, half each for two */
+  html.presenting .slide > .cards .big { font-size: 52px; line-height: 1.06; }
+  html.presenting .slide > .cards p { font-size: 21px; line-height: 1.5; }
+  html.presenting .slide .table-wrap, html.presenting .slide > figure, html.presenting .slide .code, html.presenting .slide > pre { margin: 0; }
+  html.presenting .slide table { min-width: 0; font-size: 21px; line-height: 1.5; }
+  html.presenting .slide :is(th, td) { padding: 12px 24px 12px 0; }
+  html.presenting .slide :is(th, td):last-child { padding-right: 0; }
+  html.presenting .slide thead th { font-size: 21px; }
+  html.presenting .slide pre { padding: 16px 20px; font-size: 21px; line-height: 1.6; }
+  html.presenting .slide .code.is-long > pre { padding-top: 16px; }
+  html.presenting .slide :is(.copy, .fig-more) { display: none; }
+  html.presenting .slide code { font-size: 1em; } /* inline code takes the size of the text around it, not the page's 14px */
+  html.presenting .slide figcaption { margin-top: 12px; font-size: 21px; line-height: 1.5; }
+  html.presenting .slide figure.quote blockquote { font-size: 30px; line-height: 1.3; }
+  html.presenting .slide figure.quote figcaption { margin-top: 4px; }
+  /* A status word takes the text color, and only its dot the status color: the word is text and needs 7:1, the dot is a mark. */
+  html.presenting .state:is(.ok, .warn, .err) { color: var(--text); }
+  html.presenting .state.ok::before { background: var(--ok); } html.presenting .state.warn::before { background: var(--warn); } html.presenting .state.err::before { background: var(--err); }
+  /* The slide number at the lower right of the frame, with Previous and Next: 44px square, a thin outline, no fill. */
+  html.presenting .deck-nav { display: flex; position: absolute; right: 64px; bottom: 10px; align-items: center; gap: 12px; color: var(--text); font: 400 21px/1 var(--sans); font-variant-numeric: tabular-nums; }
+  .deck-nav button { display: inline-grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 1px solid var(--line); border-radius: 6px; background: none; color: var(--text); cursor: pointer; }
+  .deck-nav button:hover { border-color: var(--text); }
+  .deck-nav button:disabled { cursor: default; opacity: 0.35; }
+  .deck-nav svg { width: 20px; height: 20px; }
+  .deck-count { margin-right: 4px; }
+}
+/* Printed while presenting, the deck prints every slide, not only the one on the screen. */
+@media print { html.presenting .slide[hidden] { display: block !important; } }
+/* Present mode is always light, with the "more contrast" tokens: the line takes the muted color, and muted text the text color, so every
+   text pair on a slide reaches 7:1 under a room's light (decks.md, section 4). A palette adds its own block after this one. Not with forced
+   colors, where the reader's system colors decide. */
+@media screen and (forced-colors: none) {
+  html:root.presenting:not([data-never]) { color-scheme: light; --bg: #fbfbfe; --panel: #f2f3f9; --fig: #f2f3f9; --text: #1c1f2e; --muted: #1c1f2e; --line: #575d75; --primary: var(--host-accent, #2f3fd0); --ink: var(--host-ink, #1b2260); --dot: var(--host-accent, #2f3fd0); --ok: #1a7f37; --warn: #7d4e00; --err: #cf222e; --heat-1: #c6e9ef; --heat-2: #86c9d5; --heat-3: #3da6b6; --heat-4: #00707e; --heat-5: #004a53; --heat-text: #1c1f2e; --heat-page: #fbfbfe; }
+}
