@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Decision record 14: a queue for reminder jobs — Example Planner</title>
 <style>
-/* docent:kit 0.19.0 */
+/* docent:kit 0.20.0 */
 /* Docent page styles. Tokens come from references/DESIGN.md. One file, no network. */
 :root {
   color-scheme: light;
@@ -213,6 +213,10 @@ svg[data-drawn="hand"] .hd-name { font-weight: 600; }
 svg[data-drawn="hand"] .hd-note { font-size: 12px; fill: var(--muted); }
 figcaption { margin-top: 12px; font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
 figcaption strong { font-weight: 600; color: var(--text); margin-right: 8px; }
+/* The source line: the last line of a caption, in the caption's size and color, says where the numbers come from. A table of outside data
+   stands in a figure too, with "Table n" in its caption, so the figure's own space is the only space above it. */
+figcaption .source { display: block; margin-top: 4px; }
+figure > .table-wrap { margin-top: 0; }
 
 /* Card grid: 3 to 8 short items side by side, each a heading or a large number and a line of text. A card is a label, like a margin note: a line above it, and no box. At most four in a row. */
 .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(max(160px, calc((100% - 72px) / 4)), 1fr)); gap: 24px; margin: 24px 0; padding: 0; list-style: none; }
@@ -683,7 +687,8 @@ footer p { margin: 0; }
 </details>
 <!-- /docent:diagram -->
       </div>
-      <figcaption><strong>Figure 1</strong>Delay of reminders in the load test for options B and C, in seconds, from the median to the 99th percentile.</figcaption>
+      <figcaption><strong>Figure 1</strong>Delay of reminders in the load test for options B and C, in seconds, from the median to the 99th percentile.
+        <span class="source">Source: load test log, run 41, 26 to 28 October 2026.</span></figcaption>
     </figure>
     <p>Option A is not in Figure 1, because its delays do not fit the same scale. At today's peak the table took 0.8 seconds at the median and 14 seconds at the 99th percentile. At twice the peak it took 3 and 58 seconds. So the table fails the target already today. The queue and the event log both meet it at twice the peak.</p>
     <p>Figure 2 shows what each option costs each month, at twice today's peak. It does not count the time of the people who run it.</p>
@@ -831,7 +836,8 @@ footer p { margin: 0; }
 </details>
 <!-- /docent:diagram -->
       </div>
-      <figcaption><strong>Figure 2</strong>Cost each month at twice today's peak, in US dollars, without staff time. Today we pay $1,900 for the database.</figcaption>
+      <figcaption><strong>Figure 2</strong>Cost each month at twice today's peak, in US dollars, without staff time. Today we pay $1,900 for the database.
+        <span class="source">Source: our estimate from the providers' price lists, October 2026.</span></figcaption>
     </figure>
 
     <h3>Each criterion</h3>
@@ -1124,7 +1130,7 @@ footer p { margin: 0; }
   </div>
 </footer>
 <script>
-// docent:kit 0.19.0
+// docent:kit 0.20.0
 (() => {
   const root = document.documentElement;
   root.classList.add('js');

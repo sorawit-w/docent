@@ -248,18 +248,24 @@
     <h3 class="step">A step that holds a block</h3>
     <p>The kit writes the number before this heading. A code block, a table or a widget can follow.</p>
     <p>A table uses the full width. A state is a dot and a word: <code>ok</code>, <code>warn</code> or <code>err</code>. A column of numbers takes <code>class="num"</code> on each cell, so the numbers line up on the right.</p>
-    <div class="table-wrap" role="region" aria-label="Example table" tabindex="0">
-      <table>
-        <thead>
-          <tr><th scope="col">Case</th><th scope="col">What it means</th><th scope="col">What you do</th><th scope="col" class="num">Reports</th><th scope="col">State</th></tr>
-        </thead>
-        <tbody>
-          <tr><th scope="row">First case</th><td>All is well.</td><td>Go on.</td><td class="num">1,204</td><td><span class="state ok">Continue</span></td></tr>
-          <tr><th scope="row">Second case</th><td>Something needs care.</td><td>Fix it, then go on.</td><td class="num">38</td><td><span class="state warn">Fix, then continue</span></td></tr>
-          <tr><th scope="row">Third case</th><td>Something is wrong.</td><td>Stop and ask.</td><td class="num">5</td><td><span class="state err">Stop</span></td></tr>
-        </tbody>
-      </table>
-    </div>
+    <!-- A table of data from a system, a survey or a study stands in a figure, with "Table n" and a source line in its caption.
+         A chart of measured numbers ends its caption with a source line too. For made-up numbers: "Source: invented sample data." -->
+    <figure>
+      <div class="table-wrap" role="region" aria-label="Table 1, example data" tabindex="0">
+        <table>
+          <thead>
+            <tr><th scope="col">Case</th><th scope="col">What it means</th><th scope="col">What you do</th><th scope="col" class="num">Reports</th><th scope="col">State</th></tr>
+          </thead>
+          <tbody>
+            <tr><th scope="row">First case</th><td>All is well.</td><td>Go on.</td><td class="num">1,204</td><td><span class="state ok">Continue</span></td></tr>
+            <tr><th scope="row">Second case</th><td>Something needs care.</td><td>Fix it, then go on.</td><td class="num">38</td><td><span class="state warn">Fix, then continue</span></td></tr>
+            <tr><th scope="row">Third case</th><td>Something is wrong.</td><td>Stop and ask.</td><td class="num">5</td><td><span class="state err">Stop</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <figcaption><strong>Table 1</strong>A caption says what the table shows, in one sentence.
+        <span class="source">Source: the system or survey, 1 July to 30 September 2026, n = 1,247 reports.</span></figcaption>
+    </figure>
     <!-- A status note: "ok", "warn" and "err" take a status color; "info" (a muted dot) and "plan" (a muted ring: planned, or behind a flag) take none. -->
     <div class="status">
       <span class="state warn">Warning</span>

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Incident review: sync errors on 12 November — Example Planner</title>
 <style>
-/* docent:kit 0.19.0 */
+/* docent:kit 0.20.0 */
 /* Docent page styles. Tokens come from references/DESIGN.md. One file, no network. */
 :root {
   color-scheme: light;
@@ -213,6 +213,10 @@ svg[data-drawn="hand"] .hd-name { font-weight: 600; }
 svg[data-drawn="hand"] .hd-note { font-size: 12px; fill: var(--muted); }
 figcaption { margin-top: 12px; font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
 figcaption strong { font-weight: 600; color: var(--text); margin-right: 8px; }
+/* The source line: the last line of a caption, in the caption's size and color, says where the numbers come from. A table of outside data
+   stands in a figure too, with "Table n" in its caption, so the figure's own space is the only space above it. */
+figcaption .source { display: block; margin-top: 4px; }
+figure > .table-wrap { margin-top: 0; }
 
 /* Card grid: 3 to 8 short items side by side, each a heading or a large number and a line of text. A card is a label, like a margin note: a line above it, and no box. At most four in a row. */
 .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(max(160px, calc((100% - 72px) / 4)), 1fr)); gap: 24px; margin: 24px 0; padding: 0; list-style: none; }
@@ -633,7 +637,8 @@ footer p { margin: 0; }
 </details>
 <!-- /docent:diagram -->
       </div>
-      <figcaption><strong>Figure 1</strong>Error rate of each part, 08:30 to 09:35 UTC, in 5-minute windows. Normal is under 1%, degraded 1% to 5%, failing 5% or more.</figcaption>
+      <figcaption><strong>Figure 1</strong>Error rate of each part, 08:30 to 09:35 UTC, in 5-minute windows. Normal is under 1%, degraded 1% to 5%, failing 5% or more.
+        <span class="source">Source: service monitoring, 12 November 2026.</span></figcaption>
     </figure>
     <div class="table-wrap" role="region" aria-label="Impact in numbers" tabindex="0">
       <table>
@@ -825,7 +830,8 @@ footer p { margin: 0; }
 </details>
 <!-- /docent:diagram -->
       </div>
-      <figcaption><strong>Figure 2</strong>Database connections of the Sync API, 08:00 to 09:55 UTC, in 5-minute points. The alert fired at 08:44 and the rollback started at 09:19.</figcaption>
+      <figcaption><strong>Figure 2</strong>Database connections of the Sync API, 08:00 to 09:55 UTC, in 5-minute points. The alert fired at 08:44 and the rollback started at 09:19.
+        <span class="source">Source: database metrics of the Sync API, 12 November 2026.</span></figcaption>
     </figure>
   </section>
 
@@ -1168,7 +1174,7 @@ database:
   </div>
 </footer>
 <script>
-// docent:kit 0.19.0
+// docent:kit 0.20.0
 (() => {
   const root = document.documentElement;
   root.classList.add('js');

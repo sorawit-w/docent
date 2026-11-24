@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Why customers left in the third quarter — Example Planner</title>
 <style>
-/* docent:kit 0.19.0 */
+/* docent:kit 0.20.0 */
 /* Docent page styles. Tokens come from references/DESIGN.md. One file, no network. */
 :root {
   color-scheme: light;
@@ -213,6 +213,10 @@ svg[data-drawn="hand"] .hd-name { font-weight: 600; }
 svg[data-drawn="hand"] .hd-note { font-size: 12px; fill: var(--muted); }
 figcaption { margin-top: 12px; font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
 figcaption strong { font-weight: 600; color: var(--text); margin-right: 8px; }
+/* The source line: the last line of a caption, in the caption's size and color, says where the numbers come from. A table of outside data
+   stands in a figure too, with "Table n" in its caption, so the figure's own space is the only space above it. */
+figcaption .source { display: block; margin-top: 4px; }
+figure > .table-wrap { margin-top: 0; }
 
 /* Card grid: 3 to 8 short items side by side, each a heading or a large number and a line of text. A card is a label, like a margin note: a line above it, and no box. At most four in a row. */
 .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(max(160px, calc((100% - 72px) / 4)), 1fr)); gap: 24px; margin: 24px 0; padding: 0; list-style: none; }
@@ -486,8 +490,8 @@ footer p { margin: 0; }
         <p>Monthly churn on the Starter plan stayed between 3.0% and 3.5% from October to April. It started to rise in May, when the price change was announced, and reached 6.4% in September. Team and Business did not move in the same way.</p>
       </div>
       <div class="note" role="note">
-        <strong>Source</strong>
-        Billing system export of 2 October 2026. Rates are cancellations in the month divided by paying accounts on the first day of the month.
+        <strong>Rate</strong>
+        Rates are cancellations in the month divided by paying accounts on the first day of the month.
       </div>
     </div>
     <figure>
@@ -636,7 +640,8 @@ footer p { margin: 0; }
 </details>
 <!-- /docent:diagram -->
       </div>
-      <figcaption><strong>Figure 1</strong>Monthly churn by plan, October 2025 to September 2026. The price change was announced in May and took effect on 1 July.</figcaption>
+      <figcaption><strong>Figure 1</strong>Monthly churn by plan, October 2025 to September 2026. The price change was announced in May and took effect on 1 July.
+        <span class="source">Source: billing system export of 2 October 2026, October 2025 to September 2026.</span></figcaption>
     </figure>
 
     <h3>Cohorts: how long new accounts keep paying</h3>
@@ -836,7 +841,8 @@ footer p { margin: 0; }
 </details>
 <!-- /docent:diagram -->
       </div>
-      <figcaption><strong>Figure 2</strong>Share of new accounts still paying, by the month they started. M1 is the first month after the start.</figcaption>
+      <figcaption><strong>Figure 2</strong>Share of new accounts still paying, by the month they started. M1 is the first month after the start.
+        <span class="source">Source: billing system export of 2 October 2026, accounts that started to pay from March to August 2026.</span></figcaption>
     </figure>
   </section>
 
@@ -1031,7 +1037,8 @@ footer p { margin: 0; }
 </details>
 <!-- /docent:diagram -->
       </div>
-      <figcaption><strong>Figure 3</strong>Quarterly churn by group, Q2 and Q3 2026. The Education discount group is on the Team plan at half price.</figcaption>
+      <figcaption><strong>Figure 3</strong>Quarterly churn by group, Q2 and Q3 2026. The Education discount group is on the Team plan at half price.
+        <span class="source">Source: billing system export of 2 October 2026, Q2 and Q3 2026.</span></figcaption>
     </figure>
     <div class="status">
       <span class="state info">Small group</span>
@@ -1219,7 +1226,8 @@ footer p { margin: 0; }
 </details>
 <!-- /docent:diagram -->
       </div>
-      <figcaption><strong>Figure 4</strong>Main reason for leaving, Q3 2026, from 734 answers to the cancel form.</figcaption>
+      <figcaption><strong>Figure 4</strong>Main reason for leaving, Q3 2026, from 734 answers to the cancel form.
+        <span class="source">Source: cancel form, 1 July to 30 September 2026, n = 734 answers.</span></figcaption>
     </figure>
     <p>The support team read 120 of the free-text answers. Three lines show what many said:</p>
     <ul>
@@ -1513,7 +1521,8 @@ footer p { margin: 0; }
 </details>
 <!-- /docent:diagram -->
       </div>
-      <figcaption><strong>Figure 5</strong>Setup steps in the first month: Starter accounts that later cancelled (first) and accounts that stayed (second). Each funnel has its own scale, so compare the shares, not the bar lengths.</figcaption>
+      <figcaption><strong>Figure 5</strong>Setup steps in the first month: Starter accounts that later cancelled (first) and accounts that stayed (second). Each funnel has its own scale, so compare the shares, not the bar lengths.
+        <span class="source">Source: product events, 1 April to 30 September 2026, n = 2,152 Starter accounts.</span></figcaption>
     </figure>
     <p>Of the accounts that left, 31% connected a calendar. Of the accounts that stayed, 68% did. This does not prove that a calendar keeps an account. Accounts that plan to stay may simply set up more. But it is the one step where the two groups differ most.</p>
   </section>
@@ -1570,7 +1579,7 @@ footer p { margin: 0; }
   </div>
 </footer>
 <script>
-// docent:kit 0.19.0
+// docent:kit 0.20.0
 (() => {
   const root = document.documentElement;
   root.classList.add('js');

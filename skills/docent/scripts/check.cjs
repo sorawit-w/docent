@@ -59,6 +59,21 @@ function wells(html) {
   }
   return out;
 }
+/** Each element whose class holds the word name: its tag, where it starts, and what is inside it, counting nested tags of the same name. */
+function withClass(markup, name) {
+  const out = [], open = new RegExp(`<([a-z][\\w-]*)\\b([^>]*\\bclass="(?:[^"]*\\s)?${name}(?:\\s[^"]*)?"[^>]*)>`, "gi");
+  for (let m; (m = open.exec(markup)); ) {
+    const tag = new RegExp(`<(/?)${m[1]}\\b[^>]*>`, "gi");
+    tag.lastIndex = open.lastIndex;
+    let depth = 1, t;
+    while (depth && (t = tag.exec(markup))) depth += t[1] ? -1 : 1;
+    out.push({ index: m.index, tag: m[1].toLowerCase(), inner: markup.slice(open.lastIndex, t ? t.index : markup.length) });
+  }
+  return out;
+}
+// The kinds that show measured numbers. A chart of one of these needs a source line in its caption; a workflow, a UML diagram, a layout
+// to scale and a plan describe a design, not data (decision 2 in docs/proposals/sources.md).
+const MEASURED = { range: "range chart", bar: "bar chart", line: "line chart", funnel: "funnel", heatmap: "heat map", heatplan: "heat plan", statusgrid: "status grid" };
 
 /** Returns { errors, warnings }: two lists of plain sentences. */
 function checkDocument(html) {
@@ -80,7 +95,7 @@ function checkDocument(html) {
   }
 
   // 2. Diagrams: each drawing must be the one that render makes from its data.
-  const diagrams = findBlocks(html, "diagram"), ids = new Set(), shapes = new Map(), walks = [], refs = [];
+  const diagrams = findBlocks(html, "diagram"), ids = new Set(), shapes = new Map(), walks = [], refs = [], charts = [];
   diagrams.forEach((found, n) => {
     const name = `diagram ${n + 1}`;
     let data;
@@ -99,12 +114,25 @@ function checkDocument(html) {
       else shapes.set(shape, drawn.model.id);
       if (drawn.model.place === "walk") walks.push({ label, legs: drawn.model.legs.length });
       for (const ref of drawn.model.refs || []) refs.push({ label, ref });
+      if (Object.hasOwn(MEASURED, data.kind)) charts.push({ n: n + 1, id: drawn.model.id, kind: MEASURED[data.kind], at: found.start });
     } catch (error) {
       errors.push(`${name}${data && data.id ? ` ("${data.id}")` : ""}: ${error.message}`);
     }
   });
   // An interaction overview links each ref frame to a sequence diagram in the same document.
   for (const { label, ref } of refs) if (!ids.has(ref)) errors.push(`${label}: a ref frame links to the diagram "${ref}", which is not in this document`);
+  // A chart of measured numbers says where they come from, in a source line at the end of its caption. A warning: the author may have a reason.
+  const unlit = html.replace(/<!--[\s\S]*?-->/g, (c) => " ".repeat(c.length)); // tags in a diagram's data do not count
+  const figures = [...unlit.matchAll(/<figure\b[^>]*>[\s\S]*?<\/figure>/gi)].map((m) => ({ start: m.index, end: m.index + m[0].length, text: m[0] }));
+  for (const chart of charts) {
+    const figure = figures.find((f) => f.start < chart.at && chart.at < f.end);
+    const caption = figure && (figure.text.match(/<figcaption\b[^>]*>([\s\S]*?)<\/figcaption>/i) || [])[1];
+    if (caption != null && withClass(caption, "source").length) continue;
+    const number = caption != null && (plain(caption).match(/^(Figure|Table) (\d+)/) || []);
+    const name = number && number[2] ? `${number[1].toLowerCase()} ${number[2]}` : `diagram ${chart.n}`;
+    const fix = caption != null ? "add <span class=\"source\">Source: …</span> to its caption" : `${figure ? "give its figure" : "put it in a <figure> with"} a <figcaption> that ends with <span class="source">Source: …</span>`;
+    warnings.push(`${name} ("${chart.id}") is a ${chart.kind} with no source line; ${fix}, or write "Source: invented sample data." when the numbers are made up`);
+  }
   // A well holds one drawing, or two for two separate chains. Beside walkthrough steps it holds one, because step n lights leg n.
   for (const { attrs, inner } of wells(html)) {
     const count = (inner.match(/<!-- docent:diagram\b/g) || []).length, name = (attrs.match(/aria-label="([^"]*)"/) || [])[1] || "a figure";
@@ -317,6 +345,13 @@ function checkDocument(html) {
       if (!numbers.length || !column.every((cell) => NUMBER.test(cell.text) || BLANK.test(cell.text)) || numbers.every((cell) => hasClass(cell.attrs, "num"))) continue;
       warnings.push(`${label ? `the table "${label}"` : "a table"}: the column ${names[c] ? `"${names[c]}"` : c + 1} holds numbers only; add class="num" to its th and td cells, so the numbers line up on the right`);
     }
+  }
+
+  // 10b. A source line is the last line of one figure's caption, and it names a source.
+  for (const { index, inner } of withClass(markup, "source")) {
+    const before = markup.slice(0, index).toLowerCase();
+    if (before.lastIndexOf("<figcaption") <= before.lastIndexOf("</figcaption")) warnings.push(`a source line (class="source") stands outside a figure caption, so it belongs to no figure; make it the last line of the <figcaption> of its chart or table`);
+    if (/^(?:sources?\s*:?)?$/i.test(plain(inner))) warnings.push(`a source line is empty${plain(inner) ? ` ("${plain(inner)}")` : ""}; write where the numbers come from, their dates and n, such as "Source: the team's bug tracker, 1 July to 30 September 2026, n = 1,090 reports."`);
   }
 
   // 11. Personal data: email addresses and phone numbers, in the page text and in the data of each diagram and widget. A warning only:

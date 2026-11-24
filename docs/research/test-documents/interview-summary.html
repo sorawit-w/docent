@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>What eight teams told us about planning — Example Planner</title>
 <style>
-/* docent:kit 0.19.0 */
+/* docent:kit 0.20.0 */
 /* Docent page styles. Tokens come from references/DESIGN.md. One file, no network. */
 :root {
   color-scheme: light;
@@ -213,6 +213,10 @@ svg[data-drawn="hand"] .hd-name { font-weight: 600; }
 svg[data-drawn="hand"] .hd-note { font-size: 12px; fill: var(--muted); }
 figcaption { margin-top: 12px; font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
 figcaption strong { font-weight: 600; color: var(--text); margin-right: 8px; }
+/* The source line: the last line of a caption, in the caption's size and color, says where the numbers come from. A table of outside data
+   stands in a figure too, with "Table n" in its caption, so the figure's own space is the only space above it. */
+figcaption .source { display: block; margin-top: 4px; }
+figure > .table-wrap { margin-top: 0; }
 
 /* Card grid: 3 to 8 short items side by side, each a heading or a large number and a line of text. A card is a label, like a margin note: a line above it, and no box. At most four in a row. */
 .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(max(160px, calc((100% - 72px) / 4)), 1fr)); gap: 24px; margin: 24px 0; padding: 0; list-style: none; }
@@ -683,7 +687,8 @@ footer p { margin: 0; }
 </details>
 <!-- /docent:diagram -->
       </div>
-      <figcaption><strong>Figure 1</strong>Participants who raised each theme, of 8.</figcaption>
+      <figcaption><strong>Figure 1</strong>Participants who raised each theme, of 8.
+        <span class="source">Source: our interviews, 14 to 25 September 2026, n = 8 participants.</span></figcaption>
     </figure>
     <p>The table shows who raised which theme. Both teams that left (P3 and P6) raised price and setup.</p>
     <div class="table-wrap" role="region" aria-label="Themes by participant" tabindex="0">
@@ -1001,7 +1006,8 @@ footer p { margin: 0; }
 </details>
 <!-- /docent:diagram -->
       </div>
-      <figcaption><strong>Figure 3</strong>Agreement minus disagreement, in percentage points, for each statement. 167 answers.</figcaption>
+      <figcaption><strong>Figure 3</strong>Agreement minus disagreement, in percentage points, for each statement. 167 answers.
+        <span class="source">Source: our survey, 29 September to 6 October 2026, n = 167 answers.</span></figcaption>
     </figure>
     <p>Price is the one statement with more disagreement than agreement. Setup is close to even: the survey does not confirm that setup is hard for most teams, only for some.</p>
   </section>
@@ -1046,7 +1052,7 @@ footer p { margin: 0; }
   </div>
 </footer>
 <script>
-// docent:kit 0.19.0
+// docent:kit 0.20.0
 (() => {
   const root = document.documentElement;
   root.classList.add('js');

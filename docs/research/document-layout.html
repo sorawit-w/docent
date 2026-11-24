@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Page layout for generated documents — Docent</title>
 <style>
-/* docent:kit 0.19.0 */
+/* docent:kit 0.20.0 */
 /* Docent page styles. Tokens come from references/DESIGN.md. One file, no network. */
 :root {
   color-scheme: light;
@@ -213,6 +213,10 @@ svg[data-drawn="hand"] .hd-name { font-weight: 600; }
 svg[data-drawn="hand"] .hd-note { font-size: 12px; fill: var(--muted); }
 figcaption { margin-top: 12px; font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
 figcaption strong { font-weight: 600; color: var(--text); margin-right: 8px; }
+/* The source line: the last line of a caption, in the caption's size and color, says where the numbers come from. A table of outside data
+   stands in a figure too, with "Table n" in its caption, so the figure's own space is the only space above it. */
+figcaption .source { display: block; margin-top: 4px; }
+figure > .table-wrap { margin-top: 0; }
 
 /* Card grid: 3 to 8 short items side by side, each a heading or a large number and a line of text. A card is a label, like a margin note: a line above it, and no box. At most four in a row. */
 .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(max(160px, calc((100% - 72px) / 4)), 1fr)); gap: 24px; margin: 24px 0; padding: 0; list-style: none; }
@@ -706,7 +710,8 @@ footer p { margin: 0; }
 </details>
 <!-- /docent:diagram -->
       </div>
-      <figcaption><strong>Figure 1</strong>Line lengths in characters, from the evidence and from Docent. The paper range is computed for 112mm at 11pt.</figcaption>
+      <figcaption><strong>Figure 1</strong>Line lengths in characters, from the evidence and from Docent. The paper range is computed for 112mm at 11pt.
+        <span class="source">Source: the studies and guidelines in "All 45 sources", and Docent's own styles.</span></figcaption>
     </figure>
     <p>For readers with dyslexia, the evidence is about text size, not line length: sizes up to 18pt read better than 12pt. Guidance for older adults asks for 19px text. So the strongest concern is text size, not width. Because Docent sets its sizes in rem, a reader who sets a larger text size gets larger letters at the same line length.</p>
 
@@ -1554,7 +1559,7 @@ footer p { margin: 0; }
   </div>
 </footer>
 <script>
-// docent:kit 0.19.0
+// docent:kit 0.20.0
 (() => {
   const root = document.documentElement;
   root.classList.add('js');
