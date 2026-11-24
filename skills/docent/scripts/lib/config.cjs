@@ -111,14 +111,18 @@ function readConfig(file, { palettes = [], profiles = [] } = {}) {
 // screen reader. Every other one, such as viewBox, fill, stroke or transform, changes what the reader sees.
 const PAGE_ONLY = /^(class|width|height|role|aria-[\w-]+|data-for|xmlns(:\w+)?|focusable|id)$/i;
 /** What a logo draws, to compare a page's logo with a file: each tag with its attributes in order and in double quotes, the text between
-    tags without the space around it, and no comment. The <svg> keeps only the attributes that change the drawing. */
+    tags without the space around it, and no comment. The <svg> keeps only the attributes that change the drawing. The logo's own ids are
+    numbered in order, with every url(#…) and href that points at them, because a page must rename them when it holds two versions. */
 function logoShapes(svg) {
   // A file may start with an XML declaration, a comment or a doctype: none of them is drawn.
   const text = svg.replace(/<!--[\s\S]*?-->/g, "").replace(/^(?:\s|<\?xml[\s\S]*?\?>|<!DOCTYPE[^>]*>)+/i, "").trim();
+  const ids = new Map();
+  for (const [, id] of text.matchAll(/\sid\s*=\s*["']([^"']+)["']/g)) if (!ids.has(id)) ids.set(id, `id${ids.size + 1}`);
+  const local = (value) => value.replace(/url\(\s*#([^)\s]+)\s*\)/g, (m, id) => (ids.has(id) ? `url(#${ids.get(id)})` : m)).replace(/^#(.+)$/, (m, id) => (ids.has(id) ? `#${ids.get(id)}` : m));
   let root = true;
   return text.replace(/<(\/?)([A-Za-z][\w:.-]*)((?:\s+[^\s"'>/=]+(?:\s*=\s*(?:"[^"]*"|'[^']*'))?)*)\s*(\/?)>/g, (all, close, name, attrs, self) => {
     if (close) return `</${name}>`;
-    const list = [...attrs.matchAll(/([^\s"'=]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'))?/g)].filter(([, a]) => !(root && name.toLowerCase() === "svg" && PAGE_ONLY.test(a))).map(([, a, d, q]) => `${a}="${d ?? q ?? ""}"`).sort();
+    const list = [...attrs.matchAll(/([^\s"'=]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'))?/g)].filter(([, a]) => !(root && name.toLowerCase() === "svg" && PAGE_ONLY.test(a))).map(([, a, d, q]) => { const v = d ?? q ?? ""; return `${a}="${a === "id" ? ids.get(v) || v : local(v)}"`; }).sort();
     root = false;
     return `<${name}${list.length ? ` ${list.join(" ")}` : ""}${self ? "/" : ""}>`;
   }).replace(/>\s+</g, "><").replace(/>\s+/g, ">").replace(/\s+</g, "<");
