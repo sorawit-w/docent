@@ -3,7 +3,7 @@
   const root = document.documentElement, main = document.querySelector('main');
   // A page saved from the browser keeps what this script added on the last visit. Take it out, so that the script adds each part once.
   document.querySelectorAll('.slide-n, .present, .deck-nav').forEach((el) => el.remove());
-  root.classList.remove('presenting');
+  root.classList.remove('presenting', 'printing');
   root.style.removeProperty('--deck-scale');
   const slides = [...document.querySelectorAll('main > section.slide')];
   // A page saved while presenting keeps the slides' present state: show them all again, with the names of the stack.
@@ -43,21 +43,24 @@
   const labels = new Map();
   const fit = () => root.style.setProperty('--deck-scale', String(Math.min(innerWidth / 1280, innerHeight / 720)));
   // A drawing on a slide stands at 1.5 times, or less when the room under the heading and above the caption needs it. render writes the
-  // size of a drawing it made (--fw and --fh); for a hand-drawn figure or a picture the real room is measured here, on the frame.
+  // size of a drawing it made on the frame (--fw and --fh, in frame pixels). For a hand-drawn figure or a picture the script writes it:
+  // 1.25 times at first, the scale check guarantees, and in present mode the real room is measured for more. The same frame size serves
+  // present mode and paper, because both lay the slide out on the same frame.
   const drawings = (slide) => [...slide.querySelectorAll('.fig > svg[data-drawn="hand"], .fig > img')];
-  const scale = (slide) => drawings(slide).forEach((art) => {
+  const size = (art, s) => { art.style.setProperty('--fw', String(Number(art.getAttribute('width')) * s)); art.style.setProperty('--fh', String(Number(art.getAttribute('height')) * s)); };
+  const sized = (art) => Number(art.getAttribute('width')) > 0 && Number(art.getAttribute('height')) > 0;
+  const scale = (slide) => drawings(slide).filter(sized).forEach((art) => {
     const w = Number(art.getAttribute('width')), h = Number(art.getAttribute('height')), fig = art.closest('.fig'), figure = fig.closest('figure') || fig;
-    if (!(w > 0 && h > 0)) return;
-    art.style.width = `${w}px`;
-    art.style.height = `${h}px`;
+    size(art, 1);
     const below = figure.offsetTop + figure.offsetHeight - (fig.offsetTop + fig.offsetHeight); // the caption under the well
     const room = { w: slide.clientWidth - 128 - 8, h: slide.clientHeight - 64 - fig.offsetTop - below - 8 };
-    const s = Math.min(1.5, room.w / w, room.h / h);
-    art.style.width = `${w * s}px`;
-    art.style.height = `${h * s}px`;
+    size(art, Math.min(1.5, room.w / w, room.h / h));
   });
-  const unscale = () => slides.forEach((slide) => drawings(slide).forEach((art) => { art.style.width = ''; art.style.height = ''; }));
-  unscale(); // a page saved in present mode keeps the sizes of the last visit
+  slides.forEach((slide) => drawings(slide).forEach((art) => {
+    art.style.removeProperty('width'); // a page saved by an earlier kit may hold a size in pixels
+    art.style.removeProperty('height');
+    if (sized(art)) size(art, 1.25);
+  }));
   const show = (n) => {
     at = Math.max(0, Math.min(slides.length - 1, n));
     slides.forEach((slide, i) => { slide.hidden = i !== at; slide.classList.toggle('is-current', i === at); });
@@ -102,7 +105,6 @@
     full = false;
     root.classList.remove('presenting');
     root.style.removeProperty('--deck-scale');
-    unscale();
     slides.forEach((slide) => {
       slide.hidden = false;
       slide.classList.remove('is-current');
@@ -123,6 +125,28 @@
     show(n);
   });
   addEventListener('hashchange', () => { const n = on ? slideOf(location.hash) : -1; if (n >= 0 && n !== at) show(n); });
+  // Paper: one slide to a landscape page in the slide form, the slide number at the lower right, and each figure's words on the page
+  // after its slide (decks.md, section 6). The kit's script opens every closed section before this runs.
+  const moved = [];
+  addEventListener('beforeprint', () => {
+    root.classList.add('printing');
+    slides.forEach((slide, i) => {
+      slide.dataset.n = `${i + 1} / ${slides.length}`;
+      const words = [...slide.querySelectorAll('.fig .dg-words')];
+      if (!words.length) return;
+      const page = document.createElement('section');
+      page.className = 'slide-words';
+      page.innerHTML = `<h2>Slide ${i + 1} in words</h2>`;
+      words.forEach((el) => { moved.push([el, el.parentNode, el.nextSibling]); page.append(el); });
+      slide.after(page);
+    });
+  });
+  addEventListener('afterprint', () => {
+    moved.splice(0).forEach(([el, parent, next]) => parent.insertBefore(el, next));
+    document.querySelectorAll('.slide-words').forEach((el) => el.remove());
+    slides.forEach((slide) => delete slide.dataset.n);
+    root.classList.remove('printing');
+  });
   present.addEventListener('click', enter);
   prev.addEventListener('click', () => show(at - 1));
   next.addEventListener('click', () => show(at + 1));

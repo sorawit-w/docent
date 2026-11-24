@@ -244,3 +244,13 @@ test("a chart whose own id ends in phone is one drawing, not a phone form", () =
   const two = build(page.replace("<!-- /docent:diagram -->", '<!-- /docent:diagram -->\n<img src="data:image/png;base64,AA==" alt="Two" width="300" height="100">'));
   assert.ok(checkDocument(two).errors.some((e) => e.includes("its figure holds 2 drawings")), "the chart and the picture are two drawings");
 });
+
+test("on paper a slide prints on a landscape page in the slide form, sized in one unit that grows to the sheet", () => {
+  assert.match(deckCss, /@page slide \{ size: landscape; @bottom-right \{ content: none; \} \}/, "landscape pages, with the slide number in the slide instead of the page number");
+  assert.match(deckCss, /html\.printing \.slide, html\.printing \.slide-words \{ --u: calc\(100cqw \/ 1280\); page: slide; \}/);
+  assert.match(deckCss, /html\.presenting \{ --u: 1px; \}/);
+  const sized = deckCss.split("\n").filter((l) => l.startsWith(":is(html.presenting, html.printing)"));
+  assert.ok(sized.length > 20 && sized.every((l) => !/\b\d+px\b/.test(l)), "every size of the shared slide form is a number of frame pixels times --u");
+  assert.match(deckJs, /addEventListener\('beforeprint'/);
+  assert.match(deckJs, /Slide \$\{i \+ 1\} in words/);
+});

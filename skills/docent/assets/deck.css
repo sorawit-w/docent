@@ -15,51 +15,56 @@ html[data-profile="deck"] main { counter-reset: slide; }
 .present:active { transform: translateY(1px); }
 .present svg { width: 15px; height: 15px; }
 .deck-nav { display: none; }
-/* Present mode: one slide on a frame of 1280 × 720 CSS pixels, with 64px margins, that the deck script scales to fill the screen as one
-   picture. So its sizes are in px on the frame, not rem: the reader's text size and data-text="large" do not apply, because the text is
-   already large. A slide changes at once, with no animation. */
+/* The slide form: one slide on a frame of 1280 × 720, with 64px margins, in present mode and on paper. Every size is a number of frame
+   pixels times --u: 1px in present mode, where the deck script scales the frame to fill the screen as one picture, and a 1280th of the
+   sheet's width on paper. So the reader's text size and data-text="large" do not apply: the text is already large. */
+:is(html.presenting, html.printing) .slide { padding: calc(64 * var(--u)); }
+:is(html.presenting, html.printing) .slide :is(p, ul, ol, dl, figure, blockquote, .table-wrap, .cards, pre, .code) { max-width: none; }
+:is(html.presenting, html.printing) .slide > :is(h1, h2) { margin: 0 0 calc(32 * var(--u)); font-size: calc(52 * var(--u)); line-height: 1.06; }
+:is(html.presenting, html.printing) .slide.title > h1 { margin-bottom: 0; }
+:is(html.presenting, html.printing) .slide-n { display: none; } /* the number stands in the corner */
+:is(html.presenting, html.printing) .slide:not(.title) > :is(p, ul, ol):not(.cards) { margin: 0; font-size: calc(30 * var(--u)); line-height: 1.3; }
+:is(html.presenting, html.printing) .slide:not(.title) > :is(ul, ol):not(.cards) { padding-left: calc(40 * var(--u)); }
+:is(html.presenting, html.printing) .slide:not(.title) > :is(ul, ol):not(.cards) > li + li { margin-top: calc(16 * var(--u)); }
+:is(html.presenting, html.printing) .slide .standfirst { margin-top: calc(24 * var(--u)); font-size: calc(30 * var(--u)); line-height: 1.3; }
+:is(html.presenting, html.printing) .slide .facts { margin-top: calc(24 * var(--u)); font-size: calc(21 * var(--u)); line-height: 1.5; }
+/* The cards share the width: a third each for three, half each for two. */
+:is(html.presenting, html.printing) .slide > .cards { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: calc(24 * var(--u)); margin: 0; }
+:is(html.presenting, html.printing) .slide > .cards > li { padding-top: calc(12 * var(--u)); }
+:is(html.presenting, html.printing) .slide > .cards .big { margin-bottom: calc(4 * var(--u)); font-size: calc(52 * var(--u)); line-height: 1.06; }
+:is(html.presenting, html.printing) .slide > .cards p { font-size: calc(21 * var(--u)); line-height: 1.5; }
+:is(html.presenting, html.printing) .slide :is(.table-wrap, .code, figure), :is(html.presenting, html.printing) .slide > pre { margin: 0; }
+:is(html.presenting, html.printing) .slide table { min-width: 0; font-size: calc(21 * var(--u)); line-height: 1.5; }
+:is(html.presenting, html.printing) .slide :is(th, td) { padding: calc(12 * var(--u)) calc(24 * var(--u)) calc(12 * var(--u)) 0; }
+:is(html.presenting, html.printing) .slide :is(th, td):last-child { padding-right: 0; }
+:is(html.presenting, html.printing) .slide thead th { font-size: calc(21 * var(--u)); }
+:is(html.presenting, html.printing) .slide pre { padding: calc(16 * var(--u)) calc(20 * var(--u)); font-size: calc(21 * var(--u)); line-height: 1.6; }
+:is(html.presenting, html.printing) .slide .code.is-long > pre { padding-top: calc(16 * var(--u)); }
+:is(html.presenting, html.printing) .slide :is(.copy, .fig-more) { display: none; }
+:is(html.presenting, html.printing) .slide code { font-size: 1em; } /* inline code takes the size of the text around it, not the page's smaller code size */
+:is(html.presenting, html.printing) .slide figcaption { margin-top: calc(4 * var(--u)); font-size: calc(21 * var(--u)); line-height: 1.5; }
+/* A figure on a slide: the drawing stands at 1.5 times, or less down to 1.25 times when it needs room. render writes the drawing's size
+   on the frame as --fw and --fh, in frame pixels; for a hand-drawn figure the deck script writes 1.25 times, and in present mode it
+   measures the room for more. The well is 4px around the drawing, the caption 4px under it, and the source line runs on in the
+   caption's line. The frame is always 1280 wide, so the desktop form shows on every screen and sheet. The figure's words do not show on
+   the slide: the room cannot read a table at that size, and the drawing's label is still its name for a screen reader. On paper the
+   words print on the page after the slide. */
+:is(html.presenting, html.printing) .slide .fig { padding: calc(4 * var(--u)); overflow: visible; }
+:is(html.presenting, html.printing) .slide .fig > svg.dg[style*="--fw"] { display: block !important; } /* render writes the slide size on the desktop form only */
+:is(html.presenting, html.printing) .slide .fig > :is(svg, img)[style*="--fw"] { width: calc(var(--fw) * var(--u)); height: calc(var(--fh) * var(--u)); max-width: none; max-height: none; }
+:is(html.presenting, html.printing) .slide .fig > svg.dg:not([style*="--fw"]), :is(html.presenting, html.printing) .slide .dg-words { display: none !important; }
+:is(html.presenting, html.printing) .slide figcaption .source { display: inline; margin: 0; }
+:is(html.presenting, html.printing) .slide figure.quote { padding-left: calc(24 * var(--u)); }
+:is(html.presenting, html.printing) .slide figure.quote blockquote { font-size: calc(30 * var(--u)); line-height: 1.3; }
+/* Present mode. A slide changes at once, with no animation. */
 @media screen {
+  html.presenting { --u: 1px; }
   html.presenting, html.presenting body { overflow: hidden; }
   html.presenting body > :not(main) { display: none !important; }
   html.presenting main { position: fixed; left: 50%; top: 50%; width: 1280px; height: 720px; margin: 0; padding: 0; background: var(--bg); transform: translate(-50%, -50%) scale(var(--deck-scale, 1)); }
-  html.presenting .slide { display: none; position: absolute; inset: 0; padding: 64px; overflow: hidden; }
+  html.presenting .slide { display: none; position: absolute; inset: 0; overflow: hidden; }
   html.presenting .slide.is-current { display: block; }
   html.presenting .slide:focus { outline: none; } /* the slide takes the focus so a screen reader reads it; the room sees no ring */
-  html.presenting .slide :is(p, ul, ol, dl, figure, blockquote, .table-wrap, .cards, pre, .code) { max-width: none; }
-  html.presenting .slide > :is(h1, h2) { margin: 0 0 32px; font-size: 52px; line-height: 1.06; }
-  html.presenting .slide.title > h1 { margin-bottom: 0; }
-  html.presenting .slide-n { display: none; } /* the number stands in the corner */
-  html.presenting .slide:not(.title) > :is(p, ul, ol):not(.cards) { margin: 0; font-size: 30px; line-height: 1.3; }
-  html.presenting .slide:not(.title) > :is(ul, ol):not(.cards) { padding-left: 40px; }
-  html.presenting .slide:not(.title) > :is(ul, ol):not(.cards) > li + li { margin-top: 16px; }
-  html.presenting .slide .standfirst { margin-top: 24px; font-size: 30px; line-height: 1.3; }
-  html.presenting .slide .facts { margin-top: 24px; font-size: 21px; line-height: 1.5; }
-  html.presenting .slide > .cards { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 24px; margin: 0; } /* the cards share the width: a third each for three, half each for two */
-  html.presenting .slide > .cards .big { font-size: 52px; line-height: 1.06; }
-  html.presenting .slide > .cards p { font-size: 21px; line-height: 1.5; }
-  html.presenting .slide .table-wrap, html.presenting .slide > figure, html.presenting .slide .code, html.presenting .slide > pre { margin: 0; }
-  html.presenting .slide table { min-width: 0; font-size: 21px; line-height: 1.5; }
-  html.presenting .slide :is(th, td) { padding: 12px 24px 12px 0; }
-  html.presenting .slide :is(th, td):last-child { padding-right: 0; }
-  html.presenting .slide thead th { font-size: 21px; }
-  html.presenting .slide pre { padding: 16px 20px; font-size: 21px; line-height: 1.6; }
-  html.presenting .slide .code.is-long > pre { padding-top: 16px; }
-  html.presenting .slide :is(.copy, .fig-more) { display: none; }
-  html.presenting .slide code { font-size: 1em; } /* inline code takes the size of the text around it, not the page's 14px */
-  html.presenting .slide figcaption { margin-top: 4px; font-size: 21px; line-height: 1.5; }
-  /* A figure on a slide: the drawing stands at 1.5 times, or less down to 1.25 times when it needs room. render writes the size of a
-     drawing it made; the deck script measures the room for a hand-drawn figure.
-     The well is 4px around it, the caption 4px under it, and the source line runs on in the caption's line. The frame is always 1280px
-     wide, so the desktop form shows on every screen. The figure's words do not show: the room cannot read a table at that size, and the
-     drawing's label is still its name for a screen reader. */
-  html.presenting .slide .fig { padding: 4px; overflow: visible; }
-  html.presenting .slide .fig > svg.dg[style*="--fw"] { display: block !important; } /* render writes the slide size on the desktop form only */
-  /* render writes the drawing's size on the frame, at its slide scale, as --fw and --fh in frame pixels. */
-  html.presenting .slide .fig > svg.dg[style*="--fw"] { width: calc(var(--fw) * 1px); height: calc(var(--fh) * 1px); }
-  html.presenting .slide .fig > svg.dg:not([style*="--fw"]), html.presenting .slide .dg-words { display: none !important; }
-  html.presenting .slide figcaption .source { display: inline; margin: 0; }
-  html.presenting .slide figure.quote blockquote { font-size: 30px; line-height: 1.3; }
-  html.presenting .slide figure.quote figcaption { margin-top: 4px; }
   /* A status word takes the text color, and only its dot the status color: the word is text and needs 7:1, the dot is a mark. */
   html.presenting .state:is(.ok, .warn, .err) { color: var(--text); }
   html.presenting .state.ok::before { background: var(--ok); } html.presenting .state.warn::before { background: var(--warn); } html.presenting .state.err::before { background: var(--err); }
@@ -71,8 +76,22 @@ html[data-profile="deck"] main { counter-reset: slide; }
   .deck-nav svg { width: 20px; height: 20px; }
   .deck-count { margin-right: 4px; }
 }
-/* Printed while presenting, the deck prints every slide, not only the one on the screen. */
-@media print { html.presenting .slide[hidden] { display: block !important; } }
+/* Paper: when the deck script is on, each slide prints in the slide form, one to a landscape page that keeps the reader's choice of A4
+   or Letter, and the frame grows to the width of the sheet. A figure's words print on the page after its slide, under "Slide 4 in
+   words". The slide number prints at the lower right. Paper is light, as for every page. With scripts off the deck prints as the stack. */
+@media print {
+  @page slide { size: landscape; @bottom-right { content: none; } }
+  html.printing main { container-type: inline-size; }
+  html.printing .slide, html.printing .slide-words { --u: calc(100cqw / 1280); page: slide; }
+  html.printing body > :not(main) { display: none !important; }
+  html.printing .slide { position: relative; width: 100%; height: calc(720 * var(--u)); overflow: hidden; break-inside: avoid; }
+  html.printing :is(.slide, .slide-words) + :is(.slide, .slide-words) { break-before: page; }
+  html.printing .slide::after { content: attr(data-n); position: absolute; right: calc(64 * var(--u)); bottom: calc(20 * var(--u)); color: var(--text); font: 400 calc(21 * var(--u))/1 var(--sans); font-variant-numeric: tabular-nums; }
+  html.printing .slide-words { padding-top: 0; }
+  html.printing .slide-words > h2 { margin-bottom: 12px; }
+  /* Printed while presenting, the deck prints every slide, not only the one on the screen. */
+  html.presenting .slide[hidden] { display: block !important; }
+}
 /* Present mode is always light, with the "more contrast" tokens: the line takes the muted color, and muted text the text color, so every
    text pair on a slide reaches 7:1 under a room's light (decks.md, section 4). A palette adds its own block after this one. Not with forced
    colors, where the reader's system colors decide. */
