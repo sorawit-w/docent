@@ -110,14 +110,18 @@ function readConfig(file, { palettes = [], profiles = [] } = {}) {
 // The attributes of a logo's <svg> that belong to the page, not to the drawing: the slot size, the class, the theme, and the name for a
 // screen reader. Every other one, such as viewBox, fill, stroke or transform, changes what the reader sees.
 const PAGE_ONLY = /^(class|width|height|role|aria-[\w-]+|data-for|xmlns(:\w+)?|focusable|id)$/i;
-/** What a logo draws, to compare a page's logo with a file: the drawing attributes of its <svg>, in order, and its shapes, without the
-    space between tags. */
+/** What a logo draws, to compare a page's logo with a file: each tag with its attributes in order and in double quotes, the text between
+    tags without the space around it, and no comment. The <svg> keeps only the attributes that change the drawing. */
 function logoShapes(svg) {
-  // A file may start with an XML declaration, a comment or a doctype, and end with a comment: none of them is drawn.
-  const text = svg.replace(/^(?:\s|<\?xml[\s\S]*?\?>|<!--[\s\S]*?-->|<!DOCTYPE[^>]*>)+/i, "").replace(/(?:\s|<!--[\s\S]*?-->)+$/, "");
-  const root = (text.match(/^<svg\b([^>]*)>/i) || ["", ""])[1];
-  const attrs = [...root.matchAll(/([^\s"'=]+)\s*=\s*(?:"([^"]*)"|'([^']*)')/g)].filter(([, name]) => !PAGE_ONLY.test(name)).map(([, name, a, b]) => `${name}="${a ?? b}"`).sort();
-  return `${attrs.join(" ")}|${text.replace(/^<svg\b[^>]*>/i, "").replace(/<\/svg>\s*$/i, "").replace(/>\s+</g, "><").trim()}`;
+  // A file may start with an XML declaration, a comment or a doctype: none of them is drawn.
+  const text = svg.replace(/<!--[\s\S]*?-->/g, "").replace(/^(?:\s|<\?xml[\s\S]*?\?>|<!DOCTYPE[^>]*>)+/i, "").trim();
+  let root = true;
+  return text.replace(/<(\/?)([A-Za-z][\w:.-]*)((?:\s+[^\s"'>/=]+(?:\s*=\s*(?:"[^"]*"|'[^']*'))?)*)\s*(\/?)>/g, (all, close, name, attrs, self) => {
+    if (close) return `</${name}>`;
+    const list = [...attrs.matchAll(/([^\s"'=]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'))?/g)].filter(([, a]) => !(root && name.toLowerCase() === "svg" && PAGE_ONLY.test(a))).map(([, a, d, q]) => `${a}="${d ?? q ?? ""}"`).sort();
+    root = false;
+    return `<${name}${list.length ? ` ${list.join(" ")}` : ""}${self ? "/" : ""}>`;
+  }).replace(/>\s+</g, "><").replace(/>\s+/g, ">").replace(/\s+</g, "<");
 }
 
 /** The logos that a good repo file names, as a page carries them: { both | light | dark: shapes of an SVG, or a data URI }. */

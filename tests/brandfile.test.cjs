@@ -120,6 +120,7 @@ test("check notes a page whose palette, logo, tagline, credit or profile differs
   const { logoShapes } = require("../skills/docent/scripts/lib/config.cjs");
   const file = fs.readFileSync(path.join(root, config.data.logo), "utf8");
   assert.equal(logoShapes(`<?xml version="1.0" encoding="UTF-8"?>\n<!-- Exported by a drawing tool -->\n<!DOCTYPE svg>\n${file}\n<!-- end -->\n`), logoShapes(file), "a file's XML declaration, doctype and comments around it are not part of the drawing");
+  assert.deepEqual(notes((h) => h.replace('rx="2" fill="currentColor"', "fill='currentColor'   rx='2'")), [], "the order and the quotes of the attributes are not part of the drawing");
   assert.deepEqual(notes((h) => h.replace("Small tools for careful teams.", "x").replace('<html lang="en"', '<html lang="en" data-brand="off"')), [], "a page about another product takes nothing from the file");
   const off = { ...config, data: { ...config.data, rules: { "brand.differs": { off: true, reason: "Old release notes keep their brand." } } } };
   assert.deepEqual(notes((h) => h.replace("Small tools for careful teams.", "x"), off), [], "a team may turn the note off");
