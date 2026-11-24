@@ -1,0 +1,1114 @@
+<!doctype html>
+<html lang="en" data-profile="standard">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Worked examples in API reference pages — Example Lab</title>
+<style>
+/* docent:kit 0.18.0 */
+/* Docent page styles. Tokens come from references/DESIGN.md. One file, no network. */
+:root {
+  color-scheme: light;
+  --bg: #fbfbfe; --panel: #f2f3f9; --fig: #f2f3f9;
+  --text: #1c1f2e; --muted: #575d75; --line: #d3d6e3;
+  --primary: var(--host-accent, #2f3fd0); --ink: var(--host-ink, #1b2260); --dot: var(--host-accent, #2f3fd0);
+  --ok: #1a7f37; --warn: #7d4e00; --err: #cf222e;
+  /* The heat steps fill the cells of a heat map and the boxes of a heat plan, and nothing else: from the least (1) to the most (5). One teal on screen; the print block sets five grays for paper. */
+  --heat-1: #c6e9ef; --heat-2: #86c9d5; --heat-3: #3da6b6; --heat-4: #00707e; --heat-5: #004a53;
+  /* The text on a heat step: the kit's own text and page colors. They equal --text and --bg, except with the reader's high contrast mode, where the kit gives those two the system colors and only its own are tested against the steps. */
+  --heat-text: #1c1f2e; --heat-page: #fbfbfe;
+  /* A host's logo for one theme (data-for) shows in that theme. A logo with no version for this theme stands on a tile in the page color of its own theme. */
+  --logo-light: block; --logo-dark: none; --tile-light: transparent; --tile-dark: #12141f;
+  /* A host project sets its own accent, heading color and fonts with the --host-* tokens. The kit never sets them, so they hold in every theme and in print.
+     In dark mode the dot follows the host's dark accent, or --host-dot-dark; on Docent's own pages it is the lamp. */
+  --serif: var(--host-serif, Charter, "Bitstream Charter", "Sitka Heading", "Sitka Text", Cambria, Georgia, serif);
+  --sans: var(--host-sans, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif);
+  --mono: var(--host-mono, ui-monospace, "SF Mono", "Cascadia Code", Consolas, Menlo, monospace);
+  --ease: cubic-bezier(0.23, 1, 0.32, 1);
+  --measure: 31rem; --margin-col: 220px; --gap: 48px; --wide: 1120px;
+  /* The profile of a page sets these. Standard is the default: code and tables end at the right edge of the notes. */
+  --block: calc(var(--measure) + var(--gap) + var(--margin-col)); --section-space: 72px; --cell-y: 12px; --step-space: 36px;
+}
+/* Profiles: one attribute on <html> sets the width of code and tables, and the spacing. A profile never changes the text column. */
+html[data-profile="task"] { --section-space: 56px; --step-space: 28px; }
+html[data-profile="reference"] { --block: var(--wide); --section-space: 56px; --cell-y: 8px; }
+html[data-profile="brief"] { --block: var(--wide); --section-space: 64px; }
+/* A page for the public: every size is in rem, so the text and the text column grow together, on top of the reader's own setting. */
+html[data-text="large"] { font-size: 112.5%; }
+/* Dark: the reader's system setting decides, unless the reader chose a theme with the switch. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #12141f; --panel: #0b0d15; --fig: #0b0d15;
+    --text: #e7e9f3; --muted: #959bb3; --line: #2d3146;
+    --primary: var(--host-accent-dark, #8e9bff); --ink: #e7e9f3; --dot: var(--host-dot-dark, var(--host-accent-dark, #f2b824));
+    --ok: #3fb950; --warn: #d29922; --err: #f85149;
+    --heat-1: #093339; --heat-2: #054e58; --heat-3: #006b78; --heat-4: #36a0b1; --heat-5: #80cad7; --heat-text: #e7e9f3; --heat-page: #12141f;
+    --logo-light: none; --logo-dark: block; --tile-light: #fbfbfe; --tile-dark: transparent;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #12141f; --panel: #0b0d15; --fig: #0b0d15;
+  --text: #e7e9f3; --muted: #959bb3; --line: #2d3146;
+  --primary: var(--host-accent-dark, #8e9bff); --ink: #e7e9f3; --dot: var(--host-dot-dark, var(--host-accent-dark, #f2b824));
+  --ok: #3fb950; --warn: #d29922; --err: #f85149;
+  --heat-1: #093339; --heat-2: #054e58; --heat-3: #006b78; --heat-4: #36a0b1; --heat-5: #80cad7; --heat-text: #e7e9f3; --heat-page: #12141f;
+  --logo-light: none; --logo-dark: block; --tile-light: #fbfbfe; --tile-dark: transparent;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-padding-top: 88px; -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 400 1rem/1.65 var(--sans); caret-color: var(--primary); }
+::selection { background: color-mix(in srgb, var(--primary) 22%, transparent); }
+:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
+a { color: var(--primary); text-decoration-thickness: 1px; text-underline-offset: 0.2em; }
+a:hover { text-decoration-thickness: 2px; }
+/* The skip link: the first thing a keyboard reaches. It is hidden until it has focus; then it stands at the upper left, over the top bar, and jumps to the main element. */
+.skip { position: absolute; top: 12px; left: 12px; z-index: 3; display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); font-size: 0.875rem; }
+.skip:not(:focus) { width: 1px; height: 1px; padding: 0; border: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+/* One left edge for the whole page. On a wide screen the text and its notes sit in the middle as a group; wide blocks start at the same edge and grow to the right, up to --wide. */
+.shell {
+  --left: max(40px, min((100% - var(--measure) - var(--gap) - var(--margin-col)) / 2, 100% - var(--wide) - 40px));
+  padding: 0 max(40px, 100% - var(--left) - var(--wide)) 0 var(--left);
+}
+
+/* Top bar. Its bottom line is the route; the dot marks the current section. */
+.topbar { position: sticky; top: 0; z-index: 2; background: var(--bg); border-bottom: 1px solid var(--line); }
+.topbar .shell { position: relative; display: flex; align-items: center; gap: 32px; height: 56px; }
+.host { display: inline-flex; align-items: center; gap: 10px; font-weight: 600; font-size: 0.875rem; white-space: nowrap; }
+/* The host's logo: 24px high and at most 160px wide; its width and height are written on it. One color (currentColor) takes the heading color. */
+.logo { display: block; flex: none; box-sizing: content-box; color: var(--ink); }
+.host:has(> .logo[data-for="dark"]) > .logo[data-for="light"] { display: var(--logo-light); }
+.host:has(> .logo[data-for="light"]) > .logo[data-for="dark"] { display: var(--logo-dark); }
+/* A logo for one theme only stands on a tile in the other theme: corners of 6px, 4px around it. The outline takes no space, so nothing moves. */
+/* A logo in one color (currentColor) keeps the ink of its own theme, so it reads on its tile too. */
+.host:not(:has(> .logo[data-for="dark"])) > .logo[data-for="light"] { background: var(--tile-light); outline: 4px solid var(--tile-light); border-radius: 2px; color: var(--host-ink, #1b2260); }
+.host:not(:has(> .logo[data-for="light"])) > .logo[data-for="dark"] { background: var(--tile-dark); outline: 4px solid var(--tile-dark); border-radius: 2px; color: #e7e9f3; }
+.route { flex: 1; min-width: 0; }
+.route ol { display: flex; gap: 28px; margin: 0; padding: 0; list-style: none; }
+.route a { display: block; padding: 6px 0; font-size: 0.875rem; color: var(--muted); text-decoration: none; white-space: nowrap; }
+.route a:hover, .route a[aria-current] { color: var(--text); }
+.route-dot { position: absolute; left: 0; bottom: -4px; width: 7px; height: 7px; border-radius: 50%; background: var(--dot); opacity: 0; transform: translateX(var(--x, 0px)); }
+.ready .route-dot, .ready .rail-dot { transition: transform 320ms var(--ease); }
+.js .route-dot { opacity: 1; }
+.theme, .wd-btn { display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px; border: 1px solid var(--line); border-radius: 6px; background: none; color: var(--text); font: 400 0.875rem/1 var(--sans); cursor: pointer; }
+.theme:hover, .wd-btn:hover { border-color: var(--muted); }
+.theme:active, .wd-btn:active { transform: translateY(1px); }
+.theme svg { width: 15px; height: 15px; }
+html:not(.js) .theme, .theme[hidden] { display: none; }
+.theme[data-next="dark"] .icon-sun, .theme[data-next="light"] .icon-moon { display: none; }
+
+/* Title block: the title leads; facts about the document sit below it. */
+.title { padding: 80px 0 8px; }
+.title .row { margin-top: 24px; }
+/* The serif headings take weight 700. A palette with sans-serif headings sets 600, so the sans-serif keeps two weights. */
+h1, h2 { font-family: var(--serif); font-weight: var(--heading-weight, 700); color: var(--ink); text-wrap: balance; margin: 0; }
+h1 { font-size: 3.25rem; line-height: 1.06; letter-spacing: -0.02em; }
+.standfirst { font: 400 1.3125rem/1.5 var(--serif); margin: 0; text-wrap: pretty; }
+.facts { margin: 0; padding-left: 0; list-style: none; font-variant-numeric: tabular-nums; }
+
+section { padding-top: var(--section-space); }
+h2 { font-size: 1.875rem; line-height: 1.2; margin-bottom: 16px; }
+h3 { font: 600 1.125rem/1.35 var(--sans); margin: 0; text-wrap: balance; }
+/* A small heading inside a part of a section: body size, weight 600. */
+h4 { font: 600 1rem/1.5 var(--sans); margin: 24px 0 4px; }
+/* A definition list: each term in weight 600, its meaning below it. */
+dl { max-width: var(--measure); margin: 0 0 16px; }
+dt { font-weight: 600; }
+dd { margin: 0 0 12px; }
+dd:last-child { margin-bottom: 0; }
+p { margin: 0 0 16px; max-width: var(--measure); text-wrap: pretty; }
+.term { text-decoration: underline; text-decoration-color: var(--primary); text-decoration-thickness: 2px; text-underline-offset: 0.22em; }
+/* A place that shows a value of a value picker. A dotted line under it says that it changes with the choice. */
+var { font-style: normal; }
+var[data-v] { text-decoration: underline dotted var(--muted); text-decoration-thickness: 1px; text-underline-offset: 0.25em; }
+code { font: 0.875rem/1.55 var(--mono); background: var(--panel); padding: 0.1em 0.38em; border-radius: 6px; }
+.standfirst code { font-size: 1.125rem; }
+
+/* Lists in the text flow: points, or numbers for steps that one actor does. The rules are weak on purpose, so the lists of the kit's own blocks keep their styles. */
+:where(main) :where(ul, ol):not(.steps, .facts, .cards) { max-width: var(--measure); margin: 0 0 16px; padding-left: 24px; }
+:where(main) :where(ul, ol):not(.steps, .facts, .cards) > :where(li + li) { margin-top: 4px; }
+/* A block heading in the text flow has more space above it than below it. A step heading of a walkthrough has none. */
+:where(main) h3 { margin: 32px 0 8px; }
+h2 + h3, h3 + h4 { margin-top: 0; }
+.steps h3 { margin: 0; }
+/* A numbered block heading: one of several steps that one actor does, where a step holds a code block, a table or a widget. The kit writes the number, and the count starts again in each section. */
+section { counter-reset: block-step; }
+h3.step { counter-increment: block-step; }
+h3.step::before { content: counter(block-step); font-weight: 400; color: var(--muted); margin-right: 10px; font-variant-numeric: tabular-nums; }
+/* With scripts on, the page script writes the number as text, so that a screen reader reads it. It looks the same as the counted number. */
+h3.is-numbered::before { content: none !important; }
+.step-n { font-weight: 400; color: var(--muted); margin-right: 6px; font-variant-numeric: tabular-nums; }
+/* A code block, a table, a closed section, a walkthrough, a status note and a figure bring no space below them. Text that follows brings it. */
+:is(pre, .code, .table-wrap, details, .walk, .status, figure) + :is(p, ul, ol, dl) { margin-top: 24px; }
+
+/* Margin notes: the guide's remarks sit beside the text, like a wall label. */
+.row { display: grid; grid-template-columns: minmax(0, var(--measure)) var(--margin-col); column-gap: var(--gap); align-items: start; }
+.note { margin: 6px 0 16px; padding-top: 12px; border-top: 1px solid var(--line); font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
+.note strong { display: block; margin-bottom: 4px; font-weight: 600; color: var(--text); }
+/* A heading may stand in the text column, with the facts about its item beside it. The row brings the space above the heading, so the note lines up with the heading. */
+.row:has(> h3:first-child) { margin-top: 32px; }
+.row > h3:first-child { margin-top: 0; }
+
+/* Walkthrough: a rail with a node per step; one dot travels along it. */
+.walk { display: grid; grid-template-columns: minmax(0, 1fr) 536px; column-gap: 40px; align-items: start; margin-top: 24px; }
+.rail { position: relative; }
+.steps { position: relative; margin: 0; padding: 0; list-style: none; counter-reset: step; }
+.steps::before { content: ""; position: absolute; left: 4px; top: 10px; bottom: 10px; width: 1px; background: var(--line); }
+.steps li { position: relative; padding: 0 0 var(--step-space) 32px; counter-increment: step; }
+.steps li:last-child { padding-bottom: 0; }
+.steps li::before { content: ""; position: absolute; left: 0; top: 8px; width: 9px; height: 9px; border-radius: 50%; border: 1px solid var(--muted); background: var(--bg); }
+.steps h3::before { content: counter(step); font-weight: 400; color: var(--muted); margin-right: 10px; font-variant-numeric: tabular-nums; }
+.steps p { margin: 6px 0 0; }
+.js .steps li:not(.is-current) h3, .js .steps li:not(.is-current) p { color: var(--muted); }
+.ready .steps h3, .ready .steps p { transition: color 120ms; }
+.rail-dot { position: absolute; left: 0; top: 8px; width: 9px; height: 9px; border-radius: 50%; background: var(--dot); opacity: 0; transform: translateY(var(--y, 0px)); }
+.js .rail-dot { opacity: 1; }
+.walk figure { position: sticky; top: 88px; }
+
+/* Figures: a well that holds a Docent diagram, with a plain caption. A diagram carries its own styles. */
+/* A well is as wide as the profile's block. A wider drawing keeps its real size, and its well grows with it. */
+figure { margin: 0; min-width: min(100%, var(--block)); width: fit-content; max-width: 100%; }
+section > figure { margin-top: 24px; }
+/* Every drawing in a well keeps its real size and sits in the middle; a wider one scrolls inside the well. */
+.fig > svg { flex: none; margin-inline: auto; }
+.fig { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 16px 24px; background: var(--fig); border-radius: 12px; padding: 8px; overflow-x: auto; scrollbar-color: var(--line) transparent; }
+/* A well may hold two drawings, for two separate chains: side by side when both fit, else one below the other. */
+/* A drawing that is wider than its well scrolls sideways. The page script shows this line under it, because the part that shows can look complete. */
+.fig-more { margin: 8px 0 0; max-width: none; font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
+/* The steps of a diagram in words: a closed section in the well, under the drawing. It takes the width of the well, so a table
+   of several columns, such as the boxes of a heat plan, keeps its words whole; its sentences and lists keep the width of the text. */
+.dg-words { flex-basis: 100%; max-width: none; margin: 0; padding: 0 8px 4px; }
+.dg-words ol { margin: 8px 0 0; padding-left: 28px; }
+.dg-words li + li { margin-top: 4px; }
+.dg-words p { margin: 12px 0 0; font-weight: 600; }
+/* The rows of a range chart in words: a small table, as wide as its content, so it fits a phone. */
+.dg-words table { width: auto; min-width: 0; margin-top: 8px; }
+.dg-words :is(th, td) { padding-right: 16px; }
+/* A long name with no spaces breaks inside its cell, so the table never runs past a phone screen. */
+.dg-words tbody th { white-space: normal; }
+.dg-words :is(th, td) { overflow-wrap: anywhere; }
+/* A wide grid in words, such as the numbers of a heat map: each cell stays on one line, numbers line up on the right, and the
+   table scrolls inside its wrapper on a narrow screen. The lines under it keep the width of the text. */
+.dg-words > .table-wrap { margin-top: 8px; max-width: none; }
+.dg-words > .table-wrap :is(th, td) { white-space: nowrap; overflow-wrap: normal; padding-right: 12px; }
+.dg-words > .table-wrap :is(td, thead th) { text-align: right; font-variant-numeric: tabular-nums; }
+/* A wide table of words, such as the boxes of a heat plan: its cells wrap at spaces but never inside a word, and keep to the left. */
+.dg-words > .table-wrap.is-text :is(th, td) { white-space: normal; }
+.dg-words > .table-wrap.is-text :is(td, thead th) { text-align: left; }
+.dg-words:has(> .table-wrap) { min-width: 0; } /* a flex item: without this it grows to the table, and the wrapper never scrolls */
+/* A hand-drawn figure holds no colors and no styles of its own, only these classes, so the tokens give it every theme, print and the
+   reader's settings. A shape with no class is a 1.5px line in the text color, and a text with no class is 14px. No class is under 12px. */
+svg[data-drawn="hand"] { display: block; flex: none; margin-inline: auto; }
+svg[data-drawn="hand"] :is(path, line, polyline, polygon, rect, circle, ellipse), svg[data-drawn="hand"] .hd-line { fill: none; stroke: var(--text); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+svg[data-drawn="hand"] text, svg[data-drawn="hand"] .hd-text { fill: var(--text); stroke: none; font-size: 14px; font-weight: 400; }
+svg[data-drawn="hand"] .hd-strong { stroke-width: 2.5; }
+svg[data-drawn="hand"] .hd-muted { stroke: var(--muted); stroke-width: 1; }
+svg[data-drawn="hand"] .hd-rule { stroke: var(--line); stroke-width: 1; }
+svg[data-drawn="hand"] .hd-fill { fill: var(--text); stroke: none; }
+svg[data-drawn="hand"] .hd-box { fill: var(--bg); stroke: var(--text); }
+svg[data-drawn="hand"] .hd-band { fill: var(--bg); stroke: none; }
+svg[data-drawn="hand"] .hd-name { font-weight: 600; }
+svg[data-drawn="hand"] .hd-note { font-size: 12px; fill: var(--muted); }
+figcaption { margin-top: 12px; font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
+figcaption strong { font-weight: 600; color: var(--text); margin-right: 8px; }
+
+/* Card grid: 3 to 8 short items side by side, each a heading or a large number and a line of text. A card is a label, like a margin note: a line above it, and no box. At most four in a row. */
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(max(160px, calc((100% - 72px) / 4)), 1fr)); gap: 24px; margin: 24px 0 0; padding: 0; list-style: none; }
+.cards > li { min-width: 0; padding-top: 12px; border-top: 1px solid var(--line); }
+.cards h3 { margin: 0 0 4px; font-size: 1rem; line-height: 1.5; }
+.cards p { margin: 0; font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
+.cards .big { margin-bottom: 4px; font: 700 1.875rem/1.2 var(--serif); font-weight: var(--heading-weight, 700); color: var(--ink); font-variant-numeric: tabular-nums; }
+.cards + :is(p, ul, ol, dl) { margin-top: 24px; }
+
+/* Code, tables and cards end at the profile's block width. */
+:is(pre, .code, .table-wrap, .cards) { max-width: var(--block); }
+
+/* Tables: rules only, no boxes. */
+.table-wrap { overflow-x: auto; margin: 24px 0 0; scrollbar-color: var(--line) transparent; }
+table { width: 100%; min-width: 640px; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; vertical-align: top; padding: var(--cell-y) 24px var(--cell-y) 0; }
+thead th { border-bottom: 1px solid var(--text); padding-bottom: 10px; font-size: 0.875rem; line-height: 1.5; font-weight: 600; color: var(--muted); }
+tbody th { font-weight: 600; white-space: nowrap; }
+tbody tr { border-bottom: 1px solid var(--line); }
+/* A column of numbers (class "num" on its th and td cells): the numbers line up on the right, in tabular figures. The last column ends at the table's edge. */
+:is(th, td).num { text-align: right; font-variant-numeric: tabular-nums; }
+:is(th, td).num:last-child { padding-right: 0; }
+.state { display: inline-flex; align-items: baseline; gap: 8px; font-weight: 600; }
+.state::before { content: ""; flex: none; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.state.ok { color: var(--ok); } .state.warn { color: var(--warn); } .state.err { color: var(--err); }
+/* Two states with no status color: plain information takes a muted dot, and a thing that is planned or not on yet takes a muted ring. */
+.state.info, .state.plan { color: var(--text); }
+.state.info::before { background: var(--muted); }
+.state.plan::before { background: none; border: 1.5px solid var(--muted); }
+/* Code and links in a cell may break anywhere, so a long path, command or address does not make the table wider than its place. */
+:is(td, th) :is(code, a) { overflow-wrap: anywhere; }
+
+/* Status note: a dot and a word carry the status. */
+.status { max-width: var(--measure); margin: 32px 0 0; }
+.status p { margin: 4px 0 0; }
+
+pre { margin: 20px 0 0; padding: 16px 20px; background: var(--panel); border-radius: 10px; overflow-x: auto; font: 0.875rem/1.6 var(--mono); scrollbar-color: var(--line) transparent; }
+pre code { background: none; padding: 0; font-size: inherit; }
+/* With scripts on, a code block sits in a holder with a button that copies the code. The holder takes the place and the space of the code block. */
+.code { position: relative; margin: 20px 0 0; }
+.code > pre { margin: 0; }
+.copy { position: absolute; top: 0; right: 0; height: 30px; padding: 0 12px; border: solid var(--line); border-width: 0 0 1px 1px; border-radius: 0 10px 0 6px; background: var(--panel); color: var(--muted); font: 400 0.875rem/1 var(--sans); cursor: pointer; }
+.copy:hover { color: var(--text); }
+/* A line of code that reaches the button would sit under it. Then the code starts below the button. */
+.code.is-long > pre { padding-top: 40px; }
+.cm { color: var(--muted); }
+
+details { max-width: var(--measure); margin: 24px 0 0; }
+/* A closed section that holds a table, a code block or a figure takes the full width, like those blocks do outside it. Its text keeps the text column. */
+details:has(> .table-wrap, > pre, > .code, > figure) { max-width: none; }
+summary { display: flex; align-items: center; gap: 10px; padding: 4px 0; font-weight: 600; cursor: pointer; list-style: none; }
+summary::-webkit-details-marker { display: none; }
+summary svg { width: 12px; height: 12px; color: var(--muted); transition: transform 150ms var(--ease); }
+details[open] summary svg { transform: rotate(90deg); }
+details > p { margin: 8px 0 0 22px; }
+
+/* Widgets: the reader chooses, ticks or decides. A widget is plain controls and text, with no box. render makes its markup from data. */
+.choose, .checks, .decide, .values { position: relative; margin: 24px 0 0; }
+:is(.choose, .checks, .decide, .values) + * { margin-top: 24px; }
+.choose > input, .checks input, .decide input, .values > input { position: absolute; width: 1px; height: 1px; margin: 0; opacity: 0; pointer-events: none; }
+.wd-t { margin: 0; max-width: none; font-size: 0.875rem; line-height: 1.5; font-weight: 600; color: var(--muted); }
+.opt { display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px; border: 1px solid var(--line); border-radius: 6px; font-size: 0.875rem; line-height: 1; cursor: pointer; }
+.opt::before { content: ""; width: 9px; height: 9px; border-radius: 50%; border: 1px solid var(--muted); }
+.opt:hover { border-color: var(--muted); }
+input:checked + .opt { border-color: var(--text); }
+input:checked + .opt::before { border-color: var(--dot); background: var(--dot); }
+input:focus-visible + .opt, .checks input:focus-visible + label::before { outline: 2px solid var(--primary); outline-offset: 3px; }
+/* Chooser: radio buttons and one panel for each case. The styles alone show the chosen case, so it works with scripts off. */
+.choose { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.choose > .wd-t { margin-right: 4px; }
+.choose > .case { display: none; flex-basis: 100%; min-width: 0; margin-top: 8px; }
+.choose > input:nth-of-type(1):checked ~ div:nth-of-type(1), .choose > input:nth-of-type(2):checked ~ div:nth-of-type(2), .choose > input:nth-of-type(3):checked ~ div:nth-of-type(3), .choose > input:nth-of-type(4):checked ~ div:nth-of-type(4), .choose > input:nth-of-type(5):checked ~ div:nth-of-type(5) { display: block; }
+.case-t { display: none; margin: 0 0 4px; font-weight: 600; }
+.case > .case-t + * { margin-top: 0; }
+.case > :last-child { margin-bottom: 0; }
+/* Checklist: a box and a line of text. A ticked line takes the muted color. */
+.checks ul { max-width: var(--measure); margin: 0; padding: 0; list-style: none; }
+.checks li { position: relative; margin-top: 12px; }
+.checks label { display: block; position: relative; padding-left: 32px; cursor: pointer; }
+.checks label::before { content: ""; position: absolute; left: 0; top: 4px; width: 18px; height: 18px; border: 1.5px solid var(--muted); border-radius: 6px; }
+.checks label::after { content: ""; position: absolute; left: 6.5px; top: 7px; width: 5px; height: 9px; border: solid var(--text); border-width: 0 2px 2px 0; transform: rotate(45deg); opacity: 0; }
+.checks input:checked + label { color: var(--muted); }
+.checks input:checked + label::before { border-color: var(--text); }
+.checks input:checked + label::after { opacity: 1; }
+.checks .sub { display: block; font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
+.wd-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin: 16px 0 0; max-width: none; font-size: 0.875rem; line-height: 1.5; color: var(--muted); font-variant-numeric: tabular-nums; }
+.wd-foot[hidden] { display: none; }
+/* Decision helper: questions, the one answer that fits, and the table of all cases. The table is the still form. */
+.decide fieldset { position: relative; display: flex; flex-wrap: wrap; gap: 8px; min-width: 0; margin: 16px 0 0; padding: 0; border: 0; }
+.decide legend { margin-bottom: 8px; padding: 0; font-weight: 600; }
+.decide-out { display: block; max-width: var(--measure); margin-top: 16px; }
+.decide-out:empty { display: none; }
+.decide-out strong { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+.decide-out strong::before { content: ""; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--dot); }
+.decide details { max-width: none; margin-top: 16px; }
+.decide .table-wrap { margin-top: 8px; }
+.decide td strong { display: block; font-weight: 600; }
+.decide tr.is-out { color: var(--muted); }
+html:not(.js) .decide-ask, html:not(.js) .wd-foot output { display: none; }
+/* Value picker: options like a chooser, a line that names the chosen option, and the table of all values. With scripts off the options do nothing, so they are hidden, and the text shows the values of the first option. */
+.values { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.values > .wd-t { margin-right: 4px; }
+.values-now { flex-basis: 100%; max-width: none; margin: 4px 0 0; font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
+.values-now strong { font-weight: 600; color: var(--text); }
+.values details { flex-basis: 100%; min-width: 0; max-width: none; margin-top: 8px; }
+.values .table-wrap { margin-top: 8px; }
+html:not(.js) .values > input + .opt { display: none; }
+
+footer { margin-top: 96px; border-top: 1px solid var(--line); }
+footer .shell { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding-top: 24px; padding-bottom: 40px; font-size: 0.875rem; color: var(--muted); }
+footer p { margin: 0; }
+/* The credit: a one-color mark and "Made with Docent", at the right. The mark takes the muted color of the words beside it. */
+.credit { margin-left: auto; }
+.credit svg { width: 16px; height: 16px; margin-right: 8px; vertical-align: -3px; }
+/* Docent's own pages carry the mark's tile in the footer. */
+.brand { display: inline-flex; align-items: center; gap: 10px; font: 700 1rem/1 var(--serif); color: var(--text); }
+.brand svg { width: 24px; height: 24px; }
+
+@media (max-width: 1100px) {
+  .walk { grid-template-columns: minmax(0, 1fr); row-gap: 32px; }
+  .walk figure { position: static; order: -1; }
+}
+@media (max-width: 900px) {
+  .row { grid-template-columns: minmax(0, 1fr); }
+  .note { max-width: var(--measure); }
+  .title .note { margin-top: 28px; }
+}
+@media (max-width: 720px) {
+  .shell { padding: 0 20px; }
+  .topbar { position: static; }
+  .topbar .shell { flex-wrap: wrap; gap: 4px 16px; height: auto; padding-top: 10px; padding-bottom: 8px; }
+  .host { flex: 1; }
+  .route { flex: none; order: 3; width: 100%; }
+  .route ol { flex-wrap: wrap; gap: 0 20px; }
+  .route a[aria-current] { text-decoration: underline; text-decoration-color: var(--dot); text-decoration-thickness: 2px; text-underline-offset: 0.4em; }
+  .route-dot { display: none; }
+  .title { padding-top: 48px; }
+  h1 { font-size: 2rem; } h2 { font-size: 1.625rem; }
+  section { padding-top: 56px; }
+  footer .shell { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .credit { margin-left: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; }
+}
+/* More contrast (the reader's system setting): outlines, tracks and rules take the muted color, and muted text takes the text color. Screen
+   only, so paper keeps the print block; and not with forced colors, where the reader's system colors already decide. */
+@media screen and (prefers-contrast: more) and (forced-colors: none) {
+  html:root:not([data-never]) { --line: #575d75; --muted: #1c1f2e; }
+  html:root:not([data-never])[data-theme="dark"] { --line: #959bb3; --muted: #e7e9f3; }
+}
+@media screen and (prefers-contrast: more) and (forced-colors: none) and (prefers-color-scheme: dark) {
+  html:root:not([data-never]):not([data-theme="light"]) { --line: #959bb3; --muted: #e7e9f3; }
+}
+/* The reader's high contrast mode (forced colors, as in Windows): the browser gives the page the few colors the reader chose. The kit gives
+   its tokens the same system colors, so the drawings follow, and the marks that are backgrounds (dots, the rail) stay visible. The heat
+   steps and the status colors keep their own values, because there the color is the content; the text on a step keeps --heat-text. */
+@media (forced-colors: active) {
+  html:root:not([data-never]) { --bg: Canvas; --fig: Canvas; --text: CanvasText; --muted: CanvasText; --line: CanvasText; --primary: Highlight; --dot: Highlight; }
+  /* A status dot takes the color of its word, which the browser forces; a background in that color would turn into the page color. */
+  .state::before { background: CanvasText; }
+  /* All borders take the text color, so the chosen option takes the highlight color, as its dot does. */
+  input:checked + .opt { border-color: Highlight; }
+}
+@media print {
+  html:root:not([data-never]) { color-scheme: light; --bg: #ffffff; --panel: #f2f3f9; --fig: #f2f3f9; --text: #1c1f2e; --muted: #575d75; --line: #d3d6e3; --primary: var(--host-accent, #2f3fd0); --ink: var(--host-ink, #1b2260); --dot: var(--host-accent, #2f3fd0); --ok: #1a7f37; --warn: #7d4e00; --err: #cf222e; --heat-1: #dee2f0; --heat-2: #babecb; --heat-3: #9498a5; --heat-4: #616571; --heat-5: #3e424d; --heat-text: #1c1f2e; --heat-page: #ffffff; --logo-light: block; --logo-dark: none; --tile-light: transparent; --tile-dark: #12141f; }
+  /* Paper: 11pt text, the page margin as the edge, and the notes beside the text again. An A4 page holds the text (112mm), a gap and the notes (50mm). */
+  html { font-size: 11pt; } html[data-text="large"] { font-size: 12pt; }
+  html:root:not([data-never]) { --measure: 112mm; --gap: 8mm; --margin-col: 50mm; --block: 100%; }
+  .shell { padding: 0; }
+  .row { grid-template-columns: minmax(0, var(--measure)) var(--margin-col); }
+  .title .note { margin-top: 6px; }
+  p, li { orphans: 2; widows: 2; }
+  /* A browser may leave out the ground of a code well on paper. A thin line keeps it a well. */
+  /* Paper cannot scroll: a long line of code wraps. */
+  pre { border: 1px solid var(--line); white-space: pre-wrap; overflow-wrap: anywhere; }
+  /* The top bar prints as one line above the title: the logo and the host's name, with no links and no switch. */
+  .topbar { position: static; border-bottom: 0; } .topbar .shell { height: auto; } .title { padding-top: 32px; }
+  .logo { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  /* Paper has no link: the credit prints as text. */
+  .credit a { color: inherit; text-decoration: none; }
+  .skip, .route, .theme, .route-dot, .rail-dot, .choose > .opt, .values > .opt, .decide-ask, .wd-foot, .copy, .fig-more { display: none !important; }
+  .choose > .case { display: block !important; margin-top: 16px; } .case-t { display: block; }
+  .checks input:checked + label, .decide tr.is-out { color: var(--text) !important; }
+  .steps li h3, .steps li p { color: var(--text) !important; }
+  .walk { grid-template-columns: minmax(0, 1fr); row-gap: 32px; } .walk figure { position: static; order: -1; }
+  table { min-width: 0; } .table-wrap { overflow: visible; }
+  /* Paper cannot scroll, so a wide grid in words, such as the numbers of a heat map, takes the smallest text size and tighter cells; render splits a grid that is still too wide into several tables. */
+  .dg-words > .table-wrap table { font-size: 0.875rem; } .dg-words > .table-wrap thead th { font-size: inherit; } .dg-words > .table-wrap :is(th, td) { padding: 4px 6px 4px 0; }
+  /* A browser leaves out backgrounds on paper. These carry meaning, so they print: status dots, the rail of the steps, and the ground of figures and code. */
+  .state::before, .steps::before, .fig, pre, code { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  /* Paper cannot scroll, and a drawing cannot split across pages. So a drawing that is wider than the paper, or taller than a page, shrinks to fit, under its caption, on A4 and on Letter. */
+  .fig > svg { width: auto; height: auto; max-width: 100%; max-height: 220mm; }
+  figure, tr, .status, pre, .checks li, .cards > li { break-inside: avoid; }
+  h2, h3 { break-after: avoid; }
+  /* Page numbers: Chrome and Edge print them; other browsers print their own footer. */
+  @page { margin: 18mm; @bottom-right { content: counter(page) " / " counter(pages); font: 9pt system-ui, sans-serif; color: #575d75; } }
+}
+/* /docent:kit */
+</style>
+</head>
+<body>
+<a class="skip" href="#content">Skip to the content</a>
+<header class="topbar">
+  <div class="shell">
+    <span class="host">Example Lab</span>
+    <nav class="route" aria-label="On this page">
+      <ol>
+        <li><a href="#question">Question</a></li>
+        <li><a href="#method">Method</a></li>
+        <li><a href="#results">Results</a></li>
+        <li><a href="#discussion">Discussion</a></li>
+        <li><a href="#limits">Limits</a></li>
+        <li><a href="#references">References</a></li>
+      </ol>
+    </nav>
+    <button class="theme" type="button">
+      <svg class="icon-moon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13.5 9.6A5.8 5.8 0 0 1 6.4 2.5a5.8 5.8 0 1 0 7.1 7.1Z"/></svg>
+      <svg class="icon-sun" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="8" cy="8" r="3"/><path d="M8 1.5v1.6M8 12.9v1.6M1.5 8h1.6M12.9 8h1.6M3.4 3.4l1.1 1.1M11.5 11.5l1.1 1.1M3.4 12.6l1.1-1.1M11.5 4.5l1.1-1.1"/></svg>
+      <span class="theme-text">Dark</span>
+    </button>
+    <span class="route-dot" aria-hidden="true"></span>
+  </div>
+</header>
+
+<main class="shell" id="content">
+  <div class="title">
+    <h1>Do worked examples in API reference pages help developers finish tasks?</h1>
+    <div class="row">
+      <p class="standfirst">We asked 24 developers to do four tasks with an API they did not know, once with reference pages that held worked examples and once with pages that did not. With examples, they finished more tasks, finished them faster, and felt more sure of their code. The study is small, and the differences are uncertain in size.</p>
+      <div class="note" role="note" aria-label="About this document">
+        <strong>Research report</strong>
+        <ul class="facts">
+          <li>12 minutes to read</li>
+          <li>Study run 2 to 20 September 2026</li>
+          <li>Plan registered 28 August 2026</li>
+          <li>Authors: Example Lab, documentation group</li>
+          <li>Every name, number and source is invented</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <section id="question" aria-labelledby="question-h">
+    <h2 id="question-h">The question</h2>
+    <div class="row">
+      <div>
+        <p>Reference pages list what an API offers: each call, its parameters and its answers. Many teams add a worked example to each call, a short piece of code that does one real task. Writing and testing these examples costs time, so teams ask whether they help.</p>
+        <p>Earlier studies found that developers look for examples first (Ortega and Lindqvist, 2019), and that tutorials with examples shorten the time to a first working call (Haddad et al., 2021). Fewer studies tested examples inside the reference pages themselves, for tasks beyond the first call.</p>
+        <p>We tested three expectations, written down before the study:</p>
+        <ol>
+          <li>With worked examples, developers finish more tasks.</li>
+          <li>With worked examples, they finish tasks faster.</li>
+          <li>With worked examples, they feel more sure that their code is right.</li>
+        </ol>
+      </div>
+      <div class="note" role="note">
+        <strong>Registered plan</strong>
+        The expectations, the measures and the analysis were registered before the first session. One change from the plan is named under <a href="#method">Method</a>.
+      </div>
+    </div>
+  </section>
+
+  <section id="method" aria-labelledby="method-h">
+    <h2 id="method-h">Method</h2>
+    <h3>Participants</h3>
+    <p>24 developers took part, recruited through a developer mailing list. They had 2 to 15 years of work experience (median 6). None had used the test API before. Each received a $40 gift card.</p>
+    <h3>Materials</h3>
+    <p>We wrote reference pages for an invented payments API with 14 calls. Version A had a description, a parameter table and an answer table for each call. Version B was the same, with one worked example under each call: 8 to 20 lines of code that run as written.</p>
+    <h3>Design and tasks</h3>
+    <p>Each participant did four tasks: sign a request, read a long list page by page, check a webhook, and handle an error and try again. Each did two tasks with version A and two with version B. The order of the tasks and of the versions followed a Latin square, so each task was done equally often with each version and in each position.</p>
+    <dl>
+      <dt>Finished</dt>
+      <dd>The task's test passed within 15 minutes.</dd>
+      <dt>Time</dt>
+      <dd>Minutes from the start of the task to a passing test, for finished tasks only.</dd>
+      <dt>Confidence</dt>
+      <dd>The answer to "How sure are you that your code is correct?", from 1 (not at all) to 7 (completely), asked after each task.</dd>
+    </dl>
+    <h3>Analysis</h3>
+    <p>We compared the two versions within each participant. For each measure we report the difference between the versions and a 95% confidence interval from a bootstrap with 10,000 samples of participants. We also give each difference as a standardized effect, d, so the three measures can be shown on one scale.</p>
+    <div class="status">
+      <span class="state info">Change from the plan</span>
+      <p>The plan named a mixed model for the time measure. It did not converge with 24 participants, so we used the paired bootstrap for all three measures.</p>
+    </div>
+  </section>
+
+  <section id="results" aria-labelledby="results-h">
+    <h2 id="results-h">Results</h2>
+    <p>All 24 participants did all four tasks, so each version has 48 tasks. The table gives each measure for both versions and the difference.</p>
+    <div class="table-wrap" role="region" aria-label="Results for each measure" tabindex="0">
+      <table>
+        <thead>
+          <tr><th scope="col">Measure</th><th scope="col" class="num">Without examples</th><th scope="col" class="num">With examples</th><th scope="col" class="num">Difference</th><th scope="col">95% interval</th><th scope="col" class="num">d</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">Tasks finished</th><td class="num">33 of 48 (69%)</td><td class="num">41 of 48 (85%)</td><td class="num">+17 points</td><td>+2 to +31 points</td><td class="num">0.38</td></tr>
+          <tr><th scope="row">Median time, minutes</th><td class="num">8.7</td><td class="num">6.2</td><td class="num">−2.3</td><td>−3.6 to −1.0</td><td class="num">0.61</td></tr>
+          <tr><th scope="row">Mean confidence, 1 to 7</th><td class="num">4.6</td><td class="num">5.4</td><td class="num">+0.8</td><td>+0.3 to +1.3</td><td class="num">0.55</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>The time difference is the mean of each participant's own difference, so it is not the gap between the two medians.</p>
+    <p>Figure 1 puts the three differences on one scale. Each bar is a 95% interval for d; its middle value is written after it. None of the intervals includes 0, so each difference is unlikely to be chance alone. But the intervals are wide: the effect on finished tasks could be small (0.04) or large (0.72).</p>
+    <figure>
+      <div class="fig" role="region" aria-label="Figure 1, effect of worked examples, with 95% intervals" tabindex="0">
+<!-- docent:diagram
+{
+  "id": "effects",
+  "kind": "range",
+  "label": "Standardized effect of worked examples, with 95% intervals. Tasks finished: d 0.38, interval 0.04 to 0.72. Time, faster: d 0.61, interval 0.25 to 0.97. Confidence: d 0.55, interval 0.20 to 0.90. No interval includes 0.",
+  "scale": {"from": -0.5, "to": 1.5, "step": 0.5, "unit": "d", "marks": [{"at": 0, "name": "no difference"}]},
+  "rows": [
+    {"name": "Tasks finished", "from": 0.04, "to": 0.72, "note": "d = 0.38"},
+    {"name": "Time, faster", "from": 0.25, "to": 0.97, "note": "d = 0.61"},
+    {"name": "Confidence", "from": 0.2, "to": 0.9, "note": "d = 0.55"}
+  ]
+}
+-->
+<svg id="dg-effects" class="dg dg-range dg-auto" xmlns="http://www.w3.org/2000/svg" width="640" height="176" viewBox="0 0 640 176" role="img" aria-label="Standardized effect of worked examples, with 95% intervals. Tasks finished: d 0.38, interval 0.04 to 0.72. Time, faster: d 0.61, interval 0.25 to 0.97. Confidence: d 0.55, interval 0.20 to 0.90. No interval includes 0.">
+<style>
+#dg-effects{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-effects .ground{fill:var(--fig,#f2f3f9)}
+#dg-effects .band{fill:var(--bg,#fbfbfe)}
+#dg-effects .track{stroke:var(--line,#d3d6e3)}
+#dg-effects .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-effects .head{fill:var(--text,#1c1f2e)}
+#dg-effects .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-effects .stop.end{fill:var(--text,#1c1f2e)}
+#dg-effects .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-effects .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-effects .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-effects .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-effects .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-effects .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-effects .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-effects .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-effects .sub,#dg-effects .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-effects .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-effects .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-effects .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-effects .r-bar{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-effects .r-pt{fill:var(--text,#1c1f2e)}
+#dg-effects .r-lim{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2}
+#dg-effects .r-ref{stroke:var(--muted,#575d75)}
+@media (prefers-reduced-motion:reduce){#dg-effects .pulse{animation:none!important}#dg-effects .pulse{display:none!important}}
+@media print{#dg-effects{max-width:100%;height:auto}#dg-effects .pulse{display:none!important}}
+#dg-effects-phone{display:none}
+</style>
+<rect width="640" height="176" class="ground"/>
+<rect x="8" y="56" width="624" height="112" rx="10" class="band"/>
+<line x1="249.25" y1="56" x2="249.25" y2="168" class="r-ref"/>
+<line x1="139" y1="56" x2="139" y2="168" class="track"/>
+<line x1="359.5" y1="56" x2="359.5" y2="168" class="track"/>
+<line x1="469.75" y1="56" x2="469.75" y2="168" class="track"/>
+<line x1="580" y1="56" x2="580" y2="168" class="track"/>
+<text x="249.25" y="24" class="sub" text-anchor="middle">no difference</text>
+<text x="139" y="44" class="val" text-anchor="middle">−0.5</text>
+<text x="249.25" y="44" class="val" text-anchor="middle">0</text>
+<text x="359.5" y="44" class="val" text-anchor="middle">0.5</text>
+<text x="469.75" y="44" class="val" text-anchor="middle">1</text>
+<text x="580" y="44" class="val" text-anchor="middle">1.5</text>
+<text x="113.08" y="44" class="sub" text-anchor="end">d</text>
+<text x="20" y="85" class="row" text-anchor="start">Tasks finished</text>
+<rect x="412.01" y="72" width="134.28" height="16" class="band"/><text x="416.01" y="84" class="val" text-anchor="start">0.04–0.72, d = 0.38</text>
+<text x="20" y="117" class="row" text-anchor="start">Time, faster</text>
+<rect x="467.14" y="104" width="134.28" height="16" class="band"/><text x="471.14" y="116" class="val" text-anchor="start">0.25–0.97, d = 0.61</text>
+<text x="20" y="149" class="row" text-anchor="start">Confidence</text>
+<rect x="451.7" y="136" width="118.44" height="16" class="band"/><text x="455.7" y="148" class="val" text-anchor="start">0.2–0.9, d = 0.55</text>
+<rect x="258.07" y="72" width="149.94" height="16" rx="4" class="r-bar"/><line x1="359.5" y1="72.75" x2="359.5" y2="87.25" class="track"/>
+<rect x="304.38" y="104" width="158.76" height="16" rx="4" class="r-bar"/><line x1="359.5" y1="104.75" x2="359.5" y2="119.25" class="track"/>
+<rect x="293.35" y="136" width="154.35" height="16" rx="4" class="r-bar"/><line x1="359.5" y1="136.75" x2="359.5" y2="151.25" class="track"/>
+</svg>
+<svg id="dg-effects-phone" class="dg dg-range dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="298" viewBox="0 0 264 298" role="img" aria-label="Standardized effect of worked examples, with 95% intervals. Tasks finished: d 0.38, interval 0.04 to 0.72. Time, faster: d 0.61, interval 0.25 to 0.97. Confidence: d 0.55, interval 0.20 to 0.90. No interval includes 0.">
+<style>
+#dg-effects-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-effects-phone .ground{fill:var(--fig,#f2f3f9)}
+#dg-effects-phone .band{fill:var(--bg,#fbfbfe)}
+#dg-effects-phone .track{stroke:var(--line,#d3d6e3)}
+#dg-effects-phone .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-effects-phone .head{fill:var(--text,#1c1f2e)}
+#dg-effects-phone .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-effects-phone .stop.end{fill:var(--text,#1c1f2e)}
+#dg-effects-phone .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-effects-phone .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-effects-phone .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-effects-phone .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-effects-phone .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-effects-phone .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-effects-phone .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-effects-phone .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-effects-phone .sub,#dg-effects-phone .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-effects-phone .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-effects-phone .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-effects-phone .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-effects-phone .r-bar{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-effects-phone .r-pt{fill:var(--text,#1c1f2e)}
+#dg-effects-phone .r-lim{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2}
+#dg-effects-phone .r-ref{stroke:var(--muted,#575d75)}
+@media (prefers-reduced-motion:reduce){#dg-effects-phone .pulse{animation:none!important}#dg-effects-phone .pulse{display:none!important}}
+@media print{#dg-effects-phone{max-width:100%;height:auto}#dg-effects-phone .pulse{display:none!important}}
+@media (max-width:736px){#dg-effects{display:none}#dg-effects-phone{display:block}}
+@media print{#dg-effects{display:block!important}#dg-effects-phone{display:none!important}}
+</style>
+<rect width="264" height="298" class="ground"/>
+<rect x="8" y="76" width="248" height="214" rx="10" class="band"/>
+<line x1="74" y1="120" x2="74" y2="148" class="r-ref"/>
+<line x1="74" y1="186" x2="74" y2="214" class="r-ref"/>
+<line x1="74" y1="252" x2="74" y2="280" class="r-ref"/>
+<line x1="28" y1="120" x2="28" y2="148" class="track"/>
+<line x1="120" y1="120" x2="120" y2="148" class="track"/>
+<line x1="212" y1="120" x2="212" y2="148" class="track"/>
+<line x1="28" y1="186" x2="28" y2="214" class="track"/>
+<line x1="120" y1="186" x2="120" y2="214" class="track"/>
+<line x1="212" y1="186" x2="212" y2="214" class="track"/>
+<line x1="28" y1="252" x2="28" y2="280" class="track"/>
+<line x1="120" y1="252" x2="120" y2="280" class="track"/>
+<line x1="212" y1="252" x2="212" y2="280" class="track"/>
+<text x="74" y="24" class="sub" text-anchor="middle">no difference</text>
+<text x="28" y="44" class="sub" text-anchor="start">d</text>
+<text x="28" y="64" class="val" text-anchor="middle">−0.5</text>
+<text x="120" y="64" class="val" text-anchor="middle">0.5</text>
+<text x="212" y="64" class="val" text-anchor="middle">1.5</text>
+<text x="20" y="100" class="row" text-anchor="start">Tasks finished</text>
+<rect x="73.68" y="108" width="134.28" height="16" class="band"/><text x="77.68" y="120" class="val" text-anchor="start">0.04–0.72, d = 0.38</text>
+<text x="20" y="166" class="row" text-anchor="start">Time, faster</text>
+<rect x="93" y="174" width="134.28" height="16" class="band"/><text x="97" y="186" class="val" text-anchor="start">0.25–0.97, d = 0.61</text>
+<text x="20" y="232" class="row" text-anchor="start">Confidence</text>
+<rect x="88.4" y="240" width="118.44" height="16" class="band"/><text x="92.4" y="252" class="val" text-anchor="start">0.2–0.9, d = 0.55</text>
+<rect x="77.68" y="126" width="62.56" height="16" rx="4" class="r-bar"/><line x1="120" y1="126.75" x2="120" y2="141.25" class="track"/>
+<rect x="97" y="192" width="66.24" height="16" rx="4" class="r-bar"/><line x1="120" y1="192.75" x2="120" y2="207.25" class="track"/>
+<rect x="92.4" y="258" width="64.4" height="16" rx="4" class="r-bar"/><line x1="120" y1="258.75" x2="120" y2="273.25" class="track"/>
+</svg>
+<details class="dg-words">
+<summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>The diagram in words</summary>
+<div class="table-wrap is-text" role="region" aria-label="The rows of the range chart" tabindex="0"><table><thead><tr><th scope="col">Row</th><th scope="col">Value, in d</th></tr></thead><tbody><tr><th scope="row">Tasks finished</th><td>0.04–0.72, d = 0.38</td></tr><tr><th scope="row">Time, faster</th><td>0.25–0.97, d = 0.61</td></tr><tr><th scope="row">Confidence</th><td>0.2–0.9, d = 0.55</td></tr></tbody></table></div>
+<ul><li>A line at 0 d: no difference.</li></ul>
+</details>
+<!-- /docent:diagram -->
+      </div>
+      <figcaption><strong>Figure 1</strong>Effect of worked examples on each measure, as d with a 95% interval. A positive d favors the pages with examples.</figcaption>
+    </figure>
+
+    <h3>Each task</h3>
+    <p>Each task was done 12 times with each version. Figure 2 shows the share finished. The examples helped most with the list task, where the pages without examples did not show how to ask for the next page.</p>
+    <figure>
+      <div class="fig" role="region" aria-label="Figure 2, share of tasks finished, by task and version" tabindex="0">
+<!-- docent:diagram
+{
+  "id": "by-task",
+  "kind": "bar",
+  "label": "Share of tasks finished, without and with worked examples, 12 tries each. Sign a request: 83% and 92%. Read a long list: 58% and 83%. Check a webhook: 67% and 83%. Handle an error: 67% and 83%.",
+  "scale": {"from": 0, "to": 100, "step": 25, "unit": "% finished"},
+  "series": ["Without examples", "With examples"],
+  "order": "written",
+  "orderNote": "in the order of the task list",
+  "rows": [
+    {"name": "Sign a request", "values": [83, 92]},
+    {"name": "Read a long list", "values": [58, 83]},
+    {"name": "Check a webhook", "values": [67, 83]},
+    {"name": "Handle an error", "values": [67, 83]}
+  ]
+}
+-->
+<svg id="dg-by-task" class="dg dg-bar dg-auto" xmlns="http://www.w3.org/2000/svg" width="640" height="234" viewBox="0 0 640 234" role="img" aria-label="Share of tasks finished, without and with worked examples, 12 tries each. Sign a request: 83% and 92%. Read a long list: 58% and 83%. Check a webhook: 67% and 83%. Handle an error: 67% and 83%.">
+<style>
+#dg-by-task{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-by-task .ground{fill:var(--fig,#f2f3f9)}
+#dg-by-task .band{fill:var(--bg,#fbfbfe)}
+#dg-by-task .track{stroke:var(--line,#d3d6e3)}
+#dg-by-task .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-by-task .head{fill:var(--text,#1c1f2e)}
+#dg-by-task .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-by-task .stop.end{fill:var(--text,#1c1f2e)}
+#dg-by-task .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-by-task .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-by-task .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-by-task .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-by-task .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-by-task .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-by-task .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-by-task .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-by-task .sub,#dg-by-task .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-by-task .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-by-task .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-by-task .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-by-task .r-bar{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-by-task .r-ref{stroke:var(--muted,#575d75)}
+#dg-by-task .r-pt{fill:var(--text,#1c1f2e)}
+#dg-by-task .d-ring{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-by-task .d-gap{stroke:var(--muted,#575d75);stroke-width:2}
+#dg-by-task .d-lead{stroke:var(--muted,#575d75);stroke-width:1}
+@media (prefers-reduced-motion:reduce){#dg-by-task .pulse{animation:none!important}#dg-by-task .pulse{display:none!important}}
+@media print{#dg-by-task{max-width:100%;height:auto}#dg-by-task .pulse{display:none!important}}
+#dg-by-task-phone{display:none}
+</style>
+<rect width="640" height="234" class="ground"/>
+<rect x="8" y="60" width="624" height="166" rx="10" class="band"/>
+<line x1="184" y1="60" x2="184" y2="226" class="track"/>
+<line x1="285.75" y1="60" x2="285.75" y2="226" class="track"/>
+<line x1="387.5" y1="60" x2="387.5" y2="226" class="track"/>
+<line x1="489.25" y1="60" x2="489.25" y2="226" class="track"/>
+<line x1="591" y1="60" x2="591" y2="226" class="track"/>
+<text x="20" y="24" class="sub" text-anchor="start">% finished, scale from 0. In the order of the task list.</text>
+<text x="184" y="48" class="val" text-anchor="middle">0</text>
+<text x="285.75" y="48" class="val" text-anchor="middle">25</text>
+<text x="387.5" y="48" class="val" text-anchor="middle">50</text>
+<text x="489.25" y="48" class="val" text-anchor="middle">75</text>
+<text x="591" y="48" class="val" text-anchor="middle">100</text>
+<text x="20" y="111" class="row" text-anchor="start">Sign a request</text>
+<rect x="488.97" y="98" width="23.84" height="16" class="band"/><text x="508.81" y="110" class="val" text-anchor="end">83</text>
+<rect x="567.44" y="98" width="23.84" height="16" class="band"/><text x="571.44" y="110" class="val" text-anchor="start">92</text>
+<rect x="430" y="76" width="110" height="16" class="band"/><text x="485" y="88" class="val" text-anchor="middle">Without examples</text>
+<rect x="540" y="76" width="92" height="16" class="band"/><text x="586" y="88" class="val" text-anchor="middle">With examples</text>
+<text x="20" y="143" class="row" text-anchor="start">Read a long list</text>
+<rect x="387.22" y="130" width="23.84" height="16" class="band"/><text x="407.06" y="142" class="val" text-anchor="end">58</text>
+<rect x="530.81" y="130" width="23.84" height="16" class="band"/><text x="534.81" y="142" class="val" text-anchor="start">83</text>
+<text x="20" y="175" class="row" text-anchor="start">Check a webhook</text>
+<rect x="423.85" y="162" width="23.84" height="16" class="band"/><text x="443.69" y="174" class="val" text-anchor="end">67</text>
+<rect x="530.81" y="162" width="23.84" height="16" class="band"/><text x="534.81" y="174" class="val" text-anchor="start">83</text>
+<text x="20" y="207" class="row" text-anchor="start">Handle an error</text>
+<rect x="423.85" y="194" width="23.84" height="16" class="band"/><text x="443.69" y="206" class="val" text-anchor="end">67</text>
+<rect x="530.81" y="194" width="23.84" height="16" class="band"/><text x="534.81" y="206" class="val" text-anchor="start">83</text>
+<line x1="521.81" y1="106" x2="558.44" y2="106" class="d-gap"/><circle cx="521.81" cy="106" r="4.25" class="d-ring"/><circle cx="558.44" cy="106" r="5" class="r-pt"/><line x1="485" y1="92" x2="521.81" y2="99" class="d-lead"/><line x1="586" y1="92" x2="558.44" y2="99" class="d-lead"/>
+<line x1="420.06" y1="138" x2="521.81" y2="138" class="d-gap"/><circle cx="420.06" cy="138" r="4.25" class="d-ring"/><circle cx="521.81" cy="138" r="5" class="r-pt"/>
+<line x1="456.69" y1="170" x2="521.81" y2="170" class="d-gap"/><circle cx="456.69" cy="170" r="4.25" class="d-ring"/><circle cx="521.81" cy="170" r="5" class="r-pt"/>
+<line x1="456.69" y1="202" x2="521.81" y2="202" class="d-gap"/><circle cx="456.69" cy="202" r="4.25" class="d-ring"/><circle cx="521.81" cy="202" r="5" class="r-pt"/>
+</svg>
+<svg id="dg-by-task-phone" class="dg dg-bar dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="322" viewBox="0 0 264 322" role="img" aria-label="Share of tasks finished, without and with worked examples, 12 tries each. Sign a request: 83% and 92%. Read a long list: 58% and 83%. Check a webhook: 67% and 83%. Handle an error: 67% and 83%.">
+<style>
+#dg-by-task-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-by-task-phone .ground{fill:var(--fig,#f2f3f9)}
+#dg-by-task-phone .band{fill:var(--bg,#fbfbfe)}
+#dg-by-task-phone .track{stroke:var(--line,#d3d6e3)}
+#dg-by-task-phone .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-by-task-phone .head{fill:var(--text,#1c1f2e)}
+#dg-by-task-phone .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-by-task-phone .stop.end{fill:var(--text,#1c1f2e)}
+#dg-by-task-phone .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-by-task-phone .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-by-task-phone .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-by-task-phone .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-by-task-phone .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-by-task-phone .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-by-task-phone .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-by-task-phone .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-by-task-phone .sub,#dg-by-task-phone .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-by-task-phone .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-by-task-phone .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-by-task-phone .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-by-task-phone .r-bar{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-by-task-phone .r-ref{stroke:var(--muted,#575d75)}
+#dg-by-task-phone .r-pt{fill:var(--text,#1c1f2e)}
+#dg-by-task-phone .d-ring{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-by-task-phone .d-gap{stroke:var(--muted,#575d75);stroke-width:2}
+#dg-by-task-phone .d-lead{stroke:var(--muted,#575d75);stroke-width:1}
+@media (prefers-reduced-motion:reduce){#dg-by-task-phone .pulse{animation:none!important}#dg-by-task-phone .pulse{display:none!important}}
+@media print{#dg-by-task-phone{max-width:100%;height:auto}#dg-by-task-phone .pulse{display:none!important}}
+@media (max-width:736px){#dg-by-task{display:none}#dg-by-task-phone{display:block}}
+@media print{#dg-by-task{display:block!important}#dg-by-task-phone{display:none!important}}
+</style>
+<rect width="264" height="322" class="ground"/>
+<rect x="8" y="76" width="248" height="238" rx="10" class="band"/>
+<line x1="49" y1="126" x2="49" y2="154" class="track"/>
+<line x1="132" y1="126" x2="132" y2="154" class="track"/>
+<line x1="215" y1="126" x2="215" y2="154" class="track"/>
+<line x1="49" y1="176" x2="49" y2="204" class="track"/>
+<line x1="132" y1="176" x2="132" y2="204" class="track"/>
+<line x1="215" y1="176" x2="215" y2="204" class="track"/>
+<line x1="49" y1="226" x2="49" y2="254" class="track"/>
+<line x1="132" y1="226" x2="132" y2="254" class="track"/>
+<line x1="215" y1="226" x2="215" y2="254" class="track"/>
+<line x1="49" y1="276" x2="49" y2="304" class="track"/>
+<line x1="132" y1="276" x2="132" y2="304" class="track"/>
+<line x1="215" y1="276" x2="215" y2="304" class="track"/>
+<text x="20" y="24" class="sub" text-anchor="start">% finished, scale from 0. In the order</text>
+<text x="20" y="40" class="sub" text-anchor="start">of the task list.</text>
+<text x="49" y="64" class="val" text-anchor="middle">0</text>
+<text x="132" y="64" class="val" text-anchor="middle">50</text>
+<text x="215" y="64" class="val" text-anchor="middle">100</text>
+<text x="20" y="100" class="row" text-anchor="start">Sign a request</text>
+<rect x="153.94" y="132" width="23.84" height="16" class="band"/><text x="173.78" y="144" class="val" text-anchor="end">83</text>
+<rect x="210.72" y="132" width="23.84" height="16" class="band"/><text x="214.72" y="144" class="val" text-anchor="start">92</text>
+<rect x="54" y="110" width="110" height="16" class="band"/><text x="109" y="122" class="val" text-anchor="middle">Without examples</text>
+<rect x="164" y="110" width="92" height="16" class="band"/><text x="210" y="122" class="val" text-anchor="middle">With examples</text>
+<text x="20" y="172" class="row" text-anchor="start">Read a long list</text>
+<rect x="112.44" y="182" width="23.84" height="16" class="band"/><text x="132.28" y="194" class="val" text-anchor="end">58</text>
+<rect x="195.78" y="182" width="23.84" height="16" class="band"/><text x="199.78" y="194" class="val" text-anchor="start">83</text>
+<text x="20" y="222" class="row" text-anchor="start">Check a webhook</text>
+<rect x="127.38" y="232" width="23.84" height="16" class="band"/><text x="147.22" y="244" class="val" text-anchor="end">67</text>
+<rect x="195.78" y="232" width="23.84" height="16" class="band"/><text x="199.78" y="244" class="val" text-anchor="start">83</text>
+<text x="20" y="272" class="row" text-anchor="start">Handle an error</text>
+<rect x="127.38" y="282" width="23.84" height="16" class="band"/><text x="147.22" y="294" class="val" text-anchor="end">67</text>
+<rect x="195.78" y="282" width="23.84" height="16" class="band"/><text x="199.78" y="294" class="val" text-anchor="start">83</text>
+<line x1="186.78" y1="140" x2="201.72" y2="140" class="d-gap"/><circle cx="186.78" cy="140" r="4.25" class="d-ring"/><circle cx="201.72" cy="140" r="5" class="r-pt"/><line x1="109" y1="126" x2="186.78" y2="133" class="d-lead"/><line x1="210" y1="126" x2="201.72" y2="133" class="d-lead"/>
+<line x1="145.28" y1="190" x2="186.78" y2="190" class="d-gap"/><circle cx="145.28" cy="190" r="4.25" class="d-ring"/><circle cx="186.78" cy="190" r="5" class="r-pt"/>
+<line x1="160.22" y1="240" x2="186.78" y2="240" class="d-gap"/><circle cx="160.22" cy="240" r="4.25" class="d-ring"/><circle cx="186.78" cy="240" r="5" class="r-pt"/>
+<line x1="160.22" y1="290" x2="186.78" y2="290" class="d-gap"/><circle cx="160.22" cy="290" r="4.25" class="d-ring"/><circle cx="186.78" cy="290" r="5" class="r-pt"/>
+</svg>
+<details class="dg-words">
+<summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>The diagram in words</summary>
+<div class="table-wrap is-text" role="region" aria-label="The rows of the bar chart" tabindex="0"><table><thead><tr><th scope="col">Row</th><th scope="col">Without examples</th><th scope="col">With examples</th><th scope="col">Change, in % finished</th></tr></thead><tbody><tr><th scope="row">Sign a request</th><td>83</td><td>92</td><td>+9</td></tr><tr><th scope="row">Read a long list</th><td>58</td><td>83</td><td>+25</td></tr><tr><th scope="row">Check a webhook</th><td>67</td><td>83</td><td>+16</td></tr><tr><th scope="row">Handle an error</th><td>67</td><td>83</td><td>+16</td></tr></tbody></table></div>
+<ul><li>% finished, scale from 0. In the order of the task list.</li></ul>
+</details>
+<!-- /docent:diagram -->
+      </div>
+      <figcaption><strong>Figure 2</strong>Share of tasks finished, by task and version. Each value is out of 12 tries, so one try is 8 points.</figcaption>
+    </figure>
+
+    <h3>How the times spread</h3>
+    <p>Times varied widely between participants. The table gives the spread of the times for finished tasks. The slowest quarter of tasks with examples was about as fast as the middle of the tasks without them.</p>
+    <div class="table-wrap" role="region" aria-label="Spread of times for finished tasks, in minutes" tabindex="0">
+      <table>
+        <thead>
+          <tr><th scope="col">Version</th><th scope="col" class="num">Finished tasks</th><th scope="col" class="num">Fastest</th><th scope="col" class="num">First quarter</th><th scope="col" class="num">Median</th><th scope="col" class="num">Third quarter</th><th scope="col" class="num">Slowest</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">Without examples</th><td class="num">33</td><td class="num">3.1</td><td class="num">5.8</td><td class="num">8.7</td><td class="num">11.6</td><td class="num">14.8</td></tr>
+          <tr><th scope="row">With examples</th><td class="num">41</td><td class="num">2.4</td><td class="num">4.1</td><td class="num">6.2</td><td class="num">8.9</td><td class="num">14.1</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Of the 24 participants, 19 were faster with examples on the tasks they finished with both versions, 4 were slower, and 1 finished no task without examples.</p>
+  </section>
+
+  <section id="discussion" aria-labelledby="discussion-h">
+    <h2 id="discussion-h">What the results mean</h2>
+    <div class="row">
+      <div>
+        <p>All three expectations held. Worked examples helped most where the reference left out a step that the code needs, such as asking for the next page of a list. Where the description already said each step, as for signing a request, the examples helped little.</p>
+        <p>The effect on time agrees with the earlier tutorial study (Haddad et al., 2021), which found that examples cut the time to a first call by about a third. Our tasks were later steps, and the cut was about a quarter.</p>
+        <p>For a team that writes reference pages, the results suggest an order: write examples first for the calls whose use needs more than one step. Those are the calls where a description alone fails most often.</p>
+      </div>
+      <div class="note" role="note">
+        <strong>A quarter</strong>
+        2.3 minutes of 8.7 is 26%. The interval runs from 11% to 41%.
+      </div>
+    </div>
+  </section>
+
+  <section id="limits" aria-labelledby="limits-h">
+    <h2 id="limits-h">Limits</h2>
+    <ul>
+      <li><strong>A small sample.</strong> With 24 participants the intervals are wide. A study of about 80 would narrow the interval for tasks finished by half.</li>
+      <li><strong>One API.</strong> The test API was small and invented. A large API with many ways to do one task may give a different result.</li>
+      <li><strong>Our own examples.</strong> We wrote the examples for these tasks. Examples in real pages are often written for other tasks, so they may help less.</li>
+      <li><strong>A lab session.</strong> Participants worked alone, in one session, with no search engine and no forum. At work, a developer who lacks an example can often find one.</li>
+      <li><strong>Who took part.</strong> People on a developer mailing list may read documentation more than most.</li>
+    </ul>
+  </section>
+
+  <section id="references" aria-labelledby="references-h">
+    <h2 id="references-h">References</h2>
+    <p>Every source below is invented for this test document. The addresses point to example.org, which holds no papers.</p>
+    <ul>
+      <li>Haddad, R., Mbeki, T., and Sørensen, L. (2021). Examples first: tutorial structure and the time to a first API call. <em>Journal of Example Software Studies</em>, 12(3), 201–219. https://example.org/doi/10.0000/jess.2021.0312</li>
+      <li>Ortega, M., and Lindqvist, P. (2019). Where developers look first in API documentation. In <em>Proceedings of the Example Conference on Program Comprehension</em>, 44–53. https://example.org/doi/10.0000/ecpc.2019.044</li>
+      <li>Example Lab (2026). Study plan: worked examples in API reference pages. Registered 28 August 2026. https://example.org/plans/2026-08-worked-examples</li>
+    </ul>
+    <details>
+      <summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>How d is worked out</summary>
+      <p>For each participant, we took the difference between the two versions, then divided the mean of those differences by their standard deviation. For tasks finished, a participant's value is the share of their two tasks that they finished with each version.</p>
+<pre tabindex="0" role="region" aria-label="The formula for d"><code><span class="cm"># d for paired measures</span>
+d = mean(differences) / sd(differences)</code></pre>
+    </details>
+  </section>
+</main>
+
+<footer>
+  <div class="shell">
+    <p class="credit"><svg viewBox="13 13 38 38" aria-hidden="true"><path d="M20 37V18H30A14 14 0 0 1 30 46H29" fill="none" stroke="currentColor" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="20" cy="46" r="4" fill="currentColor"/></svg>Made with <a href="https://github.com/sorawit-w/docent">Docent</a></p>
+  </div>
+</footer>
+<script>
+// docent:kit 0.18.0
+(() => {
+  const root = document.documentElement;
+  root.classList.add('js');
+  // A page saved from the browser ("Save page as") keeps what this script added. Take it out, so that the script adds each part once.
+  document.querySelectorAll('.fig-more, .step-n, button.copy').forEach((el) => el.remove());
+  document.querySelectorAll('div.code').forEach((holder) => holder.replaceWith(...holder.childNodes));
+  document.querySelectorAll('.is-numbered').forEach((h) => h.classList.remove('is-numbered'));
+  // A theme that the reader chose carries data-theme-reader. A saved page keeps it, and it is not a fixed theme.
+  if (root.hasAttribute('data-theme-reader')) { delete root.dataset.theme; delete root.dataset.themeReader; }
+  // Theme: the page follows the reader's system setting. The switch sets a choice that wins over the system and is remembered.
+  const button = document.querySelector('.theme');
+  const system = matchMedia('(prefers-color-scheme: dark)');
+  const theme = () => root.dataset.theme || (system.matches ? 'dark' : 'light');
+  const chooseTheme = (value) => { root.dataset.theme = value; root.dataset.themeReader = ''; };
+  // A theme written on <html> in the source is fixed: no saved choice and no switch.
+  const fixed = root.dataset.theme === 'light' || root.dataset.theme === 'dark';
+  if (fixed && button) button.hidden = true;
+  if (!fixed) try {
+    const saved = localStorage.getItem('docent-theme');
+    if (saved === 'dark' || saved === 'light') chooseTheme(saved);
+  } catch { /* no saved choice can be read: follow the system */ }
+  if (button && !fixed) {
+    const showSwitch = () => {
+      const next = theme() === 'dark' ? 'light' : 'dark';
+      button.dataset.next = next;
+      button.querySelector('.theme-text').textContent = next === 'dark' ? 'Dark' : 'Light';
+      button.setAttribute('aria-label', `Switch to the ${next} theme`);
+    };
+    showSwitch();
+    system.addEventListener('change', showSwitch);
+    button.addEventListener('click', () => {
+      chooseTheme(theme() === 'dark' ? 'light' : 'dark');
+      showSwitch();
+      try { localStorage.setItem('docent-theme', root.dataset.theme); } catch { /* private window: the choice lasts for this visit */ }
+    });
+  }
+  // Step numbers. The styles count the steps, but a screen reader in Chromium does not read a number that the styles count. So the script writes each number as text, in place of the counted one.
+  const number = (heading, n) => {
+    const span = document.createElement('span');
+    span.className = 'step-n';
+    span.textContent = `${n} `;
+    heading.prepend(span);
+    heading.classList.add('is-numbered');
+  };
+  const groups = new Map();
+  document.querySelectorAll('h3.step').forEach((h) => { const s = h.closest('section'); groups.set(s, [...(groups.get(s) || []), h]); });
+  groups.forEach((list) => list.forEach((h, i) => number(h, i + 1)));
+  document.querySelectorAll('.steps').forEach((ol) => [...ol.children].forEach((li, i) => { const h = li.querySelector('h3'); if (h) number(h, i + 1); }));
+  // A diagram outside a walkthrough runs its dot twice when it comes into view, then rests. Pointing at it runs it again.
+  const replay = (svg) => svg.querySelectorAll('.pulse').forEach((dot) => dot.getAnimations().forEach((run) => { run.cancel(); run.play(); }));
+  const seen = new IntersectionObserver((entries) => entries.forEach((entry) => {
+    if (!entry.isIntersecting) return;
+    entry.target.classList.add('is-playing');
+    seen.unobserve(entry.target);
+  }), { threshold: 0.6 });
+  document.querySelectorAll('svg.dg-auto').forEach((svg) => {
+    seen.observe(svg);
+    const well = svg.closest('.fig') || svg;
+    well.addEventListener('pointerenter', () => replay(svg));
+    well.addEventListener('focus', () => replay(svg));
+  });
+  // A drawing that is wider than its well scrolls sideways, and the part that shows can look complete. A line under the well says that more is to the side.
+  const wells = [...document.querySelectorAll('.fig')].map((well) => {
+    const note = document.createElement('p');
+    note.className = 'fig-more';
+    note.hidden = true;
+    note.textContent = 'The drawing is wider than the screen. Scroll it sideways to see all of it.';
+    well.after(note);
+    return { well, note };
+  });
+  // A code block gets a button that copies the code. The block moves into a holder, so the button stays in place when the code scrolls sideways.
+  const blocks = [...document.querySelectorAll('pre')].map((pre) => {
+    const holder = document.createElement('div'), button = document.createElement('button');
+    holder.className = 'code';
+    pre.before(holder);
+    holder.append(pre, button);
+    button.type = 'button';
+    button.className = 'copy';
+    button.textContent = 'Copy';
+    button.setAttribute('aria-live', 'polite');
+    button.addEventListener('click', async () => {
+      const text = (pre.querySelector('code') || pre).textContent;
+      let done = false;
+      try { await navigator.clipboard.writeText(text); done = true; } catch { /* no clipboard here: select the code and copy the selection */ }
+      if (!done) {
+        const range = document.createRange(), selection = getSelection();
+        range.selectNodeContents(pre);
+        selection.removeAllRanges();
+        selection.addRange(range);
+        try { done = document.execCommand('copy'); } catch { /* the code stays selected, so the reader can copy it by hand */ }
+        if (done) selection.removeAllRanges();
+      }
+      button.textContent = done ? 'Copied' : 'Select and copy';
+      setTimeout(() => (button.textContent = 'Copy'), 2000);
+    });
+    return { holder, pre, button };
+  });
+  const fit = () => {
+    wells.forEach(({ well, note }) => (note.hidden = well.scrollWidth <= well.clientWidth + 1));
+    // When the widest line of code reaches the button, the code starts below the button. A block that is hidden now has no size; it is measured when it shows.
+    blocks.forEach(({ holder, pre, button }) => {
+      if (!pre.clientWidth) return;
+      const code = pre.querySelector('code') || pre;
+      holder.classList.toggle('is-long', pre.scrollWidth > pre.clientWidth + 1 || code.getBoundingClientRect().right > button.getBoundingClientRect().left - 8);
+    });
+  };
+  // Measure again when a well or a code block changes its size: the window changes, a chooser shows another case, or a closed section opens.
+  if ('ResizeObserver' in window) {
+    const watch = new ResizeObserver(fit);
+    wells.forEach(({ well }) => watch.observe(well));
+    blocks.forEach(({ pre }) => watch.observe(pre));
+  }
+  addEventListener('resize', fit);
+  fit();
+  // Print: open every closed section so its text prints, then close it again.
+  let opened = [];
+  addEventListener('beforeprint', () => { opened = [...document.querySelectorAll('details:not([open])')]; opened.forEach((d) => (d.open = true)); });
+  addEventListener('afterprint', () => { opened.forEach((d) => (d.open = false)); opened = []; });
+  // The route dot marks the current section. In each walkthrough, the rail dot marks the current step and the diagram lights the leg with the same number.
+  const bar = document.querySelector('.topbar .shell');
+  const routeDot = document.querySelector('.route-dot');
+  const links = [...document.querySelectorAll('.route a[href^="#"]')].filter((a) => document.getElementById(a.getAttribute('href').slice(1)));
+  const sections = links.map((a) => document.getElementById(a.getAttribute('href').slice(1)));
+  const walks = [...document.querySelectorAll('.walk')].map((walk) => ({
+    steps: [...walk.querySelectorAll('.steps > li')],
+    legs: [...walk.querySelectorAll('svg.dg .leg')],
+    dot: walk.querySelector('.rail-dot'),
+  })).filter((walk) => walk.steps.length);
+  const nearest = (items, line) => items.reduce((best, el) => (el.getBoundingClientRect().top <= line ? el : best), items[0]);
+  const update = () => {
+    if (sections.length) {
+      const section = nearest(sections, innerHeight * 0.35);
+      links.forEach((a, i) => (sections[i] === section ? a.setAttribute('aria-current', 'true') : a.removeAttribute('aria-current')));
+      if (bar && routeDot) {
+        const link = links[sections.indexOf(section)].getBoundingClientRect();
+        routeDot.style.setProperty('--x', `${link.left + link.width / 2 - bar.getBoundingClientRect().left - 3.5}px`);
+      }
+    }
+    walks.forEach(({ steps, legs, dot }) => {
+      const step = nearest(steps, innerHeight * 0.5);
+      const number = steps.indexOf(step) + 1;
+      steps.forEach((li) => li.classList.toggle('is-current', li === step));
+      legs.forEach((leg) => leg.classList.toggle('is-current', Number(leg.dataset.leg) === number));
+      if (dot) dot.style.setProperty('--y', `${step.offsetTop}px`);
+    });
+  };
+  let queued = false;
+  const schedule = () => { if (!queued) { queued = true; requestAnimationFrame(() => { queued = false; update(); }); } };
+  addEventListener('scroll', schedule, { passive: true });
+  addEventListener('resize', schedule);
+  // Widgets. Each one is readable without this script. The script adds memory, the count of a checklist and the answer of a decision helper.
+  const load = (key) => { try { return JSON.parse(localStorage.getItem(key)); } catch { return null; } };
+  const save = (key, value) => { try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* private window: it lasts for this visit */ } };
+  // Chooser: the choice is remembered, and choosers with the same options change together.
+  const choosers = [...document.querySelectorAll('.choose')].map((el) => ({
+    inputs: [...el.querySelectorAll(':scope > input')],
+    key: `docent-choice:${[...el.querySelectorAll(':scope > .opt')].map((label) => label.textContent).join('|')}`,
+  }));
+  const choose = (key, n) => choosers.forEach((c) => { if (c.key === key && c.inputs[n]) c.inputs[n].checked = true; });
+  choosers.forEach((c) => {
+    choose(c.key, load(c.key));
+    c.inputs.forEach((input, n) => input.addEventListener('change', () => {
+      const top = input.getBoundingClientRect().top;
+      choose(c.key, n);
+      scrollBy(0, input.getBoundingClientRect().top - top); // a chooser higher on the page changed its height: keep this one in place
+      save(c.key, n);
+      schedule();
+    }));
+  });
+  // Value picker: every place <var data-v="key"> shows the value of the chosen option. The values come from the table of all values. Pickers with the same options change together, and the choice is remembered.
+  const pickers = [...document.querySelectorAll('.values')].map((el) => ({
+    el,
+    inputs: [...el.querySelectorAll(':scope > input')],
+    names: [...el.querySelectorAll(':scope > .opt')].map((label) => label.textContent),
+    rows: [...el.querySelectorAll('tbody tr[data-v]')].map((tr) => ({ key: tr.dataset.v, cells: [...tr.querySelectorAll('td')].map((td) => td.textContent) })),
+  }));
+  const pick = (names, n) => pickers.forEach((p) => {
+    if (p.names.join('|') !== names || !p.inputs[n]) return;
+    p.inputs[n].checked = true;
+    p.el.querySelector('.values-now strong').textContent = p.names[n];
+    p.rows.forEach(({ key, cells }) => document.querySelectorAll(`var[data-v="${CSS.escape(key)}"]`).forEach((v) => (v.textContent = cells[n])));
+  });
+  pickers.forEach((p) => {
+    const key = `docent-values:${p.names.join('|')}`, saved = load(key);
+    if (Number.isInteger(saved)) pick(p.names.join('|'), saved);
+    p.inputs.forEach((input, n) => input.addEventListener('change', () => { pick(p.names.join('|'), n); save(key, n); }));
+    p.el.querySelector('details').open = false;
+  });
+  // Checklist: the ticks are remembered for this document, and the line below the list counts them.
+  document.querySelectorAll('form.checks').forEach((form) => {
+    const boxes = [...form.querySelectorAll('input')], out = form.querySelector('output'), key = `docent-ticks:${location.pathname}#${form.id}`;
+    const saved = load(key);
+    if (Array.isArray(saved) && saved.length === boxes.length) boxes.forEach((box, i) => (box.checked = saved[i] === true));
+    const show = () => { out.textContent = `${boxes.filter((box) => box.checked).length} of ${boxes.length} done`; };
+    const keep = () => { show(); save(key, boxes.map((box) => box.checked)); schedule(); };
+    form.addEventListener('change', keep);
+    form.addEventListener('reset', () => setTimeout(keep));
+    show();
+  });
+  // Decision helper: a row that no longer fits the answers takes the muted color. When every question has an answer, the one row that fits is shown as the answer.
+  document.querySelectorAll('.decide').forEach((el) => {
+    const form = el.querySelector('form'), out = el.querySelector('output'), again = el.querySelector('.wd-foot'), groups = [...el.querySelectorAll('fieldset')], rows = [...el.querySelectorAll('tbody tr')];
+    el.querySelector('details').open = false;
+    const show = () => {
+      const picked = groups.map((group) => [...group.querySelectorAll('input')].findIndex((input) => input.checked) + 1);
+      const fits = rows.filter((row) => {
+        const fit = row.dataset.when.split(',').every((option, q) => option === '0' || !picked[q] || Number(option) === picked[q]);
+        row.classList.toggle('is-out', !fit);
+        return fit;
+      });
+      out.innerHTML = picked.every(Boolean) && fits.length === 1 ? fits[0].lastElementChild.innerHTML : '';
+      again.hidden = !picked.some(Boolean);
+      schedule();
+    };
+    form.addEventListener('change', show);
+    form.addEventListener('reset', () => setTimeout(show));
+    show();
+  });
+  update();
+  requestAnimationFrame(() => requestAnimationFrame(() => root.classList.add('ready')));
+})();
+// /docent:kit
+</script>
+</body>
+</html>

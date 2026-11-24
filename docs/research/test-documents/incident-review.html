@@ -1,0 +1,1394 @@
+<!doctype html>
+<html lang="en" data-profile="brief" data-palette="harbor">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Incident review: sync errors on 12 November — Example Planner</title>
+<style>
+/* docent:kit 0.18.0 */
+/* Docent page styles. Tokens come from references/DESIGN.md. One file, no network. */
+:root {
+  color-scheme: light;
+  --bg: #fbfbfe; --panel: #f2f3f9; --fig: #f2f3f9;
+  --text: #1c1f2e; --muted: #575d75; --line: #d3d6e3;
+  --primary: var(--host-accent, #2f3fd0); --ink: var(--host-ink, #1b2260); --dot: var(--host-accent, #2f3fd0);
+  --ok: #1a7f37; --warn: #7d4e00; --err: #cf222e;
+  /* The heat steps fill the cells of a heat map and the boxes of a heat plan, and nothing else: from the least (1) to the most (5). One teal on screen; the print block sets five grays for paper. */
+  --heat-1: #c6e9ef; --heat-2: #86c9d5; --heat-3: #3da6b6; --heat-4: #00707e; --heat-5: #004a53;
+  /* The text on a heat step: the kit's own text and page colors. They equal --text and --bg, except with the reader's high contrast mode, where the kit gives those two the system colors and only its own are tested against the steps. */
+  --heat-text: #1c1f2e; --heat-page: #fbfbfe;
+  /* A host's logo for one theme (data-for) shows in that theme. A logo with no version for this theme stands on a tile in the page color of its own theme. */
+  --logo-light: block; --logo-dark: none; --tile-light: transparent; --tile-dark: #12141f;
+  /* A host project sets its own accent, heading color and fonts with the --host-* tokens. The kit never sets them, so they hold in every theme and in print.
+     In dark mode the dot follows the host's dark accent, or --host-dot-dark; on Docent's own pages it is the lamp. */
+  --serif: var(--host-serif, Charter, "Bitstream Charter", "Sitka Heading", "Sitka Text", Cambria, Georgia, serif);
+  --sans: var(--host-sans, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif);
+  --mono: var(--host-mono, ui-monospace, "SF Mono", "Cascadia Code", Consolas, Menlo, monospace);
+  --ease: cubic-bezier(0.23, 1, 0.32, 1);
+  --measure: 31rem; --margin-col: 220px; --gap: 48px; --wide: 1120px;
+  /* The profile of a page sets these. Standard is the default: code and tables end at the right edge of the notes. */
+  --block: calc(var(--measure) + var(--gap) + var(--margin-col)); --section-space: 72px; --cell-y: 12px; --step-space: 36px;
+}
+/* Profiles: one attribute on <html> sets the width of code and tables, and the spacing. A profile never changes the text column. */
+html[data-profile="task"] { --section-space: 56px; --step-space: 28px; }
+html[data-profile="reference"] { --block: var(--wide); --section-space: 56px; --cell-y: 8px; }
+html[data-profile="brief"] { --block: var(--wide); --section-space: 64px; }
+/* A page for the public: every size is in rem, so the text and the text column grow together, on top of the reader's own setting. */
+html[data-text="large"] { font-size: 112.5%; }
+/* Dark: the reader's system setting decides, unless the reader chose a theme with the switch. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #12141f; --panel: #0b0d15; --fig: #0b0d15;
+    --text: #e7e9f3; --muted: #959bb3; --line: #2d3146;
+    --primary: var(--host-accent-dark, #8e9bff); --ink: #e7e9f3; --dot: var(--host-dot-dark, var(--host-accent-dark, #f2b824));
+    --ok: #3fb950; --warn: #d29922; --err: #f85149;
+    --heat-1: #093339; --heat-2: #054e58; --heat-3: #006b78; --heat-4: #36a0b1; --heat-5: #80cad7; --heat-text: #e7e9f3; --heat-page: #12141f;
+    --logo-light: none; --logo-dark: block; --tile-light: #fbfbfe; --tile-dark: transparent;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #12141f; --panel: #0b0d15; --fig: #0b0d15;
+  --text: #e7e9f3; --muted: #959bb3; --line: #2d3146;
+  --primary: var(--host-accent-dark, #8e9bff); --ink: #e7e9f3; --dot: var(--host-dot-dark, var(--host-accent-dark, #f2b824));
+  --ok: #3fb950; --warn: #d29922; --err: #f85149;
+  --heat-1: #093339; --heat-2: #054e58; --heat-3: #006b78; --heat-4: #36a0b1; --heat-5: #80cad7; --heat-text: #e7e9f3; --heat-page: #12141f;
+  --logo-light: none; --logo-dark: block; --tile-light: #fbfbfe; --tile-dark: transparent;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-padding-top: 88px; -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 400 1rem/1.65 var(--sans); caret-color: var(--primary); }
+::selection { background: color-mix(in srgb, var(--primary) 22%, transparent); }
+:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
+a { color: var(--primary); text-decoration-thickness: 1px; text-underline-offset: 0.2em; }
+a:hover { text-decoration-thickness: 2px; }
+/* The skip link: the first thing a keyboard reaches. It is hidden until it has focus; then it stands at the upper left, over the top bar, and jumps to the main element. */
+.skip { position: absolute; top: 12px; left: 12px; z-index: 3; display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); font-size: 0.875rem; }
+.skip:not(:focus) { width: 1px; height: 1px; padding: 0; border: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+/* One left edge for the whole page. On a wide screen the text and its notes sit in the middle as a group; wide blocks start at the same edge and grow to the right, up to --wide. */
+.shell {
+  --left: max(40px, min((100% - var(--measure) - var(--gap) - var(--margin-col)) / 2, 100% - var(--wide) - 40px));
+  padding: 0 max(40px, 100% - var(--left) - var(--wide)) 0 var(--left);
+}
+
+/* Top bar. Its bottom line is the route; the dot marks the current section. */
+.topbar { position: sticky; top: 0; z-index: 2; background: var(--bg); border-bottom: 1px solid var(--line); }
+.topbar .shell { position: relative; display: flex; align-items: center; gap: 32px; height: 56px; }
+.host { display: inline-flex; align-items: center; gap: 10px; font-weight: 600; font-size: 0.875rem; white-space: nowrap; }
+/* The host's logo: 24px high and at most 160px wide; its width and height are written on it. One color (currentColor) takes the heading color. */
+.logo { display: block; flex: none; box-sizing: content-box; color: var(--ink); }
+.host:has(> .logo[data-for="dark"]) > .logo[data-for="light"] { display: var(--logo-light); }
+.host:has(> .logo[data-for="light"]) > .logo[data-for="dark"] { display: var(--logo-dark); }
+/* A logo for one theme only stands on a tile in the other theme: corners of 6px, 4px around it. The outline takes no space, so nothing moves. */
+/* A logo in one color (currentColor) keeps the ink of its own theme, so it reads on its tile too. */
+.host:not(:has(> .logo[data-for="dark"])) > .logo[data-for="light"] { background: var(--tile-light); outline: 4px solid var(--tile-light); border-radius: 2px; color: var(--host-ink, #1b2260); }
+.host:not(:has(> .logo[data-for="light"])) > .logo[data-for="dark"] { background: var(--tile-dark); outline: 4px solid var(--tile-dark); border-radius: 2px; color: #e7e9f3; }
+.route { flex: 1; min-width: 0; }
+.route ol { display: flex; gap: 28px; margin: 0; padding: 0; list-style: none; }
+.route a { display: block; padding: 6px 0; font-size: 0.875rem; color: var(--muted); text-decoration: none; white-space: nowrap; }
+.route a:hover, .route a[aria-current] { color: var(--text); }
+.route-dot { position: absolute; left: 0; bottom: -4px; width: 7px; height: 7px; border-radius: 50%; background: var(--dot); opacity: 0; transform: translateX(var(--x, 0px)); }
+.ready .route-dot, .ready .rail-dot { transition: transform 320ms var(--ease); }
+.js .route-dot { opacity: 1; }
+.theme, .wd-btn { display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px; border: 1px solid var(--line); border-radius: 6px; background: none; color: var(--text); font: 400 0.875rem/1 var(--sans); cursor: pointer; }
+.theme:hover, .wd-btn:hover { border-color: var(--muted); }
+.theme:active, .wd-btn:active { transform: translateY(1px); }
+.theme svg { width: 15px; height: 15px; }
+html:not(.js) .theme, .theme[hidden] { display: none; }
+.theme[data-next="dark"] .icon-sun, .theme[data-next="light"] .icon-moon { display: none; }
+
+/* Title block: the title leads; facts about the document sit below it. */
+.title { padding: 80px 0 8px; }
+.title .row { margin-top: 24px; }
+/* The serif headings take weight 700. A palette with sans-serif headings sets 600, so the sans-serif keeps two weights. */
+h1, h2 { font-family: var(--serif); font-weight: var(--heading-weight, 700); color: var(--ink); text-wrap: balance; margin: 0; }
+h1 { font-size: 3.25rem; line-height: 1.06; letter-spacing: -0.02em; }
+.standfirst { font: 400 1.3125rem/1.5 var(--serif); margin: 0; text-wrap: pretty; }
+.facts { margin: 0; padding-left: 0; list-style: none; font-variant-numeric: tabular-nums; }
+
+section { padding-top: var(--section-space); }
+h2 { font-size: 1.875rem; line-height: 1.2; margin-bottom: 16px; }
+h3 { font: 600 1.125rem/1.35 var(--sans); margin: 0; text-wrap: balance; }
+/* A small heading inside a part of a section: body size, weight 600. */
+h4 { font: 600 1rem/1.5 var(--sans); margin: 24px 0 4px; }
+/* A definition list: each term in weight 600, its meaning below it. */
+dl { max-width: var(--measure); margin: 0 0 16px; }
+dt { font-weight: 600; }
+dd { margin: 0 0 12px; }
+dd:last-child { margin-bottom: 0; }
+p { margin: 0 0 16px; max-width: var(--measure); text-wrap: pretty; }
+.term { text-decoration: underline; text-decoration-color: var(--primary); text-decoration-thickness: 2px; text-underline-offset: 0.22em; }
+/* A place that shows a value of a value picker. A dotted line under it says that it changes with the choice. */
+var { font-style: normal; }
+var[data-v] { text-decoration: underline dotted var(--muted); text-decoration-thickness: 1px; text-underline-offset: 0.25em; }
+code { font: 0.875rem/1.55 var(--mono); background: var(--panel); padding: 0.1em 0.38em; border-radius: 6px; }
+.standfirst code { font-size: 1.125rem; }
+
+/* Lists in the text flow: points, or numbers for steps that one actor does. The rules are weak on purpose, so the lists of the kit's own blocks keep their styles. */
+:where(main) :where(ul, ol):not(.steps, .facts, .cards) { max-width: var(--measure); margin: 0 0 16px; padding-left: 24px; }
+:where(main) :where(ul, ol):not(.steps, .facts, .cards) > :where(li + li) { margin-top: 4px; }
+/* A block heading in the text flow has more space above it than below it. A step heading of a walkthrough has none. */
+:where(main) h3 { margin: 32px 0 8px; }
+h2 + h3, h3 + h4 { margin-top: 0; }
+.steps h3 { margin: 0; }
+/* A numbered block heading: one of several steps that one actor does, where a step holds a code block, a table or a widget. The kit writes the number, and the count starts again in each section. */
+section { counter-reset: block-step; }
+h3.step { counter-increment: block-step; }
+h3.step::before { content: counter(block-step); font-weight: 400; color: var(--muted); margin-right: 10px; font-variant-numeric: tabular-nums; }
+/* With scripts on, the page script writes the number as text, so that a screen reader reads it. It looks the same as the counted number. */
+h3.is-numbered::before { content: none !important; }
+.step-n { font-weight: 400; color: var(--muted); margin-right: 6px; font-variant-numeric: tabular-nums; }
+/* A code block, a table, a closed section, a walkthrough, a status note and a figure bring no space below them. Text that follows brings it. */
+:is(pre, .code, .table-wrap, details, .walk, .status, figure) + :is(p, ul, ol, dl) { margin-top: 24px; }
+
+/* Margin notes: the guide's remarks sit beside the text, like a wall label. */
+.row { display: grid; grid-template-columns: minmax(0, var(--measure)) var(--margin-col); column-gap: var(--gap); align-items: start; }
+.note { margin: 6px 0 16px; padding-top: 12px; border-top: 1px solid var(--line); font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
+.note strong { display: block; margin-bottom: 4px; font-weight: 600; color: var(--text); }
+/* A heading may stand in the text column, with the facts about its item beside it. The row brings the space above the heading, so the note lines up with the heading. */
+.row:has(> h3:first-child) { margin-top: 32px; }
+.row > h3:first-child { margin-top: 0; }
+
+/* Walkthrough: a rail with a node per step; one dot travels along it. */
+.walk { display: grid; grid-template-columns: minmax(0, 1fr) 536px; column-gap: 40px; align-items: start; margin-top: 24px; }
+.rail { position: relative; }
+.steps { position: relative; margin: 0; padding: 0; list-style: none; counter-reset: step; }
+.steps::before { content: ""; position: absolute; left: 4px; top: 10px; bottom: 10px; width: 1px; background: var(--line); }
+.steps li { position: relative; padding: 0 0 var(--step-space) 32px; counter-increment: step; }
+.steps li:last-child { padding-bottom: 0; }
+.steps li::before { content: ""; position: absolute; left: 0; top: 8px; width: 9px; height: 9px; border-radius: 50%; border: 1px solid var(--muted); background: var(--bg); }
+.steps h3::before { content: counter(step); font-weight: 400; color: var(--muted); margin-right: 10px; font-variant-numeric: tabular-nums; }
+.steps p { margin: 6px 0 0; }
+.js .steps li:not(.is-current) h3, .js .steps li:not(.is-current) p { color: var(--muted); }
+.ready .steps h3, .ready .steps p { transition: color 120ms; }
+.rail-dot { position: absolute; left: 0; top: 8px; width: 9px; height: 9px; border-radius: 50%; background: var(--dot); opacity: 0; transform: translateY(var(--y, 0px)); }
+.js .rail-dot { opacity: 1; }
+.walk figure { position: sticky; top: 88px; }
+
+/* Figures: a well that holds a Docent diagram, with a plain caption. A diagram carries its own styles. */
+/* A well is as wide as the profile's block. A wider drawing keeps its real size, and its well grows with it. */
+figure { margin: 0; min-width: min(100%, var(--block)); width: fit-content; max-width: 100%; }
+section > figure { margin-top: 24px; }
+/* Every drawing in a well keeps its real size and sits in the middle; a wider one scrolls inside the well. */
+.fig > svg { flex: none; margin-inline: auto; }
+.fig { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 16px 24px; background: var(--fig); border-radius: 12px; padding: 8px; overflow-x: auto; scrollbar-color: var(--line) transparent; }
+/* A well may hold two drawings, for two separate chains: side by side when both fit, else one below the other. */
+/* A drawing that is wider than its well scrolls sideways. The page script shows this line under it, because the part that shows can look complete. */
+.fig-more { margin: 8px 0 0; max-width: none; font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
+/* The steps of a diagram in words: a closed section in the well, under the drawing. It takes the width of the well, so a table
+   of several columns, such as the boxes of a heat plan, keeps its words whole; its sentences and lists keep the width of the text. */
+.dg-words { flex-basis: 100%; max-width: none; margin: 0; padding: 0 8px 4px; }
+.dg-words ol { margin: 8px 0 0; padding-left: 28px; }
+.dg-words li + li { margin-top: 4px; }
+.dg-words p { margin: 12px 0 0; font-weight: 600; }
+/* The rows of a range chart in words: a small table, as wide as its content, so it fits a phone. */
+.dg-words table { width: auto; min-width: 0; margin-top: 8px; }
+.dg-words :is(th, td) { padding-right: 16px; }
+/* A long name with no spaces breaks inside its cell, so the table never runs past a phone screen. */
+.dg-words tbody th { white-space: normal; }
+.dg-words :is(th, td) { overflow-wrap: anywhere; }
+/* A wide grid in words, such as the numbers of a heat map: each cell stays on one line, numbers line up on the right, and the
+   table scrolls inside its wrapper on a narrow screen. The lines under it keep the width of the text. */
+.dg-words > .table-wrap { margin-top: 8px; max-width: none; }
+.dg-words > .table-wrap :is(th, td) { white-space: nowrap; overflow-wrap: normal; padding-right: 12px; }
+.dg-words > .table-wrap :is(td, thead th) { text-align: right; font-variant-numeric: tabular-nums; }
+/* A wide table of words, such as the boxes of a heat plan: its cells wrap at spaces but never inside a word, and keep to the left. */
+.dg-words > .table-wrap.is-text :is(th, td) { white-space: normal; }
+.dg-words > .table-wrap.is-text :is(td, thead th) { text-align: left; }
+.dg-words:has(> .table-wrap) { min-width: 0; } /* a flex item: without this it grows to the table, and the wrapper never scrolls */
+/* A hand-drawn figure holds no colors and no styles of its own, only these classes, so the tokens give it every theme, print and the
+   reader's settings. A shape with no class is a 1.5px line in the text color, and a text with no class is 14px. No class is under 12px. */
+svg[data-drawn="hand"] { display: block; flex: none; margin-inline: auto; }
+svg[data-drawn="hand"] :is(path, line, polyline, polygon, rect, circle, ellipse), svg[data-drawn="hand"] .hd-line { fill: none; stroke: var(--text); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+svg[data-drawn="hand"] text, svg[data-drawn="hand"] .hd-text { fill: var(--text); stroke: none; font-size: 14px; font-weight: 400; }
+svg[data-drawn="hand"] .hd-strong { stroke-width: 2.5; }
+svg[data-drawn="hand"] .hd-muted { stroke: var(--muted); stroke-width: 1; }
+svg[data-drawn="hand"] .hd-rule { stroke: var(--line); stroke-width: 1; }
+svg[data-drawn="hand"] .hd-fill { fill: var(--text); stroke: none; }
+svg[data-drawn="hand"] .hd-box { fill: var(--bg); stroke: var(--text); }
+svg[data-drawn="hand"] .hd-band { fill: var(--bg); stroke: none; }
+svg[data-drawn="hand"] .hd-name { font-weight: 600; }
+svg[data-drawn="hand"] .hd-note { font-size: 12px; fill: var(--muted); }
+figcaption { margin-top: 12px; font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
+figcaption strong { font-weight: 600; color: var(--text); margin-right: 8px; }
+
+/* Card grid: 3 to 8 short items side by side, each a heading or a large number and a line of text. A card is a label, like a margin note: a line above it, and no box. At most four in a row. */
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(max(160px, calc((100% - 72px) / 4)), 1fr)); gap: 24px; margin: 24px 0 0; padding: 0; list-style: none; }
+.cards > li { min-width: 0; padding-top: 12px; border-top: 1px solid var(--line); }
+.cards h3 { margin: 0 0 4px; font-size: 1rem; line-height: 1.5; }
+.cards p { margin: 0; font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
+.cards .big { margin-bottom: 4px; font: 700 1.875rem/1.2 var(--serif); font-weight: var(--heading-weight, 700); color: var(--ink); font-variant-numeric: tabular-nums; }
+.cards + :is(p, ul, ol, dl) { margin-top: 24px; }
+
+/* Code, tables and cards end at the profile's block width. */
+:is(pre, .code, .table-wrap, .cards) { max-width: var(--block); }
+
+/* Tables: rules only, no boxes. */
+.table-wrap { overflow-x: auto; margin: 24px 0 0; scrollbar-color: var(--line) transparent; }
+table { width: 100%; min-width: 640px; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; vertical-align: top; padding: var(--cell-y) 24px var(--cell-y) 0; }
+thead th { border-bottom: 1px solid var(--text); padding-bottom: 10px; font-size: 0.875rem; line-height: 1.5; font-weight: 600; color: var(--muted); }
+tbody th { font-weight: 600; white-space: nowrap; }
+tbody tr { border-bottom: 1px solid var(--line); }
+/* A column of numbers (class "num" on its th and td cells): the numbers line up on the right, in tabular figures. The last column ends at the table's edge. */
+:is(th, td).num { text-align: right; font-variant-numeric: tabular-nums; }
+:is(th, td).num:last-child { padding-right: 0; }
+.state { display: inline-flex; align-items: baseline; gap: 8px; font-weight: 600; }
+.state::before { content: ""; flex: none; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.state.ok { color: var(--ok); } .state.warn { color: var(--warn); } .state.err { color: var(--err); }
+/* Two states with no status color: plain information takes a muted dot, and a thing that is planned or not on yet takes a muted ring. */
+.state.info, .state.plan { color: var(--text); }
+.state.info::before { background: var(--muted); }
+.state.plan::before { background: none; border: 1.5px solid var(--muted); }
+/* Code and links in a cell may break anywhere, so a long path, command or address does not make the table wider than its place. */
+:is(td, th) :is(code, a) { overflow-wrap: anywhere; }
+
+/* Status note: a dot and a word carry the status. */
+.status { max-width: var(--measure); margin: 32px 0 0; }
+.status p { margin: 4px 0 0; }
+
+pre { margin: 20px 0 0; padding: 16px 20px; background: var(--panel); border-radius: 10px; overflow-x: auto; font: 0.875rem/1.6 var(--mono); scrollbar-color: var(--line) transparent; }
+pre code { background: none; padding: 0; font-size: inherit; }
+/* With scripts on, a code block sits in a holder with a button that copies the code. The holder takes the place and the space of the code block. */
+.code { position: relative; margin: 20px 0 0; }
+.code > pre { margin: 0; }
+.copy { position: absolute; top: 0; right: 0; height: 30px; padding: 0 12px; border: solid var(--line); border-width: 0 0 1px 1px; border-radius: 0 10px 0 6px; background: var(--panel); color: var(--muted); font: 400 0.875rem/1 var(--sans); cursor: pointer; }
+.copy:hover { color: var(--text); }
+/* A line of code that reaches the button would sit under it. Then the code starts below the button. */
+.code.is-long > pre { padding-top: 40px; }
+.cm { color: var(--muted); }
+
+details { max-width: var(--measure); margin: 24px 0 0; }
+/* A closed section that holds a table, a code block or a figure takes the full width, like those blocks do outside it. Its text keeps the text column. */
+details:has(> .table-wrap, > pre, > .code, > figure) { max-width: none; }
+summary { display: flex; align-items: center; gap: 10px; padding: 4px 0; font-weight: 600; cursor: pointer; list-style: none; }
+summary::-webkit-details-marker { display: none; }
+summary svg { width: 12px; height: 12px; color: var(--muted); transition: transform 150ms var(--ease); }
+details[open] summary svg { transform: rotate(90deg); }
+details > p { margin: 8px 0 0 22px; }
+
+/* Widgets: the reader chooses, ticks or decides. A widget is plain controls and text, with no box. render makes its markup from data. */
+.choose, .checks, .decide, .values { position: relative; margin: 24px 0 0; }
+:is(.choose, .checks, .decide, .values) + * { margin-top: 24px; }
+.choose > input, .checks input, .decide input, .values > input { position: absolute; width: 1px; height: 1px; margin: 0; opacity: 0; pointer-events: none; }
+.wd-t { margin: 0; max-width: none; font-size: 0.875rem; line-height: 1.5; font-weight: 600; color: var(--muted); }
+.opt { display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px; border: 1px solid var(--line); border-radius: 6px; font-size: 0.875rem; line-height: 1; cursor: pointer; }
+.opt::before { content: ""; width: 9px; height: 9px; border-radius: 50%; border: 1px solid var(--muted); }
+.opt:hover { border-color: var(--muted); }
+input:checked + .opt { border-color: var(--text); }
+input:checked + .opt::before { border-color: var(--dot); background: var(--dot); }
+input:focus-visible + .opt, .checks input:focus-visible + label::before { outline: 2px solid var(--primary); outline-offset: 3px; }
+/* Chooser: radio buttons and one panel for each case. The styles alone show the chosen case, so it works with scripts off. */
+.choose { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.choose > .wd-t { margin-right: 4px; }
+.choose > .case { display: none; flex-basis: 100%; min-width: 0; margin-top: 8px; }
+.choose > input:nth-of-type(1):checked ~ div:nth-of-type(1), .choose > input:nth-of-type(2):checked ~ div:nth-of-type(2), .choose > input:nth-of-type(3):checked ~ div:nth-of-type(3), .choose > input:nth-of-type(4):checked ~ div:nth-of-type(4), .choose > input:nth-of-type(5):checked ~ div:nth-of-type(5) { display: block; }
+.case-t { display: none; margin: 0 0 4px; font-weight: 600; }
+.case > .case-t + * { margin-top: 0; }
+.case > :last-child { margin-bottom: 0; }
+/* Checklist: a box and a line of text. A ticked line takes the muted color. */
+.checks ul { max-width: var(--measure); margin: 0; padding: 0; list-style: none; }
+.checks li { position: relative; margin-top: 12px; }
+.checks label { display: block; position: relative; padding-left: 32px; cursor: pointer; }
+.checks label::before { content: ""; position: absolute; left: 0; top: 4px; width: 18px; height: 18px; border: 1.5px solid var(--muted); border-radius: 6px; }
+.checks label::after { content: ""; position: absolute; left: 6.5px; top: 7px; width: 5px; height: 9px; border: solid var(--text); border-width: 0 2px 2px 0; transform: rotate(45deg); opacity: 0; }
+.checks input:checked + label { color: var(--muted); }
+.checks input:checked + label::before { border-color: var(--text); }
+.checks input:checked + label::after { opacity: 1; }
+.checks .sub { display: block; font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
+.wd-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin: 16px 0 0; max-width: none; font-size: 0.875rem; line-height: 1.5; color: var(--muted); font-variant-numeric: tabular-nums; }
+.wd-foot[hidden] { display: none; }
+/* Decision helper: questions, the one answer that fits, and the table of all cases. The table is the still form. */
+.decide fieldset { position: relative; display: flex; flex-wrap: wrap; gap: 8px; min-width: 0; margin: 16px 0 0; padding: 0; border: 0; }
+.decide legend { margin-bottom: 8px; padding: 0; font-weight: 600; }
+.decide-out { display: block; max-width: var(--measure); margin-top: 16px; }
+.decide-out:empty { display: none; }
+.decide-out strong { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+.decide-out strong::before { content: ""; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--dot); }
+.decide details { max-width: none; margin-top: 16px; }
+.decide .table-wrap { margin-top: 8px; }
+.decide td strong { display: block; font-weight: 600; }
+.decide tr.is-out { color: var(--muted); }
+html:not(.js) .decide-ask, html:not(.js) .wd-foot output { display: none; }
+/* Value picker: options like a chooser, a line that names the chosen option, and the table of all values. With scripts off the options do nothing, so they are hidden, and the text shows the values of the first option. */
+.values { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.values > .wd-t { margin-right: 4px; }
+.values-now { flex-basis: 100%; max-width: none; margin: 4px 0 0; font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
+.values-now strong { font-weight: 600; color: var(--text); }
+.values details { flex-basis: 100%; min-width: 0; max-width: none; margin-top: 8px; }
+.values .table-wrap { margin-top: 8px; }
+html:not(.js) .values > input + .opt { display: none; }
+
+footer { margin-top: 96px; border-top: 1px solid var(--line); }
+footer .shell { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding-top: 24px; padding-bottom: 40px; font-size: 0.875rem; color: var(--muted); }
+footer p { margin: 0; }
+/* The credit: a one-color mark and "Made with Docent", at the right. The mark takes the muted color of the words beside it. */
+.credit { margin-left: auto; }
+.credit svg { width: 16px; height: 16px; margin-right: 8px; vertical-align: -3px; }
+/* Docent's own pages carry the mark's tile in the footer. */
+.brand { display: inline-flex; align-items: center; gap: 10px; font: 700 1rem/1 var(--serif); color: var(--text); }
+.brand svg { width: 24px; height: 24px; }
+
+@media (max-width: 1100px) {
+  .walk { grid-template-columns: minmax(0, 1fr); row-gap: 32px; }
+  .walk figure { position: static; order: -1; }
+}
+@media (max-width: 900px) {
+  .row { grid-template-columns: minmax(0, 1fr); }
+  .note { max-width: var(--measure); }
+  .title .note { margin-top: 28px; }
+}
+@media (max-width: 720px) {
+  .shell { padding: 0 20px; }
+  .topbar { position: static; }
+  .topbar .shell { flex-wrap: wrap; gap: 4px 16px; height: auto; padding-top: 10px; padding-bottom: 8px; }
+  .host { flex: 1; }
+  .route { flex: none; order: 3; width: 100%; }
+  .route ol { flex-wrap: wrap; gap: 0 20px; }
+  .route a[aria-current] { text-decoration: underline; text-decoration-color: var(--dot); text-decoration-thickness: 2px; text-underline-offset: 0.4em; }
+  .route-dot { display: none; }
+  .title { padding-top: 48px; }
+  h1 { font-size: 2rem; } h2 { font-size: 1.625rem; }
+  section { padding-top: 56px; }
+  footer .shell { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .credit { margin-left: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; }
+}
+/* More contrast (the reader's system setting): outlines, tracks and rules take the muted color, and muted text takes the text color. Screen
+   only, so paper keeps the print block; and not with forced colors, where the reader's system colors already decide. */
+@media screen and (prefers-contrast: more) and (forced-colors: none) {
+  html:root:not([data-never]) { --line: #575d75; --muted: #1c1f2e; }
+  html:root:not([data-never])[data-theme="dark"] { --line: #959bb3; --muted: #e7e9f3; }
+}
+@media screen and (prefers-contrast: more) and (forced-colors: none) and (prefers-color-scheme: dark) {
+  html:root:not([data-never]):not([data-theme="light"]) { --line: #959bb3; --muted: #e7e9f3; }
+}
+/* The reader's high contrast mode (forced colors, as in Windows): the browser gives the page the few colors the reader chose. The kit gives
+   its tokens the same system colors, so the drawings follow, and the marks that are backgrounds (dots, the rail) stay visible. The heat
+   steps and the status colors keep their own values, because there the color is the content; the text on a step keeps --heat-text. */
+@media (forced-colors: active) {
+  html:root:not([data-never]) { --bg: Canvas; --fig: Canvas; --text: CanvasText; --muted: CanvasText; --line: CanvasText; --primary: Highlight; --dot: Highlight; }
+  /* A status dot takes the color of its word, which the browser forces; a background in that color would turn into the page color. */
+  .state::before { background: CanvasText; }
+  /* All borders take the text color, so the chosen option takes the highlight color, as its dot does. */
+  input:checked + .opt { border-color: Highlight; }
+}
+@media print {
+  html:root:not([data-never]) { color-scheme: light; --bg: #ffffff; --panel: #f2f3f9; --fig: #f2f3f9; --text: #1c1f2e; --muted: #575d75; --line: #d3d6e3; --primary: var(--host-accent, #2f3fd0); --ink: var(--host-ink, #1b2260); --dot: var(--host-accent, #2f3fd0); --ok: #1a7f37; --warn: #7d4e00; --err: #cf222e; --heat-1: #dee2f0; --heat-2: #babecb; --heat-3: #9498a5; --heat-4: #616571; --heat-5: #3e424d; --heat-text: #1c1f2e; --heat-page: #ffffff; --logo-light: block; --logo-dark: none; --tile-light: transparent; --tile-dark: #12141f; }
+  /* Paper: 11pt text, the page margin as the edge, and the notes beside the text again. An A4 page holds the text (112mm), a gap and the notes (50mm). */
+  html { font-size: 11pt; } html[data-text="large"] { font-size: 12pt; }
+  html:root:not([data-never]) { --measure: 112mm; --gap: 8mm; --margin-col: 50mm; --block: 100%; }
+  .shell { padding: 0; }
+  .row { grid-template-columns: minmax(0, var(--measure)) var(--margin-col); }
+  .title .note { margin-top: 6px; }
+  p, li { orphans: 2; widows: 2; }
+  /* A browser may leave out the ground of a code well on paper. A thin line keeps it a well. */
+  /* Paper cannot scroll: a long line of code wraps. */
+  pre { border: 1px solid var(--line); white-space: pre-wrap; overflow-wrap: anywhere; }
+  /* The top bar prints as one line above the title: the logo and the host's name, with no links and no switch. */
+  .topbar { position: static; border-bottom: 0; } .topbar .shell { height: auto; } .title { padding-top: 32px; }
+  .logo { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  /* Paper has no link: the credit prints as text. */
+  .credit a { color: inherit; text-decoration: none; }
+  .skip, .route, .theme, .route-dot, .rail-dot, .choose > .opt, .values > .opt, .decide-ask, .wd-foot, .copy, .fig-more { display: none !important; }
+  .choose > .case { display: block !important; margin-top: 16px; } .case-t { display: block; }
+  .checks input:checked + label, .decide tr.is-out { color: var(--text) !important; }
+  .steps li h3, .steps li p { color: var(--text) !important; }
+  .walk { grid-template-columns: minmax(0, 1fr); row-gap: 32px; } .walk figure { position: static; order: -1; }
+  table { min-width: 0; } .table-wrap { overflow: visible; }
+  /* Paper cannot scroll, so a wide grid in words, such as the numbers of a heat map, takes the smallest text size and tighter cells; render splits a grid that is still too wide into several tables. */
+  .dg-words > .table-wrap table { font-size: 0.875rem; } .dg-words > .table-wrap thead th { font-size: inherit; } .dg-words > .table-wrap :is(th, td) { padding: 4px 6px 4px 0; }
+  /* A browser leaves out backgrounds on paper. These carry meaning, so they print: status dots, the rail of the steps, and the ground of figures and code. */
+  .state::before, .steps::before, .fig, pre, code { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  /* Paper cannot scroll, and a drawing cannot split across pages. So a drawing that is wider than the paper, or taller than a page, shrinks to fit, under its caption, on A4 and on Letter. */
+  .fig > svg { width: auto; height: auto; max-width: 100%; max-height: 220mm; }
+  figure, tr, .status, pre, .checks li, .cards > li { break-inside: avoid; }
+  h2, h3 { break-after: avoid; }
+  /* Page numbers: Chrome and Edge print them; other browsers print their own footer. */
+  @page { margin: 18mm; @bottom-right { content: counter(page) " / " counter(pages); font: 9pt system-ui, sans-serif; color: #575d75; } }
+}
+/* Palette: Harbor. Cool blue-green, for engineering and operations. Docent's own tokens turned to one hue; every pair is tested in tests/contrast.py. */
+:root[data-palette="harbor"] { --bg: #f6fcfe; --panel: #e9f6fa; --fig: #e9f6fa; --text: #152225; --muted: #526064; --line: #c0dbe3; --primary: var(--host-accent, #0a5f8a); --ink: var(--host-ink, #0d3550); --dot: var(--host-accent, #0a5f8a); --heat-1: #f0ddf0; --heat-2: #d6b4d6; --heat-3: #b68ab8; --heat-4: #7d597f; --heat-5: #533a54; --heat-text: #152225; --heat-page: #f6fcfe; --tile-dark: #01181d; --serif: var(--host-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif); --heading-weight: 600; }
+@media (prefers-color-scheme: dark) { :root[data-palette="harbor"]:not([data-theme="light"]) { color-scheme: dark; --bg: #01181d; --panel: #001013; --fig: #001013; --text: #dcecf1; --muted: #8f9ea3; --line: #1e363c; --primary: var(--host-accent-dark, #72c2ee); --ink: #dcecf1; --dot: var(--host-dot-dark, var(--host-accent-dark, #72c2ee)); --heat-1: #39283a; --heat-2: #573e58; --heat-3: #785579; --heat-4: #b085b1; --heat-5: #d8b3d8; --heat-text: #dcecf1; --heat-page: #01181d; --tile-light: #f6fcfe; --tile-dark: transparent; } }
+:root[data-palette="harbor"][data-theme="dark"] { color-scheme: dark; --bg: #01181d; --panel: #001013; --fig: #001013; --text: #dcecf1; --muted: #8f9ea3; --line: #1e363c; --primary: var(--host-accent-dark, #72c2ee); --ink: #dcecf1; --dot: var(--host-dot-dark, var(--host-accent-dark, #72c2ee)); --heat-1: #39283a; --heat-2: #573e58; --heat-3: #785579; --heat-4: #b085b1; --heat-5: #d8b3d8; --heat-text: #dcecf1; --heat-page: #01181d; --tile-light: #f6fcfe; --tile-dark: transparent; }
+@media screen and (prefers-contrast: more) and (forced-colors: none) { html:root[data-palette="harbor"]:not([data-never]) { --line: #526064; --muted: #152225; } html:root[data-palette="harbor"]:not([data-never])[data-theme="dark"] { --line: #8f9ea3; --muted: #dcecf1; } }
+@media screen and (prefers-contrast: more) and (forced-colors: none) and (prefers-color-scheme: dark) { html:root[data-palette="harbor"]:not([data-never]):not([data-theme="light"]) { --line: #8f9ea3; --muted: #dcecf1; } }
+@media (forced-colors: active) { html:root[data-palette="harbor"]:not([data-never]) { --bg: Canvas; --fig: Canvas; --text: CanvasText; --muted: CanvasText; --line: CanvasText; --primary: Highlight; --dot: Highlight; } }
+@media print { html:root[data-palette="harbor"]:not([data-never]) { color-scheme: light; --bg: #ffffff; --panel: #e9f6fa; --fig: #e9f6fa; --text: #152225; --muted: #526064; --line: #c0dbe3; --primary: var(--host-accent, #0a5f8a); --ink: var(--host-ink, #0d3550); --dot: var(--host-accent, #0a5f8a); --heat-1: #dee2f0; --heat-2: #babecb; --heat-3: #9498a5; --heat-4: #616571; --heat-5: #3e424d; --heat-text: #152225; --heat-page: #ffffff; --tile-dark: #01181d; } }
+/* /docent:kit */
+</style>
+</head>
+<body>
+<a class="skip" href="#content">Skip to the content</a>
+<header class="topbar">
+  <div class="shell">
+    <span class="host">Example Planner</span>
+    <nav class="route" aria-label="On this page">
+      <ol>
+        <li><a href="#summary">Summary</a></li>
+        <li><a href="#impact">Impact</a></li>
+        <li><a href="#timeline">Timeline</a></li>
+        <li><a href="#response">Response</a></li>
+        <li><a href="#cause">Cause</a></li>
+        <li><a href="#actions">Actions</a></li>
+      </ol>
+    </nav>
+    <button class="theme" type="button">
+      <svg class="icon-moon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13.5 9.6A5.8 5.8 0 0 1 6.4 2.5a5.8 5.8 0 1 0 7.1 7.1Z"/></svg>
+      <svg class="icon-sun" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="8" cy="8" r="3"/><path d="M8 1.5v1.6M8 12.9v1.6M1.5 8h1.6M12.9 8h1.6M3.4 3.4l1.1 1.1M11.5 11.5l1.1 1.1M3.4 12.6l1.1-1.1M11.5 4.5l1.1-1.1"/></svg>
+      <span class="theme-text">Dark</span>
+    </button>
+    <span class="route-dot" aria-hidden="true"></span>
+  </div>
+</header>
+
+<main class="shell" id="content">
+  <div class="title">
+    <h1>Incident review: sync errors on 12 November</h1>
+    <div class="row">
+      <p class="standfirst">For 47 minutes on 12 November 2026, the Sync API failed up to 61% of requests, and people could not save changes in Example Planner. A configuration change had lowered the database connection limit from 200 to 20. No data was lost. This review gives the timeline, the causes, and seven actions.</p>
+      <div class="note" role="note" aria-label="About this document">
+        <strong>Incident review</strong>
+        <ul class="facts">
+          <li>Severity 2</li>
+          <li>12 November 2026, 08:40 to 09:27 UTC</li>
+          <li>Review meeting 17 November 2026</li>
+          <li>Owner: platform team</li>
+          <li>Blameless review; every name and number is invented</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <section id="summary" aria-labelledby="summary-h">
+    <h2 id="summary-h">Summary</h2>
+    <ul class="cards">
+      <li><p class="big">47 min</p><p>from the first errors to recovery.</p></li>
+      <li><p class="big">61%</p><p>of sync requests failed at the worst point, at 08:55.</p></li>
+      <li><p class="big">3,240</p><p>accounts saw at least one failed save.</p></li>
+      <li><p class="big">0</p><p>changes lost: the app kept them and saved them after recovery.</p></li>
+    </ul>
+    <div class="row">
+      <div>
+        <p>At 08:31 a change to the shared configuration template reached production. It set the Sync API's database connection pool to 20, where it had been 200. Under the morning load in Europe, requests waited for a free connection and timed out.</p>
+        <p>The on-call engineer first treated it as database overload. The cause was found at 09:14 in the API logs, and the change was rolled back at 09:19. Errors were under 1% at 09:24.</p>
+      </div>
+      <div class="note" role="note">
+        <strong>Times</strong>
+        All times are UTC. The morning peak in Europe starts at about 08:00 UTC.
+      </div>
+    </div>
+  </section>
+
+  <section id="impact" aria-labelledby="impact-h">
+    <h2 id="impact-h">Impact</h2>
+    <p>Figure 1 shows the error rate of five parts of the service, in 5-minute windows. The Sync API and the web app's saves failed from 08:40 to 09:20. Reminders were slow, because they read through the same pool. Search did not use the pool and was not affected.</p>
+    <figure>
+      <div class="fig" role="region" aria-label="Figure 1, error rate of each part, 08:30 to 09:35" tabindex="0">
+<!-- docent:diagram
+{
+  "id": "impact",
+  "kind": "statusgrid",
+  "label": "Error rate of five parts of the service in 5-minute windows from 08:30 to 09:35 UTC. The Sync API and web app saves were in error from 08:40 to 09:20. Reminders were in warning for most of that time. Sign-in had two short warnings. Search stayed OK.",
+  "thresholds": {"better": "lower", "ok": 1, "warn": 5, "unit": "% errors"},
+  "names": {"ok": "Normal", "warn": "Degraded", "err": "Failing"},
+  "columns": ["08:30", "08:35", "08:40", "08:45", "08:50", "08:55", "09:00", "09:05", "09:10", "09:15", "09:20", "09:25", "09:30", "09:35"],
+  "rows": [
+    {"name": "Sync API", "values": [0.2, 0.3, 7.5, 24, 41, 61, 58, 55, 52, 49, 38, 0.8, 0.4, 0.3]},
+    {"name": "Web app saves", "values": [0.1, 0.1, 3.2, 12, 20, 31, 30, 28, 27, 25, 19, 0.6, 0.2, 0.1]},
+    {"name": "Reminders", "values": [0.1, 0.1, 0.4, 2.1, 3.5, 4.8, 4.4, 3.9, 3.6, 3.1, 2.2, 0.3, 0.1, 0.1]},
+    {"name": "Sign-in", "values": [0.1, 0.2, 0.2, 1.4, 1.2, 0.9, 0.6, 0.5, 0.4, 0.4, 0.3, 0.2, 0.1, 0.1]},
+    {"name": "Search", "values": [0.1, 0.1, 0.1, 0.2, 0.1, 0.1, 0.2, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]}
+  ]
+}
+-->
+<svg id="dg-impact" class="dg dg-statusgrid dg-auto" xmlns="http://www.w3.org/2000/svg" width="640" height="252" viewBox="0 0 640 252" role="img" aria-label="Error rate of five parts of the service in 5-minute windows from 08:30 to 09:35 UTC. The Sync API and web app saves were in error from 08:40 to 09:20. Reminders were in warning for most of that time. Sign-in had two short warnings. Search stayed OK.">
+<style>
+#dg-impact{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-impact .ground{fill:var(--fig,#e9f6fa)}
+#dg-impact .band{fill:var(--bg,#f6fcfe)}
+#dg-impact .track{stroke:var(--line,#c0dbe3)}
+#dg-impact .line{fill:none;stroke:var(--text,#152225);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-impact .head{fill:var(--text,#152225)}
+#dg-impact .stop{fill:var(--bg,#f6fcfe);stroke:var(--text,#152225);stroke-width:1.5}
+#dg-impact .stop.end{fill:var(--text,#152225)}
+#dg-impact .mark{fill:var(--bg,#f6fcfe);stroke:var(--text,#152225);stroke-width:1.25}
+#dg-impact .card{fill:var(--bg,#f6fcfe);stroke:var(--line,#c0dbe3)}
+#dg-impact .icon{fill:none;stroke:var(--text,#152225);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-impact .icon.on-end{stroke:var(--bg,#f6fcfe)}
+#dg-impact .icon.lane-icon{stroke:var(--muted,#526064)}
+#dg-impact .num{font-size:12px;font-weight:600;fill:var(--text,#152225);font-variant-numeric:tabular-nums}
+#dg-impact .name{font-size:14px;font-weight:600;fill:var(--text,#152225)}
+#dg-impact .lane{font-size:14px;font-weight:600;fill:var(--muted,#526064)}
+#dg-impact .sub,#dg-impact .verb{font-size:12px;fill:var(--muted,#526064)}
+#dg-impact .pulse{display:none;fill:var(--dot,#0a5f8a);stroke:var(--bg,#f6fcfe);stroke-width:2.5}
+#dg-impact .row{font-size:14px;fill:var(--text,#152225)}
+#dg-impact .val{font-size:12px;fill:var(--muted,#526064);font-variant-numeric:tabular-nums}
+#dg-impact .h0{fill:var(--bg,#f6fcfe);stroke:var(--muted,#526064);stroke-width:1}
+#dg-impact .s-ok{fill:var(--ok,#1a7f37)}
+#dg-impact .s-warn{fill:var(--warn,#7d4e00)}
+#dg-impact .s-err{fill:var(--err,#cf222e)}
+#dg-impact .sm{fill:none;stroke:var(--heat-page,#f6fcfe);stroke-width:1.5;stroke-linecap:round}
+@media (prefers-reduced-motion:reduce){#dg-impact .pulse{animation:none!important}#dg-impact .pulse{display:none!important}}
+@media print{#dg-impact{max-width:100%;height:auto}#dg-impact .pulse{display:none!important}#dg-impact .s-ok,#dg-impact .s-warn{fill:var(--line,#c0dbe3)}#dg-impact .sm-warn{stroke:var(--warn,#7d4e00)}}
+#dg-impact-phone{display:none}
+</style>
+<rect width="640" height="252" class="ground"/>
+<rect x="8" y="100" width="624" height="136" rx="10" class="band"/>
+<text x="42" y="22" class="sub" text-anchor="start">Normal: 1 % errors or less</text>
+<text x="231" y="22" class="sub" text-anchor="start">Degraded: above 1 % errors to 5 % errors</text>
+<text x="42" y="42" class="sub" text-anchor="start">Failing: above 5 % errors</text>
+<text x="156.18" y="76" class="val" text-anchor="middle">08:30</text>
+<text x="190.54" y="92" class="val" text-anchor="middle">08:35</text>
+<text x="224.89" y="76" class="val" text-anchor="middle">08:40</text>
+<text x="259.25" y="92" class="val" text-anchor="middle">08:45</text>
+<text x="293.61" y="76" class="val" text-anchor="middle">08:50</text>
+<text x="327.96" y="92" class="val" text-anchor="middle">08:55</text>
+<text x="362.32" y="76" class="val" text-anchor="middle">09:00</text>
+<text x="396.68" y="92" class="val" text-anchor="middle">09:05</text>
+<text x="431.04" y="76" class="val" text-anchor="middle">09:10</text>
+<text x="465.39" y="92" class="val" text-anchor="middle">09:15</text>
+<text x="499.75" y="76" class="val" text-anchor="middle">09:20</text>
+<text x="534.11" y="92" class="val" text-anchor="middle">09:25</text>
+<text x="568.46" y="76" class="val" text-anchor="middle">09:30</text>
+<text x="602.82" y="92" class="val" text-anchor="middle">09:35</text>
+<text x="20" y="125" class="row" text-anchor="start">Sync API</text>
+<text x="20" y="149" class="row" text-anchor="start">Web app saves</text>
+<text x="20" y="173" class="row" text-anchor="start">Reminders</text>
+<text x="20" y="197" class="row" text-anchor="start">Sign-in</text>
+<text x="20" y="221" class="row" text-anchor="start">Search</text>
+<rect x="20" y="12" width="16" height="12" rx="2" class="s-ok"/><rect x="209" y="12" width="16" height="12" rx="2" class="s-warn"/><path d="M212.5,22.5 L221.5,13.5" class="sm sm-warn"/><rect x="20" y="32" width="16" height="12" rx="2" class="s-err"/><path d="M23.5,42.5 L32.5,33.5 M23.5,33.5 L32.5,42.5" class="sm sm-err"/>
+<rect x="140" y="109" width="32.36" height="22" rx="2" class="s-ok"/><rect x="174.36" y="109" width="32.36" height="22" rx="2" class="s-ok"/><rect x="208.71" y="109" width="32.36" height="22" rx="2" class="s-err"/><path d="M219.89,125 L229.89,115 M219.89,115 L229.89,125" class="sm sm-err"/><rect x="243.07" y="109" width="32.36" height="22" rx="2" class="s-err"/><path d="M254.25,125 L264.25,115 M254.25,115 L264.25,125" class="sm sm-err"/><rect x="277.43" y="109" width="32.36" height="22" rx="2" class="s-err"/><path d="M288.61,125 L298.61,115 M288.61,115 L298.61,125" class="sm sm-err"/><rect x="311.79" y="109" width="32.36" height="22" rx="2" class="s-err"/><path d="M322.96,125 L332.96,115 M322.96,115 L332.96,125" class="sm sm-err"/><rect x="346.14" y="109" width="32.36" height="22" rx="2" class="s-err"/><path d="M357.32,125 L367.32,115 M357.32,115 L367.32,125" class="sm sm-err"/><rect x="380.5" y="109" width="32.36" height="22" rx="2" class="s-err"/><path d="M391.68,125 L401.68,115 M391.68,115 L401.68,125" class="sm sm-err"/><rect x="414.86" y="109" width="32.36" height="22" rx="2" class="s-err"/><path d="M426.04,125 L436.04,115 M426.04,115 L436.04,125" class="sm sm-err"/><rect x="449.21" y="109" width="32.36" height="22" rx="2" class="s-err"/><path d="M460.39,125 L470.39,115 M460.39,115 L470.39,125" class="sm sm-err"/><rect x="483.57" y="109" width="32.36" height="22" rx="2" class="s-err"/><path d="M494.75,125 L504.75,115 M494.75,115 L504.75,125" class="sm sm-err"/><rect x="517.93" y="109" width="32.36" height="22" rx="2" class="s-ok"/><rect x="552.29" y="109" width="32.36" height="22" rx="2" class="s-ok"/><rect x="586.64" y="109" width="32.36" height="22" rx="2" class="s-ok"/>
+<rect x="140" y="133" width="32.36" height="22" rx="2" class="s-ok"/><rect x="174.36" y="133" width="32.36" height="22" rx="2" class="s-ok"/><rect x="208.71" y="133" width="32.36" height="22" rx="2" class="s-warn"/><path d="M219.89,149 L229.89,139" class="sm sm-warn"/><rect x="243.07" y="133" width="32.36" height="22" rx="2" class="s-err"/><path d="M254.25,149 L264.25,139 M254.25,139 L264.25,149" class="sm sm-err"/><rect x="277.43" y="133" width="32.36" height="22" rx="2" class="s-err"/><path d="M288.61,149 L298.61,139 M288.61,139 L298.61,149" class="sm sm-err"/><rect x="311.79" y="133" width="32.36" height="22" rx="2" class="s-err"/><path d="M322.96,149 L332.96,139 M322.96,139 L332.96,149" class="sm sm-err"/><rect x="346.14" y="133" width="32.36" height="22" rx="2" class="s-err"/><path d="M357.32,149 L367.32,139 M357.32,139 L367.32,149" class="sm sm-err"/><rect x="380.5" y="133" width="32.36" height="22" rx="2" class="s-err"/><path d="M391.68,149 L401.68,139 M391.68,139 L401.68,149" class="sm sm-err"/><rect x="414.86" y="133" width="32.36" height="22" rx="2" class="s-err"/><path d="M426.04,149 L436.04,139 M426.04,139 L436.04,149" class="sm sm-err"/><rect x="449.21" y="133" width="32.36" height="22" rx="2" class="s-err"/><path d="M460.39,149 L470.39,139 M460.39,139 L470.39,149" class="sm sm-err"/><rect x="483.57" y="133" width="32.36" height="22" rx="2" class="s-err"/><path d="M494.75,149 L504.75,139 M494.75,139 L504.75,149" class="sm sm-err"/><rect x="517.93" y="133" width="32.36" height="22" rx="2" class="s-ok"/><rect x="552.29" y="133" width="32.36" height="22" rx="2" class="s-ok"/><rect x="586.64" y="133" width="32.36" height="22" rx="2" class="s-ok"/>
+<rect x="140" y="157" width="32.36" height="22" rx="2" class="s-ok"/><rect x="174.36" y="157" width="32.36" height="22" rx="2" class="s-ok"/><rect x="208.71" y="157" width="32.36" height="22" rx="2" class="s-ok"/><rect x="243.07" y="157" width="32.36" height="22" rx="2" class="s-warn"/><path d="M254.25,173 L264.25,163" class="sm sm-warn"/><rect x="277.43" y="157" width="32.36" height="22" rx="2" class="s-warn"/><path d="M288.61,173 L298.61,163" class="sm sm-warn"/><rect x="311.79" y="157" width="32.36" height="22" rx="2" class="s-warn"/><path d="M322.96,173 L332.96,163" class="sm sm-warn"/><rect x="346.14" y="157" width="32.36" height="22" rx="2" class="s-warn"/><path d="M357.32,173 L367.32,163" class="sm sm-warn"/><rect x="380.5" y="157" width="32.36" height="22" rx="2" class="s-warn"/><path d="M391.68,173 L401.68,163" class="sm sm-warn"/><rect x="414.86" y="157" width="32.36" height="22" rx="2" class="s-warn"/><path d="M426.04,173 L436.04,163" class="sm sm-warn"/><rect x="449.21" y="157" width="32.36" height="22" rx="2" class="s-warn"/><path d="M460.39,173 L470.39,163" class="sm sm-warn"/><rect x="483.57" y="157" width="32.36" height="22" rx="2" class="s-warn"/><path d="M494.75,173 L504.75,163" class="sm sm-warn"/><rect x="517.93" y="157" width="32.36" height="22" rx="2" class="s-ok"/><rect x="552.29" y="157" width="32.36" height="22" rx="2" class="s-ok"/><rect x="586.64" y="157" width="32.36" height="22" rx="2" class="s-ok"/>
+<rect x="140" y="181" width="32.36" height="22" rx="2" class="s-ok"/><rect x="174.36" y="181" width="32.36" height="22" rx="2" class="s-ok"/><rect x="208.71" y="181" width="32.36" height="22" rx="2" class="s-ok"/><rect x="243.07" y="181" width="32.36" height="22" rx="2" class="s-warn"/><path d="M254.25,197 L264.25,187" class="sm sm-warn"/><rect x="277.43" y="181" width="32.36" height="22" rx="2" class="s-warn"/><path d="M288.61,197 L298.61,187" class="sm sm-warn"/><rect x="311.79" y="181" width="32.36" height="22" rx="2" class="s-ok"/><rect x="346.14" y="181" width="32.36" height="22" rx="2" class="s-ok"/><rect x="380.5" y="181" width="32.36" height="22" rx="2" class="s-ok"/><rect x="414.86" y="181" width="32.36" height="22" rx="2" class="s-ok"/><rect x="449.21" y="181" width="32.36" height="22" rx="2" class="s-ok"/><rect x="483.57" y="181" width="32.36" height="22" rx="2" class="s-ok"/><rect x="517.93" y="181" width="32.36" height="22" rx="2" class="s-ok"/><rect x="552.29" y="181" width="32.36" height="22" rx="2" class="s-ok"/><rect x="586.64" y="181" width="32.36" height="22" rx="2" class="s-ok"/>
+<rect x="140" y="205" width="32.36" height="22" rx="2" class="s-ok"/><rect x="174.36" y="205" width="32.36" height="22" rx="2" class="s-ok"/><rect x="208.71" y="205" width="32.36" height="22" rx="2" class="s-ok"/><rect x="243.07" y="205" width="32.36" height="22" rx="2" class="s-ok"/><rect x="277.43" y="205" width="32.36" height="22" rx="2" class="s-ok"/><rect x="311.79" y="205" width="32.36" height="22" rx="2" class="s-ok"/><rect x="346.14" y="205" width="32.36" height="22" rx="2" class="s-ok"/><rect x="380.5" y="205" width="32.36" height="22" rx="2" class="s-ok"/><rect x="414.86" y="205" width="32.36" height="22" rx="2" class="s-ok"/><rect x="449.21" y="205" width="32.36" height="22" rx="2" class="s-ok"/><rect x="483.57" y="205" width="32.36" height="22" rx="2" class="s-ok"/><rect x="517.93" y="205" width="32.36" height="22" rx="2" class="s-ok"/><rect x="552.29" y="205" width="32.36" height="22" rx="2" class="s-ok"/><rect x="586.64" y="205" width="32.36" height="22" rx="2" class="s-ok"/>
+</svg>
+<svg id="dg-impact-phone" class="dg dg-statusgrid dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="346" viewBox="0 0 264 346" role="img" aria-label="Error rate of five parts of the service in 5-minute windows from 08:30 to 09:35 UTC. The Sync API and web app saves were in error from 08:40 to 09:20. Reminders were in warning for most of that time. Sign-in had two short warnings. Search stayed OK.">
+<style>
+#dg-impact-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-impact-phone .ground{fill:var(--fig,#e9f6fa)}
+#dg-impact-phone .band{fill:var(--bg,#f6fcfe)}
+#dg-impact-phone .track{stroke:var(--line,#c0dbe3)}
+#dg-impact-phone .line{fill:none;stroke:var(--text,#152225);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-impact-phone .head{fill:var(--text,#152225)}
+#dg-impact-phone .stop{fill:var(--bg,#f6fcfe);stroke:var(--text,#152225);stroke-width:1.5}
+#dg-impact-phone .stop.end{fill:var(--text,#152225)}
+#dg-impact-phone .mark{fill:var(--bg,#f6fcfe);stroke:var(--text,#152225);stroke-width:1.25}
+#dg-impact-phone .card{fill:var(--bg,#f6fcfe);stroke:var(--line,#c0dbe3)}
+#dg-impact-phone .icon{fill:none;stroke:var(--text,#152225);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-impact-phone .icon.on-end{stroke:var(--bg,#f6fcfe)}
+#dg-impact-phone .icon.lane-icon{stroke:var(--muted,#526064)}
+#dg-impact-phone .num{font-size:12px;font-weight:600;fill:var(--text,#152225);font-variant-numeric:tabular-nums}
+#dg-impact-phone .name{font-size:14px;font-weight:600;fill:var(--text,#152225)}
+#dg-impact-phone .lane{font-size:14px;font-weight:600;fill:var(--muted,#526064)}
+#dg-impact-phone .sub,#dg-impact-phone .verb{font-size:12px;fill:var(--muted,#526064)}
+#dg-impact-phone .pulse{display:none;fill:var(--dot,#0a5f8a);stroke:var(--bg,#f6fcfe);stroke-width:2.5}
+#dg-impact-phone .row{font-size:14px;fill:var(--text,#152225)}
+#dg-impact-phone .val{font-size:12px;fill:var(--muted,#526064);font-variant-numeric:tabular-nums}
+#dg-impact-phone .h0{fill:var(--bg,#f6fcfe);stroke:var(--muted,#526064);stroke-width:1}
+#dg-impact-phone .s-ok{fill:var(--ok,#1a7f37)}
+#dg-impact-phone .s-warn{fill:var(--warn,#7d4e00)}
+#dg-impact-phone .s-err{fill:var(--err,#cf222e)}
+#dg-impact-phone .sm{fill:none;stroke:var(--heat-page,#f6fcfe);stroke-width:1.5;stroke-linecap:round}
+@media (prefers-reduced-motion:reduce){#dg-impact-phone .pulse{animation:none!important}#dg-impact-phone .pulse{display:none!important}}
+@media print{#dg-impact-phone{max-width:100%;height:auto}#dg-impact-phone .pulse{display:none!important}#dg-impact-phone .s-ok,#dg-impact-phone .s-warn{fill:var(--line,#c0dbe3)}#dg-impact-phone .sm-warn{stroke:var(--warn,#7d4e00)}}
+@media (max-width:736px){#dg-impact{display:none}#dg-impact-phone{display:block}}
+@media print{#dg-impact{display:block!important}#dg-impact-phone{display:none!important}}
+</style>
+<rect width="264" height="346" class="ground"/>
+<rect x="8" y="120" width="248" height="210" rx="10" class="band"/>
+<text x="42" y="22" class="sub" text-anchor="start">Normal: 1 % errors or less</text>
+<text x="42" y="42" class="sub" text-anchor="start">Degraded: above 1 % errors to 5 %</text>
+<text x="42" y="58" class="sub" text-anchor="start">errors</text>
+<text x="42" y="78" class="sub" text-anchor="start">Failing: above 5 % errors</text>
+<text x="30.34" y="112" class="val" text-anchor="middle">08:30</text>
+<text x="76" y="112" class="val" text-anchor="middle">08:45</text>
+<text x="124" y="112" class="val" text-anchor="middle">09:00</text>
+<text x="172" y="112" class="val" text-anchor="middle">09:15</text>
+<text x="220" y="112" class="val" text-anchor="middle">09:30</text>
+<text x="20" y="142" class="row" text-anchor="start">Sync API</text>
+<text x="20" y="182" class="row" text-anchor="start">Web app saves</text>
+<text x="20" y="222" class="row" text-anchor="start">Reminders</text>
+<text x="20" y="262" class="row" text-anchor="start">Sign-in</text>
+<text x="20" y="302" class="row" text-anchor="start">Search</text>
+<rect x="20" y="12" width="16" height="12" rx="2" class="s-ok"/><rect x="20" y="32" width="16" height="12" rx="2" class="s-warn"/><path d="M23.5,42.5 L32.5,33.5" class="sm sm-warn"/><rect x="20" y="68" width="16" height="12" rx="2" class="s-err"/><path d="M23.5,78.5 L32.5,69.5 M23.5,69.5 L32.5,78.5" class="sm sm-err"/>
+<rect x="20.5" y="146.5" width="15" height="15" rx="2" class="s-ok"/><rect x="36.5" y="146.5" width="15" height="15" rx="2" class="s-ok"/><rect x="52.5" y="146.5" width="15" height="15" rx="2" class="s-err"/><path d="M55,159 L65,149 M55,149 L65,159" class="sm sm-err"/><rect x="68.5" y="146.5" width="15" height="15" rx="2" class="s-err"/><path d="M71,159 L81,149 M71,149 L81,159" class="sm sm-err"/><rect x="84.5" y="146.5" width="15" height="15" rx="2" class="s-err"/><path d="M87,159 L97,149 M87,149 L97,159" class="sm sm-err"/><rect x="100.5" y="146.5" width="15" height="15" rx="2" class="s-err"/><path d="M103,159 L113,149 M103,149 L113,159" class="sm sm-err"/><rect x="116.5" y="146.5" width="15" height="15" rx="2" class="s-err"/><path d="M119,159 L129,149 M119,149 L129,159" class="sm sm-err"/><rect x="132.5" y="146.5" width="15" height="15" rx="2" class="s-err"/><path d="M135,159 L145,149 M135,149 L145,159" class="sm sm-err"/><rect x="148.5" y="146.5" width="15" height="15" rx="2" class="s-err"/><path d="M151,159 L161,149 M151,149 L161,159" class="sm sm-err"/><rect x="164.5" y="146.5" width="15" height="15" rx="2" class="s-err"/><path d="M167,159 L177,149 M167,149 L177,159" class="sm sm-err"/><rect x="180.5" y="146.5" width="15" height="15" rx="2" class="s-err"/><path d="M183,159 L193,149 M183,149 L193,159" class="sm sm-err"/><rect x="196.5" y="146.5" width="15" height="15" rx="2" class="s-ok"/><rect x="212.5" y="146.5" width="15" height="15" rx="2" class="s-ok"/><rect x="228.5" y="146.5" width="15" height="15" rx="2" class="s-ok"/>
+<rect x="20.5" y="186.5" width="15" height="15" rx="2" class="s-ok"/><rect x="36.5" y="186.5" width="15" height="15" rx="2" class="s-ok"/><rect x="52.5" y="186.5" width="15" height="15" rx="2" class="s-warn"/><path d="M55,199 L65,189" class="sm sm-warn"/><rect x="68.5" y="186.5" width="15" height="15" rx="2" class="s-err"/><path d="M71,199 L81,189 M71,189 L81,199" class="sm sm-err"/><rect x="84.5" y="186.5" width="15" height="15" rx="2" class="s-err"/><path d="M87,199 L97,189 M87,189 L97,199" class="sm sm-err"/><rect x="100.5" y="186.5" width="15" height="15" rx="2" class="s-err"/><path d="M103,199 L113,189 M103,189 L113,199" class="sm sm-err"/><rect x="116.5" y="186.5" width="15" height="15" rx="2" class="s-err"/><path d="M119,199 L129,189 M119,189 L129,199" class="sm sm-err"/><rect x="132.5" y="186.5" width="15" height="15" rx="2" class="s-err"/><path d="M135,199 L145,189 M135,189 L145,199" class="sm sm-err"/><rect x="148.5" y="186.5" width="15" height="15" rx="2" class="s-err"/><path d="M151,199 L161,189 M151,189 L161,199" class="sm sm-err"/><rect x="164.5" y="186.5" width="15" height="15" rx="2" class="s-err"/><path d="M167,199 L177,189 M167,189 L177,199" class="sm sm-err"/><rect x="180.5" y="186.5" width="15" height="15" rx="2" class="s-err"/><path d="M183,199 L193,189 M183,189 L193,199" class="sm sm-err"/><rect x="196.5" y="186.5" width="15" height="15" rx="2" class="s-ok"/><rect x="212.5" y="186.5" width="15" height="15" rx="2" class="s-ok"/><rect x="228.5" y="186.5" width="15" height="15" rx="2" class="s-ok"/>
+<rect x="20.5" y="226.5" width="15" height="15" rx="2" class="s-ok"/><rect x="36.5" y="226.5" width="15" height="15" rx="2" class="s-ok"/><rect x="52.5" y="226.5" width="15" height="15" rx="2" class="s-ok"/><rect x="68.5" y="226.5" width="15" height="15" rx="2" class="s-warn"/><path d="M71,239 L81,229" class="sm sm-warn"/><rect x="84.5" y="226.5" width="15" height="15" rx="2" class="s-warn"/><path d="M87,239 L97,229" class="sm sm-warn"/><rect x="100.5" y="226.5" width="15" height="15" rx="2" class="s-warn"/><path d="M103,239 L113,229" class="sm sm-warn"/><rect x="116.5" y="226.5" width="15" height="15" rx="2" class="s-warn"/><path d="M119,239 L129,229" class="sm sm-warn"/><rect x="132.5" y="226.5" width="15" height="15" rx="2" class="s-warn"/><path d="M135,239 L145,229" class="sm sm-warn"/><rect x="148.5" y="226.5" width="15" height="15" rx="2" class="s-warn"/><path d="M151,239 L161,229" class="sm sm-warn"/><rect x="164.5" y="226.5" width="15" height="15" rx="2" class="s-warn"/><path d="M167,239 L177,229" class="sm sm-warn"/><rect x="180.5" y="226.5" width="15" height="15" rx="2" class="s-warn"/><path d="M183,239 L193,229" class="sm sm-warn"/><rect x="196.5" y="226.5" width="15" height="15" rx="2" class="s-ok"/><rect x="212.5" y="226.5" width="15" height="15" rx="2" class="s-ok"/><rect x="228.5" y="226.5" width="15" height="15" rx="2" class="s-ok"/>
+<rect x="20.5" y="266.5" width="15" height="15" rx="2" class="s-ok"/><rect x="36.5" y="266.5" width="15" height="15" rx="2" class="s-ok"/><rect x="52.5" y="266.5" width="15" height="15" rx="2" class="s-ok"/><rect x="68.5" y="266.5" width="15" height="15" rx="2" class="s-warn"/><path d="M71,279 L81,269" class="sm sm-warn"/><rect x="84.5" y="266.5" width="15" height="15" rx="2" class="s-warn"/><path d="M87,279 L97,269" class="sm sm-warn"/><rect x="100.5" y="266.5" width="15" height="15" rx="2" class="s-ok"/><rect x="116.5" y="266.5" width="15" height="15" rx="2" class="s-ok"/><rect x="132.5" y="266.5" width="15" height="15" rx="2" class="s-ok"/><rect x="148.5" y="266.5" width="15" height="15" rx="2" class="s-ok"/><rect x="164.5" y="266.5" width="15" height="15" rx="2" class="s-ok"/><rect x="180.5" y="266.5" width="15" height="15" rx="2" class="s-ok"/><rect x="196.5" y="266.5" width="15" height="15" rx="2" class="s-ok"/><rect x="212.5" y="266.5" width="15" height="15" rx="2" class="s-ok"/><rect x="228.5" y="266.5" width="15" height="15" rx="2" class="s-ok"/>
+<rect x="20.5" y="306.5" width="15" height="15" rx="2" class="s-ok"/><rect x="36.5" y="306.5" width="15" height="15" rx="2" class="s-ok"/><rect x="52.5" y="306.5" width="15" height="15" rx="2" class="s-ok"/><rect x="68.5" y="306.5" width="15" height="15" rx="2" class="s-ok"/><rect x="84.5" y="306.5" width="15" height="15" rx="2" class="s-ok"/><rect x="100.5" y="306.5" width="15" height="15" rx="2" class="s-ok"/><rect x="116.5" y="306.5" width="15" height="15" rx="2" class="s-ok"/><rect x="132.5" y="306.5" width="15" height="15" rx="2" class="s-ok"/><rect x="148.5" y="306.5" width="15" height="15" rx="2" class="s-ok"/><rect x="164.5" y="306.5" width="15" height="15" rx="2" class="s-ok"/><rect x="180.5" y="306.5" width="15" height="15" rx="2" class="s-ok"/><rect x="196.5" y="306.5" width="15" height="15" rx="2" class="s-ok"/><rect x="212.5" y="306.5" width="15" height="15" rx="2" class="s-ok"/><rect x="228.5" y="306.5" width="15" height="15" rx="2" class="s-ok"/>
+</svg>
+<details class="dg-words">
+<summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>The diagram in words</summary>
+<div class="table-wrap" role="region" aria-label="The states of the status grid, columns 08:30 to 08:50" tabindex="0"><table><thead><tr><td></td><th scope="col">08:30</th><th scope="col">08:35</th><th scope="col">08:40</th><th scope="col">08:45</th><th scope="col">08:50</th></tr></thead><tbody><tr><th scope="row">Sync API</th><td>0.2</td><td>0.3</td><td>7.5 Failing</td><td>24 Failing</td><td>41 Failing</td></tr><tr><th scope="row">Web app saves</th><td>0.1</td><td>0.1</td><td>3.2 Degraded</td><td>12 Failing</td><td>20 Failing</td></tr><tr><th scope="row">Reminders</th><td>0.1</td><td>0.1</td><td>0.4</td><td>2.1 Degraded</td><td>3.5 Degraded</td></tr><tr><th scope="row">Sign-in</th><td>0.1</td><td>0.2</td><td>0.2</td><td>1.4 Degraded</td><td>1.2 Degraded</td></tr><tr><th scope="row">Search</th><td>0.1</td><td>0.1</td><td>0.1</td><td>0.2</td><td>0.1</td></tr></tbody></table></div>
+<div class="table-wrap" role="region" aria-label="The states of the status grid, columns 08:55 to 09:15" tabindex="0"><table><thead><tr><td></td><th scope="col">08:55</th><th scope="col">09:00</th><th scope="col">09:05</th><th scope="col">09:10</th><th scope="col">09:15</th></tr></thead><tbody><tr><th scope="row">Sync API</th><td>61 Failing</td><td>58 Failing</td><td>55 Failing</td><td>52 Failing</td><td>49 Failing</td></tr><tr><th scope="row">Web app saves</th><td>31 Failing</td><td>30 Failing</td><td>28 Failing</td><td>27 Failing</td><td>25 Failing</td></tr><tr><th scope="row">Reminders</th><td>4.8 Degraded</td><td>4.4 Degraded</td><td>3.9 Degraded</td><td>3.6 Degraded</td><td>3.1 Degraded</td></tr><tr><th scope="row">Sign-in</th><td>0.9</td><td>0.6</td><td>0.5</td><td>0.4</td><td>0.4</td></tr><tr><th scope="row">Search</th><td>0.1</td><td>0.2</td><td>0.1</td><td>0.1</td><td>0.1</td></tr></tbody></table></div>
+<div class="table-wrap" role="region" aria-label="The states of the status grid, columns 09:20 to 09:35" tabindex="0"><table><thead><tr><td></td><th scope="col">09:20</th><th scope="col">09:25</th><th scope="col">09:30</th><th scope="col">09:35</th></tr></thead><tbody><tr><th scope="row">Sync API</th><td>38 Failing</td><td>0.8</td><td>0.4</td><td>0.3</td></tr><tr><th scope="row">Web app saves</th><td>19 Failing</td><td>0.6</td><td>0.2</td><td>0.1</td></tr><tr><th scope="row">Reminders</th><td>2.2 Degraded</td><td>0.3</td><td>0.1</td><td>0.1</td></tr><tr><th scope="row">Sign-in</th><td>0.3</td><td>0.2</td><td>0.1</td><td>0.1</td></tr><tr><th scope="row">Search</th><td>0.1</td><td>0.1</td><td>0.1</td><td>0.1</td></tr></tbody></table></div>
+<ul><li>Each number is in % errors. A cell is Normal at 1 or less, Degraded from above 1 to 5, and Failing above 5; a value on a threshold takes the better state. A cell with no state word is Normal.</li><li>42 cells are Normal, 11 are Degraded and 17 are Failing.</li><li>Failing in 17 cells; the table shows each.</li><li>The worst is 61 (Sync API, 08:55).</li></ul>
+</details>
+<!-- /docent:diagram -->
+      </div>
+      <figcaption><strong>Figure 1</strong>Error rate of each part, 08:30 to 09:35 UTC, in 5-minute windows. Normal is under 1%, degraded 1% to 5%, failing 5% or more.</figcaption>
+    </figure>
+    <div class="table-wrap" role="region" aria-label="Impact in numbers" tabindex="0">
+      <table>
+        <thead>
+          <tr><th scope="col">Who or what</th><th scope="col">Impact</th><th scope="col" class="num">Count</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">Accounts</th><td>Saw at least one failed save</td><td class="num">3,240</td></tr>
+          <tr><th scope="row">Sync requests</th><td>Failed with a timeout, of 1.9 million in the 47 minutes</td><td class="num">342,000</td></tr>
+          <tr><th scope="row">Reminders</th><td>Sent late, by up to 6 minutes</td><td class="num">9,800</td></tr>
+          <tr><th scope="row">Support tickets</th><td>Opened during the incident and the hour after</td><td class="num">112</td></tr>
+          <tr><th scope="row">Changes lost</th><td>The app kept unsaved changes and sent them again after recovery</td><td class="num">0</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="timeline" aria-labelledby="timeline-h">
+    <h2 id="timeline-h">Timeline</h2>
+    <div class="table-wrap" role="region" aria-label="Timeline of the incident, UTC" tabindex="0">
+      <table>
+        <thead>
+          <tr><th scope="col">Time</th><th scope="col">What happened</th><th scope="col">Who</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">08:12</th><td>A change to the shared configuration template is merged. It moves the pool size into a new section, where a default of 20 applies.</td><td>Platform engineer</td></tr>
+          <tr><th scope="row">08:31</th><td>The deploy pipeline sends the new configuration to all three regions at once.</td><td>Deploy pipeline</td></tr>
+          <tr><th scope="row">08:40</th><td>Sync API errors pass 5%.</td><td>—</td></tr>
+          <tr><th scope="row">08:44</th><td>The alert "sync errors above 5% for 3 minutes" pages the on-call engineer.</td><td>Monitoring</td></tr>
+          <tr><th scope="row">08:49</th><td>The on-call engineer acknowledges the page.</td><td>On-call engineer</td></tr>
+          <tr><th scope="row">08:55</th><td>Errors reach their highest point, 61%.</td><td>—</td></tr>
+          <tr><th scope="row">08:58</th><td>Incident declared at severity 2. The status page says saving is failing.</td><td>On-call engineer</td></tr>
+          <tr><th scope="row">09:06</th><td>Two database read replicas are added, on the guess that the database is overloaded. Errors do not change.</td><td>On-call engineer</td></tr>
+          <tr><th scope="row">09:14</th><td>"Connection pool exhausted, limit 20" is found in the API logs. The configuration change is found in the deploy history.</td><td>Database engineer</td></tr>
+          <tr><th scope="row">09:19</th><td>Rollback of the configuration starts.</td><td>On-call engineer</td></tr>
+          <tr><th scope="row">09:24</th><td>Errors fall under 1%.</td><td>—</td></tr>
+          <tr><th scope="row">09:27</th><td>Incident resolved. The app sends its kept changes again.</td><td>On-call engineer</td></tr>
+          <tr><th scope="row">10:30</th><td>Status page closed, after an hour with no errors.</td><td>Support lead</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Figure 2 shows the cause plainly. The pool limit fell to 20 at 08:35, and the connections in use stayed pinned at the limit until the rollback. Just after the rollback, the waiting requests took 118 connections at once.</p>
+    <figure>
+      <div class="fig" role="region" aria-label="Figure 2, database connections of the Sync API" tabindex="0">
+<!-- docent:diagram
+{
+  "id": "pool",
+  "kind": "line",
+  "label": "Database connections of the Sync API from 08:00 to 09:55 UTC. Connections in use rose from 52 to 74 before 08:35. The pool limit then fell from 200 to 20, and connections in use stayed at 20 until 09:20. After the rollback they rose to 118 at 09:25 and settled near 75.",
+  "scale": {"from": 0, "to": 200, "step": 50, "unit": "connections"},
+  "points": ["08:00", "08:05", "08:10", "08:15", "08:20", "08:25", "08:30", "08:35", "08:40", "08:45", "08:50", "08:55", "09:00", "09:05", "09:10", "09:15", "09:20", "09:25", "09:30", "09:35", "09:40", "09:45", "09:50", "09:55"],
+  "series": [
+    {"name": "In use", "focus": true, "values": [52, 55, 58, 61, 66, 70, 74, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 118, 96, 84, 80, 78, 76, 75]},
+    {"name": "Pool limit", "values": [200, 200, 200, 200, 200, 200, 200, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 200, 200, 200, 200, 200, 200, 200]}
+  ]
+}
+-->
+<svg id="dg-pool" class="dg dg-line dg-auto" xmlns="http://www.w3.org/2000/svg" width="640" height="312" viewBox="0 0 640 312" role="img" aria-label="Database connections of the Sync API from 08:00 to 09:55 UTC. Connections in use rose from 52 to 74 before 08:35. The pool limit then fell from 200 to 20, and connections in use stayed at 20 until 09:20. After the rollback they rose to 118 at 09:25 and settled near 75.">
+<style>
+#dg-pool{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-pool .ground{fill:var(--fig,#e9f6fa)}
+#dg-pool .band{fill:var(--bg,#f6fcfe)}
+#dg-pool .track{stroke:var(--line,#c0dbe3)}
+#dg-pool .line{fill:none;stroke:var(--text,#152225);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-pool .head{fill:var(--text,#152225)}
+#dg-pool .stop{fill:var(--bg,#f6fcfe);stroke:var(--text,#152225);stroke-width:1.5}
+#dg-pool .stop.end{fill:var(--text,#152225)}
+#dg-pool .mark{fill:var(--bg,#f6fcfe);stroke:var(--text,#152225);stroke-width:1.25}
+#dg-pool .card{fill:var(--bg,#f6fcfe);stroke:var(--line,#c0dbe3)}
+#dg-pool .icon{fill:none;stroke:var(--text,#152225);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-pool .icon.on-end{stroke:var(--bg,#f6fcfe)}
+#dg-pool .icon.lane-icon{stroke:var(--muted,#526064)}
+#dg-pool .num{font-size:12px;font-weight:600;fill:var(--text,#152225);font-variant-numeric:tabular-nums}
+#dg-pool .name{font-size:14px;font-weight:600;fill:var(--text,#152225)}
+#dg-pool .lane{font-size:14px;font-weight:600;fill:var(--muted,#526064)}
+#dg-pool .sub,#dg-pool .verb{font-size:12px;fill:var(--muted,#526064)}
+#dg-pool .pulse{display:none;fill:var(--dot,#0a5f8a);stroke:var(--bg,#f6fcfe);stroke-width:2.5}
+#dg-pool .row{font-size:14px;fill:var(--text,#152225)}
+#dg-pool .dim{font-size:14px;fill:var(--muted,#526064)}
+#dg-pool .val{font-size:12px;fill:var(--muted,#526064);font-variant-numeric:tabular-nums}
+#dg-pool .ln{fill:none;stroke:var(--text,#152225);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}#dg-pool .pt{fill:var(--text,#152225)}
+#dg-pool .ln-o{fill:none;stroke:var(--muted,#526064);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}#dg-pool .pt-o{fill:var(--muted,#526064)}
+#dg-pool .ln-g{fill:none;stroke:var(--line,#c0dbe3);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}#dg-pool .pt-g{fill:var(--line,#c0dbe3)}
+#dg-pool .ld{stroke:var(--muted,#526064);stroke-width:1}
+#dg-pool .r-ref{stroke:var(--muted,#526064)}
+@media (prefers-reduced-motion:reduce){#dg-pool .pulse{animation:none!important}#dg-pool .pulse{display:none!important}}
+@media print{#dg-pool{max-width:100%;height:auto}#dg-pool .pulse{display:none!important}}
+#dg-pool-phone{display:none}
+</style>
+<rect width="640" height="312" class="ground"/>
+<rect x="8" y="36" width="624" height="268" rx="10" class="band"/>
+<line x1="52" y1="260" x2="550" y2="260" class="track"/>
+<line x1="52" y1="210" x2="550" y2="210" class="track"/>
+<line x1="52" y1="160" x2="550" y2="160" class="track"/>
+<line x1="52" y1="110" x2="550" y2="110" class="track"/>
+<line x1="52" y1="60" x2="550" y2="60" class="track"/>
+<text x="20" y="24" class="sub" text-anchor="start">Connections, scale from 0.</text>
+<text x="52" y="278" class="val" text-anchor="middle">08:00</text>
+<text x="73.65" y="294" class="val" text-anchor="middle">08:05</text>
+<text x="95.3" y="278" class="val" text-anchor="middle">08:10</text>
+<text x="116.96" y="294" class="val" text-anchor="middle">08:15</text>
+<text x="138.61" y="278" class="val" text-anchor="middle">08:20</text>
+<text x="160.26" y="294" class="val" text-anchor="middle">08:25</text>
+<text x="181.91" y="278" class="val" text-anchor="middle">08:30</text>
+<text x="203.57" y="294" class="val" text-anchor="middle">08:35</text>
+<text x="225.22" y="278" class="val" text-anchor="middle">08:40</text>
+<text x="246.87" y="294" class="val" text-anchor="middle">08:45</text>
+<text x="268.52" y="278" class="val" text-anchor="middle">08:50</text>
+<text x="290.17" y="294" class="val" text-anchor="middle">08:55</text>
+<text x="311.83" y="278" class="val" text-anchor="middle">09:00</text>
+<text x="333.48" y="294" class="val" text-anchor="middle">09:05</text>
+<text x="355.13" y="278" class="val" text-anchor="middle">09:10</text>
+<text x="376.78" y="294" class="val" text-anchor="middle">09:15</text>
+<text x="398.43" y="278" class="val" text-anchor="middle">09:20</text>
+<text x="420.09" y="294" class="val" text-anchor="middle">09:25</text>
+<text x="441.74" y="278" class="val" text-anchor="middle">09:30</text>
+<text x="463.39" y="294" class="val" text-anchor="middle">09:35</text>
+<text x="485.04" y="278" class="val" text-anchor="middle">09:40</text>
+<text x="506.7" y="294" class="val" text-anchor="middle">09:45</text>
+<text x="528.35" y="278" class="val" text-anchor="middle">09:50</text>
+<text x="550" y="294" class="val" text-anchor="middle">09:55</text>
+<text x="558" y="65" class="dim" text-anchor="start">Pool limit</text>
+<text x="558" y="190" class="row" text-anchor="start">In use</text>
+<text x="44" y="264" class="val" text-anchor="end">0</text>
+<text x="44" y="214" class="val" text-anchor="end">50</text>
+<text x="44" y="164" class="val" text-anchor="end">100</text>
+<text x="44" y="114" class="val" text-anchor="end">150</text>
+<text x="44" y="64" class="val" text-anchor="end">200</text>
+<path d="M52,60 L73.65,60 L95.3,60 L116.96,60 L138.61,60 L160.26,60 L181.91,60 L203.57,240 L225.22,240 L246.87,240 L268.52,240 L290.17,240 L311.83,240 L333.48,240 L355.13,240 L376.78,240 L398.43,240 L420.09,60 L441.74,60 L463.39,60 L485.04,60 L506.7,60 L528.35,60 L550,60" class="ln-o"/>
+<path d="M52,208 L73.65,205 L95.3,202 L116.96,199 L138.61,194 L160.26,190 L181.91,186 L203.57,240 L225.22,240 L246.87,240 L268.52,240 L290.17,240 L311.83,240 L333.48,240 L355.13,240 L376.78,240 L398.43,240 L420.09,142 L441.74,164 L463.39,176 L485.04,180 L506.7,182 L528.35,184 L550,185" class="ln"/><circle cx="52" cy="208" r="3" class="pt"/><circle cx="73.65" cy="205" r="3" class="pt"/><circle cx="95.3" cy="202" r="3" class="pt"/><circle cx="116.96" cy="199" r="3" class="pt"/><circle cx="138.61" cy="194" r="3" class="pt"/><circle cx="160.26" cy="190" r="3" class="pt"/><circle cx="181.91" cy="186" r="3" class="pt"/><circle cx="203.57" cy="240" r="3" class="pt"/><circle cx="225.22" cy="240" r="3" class="pt"/><circle cx="246.87" cy="240" r="3" class="pt"/><circle cx="268.52" cy="240" r="3" class="pt"/><circle cx="290.17" cy="240" r="3" class="pt"/><circle cx="311.83" cy="240" r="3" class="pt"/><circle cx="333.48" cy="240" r="3" class="pt"/><circle cx="355.13" cy="240" r="3" class="pt"/><circle cx="376.78" cy="240" r="3" class="pt"/><circle cx="398.43" cy="240" r="3" class="pt"/><circle cx="420.09" cy="142" r="3" class="pt"/><circle cx="441.74" cy="164" r="3" class="pt"/><circle cx="463.39" cy="176" r="3" class="pt"/><circle cx="485.04" cy="180" r="3" class="pt"/><circle cx="506.7" cy="182" r="3" class="pt"/><circle cx="528.35" cy="184" r="3" class="pt"/><circle cx="550" cy="185" r="3" class="pt"/>
+</svg>
+<svg id="dg-pool-phone" class="dg dg-line dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="236" viewBox="0 0 264 236" role="img" aria-label="Database connections of the Sync API from 08:00 to 09:55 UTC. Connections in use rose from 52 to 74 before 08:35. The pool limit then fell from 200 to 20, and connections in use stayed at 20 until 09:20. After the rollback they rose to 118 at 09:25 and settled near 75.">
+<style>
+#dg-pool-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-pool-phone .ground{fill:var(--fig,#e9f6fa)}
+#dg-pool-phone .band{fill:var(--bg,#f6fcfe)}
+#dg-pool-phone .track{stroke:var(--line,#c0dbe3)}
+#dg-pool-phone .line{fill:none;stroke:var(--text,#152225);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-pool-phone .head{fill:var(--text,#152225)}
+#dg-pool-phone .stop{fill:var(--bg,#f6fcfe);stroke:var(--text,#152225);stroke-width:1.5}
+#dg-pool-phone .stop.end{fill:var(--text,#152225)}
+#dg-pool-phone .mark{fill:var(--bg,#f6fcfe);stroke:var(--text,#152225);stroke-width:1.25}
+#dg-pool-phone .card{fill:var(--bg,#f6fcfe);stroke:var(--line,#c0dbe3)}
+#dg-pool-phone .icon{fill:none;stroke:var(--text,#152225);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-pool-phone .icon.on-end{stroke:var(--bg,#f6fcfe)}
+#dg-pool-phone .icon.lane-icon{stroke:var(--muted,#526064)}
+#dg-pool-phone .num{font-size:12px;font-weight:600;fill:var(--text,#152225);font-variant-numeric:tabular-nums}
+#dg-pool-phone .name{font-size:14px;font-weight:600;fill:var(--text,#152225)}
+#dg-pool-phone .lane{font-size:14px;font-weight:600;fill:var(--muted,#526064)}
+#dg-pool-phone .sub,#dg-pool-phone .verb{font-size:12px;fill:var(--muted,#526064)}
+#dg-pool-phone .pulse{display:none;fill:var(--dot,#0a5f8a);stroke:var(--bg,#f6fcfe);stroke-width:2.5}
+#dg-pool-phone .row{font-size:14px;fill:var(--text,#152225)}
+#dg-pool-phone .dim{font-size:14px;fill:var(--muted,#526064)}
+#dg-pool-phone .val{font-size:12px;fill:var(--muted,#526064);font-variant-numeric:tabular-nums}
+#dg-pool-phone .ln{fill:none;stroke:var(--text,#152225);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}#dg-pool-phone .pt{fill:var(--text,#152225)}
+#dg-pool-phone .ln-o{fill:none;stroke:var(--muted,#526064);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}#dg-pool-phone .pt-o{fill:var(--muted,#526064)}
+#dg-pool-phone .ln-g{fill:none;stroke:var(--line,#c0dbe3);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}#dg-pool-phone .pt-g{fill:var(--line,#c0dbe3)}
+#dg-pool-phone .ld{stroke:var(--muted,#526064);stroke-width:1}
+#dg-pool-phone .r-ref{stroke:var(--muted,#526064)}
+@media (prefers-reduced-motion:reduce){#dg-pool-phone .pulse{animation:none!important}#dg-pool-phone .pulse{display:none!important}}
+@media print{#dg-pool-phone{max-width:100%;height:auto}#dg-pool-phone .pulse{display:none!important}}
+@media (max-width:736px){#dg-pool{display:none}#dg-pool-phone{display:block}}
+@media print{#dg-pool{display:block!important}#dg-pool-phone{display:none!important}}
+</style>
+<rect width="264" height="236" class="ground"/>
+<rect x="8" y="36" width="248" height="192" rx="10" class="band"/>
+<line x1="20" y1="200" x2="174" y2="200" class="track"/>
+<line x1="20" y1="165" x2="174" y2="165" class="track"/>
+<line x1="20" y1="130" x2="174" y2="130" class="track"/>
+<line x1="20" y1="95" x2="174" y2="95" class="track"/>
+<line x1="20" y1="60" x2="174" y2="60" class="track"/>
+<text x="20" y="24" class="sub" text-anchor="start">Connections, scale from 0.</text>
+<text x="30.34" y="218" class="val" text-anchor="middle">08:00</text>
+<text x="100.35" y="218" class="val" text-anchor="middle">09:00</text>
+<text x="182" y="65" class="dim" text-anchor="start">Pool limit</text>
+<text x="182" y="152.5" class="row" text-anchor="start">In use</text>
+<text x="20" y="196" class="val" text-anchor="start">0</text>
+<text x="20" y="161" class="val" text-anchor="start">50</text>
+<text x="20" y="126" class="val" text-anchor="start">100</text>
+<text x="20" y="91" class="val" text-anchor="start">150</text>
+<text x="20" y="56" class="val" text-anchor="start">200</text>
+<path d="M20,60 L26.7,60 L33.39,60 L40.09,60 L46.78,60 L53.48,60 L60.17,60 L66.87,186 L73.57,186 L80.26,186 L86.96,186 L93.65,186 L100.35,186 L107.04,186 L113.74,186 L120.43,186 L127.13,186 L133.83,60 L140.52,60 L147.22,60 L153.91,60 L160.61,60 L167.3,60 L174,60" class="ln-o"/>
+<path d="M20,163.6 L26.7,161.5 L33.39,159.4 L40.09,157.3 L46.78,153.8 L53.48,151 L60.17,148.2 L66.87,186 L73.57,186 L80.26,186 L86.96,186 L93.65,186 L100.35,186 L107.04,186 L113.74,186 L120.43,186 L127.13,186 L133.83,117.4 L140.52,132.8 L147.22,141.2 L153.91,144 L160.61,145.4 L167.3,146.8 L174,147.5" class="ln"/>
+</svg>
+<details class="dg-words">
+<summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>The diagram in words</summary>
+<div class="table-wrap" role="region" aria-label="The values of the line chart" tabindex="0"><table><thead><tr><td></td><th scope="col">In use</th><th scope="col">Pool limit</th></tr></thead><tbody><tr><th scope="row">08:00</th><td>52</td><td>200</td></tr><tr><th scope="row">08:05</th><td>55</td><td>200</td></tr><tr><th scope="row">08:10</th><td>58</td><td>200</td></tr><tr><th scope="row">08:15</th><td>61</td><td>200</td></tr><tr><th scope="row">08:20</th><td>66</td><td>200</td></tr><tr><th scope="row">08:25</th><td>70</td><td>200</td></tr><tr><th scope="row">08:30</th><td>74</td><td>200</td></tr><tr><th scope="row">08:35</th><td>20</td><td>20</td></tr><tr><th scope="row">08:40</th><td>20</td><td>20</td></tr><tr><th scope="row">08:45</th><td>20</td><td>20</td></tr><tr><th scope="row">08:50</th><td>20</td><td>20</td></tr><tr><th scope="row">08:55</th><td>20</td><td>20</td></tr><tr><th scope="row">09:00</th><td>20</td><td>20</td></tr><tr><th scope="row">09:05</th><td>20</td><td>20</td></tr><tr><th scope="row">09:10</th><td>20</td><td>20</td></tr><tr><th scope="row">09:15</th><td>20</td><td>20</td></tr><tr><th scope="row">09:20</th><td>20</td><td>20</td></tr><tr><th scope="row">09:25</th><td>118</td><td>200</td></tr><tr><th scope="row">09:30</th><td>96</td><td>200</td></tr><tr><th scope="row">09:35</th><td>84</td><td>200</td></tr><tr><th scope="row">09:40</th><td>80</td><td>200</td></tr><tr><th scope="row">09:45</th><td>78</td><td>200</td></tr><tr><th scope="row">09:50</th><td>76</td><td>200</td></tr><tr><th scope="row">09:55</th><td>75</td><td>200</td></tr></tbody></table></div>
+<ul><li>Connections, scale from 0.</li><li>In use: 52 in 08:00, 75 in 09:55; highest 118 in 09:25; lowest 20 in 08:35.</li><li>Pool limit: 200 in 08:00, 200 in 09:55; highest 200 in 08:00; lowest 20 in 08:35.</li></ul>
+</details>
+<!-- /docent:diagram -->
+      </div>
+      <figcaption><strong>Figure 2</strong>Database connections of the Sync API, 08:00 to 09:55 UTC, in 5-minute points. The alert fired at 08:44 and the rollback started at 09:19.</figcaption>
+    </figure>
+  </section>
+
+  <section id="response" aria-labelledby="response-h">
+    <h2 id="response-h">How the response went</h2>
+    <p>Follow the dot. Each step names one arrow in the figure.</p>
+    <div class="walk">
+      <div class="rail">
+      <ol class="steps">
+        <li>
+          <h3>The alert pages the engineer.</h3>
+          <p>The alert fired at 08:44, four minutes after errors passed 5%. The engineer acknowledged at 08:49.</p>
+        </li>
+        <li>
+          <h3>The engineer reads the logs.</h3>
+          <p>The first guess was database overload, and two replicas were added at 09:06. They did not help. The logs held the real cause from 08:35.</p>
+        </li>
+        <li>
+          <h3>The logs show the cause.</h3>
+          <p>At 09:14 a database engineer who joined the call saw "pool exhausted, limit 20", and found the change in the deploy history.</p>
+        </li>
+        <li>
+          <h3>The engineer rolls back.</h3>
+          <p>The rollback started at 09:19 and reached all regions by 09:24. No restart was needed.</p>
+        </li>
+      </ol>
+      <span class="rail-dot" aria-hidden="true"></span>
+      </div>
+      <figure>
+        <div class="fig" role="region" aria-label="Figure 3, the response" tabindex="0">
+<!-- docent:diagram
+{
+  "id": "response",
+  "place": "walk",
+  "label": "The response in four steps: the alert pages the on-call engineer, the engineer reads the API logs, the logs show the pool limit, and the engineer rolls back the configuration.",
+  "lanes": [
+    {"id": "sys", "name": "Systems", "icon": "server"},
+    {"id": "eng", "name": "On-call", "icon": "person"}
+  ],
+  "parts": [
+    {"id": "alert", "lane": "sys", "name": "Error alert", "note": "08:44", "icon": "timer"},
+    {"id": "page", "lane": "eng", "name": "Engineer", "note": "acknowledged 08:49", "icon": "person"},
+    {"id": "logs", "lane": "sys", "name": "API logs", "note": "pool exhausted", "icon": "document"},
+    {"id": "cause", "lane": "eng", "name": "Cause found", "note": "09:14", "icon": "inspect"},
+    {"id": "deploy", "lane": "sys", "name": "Rollback", "note": "09:19 to 09:24", "icon": "release", "state": "ok"}
+  ],
+  "legs": [
+    {"from": "alert", "to": "page", "verb": "page"},
+    {"from": "page", "to": "logs", "verb": "read"},
+    {"from": "logs", "to": "cause", "verb": "show the limit"},
+    {"from": "cause", "to": "deploy", "verb": "roll back"}
+  ]
+}
+-->
+<svg id="dg-response" class="dg dg-tall" xmlns="http://www.w3.org/2000/svg" width="470" height="568" viewBox="0 0 470 568" role="img" aria-label="The response in four steps: the alert pages the on-call engineer, the engineer reads the API logs, the logs show the pool limit, and the engineer rolls back the configuration.">
+<style>
+#dg-response{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-response .ground{fill:var(--fig,#e9f6fa)}
+#dg-response .band{fill:var(--bg,#f6fcfe)}
+#dg-response .track{stroke:var(--line,#c0dbe3)}
+#dg-response .line{fill:none;stroke:var(--text,#152225);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-response .head{fill:var(--text,#152225)}
+#dg-response .stop{fill:var(--bg,#f6fcfe);stroke:var(--text,#152225);stroke-width:1.5}
+#dg-response .stop.end{fill:var(--text,#152225)}
+#dg-response .mark{fill:var(--bg,#f6fcfe);stroke:var(--text,#152225);stroke-width:1.25}
+#dg-response .card{fill:var(--bg,#f6fcfe);stroke:var(--line,#c0dbe3)}
+#dg-response .icon{fill:none;stroke:var(--text,#152225);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-response .icon.on-end{stroke:var(--bg,#f6fcfe)}
+#dg-response .icon.lane-icon{stroke:var(--muted,#526064)}
+#dg-response .num{font-size:12px;font-weight:600;fill:var(--text,#152225);font-variant-numeric:tabular-nums}
+#dg-response .name{font-size:14px;font-weight:600;fill:var(--text,#152225)}
+#dg-response .lane{font-size:14px;font-weight:600;fill:var(--muted,#526064)}
+#dg-response .sub,#dg-response .verb{font-size:12px;fill:var(--muted,#526064)}
+#dg-response .pulse{display:none;fill:var(--dot,#0a5f8a);stroke:var(--bg,#f6fcfe);stroke-width:2.5}
+#dg-response .stop.is-ok,#dg-response .card.is-ok{stroke:var(--ok,#1a7f37);stroke-width:1.5}
+#dg-response .flag.is-ok{fill:var(--ok,#1a7f37);stroke:var(--bg,#f6fcfe);stroke-width:2}
+.js #dg-response .leg.is-current .line{stroke:var(--primary,#0a5f8a);stroke-width:2.5}
+.js #dg-response .leg.is-current .head,.js #dg-response .leg.is-current .num{fill:var(--primary,#0a5f8a)}
+.js #dg-response .leg.is-current .mark{stroke:var(--primary,#0a5f8a)}
+.js #dg-response .leg.is-current .pulse{display:block;animation:2.4s linear infinite}
+@keyframes dg-response-1{0%{transform:translate(132px,111px);opacity:0}8%{transform:translate(132px,111px);opacity:1}10.43%{transform:translate(132px,120px);opacity:1}58.29%{transform:translate(307px,150px);opacity:1}68%{transform:translate(307px,186px);opacity:1}88%{transform:translate(307px,186px);opacity:1}100%{transform:translate(307px,186px);opacity:0}}
+#dg-response .pulse-1{transform:translate(174px,127.2px)}
+.js #dg-response .leg.is-current .pulse-1{animation-name:dg-response-1}
+@keyframes dg-response-2{0%{transform:translate(307px,216px);opacity:0}8%{transform:translate(307px,216px);opacity:1}10.43%{transform:translate(307px,225px);opacity:1}58.29%{transform:translate(132px,255px);opacity:1}68%{transform:translate(132px,291px);opacity:1}88%{transform:translate(132px,291px);opacity:1}100%{transform:translate(132px,291px);opacity:0}}
+#dg-response .pulse-2{transform:translate(265px,232.2px)}
+.js #dg-response .leg.is-current .pulse-2{animation-name:dg-response-2}
+@keyframes dg-response-3{0%{transform:translate(132px,321px);opacity:0}8%{transform:translate(132px,321px);opacity:1}10.43%{transform:translate(132px,330px);opacity:1}58.29%{transform:translate(307px,360px);opacity:1}68%{transform:translate(307px,396px);opacity:1}88%{transform:translate(307px,396px);opacity:1}100%{transform:translate(307px,396px);opacity:0}}
+#dg-response .pulse-3{transform:translate(174px,337.2px)}
+.js #dg-response .leg.is-current .pulse-3{animation-name:dg-response-3}
+@keyframes dg-response-4{0%{transform:translate(307px,426px);opacity:0}8%{transform:translate(307px,426px);opacity:1}10.43%{transform:translate(307px,435px);opacity:1}58.29%{transform:translate(132px,465px);opacity:1}68%{transform:translate(132px,501px);opacity:1}88%{transform:translate(132px,501px);opacity:1}100%{transform:translate(132px,501px);opacity:0}}
+#dg-response .pulse-4{transform:translate(265px,442.2px)}
+.js #dg-response .leg.is-current .pulse-4{animation-name:dg-response-4}
+@media (prefers-reduced-motion:reduce){#dg-response .pulse{animation:none!important}}
+@media print{#dg-response{max-width:100%;height:auto}#dg-response .pulse{display:none!important}#dg-response .leg .line{stroke:var(--text,#152225)!important;stroke-width:2px!important}#dg-response .leg .head,#dg-response .leg .num{fill:var(--text,#152225)!important}#dg-response .leg .mark{stroke:var(--text,#152225)!important}}
+#dg-response-phone{display:none}
+</style>
+<rect width="470" height="568" class="ground"/>
+<rect x="8" y="12" width="200" height="544" rx="10" class="band"/>
+<rect x="232" y="12" width="230" height="544" rx="10" class="band"/>
+<line x1="132" y1="62" x2="132" y2="542" class="track"/>
+<line x1="307" y1="62" x2="307" y2="542" class="track"/>
+<g class="icon lane-icon" transform="translate(22,29)"><rect x="2.5" y="2.5" width="11" height="4.5" rx="1"/><rect x="2.5" y="9" width="11" height="4.5" rx="1"/><path d="M5 4.75h.01M5 11.25h.01"/></g>
+<text x="46" y="42" class="lane" text-anchor="start">Systems</text>
+<g class="icon lane-icon" transform="translate(246,29)"><circle cx="8" cy="5" r="2.5"/><path d="M3 13.5c0-2.8 2.2-4.5 5-4.5s5 1.7 5 4.5"/></g>
+<text x="270" y="42" class="lane" text-anchor="start">On-call</text>
+<g class="leg" data-leg="1"><path d="M132,111 L132,120 L307,150 L307,180" class="line"/><polygon points="302.5,178 311.5,178 307,186" class="head"/><circle r="6" class="pulse pulse-1"/><circle cx="220" cy="135.09" r="10" class="mark"/><text x="220" y="139.09" class="num" text-anchor="middle">1</text><text x="220" y="118.09" class="verb" text-anchor="middle">page</text></g>
+<g class="leg" data-leg="2"><path d="M307,216 L307,225 L132,255 L132,285" class="line"/><polygon points="127.5,283 136.5,283 132,291" class="head"/><circle r="6" class="pulse pulse-2"/><circle cx="220" cy="239.91" r="10" class="mark"/><text x="220" y="243.91" class="num" text-anchor="middle">2</text><text x="220" y="222.91" class="verb" text-anchor="middle">read</text></g>
+<g class="leg" data-leg="3"><path d="M132,321 L132,330 L307,360 L307,390" class="line"/><polygon points="302.5,388 311.5,388 307,396" class="head"/><circle r="6" class="pulse pulse-3"/><circle cx="220" cy="345.09" r="10" class="mark"/><text x="220" y="349.09" class="num" text-anchor="middle">3</text><text x="220" y="328.09" class="verb" text-anchor="middle">show the limit</text></g>
+<g class="leg" data-leg="4"><path d="M307,426 L307,435 L132,465 L132,495" class="line"/><polygon points="127.5,493 136.5,493 132,501" class="head"/><circle r="6" class="pulse pulse-4"/><circle cx="220" cy="449.91" r="10" class="mark"/><text x="220" y="453.91" class="num" text-anchor="middle">4</text><text x="220" y="432.91" class="verb" text-anchor="middle">roll back</text></g>
+<circle cx="132" cy="96" r="13" class="stop"/>
+<g class="icon" transform="translate(124,88)"><circle cx="8" cy="9" r="4.75"/><path d="M8 6.5V9l1.75 1.25M6.5 1.75h3M8 1.75v2.5"/></g>
+<text x="111" y="101" class="name" text-anchor="end">Error alert</text>
+<text x="111" y="118" class="sub" text-anchor="end">08:44</text>
+<circle cx="307" cy="201" r="13" class="stop"/>
+<g class="icon" transform="translate(299,193)"><circle cx="8" cy="5" r="2.5"/><path d="M3 13.5c0-2.8 2.2-4.5 5-4.5s5 1.7 5 4.5"/></g>
+<text x="328" y="206" class="name" text-anchor="start">Engineer</text>
+<text x="328" y="223" class="sub" text-anchor="start">acknowledged 08:49</text>
+<circle cx="132" cy="306" r="13" class="stop"/>
+<g class="icon" transform="translate(124,298)"><path d="M9.5 2.5h-5a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1v-7z"/><path d="M9.5 2.5v3h3M6 9h4M6 11.25h4"/></g>
+<text x="111" y="311" class="name" text-anchor="end">API logs</text>
+<text x="111" y="328" class="sub" text-anchor="end">pool exhausted</text>
+<circle cx="307" cy="411" r="13" class="stop"/>
+<g class="icon" transform="translate(299,403)"><circle cx="7" cy="7" r="4"/><path d="M10 10l3.5 3.5"/></g>
+<text x="328" y="416" class="name" text-anchor="start">Cause found</text>
+<text x="328" y="433" class="sub" text-anchor="start">09:14</text>
+<circle cx="132" cy="516" r="13" class="stop end is-ok"/>
+<g class="icon on-end" transform="translate(124,508)"><path d="M2.5 8.4V3.5a1 1 0 0 1 1-1h4.9l5.1 5.1a1 1 0 0 1 0 1.4l-4.5 4.5a1 1 0 0 1-1.4 0z"/><path d="M5.6 5.6h.01"/></g>
+<circle cx="141.19" cy="506.81" r="3.5" class="flag is-ok"/>
+<text x="111" y="521" class="name" text-anchor="end">Rollback</text>
+<text x="111" y="538" class="sub" text-anchor="end">09:19 to 09:24</text>
+</svg>
+<svg id="dg-response-phone" class="dg dg-track" xmlns="http://www.w3.org/2000/svg" width="264" height="520" viewBox="0 0 264 520" role="img" aria-label="The response in four steps: the alert pages the on-call engineer, the engineer reads the API logs, the logs show the pool limit, and the engineer rolls back the configuration.">
+<style>
+#dg-response-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-response-phone .ground{fill:var(--fig,#e9f6fa)}
+#dg-response-phone .band{fill:var(--bg,#f6fcfe)}
+#dg-response-phone .track{stroke:var(--line,#c0dbe3)}
+#dg-response-phone .line{fill:none;stroke:var(--text,#152225);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-response-phone .head{fill:var(--text,#152225)}
+#dg-response-phone .stop{fill:var(--bg,#f6fcfe);stroke:var(--text,#152225);stroke-width:1.5}
+#dg-response-phone .stop.end{fill:var(--text,#152225)}
+#dg-response-phone .mark{fill:var(--bg,#f6fcfe);stroke:var(--text,#152225);stroke-width:1.25}
+#dg-response-phone .card{fill:var(--bg,#f6fcfe);stroke:var(--line,#c0dbe3)}
+#dg-response-phone .icon{fill:none;stroke:var(--text,#152225);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-response-phone .icon.on-end{stroke:var(--bg,#f6fcfe)}
+#dg-response-phone .icon.lane-icon{stroke:var(--muted,#526064)}
+#dg-response-phone .num{font-size:12px;font-weight:600;fill:var(--text,#152225);font-variant-numeric:tabular-nums}
+#dg-response-phone .name{font-size:14px;font-weight:600;fill:var(--text,#152225)}
+#dg-response-phone .lane{font-size:14px;font-weight:600;fill:var(--muted,#526064)}
+#dg-response-phone .sub,#dg-response-phone .verb{font-size:12px;fill:var(--muted,#526064)}
+#dg-response-phone .pulse{display:none;fill:var(--dot,#0a5f8a);stroke:var(--bg,#f6fcfe);stroke-width:2.5}
+#dg-response-phone .stop.is-ok,#dg-response-phone .card.is-ok{stroke:var(--ok,#1a7f37);stroke-width:1.5}
+#dg-response-phone .flag.is-ok{fill:var(--ok,#1a7f37);stroke:var(--bg,#f6fcfe);stroke-width:2}
+.js #dg-response-phone .leg.is-current .line{stroke:var(--primary,#0a5f8a);stroke-width:2.5}
+.js #dg-response-phone .leg.is-current .head,.js #dg-response-phone .leg.is-current .num{fill:var(--primary,#0a5f8a)}
+.js #dg-response-phone .leg.is-current .mark{stroke:var(--primary,#0a5f8a)}
+.js #dg-response-phone .leg.is-current .pulse{display:block;animation:2.4s linear infinite}
+@keyframes dg-response-phone-1{0%{transform:translate(30px,71px);opacity:0}8%{transform:translate(30px,71px);opacity:1}68%{transform:translate(30px,145px);opacity:1}88%{transform:translate(30px,145px);opacity:1}100%{transform:translate(30px,145px);opacity:0}}
+#dg-response-phone .pulse-1{transform:translate(30px,79.88px)}
+.js #dg-response-phone .leg.is-current .pulse-1{animation-name:dg-response-phone-1}
+@keyframes dg-response-phone-2{0%{transform:translate(30px,175px);opacity:0}8%{transform:translate(30px,175px);opacity:1}68%{transform:translate(30px,249px);opacity:1}88%{transform:translate(30px,249px);opacity:1}100%{transform:translate(30px,249px);opacity:0}}
+#dg-response-phone .pulse-2{transform:translate(30px,183.88px)}
+.js #dg-response-phone .leg.is-current .pulse-2{animation-name:dg-response-phone-2}
+@keyframes dg-response-phone-3{0%{transform:translate(30px,279px);opacity:0}8%{transform:translate(30px,279px);opacity:1}68%{transform:translate(30px,353px);opacity:1}88%{transform:translate(30px,353px);opacity:1}100%{transform:translate(30px,353px);opacity:0}}
+#dg-response-phone .pulse-3{transform:translate(30px,287.88px)}
+.js #dg-response-phone .leg.is-current .pulse-3{animation-name:dg-response-phone-3}
+@keyframes dg-response-phone-4{0%{transform:translate(30px,383px);opacity:0}8%{transform:translate(30px,383px);opacity:1}68%{transform:translate(30px,457px);opacity:1}88%{transform:translate(30px,457px);opacity:1}100%{transform:translate(30px,457px);opacity:0}}
+#dg-response-phone .pulse-4{transform:translate(30px,391.88px)}
+.js #dg-response-phone .leg.is-current .pulse-4{animation-name:dg-response-phone-4}
+@media (prefers-reduced-motion:reduce){#dg-response-phone .pulse{animation:none!important}}
+@media print{#dg-response-phone{max-width:100%;height:auto}#dg-response-phone .pulse{display:none!important}#dg-response-phone .leg .line{stroke:var(--text,#152225)!important;stroke-width:2px!important}#dg-response-phone .leg .head,#dg-response-phone .leg .num{fill:var(--text,#152225)!important}#dg-response-phone .leg .mark{stroke:var(--text,#152225)!important}}
+@media (max-width:566px){#dg-response{display:none}#dg-response-phone{display:block}}
+</style>
+<rect width="264" height="520" class="ground"/>
+<rect x="8" y="12" width="248" height="80" rx="10" class="band"/>
+<rect x="8" y="116" width="248" height="80" rx="10" class="band"/>
+<rect x="8" y="220" width="248" height="80" rx="10" class="band"/>
+<rect x="8" y="324" width="248" height="80" rx="10" class="band"/>
+<rect x="8" y="428" width="248" height="80" rx="10" class="band"/>
+<g class="icon lane-icon" transform="translate(155,19)"><rect x="2.5" y="2.5" width="11" height="4.5" rx="1"/><rect x="2.5" y="9" width="11" height="4.5" rx="1"/><path d="M5 4.75h.01M5 11.25h.01"/></g>
+<text x="240" y="32" class="lane" text-anchor="end">Systems</text>
+<g class="icon lane-icon" transform="translate(164,123)"><circle cx="8" cy="5" r="2.5"/><path d="M3 13.5c0-2.8 2.2-4.5 5-4.5s5 1.7 5 4.5"/></g>
+<text x="240" y="136" class="lane" text-anchor="end">On-call</text>
+<g class="icon lane-icon" transform="translate(155,227)"><rect x="2.5" y="2.5" width="11" height="4.5" rx="1"/><rect x="2.5" y="9" width="11" height="4.5" rx="1"/><path d="M5 4.75h.01M5 11.25h.01"/></g>
+<text x="240" y="240" class="lane" text-anchor="end">Systems</text>
+<g class="icon lane-icon" transform="translate(164,331)"><circle cx="8" cy="5" r="2.5"/><path d="M3 13.5c0-2.8 2.2-4.5 5-4.5s5 1.7 5 4.5"/></g>
+<text x="240" y="344" class="lane" text-anchor="end">On-call</text>
+<g class="icon lane-icon" transform="translate(155,435)"><rect x="2.5" y="2.5" width="11" height="4.5" rx="1"/><rect x="2.5" y="9" width="11" height="4.5" rx="1"/><path d="M5 4.75h.01M5 11.25h.01"/></g>
+<text x="240" y="448" class="lane" text-anchor="end">Systems</text>
+<g class="leg" data-leg="1"><path d="M30,71 L30,139" class="line"/><polygon points="25.5,137 34.5,137 30,145" class="head"/><circle r="6" class="pulse pulse-1"/><circle cx="30" cy="104" r="10" class="mark"/><text x="30" y="108" class="num" text-anchor="middle">1</text><text x="51" y="108" class="verb" text-anchor="start">page</text></g>
+<g class="leg" data-leg="2"><path d="M30,175 L30,243" class="line"/><polygon points="25.5,241 34.5,241 30,249" class="head"/><circle r="6" class="pulse pulse-2"/><circle cx="30" cy="208" r="10" class="mark"/><text x="30" y="212" class="num" text-anchor="middle">2</text><text x="51" y="212" class="verb" text-anchor="start">read</text></g>
+<g class="leg" data-leg="3"><path d="M30,279 L30,347" class="line"/><polygon points="25.5,345 34.5,345 30,353" class="head"/><circle r="6" class="pulse pulse-3"/><circle cx="30" cy="312" r="10" class="mark"/><text x="30" y="316" class="num" text-anchor="middle">3</text><text x="51" y="316" class="verb" text-anchor="start">show the limit</text></g>
+<g class="leg" data-leg="4"><path d="M30,383 L30,451" class="line"/><polygon points="25.5,449 34.5,449 30,457" class="head"/><circle r="6" class="pulse pulse-4"/><circle cx="30" cy="416" r="10" class="mark"/><text x="30" y="420" class="num" text-anchor="middle">4</text><text x="51" y="420" class="verb" text-anchor="start">roll back</text></g>
+<circle cx="30" cy="56" r="13" class="stop"/>
+<g class="icon" transform="translate(22,48)"><circle cx="8" cy="9" r="4.75"/><path d="M8 6.5V9l1.75 1.25M6.5 1.75h3M8 1.75v2.5"/></g>
+<text x="51" y="61" class="name" text-anchor="start">Error alert</text>
+<text x="51" y="78" class="sub" text-anchor="start">08:44</text>
+<circle cx="30" cy="160" r="13" class="stop"/>
+<g class="icon" transform="translate(22,152)"><circle cx="8" cy="5" r="2.5"/><path d="M3 13.5c0-2.8 2.2-4.5 5-4.5s5 1.7 5 4.5"/></g>
+<text x="51" y="165" class="name" text-anchor="start">Engineer</text>
+<text x="51" y="182" class="sub" text-anchor="start">acknowledged 08:49</text>
+<circle cx="30" cy="264" r="13" class="stop"/>
+<g class="icon" transform="translate(22,256)"><path d="M9.5 2.5h-5a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1v-7z"/><path d="M9.5 2.5v3h3M6 9h4M6 11.25h4"/></g>
+<text x="51" y="269" class="name" text-anchor="start">API logs</text>
+<text x="51" y="286" class="sub" text-anchor="start">pool exhausted</text>
+<circle cx="30" cy="368" r="13" class="stop"/>
+<g class="icon" transform="translate(22,360)"><circle cx="7" cy="7" r="4"/><path d="M10 10l3.5 3.5"/></g>
+<text x="51" y="373" class="name" text-anchor="start">Cause found</text>
+<text x="51" y="390" class="sub" text-anchor="start">09:14</text>
+<circle cx="30" cy="472" r="13" class="stop end is-ok"/>
+<g class="icon on-end" transform="translate(22,464)"><path d="M2.5 8.4V3.5a1 1 0 0 1 1-1h4.9l5.1 5.1a1 1 0 0 1 0 1.4l-4.5 4.5a1 1 0 0 1-1.4 0z"/><path d="M5.6 5.6h.01"/></g>
+<circle cx="39.19" cy="462.81" r="3.5" class="flag is-ok"/>
+<text x="51" y="477" class="name" text-anchor="start">Rollback</text>
+<text x="51" y="494" class="sub" text-anchor="start">09:19 to 09:24</text>
+</svg>
+<!-- /docent:diagram -->
+        </div>
+        <figcaption><strong>Figure 3</strong>The response, one arrow for each step.</figcaption>
+      </figure>
+    </div>
+    <h3>What went well</h3>
+    <ul>
+      <li>The app kept every unsaved change and sent it again after recovery, so no work was lost.</li>
+      <li>The status page was updated 18 minutes after the first errors.</li>
+      <li>The rollback took five minutes and needed no restart.</li>
+    </ul>
+    <h3>What went badly</h3>
+    <ul>
+      <li>The change reached all regions at once, so no region stayed healthy.</li>
+      <li>No alert watches the pool, so the first guess was wrong and cost 8 minutes.</li>
+      <li>The runbook for sync errors does not mention the connection pool.</li>
+    </ul>
+  </section>
+
+  <section id="cause" aria-labelledby="cause-h">
+    <h2 id="cause-h">Why it happened</h2>
+    <p>The direct cause was the pool limit of 20. Figure 4 groups the causes that let the change reach production and kept the outage long. No single person caused it; each cause is a gap in a process.</p>
+    <figure>
+      <div class="fig" role="region" aria-label="Figure 4, why the Sync API failed for 47 minutes" tabindex="0">
+<svg id="hd-causes" data-drawn="hand" data-type="fishbone" xmlns="http://www.w3.org/2000/svg" width="640" height="290" viewBox="0 0 640 290" role="img" aria-labelledby="hd-causes-t hd-causes-d">
+<title id="hd-causes-t">Why the Sync API failed for 47 minutes</title>
+<desc id="hd-causes-d">A fishbone diagram. Four groups of causes lead to the head, "Sync API failed for 47 minutes". Change: a hidden pool limit, and the output was not reviewed. Deploy: all regions at once, and no canary step. Detection: no alert on the pool, and the alert came after 4 minutes. Response: the first guess was wrong, and the runbook lacks the pool.</desc>
+<!-- the spine and the head -->
+<line class="hd-strong" x1="24" y1="150" x2="488" y2="150"/>
+<rect class="hd-box" x="488" y="122" width="136" height="56" rx="6"/>
+<text class="hd-name" text-anchor="middle" x="556" y="146">Sync API failed</text>
+<text class="hd-note" text-anchor="middle" x="556" y="164">for 47 minutes</text>
+<!-- top: Change -->
+<text class="hd-name" text-anchor="middle" x="140" y="32">Change</text>
+<line class="hd-line" x1="140" y1="44" x2="220" y2="150"/>
+<line class="hd-muted" x1="25.7" y1="78" x2="165.7" y2="78"/>
+<text class="hd-note" text-anchor="end" x="143.7" y="72">Hidden pool limit</text>
+<line class="hd-muted" x1="51.3" y1="112" x2="191.3" y2="112"/>
+<text class="hd-note" text-anchor="end" x="169.3" y="106">Output not reviewed</text>
+<!-- top: Deploy -->
+<text class="hd-name" text-anchor="middle" x="330" y="32">Deploy</text>
+<line class="hd-line" x1="330" y1="44" x2="410" y2="150"/>
+<line class="hd-muted" x1="215.7" y1="78" x2="355.7" y2="78"/>
+<text class="hd-note" text-anchor="end" x="333.7" y="72">All regions at once</text>
+<line class="hd-muted" x1="241.3" y1="112" x2="381.3" y2="112"/>
+<text class="hd-note" text-anchor="end" x="359.3" y="106">No canary step</text>
+<!-- bottom: Detection -->
+<text class="hd-name" text-anchor="middle" x="140" y="280">Detection</text>
+<line class="hd-line" x1="140" y1="256" x2="220" y2="150"/>
+<line class="hd-muted" x1="51.3" y1="188" x2="191.3" y2="188"/>
+<text class="hd-note" text-anchor="end" x="169.3" y="182">No alert on the pool</text>
+<line class="hd-muted" x1="25.7" y1="222" x2="165.7" y2="222"/>
+<text class="hd-note" text-anchor="end" x="143.7" y="216">Alert after 4 min</text>
+<!-- bottom: Response -->
+<text class="hd-name" text-anchor="middle" x="330" y="280">Response</text>
+<line class="hd-line" x1="330" y1="256" x2="410" y2="150"/>
+<line class="hd-muted" x1="241.3" y1="188" x2="381.3" y2="188"/>
+<text class="hd-note" text-anchor="end" x="359.3" y="182">First guess wrong</text>
+<line class="hd-muted" x1="215.7" y1="222" x2="355.7" y2="222"/>
+<text class="hd-note" text-anchor="end" x="333.7" y="216">Runbook lacks pool</text>
+</svg>
+<details class="dg-words">
+<summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>The diagram in words</summary>
+<table>
+<thead><tr><th scope="col">Group</th><th scope="col">Cause</th></tr></thead>
+<tbody>
+<tr><th scope="row">Change</th><td>The new template section had a default pool limit of 20, which nobody saw.</td></tr>
+<tr><th scope="row">Change</th><td>The review looked at the template, not at the configuration it produced.</td></tr>
+<tr><th scope="row">Deploy</th><td>The pipeline sent the configuration to all three regions at once.</td></tr>
+<tr><th scope="row">Deploy</th><td>Configuration changes skip the canary step that code changes have.</td></tr>
+<tr><th scope="row">Detection</th><td>No alert watches the share of the pool in use.</td></tr>
+<tr><th scope="row">Detection</th><td>The error alert waits 3 minutes, and fired 4 minutes after errors passed 5%.</td></tr>
+<tr><th scope="row">Response</th><td>The first guess, database overload, was wrong and cost 8 minutes.</td></tr>
+<tr><th scope="row">Response</th><td>The runbook for sync errors does not mention the connection pool.</td></tr>
+</tbody>
+</table>
+</details>
+      </div>
+      <figcaption><strong>Figure 4</strong>Why the Sync API failed for 47 minutes, in four groups of causes.</figcaption>
+    </figure>
+    <details>
+      <summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>The change that caused it</summary>
+<pre tabindex="0" role="region" aria-label="The configuration before and after the change"><code><span class="cm"># Before: sync-api.yaml, as the template produced it</span>
+database:
+  pool_size: 200
+  timeout_ms: 2000
+
+<span class="cm"># After: the value moved to a new section, and the old key was ignored</span>
+database:
+  timeout_ms: 2000
+  pool:
+    size: 20        <span class="cm"># the new section's default</span></code></pre>
+    </details>
+  </section>
+
+  <section id="actions" aria-labelledby="actions-h">
+    <h2 id="actions-h">Actions</h2>
+    <p>Each action closes one of the causes in Figure 4. The review meeting agreed the owners and dates on 17 November.</p>
+    <div class="table-wrap" role="region" aria-label="Actions from the review" tabindex="0">
+      <table>
+        <thead>
+          <tr><th scope="col">Action</th><th scope="col">Cause it closes</th><th scope="col">Owner</th><th scope="col">Due</th><th scope="col">State</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">Show the produced configuration in every template review</th><td>Output not reviewed</td><td>Platform team</td><td>27 Nov 2026</td><td><span class="state ok">Done</span></td></tr>
+          <tr><th scope="row">Fail the build when a known key is set to a default it did not have before</th><td>Hidden pool limit</td><td>Platform team</td><td>4 Dec 2026</td><td><span class="state warn">In progress</span></td></tr>
+          <tr><th scope="row">Send configuration changes through the canary region first</th><td>All regions at once; no canary step</td><td>Deploy team</td><td>11 Dec 2026</td><td><span class="state plan">Planned</span></td></tr>
+          <tr><th scope="row">Alert when the pool is more than 80% in use for 2 minutes</th><td>No alert on the pool</td><td>Sync API team</td><td>27 Nov 2026</td><td><span class="state ok">Done</span></td></tr>
+          <tr><th scope="row">Lower the error alert's wait from 3 minutes to 1</th><td>Alert after 4 min</td><td>Sync API team</td><td>27 Nov 2026</td><td><span class="state ok">Done</span></td></tr>
+          <tr><th scope="row">Add the pool to the sync errors runbook, as the second thing to check</th><td>Runbook lacks pool; first guess wrong</td><td>On-call leads</td><td>4 Dec 2026</td><td><span class="state warn">In progress</span></td></tr>
+          <tr><th scope="row">Practise this failure in the January game day</th><td>First guess wrong</td><td>On-call leads</td><td>20 Jan 2027</td><td><span class="state plan">Planned</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="status">
+      <span class="state info">Follow-up</span>
+      <p>The platform team will report on the open actions in the operations review of 15 December.</p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="shell">
+    <p class="credit"><svg viewBox="13 13 38 38" aria-hidden="true"><path d="M20 37V18H30A14 14 0 0 1 30 46H29" fill="none" stroke="currentColor" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="20" cy="46" r="4" fill="currentColor"/></svg>Made with <a href="https://github.com/sorawit-w/docent">Docent</a></p>
+  </div>
+</footer>
+<script>
+// docent:kit 0.18.0
+(() => {
+  const root = document.documentElement;
+  root.classList.add('js');
+  // A page saved from the browser ("Save page as") keeps what this script added. Take it out, so that the script adds each part once.
+  document.querySelectorAll('.fig-more, .step-n, button.copy').forEach((el) => el.remove());
+  document.querySelectorAll('div.code').forEach((holder) => holder.replaceWith(...holder.childNodes));
+  document.querySelectorAll('.is-numbered').forEach((h) => h.classList.remove('is-numbered'));
+  // A theme that the reader chose carries data-theme-reader. A saved page keeps it, and it is not a fixed theme.
+  if (root.hasAttribute('data-theme-reader')) { delete root.dataset.theme; delete root.dataset.themeReader; }
+  // Theme: the page follows the reader's system setting. The switch sets a choice that wins over the system and is remembered.
+  const button = document.querySelector('.theme');
+  const system = matchMedia('(prefers-color-scheme: dark)');
+  const theme = () => root.dataset.theme || (system.matches ? 'dark' : 'light');
+  const chooseTheme = (value) => { root.dataset.theme = value; root.dataset.themeReader = ''; };
+  // A theme written on <html> in the source is fixed: no saved choice and no switch.
+  const fixed = root.dataset.theme === 'light' || root.dataset.theme === 'dark';
+  if (fixed && button) button.hidden = true;
+  if (!fixed) try {
+    const saved = localStorage.getItem('docent-theme');
+    if (saved === 'dark' || saved === 'light') chooseTheme(saved);
+  } catch { /* no saved choice can be read: follow the system */ }
+  if (button && !fixed) {
+    const showSwitch = () => {
+      const next = theme() === 'dark' ? 'light' : 'dark';
+      button.dataset.next = next;
+      button.querySelector('.theme-text').textContent = next === 'dark' ? 'Dark' : 'Light';
+      button.setAttribute('aria-label', `Switch to the ${next} theme`);
+    };
+    showSwitch();
+    system.addEventListener('change', showSwitch);
+    button.addEventListener('click', () => {
+      chooseTheme(theme() === 'dark' ? 'light' : 'dark');
+      showSwitch();
+      try { localStorage.setItem('docent-theme', root.dataset.theme); } catch { /* private window: the choice lasts for this visit */ }
+    });
+  }
+  // Step numbers. The styles count the steps, but a screen reader in Chromium does not read a number that the styles count. So the script writes each number as text, in place of the counted one.
+  const number = (heading, n) => {
+    const span = document.createElement('span');
+    span.className = 'step-n';
+    span.textContent = `${n} `;
+    heading.prepend(span);
+    heading.classList.add('is-numbered');
+  };
+  const groups = new Map();
+  document.querySelectorAll('h3.step').forEach((h) => { const s = h.closest('section'); groups.set(s, [...(groups.get(s) || []), h]); });
+  groups.forEach((list) => list.forEach((h, i) => number(h, i + 1)));
+  document.querySelectorAll('.steps').forEach((ol) => [...ol.children].forEach((li, i) => { const h = li.querySelector('h3'); if (h) number(h, i + 1); }));
+  // A diagram outside a walkthrough runs its dot twice when it comes into view, then rests. Pointing at it runs it again.
+  const replay = (svg) => svg.querySelectorAll('.pulse').forEach((dot) => dot.getAnimations().forEach((run) => { run.cancel(); run.play(); }));
+  const seen = new IntersectionObserver((entries) => entries.forEach((entry) => {
+    if (!entry.isIntersecting) return;
+    entry.target.classList.add('is-playing');
+    seen.unobserve(entry.target);
+  }), { threshold: 0.6 });
+  document.querySelectorAll('svg.dg-auto').forEach((svg) => {
+    seen.observe(svg);
+    const well = svg.closest('.fig') || svg;
+    well.addEventListener('pointerenter', () => replay(svg));
+    well.addEventListener('focus', () => replay(svg));
+  });
+  // A drawing that is wider than its well scrolls sideways, and the part that shows can look complete. A line under the well says that more is to the side.
+  const wells = [...document.querySelectorAll('.fig')].map((well) => {
+    const note = document.createElement('p');
+    note.className = 'fig-more';
+    note.hidden = true;
+    note.textContent = 'The drawing is wider than the screen. Scroll it sideways to see all of it.';
+    well.after(note);
+    return { well, note };
+  });
+  // A code block gets a button that copies the code. The block moves into a holder, so the button stays in place when the code scrolls sideways.
+  const blocks = [...document.querySelectorAll('pre')].map((pre) => {
+    const holder = document.createElement('div'), button = document.createElement('button');
+    holder.className = 'code';
+    pre.before(holder);
+    holder.append(pre, button);
+    button.type = 'button';
+    button.className = 'copy';
+    button.textContent = 'Copy';
+    button.setAttribute('aria-live', 'polite');
+    button.addEventListener('click', async () => {
+      const text = (pre.querySelector('code') || pre).textContent;
+      let done = false;
+      try { await navigator.clipboard.writeText(text); done = true; } catch { /* no clipboard here: select the code and copy the selection */ }
+      if (!done) {
+        const range = document.createRange(), selection = getSelection();
+        range.selectNodeContents(pre);
+        selection.removeAllRanges();
+        selection.addRange(range);
+        try { done = document.execCommand('copy'); } catch { /* the code stays selected, so the reader can copy it by hand */ }
+        if (done) selection.removeAllRanges();
+      }
+      button.textContent = done ? 'Copied' : 'Select and copy';
+      setTimeout(() => (button.textContent = 'Copy'), 2000);
+    });
+    return { holder, pre, button };
+  });
+  const fit = () => {
+    wells.forEach(({ well, note }) => (note.hidden = well.scrollWidth <= well.clientWidth + 1));
+    // When the widest line of code reaches the button, the code starts below the button. A block that is hidden now has no size; it is measured when it shows.
+    blocks.forEach(({ holder, pre, button }) => {
+      if (!pre.clientWidth) return;
+      const code = pre.querySelector('code') || pre;
+      holder.classList.toggle('is-long', pre.scrollWidth > pre.clientWidth + 1 || code.getBoundingClientRect().right > button.getBoundingClientRect().left - 8);
+    });
+  };
+  // Measure again when a well or a code block changes its size: the window changes, a chooser shows another case, or a closed section opens.
+  if ('ResizeObserver' in window) {
+    const watch = new ResizeObserver(fit);
+    wells.forEach(({ well }) => watch.observe(well));
+    blocks.forEach(({ pre }) => watch.observe(pre));
+  }
+  addEventListener('resize', fit);
+  fit();
+  // Print: open every closed section so its text prints, then close it again.
+  let opened = [];
+  addEventListener('beforeprint', () => { opened = [...document.querySelectorAll('details:not([open])')]; opened.forEach((d) => (d.open = true)); });
+  addEventListener('afterprint', () => { opened.forEach((d) => (d.open = false)); opened = []; });
+  // The route dot marks the current section. In each walkthrough, the rail dot marks the current step and the diagram lights the leg with the same number.
+  const bar = document.querySelector('.topbar .shell');
+  const routeDot = document.querySelector('.route-dot');
+  const links = [...document.querySelectorAll('.route a[href^="#"]')].filter((a) => document.getElementById(a.getAttribute('href').slice(1)));
+  const sections = links.map((a) => document.getElementById(a.getAttribute('href').slice(1)));
+  const walks = [...document.querySelectorAll('.walk')].map((walk) => ({
+    steps: [...walk.querySelectorAll('.steps > li')],
+    legs: [...walk.querySelectorAll('svg.dg .leg')],
+    dot: walk.querySelector('.rail-dot'),
+  })).filter((walk) => walk.steps.length);
+  const nearest = (items, line) => items.reduce((best, el) => (el.getBoundingClientRect().top <= line ? el : best), items[0]);
+  const update = () => {
+    if (sections.length) {
+      const section = nearest(sections, innerHeight * 0.35);
+      links.forEach((a, i) => (sections[i] === section ? a.setAttribute('aria-current', 'true') : a.removeAttribute('aria-current')));
+      if (bar && routeDot) {
+        const link = links[sections.indexOf(section)].getBoundingClientRect();
+        routeDot.style.setProperty('--x', `${link.left + link.width / 2 - bar.getBoundingClientRect().left - 3.5}px`);
+      }
+    }
+    walks.forEach(({ steps, legs, dot }) => {
+      const step = nearest(steps, innerHeight * 0.5);
+      const number = steps.indexOf(step) + 1;
+      steps.forEach((li) => li.classList.toggle('is-current', li === step));
+      legs.forEach((leg) => leg.classList.toggle('is-current', Number(leg.dataset.leg) === number));
+      if (dot) dot.style.setProperty('--y', `${step.offsetTop}px`);
+    });
+  };
+  let queued = false;
+  const schedule = () => { if (!queued) { queued = true; requestAnimationFrame(() => { queued = false; update(); }); } };
+  addEventListener('scroll', schedule, { passive: true });
+  addEventListener('resize', schedule);
+  // Widgets. Each one is readable without this script. The script adds memory, the count of a checklist and the answer of a decision helper.
+  const load = (key) => { try { return JSON.parse(localStorage.getItem(key)); } catch { return null; } };
+  const save = (key, value) => { try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* private window: it lasts for this visit */ } };
+  // Chooser: the choice is remembered, and choosers with the same options change together.
+  const choosers = [...document.querySelectorAll('.choose')].map((el) => ({
+    inputs: [...el.querySelectorAll(':scope > input')],
+    key: `docent-choice:${[...el.querySelectorAll(':scope > .opt')].map((label) => label.textContent).join('|')}`,
+  }));
+  const choose = (key, n) => choosers.forEach((c) => { if (c.key === key && c.inputs[n]) c.inputs[n].checked = true; });
+  choosers.forEach((c) => {
+    choose(c.key, load(c.key));
+    c.inputs.forEach((input, n) => input.addEventListener('change', () => {
+      const top = input.getBoundingClientRect().top;
+      choose(c.key, n);
+      scrollBy(0, input.getBoundingClientRect().top - top); // a chooser higher on the page changed its height: keep this one in place
+      save(c.key, n);
+      schedule();
+    }));
+  });
+  // Value picker: every place <var data-v="key"> shows the value of the chosen option. The values come from the table of all values. Pickers with the same options change together, and the choice is remembered.
+  const pickers = [...document.querySelectorAll('.values')].map((el) => ({
+    el,
+    inputs: [...el.querySelectorAll(':scope > input')],
+    names: [...el.querySelectorAll(':scope > .opt')].map((label) => label.textContent),
+    rows: [...el.querySelectorAll('tbody tr[data-v]')].map((tr) => ({ key: tr.dataset.v, cells: [...tr.querySelectorAll('td')].map((td) => td.textContent) })),
+  }));
+  const pick = (names, n) => pickers.forEach((p) => {
+    if (p.names.join('|') !== names || !p.inputs[n]) return;
+    p.inputs[n].checked = true;
+    p.el.querySelector('.values-now strong').textContent = p.names[n];
+    p.rows.forEach(({ key, cells }) => document.querySelectorAll(`var[data-v="${CSS.escape(key)}"]`).forEach((v) => (v.textContent = cells[n])));
+  });
+  pickers.forEach((p) => {
+    const key = `docent-values:${p.names.join('|')}`, saved = load(key);
+    if (Number.isInteger(saved)) pick(p.names.join('|'), saved);
+    p.inputs.forEach((input, n) => input.addEventListener('change', () => { pick(p.names.join('|'), n); save(key, n); }));
+    p.el.querySelector('details').open = false;
+  });
+  // Checklist: the ticks are remembered for this document, and the line below the list counts them.
+  document.querySelectorAll('form.checks').forEach((form) => {
+    const boxes = [...form.querySelectorAll('input')], out = form.querySelector('output'), key = `docent-ticks:${location.pathname}#${form.id}`;
+    const saved = load(key);
+    if (Array.isArray(saved) && saved.length === boxes.length) boxes.forEach((box, i) => (box.checked = saved[i] === true));
+    const show = () => { out.textContent = `${boxes.filter((box) => box.checked).length} of ${boxes.length} done`; };
+    const keep = () => { show(); save(key, boxes.map((box) => box.checked)); schedule(); };
+    form.addEventListener('change', keep);
+    form.addEventListener('reset', () => setTimeout(keep));
+    show();
+  });
+  // Decision helper: a row that no longer fits the answers takes the muted color. When every question has an answer, the one row that fits is shown as the answer.
+  document.querySelectorAll('.decide').forEach((el) => {
+    const form = el.querySelector('form'), out = el.querySelector('output'), again = el.querySelector('.wd-foot'), groups = [...el.querySelectorAll('fieldset')], rows = [...el.querySelectorAll('tbody tr')];
+    el.querySelector('details').open = false;
+    const show = () => {
+      const picked = groups.map((group) => [...group.querySelectorAll('input')].findIndex((input) => input.checked) + 1);
+      const fits = rows.filter((row) => {
+        const fit = row.dataset.when.split(',').every((option, q) => option === '0' || !picked[q] || Number(option) === picked[q]);
+        row.classList.toggle('is-out', !fit);
+        return fit;
+      });
+      out.innerHTML = picked.every(Boolean) && fits.length === 1 ? fits[0].lastElementChild.innerHTML : '';
+      again.hidden = !picked.some(Boolean);
+      schedule();
+    };
+    form.addEventListener('change', show);
+    form.addEventListener('reset', () => setTimeout(show));
+    show();
+  });
+  update();
+  requestAnimationFrame(() => requestAnimationFrame(() => root.classList.add('ready')));
+})();
+// /docent:kit
+</script>
+</body>
+</html>
