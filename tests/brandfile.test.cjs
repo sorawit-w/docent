@@ -82,3 +82,15 @@ test("the sample repo: its branded page is built from its repo file, and passes 
   assert.match(hostOf(page), new RegExp(`--host-ink: ${data.tokens["host-ink"].value};`), "the file's heading color, written by stamp");
   for (const text of [page, fs.readFileSync(path.join(root, "DESIGN.md"), "utf8"), JSON.stringify(data)]) assert.ok(!/@(?!example\.)[\w-]+\.\w+|\/Users\//.test(text), "invented content only: no address and no machine path");
 });
+
+test("after stamp, a page's own host color still wins over the file's, as it does in the browser", () => {
+  const own = specimen.replace("</head>", "<style>:root { --host-ink: #3b2a5c; }</style></head>");
+  const root = repo({ ".docent/config.json": { version: 1, tokens: { "host-ink": { value: "#9a8fb5", reason: "A lighter violet." } } }, "docs/a.html": own });
+  assert.equal(run("check.cjs", ["docs/a.html"], root).code, 0, "before stamp");
+  run("stamp.cjs", ["docs/a.html"], root);
+  assert.match(hostOf(read(root, "docs/a.html")), /--host-ink: #9a8fb5;/);
+  assert.equal(run("check.cjs", ["docs/a.html"], root).code, 0, "after stamp: the page's own heading color wins");
+  fs.writeFileSync(path.join(root, "docs/b.html"), specimen);
+  run("stamp.cjs", ["docs/b.html"], root);
+  assert.match(run("check.cjs", ["--no-config", "docs/b.html"], root).out, /error \[host\.contrast\]: --host-ink #9a8fb5 from the docent:host block has a contrast/, "a stamped value that the page does not override is tested");
+});

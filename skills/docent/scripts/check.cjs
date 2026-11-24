@@ -8,7 +8,7 @@ require("./lib/node.cjs").warnOldNode(); // first, so that an old Node is named 
 const fs = require("node:fs");
 const path = require("node:path");
 const { findConfig, readConfig } = require("./lib/config.cjs");
-const { VERSION, cssBlock, jsBlock, findKit, isDeck, htmlAttr } = require("./lib/kit.cjs");
+const { VERSION, cssBlock, jsBlock, findKit, isDeck, htmlAttr, hostOf } = require("./lib/kit.cjs");
 const { checkDeck, roomAt } = require("./lib/slide.cjs");
 const { renderDiagram, slideRoomsOf } = require("./lib/diagram.cjs");
 const { renderWidget, PLACE, esc } = require("./lib/widget.cjs");
@@ -236,6 +236,10 @@ function checkDocument(html, options = {}) {
 
   // From here on, test the author's own content: everything except the kit, the drawings and the widgets.
   for (const k of findKit(rest)) rest = rest.replace(k.text, "");
+  // The host block that stamp writes is not the author's own style: a --host-* value of the page wins over it, as in the browser.
+  const stampedBlock = hostOf(rest);
+  if (stampedBlock) rest = rest.replace(stampedBlock, "");
+  const stamped = stampedBlock ? [...stampedBlock.matchAll(/--(host-accent-dark|host-accent|host-ink|host-dot-dark)\s*:\s*([^;}]+)/g)].map(([, name, value]) => [name, value.trim()]) : [];
   const noComments = rest.replace(/<!--[\s\S]*?-->/g, "");
   const css = [...noComments.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/g)].map((m) => m[1]).concat([...noComments.matchAll(/\bstyle="([^"]*)"/g)].map((m) => m[1])).join("\n");
   const scripts = [...noComments.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/g)].map((m) => m[1]).join("\n");
@@ -259,6 +263,8 @@ function checkDocument(html, options = {}) {
   const own = [...css.matchAll(/--(host-accent-dark|host-accent|host-ink|host-dot-dark)\s*:\s*([^;}]+)/g)].map(([, name, value]) => [name, value.trim(), ""]);
   const brandValue = htmlAttr(html, "data-brand"); // "off": a page about another product takes no brand field of the repo file
   const fileTokens = (brandValue !== "off" && options.config && options.config.data && options.config.data.tokens) || {};
+  // Then each one of the host block of stamp, then each one of the repo file: the page's own value wins, as it does in the browser.
+  if (brandValue !== "off") for (const [name, value] of stamped) if (!own.some(([n]) => n === name)) own.push([name, value, " from the docent:host block"]);
   for (const name of Object.keys(HOST)) if (Object.hasOwn(fileTokens, name) && !own.some(([n]) => n === name)) own.push([name, fileTokens[name].value.toLowerCase(), ` from ${options.config.label}`]);
   for (const [name, color, from] of own) {
     if (!/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(color)) { warn("host.hex", `--${name} is "${color}"; check tests the contrast of a hex color only, such as #2f3fd0`); hosts[name] = null; continue; }
