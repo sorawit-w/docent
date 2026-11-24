@@ -394,27 +394,27 @@ function checkDocument(html) {
     const start = Number(attrOf(list.attrs, "start") || 1);
     return [...list.inner.matchAll(/<li\b([^>]*)>([\s\S]*?)(?=<li\b|$)/gi)].map(([, attrs, body], i) => ({ n: start + i, id: attrOf(attrs, "id"), body: body.replace(/<\/li>\s*$/i, ""), at: list.index }));
   });
-  const marks = withClass(markup, "fn").filter((m) => m.tag === "a").map((m) => ({ ...m, text: plain(m.inner), href: (attrOf(m.attrs, "href") || "").replace(/^#/, ""), id: attrOf(m.attrs, "id"), label: attrOf(m.attrs, "aria-label") }));
+  const marks = withClass(markup, "fn").filter((m) => m.tag === "a").map((m) => ({ ...m, text: plain(m.inner), href: attrOf(m.attrs, "href") || "", target: ((attrOf(m.attrs, "href") || "").match(/^#(.+)/) || [])[1], id: attrOf(m.attrs, "id"), label: attrOf(m.attrs, "aria-label") }));
   if (notes.some((note, i) => note.n !== i + 1)) errors.push(`the notes run ${notes.map((note) => note.n).join(", ")} down the page; they run 1, 2, 3 … with no gap and no repeat, so a notes list after the first takes start="n", where n follows the last note before it`);
   for (const mark of marks) {
-    const note = notes.find((x) => x.id && x.id === mark.href), name = `the footnote mark "${mark.text}"`;
-    if (!note) { errors.push(`${name} links to "#${mark.href}", which is no note in a notes list (<ol class="notes">) on this page`); continue; }
+    const note = notes.find((x) => x.id && x.id === mark.target), name = `the footnote mark "${mark.text}"`;
+    if (!note) { errors.push(`${name} links to "${mark.href}", which is no note in a notes list (<ol class="notes">) on this page${mark.target || !mark.href ? "" : `; a link to a place on the page starts with #, as in href="#${mark.href}"`}`); continue; }
     if (mark.text !== `[${note.n}]`) errors.push(`${name} links to note ${note.n}; write "[${note.n}]"`);
     if (mark.label !== `Note ${note.n}`) warnings.push(`${name} has ${mark.label == null ? "no aria-label" : `aria-label="${mark.label}"`}; give it aria-label="Note ${note.n}", so a screen reader says "Note ${note.n}, link" and not the brackets`);
     if (headings.some(([a, b]) => a < mark.index && mark.index < b)) warnings.push(`${name} stands in a heading; a screen reader lists headings by their words, where "Note ${note.n}" is noise. Put the mark in the text below`);
     if (sectionOf(mark.index) !== sectionOf(note.at)) warnings.push(`${name} and its note stand in different sections; put the note in the notes list at the end of the mark's section`);
   }
-  const order = marks.map((mark) => (notes.find((x) => x.id && x.id === mark.href) || {}).n).filter(Boolean);
+  const order = marks.map((mark) => (notes.find((x) => x.id && x.id === mark.target) || {}).n).filter(Boolean);
   if (order.some((n, i) => i && n < order[i - 1])) warnings.push(`the footnote marks run ${order.join(", ")} down the page; number the notes in the order of their marks`);
   for (const note of notes) {
-    const own = marks.filter((mark) => note.id && mark.href === note.id), back = withClass(note.body, "back").filter((b) => b.tag === "a");
+    const own = marks.filter((mark) => note.id && mark.target === note.id), back = withClass(note.body, "back").filter((b) => b.tag === "a");
     if (!own.length) errors.push(`note ${note.n} has no mark in the text that links to it${note.id ? ` (href="#${note.id}")` : "; give it an id, such as id=\"fn-" + note.n + "\""}`);
     else if (own.length > 1) errors.push(`note ${note.n} has ${own.length} marks; a note has one mark. In the second place, say it in words or cite a source`);
     if (!back.length) errors.push(`note ${note.n} has no link back to its mark; end it with <a class="back" href="#fn-${note.n}-ref" aria-label="Back to the text of note ${note.n}">Back</a>`);
     else if (own.length === 1) {
-      const href = (attrOf(back[0].attrs, "href") || "").replace(/^#/, ""), label = attrOf(back[0].attrs, "aria-label") || "";
+      const href = attrOf(back[0].attrs, "href") || "", label = attrOf(back[0].attrs, "aria-label") || "";
       if (!own[0].id) errors.push(`the mark of note ${note.n} has no id, so the note cannot link back to it; give the mark id="fn-${note.n}-ref"`);
-      else if (href !== own[0].id) errors.push(`the link back of note ${note.n} points at "#${href}", but its mark has id="${own[0].id}"`);
+      else if (href !== `#${own[0].id}`) errors.push(`the link back of note ${note.n} points at "${href}", but its mark has id="${own[0].id}"; write href="#${own[0].id}"`);
       if (!new RegExp(`\\bnote ${note.n}\\b`, "i").test(label)) warnings.push(`the link back of note ${note.n} has ${label ? `aria-label="${label}"` : "no aria-label"}; give it aria-label="Back to the text of note ${note.n}", so a list of links tells the "Back" links apart`);
     }
     const count = words(plain(note.body.replace(/<a\b[^>]*\bclass="(?:[^"]*\s)?back(?:\s[^"]*)?"[^>]*>[\s\S]*?<\/a>/gi, ""))).length;
