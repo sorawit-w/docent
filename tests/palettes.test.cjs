@@ -46,7 +46,7 @@ test("stamp writes only the palette that the page names, in the four places that
   assert.match(css, /@media screen and \(prefers-contrast: more\) and \(forced-colors: none\) \{ html:root\[data-palette="plum"\]:not\(\[data-never\]\) \{ --line: #645b63; --muted: #251d24; \}/, "more contrast uses the palette's own muted and text colors");
   assert.match(css, /@media \(forced-colors: active\) \{ html:root\[data-palette="plum"\]:not\(\[data-never\]\) \{ --bg: Canvas;/, "the reader's system colors win over the palette, also over its dark block");
   assert.ok(css.indexOf("forced-colors: active") < css.indexOf("@media print"), "paper wins over forced colors, as in the kit");
-  assert.throws(() => stampHtml(named("dusk")), /"dusk" is not a palette; the palettes are "harbor", "plum", "sepia"/);
+  assert.throws(() => stampHtml(named("dusk")), /<html> has data-palette="dusk"; the palettes are "harbor", "plum", "sepia", and "custom" with data-palette-hue/);
 });
 
 test("render paints each drawing with the palette's light values, so a drawing copied out of the page keeps the palette", () => {

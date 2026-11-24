@@ -4,6 +4,8 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const { RULES, GUARANTEE } = require("./rules.cjs");
+const { customPalette } = require("./hue.cjs");
+const { refusal } = require("./palettes.cjs");
 
 const NAME = path.join(".docent", "config.json");
 const VERSION = 1;
@@ -78,7 +80,14 @@ function readConfig(file, { palettes = [], profiles = [] } = {}) {
       if (FONTS.includes(name) && !(typeof entry.value === "string" && entry.value.trim() && !/[;{}<>\\]|\/\*|\*\/|url\s*\(|@import/i.test(entry.value))) at(`${field}."value"`, `is ${shown(entry.value)}; a font token is a list of font names, such as "Inter, system-ui, sans-serif"`);
     }
   }
-  if ("palette" in data && data.palette !== null && !palettes.includes(data.palette)) at('"palette"', `is ${shown(data.palette)}; the palettes are ${palettes.map(shown).join(", ")}, or null for Docent's own colors`);
+  if ("palette" in data && data.palette !== null) {
+    if (isPlain(data.palette)) { // a palette from the host's own hue: the file keeps the input only, and the scripts work out the rest
+      const keys = Object.keys(data.palette), hue = data.palette.hue;
+      if (keys.length !== 1 || keys[0] !== "hue") at('"palette"', 'a palette from a hue is { "hue": "#…" } and nothing else');
+      else if (typeof hue !== "string" || !HEX.test(hue)) at('"palette"."hue"', `is ${shown(hue)}; it is a hex color, such as "#eef2ff"`);
+      else { const tested = customPalette(hue); if (tested.failing.length) at('"palette"', refusal(hue, tested)); }
+    } else if (!palettes.includes(data.palette)) at('"palette"', `is ${shown(data.palette)}; the palettes are ${palettes.map(shown).join(", ")}, { "hue": "#…" } for a palette from the host's own hue, or null for Docent's own colors`);
+  }
   if ("logo" in data && data.logo !== null) {
     const logo = { re: LOGO, what: "an SVG, PNG or WebP file" };
     if (isPlain(data.logo)) {
