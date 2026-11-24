@@ -172,6 +172,19 @@ function print(result) {
   return `<style>\n:root {\n${lines.join("\n")}\n}\n</style>`;
 }
 
+/** The host tokens of a repo file that has no error, as stamp writes them: { tokens: [[name, value]] } or { error }. */
+function hostTokens(config) {
+  let result = { tokens: [], unused: [], notes: [], page: null };
+  if (config.data.design) {
+    const design = path.resolve(config.base, config.data.design);
+    let text;
+    try { text = fs.readFileSync(design, "utf8"); } catch (error) { return { error: `${config.data.design}: ${error.message}` }; }
+    result = brand(text);
+    if (result.error) return { error: `${config.data.design}: ${result.error}` };
+  }
+  return { tokens: withFile(result, config.data.tokens, config.label || "the repo file").tokens.map(([name, value]) => [name, value]) };
+}
+
 const USAGE = "usage: node brand.cjs [DESIGN.md] [--config <path> | --no-config]\n       with no DESIGN.md, brand reads the one that .docent/config.json names";
 
 function main(args) {
@@ -205,4 +218,4 @@ function main(args) {
 }
 
 if (require.main === module) process.exitCode = main(process.argv.slice(2));
-module.exports = { brand, frontMatter, stack, mend, print, withFile, pageNote, main };
+module.exports = { brand, frontMatter, stack, mend, print, withFile, pageNote, hostTokens, main };
