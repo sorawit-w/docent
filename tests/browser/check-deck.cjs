@@ -220,6 +220,27 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     await context.close();
   }
 
+  // Inline code takes the slide's text size; a page saved while presenting reopens as the full stack; printing while presenting prints
+  // every slide.
+  {
+    const content = build(source.replace("<p>A report form that asks for the steps gets them in most reports.</p>", "<p>Run <code>report check</code> before you file a report.</p>"));
+    const { page, context } = await open({ content });
+    await page.click(".present");
+    await page.evaluate(() => { const n = [...document.querySelectorAll(".slide")].findIndex((s) => s.querySelector("p > code")); for (let i = 0; i < n; i++) document.querySelector(".deck-next").click(); });
+    const code = await page.evaluate(() => [getComputedStyle(document.querySelector(".slide.is-current p > code")).fontSize, getComputedStyle(document.querySelector(".slide.is-current p")).fontSize]);
+    ok("present mode: inline code takes the size of the text around it", code[0] === code[1] && code[1] === "30px", code);
+    await page.emulateMedia({ media: "print" });
+    const printed = await page.evaluate(() => [...document.querySelectorAll(".slide")].filter((s) => getComputedStyle(s).display !== "none").length);
+    ok("printed while presenting, every slide prints", printed === 9, printed);
+    await page.emulateMedia({ media: "screen" });
+    const saved = await page.evaluate(() => document.documentElement.outerHTML);
+    await context.close();
+    const again = await open({ content: `<!doctype html>${saved}` });
+    const stack = await again.page.evaluate(() => [...document.querySelectorAll(".slide")].map((s) => [s.hidden, s.getAttribute("role"), s.getAttribute("aria-label"), s.getAttribute("aria-labelledby"), s.querySelectorAll(".slide-n").length].join("|")));
+    ok("a page saved while presenting reopens as the full stack, with the names of the stack and each number once", stack.every((x, i) => x === `false|||s${i + 1}-h|${i ? 1 : 0}`), stack);
+    await again.context.close();
+  }
+
   // axe in present mode, light.
   {
     const { page, context } = await open({});

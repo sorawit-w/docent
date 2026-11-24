@@ -6,6 +6,14 @@
   root.classList.remove('presenting');
   root.style.removeProperty('--deck-scale');
   const slides = [...document.querySelectorAll('main > section.slide')];
+  // A page saved while presenting keeps the slides' present state: show them all again, with the names of the stack.
+  slides.forEach((slide) => {
+    slide.hidden = false;
+    slide.classList.remove('is-current');
+    ['role', 'aria-roledescription', 'aria-label', 'tabindex'].forEach((name) => slide.removeAttribute(name));
+    const heading = slide.querySelector(':scope > h1[id], :scope > h2[id]');
+    if (heading && !slide.hasAttribute('aria-labelledby')) slide.setAttribute('aria-labelledby', heading.id);
+  });
   slides.forEach((slide, i) => {
     const heading = slide.firstElementChild;
     if (i === 0 || !heading || heading.tagName !== 'H2') return; // the title slide counts as slide 1 and shows no number
