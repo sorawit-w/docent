@@ -17,8 +17,8 @@ const ROW_PAD = 2 * 12; // a table row: its lines at 21px, with 12px above and b
 const CELL_GAP = 24; // the space after each table cell
 const QUOTE_INDENT = 24; // a quote is indented like a list
 const CODE_CHARS = Math.floor((INNER.width - 2 * 20) / (21 * 0.6)); // a monospace character is about 0.6em wide: 88 characters at 21px
-const WELL = 16; // a figure well's padding, above and below
-const CAPTION_GAP = 12;
+const WELL = 8; // a figure well's padding on a slide, 4px on each side (deck.css)
+const CAPTION_GAP = 4; // the caption stands 4px under the well, and its source line runs on in the same line
 const SCALE = { most: 1.5, least: 1.25 }; // a drawing on a slide stands at 1.5 times, or down to 1.25 times when it needs room
 const LIMIT = { headingLines: 2, points: 3, cards: 3, columns: 4, rows: 5, paragraphLines: 2, codeLines: 8 };
 
@@ -74,19 +74,16 @@ const BODIES = "one figure, at most three points, up to three large numbers, one
 function drawingSize(inner) {
   for (const m of inner.matchAll(/<(svg|img)\b([^>]*)>/gi)) {
     const w = Number(attrOf(m[2], "width")), h = Number(attrOf(m[2], "height"));
-    if (w > 0 && h > 0) return { w, h, hand: /\bdata-drawn="hand"/.test(m[2]) };
+    if (w > 0 && h > 0) return { w, h, hand: /\bdata-drawn="hand"/.test(m[2]), drawn: /\bclass="dg\b/.test(m[2]) };
   }
   return null;
 }
 
-/** A figure's caption: its lines at 21px, with the source line on a line of its own. */
+/** A figure's caption: its lines at 21px. On a slide the source line runs on in the caption's line. */
 function captionHeight(inner) {
   const caption = (inner.match(/<figcaption\b[^>]*>([\s\S]*?)<\/figcaption>/i) || [])[1];
-  if (caption == null) return 0;
-  const source = (caption.match(/<([a-z]+)\b[^>]*\bclass="(?:[^"]*\s)?source(?:\s[^"]*)?"[^>]*>([\s\S]*?)<\/\1>/i) || [])[2];
-  const rest = plain(source == null ? caption : caption.replace(source, ""));
-  const count = (rest ? lines(rest, SIZE.small, INNER.width) : 0) + (source != null ? lines(plain(source), SIZE.small, INNER.width) : 0);
-  return CAPTION_GAP + count * LINE.small;
+  if (caption == null || !plain(caption)) return 0;
+  return CAPTION_GAP + lines(plain(caption), SIZE.small, INNER.width) * LINE.small;
 }
 
 /** The kind of a slide's body and its height on the frame, or an error. room is the height left for the body under the heading. */
@@ -156,14 +153,18 @@ function measureBody(el, room) {
   if (tag === "figure") {
     const size = drawingSize(inner), caption = captionHeight(inner);
     // One drawing: a desktop form (not a phone form), a hand-drawn figure or a picture.
-    const drawings = [...inner.matchAll(/<svg\b([^>]*)>/gi)].filter(([, a]) => (/\bclass="dg\b/.test(a) && !/\bid="[^"]*-phone"/.test(a)) || /\bdata-drawn="hand"/.test(a)).length + (inner.match(/<img\b/gi) || []).length;
+    // A phone form is the drawing whose id is another drawing's id with "-phone" after it; an author's own id may end in "-phone" too.
+    const svgs = [...inner.matchAll(/<svg\b([^>]*)>/gi)].map(([, a]) => ({ a, id: attrOf(a, "id") })), ids = new Set(svgs.map((v) => v.id));
+    const drawings = svgs.filter(({ a, id }) => (/\bclass="dg\b/.test(a) && !(id && id.endsWith("-phone") && ids.has(id.slice(0, -6)))) || /\bdata-drawn="hand"/.test(a)).length + (inner.match(/<img\b/gi) || []).length;
     if (drawings > 1) problems.push(`its figure holds ${drawings} drawings; a figure on a slide holds one. Two charts on one slide are two points: give each its own slide`);
     if (!size && /<(?:img|svg)\b/i.test(inner)) problems.push("its drawing has no width and height, so check cannot test that it fits the slide; give the <img> or <svg> its width and height in pixels");
+    const sources = (((inner.match(/<figcaption\b[^>]*>([\s\S]*?)<\/figcaption>/i) || [])[1] || "").match(/\bclass="(?:[^"]*\s)?source(?:\s[^"]*)?"/g) || []).length;
+    if (sources > 1) problems.push(`its figure has ${sources} source lines; a figure on a slide has one source line under it`);
     if (!size) return { kind: "one figure", height: caption, problems };
     const fit = Math.min(SCALE.most, (INNER.width - WELL) / size.w, (room - caption - WELL) / size.h), scale = Math.max(SCALE.least, fit);
     // A drawing that does not fit at the least scale is refused with its size and the room; the slide is not called too tall as well.
     const most = { w: Math.floor((INNER.width - WELL) / SCALE.least), h: Math.floor(Math.max(0, room - caption - WELL) / SCALE.least) };
-    if (fit < SCALE.least) {
+    if (fit < SCALE.least && !size.drawn) { // a drawing that render made is refused by render, with the same numbers
       problems.push(`the drawing is ${size.w} × ${size.h}px; a slide holds ${most.w} × ${most.h}px at ${SCALE.least} times under this heading and caption. Show less on the slide, and the full drawing in the report`);
       return { kind: "one figure", height: Math.min(room, size.h * scale + WELL + caption), problems, size, scale: fit };
     }
@@ -171,6 +172,30 @@ function measureBody(el, room) {
   }
   return null;
 }
+
+/** The room for a drawing in each figure of each slide, on the frame: [{ n, from, to, w, h }], where from and to are where the figure
+    stands in html. html is the page with its comments blanked out, so positions match the page. */
+function figureRooms(html) {
+  const main = html.match(/<main\b[^>]*>([\s\S]*?)<\/main>/i);
+  if (!main) return [];
+  const offset = main.index + main[0].indexOf(">") + 1, rooms = [];
+  elements(main[1]).filter((el) => el.tag === "section" && hasClass(el.attrs, "slide")).forEach((slide, i) => {
+    const parts = elements(slide.inner), base = offset + slide.from;
+    const heading = parts[0] && /^h[1-6]$/.test(parts[0].tag) ? parts[0] : null;
+    const above = (heading ? lines(plain(heading.inner), SIZE.heading, INNER.width, 600) * LINE.heading : 0) + GAP;
+    for (const el of parts.filter((p) => p.tag === "figure")) rooms.push({ n: i + 1, from: base + el.start, to: base + el.end, w: INNER.width - WELL, h: INNER.height - above - captionHeight(el.inner) - WELL });
+  });
+  return rooms;
+}
+
+/** The room for a drawing that starts at position at, or null when it is not in a figure on a slide. */
+const roomAt = (rooms, at) => rooms.find((r) => r.from <= at && at < r.to) || null;
+
+/** The words of a refusal: a drawing that does not fit its slide at the least scale. */
+function refusal(room, what, w, h, fewer) {
+  return `slide ${room.n}: the ${what} is ${w} × ${h}px; a slide holds ${Math.floor(room.w / SCALE.least)} × ${Math.floor(Math.max(0, room.h) / SCALE.least)}px at ${SCALE.least} times. ${fewer}`;
+}
+const fits = (room, w, h) => w * SCALE.least <= room.w && h * SCALE.least <= room.h;
 
 /** Tests the slides of a deck. html is the page with its comments blanked out, so the drawings are still in it. */
 function checkDeck(html) {
@@ -223,4 +248,4 @@ function checkDeck(html) {
   return { errors, slides: slides.map((s, i) => ({ n: i + 1, id: attrOf(s.attrs, "id"), height: px(s.height || 0) })), measured };
 }
 
-module.exports = { FRAME, INNER, SIZE, LINE, GAP, SCALE, LIMIT, elements, checkDeck };
+module.exports = { FRAME, INNER, SIZE, LINE, GAP, WELL, SCALE, LIMIT, elements, checkDeck, figureRooms, roomAt, refusal, fits };

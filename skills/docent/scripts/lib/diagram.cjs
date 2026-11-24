@@ -9,6 +9,8 @@ const { textWidth } = require("./text.cjs");
 const { readSequence, layoutSequence } = require("./sequence.cjs");
 const { readFlow, inWords: flowWords } = require("./flow.cjs");
 const { fitWarnings } = require("./fit.cjs");
+const { figureRooms, roomAt, refusal, fits, SCALE } = require("./slide.cjs");
+const { isDeck } = require("./kit.cjs");
 
 const ARROW = '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>';
 /** The steps of a drawing in words, in a closed section under it, for a screen reader, a phone and paper. */
@@ -163,8 +165,9 @@ function readData(data) {
   return { model, warnings };
 }
 
-/** The forms to try, in order. The renderer picks from where the diagram sits and what it shows. */
-function formsFor(model) {
+/** The forms to try, in order. The renderer picks from where the diagram sits and what it shows. On a slide, Route wide comes before
+    Route tall, because Route wide is low, and a slide is wide and low. */
+function formsFor(model, slide = null) {
   // Side legs are drawn in Route tall, which keeps them beside the route.
   if (model.side.length) {
     if (model.form !== "auto" && model.form !== "tall") fail(`a diagram with side legs is drawn as Route tall; "form" is "${model.form}"`);
@@ -172,6 +175,7 @@ function formsFor(model) {
   }
   if (model.form !== "auto") return [model.form];
   if (!model.chain) return ["plates"];
+  if (slide) return ["wide", "tall", "plates"];
   if (model.place === "walk") return ["tall", "plates"];
   if (model.legs.length > 5) return ["tall", "plates"];
   return ["wide", "tall", "plates"];
@@ -200,7 +204,24 @@ function renderFlow(data) {
   return { svg: `${svg}\n${inWords(flowWords(model))}`, form: "flow", warnings, icons: [], model, scene };
 }
 
-function renderDiagram(data) {
+// On a slide (decks.md, section 7), a drawing stands at 1.5 times, or down to 1.25 times when it needs room. A drawing that does not fit
+// at 1.25 times is refused, with its size and the room, and the author shows a part of it on the slide.
+const SLIDE_NAMES = { sequence: "sequence diagram", flow: "flowchart", timing: "timing diagram", range: "range chart", layout: "layout", plan: "plan", funnel: "funnel", bar: "bar chart", line: "line chart", heatmap: "heat map", heatplan: "heat plan", statusgrid: "status grid" };
+const SLIDE_FEWER = { sequence: "Show fewer messages on the slide, and the full diagram in the report", workflow: "Show fewer parts and legs on the slide, and the full diagram in the report" };
+const fewer = (kind) => SLIDE_FEWER[kind] || (["range", "bar", "line", "heatmap", "statusgrid", "funnel"].includes(kind) ? "Show fewer rows on the slide, and the full chart in the report" : "Show a part of it on the slide, and the full diagram in the report");
+
+/** Draws one diagram. slide is the room on a slide ({ n, w, h } on the frame), or null on a page. */
+function renderDiagram(data, slide = null) {
+  const drawn = drawDiagram(data, slide);
+  if (!slide) return drawn;
+  const { w, h } = drawn.scene;
+  if (data && data.kind != null && !fits(slide, w, h)) fail(refusal(slide, SLIDE_NAMES[data.kind] || `${data.kind} diagram`, w, h, fewer(data.kind)));
+  // The drawing's size on the frame, at its slide scale, for present mode and paper: --fw and --fh in frame pixels.
+  const scale = Math.min(SCALE.most, slide.w / w, slide.h / h), size = (n) => Math.round(n * scale * 10) / 10;
+  return { ...drawn, scale, svg: drawn.svg.replace(/^<svg\b/, `<svg style="--fw: ${size(w)}; --fh: ${size(h)}"`) };
+}
+
+function drawDiagram(data, slide) {
   if (data && data.kind != null) {
     if (data.kind === "sequence") return renderSequence(data);
     if (data.kind === "flow") return renderFlow(data);
@@ -211,16 +232,23 @@ function renderDiagram(data) {
   }
   const { model, warnings } = readData(data);
   const icons = warnings.filter((w) => !w.startsWith("every part has the state") && !w.startsWith("no leg has a verb")); // these warnings are about icons; check reports them as errors
-  const forms = formsFor(model);
-  let scene = null, reason = null;
+  const forms = formsFor(model, slide);
+  let scene = null, reason = null, closest = null;
   for (const form of forms) {
     try {
       const made = layout(model, form);
-      if (forms.length > 1 && form === "wide" && made.w > PAGE) { reason = new Error(`Route wide is ${made.w}px wide; a full-width well holds ${PAGE}px`); continue; }
+      if (slide && !fits(slide, made.w, made.h)) {
+        // Keep the form that comes closest, to name its size when no form fits.
+        const scale = Math.min(slide.w / made.w, slide.h / made.h);
+        if (!closest || scale > closest.scale) closest = { scale, w: made.w, h: made.h };
+        reason = new DataError(refusal(slide, "workflow diagram", closest.w, closest.h, fewer("workflow")));
+        continue;
+      }
+      if (!slide && forms.length > 1 && form === "wide" && made.w > PAGE) { reason = new Error(`Route wide is ${made.w}px wide; a full-width well holds ${PAGE}px`); continue; }
       scene = made;
       break;
     } catch (error) {
-      if (error instanceof DataError || forms.length === 1) throw error;
+      if (error instanceof DataError || (forms.length === 1 && !slide)) throw error;
       reason = error;
     }
   }
@@ -267,8 +295,9 @@ function renderDiagram(data) {
 /** Draws every diagram block and builds every widget block of a document, in place. Returns { html, results, widgets }: one result for each block, { id, form, warnings, error }. */
 function renderDocument(html) {
   const palette = paletteOf(html); // a drawing carries the light values of the page's palette as its fallback colors
-  const diagrams = replaceBlocks(html, "diagram", (data) => {
-    const drawn = renderDiagram(data);
+  const rooms = slideRoomsOf(html); // in a deck, the room for a drawing in each figure on a slide
+  const diagrams = replaceBlocks(html, "diagram", (data, found) => {
+    const drawn = renderDiagram(data, roomAt(rooms, found.start));
     return { id: drawn.model.id, out: paint(drawn.svg, palette), form: drawn.note ? `${drawn.form}; ${drawn.note}` : drawn.form, warnings: drawn.warnings };
   });
   const widgets = replaceBlocks(diagrams.html, "widget", (data) => {
@@ -288,5 +317,7 @@ function renderDocument(html) {
 }
 
 const findDiagrams = (html) => findBlocks(html, "diagram");
+/** In a deck, the room for a drawing in each figure on a slide; on any other page, none. */
+const slideRoomsOf = (html) => (isDeck(html) ? figureRooms(html.replace(/<!--[\s\S]*?-->/g, (c) => " ".repeat(c.length))) : []);
 
-module.exports = { readData, formsFor, renderDiagram, renderDocument, findDiagrams, block, DataError, MOST };
+module.exports = { readData, formsFor, renderDiagram, renderDocument, findDiagrams, slideRoomsOf, block, DataError, MOST };

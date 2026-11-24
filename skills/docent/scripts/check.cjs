@@ -5,8 +5,8 @@
 require("./lib/node.cjs").warnOldNode(); // first, so that an old Node is named before anything else can fail
 const fs = require("node:fs");
 const { VERSION, cssBlock, jsBlock, findKit, isDeck } = require("./lib/kit.cjs");
-const { checkDeck } = require("./lib/slide.cjs");
-const { renderDiagram } = require("./lib/diagram.cjs");
+const { checkDeck, roomAt } = require("./lib/slide.cjs");
+const { renderDiagram, slideRoomsOf } = require("./lib/diagram.cjs");
 const { renderWidget, PLACE, esc } = require("./lib/widget.cjs");
 const { findBlocks, block } = require("./lib/blocks.cjs");
 const { PROFILES, suggestProfile } = require("./lib/profile.cjs");
@@ -112,12 +112,13 @@ function checkDocument(html) {
 
   // 2. Diagrams: each drawing must be the one that render makes from its data.
   const diagrams = findBlocks(html, "diagram"), ids = new Set(), shapes = new Map(), walks = [], refs = [], charts = [];
+  const rooms = slideRoomsOf(html); // in a deck, a drawing on a slide is drawn for the room there, and refused when it does not fit
   diagrams.forEach((found, n) => {
     const name = `diagram ${n + 1}`;
     let data;
     try { data = JSON.parse(found.json); } catch (error) { return errors.push(`${name}: the data is not valid JSON: ${error.message}`); }
     try {
-      const drawn = renderDiagram(data);
+      const drawn = renderDiagram(data, roomAt(rooms, found.start));
       const label = `${name} ("${drawn.model.id}")`;
       if (ids.has(drawn.model.id)) errors.push(`${label}: another diagram has the same id`);
       ids.add(drawn.model.id);
