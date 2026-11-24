@@ -21,7 +21,7 @@ test("the sample page is the output of stamp and render, and it passes check", (
 test("the starting page holds content and data only; render and stamp build it into a page that passes check with no warning", () => {
   const template = fs.readFileSync(path.join(__dirname, "..", "skills", "docent", "assets", "template.html"), "utf8");
   assert.ok(!/docent:kit|<svg id="dg-|class="(choose|checks|decide|values)"|<var data-v="[^"]+">[^<]/.test(template), "the starting page is not built: it has no kit, no drawing and no widget markup");
-  assert.ok(template.length < 18000, `the starting page has ${template.length} bytes; an agent reads all of it, so it stays below 18000 (raised from 16000 for "Method and limits" and "Sources")`);
+  assert.ok(template.length < 18500, `the starting page has ${template.length} bytes; an agent reads all of it, so it stays below 18500 (raised from 16000 for "Method and limits" and "Sources", and from 18000 for key findings, a total row and a quote)`);
   const made = renderDocument(template);
   assert.deepEqual([...made.results, ...made.widgets].map((r) => [r.id, r.error, r.warnings.length]), [["glance", null, 0], ["steps", null, 0], ["case", null, 0], ["list", null, 0], ["choice", null, 0], ["where", null, 0]]);
   assert.deepEqual(made.places, { count: 2, unknown: [], clash: [] }, "render fills both places of the value picker");
@@ -453,4 +453,25 @@ test("key findings: each item opens with one <strong> sentence; check warns abou
   assert.match(warned(two, ""), /a findings list \(<ol class="findings">\) has no aria-label/, "no aria-label");
   assert.match(warned([two[0], item('Sign-in had <a href="#f">the most reports</a>.')]), /\("Sign-in had the most reports\."\) holds a link or a state/, "a link inside the lead");
   assert.match(warned([two[0], item('Sign-in is done. <span class="state ok">Done</span>')]), /holds a link or a state/, "a state inside the lead");
+});
+
+test("a total row: a <tfoot> row with a row heading; data-sum adds up its column, exactly or within the allowance for rounded parts", () => {
+  const rows = [["Sign-in", "412", "58"], ["Search", "268", "61"], ["Checkout", "231", "49"], ["Settings", "97", "22"], ["Profile", "64", "6"], ["Help pages", "18", "0"]];
+  const row = (cells, head = true) => `<tr>${cells.map((c, i) => (i === 0 && head ? `<th scope="row">${c}</th>` : `<td class="num">${c}</td>`)).join("")}</tr>`;
+  const table = (body, foot) => `<section id="t" aria-labelledby="t-h"><h2 id="t-h">T</h2><div class="table-wrap" role="region" aria-label="Bug reports by area" tabindex="0"><table><thead><tr><th scope="col">Area</th><th scope="col" class="num">Reports</th><th scope="col" class="num">Could not be repeated</th></tr></thead><tbody>${body.map((r) => row(r)).join("")}</tbody>${foot == null ? "" : `<tfoot>${foot}</tfoot>`}</table></div></section>`;
+  const warned = (body, foot) => checkDocument(specimen.replace("</main>", `${table(body, foot)}</main>`)).warnings.filter((w) => /Bug reports by area/.test(w)).join("\n");
+  const total = (a, b, sum = "data-sum", head = '<th scope="row">All areas</th>') => `<tr>${head}<td class="num" ${sum}>${a}</td><td class="num" ${sum}>${b}</td></tr>`;
+  assert.equal(warned(rows, total("1,090", "196")), "", "a right sum");
+  assert.match(warned(rows, total("1,090", "195")), /the total 195 in column "Could not be repeated" is not the sum of its column, 196/, "a wrong sum");
+  const shares = [["A", "16.7%", "1"], ["B", "16.7%", "1"], ["C", "16.7%", "1"], ["D", "16.7%", "1"], ["E", "16.7%", "1"], ["F", "16.7%", "1"]]; // 100.2
+  assert.match(warned(shares, total("100.0%", "6")), /the total 100.0% in column "Reports" is not the sum of its column, 100.2/, "plain data-sum is exact");
+  assert.equal(warned(shares, total("100.0%", "6", 'data-sum="rounded"')), "", "a rounded sum within its allowance: 6 rows of 0.05");
+  assert.match(warned(shares, total("99.8%", "6", 'data-sum="rounded"')), /the total 99.8% in column "Reports" is not the sum of its column, 100.2, within 0.3 for rounded parts/, "a rounded sum outside its allowance");
+  assert.match(warned([...rows.slice(0, 5), ["Help pages", "about 18", "0"]], total("1,090", "196")), /the cell "about 18" in column "Reports" is not a number, so check cannot add up the column/, "a body cell that is not a number");
+  assert.equal(warned(rows, total("1,090", "196", "")), "", "no data-sum, no sum test");
+  assert.match(warned([...rows, ["Total", "1,090", "196"]]), /the last body row "Total" reads as a total; put it in a <tfoot>/, "a total in the body");
+  assert.match(warned([...rows, ["All areas", "1,090", "196"]]), /the last body row "All areas" reads as a total/);
+  assert.match(warned(rows, total("1,090", "196", "data-sum", '<td class="num"></td>')), /a row of its <tfoot> has no row heading in words/, "no row heading");
+  assert.match(warned(rows, total("1,090", "196").repeat(3)), /has 3 rows in its <tfoot>; it holds one or two/);
+  assert.equal(checkDocument(specimen).warnings.filter((w) => /total|tfoot/.test(w)).length, 0);
 });

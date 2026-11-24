@@ -249,6 +249,12 @@ th, td { text-align: left; vertical-align: top; padding: var(--cell-y) 24px var(
 thead th { border-bottom: 1px solid var(--text); padding-bottom: 10px; font-size: 0.875rem; line-height: 1.5; font-weight: 600; color: var(--muted); }
 tbody th { font-weight: 600; white-space: nowrap; }
 tbody tr { border-bottom: 1px solid var(--line); }
+/* A total row (tfoot): a 1px rule in the text color above it, the rule that stands under the headings, and every cell in weight 600; no fill.
+   The last body row loses its own line, so two rules never stand together. A second row, such as an average, has the line of a body row. */
+tbody:has(+ tfoot) > tr:last-child { border-bottom: 0; }
+tfoot tr:first-child { border-top: 1px solid var(--text); }
+tfoot tr + tr { border-top: 1px solid var(--line); }
+tfoot :is(th, td) { font-weight: 600; }
 /* A column of numbers (class "num" on its th and td cells): the numbers line up on the right, in tabular figures. The last column ends at the table's edge. */
 :is(th, td).num { text-align: right; font-variant-numeric: tabular-nums; }
 :is(th, td).num:last-child { padding-right: 0; }
@@ -419,6 +425,8 @@ footer p { margin: 0; }
   table { min-width: 0; } .table-wrap { overflow: visible; }
   /* Paper cannot scroll: a long row heading wraps, as the other cells do. On screen it stays on one line, and the table scrolls inside itself. */
   tbody th { white-space: normal; }
+  /* A browser may repeat a tfoot at the foot of each printed page; a total under half of the rows would mislead, so it prints once, at the end. */
+  tfoot { display: table-row-group; }
   /* Paper cannot scroll, so a wide grid in words, such as the numbers of a heat map, takes the smallest text size and tighter cells; render splits a grid that is still too wide into several tables. */
   .dg-words > .table-wrap table { font-size: 0.875rem; } .dg-words > .table-wrap thead th { font-size: inherit; } .dg-words > .table-wrap :is(th, td) { padding: 4px 6px 4px 0; }
   /* A browser leaves out backgrounds on paper. These carry meaning, so they print: status dots, the rail of the steps, and the ground of figures and code. */

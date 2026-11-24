@@ -1122,6 +1122,29 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     ok("on screen, a row heading stays on one line, as before, and a wide table scrolls inside its wrapper", onScreen.wrap === "nowrap" && onScreen.lines === 1 && onScreen.table > onScreen.room && onScreen.scroll === "auto", onScreen);
   }
 
+  // A total row (tfoot) in a table long enough to run onto a second page. A browser repeats a table-footer-group at the foot of each printed
+  // page, so on paper the tfoot is a plain row group and prints once, after the last body row. On screen it stands under a rule in the text
+  // color, in weight 600, and the last body row has no line of its own.
+  {
+    const body = Array.from({ length: 60 }, (_, i) => `<tr><th scope="row">Area ${i + 1}</th><td class="num">10</td></tr>`).join("");
+    const table = `<section id="long" aria-labelledby="long-h"><h2 id="long-h">Totals</h2><div class="table-wrap" role="region" aria-label="Reports by area" tabindex="0"><table><thead><tr><th scope="col">Area</th><th scope="col" class="num">Reports</th></tr></thead><tbody>${body}</tbody><tfoot><tr><th scope="row">All areas</th><td class="num" data-sum>600</td></tr></tfoot></table></div></section>`;
+    const content = html.replace("</main>", `${table}</main>`);
+    const measure = (page) => page.evaluate(() => {
+      const t = document.querySelector("#long table"), foot = t.tFoot, rows = t.tBodies[0].rows, last = rows[rows.length - 1], cell = foot.rows[0].cells[1];
+      return { display: getComputedStyle(foot).display, after: Math.round(foot.getBoundingClientRect().top - last.getBoundingClientRect().bottom), height: Math.round(t.getBoundingClientRect().height), ruleColor: getComputedStyle(foot.rows[0]).borderTopColor, ruleWidth: getComputedStyle(foot.rows[0]).borderTopWidth, lastLine: getComputedStyle(last).borderBottomStyle, weight: getComputedStyle(cell).fontWeight };
+    });
+    const paper = await open({ width: 658, media: "print", content });
+    const onPaper = await measure(paper.page);
+    const pdf = (await paper.page.pdf({ format: "A4", printBackground: true })).toString("latin1");
+    onPaper.pages = (pdf.match(/\/Type\s*\/Page\b/g) || []).length;
+    await paper.context.close();
+    ok("on paper, a total row is a plain row group after the last body row, so a table that runs onto a second page prints its total once, at the end", onPaper.display === "table-row-group" && onPaper.after >= 0 && onPaper.pages >= 2, onPaper);
+    const screen = await open({ width: 1280, content });
+    const onScreen = await measure(screen.page);
+    await screen.context.close();
+    ok("on screen, a total row stands under a 1px rule in the text color, in weight 600, and the last body row has no line of its own", onScreen.display === "table-footer-group" && onScreen.ruleColor === LIGHT.text && onScreen.ruleWidth === "1px" && onScreen.lastLine === "none" && onScreen.weight === "600", onScreen);
+  }
+
   // A hand-drawn figure (a fishbone under the contract in diagrams.md): no accessibility problem in either theme, its real size on a
   // desktop and on paper (no shrink), the drawing tokens in dark, forced colors and more contrast, and at 320px it scrolls inside its
   // well while the page does not scroll sideways.
