@@ -97,7 +97,7 @@ If the worked logo stayed inside each page and nowhere else, one `docent.json` a
 | Field | What it holds | When it is missing |
 |---|---|---|
 | `version` | `1`, so that a later Docent can read an older file | `check` refuses the file |
-| `design` | The path to the host's `DESIGN.md`, from the repo file's folder. `null` means "use none" | No `DESIGN.md` is used |
+| `design` | The path to the host's `DESIGN.md`. `null` means "use none" | No `DESIGN.md` is used |
 | `tokens` | Host-token values that win over `DESIGN.md`: each key is a host token without its dashes (`host-ink`, `host-accent`, `host-accent-dark`, `host-dot-dark`, `host-serif`, `host-sans`, `host-mono`), and each value is `{ "value": "…", "reason": "…" }` | The tokens come from `DESIGN.md`, or Docent's own |
 | `palette` | `"harbor"`, `"plum"`, `"sepia"` or `null` | Docent's own colors |
 | `logo` | One path, or `{ "light": …, "dark": … }`. Each path is an SVG, PNG or WebP file inside the repo | No logo |
@@ -108,7 +108,7 @@ If the worked logo stayed inside each page and nowhere else, one `docent.json` a
 
 **What the file does not save.** It saves only the interview's answers that are house style. The host's name is not saved: the scripts find it again each time in `package.json` or the README, and a saved copy would go out of date. A name that the user corrects in the interview stays in each page, as today. The file holds no copy of a token that `brand` works out from `DESIGN.md`; a value in `tokens` is a change the team chose, with its reason, not a copy.
 
-**Paths stay inside the repo.** `check` refuses a path that leaves the repo, and a web address. The logo still goes through the logo check of `check`, as it does today.
+**Every path is read from the folder that holds `.docent/`,** usually the root of the repo, not from `.docent/` itself. So `"design": "docs/DESIGN.md"` names `<repo>/docs/DESIGN.md`, and `".docent/logo-dark.svg"` names the worked logo beside the file. **Paths stay inside the repo.** `check` refuses a path that leaves the repo, and a web address. The logo still goes through the logo check of `check`, as it does today.
 
 **There is no field to turn dark mode off.** A single page can still fix its theme with `data-theme="light"`, as today. One line that removes the reader's choice on every page is a different thing, and dark mode is a guarantee (section 4).
 
