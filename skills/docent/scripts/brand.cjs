@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // brand: reads a host project's DESIGN.md and prints the host tokens for a Docent page. It writes nothing.
 // Usage: node brand.cjs [DESIGN.md] [--config <path> | --no-config]
+//        node brand.cjs --hue <color>   the closest tested palette for a page color, and whether a palette from its hue passes
 // With no DESIGN.md, it reads the one that the repo file names: the nearest .docent/config.json at or above the current folder.
 // The file's "tokens" win over the values worked out from DESIGN.md (docs/proposals/repo-config.md, section 2).
 // It reads the front matter only, and of that only "colors" and "typography". Six host tokens come out, and nothing else:
@@ -10,7 +11,8 @@ const fs = require("node:fs");
 const path = require("node:path");
 const { PAGE, contrast, lab, atLightness, darkAccent, nearestStatus } = require("./lib/color.cjs");
 const { findConfig, readConfig, COLORS, FONTS } = require("./lib/config.cjs");
-const { NAMES: PALETTES, PALETTES: NAMED, closest } = require("./lib/palettes.cjs");
+const { NAMES: PALETTES, PALETTES: NAMED, closest, refusal } = require("./lib/palettes.cjs");
+const { customPalette } = require("./lib/hue.cjs");
 const { PROFILES } = require("./lib/profile.cjs");
 
 const INK_L = 16.6; // the CIELAB lightness of Docent's own heading color (#1b2260)
@@ -155,10 +157,13 @@ function withFile(result, tokens, label) {
   return out;
 }
 
-/** The line about a host's page color: one plain reason, and the closest tested palette as a choice, picked by distance. */
+/** The line about a host's page color: one plain reason, the closest tested palette as a choice, picked by distance, and whether a palette
+    built from the color's own hue passes every tested pair, as a third choice. */
 function pageNote(page) {
   const [first, ...rest] = page.closest, name = (p) => (p.name === "docent" ? "Docent's own page" : NAMED[p.name].name);
-  return `${page.key} ${page.color} is a page color. Docent keeps its own page color, because some text would become hard to read in dark mode and on paper. The closest tested page is ${name(first)} (${first.page}), a distance of ${first.distance.toFixed(1)}; then ${rest.map((p) => `${name(p)} ${p.distance.toFixed(1)}`).join(", ")}. Offer it to the user as a choice; never swap it in without asking`;
+  const tested = customPalette(page.color);
+  const custom = tested.failing.length ? `${refusal(page.color, tested).replace(/^a/, "A")}` : `A palette built from ${page.color} passes every tested pair: "palette": { "hue": "${page.color}" }`;
+  return `${page.key} ${page.color} is a page color. Docent keeps its own page color, because some text would become hard to read in dark mode and on paper. The closest tested page is ${name(first)} (${first.page}), a distance of ${first.distance.toFixed(1)}; then ${rest.map((p) => `${name(p)} ${p.distance.toFixed(1)}`).join(", ")}. ${custom}. Offer these to the user as choices; never swap one in without asking`;
 }
 
 /** A note made safe for a CSS comment inside <style>: it cannot end the comment, and it cannot end the style element. */
@@ -185,9 +190,15 @@ function hostTokens(config) {
   return { tokens: withFile(result, config.data.tokens, config.label || "the repo file").tokens.map(([name, value]) => [name, value]) };
 }
 
-const USAGE = "usage: node brand.cjs [DESIGN.md] [--config <path> | --no-config]\n       with no DESIGN.md, brand reads the one that .docent/config.json names";
+const USAGE = "usage: node brand.cjs [DESIGN.md] [--config <path> | --no-config]\n       node brand.cjs --hue <color>\n       with no DESIGN.md, brand reads the one that .docent/config.json names";
 
 function main(args) {
+  if (args[0] === "--hue") {
+    if (args.length !== 2 || !HEX.test(args[1])) { console.error(USAGE); return 2; }
+    const color = args[1].toLowerCase();
+    console.log(`brand: ${pageNote({ key: "The color", color, closest: closest(color) })}`);
+    return 0;
+  }
   const rest = [...args], flag = (name) => { const i = rest.indexOf(name); return i >= 0 ? rest.splice(i, 1).length : 0; };
   const noConfig = flag("--no-config"), at = rest.indexOf("--config"), given = at >= 0 ? rest.splice(at, 2)[1] : null;
   if ((at >= 0 && !given) || (noConfig && at >= 0) || rest.length > 1 || rest.some((a) => a.startsWith("--"))) { console.error(USAGE); return 2; }

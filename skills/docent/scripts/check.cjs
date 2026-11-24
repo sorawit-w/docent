@@ -17,7 +17,7 @@ const { PROFILES, suggestProfile } = require("./lib/profile.cjs");
 const { checkLogos } = require("./lib/logo.cjs");
 const { checkFigures } = require("./lib/hand.cjs");
 const { lab, darkAccent, nearestStatus } = require("./lib/color.cjs");
-const { NAMES: PALETTES, paletteOf, paint, grounds } = require("./lib/palettes.cjs");
+const { NAMES: PALETTES, paletteFor, keyOf, paint, grounds } = require("./lib/palettes.cjs");
 const { findPersonal, findTel } = require("./lib/personal.cjs");
 const { wordsOf, findNumberText, findNumberColumn, findBigNumber } = require("./lib/numbers.cjs");
 const { RULES, NUMBER_RULES, say, split } = require("./lib/rules.cjs");
@@ -101,10 +101,12 @@ function checkDocument(html, options = {}) {
   const errors = [], warnings = [];
   const error = (id, text) => errors.push(say(id, text)), warn = (id, text) => warnings.push(say(id, text));
   // A palette turns Docent's own tokens to one hue. A host color is tested on the palette's pages, and each drawing carries its light values.
-  const named = paletteOf(html), palette = PALETTES.includes(named) ? named : null;
-  if (named != null && !palette) error("kit.palette", `<html> has data-palette="${named}"; the palettes are ${PALETTES.map((n) => `"${n}"`).join(", ")} (see "Palettes" in DESIGN.md)`);
+  // A palette from a hue (data-palette="custom") is worked out again from data-palette-hue, and refused when a pair fails.
+  const { name: named, palette, error: paletteError } = paletteFor(html);
+  if (paletteError) error("kit.palette", paletteError);
   const deck = isDeck(html); // a deck carries the deck part of the kit, and only a deck does
-  const carried = (text) => [null, ...PALETTES].findIndex((p) => text === cssBlock(p, deck)); // 0: no palette, n: the nth palette, -1: neither
+  const known = [null, ...PALETTES, ...(palette && typeof palette === "object" ? [palette] : [])];
+  const carried = (text) => known.findIndex((p) => text === cssBlock(p, deck)); // 0: no palette, n: the nth palette, -1: neither
   const GROUNDS = grounds(palette); // the pages that the kit draws on, light and dark: a host color must read on both the page and the well
 
   // 1. The kit: the same styles and script in every document.
@@ -114,7 +116,7 @@ function checkDocument(html, options = {}) {
     else if (found.length > 1) error("kit.blocks", `the document has ${found.length} kit ${kind} blocks; it must have one`);
     else if (found[0].version !== VERSION) error("kit.blocks", `the kit ${kind} are version ${found[0].version}; this skill has ${VERSION}; run stamp`);
     else if (found[0].text === other) error("kit.blocks", deck ? `the kit ${kind} have no deck part, but <html> has data-profile="deck"; run stamp` : `the kit ${kind} carry the deck part, but <html> does not have data-profile="deck"; run stamp`);
-    else if (found[0].text !== current && kind === "styles" && carried(found[0].text) >= 0) error("kit.blocks", `the kit styles carry ${carried(found[0].text) ? `the palette "${PALETTES[carried(found[0].text) - 1]}"` : "no palette"}, but <html> names ${palette ? `"${palette}"` : "none"}; run stamp`);
+    else if (found[0].text !== current && kind === "styles" && carried(found[0].text) >= 0) error("kit.blocks", `the kit styles carry ${carried(found[0].text) ? `the palette "${keyOf(known[carried(found[0].text)])}"` : "no palette"}, but <html> names ${palette ? `"${keyOf(palette)}"` : "none"}; run stamp`);
     else if (found[0].text !== current) error("kit.blocks", `the kit ${kind} were changed by hand or by a code formatter; run stamp, keep your own styles outside the markers, and keep the document out of the formatter (see SKILL.md)`);
   }
 
@@ -610,7 +612,9 @@ function checkDocument(html, options = {}) {
   const file = options.config && options.config.data;
   if (file && brandValue !== "off" && !Object.hasOwn(off, "brand.differs")) {
     const q = (v) => (v == null ? "none" : JSON.stringify(v)), differs = [];
-    if ((palette ?? null) !== (file.palette ?? null)) differs.push(`the palette (the page has ${q(named)}, the file ${q(file.palette ?? null)})`);
+    const paletteKey = (p) => (p == null ? null : typeof p === "string" ? p : `custom ${String(p.hue).toLowerCase()}`); // a palette from a hue is its hue
+    const shownPalette = (p) => (p == null ? "none" : typeof p === "string" ? JSON.stringify(p) : `a palette from ${p.hue}`);
+    if (paletteKey(palette ?? named ?? null) !== paletteKey(file.palette ?? null)) differs.push(`the palette (the page has ${shownPalette(palette ?? named ?? null)}, the file ${shownPalette(file.palette ?? null)})`);
     const fileLogos = options.config.logos === undefined ? logosOf(options.config) : options.config.logos;
     const pageLogos = logo.logos.length ? Object.fromEntries(logo.logos.map((l) => [l.forTheme || "both", l.raster ? (l.text.match(/\bsrc\s*=\s*["']([^"']*)/i) || [])[1] : logoShapes(l.text)])) : null;
     if (JSON.stringify(pageLogos && Object.entries(pageLogos).sort()) !== JSON.stringify(fileLogos && Object.entries(fileLogos).sort())) differs.push(!pageLogos ? "the logo (the page has none)" : !fileLogos ? "the logo (the file names none)" : "the logo");

@@ -60,7 +60,7 @@ test("a bad file is refused, field by field, and none of it is used", () => {
   assert.deepEqual(errorsOf({ version: 1, design: "docs/MISSING.md" }), ['"design": there is no file at "docs/MISSING.md", read from the folder that holds .docent/']);
   assert.deepEqual(errorsOf({ version: 1, logo: "brand/logo.jpg" }, { "brand/logo.jpg": "x" }), ['"logo": "brand/logo.jpg" is not an SVG, PNG or WebP file']);
   assert.deepEqual(errorsOf({ version: 1, pallete: "sepia" }), ['"pallete": no field has this name; the fields are "version", "design", "tokens", "palette", "logo", "tagline", "credit", "profile", "rules"']);
-  assert.deepEqual(errorsOf({ version: 1, palette: "teal" }), ['"palette": is "teal"; the palettes are "harbor", "plum", "sepia", or null for Docent\'s own colors']);
+  assert.deepEqual(errorsOf({ version: 1, palette: "teal" }), ['"palette": is "teal"; the palettes are "harbor", "plum", "sepia", { "hue": "#…" } for a palette from the host\'s own hue, or null for Docent\'s own colors']);
   assert.deepEqual(errorsOf({ version: 1, credit: "yes" }), ['"credit": is "yes"; it is "link", "text", "none"']);
   assert.deepEqual(errorsOf({ version: 1, tagline: "x".repeat(91) }), ['"tagline": has 91 characters; it is one line of at most 90']);
   assert.deepEqual(errorsOf({ version: 1, tokens: { "host-ink": { value: "#3b2a5c" } } }), ['"tokens"."host-ink": no "reason"; write why the team chose this value']);

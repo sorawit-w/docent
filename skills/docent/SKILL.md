@@ -228,7 +228,7 @@ A host project may set its accent, its heading color and its fonts, with these t
 - `check` warns when an accent is close to green, amber or red, because its links and dots would read as a status, and when it has almost no color, because it looks like the body text.
 - Do not set the kit's own tokens (`--primary`, `--bg`, and the others). The kit sets them in four places, so your value is lost in dark mode or in print; `check` warns.
 - There is no token for the page, the text or the status colors. For a tinted page and grays, name a palette instead.
-- **A palette** turns Docent's own colors to one hue, tested in advance: write `data-palette="harbor"`, `"plum"` or `"sepia"` on `<html>`, then run `render` and `stamp`. Harbor is a cool blue-green, for engineering and operations; Plum a deep violet-red, for product and design; Sepia warm paper, for long reading and policy. Host tokens still win over a palette's. See "Palettes" in `references/DESIGN.md`.
+- **A palette** turns Docent's own colors to one hue, tested in advance: write `data-palette="harbor"`, `"plum"` or `"sepia"` on `<html>`, then run `render` and `stamp`. Harbor is a cool blue-green, for engineering and operations; Plum a deep violet-red, for product and design; Sepia warm paper, for long reading and policy. Host tokens still win over a palette's. See "Palettes" in `references/DESIGN.md`. A team that needs a page color no palette comes close to can build **a palette from its own hue**: write `data-palette="custom" data-palette-hue="#eef2ff"`. The scripts work out the page, the grays, the accent, the dark forms and the heat steps from that hue, at Docent's lightness, and test every pair; `stamp` and `check` refuse a hue whose palette fails a pair, and name the pair and the closest color that passes. The page keeps the lightness of Docent's page, so it is a light page of that hue, not the color itself.
 - A font must be in the file or on the reader's system. Drawings keep the system font.
 - **To turn dark mode off**, write `<html lang="en" data-theme="light">`. The switch is hidden, and the page stays light. `data-theme="dark"` keeps it dark.
 
@@ -236,7 +236,7 @@ A host project may set its accent, its heading color and its fonts, with these t
 
 **First, read the repo file.** A repo may hold `.docent/config.json`, the record of its brand: the `DESIGN.md` it names, host-token values that win over that file, the palette, the logo, the tagline, the credit and the default profile, kept once for every page. The scripts read the nearest one above the page, up to the root of the repo. When it exists, ask nothing, and write what it says into each new page:
 
-- its `palette` as `data-palette` on `<html>`, and its `profile` as `data-profile` when the content does not choose another (see "Choose a profile");
+- its `palette` as `data-palette` on `<html>` (for `{ "hue": "#…" }`, `data-palette="custom" data-palette-hue="#…"`), and its `profile` as `data-profile` when the content does not choose another (see "Choose a profile");
 - its `logo` in the top bar: paste an SVG file as inline SVG, with `class="logo"` and the size that `check` names, or a PNG or WebP as a data URI; with `{ "light": …, "dark": … }`, both versions with `data-for`;
 - its `tagline` in the footer, and its `credit`: `"text"` takes out the link, `"none"` takes out the credit;
 - then run `stamp`: it writes the host tokens, from the `DESIGN.md` the file names and the file's own `tokens`, between `docent:host` markers. Do not copy a style block from `brand` as well.
@@ -270,11 +270,13 @@ Find the host's name as below; the file does not keep it. An existing page keeps
 
 **A heading color that differs from the `DESIGN.md`.** Put it in the repo file's `tokens`, with the reason in the user's words: `"tokens": { "host-ink": { "value": "#3b2a5c", "reason": "Our docs use the violet of the product's headings." } }`. It wins over the value `brand` works out, and `check` tests its contrast. The accents, the dark dot and the fonts work the same way (see "Host tokens" in `references/DESIGN.md`).
 
-**A page color.** It comes up in two cases: the host's `DESIGN.md` has one (`brand` then prints a line about `colors.surface` or `colors.neutral`), or the user asks, such as "make the background beige". Docent keeps its own page color, and offers a tested palette. Send one short message in three parts: what the file or the request has, one plain reason with no contrast numbers, and the closest tested palette as a choice, the one `brand` names, never one picked by eye:
+**A page color.** It comes up in two cases: the host's `DESIGN.md` has one (`brand` then prints a line about `colors.surface` or `colors.neutral`), or the user asks, such as "make the background beige": then run `node SKILL/scripts/brand.cjs --hue "#f3ece0"` with the color they name. Docent keeps its own page color, and offers a tested palette. Send one short message in three parts: what the file or the request has, one plain reason with no contrast numbers, and the closest tested palette as a choice, the one `brand` names, never one picked by eye:
 
 > Your DESIGN.md has a beige page color, #f3ece0. Docent keeps its own page color, because some text would become hard to read in dark mode and on paper. The closest tested palette is Sepia (warm paper).
 >
-> [Use Sepia] [Keep Docent's white page]
+> [Use Sepia] [Keep Docent's white page] [Build a palette from #f3ece0]
+
+Offer the third choice only when `brand` says that a palette built from the color passes every tested pair; save it as `"palette": { "hue": "#f3ece0" }`, and write `data-palette="custom" data-palette-hue="#f3ece0"` on each new page. When `brand` says it is refused, leave the button out and say why in one sentence, with the one number that matters and the closest color that passes, as `brand` prints them: "A palette from #f3ece0 would make links look like warnings. The closest color that passes is #efede0." The user may choose that color instead.
 
 Before the user answers, offer to open the page with the palette in light and in dark mode, so they decide on what they see. The user may ask for another palette. Save the answer in the repo file (with the user's OK, as above), and say so in one line; later pages do not ask again. Never swap a palette in without asking. When the user insists on the exact color, say in one sentence what breaks: dark mode and print keep Docent's page. Then set it on that one page only, as `--bg` in the page's own `<style>`, and never save it in the repo file: `check` warns, and the risk stays on one page.
 

@@ -13,7 +13,7 @@ const JS_BLOCK = /\/\/ docent:kit ([^\s]+)\n[\s\S]*?\/\/ \/docent:kit/g;
 const HOST_BLOCK = /\/\* docent:host \*\/[\s\S]*?\/\* \/docent:host \*\//g;
 const HOST_STYLE = /<style>\n\/\* docent:host \*\/[\s\S]*?\/\* \/docent:host \*\/\n<\/style>\n?/g;
 
-const { paletteOf, paletteCss, presentCss } = require("./palettes.cjs");
+const { paletteFor, paletteCss, presentCss } = require("./palettes.cjs");
 /** The value of an attribute on <html>, or null. */
 function htmlAttr(html, name) {
   const tag = (html.match(/<html\b[^>]*>/i) || [""])[0];
@@ -25,7 +25,7 @@ const profileOf = (html) => htmlAttr(html, "data-profile");
 /** True for a page about another product (data-brand="off"): it takes no brand field of the repo file, and keeps its rule changes. */
 const brandOff = (html) => htmlAttr(html, "data-brand") === "off";
 const isDeck = (html) => profileOf(html) === "deck";
-/** The kit styles, with the one palette that the page names, if any, and the deck part only in a deck. */
+/** The kit styles, with the one palette that the page names, if any (a name, or a palette worked out from a hue), and the deck part only in a deck. */
 const cssBlock = (palette = null, deck = false) => `/* docent:kit ${VERSION} */\n${read("kit.css")}${palette ? `\n${paletteCss(palette)}` : ""}${deck ? `\n${read("deck.css")}${palette ? `\n${presentCss(palette)}` : ""}` : ""}\n/* /docent:kit */`;
 const jsBlock = (deck = false) => `// docent:kit ${VERSION}\n${read("kit.js")}${deck ? `\n${read("deck.js")}` : ""}\n// /docent:kit`;
 
@@ -62,7 +62,9 @@ function stampHtml(html, options = {}) {
     actions.push(`${kind} added`);
   };
   const deck = isDeck(html);
-  put("styles", CSS_BLOCK, cssBlock(paletteOf(html), deck), (b) => `<style>\n${b}\n</style>\n`, "</head>");
+  const palette = paletteFor(html);
+  if (palette.error) throw new Error(palette.error);
+  put("styles", CSS_BLOCK, cssBlock(palette.palette, deck), (b) => `<style>\n${b}\n</style>\n`, "</head>");
   put("script", JS_BLOCK, jsBlock(deck), (b) => `<script>\n${b}\n</script>\n`, "</body>");
   if ("host" in options) {
     if (options.host && options.host.length) put("host tokens", HOST_BLOCK, hostBlock(options.host), (b) => `<style>\n${b}\n</style>\n`, "</head>");

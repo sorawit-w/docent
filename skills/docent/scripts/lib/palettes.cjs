@@ -4,6 +4,7 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const { distance } = require("./color.cjs");
+const { customPalette } = require("./hue.cjs");
 
 const PALETTES = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "..", "assets", "palettes.json"), "utf8"));
 const NAMES = Object.keys(PALETTES);
@@ -13,18 +14,39 @@ const DOCENT = { bg: "#fbfbfe", fig: "#f2f3f9", text: "#1c1f2e", muted: "#575d75
 const PAPER_HEAT = ["#dee2f0", "#babecb", "#9498a5", "#616571", "#3e424d"];
 const SANS = /^system-ui\b/;
 
-/** The palette that a page names on <html>, or null. */
-function paletteOf(html) {
+/** The value of an attribute on <html>, or null. */
+function attrOf(html, name) {
   const tag = (html.match(/<html\b[^>]*>/i) || [""])[0];
-  const m = tag.match(/\sdata-palette\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'>]+))/i);
+  const m = tag.match(new RegExp(`\\s${name}\\s*=\\s*(?:"([^"]*)"|'([^']*)'|([^\\s"'>]+))`, "i"));
   return m ? m[1] ?? m[2] ?? m[3] : null;
 }
+/** The palette that a page names on <html>, or null. */
+const paletteOf = (html) => attrOf(html, "data-palette");
+/** A palette by its name, or a palette worked out from a hue, as it is. */
+const get = (p) => (typeof p === "string" ? PALETTES[p] : p);
+/** The name a palette has on <html>: its own name, or "custom" for one worked out from a hue. */
+const keyOf = (p) => (typeof p === "string" ? p : p && p.hue ? "custom" : null);
+
+/** The palette of a page: { name, palette, error }. palette is a palette's name, or for data-palette="custom", the palette worked out
+    from data-palette-hue (hue.cjs); error says why the page's palette cannot be used. */
+function paletteFor(html) {
+  const name = paletteOf(html), hue = attrOf(html, "data-palette-hue");
+  if (name == null) return { name, palette: null, error: hue != null ? `<html> has data-palette-hue="${hue}" and no data-palette="custom"; write both, or neither` : null };
+  if (NAMES.includes(name)) return { name, palette: name, error: hue != null ? `<html> has data-palette-hue="${hue}", but data-palette="${name}" is a named palette; take out data-palette-hue` : null };
+  if (name !== "custom") return { name, palette: null, error: `<html> has data-palette="${name}"; the palettes are ${NAMES.map((n) => `"${n}"`).join(", ")}, and "custom" with data-palette-hue (see "Palettes" in DESIGN.md)` };
+  if (hue == null || !/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(hue)) return { name, palette: null, error: `<html> has data-palette="custom" and ${hue == null ? "no data-palette-hue" : `data-palette-hue="${hue}"`}; write the hue the palette is worked out from, as a hex color, such as data-palette-hue="#eef2ff"` };
+  const tested = customPalette(hue);
+  if (tested.failing.length) return { name, palette: null, error: refusal(hue, tested) };
+  return { name, palette: tested.palette, error: null };
+}
+/** Why a palette from a hue is refused, in plain words: the first failing pair, and the closest color that passes. */
+const refusal = (hue, tested) => `a palette from ${hue} is refused: ${tested.failing[0].words}${tested.failing.length > 1 ? `, and ${tested.failing.length - 1} more pair${tested.failing.length > 2 ? "s" : ""}` : ""}. ${tested.closest ? `The closest color that passes is ${tested.closest}` : "No nearby color passes; use a named palette"}`;
 
 /** The four blocks of tokens for one palette, as the kit sets its own: light, dark by the system, dark by the switch, and print. */
 function paletteCss(name) {
-  const p = PALETTES[name];
+  const p = get(name);
   if (!p) throw new Error(`"${name}" is not a palette; the palettes are ${NAMES.map((n) => `"${n}"`).join(", ")}`);
-  const sel = `:root[data-palette="${name}"]`;
+  const sel = `:root[data-palette="${keyOf(name)}"]`;
   const heat = (steps) => steps.map((s, i) => `--heat-${i + 1}: ${s};`).join(" ");
   const on = (t, page = t.bg) => `--heat-text: ${t.text}; --heat-page: ${page};`; // the text on a heat step: the palette's own text and page colors
   const grays = (t) => `--bg: ${t.bg}; --panel: ${t.panel}; --fig: ${t.fig}; --text: ${t.text}; --muted: ${t.muted}; --line: ${t.line};`;
@@ -34,7 +56,7 @@ function paletteCss(name) {
   // Headings in a sans-serif take weight 600, so the sans-serif keeps two weights, 400 and 600.
   const type = `--serif: var(--host-serif, ${p.serif});${SANS.test(p.serif) ? " --heading-weight: 600;" : ""}`;
   return [
-    `/* Palette: ${p.name}. ${p.mood}. Docent's own tokens turned to one hue; every pair is tested in tests/contrast.py. */`,
+    `/* Palette: ${p.name}. ${p.mood}. Docent's own tokens turned to one hue; every pair is tested ${p.hue ? "by stamp and check (scripts/lib/pairs.cjs)" : "in tests/contrast.py"}. */`,
     `${sel} { ${light} ${heat(steps(p.light))} ${on(p.light)} --tile-dark: ${p.dark.bg}; ${type} }`,
     `@media (prefers-color-scheme: dark) { ${sel}:not([data-theme="light"]) { ${dark} } }`,
     `${sel}[data-theme="dark"] { ${dark} }`,
@@ -51,16 +73,16 @@ function paletteCss(name) {
     text the text color), so every text pair reaches 7:1 on the page. A palette whose accent has less than 7:1 on its light page gives
     a darker accent of the same hue for present mode ("present" in palettes.json). Screen only, and not with forced colors. */
 function presentCss(name) {
-  const p = PALETTES[name];
+  const p = get(name);
   if (!p) throw new Error(`"${name}" is not a palette; the palettes are ${NAMES.map((n) => `"${n}"`).join(", ")}`);
   const t = p.light, accent = (p.present && p.present.primary) || t.primary;
   const heat = [1, 2, 3, 4, 5].map((i) => `--heat-${i}: ${t[`heat-${i}`]};`).join(" ");
-  return `@media screen and (forced-colors: none) { html:root[data-palette="${name}"].presenting:not([data-never]) { color-scheme: light; --bg: ${t.bg}; --panel: ${t.panel}; --fig: ${t.fig}; --text: ${t.text}; --muted: ${t.text}; --line: ${t.muted}; --primary: var(--host-accent, ${accent}); --ink: var(--host-ink, ${t.ink}); --dot: var(--host-accent, ${accent}); ${heat} --heat-text: ${t.text}; --heat-page: ${t.bg}; } }`;
+  return `@media screen and (forced-colors: none) { html:root[data-palette="${keyOf(name)}"].presenting:not([data-never]) { color-scheme: light; --bg: ${t.bg}; --panel: ${t.panel}; --fig: ${t.fig}; --text: ${t.text}; --muted: ${t.text}; --line: ${t.muted}; --primary: var(--host-accent, ${accent}); --ink: var(--host-ink, ${t.ink}); --dot: var(--host-accent, ${accent}); ${heat} --heat-text: ${t.text}; --heat-page: ${t.bg}; } }`;
 }
 
 /** A drawing with the palette's light values as its fallback colors in place of Docent's. */
 function paint(svg, name) {
-  const p = name && PALETTES[name];
+  const p = name && get(name);
   if (!p) return svg;
   const light = { ...p.light, dot: p.light.primary, "heat-text": p.light.text, "heat-page": p.light.bg };
   return svg.replace(/var\(--([\w-]+),(#[0-9a-f]{6})\)/g, (all, token, hex) => (DOCENT[token] === hex && light[token] ? `var(--${token},${light[token]})` : all));
@@ -68,7 +90,7 @@ function paint(svg, name) {
 
 /** The pages a host color is tested on: the page and the well of each theme. */
 function grounds(name) {
-  const p = name && PALETTES[name];
+  const p = name && get(name);
   return p ? { light: [p.light.bg, p.light.panel], dark: [p.dark.bg, p.dark.panel] } : { light: ["#fbfbfe", "#f2f3f9"], dark: ["#12141f", "#0b0d15"] };
 }
 
@@ -79,4 +101,4 @@ function closest(hex) {
   return pages.map(([name, page]) => ({ name, page, distance: distance(hex, page) })).sort((a, b) => a.distance - b.distance);
 }
 
-module.exports = { PALETTES, NAMES, DOCENT, PAPER_HEAT, paletteOf, paletteCss, presentCss, paint, grounds, closest };
+module.exports = { PALETTES, NAMES, DOCENT, PAPER_HEAT, paletteOf, paletteFor, keyOf, refusal, paletteCss, presentCss, paint, grounds, closest };
