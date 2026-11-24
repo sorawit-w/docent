@@ -13,7 +13,8 @@ const GAP = 32; // between the heading and the body
 const POINT_GAP = 16; // between two points
 const INDENT = 40; // the indent of a list of points
 const CARD_GAP = 24; // between two cards
-const ROW = 21 * 1.5 + 2 * 12; // a table row at 21px, with 12px above and below
+const ROW_PAD = 2 * 12; // a table row: its lines at 21px, with 12px above and below
+const CELL_GAP = 24; // the space after each table cell
 const WELL = 16; // a figure well's padding, above and below
 const CAPTION_GAP = 12;
 const SCALE = { most: 1.5, least: 1.25 }; // a drawing on a slide stands at 1.5 times, or down to 1.25 times when it needs room
@@ -76,12 +77,14 @@ function measureBody(el, room) {
   const table = (inner) => {
     const head = (inner.match(/<thead\b[^>]*>([\s\S]*?)<\/thead>/i) || [])[1];
     const body = inner.replace(/<thead\b[^>]*>[\s\S]*?<\/thead>/i, "").replace(/<tfoot\b[^>]*>[\s\S]*?<\/tfoot>/i, "");
-    const rows = [...body.matchAll(/<tr\b[^>]*>([\s\S]*?)<\/tr>/gi)].map((r) => r[1]);
-    const first = head != null ? (head.match(/<tr\b[^>]*>([\s\S]*?)<\/tr>/i) || [, head])[1] : rows[0] || "";
-    const columns = (first.match(/<t[hd]\b/gi) || []).length, count = rows.length - (head == null && rows.length ? 1 : 0);
+    const rowsOf = (part) => [...(part || "").matchAll(/<tr\b[^>]*>([\s\S]*?)<\/tr>/gi)].map((r) => [...r[1].matchAll(/<t[hd]\b[^>]*>([\s\S]*?)<\/t[hd]>/gi)].map((c) => plain(c[1])));
+    const rows = rowsOf(body), all = [...rowsOf(head), ...rows, ...rowsOf((inner.match(/<tfoot\b[^>]*>([\s\S]*?)<\/tfoot>/i) || [])[1])];
+    const columns = Math.max(0, ...all.map((r) => r.length)), count = rows.length - (head == null && rows.length ? 1 : 0);
     if (columns > LIMIT.columns) problems.push(`its table has ${columns} columns; a table on a slide has at most ${LIMIT.columns}`);
     if (count > LIMIT.rows) problems.push(`its table has ${count} rows under the heading row; a table on a slide has at most ${LIMIT.rows}. A larger table belongs in the report`);
-    return (count + 1 + (/<tfoot\b/i.test(inner) ? 1 : 0)) * ROW;
+    // Each row is as tall as its tallest cell: the columns share the width equally here, less 24px of space after each cell.
+    const cell = Math.max(1, INNER.width / Math.max(1, columns) - CELL_GAP);
+    return all.reduce((sum, row) => sum + Math.max(1, ...row.map((text) => (text ? lines(text, SIZE.small, cell) : 1))) * LINE.small + ROW_PAD, 0);
   };
   const { tag, attrs, inner } = el;
   if ((tag === "ul" || tag === "ol") && hasClass(attrs, "cards")) {
@@ -122,6 +125,12 @@ function measureBody(el, room) {
     const size = drawingSize(inner), caption = captionHeight(inner);
     if (!size) return { kind: "one figure", height: caption, problems };
     const fit = Math.min(SCALE.most, (INNER.width - WELL) / size.w, (room - caption - WELL) / size.h), scale = Math.max(SCALE.least, fit);
+    // A drawing that does not fit at the least scale is refused with its size and the room; the slide is not called too tall as well.
+    const most = { w: Math.floor((INNER.width - WELL) / SCALE.least), h: Math.floor(Math.max(0, room - caption - WELL) / SCALE.least) };
+    if (fit < SCALE.least) {
+      problems.push(`the drawing is ${size.w} × ${size.h}px; a slide holds ${most.w} × ${most.h}px at ${SCALE.least} times under this heading and caption. Show less on the slide, and the full drawing in the report`);
+      return { kind: "one figure", height: Math.min(room, size.h * scale + WELL + caption), problems, size, scale: fit };
+    }
     return { kind: "one figure", height: size.h * scale + WELL + caption, problems, size, scale };
   }
   return null;

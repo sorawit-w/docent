@@ -91,13 +91,21 @@ test("a slide holds one body from the list, within its limits", () => {
 });
 
 test("a slide that is taller than the frame is refused, with its height", () => {
-  // Two heading lines, three points: fits. A table of five rows under two heading lines: fits too, as the proposal measured.
-  const five = `<h2>Ask for three things in every bug report, and say why each one matters</h2>\n<div class="table-wrap"><table><thead><tr><th>A</th><th>B</th></tr></thead><tbody>${"<tr><td>1</td><td>2</td></tr>".repeat(5)}</tbody></table></div>`;
-  assert.deepEqual(errorsOf(slide(9, five)), []);
-  // A tall drawing: a code block of 8 lines under two heading lines fits; a figure 500px high does not, even at 1.25 times.
-  const tall = `<h2>Questions</h2>\n<figure><div class="fig" role="region" aria-label="A tall drawing" tabindex="0"><img src="data:image/png;base64,AA==" alt="A tall drawing" width="400" height="500"></div><figcaption>A caption.</figcaption></figure>`;
-  const errors = errorsOf(slide(9, tall));
+  const table = (rows, text) => `<h2>Ask for three things in every bug report, and say why each one matters</h2>\n<div class="table-wrap"><table><thead><tr><th>Part</th><th>Why</th><th>Who</th><th>When</th></tr></thead><tbody>${`<tr><td>${text}</td><td>${text}</td><td>${text}</td><td>${text}</td></tr>`.repeat(rows)}</tbody></table></div>`;
+  // Two heading lines and a table of five short rows: fits, as the proposal measured.
+  assert.deepEqual(errorsOf(slide(9, table(5, "Steps"))), []);
+  // The same table with long text in its cells: each row wraps to several lines, so the slide is too tall.
+  const errors = errorsOf(slide(9, table(5, "What you did, step by step, with the page you opened")));
   assert.ok(errors.some((e) => /^slide 9 is about \d+px tall, and a slide holds 592px\. Cut a point, or move the detail to the speaker notes or to the report$/.test(e)), errors.join("\n"));
+});
+
+test("a drawing that does not fit the slide at 1.25 times is refused with its size and the room", () => {
+  const figure = (w, h) => `<h2>Questions</h2>\n<figure><div class="fig" role="region" aria-label="A drawing" tabindex="0"><img src="data:image/png;base64,AA==" alt="A drawing" width="${w}" height="${h}"></div><figcaption>A caption.</figcaption></figure>`;
+  const tall = errorsOf(slide(9, figure(400, 500)));
+  assert.ok(tall.some((e) => /^slide 9: the drawing is 400 × 500px; a slide holds 908 × \d+px at 1\.25 times under this heading and caption\. Show less on the slide, and the full drawing in the report$/.test(e)), tall.join("\n"));
+  assert.ok(!tall.some((e) => e.includes("px tall")), "the slide is not called too tall as well");
+  assert.ok(errorsOf(slide(9, figure(1200, 100))).some((e) => e.startsWith("slide 9: the drawing is 1200 × 100px")), "a drawing too wide for the frame");
+  assert.deepEqual(errorsOf(slide(9, figure(640, 300))), [], "a chart of 640 × 300 fits");
 });
 
 test("a deck has no widget, no walkthrough and no closed section other than a figure's words and the speaker notes", () => {
