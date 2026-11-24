@@ -92,6 +92,7 @@ To choose, ask four questions:
    | Where does each part run, and how do the machines talk? | A deployment diagram (`"kind": "deployment"`) |
    | Who is linked to whom, and in which order do they talk? | A communication diagram (`"kind": "communication"`); a sequence diagram reads better when the order matters more than the links |
    | Where does each value or range fall on one scale, and does ours fall inside theirs? | A range chart (`"kind": "range"`), for 3 to 12 values in one unit; a sentence for one or two |
+   | How large is each estimate, and how sure is it? | A range chart with estimate rows (`"at"`, `"from"` and `"to"`): a point inside its interval, such as a share with its 95% interval |
    | Where does each part sit along one width, how wide is it, and how big are the gaps? | A layout to scale (`"kind": "layout"`), for one axis only, such as a screen or a page |
    | Where do the parts of a page or screen sit, and what is next to what? | A plan (`"kind": "plan"`), a grid of named areas in rows and columns |
    | How many people reach each step of a flow, and where do they leave? | A funnel (`"kind": "funnel"`), for 3 to 8 steps that everyone takes in one order; a sentence for 2 |

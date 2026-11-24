@@ -1072,6 +1072,34 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     ok(`list of sources, ${name}: no bullets, body size, a hanging indent of 24px, the address as the link's text inside the column${name === "320px" ? ", and the page does not scroll sideways" : ""}`, src.bullets === "none" && src.size && src.hang === 24 && src.link && src.inside && (name !== "320px" || src.page === src.view), src);
   }
 
+  // An estimate row in a range chart: the point stands on its bar, inside its interval, in the text color over the page-colored bar, in
+  // light, dark, print and forced colors; at 320px the phone form shows and the page does not scroll sideways. No accessibility problem.
+  {
+    const data = fs.readFileSync(path.join(root, "tests", "fixtures", "range-estimate.json"), "utf8");
+    const figure = `<section id="est" aria-labelledby="est-h"><h2 id="est-h">Estimates</h2><figure><div class="fig" role="region" aria-label="Figure 9, reports that could not be repeated" tabindex="0">\n<!-- docent:diagram\n${data}\n-->\n<!-- /docent:diagram -->\n</div><figcaption><strong>Figure 9</strong>Reports that could not be repeated, by area, with 95% intervals. <span class="source">Source: invented sample data.</span></figcaption></figure></section>`;
+    const content = stampHtml(renderDocument(fs.readFileSync(file, "utf8").replace("</main>", `${figure}</main>`)).html).html;
+    for (const [name, opts] of [["desktop light", { width: 1280 }], ["desktop dark", { width: 1280, theme: "dark" }], ["320px", { width: 320 }], ["print", { width: 794, media: "print" }], ["forced colors", { width: 1280, forcedColors: "active" }]]) {
+      const { page, context } = await open({ ...opts, content });
+      if (name === "desktop light" || name === "desktop dark") await page.addScriptTag({ path: axePath });
+      const est = await page.evaluate(async () => {
+        const svg = [...document.querySelectorAll("#est svg.dg")].find((s) => s.getBoundingClientRect().width), text = getComputedStyle(document.body).color, bg = getComputedStyle(document.body).backgroundColor;
+        // Row i is bar i and point i, in the order they are drawn; the point comes after its bar and before the next row's bar.
+        const bars = [...svg.querySelectorAll("rect.r-bar")];
+        const rows = [...svg.querySelectorAll("circle.r-pt")].map((c, i) => {
+          const el = bars[i], bar = el.getBoundingClientRect(), dot = c.getBoundingClientRect(), cs = getComputedStyle(c), bs = getComputedStyle(el), after = (a, b) => !!(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_PRECEDING);
+          const mid = dot.left + dot.width / 2;
+          return { inside: mid >= bar.left && mid <= bar.right && Math.abs(dot.top + dot.height / 2 - (bar.top + bar.height / 2)) < 1, last: after(c, el) && (!bars[i + 1] || after(bars[i + 1], c)), dot: cs.fill === text, bar: bs.stroke === text && bs.fill === bg };
+        });
+        const axe = window.axe ? (await window.axe.run(document.querySelector("#est"), { runOnly: { type: "tag", values: ["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"] } })).violations.map((v) => v.id) : [];
+        return { form: Math.round(svg.getBoundingClientRect().width), rows, axe, page: document.documentElement.scrollWidth, view: innerWidth };
+      });
+      if (name === "desktop light" || name === "320px") await page.locator("#est figure").screenshot({ path: `${out}/estimate-${name.split(" ")[0]}.png` });
+      await context.close();
+      const form = name === "320px" ? 264 : 640;
+      ok(`estimate row, ${name}: the ${form}px form, each of ${est.rows.length} points on its bar inside its interval, drawn last, in the text color over a page-colored bar${name === "320px" ? "; the page does not scroll sideways" : ""}`, est.form === form && est.rows.length === 5 && est.rows.every((r) => r.inside && r.last && (name === "forced colors" || (r.dot && r.bar))) && est.axe.length === 0 && (name !== "320px" || est.page === est.view), est);
+    }
+  }
+
   // A hand-drawn figure (a fishbone under the contract in diagrams.md): no accessibility problem in either theme, its real size on a
   // desktop and on paper (no shrink), the drawing tokens in dark, forced colors and more contrast, and at 320px it scrolls inside its
   // well while the page does not scroll sideways.

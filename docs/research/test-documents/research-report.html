@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Worked examples in API reference pages — Example Lab</title>
 <style>
-/* docent:kit 0.24.0 */
+/* docent:kit 0.25.0 */
 /* Docent page styles. Tokens come from references/DESIGN.md. One file, no network. */
 :root {
   color-scheme: light;
@@ -512,7 +512,7 @@ footer p { margin: 0; }
       </table>
     </div>
     <p>The time difference is the mean of each participant's own difference, so it is not the gap between the two medians.</p>
-    <p>Figure 1 puts the three differences on one scale. Each bar is a 95% interval for d; its middle value is written after it. None of the intervals includes 0, so each difference is unlikely to be chance alone. But the intervals are wide: the effect on finished tasks could be small (0.04) or large (0.72).</p>
+    <p>Figure 1 puts the three differences on one scale. Each dot is the estimate of d, on the bar of its 95% interval. None of the intervals includes 0, so each difference is unlikely to be chance alone. But the intervals are wide: the effect on finished tasks could be small (0.04) or large (0.72).</p>
     <figure>
       <div class="fig" role="region" aria-label="Figure 1, effect of worked examples, with 95% intervals" tabindex="0">
 <!-- docent:diagram
@@ -522,9 +522,9 @@ footer p { margin: 0; }
   "label": "Standardized effect of worked examples, with 95% intervals. Tasks finished: d 0.38, interval 0.04 to 0.72. Time, faster: d 0.61, interval 0.25 to 0.97. Confidence: d 0.55, interval 0.20 to 0.90. No interval includes 0.",
   "scale": {"from": -0.5, "to": 1.5, "step": 0.5, "unit": "d", "marks": [{"at": 0, "name": "no difference"}]},
   "rows": [
-    {"name": "Tasks finished", "from": 0.04, "to": 0.72, "note": "d = 0.38"},
-    {"name": "Time, faster", "from": 0.25, "to": 0.97, "note": "d = 0.61"},
-    {"name": "Confidence", "from": 0.2, "to": 0.9, "note": "d = 0.55"}
+    {"name": "Tasks finished", "at": 0.38, "from": 0.04, "to": 0.72},
+    {"name": "Time, faster", "at": 0.61, "from": 0.25, "to": 0.97},
+    {"name": "Confidence", "at": 0.55, "from": 0.2, "to": 0.9}
   ]
 }
 -->
@@ -573,14 +573,14 @@ footer p { margin: 0; }
 <text x="580" y="44" class="val" text-anchor="middle">1.5</text>
 <text x="113.08" y="44" class="sub" text-anchor="end">d</text>
 <text x="20" y="85" class="row" text-anchor="start">Tasks finished</text>
-<rect x="412.01" y="72" width="134.28" height="16" class="band"/><text x="416.01" y="84" class="val" text-anchor="start">0.04–0.72, d = 0.38</text>
+<rect x="412.01" y="72" width="116.28" height="16" class="band"/><text x="416.01" y="84" class="val" text-anchor="start">0.38 (0.04–0.72)</text>
 <text x="20" y="117" class="row" text-anchor="start">Time, faster</text>
-<rect x="467.14" y="104" width="134.28" height="16" class="band"/><text x="471.14" y="116" class="val" text-anchor="start">0.25–0.97, d = 0.61</text>
+<rect x="467.14" y="104" width="116.28" height="16" class="band"/><text x="471.14" y="116" class="val" text-anchor="start">0.61 (0.25–0.97)</text>
 <text x="20" y="149" class="row" text-anchor="start">Confidence</text>
-<rect x="451.7" y="136" width="118.44" height="16" class="band"/><text x="455.7" y="148" class="val" text-anchor="start">0.2–0.9, d = 0.55</text>
-<rect x="258.07" y="72" width="149.94" height="16" rx="4" class="r-bar"/><line x1="359.5" y1="72.75" x2="359.5" y2="87.25" class="track"/>
-<rect x="304.38" y="104" width="158.76" height="16" rx="4" class="r-bar"/><line x1="359.5" y1="104.75" x2="359.5" y2="119.25" class="track"/>
-<rect x="293.35" y="136" width="154.35" height="16" rx="4" class="r-bar"/><line x1="359.5" y1="136.75" x2="359.5" y2="151.25" class="track"/>
+<rect x="451.7" y="136" width="116.28" height="16" class="band"/><text x="455.7" y="148" class="val" text-anchor="start">0.55 (0.20–0.90)</text>
+<rect x="258.07" y="72" width="149.94" height="16" rx="4" class="r-bar"/><line x1="359.5" y1="72.75" x2="359.5" y2="87.25" class="track"/><circle cx="333.04" cy="80" r="5" class="r-pt"/>
+<rect x="304.38" y="104" width="158.76" height="16" rx="4" class="r-bar"/><line x1="359.5" y1="104.75" x2="359.5" y2="119.25" class="track"/><circle cx="383.76" cy="112" r="5" class="r-pt"/>
+<rect x="293.35" y="136" width="154.35" height="16" rx="4" class="r-bar"/><line x1="359.5" y1="136.75" x2="359.5" y2="151.25" class="track"/><circle cx="370.53" cy="144" r="5" class="r-pt"/>
 </svg>
 <svg id="dg-effects-phone" class="dg dg-range dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="298" viewBox="0 0 264 298" role="img" aria-label="Standardized effect of worked examples, with 95% intervals. Tasks finished: d 0.38, interval 0.04 to 0.72. Time, faster: d 0.61, interval 0.25 to 0.97. Confidence: d 0.55, interval 0.20 to 0.90. No interval includes 0.">
 <style>
@@ -633,18 +633,18 @@ footer p { margin: 0; }
 <text x="120" y="64" class="val" text-anchor="middle">0.5</text>
 <text x="212" y="64" class="val" text-anchor="middle">1.5</text>
 <text x="20" y="100" class="row" text-anchor="start">Tasks finished</text>
-<rect x="73.68" y="108" width="134.28" height="16" class="band"/><text x="77.68" y="120" class="val" text-anchor="start">0.04–0.72, d = 0.38</text>
+<rect x="73.68" y="108" width="116.28" height="16" class="band"/><text x="77.68" y="120" class="val" text-anchor="start">0.38 (0.04–0.72)</text>
 <text x="20" y="166" class="row" text-anchor="start">Time, faster</text>
-<rect x="93" y="174" width="134.28" height="16" class="band"/><text x="97" y="186" class="val" text-anchor="start">0.25–0.97, d = 0.61</text>
+<rect x="93" y="174" width="116.28" height="16" class="band"/><text x="97" y="186" class="val" text-anchor="start">0.61 (0.25–0.97)</text>
 <text x="20" y="232" class="row" text-anchor="start">Confidence</text>
-<rect x="88.4" y="240" width="118.44" height="16" class="band"/><text x="92.4" y="252" class="val" text-anchor="start">0.2–0.9, d = 0.55</text>
-<rect x="77.68" y="126" width="62.56" height="16" rx="4" class="r-bar"/><line x1="120" y1="126.75" x2="120" y2="141.25" class="track"/>
-<rect x="97" y="192" width="66.24" height="16" rx="4" class="r-bar"/><line x1="120" y1="192.75" x2="120" y2="207.25" class="track"/>
-<rect x="92.4" y="258" width="64.4" height="16" rx="4" class="r-bar"/><line x1="120" y1="258.75" x2="120" y2="273.25" class="track"/>
+<rect x="88.4" y="240" width="116.28" height="16" class="band"/><text x="92.4" y="252" class="val" text-anchor="start">0.55 (0.20–0.90)</text>
+<rect x="77.68" y="126" width="62.56" height="16" rx="4" class="r-bar"/><line x1="120" y1="126.75" x2="120" y2="141.25" class="track"/><circle cx="108.96" cy="134" r="5" class="r-pt"/>
+<rect x="97" y="192" width="66.24" height="16" rx="4" class="r-bar"/><line x1="120" y1="192.75" x2="120" y2="207.25" class="track"/><circle cx="130.12" cy="200" r="5" class="r-pt"/>
+<rect x="92.4" y="258" width="64.4" height="16" rx="4" class="r-bar"/><line x1="120" y1="258.75" x2="120" y2="273.25" class="track"/><circle cx="124.6" cy="266" r="5" class="r-pt"/>
 </svg>
 <details class="dg-words">
 <summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>The diagram in words</summary>
-<div class="table-wrap is-text" role="region" aria-label="The rows of the range chart" tabindex="0"><table><thead><tr><th scope="col">Row</th><th scope="col">Value, in d</th></tr></thead><tbody><tr><th scope="row">Tasks finished</th><td>0.04–0.72, d = 0.38</td></tr><tr><th scope="row">Time, faster</th><td>0.25–0.97, d = 0.61</td></tr><tr><th scope="row">Confidence</th><td>0.2–0.9, d = 0.55</td></tr></tbody></table></div>
+<div class="table-wrap is-text" role="region" aria-label="The rows of the range chart" tabindex="0"><table><thead><tr><th scope="col">Row</th><th scope="col" class="num">Estimate, in d</th><th scope="col" class="num">Low</th><th scope="col" class="num">High</th></tr></thead><tbody><tr><th scope="row">Tasks finished</th><td class="num">0.38</td><td class="num">0.04</td><td class="num">0.72</td></tr><tr><th scope="row">Time, faster</th><td class="num">0.61</td><td class="num">0.25</td><td class="num">0.97</td></tr><tr><th scope="row">Confidence</th><td class="num">0.55</td><td class="num">0.20</td><td class="num">0.90</td></tr></tbody></table></div>
 <ul><li>A line at 0 d: no difference.</li></ul>
 </details>
 <!-- /docent:diagram -->
@@ -926,7 +926,7 @@ d = mean(differences) / sd(differences)</code></pre>
   </div>
 </footer>
 <script>
-// docent:kit 0.24.0
+// docent:kit 0.25.0
 (() => {
   const root = document.documentElement;
   root.classList.add('js');

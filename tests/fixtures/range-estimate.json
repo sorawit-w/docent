@@ -1,0 +1,13 @@
+{
+  "id": "not-repeated",
+  "kind": "range",
+  "label": "About 18% of all reports could not be repeated. Search, Checkout and Settings had the highest shares, about 21% to 23%. Profile had the lowest, 9%, but its interval is wide, from 4% to 19%.",
+  "scale": {"from": 0, "to": 40, "step": 10, "unit": "%", "marks": [{"at": 18, "name": "all areas"}]},
+  "rows": [
+    {"name": "Sign-in", "at": 14, "from": 11, "to": 18},
+    {"name": "Search", "at": 23, "from": 18, "to": 28},
+    {"name": "Checkout", "at": 21, "from": 16, "to": 27},
+    {"name": "Settings", "at": 23, "from": 16, "to": 32},
+    {"name": "Profile", "at": 9, "from": 4, "to": 19}
+  ]
+}
