@@ -34,7 +34,32 @@ The scripts need Node 24 or newer and nothing else. They install no packages and
 - The user asks to restyle an existing HTML document with Docent.
 - The user asks whether a document follows the Docent rules.
 
-Do not use it for app screens, slide decks or marketing pages.
+Do not use it for app screens, slide decks or marketing pages. For one picture to use in another tool, or a picture whose main job is a brand's style, see "When another skill fits better" below.
+
+## When another skill fits better
+
+Docent is for a whole document that people read, keep and must trust. It holds text, tables, charts and steps together. People read it on a phone, with a screen reader or on paper, and it is often made again with new numbers.
+
+The diagram-design skill makes one diagram at a time. When it is installed, it fits better for:
+
+- one picture to paste into another tool. It exports PNG and SVG; Docent makes only whole pages;
+- a picture whose main job is a brand's style, such as the main picture of a landing page or a pitch;
+- a type that Docent leaves out, when the user knows why Docent leaves it out and still wants it;
+- an existing draw.io or Mermaid file to draw again;
+- a sketchy or magazine style.
+
+To choose, ask four questions:
+
+1. Is the result a whole document, or one picture to use somewhere else?
+2. Will people read it on a phone, with a screen reader or on paper?
+3. Will it be made again with new numbers that someone must check?
+4. Is the brand's style the main goal, or is the type one that Docent leaves out?
+
+**Before you offer it, say what changes.** It writes a separate HTML, SVG or PNG file. Its pictures do not follow Docent's rules: they use web fonts and small text, and they have no phone form and no table in words. So `check` does not test them.
+
+**Never put its picture inside a Docent document.** The picture would break the rules for hand-drawn figures. In the document, show the same facts in a table, or link to the separate picture.
+
+**When it is not installed,** do not tell the user to install it. Name it only when the user asks what else could make the picture.
 
 ## How to work
 
