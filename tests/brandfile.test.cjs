@@ -103,3 +103,42 @@ test("the host block holds host tokens only, and stays in every other test of ch
   assert.match(errors, /\[network\.url\]/);
   assert.deepEqual(checkDocument(stampHtml(page, { host: [["host-sans", '"Brand Sans", system-ui, sans-serif'], ["host-ink", "#3b2a5c"]] }).html).errors, [], "a block with a font stack has the right shape");
 });
+
+test("check notes a page whose palette, logo, tagline, credit or profile differs from the repo file, in one note", () => {
+  const root = path.join(assets, "sample-repo");
+  const config = { ...readConfig(path.join(root, ".docent", "config.json"), { palettes: PALETTES, profiles: PROFILES }), label: ".docent/config.json" };
+  const page = fs.readFileSync(path.join(root, "docs", "report-a-bug.html"), "utf8");
+  const notes = (change, c = config) => checkDocument(change(page), { config: c }).notes;
+  assert.deepEqual(notes((h) => h), [], "the sample page follows its file");
+  assert.deepEqual(notes((h) => h.replace("Small tools for careful teams.", "Small tools for busy teams.")), ['[brand.differs] the tagline (the page has "Small tools for busy teams.", the file "Small tools for careful teams.") differs from .docent/config.json. A page keeps its own brand when the file changes; if the page should follow the file, change the page, or write data-brand="off" on a page about another product']);
+  const many = notes((h) => h.replace('data-palette="sepia"', 'data-palette="harbor"').replace("Made with Docent</p>", 'Made with <a href="https://github.com/sorawit-w/docent">Docent</a></p>').replace('data-profile="standard"', 'data-profile="brief"').replace(/<svg class="logo"[\s\S]*?<\/svg>/, ""));
+  assert.equal(many.length, 1, "one note for the page");
+  assert.match(many[0], /^\[brand\.differs\] the palette \(the page has "harbor", the file "sepia"\), the logo \(the page has none\), the credit \(the page has "link", the file "text"\) and the profile \(the page has "brief", the file "standard"\) differ from \.docent\/config\.json\./);
+  assert.match(notes((h) => h.replace(/(<svg class="logo"[^>]*>[\s\S]*?)rx="2"/, '$1rx="3"'))[0], /^\[brand\.differs\] the logo differs/, "a logo whose shapes differ from the file's");
+  assert.match(notes((h) => h.replace('<svg class="logo" viewBox="0 0 24 24"', '<svg class="logo" viewBox="0 0 48 48"'))[0], /^\[brand\.differs\] the logo differs/, "a logo whose viewBox differs: it draws at another size");
+  assert.match(notes((h) => h.replace('<svg class="logo" viewBox="0 0 24 24"', '<svg class="logo" viewBox="0 0 24 24" fill="#5b3fa8"'))[0], /^\[brand\.differs\] the logo differs/, "an inherited fill changes the drawing too");
+  const { logoShapes } = require("../skills/docent/scripts/lib/config.cjs");
+  const file = fs.readFileSync(path.join(root, config.data.logo), "utf8");
+  assert.equal(logoShapes(`<?xml version="1.0" encoding="UTF-8"?>\n<!-- Exported by a drawing tool -->\n<!DOCTYPE svg>\n${file}\n<!-- end -->\n`), logoShapes(file), "a file's XML declaration, doctype and comments around it are not part of the drawing");
+  assert.deepEqual(notes((h) => h.replace('rx="2" fill="currentColor"', "fill='currentColor'   rx='2'")), [], "the order and the quotes of the attributes are not part of the drawing");
+  assert.deepEqual(notes((h) => h.replace(/(<svg class="logo"[\s\S]*?<rect [^>]*?)\/>/, "$1></rect>")), [], "an empty element closed by its own end tag is the same element");
+  assert.deepEqual(notes((h) => h.replace("Small tools for careful teams.", "Small tools for careful&nbsp;teams&#46;")), [], "a character written as a reference is the same character");
+  assert.match(notes((h) => h.replace("Small tools for careful teams.", "Small tools &#1114112; &#x110000;"))[0], /^\[brand\.differs\] the tagline/, "a reference past the last code point does not stop check");
+  const shaded = (id) => `<svg viewBox="0 0 24 24"><defs><linearGradient id="${id}"><stop offset="0" stop-color="#5b3fa8"/><stop offset="1" stop-color="#3b2a5c"/></linearGradient></defs><rect width="24" height="24" fill="url(#${id})"/></svg>`;
+  assert.equal(logoShapes(shaded("shade-dark")), logoShapes(shaded("shade")), "a logo's own ids, renamed so two versions can stand in one page, are not part of the drawing");
+  assert.notEqual(logoShapes(shaded("shade").replace("#3b2a5c", "#000000")), logoShapes(shaded("shade")));
+  assert.equal(logoShapes(shaded("shade").replace("<svg ", '<svg id="brand-mark" ')), logoShapes(shaded("shade")), "an id on the <svg> itself belongs to the page");
+  assert.deepEqual(notes((h) => h.replace("Small tools for careful teams.", "x").replace('<html lang="en"', '<html lang="en" data-brand="off"')), [], "a page about another product takes nothing from the file");
+  const off = { ...config, data: { ...config.data, rules: { "brand.differs": { off: true, reason: "Old release notes keep their brand." } } } };
+  assert.deepEqual(notes((h) => h.replace("Small tools for careful teams.", "x"), off), [], "a team may turn the note off");
+  const unbranded = { label: ".docent/config.json", base: root, data: { version: 1 } };
+  assert.deepEqual(checkDocument(specimen, { config: unbranded }).notes, [], "a file with no brand fields and a page with none agree: Docent's own colors, no logo, no tagline, the credit as a link");
+});
+
+test("a page that differs from the file passes check, with the note in the output", () => {
+  const root = repo({ ".docent/config.json": { version: 1, palette: "plum", tagline: "Small tools for careful teams." }, "docs/a.html": specimen });
+  const { code, out } = run("check.cjs", ["docs/a.html"], root);
+  assert.equal(code, 0, out);
+  assert.match(out, /check docs\/a\.html: note \[brand\.differs\]: the palette \(the page has none, the file "plum"\) and the tagline \(the page has none, the file "Small tools for careful teams\."\) differ from \.docent\/config\.json\./);
+  assert.match(out, /check docs\/a\.html: 0 errors, 2 warnings, 1 note/);
+});

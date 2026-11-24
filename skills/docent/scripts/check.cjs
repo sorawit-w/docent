@@ -7,7 +7,7 @@
 require("./lib/node.cjs").warnOldNode(); // first, so that an old Node is named before anything else can fail
 const fs = require("node:fs");
 const path = require("node:path");
-const { findConfig, readConfig } = require("./lib/config.cjs");
+const { findConfig, readConfig, logoShapes, logosOf } = require("./lib/config.cjs");
 const { VERSION, cssBlock, jsBlock, findKit, isDeck, htmlAttr, hostOf } = require("./lib/kit.cjs");
 const { checkDeck, roomAt } = require("./lib/slide.cjs");
 const { renderDiagram, slideRoomsOf } = require("./lib/diagram.cjs");
@@ -604,6 +604,26 @@ function checkDocument(html, options = {}) {
     const line = options.config.lines && options.config.lines[id] ? `, line ${options.config.lines[id]}` : "";
     changed.push(say(id, `off in ${options.config.label}${line} (${JSON.stringify(change.reason)}); ${found.length === 1 ? "1 place" : `${found.length} places`} on the page, the first: ${split(found[0]).text}`));
     for (const list of [errors, warnings]) for (let i = list.length - 1; i >= 0; i -= 1) if (split(list[i]).id === id) list.splice(i, 1);
+  }
+  // 13. A brand that differs from the repo file: the palette, the logo, the tagline, the credit and the profile are the page's own content,
+  // which a reader may have seen, so the page keeps them when the file changes; one note makes sure the author knows (section 8).
+  const file = options.config && options.config.data;
+  if (file && brandValue !== "off" && !Object.hasOwn(off, "brand.differs")) {
+    const q = (v) => (v == null ? "none" : JSON.stringify(v)), differs = [];
+    if ((palette ?? null) !== (file.palette ?? null)) differs.push(`the palette (the page has ${q(named)}, the file ${q(file.palette ?? null)})`);
+    const fileLogos = options.config.logos === undefined ? logosOf(options.config) : options.config.logos;
+    const pageLogos = logo.logos.length ? Object.fromEntries(logo.logos.map((l) => [l.forTheme || "both", l.raster ? (l.text.match(/\bsrc\s*=\s*["']([^"']*)/i) || [])[1] : logoShapes(l.text)])) : null;
+    if (JSON.stringify(pageLogos && Object.entries(pageLogos).sort()) !== JSON.stringify(fileLogos && Object.entries(fileLogos).sort())) differs.push(!pageLogos ? "the logo (the page has none)" : !fileLogos ? "the logo (the file names none)" : "the logo");
+    const tagline = (((footer || "").match(/<p\b[^>]*\bclass="(?:[^"]*\s)?tagline(?:\s[^"]*)?"[^>]*>([\s\S]*?)<\/p>/i) || [])[1]);
+    // The text a reader sees: a character written as a reference, such as &#46; or &nbsp;, is the character itself.
+    const char = (n) => (n <= 0x10ffff ? String.fromCodePoint(n) : "\ufffd"); // a reference past the last code point reads as the replacement character
+    const seen = tagline == null ? null : plain(tagline.replace(/&#(\d+);/g, (m, n) => char(Number(n))).replace(/&#x([0-9a-f]+);/gi, (m, n) => char(parseInt(n, 16))).replace(/&nbsp;/g, " "));
+    if (seen !== (file.tagline == null ? null : plain(file.tagline))) differs.push(`the tagline (the page has ${q(seen)}, the file ${q(file.tagline ?? null)})`);
+    const credit = ((footer || "").match(/<p\b[^>]*\bclass="(?:[^"]*\s)?credit(?:\s[^"]*)?"[^>]*>([\s\S]*?)<\/p>/i) || [])[1];
+    const pageCredit = credit == null || !/Made with Docent/.test(plain(credit)) ? "none" : /<a\b/i.test(credit) ? "link" : "text";
+    if (pageCredit !== (file.credit ?? "link")) differs.push(`the credit (the page has ${q(pageCredit)}, the file ${q(file.credit ?? "link")})`);
+    if (file.profile != null && (profile ?? "standard") !== file.profile) differs.push(`the profile (the page has ${q(profile ?? "standard")}, the file ${q(file.profile)})`);
+    if (differs.length) changed.push(say("brand.differs", `${differs.length === 1 ? differs[0] : `${differs.slice(0, -1).join(", ")} and ${differs.at(-1)}`} differ${differs.length === 1 ? "s" : ""} from ${options.config.label}. A page keeps its own brand when the file changes; if the page should follow the file, change the page, or write data-brand="off" on a page about another product`));
   }
   return { errors, warnings, notes: changed };
 }

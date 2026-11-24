@@ -107,6 +107,36 @@ function readConfig(file, { palettes = [], profiles = [] } = {}) {
   return { file: abs, base, data: errors.length ? null : data, errors, lines: errors.length ? {} : linesOf(fs.readFileSync(abs, "utf8"), data) };
 }
 
+// The attributes of a logo's <svg> that belong to the page, not to the drawing: the slot size, the class, the theme, and the name for a
+// screen reader. Every other one, such as viewBox, fill, stroke or transform, changes what the reader sees.
+const PAGE_ONLY = /^(class|width|height|role|aria-[\w-]+|data-for|xmlns(:\w+)?|focusable|id)$/i;
+/** What a logo draws, to compare a page's logo with a file: each tag with its attributes in order and in double quotes, the text between
+    tags without the space around it, and no comment. The <svg> keeps only the attributes that change the drawing. The logo's own ids are
+    numbered in order, with every url(#…) and href that points at them, because a page must rename them when it holds two versions. */
+function logoShapes(svg) {
+  // A file may start with an XML declaration, a comment or a doctype: none of them is drawn.
+  const text = svg.replace(/<!--[\s\S]*?-->/g, "").replace(/^(?:\s|<\?xml[\s\S]*?\?>|<!DOCTYPE[^>]*>)+/i, "").trim();
+  const ids = new Map();
+  const inside = text.replace(/^<svg\b[^>]*>/i, ""); // an id on the <svg> itself belongs to the page, and is left out
+  for (const [, id] of inside.matchAll(/\sid\s*=\s*["']([^"']+)["']/g)) if (!ids.has(id)) ids.set(id, `id${ids.size + 1}`);
+  const local = (value) => value.replace(/url\(\s*#([^)\s]+)\s*\)/g, (m, id) => (ids.has(id) ? `url(#${ids.get(id)})` : m)).replace(/^#(.+)$/, (m, id) => (ids.has(id) ? `#${ids.get(id)}` : m));
+  let root = true;
+  return text.replace(/<(\/?)([A-Za-z][\w:.-]*)((?:\s+[^\s"'>/=]+(?:\s*=\s*(?:"[^"]*"|'[^']*'))?)*)\s*(\/?)>/g, (all, close, name, attrs, self) => {
+    if (close) return `</${name}>`;
+    const list = [...attrs.matchAll(/([^\s"'=]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'))?/g)].filter(([, a]) => !(root && name.toLowerCase() === "svg" && PAGE_ONLY.test(a))).map(([, a, d, q]) => { const v = d ?? q ?? ""; return `${a}="${a === "id" ? ids.get(v) || v : local(v)}"`; }).sort();
+    root = false;
+    return `<${name}${list.length ? ` ${list.join(" ")}` : ""}${self ? "/" : ""}>`;
+  }).replace(/>\s+</g, "><").replace(/>\s+/g, ">").replace(/\s+</g, "<").replace(/<([A-Za-z][\w:.-]*)([^>]*?)><\/\1>/g, "<$1$2/>"); // an empty element, closed or self-closed
+}
+
+/** The logos that a good repo file names, as a page carries them: { both | light | dark: shapes of an SVG, or a data URI }. */
+function logosOf(config) {
+  const logo = config.data && config.data.logo;
+  if (logo == null) return null;
+  const read = (p) => { const full = path.resolve(config.base, p), ext = path.extname(p).slice(1).toLowerCase(); return ext === "svg" ? logoShapes(fs.readFileSync(full, "utf8")) : `data:image/${ext};base64,${fs.readFileSync(full).toString("base64")}`; };
+  return typeof logo === "string" ? { both: read(logo) } : Object.fromEntries(Object.entries(logo).map(([k, p]) => [k, read(p)]));
+}
+
 /** The line of the file where each rule change stands, so a note can name it: { id: line }. */
 function linesOf(text, data) {
   const out = {}, rows = text.split(/\r?\n/), start = rows.findIndex((r) => /"rules"\s*:/.test(r));
@@ -117,4 +147,4 @@ function linesOf(text, data) {
   return out;
 }
 
-module.exports = { NAME, VERSION, COLORS, FONTS, FIELDS, repoRoot, findConfig, readConfig };
+module.exports = { NAME, VERSION, COLORS, FONTS, FIELDS, repoRoot, findConfig, readConfig, logoShapes, logosOf };
