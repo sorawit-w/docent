@@ -21,11 +21,14 @@ const SCALE = { most: 1.5, least: 1.25 }; // a drawing on a slide stands at 1.5 
 const LIMIT = { headingLines: 2, points: 3, cards: 3, columns: 4, rows: 5, paragraphLines: 2, codeLines: 8 };
 
 const VOID = new Set(["area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "source", "track", "wbr"]);
-const plain = (s) => s.replace(/<[^>]*>/g, " ").replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#39;|&apos;/g, "'").replace(/&nbsp;/g, " ").replace(/\s+/g, " ").trim();
+// The text of markup. A <br> stays a line break ("\n"), because it starts a new line on the slide; other white space is one space.
+const plain = (s) => s.replace(/\s+/g, " ").replace(/<br\b[^>]*>/gi, "\n").replace(/<[^>]*>/g, " ").replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#39;|&apos;/g, "'").replace(/&nbsp;/g, " ").replace(/[^\S\n]+/g, " ").replace(/ *\n */g, "\n").trim();
 const hasClass = (attrs, name) => new RegExp(`\\bclass="(?:[^"]*\\s)?${name}(?:\\s[^"]*)?"`).test(attrs);
 const attrOf = (attrs, name) => (attrs.match(new RegExp(`\\b${name}="([^"]*)"`)) || [])[1];
 const px = (n) => Math.round(n);
-const lines = (text, size, width, weight = 400) => Math.max(1, Math.ceil(textWidth(text, size, weight) / width));
+const lines = (text, size, width, weight = 400) => text.split("\n").reduce((n, line) => n + Math.max(1, Math.ceil(textWidth(line, size, weight) / width)), 0);
+const oneLine = (text, size, width) => !text.includes("\n") && textWidth(text, size) <= width;
+const quote = (text) => { const t = text.replace(/\n/g, " "); return `"${t.length > 50 ? `${t.slice(0, 50)}…` : t}"`; };
 
 /** The elements directly inside a piece of markup: [{ tag, attrs, inner, start, end }]. Text between them is skipped. */
 function elements(markup) {
@@ -94,14 +97,14 @@ function measureBody(el, room) {
     raw.forEach((card, i) => {
       const said = [...card.matchAll(/<p\b([^>]*)>([\s\S]*?)<\/p>/gi)].filter(([, a]) => !hasClass(a, "big")).map(([, , t]) => plain(t));
       if (said.length > 1) problems.push(`card ${i + 1} has ${said.length} lines under its number; a card on a slide has one`);
-      else if (said.length && textWidth(said[0], SIZE.small) > width) problems.push(`the line of card ${i + 1} ("${said[0]}") is longer than one line of a card at 21px (${px(width)}px); say it in fewer words`);
+      else if (said.length && !oneLine(said[0], SIZE.small, width)) problems.push(`the line of card ${i + 1} (${quote(said[0])}) is longer than one line of a card at 21px (${px(width)}px); say it in fewer words`);
     });
     return { kind: "large numbers", height: 13 + LINE.heading + 4 + LINE.small, problems };
   }
   if (tag === "ul" || tag === "ol") {
     const points = items(inner);
     if (points.length > LIMIT.points) problems.push(`it has ${points.length} points; a slide holds at most ${LIMIT.points}. More than three points is a list to read, not a point to see`);
-    points.forEach((p, i) => { if (textWidth(p, SIZE.large) > INNER.width - INDENT) problems.push(`point ${i + 1} ("${p.length > 50 ? `${p.slice(0, 50)}…` : p}") is longer than one line at 30px (about 75 characters)`); });
+    points.forEach((p, i) => { if (!oneLine(p, SIZE.large, INNER.width - INDENT)) problems.push(`point ${i + 1} (${quote(p)}) is longer than one line at 30px (about 75 characters)`); });
     return { kind: "points", height: points.length * LINE.large + Math.max(0, points.length - 1) * POINT_GAP, problems };
   }
   if (tag === "p" && !attrOf(attrs, "class")) {
@@ -162,7 +165,7 @@ function checkDeck(html) {
     else if (heading.tag !== want) errors.push(`${name} starts with an <${heading.tag}>; ${title ? "the title slide holds the <h1>" : "a slide after the title slide starts with an <h2>"}`);
     if (headings.length > 1) errors.push(`${name} has ${headings.length} headings; a slide has one heading, a sentence that says its point`);
     const headingLines = heading ? lines(plain(heading.inner), SIZE.heading, INNER.width, 600) : 0;
-    if (headingLines > LIMIT.headingLines) errors.push(`${name}: the heading "${plain(heading.inner)}" is about ${headingLines} lines at 52px; a slide's heading is at most ${LIMIT.headingLines} lines (about 80 characters). Say the point in fewer words`);
+    if (headingLines > LIMIT.headingLines) errors.push(`${name}: the heading ${quote(plain(heading.inner))} is about ${headingLines} lines at 52px; a slide's heading is at most ${LIMIT.headingLines} lines (about 80 characters). Say the point in fewer words`);
     let height = headingLines * LINE.heading;
     const body = parts.filter((el) => !/^h[1-6]$/.test(el.tag));
     if (title) {
