@@ -1,0 +1,128 @@
+<svg id="dg-reports-by-month" class="dg dg-line dg-auto" xmlns="http://www.w3.org/2000/svg" width="640" height="328" viewBox="0 0 640 328" role="img" aria-label="Sign-in reports rose from 62 in January to 138 in June, after the new sign-in page in May, then fell to 66 in December after the fix in July. Search and Checkout stayed between 28 and 52 all year.">
+<style>
+#dg-reports-by-month{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-reports-by-month .ground{fill:var(--fig,#f2f3f9)}
+#dg-reports-by-month .band{fill:var(--bg,#fbfbfe)}
+#dg-reports-by-month .track{stroke:var(--line,#d3d6e3)}
+#dg-reports-by-month .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-reports-by-month .head{fill:var(--text,#1c1f2e)}
+#dg-reports-by-month .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-reports-by-month .stop.end{fill:var(--text,#1c1f2e)}
+#dg-reports-by-month .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-reports-by-month .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-reports-by-month .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-reports-by-month .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-reports-by-month .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-reports-by-month .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-reports-by-month .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-reports-by-month .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-reports-by-month .sub,#dg-reports-by-month .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-reports-by-month .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-reports-by-month .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-reports-by-month .dim{font-size:14px;fill:var(--muted,#575d75)}
+#dg-reports-by-month .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-reports-by-month .ln{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}#dg-reports-by-month .pt{fill:var(--text,#1c1f2e)}
+#dg-reports-by-month .ln-o{fill:none;stroke:var(--muted,#575d75);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}#dg-reports-by-month .pt-o{fill:var(--muted,#575d75)}
+#dg-reports-by-month .ln-g{fill:none;stroke:var(--line,#d3d6e3);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}#dg-reports-by-month .pt-g{fill:var(--line,#d3d6e3)}
+#dg-reports-by-month .ld{stroke:var(--muted,#575d75);stroke-width:1}
+#dg-reports-by-month .r-ref{stroke:var(--muted,#575d75)}
+@media (prefers-reduced-motion:reduce){#dg-reports-by-month .pulse{animation:none!important}#dg-reports-by-month .pulse{display:none!important}}
+@media print{#dg-reports-by-month{max-width:100%;height:auto}#dg-reports-by-month .pulse{display:none!important}}
+#dg-reports-by-month-phone{display:none}
+</style>
+<rect width="640" height="328" class="ground"/>
+<rect x="8" y="36" width="624" height="284" rx="10" class="band"/>
+<line x1="52" y1="292" x2="549" y2="292" class="track"/>
+<line x1="52" y1="225.33" x2="549" y2="225.33" class="track"/>
+<line x1="52" y1="158.67" x2="549" y2="158.67" class="track"/>
+<line x1="52" y1="92" x2="549" y2="92" class="track"/>
+<text x="20" y="24" class="sub" text-anchor="start">Reports, scale from 0.</text>
+<text x="52" y="310" class="val" text-anchor="middle">Jan</text>
+<text x="97.18" y="310" class="val" text-anchor="middle">Feb</text>
+<text x="142.36" y="310" class="val" text-anchor="middle">Mar</text>
+<text x="187.55" y="310" class="val" text-anchor="middle">Apr</text>
+<text x="232.73" y="310" class="val" text-anchor="middle">May</text>
+<text x="277.91" y="310" class="val" text-anchor="middle">Jun</text>
+<text x="323.09" y="310" class="val" text-anchor="middle">Jul</text>
+<text x="368.27" y="310" class="val" text-anchor="middle">Aug</text>
+<text x="413.45" y="310" class="val" text-anchor="middle">Sep</text>
+<text x="458.64" y="310" class="val" text-anchor="middle">Oct</text>
+<text x="503.82" y="310" class="val" text-anchor="middle">Nov</text>
+<text x="549" y="310" class="val" text-anchor="middle">Dec</text>
+<text x="236.73" y="58" class="sub" text-anchor="start">New sign-in page</text>
+<text x="327.09" y="74" class="sub" text-anchor="start">Sign-in fix</text>
+<text x="557" y="229" class="dim" text-anchor="start">Search</text>
+<text x="557" y="250.33" class="dim" text-anchor="start">Checkout</text>
+<text x="557" y="209" class="row" text-anchor="start">Sign-in</text>
+<text x="44" y="296" class="val" text-anchor="end">0</text>
+<text x="44" y="229.33" class="val" text-anchor="end">50</text>
+<text x="44" y="162.67" class="val" text-anchor="end">100</text>
+<text x="44" y="96" class="val" text-anchor="end">150</text>
+<line x1="232.73" y1="292" x2="232.73" y2="49" class="ld"/><line x1="323.09" y1="292" x2="323.09" y2="65" class="ld"/>
+<path d="M52,238.67 L97.18,236 L142.36,240 L187.55,232 L232.73,228 L277.91,233.33 L323.09,230.67 L368.27,225.33 L413.45,229.33 L458.64,226.67 L503.82,222.67 L549,224" class="ln-o"/>
+<path d="M52,252 L97.18,254.67 L142.36,245.33 L187.55,248 L232.73,250.67 L277.91,244 L323.09,246.67 L368.27,252 L413.45,253.33 L458.64,248 L503.82,249.33 L549,245.33" class="ln-o"/>
+<path d="M52,209.33 L97.18,198.67 L142.36,184 L187.55,165.33 L232.73,132 L277.91,108 L323.09,117.33 L368.27,142.67 L413.45,164 L458.64,180 L503.82,197.33 L549,204" class="ln"/><circle cx="52" cy="209.33" r="3" class="pt"/><circle cx="97.18" cy="198.67" r="3" class="pt"/><circle cx="142.36" cy="184" r="3" class="pt"/><circle cx="187.55" cy="165.33" r="3" class="pt"/><circle cx="232.73" cy="132" r="3" class="pt"/><circle cx="277.91" cy="108" r="3" class="pt"/><circle cx="323.09" cy="117.33" r="3" class="pt"/><circle cx="368.27" cy="142.67" r="3" class="pt"/><circle cx="413.45" cy="164" r="3" class="pt"/><circle cx="458.64" cy="180" r="3" class="pt"/><circle cx="503.82" cy="197.33" r="3" class="pt"/><circle cx="549" cy="204" r="3" class="pt"/>
+</svg>
+<svg id="dg-reports-by-month-phone" class="dg dg-line dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="268" viewBox="0 0 264 268" role="img" aria-label="Sign-in reports rose from 62 in January to 138 in June, after the new sign-in page in May, then fell to 66 in December after the fix in July. Search and Checkout stayed between 28 and 52 all year.">
+<style>
+#dg-reports-by-month-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-reports-by-month-phone .ground{fill:var(--fig,#f2f3f9)}
+#dg-reports-by-month-phone .band{fill:var(--bg,#fbfbfe)}
+#dg-reports-by-month-phone .track{stroke:var(--line,#d3d6e3)}
+#dg-reports-by-month-phone .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-reports-by-month-phone .head{fill:var(--text,#1c1f2e)}
+#dg-reports-by-month-phone .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-reports-by-month-phone .stop.end{fill:var(--text,#1c1f2e)}
+#dg-reports-by-month-phone .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-reports-by-month-phone .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-reports-by-month-phone .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-reports-by-month-phone .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-reports-by-month-phone .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-reports-by-month-phone .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-reports-by-month-phone .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-reports-by-month-phone .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-reports-by-month-phone .sub,#dg-reports-by-month-phone .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-reports-by-month-phone .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-reports-by-month-phone .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-reports-by-month-phone .dim{font-size:14px;fill:var(--muted,#575d75)}
+#dg-reports-by-month-phone .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-reports-by-month-phone .ln{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}#dg-reports-by-month-phone .pt{fill:var(--text,#1c1f2e)}
+#dg-reports-by-month-phone .ln-o{fill:none;stroke:var(--muted,#575d75);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}#dg-reports-by-month-phone .pt-o{fill:var(--muted,#575d75)}
+#dg-reports-by-month-phone .ln-g{fill:none;stroke:var(--line,#d3d6e3);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}#dg-reports-by-month-phone .pt-g{fill:var(--line,#d3d6e3)}
+#dg-reports-by-month-phone .ld{stroke:var(--muted,#575d75);stroke-width:1}
+#dg-reports-by-month-phone .r-ref{stroke:var(--muted,#575d75)}
+@media (prefers-reduced-motion:reduce){#dg-reports-by-month-phone .pulse{animation:none!important}#dg-reports-by-month-phone .pulse{display:none!important}}
+@media print{#dg-reports-by-month-phone{max-width:100%;height:auto}#dg-reports-by-month-phone .pulse{display:none!important}}
+@media (max-width:736px){#dg-reports-by-month{display:none}#dg-reports-by-month-phone{display:block}}
+@media print{#dg-reports-by-month{display:block!important}#dg-reports-by-month-phone{display:none!important}}
+</style>
+<rect width="264" height="268" class="ground"/>
+<rect x="8" y="36" width="248" height="224" rx="10" class="band"/>
+<line x1="20" y1="232" x2="161" y2="232" class="track"/>
+<line x1="20" y1="185.33" x2="161" y2="185.33" class="track"/>
+<line x1="20" y1="138.67" x2="161" y2="138.67" class="track"/>
+<line x1="20" y1="92" x2="161" y2="92" class="track"/>
+<text x="20" y="24" class="sub" text-anchor="start">Reports, scale from 0.</text>
+<text x="22.5" y="250" class="val" text-anchor="middle">Jan</text>
+<text x="58.45" y="250" class="val" text-anchor="middle">Apr</text>
+<text x="96.91" y="250" class="val" text-anchor="middle">Jul</text>
+<text x="135.36" y="250" class="val" text-anchor="middle">Oct</text>
+<text x="75.27" y="58" class="sub" text-anchor="start">New sign-in page</text>
+<text x="100.91" y="74" class="sub" text-anchor="start">Sign-in fix</text>
+<text x="181" y="189.71" class="dim" text-anchor="start">Search</text>
+<text x="181" y="207.71" class="dim" text-anchor="start">Checkout</text>
+<text x="181" y="171.71" class="row" text-anchor="start">Sign-in</text>
+<text x="20" y="228" class="val" text-anchor="start">0</text>
+<text x="20" y="181.33" class="val" text-anchor="start">50</text>
+<text x="20" y="134.67" class="val" text-anchor="start">100</text>
+<text x="20" y="88" class="val" text-anchor="start">150</text>
+<line x1="71.27" y1="232" x2="71.27" y2="49" class="ld"/><line x1="96.91" y1="232" x2="96.91" y2="65" class="ld"/>
+<path d="M20,194.67 L32.82,192.8 L45.64,195.6 L58.45,190 L71.27,187.2 L84.09,190.93 L96.91,189.07 L109.73,185.33 L122.55,188.13 L135.36,186.27 L148.18,183.47 L161,184.4" class="ln-o"/>
+<path d="M20,204 L32.82,205.87 L45.64,199.33 L58.45,201.2 L71.27,203.07 L84.09,198.4 L96.91,200.27 L109.73,204 L122.55,204.93 L135.36,201.2 L148.18,202.13 L161,199.33" class="ln-o"/><line x1="165" y1="199.33" x2="177" y2="202.71" class="ld"/>
+<path d="M20,174.13 L32.82,166.67 L45.64,156.4 L58.45,143.33 L71.27,120 L84.09,103.2 L96.91,109.73 L109.73,127.47 L122.55,142.4 L135.36,153.6 L148.18,165.73 L161,170.4" class="ln"/><circle cx="20" cy="174.13" r="3" class="pt"/><circle cx="32.82" cy="166.67" r="3" class="pt"/><circle cx="45.64" cy="156.4" r="3" class="pt"/><circle cx="58.45" cy="143.33" r="3" class="pt"/><circle cx="71.27" cy="120" r="3" class="pt"/><circle cx="84.09" cy="103.2" r="3" class="pt"/><circle cx="96.91" cy="109.73" r="3" class="pt"/><circle cx="109.73" cy="127.47" r="3" class="pt"/><circle cx="122.55" cy="142.4" r="3" class="pt"/><circle cx="135.36" cy="153.6" r="3" class="pt"/><circle cx="148.18" cy="165.73" r="3" class="pt"/><circle cx="161" cy="170.4" r="3" class="pt"/><line x1="165" y1="170.4" x2="177" y2="166.71" class="ld"/>
+</svg>
+<details class="dg-words">
+<summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>The diagram in words</summary>
+<div class="table-wrap" role="region" aria-label="The values of the line chart" tabindex="0"><table><thead><tr><td></td><th scope="col">Sign-in</th><th scope="col">Search</th><th scope="col">Checkout</th><th scope="col">Event</th></tr></thead><tbody><tr><th scope="row">Jan</th><td>62</td><td>40</td><td>30</td><td></td></tr><tr><th scope="row">Feb</th><td>70</td><td>42</td><td>28</td><td></td></tr><tr><th scope="row">Mar</th><td>81</td><td>39</td><td>35</td><td></td></tr><tr><th scope="row">Apr</th><td>95</td><td>45</td><td>33</td><td></td></tr><tr><th scope="row">May</th><td>120</td><td>48</td><td>31</td><td>New sign-in page</td></tr><tr><th scope="row">Jun</th><td>138</td><td>44</td><td>36</td><td></td></tr><tr><th scope="row">Jul</th><td>131</td><td>46</td><td>34</td><td>Sign-in fix</td></tr><tr><th scope="row">Aug</th><td>112</td><td>50</td><td>30</td><td></td></tr><tr><th scope="row">Sep</th><td>96</td><td>47</td><td>29</td><td></td></tr><tr><th scope="row">Oct</th><td>84</td><td>49</td><td>33</td><td></td></tr><tr><th scope="row">Nov</th><td>71</td><td>52</td><td>32</td><td></td></tr><tr><th scope="row">Dec</th><td>66</td><td>51</td><td>35</td><td></td></tr></tbody></table></div>
+<ul><li>Reports, scale from 0.</li><li>Sign-in: 62 in Jan, 66 in Dec; highest 138 in Jun; lowest 62 in Jan.</li><li>Search: 40 in Jan, 51 in Dec; highest 52 in Nov; lowest 39 in Mar.</li><li>Checkout: 30 in Jan, 35 in Dec; highest 36 in Jun; lowest 28 in Feb.</li><li>Events: New sign-in page, May; Sign-in fix, Jul.</li></ul>
+</details>

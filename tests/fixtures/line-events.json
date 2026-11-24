@@ -1,0 +1,16 @@
+{
+  "id": "reports-by-month",
+  "kind": "line",
+  "label": "Sign-in reports rose from 62 in January to 138 in June, after the new sign-in page in May, then fell to 66 in December after the fix in July. Search and Checkout stayed between 28 and 52 all year.",
+  "scale": {"from": 0, "to": 150, "step": 50, "unit": "reports"},
+  "points": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+  "series": [
+    {"name": "Sign-in", "focus": true, "values": [62, 70, 81, 95, 120, 138, 131, 112, 96, 84, 71, 66]},
+    {"name": "Search", "values": [40, 42, 39, 45, 48, 44, 46, 50, 47, 49, 52, 51]},
+    {"name": "Checkout", "values": [30, 28, 35, 33, 31, 36, 34, 30, 29, 33, 32, 35]}
+  ],
+  "events": [
+    {"at": "May", "name": "New sign-in page"},
+    {"at": "Jul", "name": "Sign-in fix"}
+  ]
+}

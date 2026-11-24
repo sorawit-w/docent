@@ -11,7 +11,8 @@ const { fail, words, id } = require("./blocks.cjs");
 const { textWidth } = require("./text.cjs");
 const { WIDE, PHONE, esc, wrapName, labelsOf, upAxis, headLines, apart, gridTables, readScale, valueWidth, fmt, isNum, num, diff } = require("./chart.cjs");
 
-const MOST = { points: 36, point: 10, series: 5, multiples: 6, slope: 10, name: 20 };
+const MOST = { points: 36, point: 10, series: 5, multiples: 6, slope: 10, name: 20, events: 3, event: 20 };
+const EVENT = { row: 16, gap: 8, clear: 4 }; // the rows of event names, the room between two names in one row, and between a name and a line
 const PLOT = { wide: 200, phone: 140, panel: 100, slope: 200 }; // the height of a plot, so its shape is the same at each width
 const PANEL = { wide: 184, phone: 224, gap: 24 }; // a small multiple's width with its value labels, and the room between two
 const ROOM = 96; // on a phone a name may be this wide, so the plot keeps 120px; a longer name wraps
@@ -62,7 +63,48 @@ function readLine(data) {
     ? `say which series the text talks about with "focus"; when every series matters equally, a dumbbell (a bar chart with "series") compares the two times row by row`
     : `say which series the text talks about with "focus", or show each series in its own panel with "multiples": true`);
   const focus = multiples ? -1 : count === 1 ? 0 : series.findIndex((sr) => sr.focus);
-  return { id: id(data.id, '"id"'), label: words(data.label, '"label"', 400), kind: "line", scale, points, series, focus, multiples, slope };
+  return { id: id(data.id, '"id"'), label: words(data.label, '"label"', 400), kind: "line", scale, points, series, focus, multiples, slope, events: readEvents(data.events, points, slope, multiples) };
+}
+
+/** The moments that the text explains, each at one of the points, in the order of the points. */
+function readEvents(list, points, slope, multiples) {
+  if (list == null) return [];
+  if (slope || multiples) fail(`${slope ? "a slopegraph has" : "small multiples have"} no "events": their panels have little room above. Say the moment in the text, or draw one line chart`);
+  if (!Array.isArray(list) || list.length < 1 || list.length > MOST.events) fail(`"events" is a list of 1 to ${MOST.events} moments, each with "at" and a "name"; more events are a timeline, which stays a table`);
+  const events = list.map((e, i) => {
+    if (!e || typeof e !== "object" || Array.isArray(e)) fail(`event ${i + 1} must be an object with "at", one of the "points", and a "name"`);
+    const name = words(e.name, `the name of event ${i + 1}`, MOST.event);
+    const at = points.indexOf(e.at);
+    if (at < 0) fail(`the event "${name}" stands at ${JSON.stringify(e.at)}, which is not one of the "points"; an event between two points takes the nearest point, and its name gives the exact time, such as {"at": "08:45", "name": "Alert, 08:44"}`);
+    if (points.lastIndexOf(e.at) !== at) fail(`the event "${name}" stands at "${e.at}", a label used more than once in "points", so it could stand at either; give each point its own label, such as "2026"`);
+    return { at, name };
+  });
+  events.forEach((e, i) => { const o = events.findIndex((x) => x.at === e.at); if (o !== i) fail(`the events "${events[o].name}" and "${e.name}" stand at the same point, "${points[e.at]}"; write one event, and name both moments in it`); });
+  return events.sort((a, b) => a.at - b.at);
+}
+
+/**
+ * The rows of the event names above the plot, the lowest row 0. A name stands 4px after its line, running right, or before it,
+ * running left, when it would pass the right edge. Two names closer than 8px take separate rows, and a line that a name passes
+ * over stops in a row under that name, so no line crosses a name. Every way of giving the names rows is tried, fewest rows first,
+ * and the first that keeps every line clear wins. Returns { rows, count, names }, or refuses when no way fits.
+ */
+function eventRows(events, x, W, where) {
+  const names = events.map((e) => {
+    const lx = x(e.at), w = textWidth(e.name, 12), right = lx + EVENT.clear + w <= W - 12;
+    if (!right && lx - EVENT.clear - w < 12) fail(`the event name "${e.name}" does not fit beside its line ${where}; shorten an event name, or leave one event out`);
+    return { lx, right, a: right ? lx + EVENT.clear : lx - EVENT.clear - w, b: right ? lx + EVENT.clear + w : lx - EVENT.clear };
+  });
+  const n = names.length, meet = (i, j) => names[i].a < names[j].b + EVENT.gap && names[j].a < names[i].b + EVENT.gap;
+  const over = (i, j) => names[j].lx >= names[i].a - EVENT.clear && names[j].lx <= names[i].b + EVENT.clear; // name i passes over line j
+  const fits = (rows) => rows.every((r, i) => rows.every((q, j) => i === j || ((!meet(i, j) || r !== q) && (!over(i, j) || r > q))));
+  for (let count = 1; count <= n; count++) {
+    for (let k = 0; k < count ** n; k++) {
+      const rows = Array.from({ length: n }, (_, i) => Math.floor(k / count ** i) % count);
+      if (Math.max(...rows) === count - 1 && fits(rows)) return { rows, count, names };
+    }
+  }
+  return fail(`the event names cannot stand without crossing another event's line ${where}; shorten an event name, or leave one event out`);
 }
 
 /** The line above the chart: the unit, where the scale starts, how to read small multiples, and what a gap means. */
@@ -131,13 +173,14 @@ function grid(s, model, ax, x0, x1) {
 function drawPlot(model, s, phone, top, where) {
   const { series, points, focus } = model;
   const W = s.w, n = points.length;
-  const y0 = top + 24, y1 = y0 + (phone ? PLOT.phone : PLOT.wide);
-  const ax = upAxis(model.scale, y1, y0);
+  const H = phone ? PLOT.phone : PLOT.wide;
+  let y0 = top + 24, y1 = y0 + H, ax = upAxis(model.scale, y1, y0);
   const widest = Math.max(...series.map((sr) => textWidth(sr.name, 14)));
   const lines = series.map((sr) => (phone && widest > ROOM ? wrapName(sr.name, ROOM, { weight: 400 }) : [sr.name]));
   const nameW = Math.max(...lines.flat().map((l) => textWidth(l, 14)));
   const ends = series.map((sr) => lastOf(sr.values));
-  const placed = placeNames(lines, series.map((sr, i) => ax.y(sr.values[ends[i]])), y0 - 12, y1 + 7, `the names of the ${series.length} series do not fit beside the line ends ${where}; shorten them`);
+  const place = () => placeNames(lines, series.map((sr, i) => ax.y(sr.values[ends[i]])), y0 - 12, y1 + 7, `the names of the ${series.length} series do not fit beside the line ends ${where}; shorten them`);
+  let placed = place();
   // A name that moved, or whose line ends before the last point, gets a thin line to its line's end, and every name then
   // stands 20px after the plot, so that each such line has room.
   const lead = placed.moved.map((m, i) => m || ends[i] < n - 1);
@@ -145,8 +188,18 @@ function drawPlot(model, s, phone, top, where) {
   const labelW = Math.max(0, ...ax.ticks.map((t) => valueWidth(t.label)));
   const x0 = phone ? 20 : Math.ceil(20 + labelW + 8), x1 = Math.floor(W - 20 - nameW - gap);
   const step = (x1 - x0) / (n - 1), x = (i) => x0 + i * step;
+  // Event names stand in rows above the plot, under the line above the chart, so the plot moves down by their rows. A move of
+  // whole rows moves every series name with it, so the names that moved stay the same.
+  const ev = model.events.length ? eventRows(model.events, x, W, where) : null;
+  if (ev) { y0 += ev.count * EVENT.row; y1 = y0 + H; ax = upAxis(model.scale, y1, y0); placed = place(); }
   grid(s, model, ax, x0, x1);
   const bottom = timeAxis(s, model, x, y1, W, where, 12, W - 12);
+  // Each event: a 1px muted line from the bottom of the plot up to its name, over the grid lines and under the series lines.
+  if (ev) {
+    const base = (r) => y0 - 18 - r * EVENT.row; // the baseline of row r
+    s.parts.push({ id: "", svg: ev.names.map((nm, i) => `<line x1="${num(nm.lx)}" y1="${num(y1)}" x2="${num(nm.lx)}" y2="${num(base(ev.rows[i]) - 9)}" class="ld"/>`).join(""), texts: [] });
+    ev.names.forEach((nm, i) => s.notes.push({ x: nm.right ? nm.a : nm.b, y: base(ev.rows[i]), s: model.events[i].name, cls: "sub", anchor: nm.right ? "start" : "end" }));
+  }
   const order = series.map((_, i) => i).filter((i) => i !== focus).concat(focus >= 0 ? [focus] : []);
   for (const i of order) {
     const sr = series[i], main = i === focus;
@@ -257,7 +310,11 @@ function wordsOf(model) {
     const body = series.map((sr) => `<tr><th scope="row">${esc(sr.name)}</th>${[...sr.values.map(cell), change(sr)].map((c) => `<td>${c}</td>`).join("")}</tr>`).join("");
     table = `<div class="table-wrap is-text" role="region" aria-label="The values of the slopegraph" tabindex="0"><table><thead>${head}</thead><tbody>${body}</tbody></table></div>`;
   } else {
-    table = gridTables({ columns: series.map((sr) => sr.name), rows: points.map((p, k) => ({ name: p, cells: series.map((sr) => sr.values[k]) })) }, cell, "The values of the line chart");
+    // Events take a last column, "Event", with each name in the row of its point and nothing in the other rows.
+    const event = (k) => (model.events.find((e) => e.at === k) || { name: "" }).name;
+    const columns = series.map((sr) => sr.name).concat(model.events.length ? ["Event"] : []);
+    const rows = points.map((p, k) => ({ name: p, cells: series.map((sr) => sr.values[k]).concat(model.events.length ? [event(k)] : []) }));
+    table = gridTables({ columns, rows }, (c) => (typeof c === "string" ? c : cell(c)), "The values of the line chart");
   }
   // A point whose label is used more than once, such as "Feb" in each of three years, is named with its place.
   const at = (k) => `${points[k]}${points.indexOf(points[k]) !== points.lastIndexOf(points[k]) ? ` (point ${k + 1})` : ""}`;
@@ -274,6 +331,7 @@ function wordsOf(model) {
     if (none.length) parts.push(`no data in ${none.join(", ")}`);
     lines.push(esc(`${sr.name}: ${parts.join("; ")}.`));
   }
+  if (model.events.length) lines.push(esc(`Events: ${model.events.map((e) => `${e.name}, ${at(e.at)}`).join("; ")}.`));
   return `${table}\n<ul>${lines.map((l) => `<li>${l}</li>`).join("")}</ul>`;
 }
 

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Incident review: sync errors on 12 November — Example Planner</title>
 <style>
-/* docent:kit 0.30.0 */
+/* docent:kit 0.31.0 */
 /* Docent page styles. Tokens come from references/DESIGN.md. One file, no network. */
 :root {
   color-scheme: light;
@@ -726,16 +726,20 @@ footer p { margin: 0; }
 {
   "id": "pool",
   "kind": "line",
-  "label": "Database connections of the Sync API from 08:00 to 09:55 UTC. Connections in use rose from 52 to 74 before 08:35. The pool limit then fell from 200 to 20, and connections in use stayed at 20 until 09:20. After the rollback they rose to 118 at 09:25 and settled near 75.",
+  "label": "Database connections of the Sync API from 08:00 to 09:55 UTC. Connections in use rose from 52 to 74 before 08:35. The pool limit then fell from 200 to 20, and connections in use stayed at 20 from before the alert at 08:44 until the rollback at 09:19. After the rollback they rose to 118 at 09:25 and settled near 75.",
   "scale": {"from": 0, "to": 200, "step": 50, "unit": "connections"},
   "points": ["08:00", "08:05", "08:10", "08:15", "08:20", "08:25", "08:30", "08:35", "08:40", "08:45", "08:50", "08:55", "09:00", "09:05", "09:10", "09:15", "09:20", "09:25", "09:30", "09:35", "09:40", "09:45", "09:50", "09:55"],
   "series": [
     {"name": "In use", "focus": true, "values": [52, 55, 58, 61, 66, 70, 74, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 118, 96, 84, 80, 78, 76, 75]},
     {"name": "Pool limit", "values": [200, 200, 200, 200, 200, 200, 200, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 200, 200, 200, 200, 200, 200, 200]}
+  ],
+  "events": [
+    {"at": "08:45", "name": "Alert, 08:44"},
+    {"at": "09:20", "name": "Rollback, 09:19"}
   ]
 }
 -->
-<svg id="dg-pool" class="dg dg-line dg-auto" xmlns="http://www.w3.org/2000/svg" width="640" height="312" viewBox="0 0 640 312" role="img" aria-label="Database connections of the Sync API from 08:00 to 09:55 UTC. Connections in use rose from 52 to 74 before 08:35. The pool limit then fell from 200 to 20, and connections in use stayed at 20 until 09:20. After the rollback they rose to 118 at 09:25 and settled near 75.">
+<svg id="dg-pool" class="dg dg-line dg-auto" xmlns="http://www.w3.org/2000/svg" width="640" height="328" viewBox="0 0 640 328" role="img" aria-label="Database connections of the Sync API from 08:00 to 09:55 UTC. Connections in use rose from 52 to 74 before 08:35. The pool limit then fell from 200 to 20, and connections in use stayed at 20 from before the alert at 08:44 until the rollback at 09:19. After the rollback they rose to 118 at 09:25 and settled near 75.">
 <style>
 #dg-pool{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
 #dg-pool .ground{fill:var(--fig,#e9f6fa)}
@@ -767,49 +771,52 @@ footer p { margin: 0; }
 @media print{#dg-pool{max-width:100%;height:auto}#dg-pool .pulse{display:none!important}}
 #dg-pool-phone{display:none}
 </style>
-<rect width="640" height="312" class="ground"/>
-<rect x="8" y="36" width="624" height="268" rx="10" class="band"/>
-<line x1="52" y1="260" x2="550" y2="260" class="track"/>
-<line x1="52" y1="210" x2="550" y2="210" class="track"/>
-<line x1="52" y1="160" x2="550" y2="160" class="track"/>
-<line x1="52" y1="110" x2="550" y2="110" class="track"/>
-<line x1="52" y1="60" x2="550" y2="60" class="track"/>
+<rect width="640" height="328" class="ground"/>
+<rect x="8" y="36" width="624" height="284" rx="10" class="band"/>
+<line x1="52" y1="276" x2="550" y2="276" class="track"/>
+<line x1="52" y1="226" x2="550" y2="226" class="track"/>
+<line x1="52" y1="176" x2="550" y2="176" class="track"/>
+<line x1="52" y1="126" x2="550" y2="126" class="track"/>
+<line x1="52" y1="76" x2="550" y2="76" class="track"/>
 <text x="20" y="24" class="sub" text-anchor="start">Connections, scale from 0.</text>
-<text x="52" y="278" class="val" text-anchor="middle">08:00</text>
-<text x="73.65" y="294" class="val" text-anchor="middle">08:05</text>
-<text x="95.3" y="278" class="val" text-anchor="middle">08:10</text>
-<text x="116.96" y="294" class="val" text-anchor="middle">08:15</text>
-<text x="138.61" y="278" class="val" text-anchor="middle">08:20</text>
-<text x="160.26" y="294" class="val" text-anchor="middle">08:25</text>
-<text x="181.91" y="278" class="val" text-anchor="middle">08:30</text>
-<text x="203.57" y="294" class="val" text-anchor="middle">08:35</text>
-<text x="225.22" y="278" class="val" text-anchor="middle">08:40</text>
-<text x="246.87" y="294" class="val" text-anchor="middle">08:45</text>
-<text x="268.52" y="278" class="val" text-anchor="middle">08:50</text>
-<text x="290.17" y="294" class="val" text-anchor="middle">08:55</text>
-<text x="311.83" y="278" class="val" text-anchor="middle">09:00</text>
-<text x="333.48" y="294" class="val" text-anchor="middle">09:05</text>
-<text x="355.13" y="278" class="val" text-anchor="middle">09:10</text>
-<text x="376.78" y="294" class="val" text-anchor="middle">09:15</text>
-<text x="398.43" y="278" class="val" text-anchor="middle">09:20</text>
-<text x="420.09" y="294" class="val" text-anchor="middle">09:25</text>
-<text x="441.74" y="278" class="val" text-anchor="middle">09:30</text>
-<text x="463.39" y="294" class="val" text-anchor="middle">09:35</text>
-<text x="485.04" y="278" class="val" text-anchor="middle">09:40</text>
-<text x="506.7" y="294" class="val" text-anchor="middle">09:45</text>
-<text x="528.35" y="278" class="val" text-anchor="middle">09:50</text>
-<text x="550" y="294" class="val" text-anchor="middle">09:55</text>
-<text x="558" y="65" class="dim" text-anchor="start">Pool limit</text>
-<text x="558" y="190" class="row" text-anchor="start">In use</text>
-<text x="44" y="264" class="val" text-anchor="end">0</text>
-<text x="44" y="214" class="val" text-anchor="end">50</text>
-<text x="44" y="164" class="val" text-anchor="end">100</text>
-<text x="44" y="114" class="val" text-anchor="end">150</text>
-<text x="44" y="64" class="val" text-anchor="end">200</text>
-<path d="M52,60 L73.65,60 L95.3,60 L116.96,60 L138.61,60 L160.26,60 L181.91,60 L203.57,240 L225.22,240 L246.87,240 L268.52,240 L290.17,240 L311.83,240 L333.48,240 L355.13,240 L376.78,240 L398.43,240 L420.09,60 L441.74,60 L463.39,60 L485.04,60 L506.7,60 L528.35,60 L550,60" class="ln-o"/>
-<path d="M52,208 L73.65,205 L95.3,202 L116.96,199 L138.61,194 L160.26,190 L181.91,186 L203.57,240 L225.22,240 L246.87,240 L268.52,240 L290.17,240 L311.83,240 L333.48,240 L355.13,240 L376.78,240 L398.43,240 L420.09,142 L441.74,164 L463.39,176 L485.04,180 L506.7,182 L528.35,184 L550,185" class="ln"/><circle cx="52" cy="208" r="3" class="pt"/><circle cx="73.65" cy="205" r="3" class="pt"/><circle cx="95.3" cy="202" r="3" class="pt"/><circle cx="116.96" cy="199" r="3" class="pt"/><circle cx="138.61" cy="194" r="3" class="pt"/><circle cx="160.26" cy="190" r="3" class="pt"/><circle cx="181.91" cy="186" r="3" class="pt"/><circle cx="203.57" cy="240" r="3" class="pt"/><circle cx="225.22" cy="240" r="3" class="pt"/><circle cx="246.87" cy="240" r="3" class="pt"/><circle cx="268.52" cy="240" r="3" class="pt"/><circle cx="290.17" cy="240" r="3" class="pt"/><circle cx="311.83" cy="240" r="3" class="pt"/><circle cx="333.48" cy="240" r="3" class="pt"/><circle cx="355.13" cy="240" r="3" class="pt"/><circle cx="376.78" cy="240" r="3" class="pt"/><circle cx="398.43" cy="240" r="3" class="pt"/><circle cx="420.09" cy="142" r="3" class="pt"/><circle cx="441.74" cy="164" r="3" class="pt"/><circle cx="463.39" cy="176" r="3" class="pt"/><circle cx="485.04" cy="180" r="3" class="pt"/><circle cx="506.7" cy="182" r="3" class="pt"/><circle cx="528.35" cy="184" r="3" class="pt"/><circle cx="550" cy="185" r="3" class="pt"/>
+<text x="52" y="294" class="val" text-anchor="middle">08:00</text>
+<text x="73.65" y="310" class="val" text-anchor="middle">08:05</text>
+<text x="95.3" y="294" class="val" text-anchor="middle">08:10</text>
+<text x="116.96" y="310" class="val" text-anchor="middle">08:15</text>
+<text x="138.61" y="294" class="val" text-anchor="middle">08:20</text>
+<text x="160.26" y="310" class="val" text-anchor="middle">08:25</text>
+<text x="181.91" y="294" class="val" text-anchor="middle">08:30</text>
+<text x="203.57" y="310" class="val" text-anchor="middle">08:35</text>
+<text x="225.22" y="294" class="val" text-anchor="middle">08:40</text>
+<text x="246.87" y="310" class="val" text-anchor="middle">08:45</text>
+<text x="268.52" y="294" class="val" text-anchor="middle">08:50</text>
+<text x="290.17" y="310" class="val" text-anchor="middle">08:55</text>
+<text x="311.83" y="294" class="val" text-anchor="middle">09:00</text>
+<text x="333.48" y="310" class="val" text-anchor="middle">09:05</text>
+<text x="355.13" y="294" class="val" text-anchor="middle">09:10</text>
+<text x="376.78" y="310" class="val" text-anchor="middle">09:15</text>
+<text x="398.43" y="294" class="val" text-anchor="middle">09:20</text>
+<text x="420.09" y="310" class="val" text-anchor="middle">09:25</text>
+<text x="441.74" y="294" class="val" text-anchor="middle">09:30</text>
+<text x="463.39" y="310" class="val" text-anchor="middle">09:35</text>
+<text x="485.04" y="294" class="val" text-anchor="middle">09:40</text>
+<text x="506.7" y="310" class="val" text-anchor="middle">09:45</text>
+<text x="528.35" y="294" class="val" text-anchor="middle">09:50</text>
+<text x="550" y="310" class="val" text-anchor="middle">09:55</text>
+<text x="250.87" y="58" class="sub" text-anchor="start">Alert, 08:44</text>
+<text x="402.43" y="58" class="sub" text-anchor="start">Rollback, 09:19</text>
+<text x="558" y="81" class="dim" text-anchor="start">Pool limit</text>
+<text x="558" y="206" class="row" text-anchor="start">In use</text>
+<text x="44" y="280" class="val" text-anchor="end">0</text>
+<text x="44" y="230" class="val" text-anchor="end">50</text>
+<text x="44" y="180" class="val" text-anchor="end">100</text>
+<text x="44" y="130" class="val" text-anchor="end">150</text>
+<text x="44" y="80" class="val" text-anchor="end">200</text>
+<line x1="246.87" y1="276" x2="246.87" y2="49" class="ld"/><line x1="398.43" y1="276" x2="398.43" y2="49" class="ld"/>
+<path d="M52,76 L73.65,76 L95.3,76 L116.96,76 L138.61,76 L160.26,76 L181.91,76 L203.57,256 L225.22,256 L246.87,256 L268.52,256 L290.17,256 L311.83,256 L333.48,256 L355.13,256 L376.78,256 L398.43,256 L420.09,76 L441.74,76 L463.39,76 L485.04,76 L506.7,76 L528.35,76 L550,76" class="ln-o"/>
+<path d="M52,224 L73.65,221 L95.3,218 L116.96,215 L138.61,210 L160.26,206 L181.91,202 L203.57,256 L225.22,256 L246.87,256 L268.52,256 L290.17,256 L311.83,256 L333.48,256 L355.13,256 L376.78,256 L398.43,256 L420.09,158 L441.74,180 L463.39,192 L485.04,196 L506.7,198 L528.35,200 L550,201" class="ln"/><circle cx="52" cy="224" r="3" class="pt"/><circle cx="73.65" cy="221" r="3" class="pt"/><circle cx="95.3" cy="218" r="3" class="pt"/><circle cx="116.96" cy="215" r="3" class="pt"/><circle cx="138.61" cy="210" r="3" class="pt"/><circle cx="160.26" cy="206" r="3" class="pt"/><circle cx="181.91" cy="202" r="3" class="pt"/><circle cx="203.57" cy="256" r="3" class="pt"/><circle cx="225.22" cy="256" r="3" class="pt"/><circle cx="246.87" cy="256" r="3" class="pt"/><circle cx="268.52" cy="256" r="3" class="pt"/><circle cx="290.17" cy="256" r="3" class="pt"/><circle cx="311.83" cy="256" r="3" class="pt"/><circle cx="333.48" cy="256" r="3" class="pt"/><circle cx="355.13" cy="256" r="3" class="pt"/><circle cx="376.78" cy="256" r="3" class="pt"/><circle cx="398.43" cy="256" r="3" class="pt"/><circle cx="420.09" cy="158" r="3" class="pt"/><circle cx="441.74" cy="180" r="3" class="pt"/><circle cx="463.39" cy="192" r="3" class="pt"/><circle cx="485.04" cy="196" r="3" class="pt"/><circle cx="506.7" cy="198" r="3" class="pt"/><circle cx="528.35" cy="200" r="3" class="pt"/><circle cx="550" cy="201" r="3" class="pt"/>
 </svg>
-<svg id="dg-pool-phone" class="dg dg-line dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="236" viewBox="0 0 264 236" role="img" aria-label="Database connections of the Sync API from 08:00 to 09:55 UTC. Connections in use rose from 52 to 74 before 08:35. The pool limit then fell from 200 to 20, and connections in use stayed at 20 until 09:20. After the rollback they rose to 118 at 09:25 and settled near 75.">
+<svg id="dg-pool-phone" class="dg dg-line dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="268" viewBox="0 0 264 268" role="img" aria-label="Database connections of the Sync API from 08:00 to 09:55 UTC. Connections in use rose from 52 to 74 before 08:35. The pool limit then fell from 200 to 20, and connections in use stayed at 20 from before the alert at 08:44 until the rollback at 09:19. After the rollback they rose to 118 at 09:25 and settled near 75.">
 <style>
 #dg-pool-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
 #dg-pool-phone .ground{fill:var(--fig,#e9f6fa)}
@@ -842,34 +849,37 @@ footer p { margin: 0; }
 @media (max-width:736px){#dg-pool{display:none}#dg-pool-phone{display:block}}
 @media print{#dg-pool{display:block!important}#dg-pool-phone{display:none!important}}
 </style>
-<rect width="264" height="236" class="ground"/>
-<rect x="8" y="36" width="248" height="192" rx="10" class="band"/>
-<line x1="20" y1="200" x2="174" y2="200" class="track"/>
-<line x1="20" y1="165" x2="174" y2="165" class="track"/>
-<line x1="20" y1="130" x2="174" y2="130" class="track"/>
-<line x1="20" y1="95" x2="174" y2="95" class="track"/>
-<line x1="20" y1="60" x2="174" y2="60" class="track"/>
+<rect width="264" height="268" class="ground"/>
+<rect x="8" y="36" width="248" height="224" rx="10" class="band"/>
+<line x1="20" y1="232" x2="174" y2="232" class="track"/>
+<line x1="20" y1="197" x2="174" y2="197" class="track"/>
+<line x1="20" y1="162" x2="174" y2="162" class="track"/>
+<line x1="20" y1="127" x2="174" y2="127" class="track"/>
+<line x1="20" y1="92" x2="174" y2="92" class="track"/>
 <text x="20" y="24" class="sub" text-anchor="start">Connections, scale from 0.</text>
-<text x="30.34" y="218" class="val" text-anchor="middle">08:00</text>
-<text x="100.35" y="218" class="val" text-anchor="middle">09:00</text>
-<text x="182" y="65" class="dim" text-anchor="start">Pool limit</text>
-<text x="182" y="152.5" class="row" text-anchor="start">In use</text>
-<text x="20" y="196" class="val" text-anchor="start">0</text>
-<text x="20" y="161" class="val" text-anchor="start">50</text>
-<text x="20" y="126" class="val" text-anchor="start">100</text>
-<text x="20" y="91" class="val" text-anchor="start">150</text>
-<text x="20" y="56" class="val" text-anchor="start">200</text>
-<path d="M20,60 L26.7,60 L33.39,60 L40.09,60 L46.78,60 L53.48,60 L60.17,60 L66.87,186 L73.57,186 L80.26,186 L86.96,186 L93.65,186 L100.35,186 L107.04,186 L113.74,186 L120.43,186 L127.13,186 L133.83,60 L140.52,60 L147.22,60 L153.91,60 L160.61,60 L167.3,60 L174,60" class="ln-o"/>
-<path d="M20,163.6 L26.7,161.5 L33.39,159.4 L40.09,157.3 L46.78,153.8 L53.48,151 L60.17,148.2 L66.87,186 L73.57,186 L80.26,186 L86.96,186 L93.65,186 L100.35,186 L107.04,186 L113.74,186 L120.43,186 L127.13,186 L133.83,117.4 L140.52,132.8 L147.22,141.2 L153.91,144 L160.61,145.4 L167.3,146.8 L174,147.5" class="ln"/>
+<text x="30.34" y="250" class="val" text-anchor="middle">08:00</text>
+<text x="100.35" y="250" class="val" text-anchor="middle">09:00</text>
+<text x="84.26" y="58" class="sub" text-anchor="start">Alert, 08:44</text>
+<text x="131.13" y="74" class="sub" text-anchor="start">Rollback, 09:19</text>
+<text x="182" y="97" class="dim" text-anchor="start">Pool limit</text>
+<text x="182" y="184.5" class="row" text-anchor="start">In use</text>
+<text x="20" y="228" class="val" text-anchor="start">0</text>
+<text x="20" y="193" class="val" text-anchor="start">50</text>
+<text x="20" y="158" class="val" text-anchor="start">100</text>
+<text x="20" y="123" class="val" text-anchor="start">150</text>
+<text x="20" y="88" class="val" text-anchor="start">200</text>
+<line x1="80.26" y1="232" x2="80.26" y2="49" class="ld"/><line x1="127.13" y1="232" x2="127.13" y2="65" class="ld"/>
+<path d="M20,92 L26.7,92 L33.39,92 L40.09,92 L46.78,92 L53.48,92 L60.17,92 L66.87,218 L73.57,218 L80.26,218 L86.96,218 L93.65,218 L100.35,218 L107.04,218 L113.74,218 L120.43,218 L127.13,218 L133.83,92 L140.52,92 L147.22,92 L153.91,92 L160.61,92 L167.3,92 L174,92" class="ln-o"/>
+<path d="M20,195.6 L26.7,193.5 L33.39,191.4 L40.09,189.3 L46.78,185.8 L53.48,183 L60.17,180.2 L66.87,218 L73.57,218 L80.26,218 L86.96,218 L93.65,218 L100.35,218 L107.04,218 L113.74,218 L120.43,218 L127.13,218 L133.83,149.4 L140.52,164.8 L147.22,173.2 L153.91,176 L160.61,177.4 L167.3,178.8 L174,179.5" class="ln"/>
 </svg>
 <details class="dg-words">
 <summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>The diagram in words</summary>
-<div class="table-wrap" role="region" aria-label="The values of the line chart" tabindex="0"><table><thead><tr><td></td><th scope="col">In use</th><th scope="col">Pool limit</th></tr></thead><tbody><tr><th scope="row">08:00</th><td>52</td><td>200</td></tr><tr><th scope="row">08:05</th><td>55</td><td>200</td></tr><tr><th scope="row">08:10</th><td>58</td><td>200</td></tr><tr><th scope="row">08:15</th><td>61</td><td>200</td></tr><tr><th scope="row">08:20</th><td>66</td><td>200</td></tr><tr><th scope="row">08:25</th><td>70</td><td>200</td></tr><tr><th scope="row">08:30</th><td>74</td><td>200</td></tr><tr><th scope="row">08:35</th><td>20</td><td>20</td></tr><tr><th scope="row">08:40</th><td>20</td><td>20</td></tr><tr><th scope="row">08:45</th><td>20</td><td>20</td></tr><tr><th scope="row">08:50</th><td>20</td><td>20</td></tr><tr><th scope="row">08:55</th><td>20</td><td>20</td></tr><tr><th scope="row">09:00</th><td>20</td><td>20</td></tr><tr><th scope="row">09:05</th><td>20</td><td>20</td></tr><tr><th scope="row">09:10</th><td>20</td><td>20</td></tr><tr><th scope="row">09:15</th><td>20</td><td>20</td></tr><tr><th scope="row">09:20</th><td>20</td><td>20</td></tr><tr><th scope="row">09:25</th><td>118</td><td>200</td></tr><tr><th scope="row">09:30</th><td>96</td><td>200</td></tr><tr><th scope="row">09:35</th><td>84</td><td>200</td></tr><tr><th scope="row">09:40</th><td>80</td><td>200</td></tr><tr><th scope="row">09:45</th><td>78</td><td>200</td></tr><tr><th scope="row">09:50</th><td>76</td><td>200</td></tr><tr><th scope="row">09:55</th><td>75</td><td>200</td></tr></tbody></table></div>
-<ul><li>Connections, scale from 0.</li><li>In use: 52 in 08:00, 75 in 09:55; highest 118 in 09:25; lowest 20 in 08:35.</li><li>Pool limit: 200 in 08:00, 200 in 09:55; highest 200 in 08:00; lowest 20 in 08:35.</li></ul>
+<div class="table-wrap" role="region" aria-label="The values of the line chart" tabindex="0"><table><thead><tr><td></td><th scope="col">In use</th><th scope="col">Pool limit</th><th scope="col">Event</th></tr></thead><tbody><tr><th scope="row">08:00</th><td>52</td><td>200</td><td></td></tr><tr><th scope="row">08:05</th><td>55</td><td>200</td><td></td></tr><tr><th scope="row">08:10</th><td>58</td><td>200</td><td></td></tr><tr><th scope="row">08:15</th><td>61</td><td>200</td><td></td></tr><tr><th scope="row">08:20</th><td>66</td><td>200</td><td></td></tr><tr><th scope="row">08:25</th><td>70</td><td>200</td><td></td></tr><tr><th scope="row">08:30</th><td>74</td><td>200</td><td></td></tr><tr><th scope="row">08:35</th><td>20</td><td>20</td><td></td></tr><tr><th scope="row">08:40</th><td>20</td><td>20</td><td></td></tr><tr><th scope="row">08:45</th><td>20</td><td>20</td><td>Alert, 08:44</td></tr><tr><th scope="row">08:50</th><td>20</td><td>20</td><td></td></tr><tr><th scope="row">08:55</th><td>20</td><td>20</td><td></td></tr><tr><th scope="row">09:00</th><td>20</td><td>20</td><td></td></tr><tr><th scope="row">09:05</th><td>20</td><td>20</td><td></td></tr><tr><th scope="row">09:10</th><td>20</td><td>20</td><td></td></tr><tr><th scope="row">09:15</th><td>20</td><td>20</td><td></td></tr><tr><th scope="row">09:20</th><td>20</td><td>20</td><td>Rollback, 09:19</td></tr><tr><th scope="row">09:25</th><td>118</td><td>200</td><td></td></tr><tr><th scope="row">09:30</th><td>96</td><td>200</td><td></td></tr><tr><th scope="row">09:35</th><td>84</td><td>200</td><td></td></tr><tr><th scope="row">09:40</th><td>80</td><td>200</td><td></td></tr><tr><th scope="row">09:45</th><td>78</td><td>200</td><td></td></tr><tr><th scope="row">09:50</th><td>76</td><td>200</td><td></td></tr><tr><th scope="row">09:55</th><td>75</td><td>200</td><td></td></tr></tbody></table></div>
+<ul><li>Connections, scale from 0.</li><li>In use: 52 in 08:00, 75 in 09:55; highest 118 in 09:25; lowest 20 in 08:35.</li><li>Pool limit: 200 in 08:00, 200 in 09:55; highest 200 in 08:00; lowest 20 in 08:35.</li><li>Events: Alert, 08:44, 08:45; Rollback, 09:19, 09:20.</li></ul>
 </details>
 <!-- /docent:diagram -->
       </div>
-      <figcaption><strong>Figure 2</strong>Database connections of the Sync API, 08:00 to 09:55 UTC, in 5-minute points. The alert fired at 08:44 and the rollback started at 09:19.
+      <figcaption><strong>Figure 2</strong>Connections in use stayed at the limit from the alert to the rollback. Database connections of the Sync API, 08:00 to 09:55 UTC, in 5-minute points.
         <span class="source">Source: database metrics of the Sync API, 12 November 2026.</span></figcaption>
     </figure>
   </section>
@@ -1213,7 +1223,7 @@ database:
   </div>
 </footer>
 <script>
-// docent:kit 0.30.0
+// docent:kit 0.31.0
 (() => {
   const root = document.documentElement;
   root.classList.add('js');

@@ -292,3 +292,104 @@ test("check accepts a line chart that render drew, and reports one that was chan
   assert.deepEqual(checkDocument(page).errors, []);
   assert.match(checkDocument(page.replace('class="ln"/>', 'class="ln-o"/>')).errors.join("\n"), /the drawing does not match its data; run render/);
 });
+
+// Event marks: a thin muted upright line at a point, named above the plot.
+const events = () => fixture("line-events");
+const eventLines = (scene) => [...(scene.parts.find((p) => p.id === "") || { svg: "" }).svg.matchAll(/<line x1="([\d.]+)" y1="([\d.]+)" x2="([\d.]+)" y2="([\d.]+)" class="ld"\/>/g)].map((m) => m.slice(1, 5).map(Number));
+const eventNames = (scene) => scene.notes.filter((n) => n.cls === "sub" && n.y > scene.notes[0].y + 4);
+/** Each event line that passes through a name other than its own. */
+function crossings(scene) {
+  const out = [];
+  eventLines(scene).forEach(([x, yb, , yt], i) => eventNames(scene).forEach((n, k) => {
+    const b = box(n);
+    if (k !== i && x >= b.x0 - 2 && x <= b.x1 + 2 && yt < b.y1 && yb > b.y0) out.push(`line ${i + 1} / ${n.s}`);
+  }));
+  return out;
+}
+const rowsOf = (scene) => [...new Set(eventNames(scene).map((n) => n.y))].length;
+
+test("line-events, the example of the proposal, matches the stored drawing in both forms; each event is a 1px muted line from the bottom of the plot to its name", () => {
+  const { svg, scene, phone, warnings } = renderDiagram(events());
+  assert.deepEqual(warnings, []);
+  const file = path.join(__dirname, "expected", "line-events.svg");
+  if (process.env.UPDATE) fs.writeFileSync(file, svg + "\n");
+  assert.equal(svg + "\n", fs.readFileSync(file, "utf8"), "line-events.svg changed; look at the drawing, then run with UPDATE=1");
+  for (const sc of [scene, phone]) {
+    assert.deepEqual(clashes(sc), []);
+    assert.deepEqual(crossings(sc), []);
+    const plot = marks(sc, "Sign-in").paths[0].pts, bottom = Math.max(...sc.tracks.map((t) => t[1]));
+    const lines = eventLines(sc);
+    assert.equal(lines.length, 2);
+    assert.deepEqual(lines.map((l) => l[0]), [plot[4][0], plot[6][0]], "at the points May and Jul");
+    for (const l of lines) assert.ok(l[1] === bottom && l[3] < Math.min(...sc.tracks.map((t) => t[1])), "from the bottom of the plot to above it");
+    // Drawn over the grid lines (tracks come first) and under the series lines: its part comes before the series.
+    assert.equal(sc.parts[0].id, "");
+    assert.deepEqual(eventNames(sc).map((n) => [n.s, n.cls]), [["New sign-in page", "sub"], ["Sign-in fix", "sub"]]);
+    assert.ok(eventNames(sc).every((n) => n.y < Math.min(...sc.tracks.map((t) => t[1]))), "the names stand above the plot");
+    assert.ok(eventNames(sc).every((n) => n.y > sc.notes[0].y + 12), "under the line above the chart");
+  }
+  // "New sign-in page" (100px) runs over July's line, so on both forms it takes the upper row and July's line stops under it.
+  for (const sc of [scene, phone]) {
+    const [may, jul] = eventNames(sc);
+    assert.ok(may.y < jul.y, "the earlier name, running right, takes the higher row");
+    assert.equal(rowsOf(sc), 2);
+  }
+  assert.equal(scene.h - renderDiagram(reports()).scene.h, 32, "two rows add 32px above the plot, never width");
+  assert.deepEqual(marks(scene, "Sign-in").paths[0].pts.map((p) => p[0]), marks(renderDiagram(reports()).scene, "Sign-in").paths[0].pts.map((p) => p[0]), "the plot keeps its width");
+  // The table in words: an "Event" column, with each name in the row of its point, and a line under it.
+  const w = words(events());
+  assert.match(w, /<th scope="col">Event<\/th><\/tr>/);
+  assert.match(w, /<th scope="row">May<\/th><td>120<\/td><td>48<\/td><td>31<\/td><td>New sign-in page<\/td><\/tr>/);
+  assert.match(w, /<th scope="row">Jun<\/th><td>138<\/td><td>44<\/td><td>36<\/td><td><\/td><\/tr>/, "nothing in the other rows");
+  assert.match(w, /<li>Events: New sign-in page, May; Sign-in fix, Jul\.<\/li>/);
+});
+
+test("event names share a row when they stand apart, take two rows when they meet, and a name near the right edge runs left; no line crosses a name", () => {
+  const minutes = Array.from({ length: 24 }, (_, i) => { const m = 8 * 60 + 5 * i; return `${String(Math.floor(m / 60)).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`; });
+  const incident = (evs) => ({ id: "in-use", kind: "line", label: "Connections in use reached the limit after the alert, and fell after the rollback.", scale: { from: 0, to: 200, step: 50, unit: "connections" }, points: minutes, series: [{ name: "In use", values: minutes.map((_, i) => (i < 9 ? 40 : i < 16 ? 200 : 60)) }], events: evs });
+  // The incident review: 08:45 and 09:20 stand 7 steps apart, 151px on a desktop, so their names share one row; on a phone, two rows.
+  const shared = renderDiagram(incident([{ at: "08:45", name: "Alert, 08:44" }, { at: "09:20", name: "Rollback, 09:19" }]));
+  assert.equal(rowsOf(shared.scene), 1);
+  assert.equal(rowsOf(shared.phone), 2);
+  for (const sc of [shared.scene, shared.phone]) { assert.deepEqual(clashes(sc), []); assert.deepEqual(crossings(sc), []); }
+  // Near the right edge a name ends at its line, running left; then the later name takes the higher row.
+  const late = renderDiagram(incident([{ at: "09:45", name: "Limit raised again" }, { at: "09:55", name: "All traffic restored" }]));
+  for (const sc of [late.scene, late.phone]) {
+    const names = eventNames(sc), lines = eventLines(sc);
+    assert.deepEqual(names.map((n) => n.anchor), ["end", "end"], "both names run left, each ending 4px before its line");
+    names.forEach((n, i) => assert.ok(Math.abs(n.x - (lines[i][0] - 4)) < 0.01, `${n.s} ends 4px before its line`));
+    assert.ok(names[1].y < names[0].y, "running left, the later name takes the higher row, so the earlier line stops under it");
+    assert.deepEqual(clashes(sc), []);
+    assert.deepEqual(crossings(sc), []);
+  }
+  assert.throws(() => renderDiagram(incident([{ at: "09:40", name: "Pool limit raised" }, { at: "09:55", name: "All traffic restored" }])), /cannot stand without crossing another event's line/, "a short name runs right over the next line, which runs left over it");
+  // Three events, two rows or three, still with no crossing.
+  const three = renderDiagram(incident([{ at: "08:20", name: "Config change" }, { at: "08:45", name: "Alert, 08:44" }, { at: "09:20", name: "Rollback, 09:19" }]));
+  assert.deepEqual([rowsOf(three.scene), rowsOf(three.phone)], [1, 3], "three events: one row on a desktop, three on a phone");
+  for (const sc of [three.scene, three.phone]) { assert.deepEqual(clashes(sc), []); assert.deepEqual(crossings(sc), []); }
+});
+
+test("render refuses events that cannot stand: names that run both ways over each other's lines, and each other wrong field", () => {
+  const withEvents = (evs, change = (d) => d) => () => renderDiagram(change({ ...reports(), events: evs }));
+  // Oct runs right over Dec's line; Dec, near the edge, runs left over Oct's line. No order of rows keeps both lines clear.
+  assert.throws(withEvents([{ at: "Oct", name: "Twenty chars exactly" }, { at: "Dec", name: "Twenty chars exactly" }]), /the event names cannot stand without crossing another event's line on a desktop and on paper; shorten an event name, or leave one event out/);
+  assert.throws(withEvents([{ at: "Mai", name: "New page" }]), /the event "New page" stands at "Mai", which is not one of the "points"; an event between two points takes the nearest point/);
+  assert.throws(withEvents([{ at: "May", name: "New page" }, { at: "May", name: "Fix" }]), /the events "New page" and "Fix" stand at the same point, "May"/);
+  assert.throws(withEvents([{ at: "May", name: "" }]), /the name of event 1 is missing/);
+  assert.throws(withEvents([{ at: "May", name: "   " }]), /the name of event 1 is empty/);
+  assert.throws(withEvents([{ at: "May", name: "Twenty-one characters" }]), /the name of event 1 is 21 characters long; the most is 20/);
+  assert.throws(withEvents([]), /"events" is a list of 1 to 3 moments/);
+  assert.throws(withEvents(["Jan", "Feb", "Mar", "Apr"].map((at) => ({ at, name: at }))), /"events" is a list of 1 to 3 moments[^\n]*more events are a timeline, which stays a table/);
+  assert.throws(withEvents(["May"]), /event 1 must be an object with "at", one of the "points", and a "name"/);
+  assert.throws(withEvents([{ at: "Feb", name: "A" }], (d) => ({ ...d, points: ["Jan", "Feb", "Mar", "Jan", "Feb", "Mar", "Jan", "Feb", "Mar", "Jan", "Feb", "Mar"] })), /a label used more than once in "points"/);
+  assert.throws(() => renderDiagram({ ...panels(), events: [{ at: panels().points[1], name: "A" }] }), /small multiples have no "events"/);
+  assert.throws(() => renderDiagram({ ...slope(), events: [{ at: slope().points[1], name: "A" }] }), /a slopegraph has no "events"/);
+});
+
+test("a line chart without events is drawn exactly as before: no event part, no new row, no Event column", () => {
+  for (const data of [reports(), months()]) {
+    const { scene, phone, svg } = renderDiagram(data);
+    for (const sc of [scene, phone]) assert.ok(!sc.parts.some((p) => p.id === ""));
+    assert.ok(!/Event|Events:/.test(svg));
+  }
+});
