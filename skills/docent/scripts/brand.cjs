@@ -63,7 +63,8 @@ function stack(family, own) {
   const key = (n) => n.replace(/^["']|["']$/g, "").toLowerCase();
   const quote = (n) => (/^["']/.test(n) || /^[\w-]+$/.test(n) ? n : `"${n}"`);
   const seen = new Set(), out = [];
-  for (const n of [...names(family).filter((n) => !GENERIC.has(key(n))).map(quote), ...names(own)]) if (!seen.has(key(n))) { seen.add(key(n)); out.push(n); }
+  const safe = (n) => !/[;{}<>\\]|\/\*|\*\/|url\s*\(/i.test(n); // a name that could end the value, the rule or the style element is left out
+  for (const n of [...names(family).filter((n) => !GENERIC.has(key(n)) && safe(n)).map(quote), ...names(own)]) if (!seen.has(key(n))) { seen.add(key(n)); out.push(n); }
   return out.join(", ");
 }
 
@@ -160,11 +161,14 @@ function pageNote(page) {
   return `${page.key} ${page.color} is a page color. Docent keeps its own page color, because some text would become hard to read in dark mode and on paper. The closest tested page is ${name(first)} (${first.page}), a distance of ${first.distance.toFixed(1)}; then ${rest.map((p) => `${name(p)} ${p.distance.toFixed(1)}`).join(", ")}. Offer it to the user as a choice; never swap it in without asking`;
 }
 
+/** A note made safe for a CSS comment inside <style>: it cannot end the comment, and it cannot end the style element. */
+const comment = (note) => note.replace(/\*\//g, "* /").replace(/</g, "&lt;");
+
 /** The style block to copy into a page, with a comment for each value. */
 function print(result) {
   if (!result.tokens.length) return "";
   const width = Math.max(...result.tokens.filter(([n]) => !/serif|sans|mono/.test(n)).map(([n, v]) => n.length + v.length), 0);
-  const lines = result.tokens.map(([name, value, note]) => `  --${name}: ${value};${" ".repeat(Math.max(1, width - name.length - value.length + 1))}/* ${note} */`);
+  const lines = result.tokens.map(([name, value, note]) => `  --${name}: ${value};${" ".repeat(Math.max(1, width - name.length - value.length + 1))}/* ${comment(note)} */`);
   return `<style>\n:root {\n${lines.join("\n")}\n}\n</style>`;
 }
 

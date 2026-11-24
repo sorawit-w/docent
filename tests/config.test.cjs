@@ -136,3 +136,13 @@ test("check tests the file's heading color on each page, reports a bad file once
   fs.writeFileSync(path.join(root, "other.json"), JSON.stringify({ version: 1, tokens: { "host-ink": { value: "#9a8fb5", reason: "r" } } }));
   assert.match(run("check.cjs", ["--config", "other.json", "docs/a.html"], root).out, /from other\.json has a contrast/);
 });
+
+test("a reason or a font from the files cannot end the style block that brand prints", () => {
+  const { print, withFile, stack } = require("../skills/docent/scripts/brand.cjs");
+  const style = print(withFile({ tokens: [], notes: [] }, { "host-ink": { value: "#3b2a5c", reason: "Violet */ </style><script>alert(1)</script>" } }, ".docent/config.json"));
+  assert.equal((style.match(/<\/style>/g) || []).length, 1, "the only </style> is the one that ends the block");
+  assert.equal((style.match(/\*\//g) || []).length, 1, "the only */ is the one that ends the comment");
+  assert.ok(!/<script/.test(style));
+  assert.equal(stack('Brand Sans, "Bad</style>", Evil;x, Other /* y', "sans-serif"), '"Brand Sans", sans-serif', "a font name from DESIGN.md that could end the value or the style is left out");
+  assert.equal(errorsOf({ version: 1, tokens: { "host-sans": { value: "Inter /* x", reason: "r" } } }).length, 1, "a font token cannot open a comment");
+});

@@ -74,7 +74,7 @@ function readConfig(file, { palettes = [], profiles = [] } = {}) {
       if (typeof entry.reason !== "string" || !entry.reason.trim()) at(field, 'no "reason"; write why the team chose this value');
       for (const key of Object.keys(entry)) if (!["value", "reason"].includes(key)) at(`${field}.${shown(key)}`, 'no field has this name; a token holds "value" and "reason"');
       if (COLORS.includes(name) && !(typeof entry.value === "string" && HEX.test(entry.value))) at(`${field}."value"`, `is ${shown(entry.value)}; a host color is a hex color, such as "#3b2a5c"`);
-      if (FONTS.includes(name) && !(typeof entry.value === "string" && entry.value.trim() && !/[;{}<>\\]|url\s*\(|@import/i.test(entry.value))) at(`${field}."value"`, `is ${shown(entry.value)}; a font token is a list of font names, such as "Inter, system-ui, sans-serif"`);
+      if (FONTS.includes(name) && !(typeof entry.value === "string" && entry.value.trim() && !/[;{}<>\\]|\/\*|\*\/|url\s*\(|@import/i.test(entry.value))) at(`${field}."value"`, `is ${shown(entry.value)}; a font token is a list of font names, such as "Inter, system-ui, sans-serif"`);
     }
   }
   if ("palette" in data && data.palette !== null && !palettes.includes(data.palette)) at('"palette"', `is ${shown(data.palette)}; the palettes are ${palettes.map(shown).join(", ")}, or null for Docent's own colors`);
