@@ -63,7 +63,7 @@
     <div class="row">
       <div>
         <p>Body text goes here. A <span class="term">highlighted term</span> has an underline in the ink color, and <code>code</code> sits in a small well.</p>
-        <p>A second paragraph. A link to <a href="#more">another section</a> looks like this.</p>
+        <p>A second paragraph. A link to <a href="#more">another section</a> looks like this.<a class="fn" id="fn-1-ref" href="#fn-1" aria-label="Note 1">[1]</a></p>
       </div>
       <div class="note" role="note">
         <strong>Note</strong>
@@ -97,6 +97,11 @@
       </div>
       <figcaption><strong>Figure 1</strong>A caption says what the figure shows, in one sentence.</figcaption>
     </figure>
+    <!-- FOOTNOTES. A mark [n] after the word links to note n; the notes end the section. Numbers run on down the page: a later list takes start="n". -->
+    <ol class="notes" aria-label="Notes to this section">
+      <li id="fn-1">A note holds a detail that most readers skip, in one to three sentences.
+        <a class="back" href="#fn-1-ref" aria-label="Back to the text of note 1">Back</a></li>
+    </ol>
   </section>
 
   <!-- WALKTHROUGH. For steps with two or more actors: the diagram shows who acts and what moves.

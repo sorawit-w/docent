@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Worked examples in API reference pages — Example Lab</title>
 <style>
-/* docent:kit 0.22.0 */
+/* docent:kit 0.23.0 */
 /* Docent page styles. Tokens come from references/DESIGN.md. One file, no network. */
 :root {
   color-scheme: light;
@@ -217,6 +217,12 @@ figcaption strong { font-weight: 600; color: var(--text); margin-right: 8px; }
    stands in a figure too, with "Table n" in its caption, so the figure's own space is the only space above it. */
 figcaption .source { display: block; margin-top: 4px; }
 figure > .table-wrap { margin-top: 0; }
+/* Footnotes: a mark in the line, [1], at full size with the link look, and the notes at the end of the section: 14px, muted, 32px under
+   the last block, with no heading, box or line. The note a jump lands on takes the text color; "Back" does not print. */
+.fn { white-space: nowrap; }
+ol.notes { margin: 32px 0 0; font-size: 0.875rem; line-height: 1.5; color: var(--muted); font-variant-numeric: tabular-nums; }
+.notes li:target { color: var(--text); }
+.fn:target { text-decoration-thickness: 2px; }
 
 /* Card grid: 3 to 8 short items side by side, each a heading or a large number and a line of text. A card is a label, like a margin note: a line above it, and no box. At most four in a row. */
 .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(max(160px, calc((100% - 72px) / 4)), 1fr)); gap: 24px; margin: 24px 0; padding: 0; list-style: none; }
@@ -403,7 +409,7 @@ footer p { margin: 0; }
   .logo { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   /* Paper has no link: the credit prints as text. */
   .credit a { color: inherit; text-decoration: none; }
-  .skip, .route, .theme, .route-dot, .rail-dot, .choose > .opt, .values > .opt, .decide-ask, .wd-foot, .copy, .fig-more { display: none !important; }
+  .skip, .route, .theme, .route-dot, .rail-dot, .choose > .opt, .values > .opt, .decide-ask, .wd-foot, .copy, .fig-more, .notes .back { display: none !important; }
   .choose > .case { display: block !important; margin-top: 16px; } .case-t { display: block; }
   .checks input:checked + label, .decide tr.is-out { color: var(--text) !important; }
   .steps li h3, .steps li p { color: var(--text) !important; }
@@ -502,11 +508,15 @@ footer p { margin: 0; }
       <dd>The answer to "How sure are you that your code is correct?", from 1 (not at all) to 7 (completely), asked after each task.</dd>
     </dl>
     <h3>Analysis</h3>
-    <p>We compared the two versions within each participant. For each measure we report the difference between the versions and a 95% confidence interval from a bootstrap with 10,000 samples of participants. We also give each difference as a standardized effect, d, so the three measures can be shown on one scale.</p>
+    <p>We compared the two versions within each participant. For each measure we report the difference between the versions and a 95% confidence interval from a bootstrap with 10,000 samples of participants.<a class="fn" id="fn-1-ref" href="#fn-1" aria-label="Note 1">[1]</a> We also give each difference as a standardized effect, d, so the three measures can be shown on one scale.</p>
     <div class="status">
       <span class="state info">Change from the plan</span>
       <p>The plan named a mixed model for the time measure. It did not converge with 24 participants, so we used the paired bootstrap for all three measures.</p>
     </div>
+    <ol class="notes" aria-label="Notes to this section">
+      <li id="fn-1">A bootstrap draws 24 participants at random from the 24, with repeats allowed, and works out the difference again. After 10,000 draws, the interval holds the middle 95% of those differences.
+        <a class="back" href="#fn-1-ref" aria-label="Back to the text of note 1">Back</a></li>
+    </ol>
   </section>
 
   <section id="results" aria-labelledby="results-h">
@@ -846,7 +856,11 @@ footer p { margin: 0; }
         </tbody>
       </table>
     </div>
-    <p>Of the 24 participants, 19 were faster with examples on the tasks they finished with both versions, 4 were slower, and 1 finished no task without examples.</p>
+    <p>Of the 24 participants, 19 were faster with examples on the tasks they finished with both versions, 4 were slower, and 1 finished no task without examples.<a class="fn" id="fn-2-ref" href="#fn-2" aria-label="Note 2">[2]</a></p>
+    <ol class="notes" start="2" aria-label="Notes to this section">
+      <li id="fn-2">This participant counts in the tasks finished, but not in the time, because a time needs a finished task with both versions.
+        <a class="back" href="#fn-2-ref" aria-label="Back to the text of note 2">Back</a></li>
+    </ol>
   </section>
 
   <section id="discussion" aria-labelledby="discussion-h">
@@ -898,7 +912,7 @@ d = mean(differences) / sd(differences)</code></pre>
   </div>
 </footer>
 <script>
-// docent:kit 0.22.0
+// docent:kit 0.23.0
 (() => {
   const root = document.documentElement;
   root.classList.add('js');
