@@ -5,6 +5,8 @@ const path = require("node:path");
 const { checkDocument } = require("../skills/docent/scripts/check.cjs");
 const { VERSION, stampHtml, cssBlock } = require("../skills/docent/scripts/lib/kit.cjs");
 const { renderDocument } = require("../skills/docent/scripts/lib/diagram.cjs");
+const { split, NUMBER_RULES } = require("../skills/docent/scripts/lib/rules.cjs");
+const textOf = (line) => split(line).text;
 
 const specimen = fs.readFileSync(path.join(__dirname, "..", "skills", "docent", "assets", "specimen.html"), "utf8");
 const errorsOf = (change) => checkDocument(change(specimen)).errors.join("\n");
@@ -116,7 +118,7 @@ test("check ties a walkthrough to its diagram: one step for each leg", () => {
 
 test("the kit keeps the rules that check applies to an author's own styles", () => {
   const page = `<!doctype html><html lang="en"><head><meta name="viewport" content="width=device-width"><title>T — H</title><style>${cssBlock().replace(/docent:kit/g, "kit")}</style></head><body><span class="host">H</span><h1>T</h1></body></html>`;
-  assert.deepEqual(checkDocument(page).errors, ["the document has no kit styles; run stamp", "the document has no kit script; run stamp"]);
+  assert.deepEqual(checkDocument(page).errors, ["[kit.blocks] the document has no kit styles; run stamp", "[kit.blocks] the document has no kit script; run stamp"]);
 });
 
 test("check ties each value place to a value picker", () => {
@@ -314,7 +316,7 @@ test("a source line: a chart of measured numbers needs one in its caption; check
   const warned = (html) => checkDocument(html).warnings.filter((w) => /source line/.test(w));
   assert.deepEqual(warned(specimen), [], "every chart of the sample page has a source line");
   const bare = specimen.replace(/\n\s*<span class="source">Source: invented sample data\.<\/span>(?=<\/figcaption>)/, "");
-  assert.deepEqual(warned(bare), ['figure 4 ("reports-month") is a funnel with no source line; add <span class="source">Source: …</span> to its caption, or write "Source: invented sample data." when the numbers are made up']);
+  assert.deepEqual(warned(bare), ['[source.chart] figure 4 ("reports-month") is a funnel with no source line; add <span class="source">Source: …</span> to its caption, or write "Source: invented sample data." when the numbers are made up']);
   // A workflow describes a design, not data, so it needs no source line; a chart with no caption is told to get one.
   const flow = '{"id": "flow-x", "label": "A goes to B.", "lanes": [{"id": "l", "name": "Lane"}], "parts": [{"id": "a", "lane": "l", "name": "A"}, {"id": "b", "lane": "l", "name": "B"}], "legs": [{"from": "a", "to": "b", "verb": "send"}]}';
   const bar = '{"id": "bar-x", "kind": "bar", "label": "Two amounts: A has 3 and B has 2.", "scale": {"from": 0, "to": 4, "step": 1, "unit": "reports"}, "rows": [{"name": "A", "value": 3}, {"name": "B", "value": 2}]}';
@@ -334,8 +336,9 @@ test("a source line: a chart of measured numbers needs one in its caption; check
 
 test("the number rules: check warns about each tested rule, quotes what it found, and reads no code, web address or look-alike", () => {
   const fixture = (name) => fs.readFileSync(path.join(__dirname, "fixtures", `numbers-${name}.html`), "utf8");
-  const warned = (name) => checkDocument(specimen.replace("</main>", `${fixture(name)}</main>`)).warnings.filter((w) => /^numbers, rule/.test(w));
-  assert.deepEqual(checkDocument(specimen).warnings.filter((w) => /^numbers, rule/.test(w)), [], "the sample page keeps the rules");
+  const numbers = (warnings) => warnings.filter((w) => /^numbers, rule/.test(textOf(w)));
+  const warned = (name) => numbers(checkDocument(specimen.replace("</main>", `${fixture(name)}</main>`)).warnings);
+  assert.deepEqual(numbers(checkDocument(specimen).warnings), [], "the sample page keeps the rules");
   const found = warned("break");
   const expect = [
     [2, '"1.2 s" and "0.95 s" in the column "Time" of the table "Times and counts"'], [2, '"17.981%" in "…the rules The share was 17.981% of reports, and the gro…", "123.456%" in "…reports, and the growth 123.456%. The count fell to -12…"'], [3, '"1090" in the column "Reports"'], [3, '"12400" in a card'],
@@ -343,7 +346,8 @@ test("the number rules: check warns about each tested rule, quotes what it found
   ];
   assert.equal(found.length, expect.length, found.join("\n"));
   expect.forEach(([rule, text], i) => {
-    assert.ok(found[i].startsWith(`numbers, rule ${rule} (`), found[i]);
+    assert.equal(split(found[i]).id, NUMBER_RULES[rule], "each number rule has its own ID");
+    assert.ok(textOf(found[i]).startsWith(`numbers, rule ${rule} (`), found[i]);
     assert.ok(found[i].includes(text), `${found[i]} names ${text}`);
     assert.match(found[i], /\(see "Numbers" in DESIGN\.md\)$/);
   });
@@ -431,8 +435,8 @@ test("status words: each listed word in its own state passes; a listed word in a
   assert.deepEqual(warned(...right), [], "every word of the table in its right state");
   const wrong = warned(["warn", "In progress"], ["err", "Rejected"]);
   assert.equal(wrong.length, 2);
-  assert.match(wrong[0], /^"In progress" takes the state info \(under way, nothing is wrong\), not warn; write warn with words that say why, such as "In progress, late"/);
-  assert.match(wrong[1], /^"Rejected" takes the state info \(closed; nothing is broken\), not err/);
+  assert.match(textOf(wrong[0]), /^"In progress" takes the state info \(under way, nothing is wrong\), not warn; write warn with words that say why, such as "In progress, late"/);
+  assert.match(textOf(wrong[1]), /^"Rejected" takes the state info \(closed; nothing is broken\), not err/);
   assert.deepEqual(warned(["warn", "In progress, late"]), [], "a longer label may hold a judgment");
   assert.match(warned(["err", "Superseded by this record"]).join("\n"), /"Superseded by this record" takes the state info/, "the word then by …");
   assert.match(warned(["ok", "open question"]).join("\n"), /takes the state plan \(not yet\), not ok/, "a word in lowercase");

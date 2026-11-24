@@ -5,6 +5,7 @@
 // type from the list, real size, no network and no script, an accessible name, and the diagram in words beside it. Elements and
 // attributes are read from a list, as strictly as a logo's (logo.cjs).
 const { TAG, attributes } = require("./logo.cjs");
+const { say, split, relabel } = require("./rules.cjs");
 
 const TYPES = ["quadrant", "nested", "venn", "fishbone", "wardley-map", "user-journey", "story-map"];
 // A type that Docent draws from data: the kind to write instead ("" is the workflow diagram, which has no "kind").
@@ -58,6 +59,8 @@ const RULE = {
   1: "rule 1, a marker", 2: "rule 2, the kit's classes only", 3: "rule 3, no text under 12px", 4: "rule 4, real size", 5: "rule 5, the page's font",
   6: "rule 6, no network and no script", 7: "rule 7, nothing dashed", 8: "rule 8, an accessible name", 9: "rule 9, the diagram in words", 0: "the markup",
 };
+// The ID of each rule of the contract in check's list (scripts/lib/rules.cjs).
+const RULE_ID = { 0: "hand.markup", 1: "hand.marker", 2: "hand.classes", 3: "hand.text-size", 4: "hand.size", 5: "hand.font", 6: "hand.network", 7: "hand.dashed", 8: "hand.name", 9: "hand.words" };
 const CLASS_LIST = Object.keys(CLASSES).join(", ");
 
 const words = (s) => s.replace(/<[^>]*>/g, "").replace(/&[#\w]+;/g, "x").trim();
@@ -106,19 +109,19 @@ function typeOf(type) {
   const look = [key, key.replace(/-(chart|diagram|graph)$/, "")].find((k) => Object.hasOwn(BUILT, k) || Object.hasOwn(PLANNED, k) || Object.hasOwn(LEFT_OUT, k)) || key;
   if (Object.hasOwn(BUILT, look)) {
     const kind = BUILT[look];
-    return { stop: true, error: [1, `it is a hand-drawn ${type}, which Docent draws from data; write its data in a block ${kind ? `with "kind": "${kind}"` : 'with no "kind" (a workflow diagram)'} and run render`] };
+    return { stop: true, id: "hand.built", error: [1, `it is a hand-drawn ${type}, which Docent draws from data; write its data in a block ${kind ? `with "kind": "${kind}"` : 'with no "kind" (a workflow diagram)'} and run render`] };
   }
-  if (Object.hasOwn(PLANNED, look)) return { stop: true, error: [1, `it is a hand-drawn ${type}; Docent plans a built-in kind for ${PLANNED[look]}, so until it is built, write its data as a table or in words`] };
-  if (Object.hasOwn(LEFT_OUT, look)) return { stop: true, error: [1, `it is a hand-drawn ${type}, which Docent leaves out: ${LEFT_OUT[look]} ("Position and length" in DESIGN.md). Use that instead. If the user asks for it after you name this rule, it is the user's call, and check still reports it (see SKILL.md on a design rule the user asks to break)`] };
+  if (Object.hasOwn(PLANNED, look)) return { stop: true, id: "hand.planned", error: [1, `it is a hand-drawn ${type}; Docent plans a built-in kind for ${PLANNED[look]}, so until it is built, write its data as a table or in words`] };
+  if (Object.hasOwn(LEFT_OUT, look)) return { stop: true, id: `hand.left-out.${look}`, error: [1, `it is a hand-drawn ${type}, which Docent leaves out: ${LEFT_OUT[look]} ("Position and length" in DESIGN.md). Use that instead. If the user asks for it after you name this rule, it is the user's call, and check still reports it (see SKILL.md on a design rule the user asks to break)`] };
   return { error: [1, `data-type="${type}" is not in the hand-drawn list; the types are ${TYPES.map((t) => `"${t}"`).join(", ")}, written as they are here`] };
 }
 
-/** Checks one hand-drawn <svg>. Returns { type, errors }, each error a sentence that names its rule and its element. */
+/** Checks one hand-drawn <svg>. Returns { type, errors }, each error a sentence that names its rule and its element, after the rule's ID. */
 function checkDrawing(source, { html = "" } = {}) {
   const svg = blank(source); // a comment is a note for the author: neither text nor tags
   const found = new Map(); // one message for each rule and reason, with the first element that breaks it and a count of the others
   const fail = (rule, why) => { const key = `${rule}|${why.slice(why.indexOf(";") + 1)}`, had = found.get(key); if (had) had[2] += 1; else found.set(key, [rule, why, 1]); };
-  const errors = () => [...found.values()].map(([rule, why, n]) => `${RULE[rule]}: ${why}${n > 1 ? ` (and ${n - 1} more like it)` : ""}`);
+  const errors = () => [...found.values()].map(([rule, why, n]) => say(RULE_ID[rule], `${RULE[rule]}: ${why}${n > 1 ? ` (and ${n - 1} more like it)` : ""}`));
   const stack = [], ids = [], children = [];
   let root = null, at = 0, type = null;
   for (const m of svg.matchAll(TAG)) {
@@ -160,11 +163,11 @@ function checkDrawing(source, { html = "" } = {}) {
     if (svg.slice(at).trim()) fail(0, "it holds something after </svg>, or markup that check cannot read");
     else if (stack.length) fail(0, `<${stack.at(-1).name}> is never closed`);
   }
-  if (!root) return { type, errors: [`${RULE[0]}: it holds no <svg>`] };
+  if (!root) return { type, errors: [say("hand.markup", `${RULE[0]}: it holds no <svg>`)] };
 
   // Rule 1: the type.
   const kind = typeOf(type);
-  if (kind.stop) return { type, errors: [`${RULE[kind.error[0]]}: ${kind.error[1]}`] };
+  if (kind.stop) return { type, errors: [say(kind.id, `${RULE[kind.error[0]]}: ${kind.error[1]}`)] };
   if (kind.error) fail(...kind.error);
 
   // Rule 4: real size, on screen and on paper.
@@ -223,17 +226,17 @@ function checkFigures(wells, { html = "" } = {}) {
     for (const s of svgs) {
       const open = s.text.match(/^<svg\b[^>]*>/i)[0];
       if (!/\bdata-drawn\s*=\s*["']hand["']/.test(open)) {
-        errors.push(`${label || "a figure"} holds a drawing that no diagram block made; write its data in a block and run render. Only a type in the hand-drawn list may be drawn by hand, marked data-drawn="hand" (see "Hand-drawn figures" in diagrams.md)`);
+        errors.push(say("hand.unmade", `${label || "a figure"} holds a drawing that no diagram block made; write its data in a block and run render. Only a type in the hand-drawn list may be drawn by hand, marked data-drawn="hand" (see "Hand-drawn figures" in diagrams.md)`));
         continue;
       }
       hand += 1;
       drawn.push(s.text);
       const name = label || `figure ${n + 1}`;
       const result = checkDrawing(s.text, { html });
-      result.errors.forEach((e) => errors.push(`${name}, hand-drawn: ${e}`));
-      if (!result.errors.some((e) => e.startsWith(RULE[1]))) warnings.push(`${name} is hand-drawn (${result.type}); check cannot see its layout, so open the page in a browser in light and in dark, at 375px and in print preview, and look at it. Tell the user this figure is hand-drawn`);
+      result.errors.forEach((e) => errors.push(relabel(e, `${name}, hand-drawn: `)));
+      if (!result.errors.some((e) => split(e).text.startsWith(RULE[1]))) warnings.push(say("hand.look", `${name} is hand-drawn (${result.type}); check cannot see its layout, so open the page in a browser in light and in dark, at 375px and in print preview, and look at it. Tell the user this figure is hand-drawn`));
     }
-    if (hand) { const why = wordsProblem(inner); if (why) errors.push(`${label || `figure ${n + 1}`}, hand-drawn: ${RULE[9]}: ${why}`); }
+    if (hand) { const why = wordsProblem(inner); if (why) errors.push(say("hand.words", `${label || `figure ${n + 1}`}, hand-drawn: ${RULE[9]}: ${why}`)); }
   });
   return { errors, warnings, drawn };
 }

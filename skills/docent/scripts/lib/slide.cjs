@@ -3,6 +3,7 @@
 // slide at slide sizes with the renderer's own width estimate. The heading is in the serif; it is estimated with the sans-serif at
 // weight 600, which is wider than the serif on Apple devices.
 const { textWidth } = require("./text.cjs");
+const { say } = require("./rules.cjs");
 
 const FRAME = { width: 1280, height: 720, margin: 64 };
 const INNER = { width: FRAME.width - 2 * FRAME.margin, height: FRAME.height - 2 * FRAME.margin }; // 1152 × 592
@@ -199,60 +200,60 @@ const fits = (room, w, h) => w * SCALE.least <= room.w && h * SCALE.least <= roo
 
 /** Tests the slides of a deck. html is the page with its comments blanked out, so the drawings are still in it. */
 function checkDeck(html) {
-  const errors = [];
+  const errors = [], error = (id, text) => errors.push(say(id, text));
   const main = html.match(/<main\b[^>]*>([\s\S]*?)<\/main>/i);
-  if (!main) return { errors: ["a deck has no <main>; its slides are sections directly inside <main>"], slides: [] };
+  if (!main) return { errors: [say("deck.frame", "a deck has no <main>; its slides are sections directly inside <main>")], slides: [] };
   const slides = [];
   for (const el of elements(main[1])) {
     if (el.tag === "section" && hasClass(el.attrs, "slide")) slides.push(el);
-    else errors.push(`${describe(el)} stands directly inside <main>; in a deck every child of <main> is a slide, a <section class="slide">`);
+    else error("deck.frame", `${describe(el)} stands directly inside <main>; in a deck every child of <main> is a slide, a <section class="slide">`);
   }
-  if (!slides.length) errors.push('a deck has no slides; each slide is a <section class="slide"> directly inside <main>, and the first is the title slide');
+  if (!slides.length) error("deck.frame", 'a deck has no slides; each slide is a <section class="slide"> directly inside <main>, and the first is the title slide');
   const ids = new Map(), measured = [];
   slides.forEach((slide, i) => {
     const n = i + 1, name = `slide ${n}`, title = i === 0, id = attrOf(slide.attrs, "id");
-    if (title && !hasClass(slide.attrs, "title")) errors.push('slide 1 is not the title slide; the first slide is <section class="slide title">, with the <h1>, the opening paragraph and a facts list');
-    if (!title && hasClass(slide.attrs, "title")) errors.push(`${name} has the class "title"; only the first slide is the title slide`);
-    if (!id) errors.push(`${name} has no id; give each slide an id, such as id="s${n}", so a link and the address can open it`);
-    else if (ids.has(id)) errors.push(`${name} has the id "${id}", as slide ${ids.get(id)} has; each slide has its own id`);
+    if (title && !hasClass(slide.attrs, "title")) error("deck.frame", 'slide 1 is not the title slide; the first slide is <section class="slide title">, with the <h1>, the opening paragraph and a facts list');
+    if (!title && hasClass(slide.attrs, "title")) error("deck.frame", `${name} has the class "title"; only the first slide is the title slide`);
+    if (!id) error("deck.frame", `${name} has no id; give each slide an id, such as id="s${n}", so a link and the address can open it`);
+    else if (ids.has(id)) error("deck.frame", `${name} has the id "${id}", as slide ${ids.get(id)} has; each slide has its own id`);
     else ids.set(id, n);
     // Speaker notes (decks.md, section 8): at most one closed section per slide, as its last child, holding text only.
     const all = elements(slide.inner), isNotes = (el) => el.tag === "details" && hasClass(el.attrs, "notes");
     const notes = all.filter(isNotes), nested = (slide.inner.match(/<details\b[^>]*\bclass="(?:[^"]*\s)?notes(?:\s[^"]*)?"/gi) || []).length - notes.length;
-    if (notes.length > 1) errors.push(`${name} has ${notes.length} sections of speaker notes; a slide has at most one, at its end`);
-    else if (notes.length && all[all.length - 1] !== notes[0]) errors.push(`${name}: the speaker notes are not the slide's last part; put <details class="notes"> at the end of the slide`);
-    if (nested > 0) errors.push(`${name} has speaker notes inside another part; the notes are a <details class="notes"> directly inside the slide, at its end`);
+    if (notes.length > 1) error("deck.notes", `${name} has ${notes.length} sections of speaker notes; a slide has at most one, at its end`);
+    else if (notes.length && all[all.length - 1] !== notes[0]) error("deck.notes", `${name}: the speaker notes are not the slide's last part; put <details class="notes"> at the end of the slide`);
+    if (nested > 0) error("deck.notes", `${name} has speaker notes inside another part; the notes are a <details class="notes"> directly inside the slide, at its end`);
     for (const note of notes) {
       const odd = elements(note.inner).filter((el) => el.tag !== "summary" && (!["p", "ul", "ol"].includes(el.tag) || /<(?:figure|table|pre|svg|img|details|div|input|form)\b/i.test(el.inner))); // the summary holds its arrow
-      if (odd.length) errors.push(`${name}: the speaker notes hold ${describe(odd[0])}; notes hold text only, in paragraphs and lists, with no figure, table, widget or code block`);
+      if (odd.length) error("deck.notes", `${name}: the speaker notes hold ${describe(odd[0])}; notes hold text only, in paragraphs and lists, with no figure, table, widget or code block`);
     }
     const parts = all.filter((el) => !isNotes(el));
     const headings = parts.filter((el) => /^h[1-6]$/.test(el.tag)), want = title ? "h1" : "h2";
     const heading = parts[0] && /^h[1-6]$/.test(parts[0].tag) ? parts[0] : null;
-    if (!heading) errors.push(`${name} does not start with its heading; a slide starts with one <${want}> that says its point`);
-    else if (heading.tag !== want) errors.push(`${name} starts with an <${heading.tag}>; ${title ? "the title slide holds the <h1>" : "a slide after the title slide starts with an <h2>"}`);
-    if (headings.length > 1) errors.push(`${name} has ${headings.length} headings; a slide has one heading, a sentence that says its point`);
+    if (!heading) error("deck.heading", `${name} does not start with its heading; a slide starts with one <${want}> that says its point`);
+    else if (heading.tag !== want) error("deck.heading", `${name} starts with an <${heading.tag}>; ${title ? "the title slide holds the <h1>" : "a slide after the title slide starts with an <h2>"}`);
+    if (headings.length > 1) error("deck.heading", `${name} has ${headings.length} headings; a slide has one heading, a sentence that says its point`);
     const headingLines = heading ? lines(plain(heading.inner), SIZE.heading, INNER.width, 600) : 0;
-    if (headingLines > LIMIT.headingLines) errors.push(`${name}: the heading ${quote(plain(heading.inner))} is about ${headingLines} lines at 52px; a slide's heading is at most ${LIMIT.headingLines} lines (about 80 characters). Say the point in fewer words`);
+    if (headingLines > LIMIT.headingLines) error("deck.heading", `${name}: the heading ${quote(plain(heading.inner))} is about ${headingLines} lines at 52px; a slide's heading is at most ${LIMIT.headingLines} lines (about 80 characters). Say the point in fewer words`);
     let height = headingLines * LINE.heading;
     const body = parts.filter((el) => !/^h[1-6]$/.test(el.tag));
     if (title) {
       for (const el of body) {
         if (el.tag === "p" && hasClass(el.attrs, "standfirst")) height += 24 + lines(plain(el.inner), SIZE.large, INNER.width) * LINE.large;
         else if (el.tag === "ul" && hasClass(el.attrs, "facts")) height += 24 + [...el.inner.matchAll(/<li\b[^>]*>([\s\S]*?)(?=<li\b|$)/gi)].reduce((sum, [, fact]) => sum + lines(plain(fact.replace(/<\/li>\s*$/i, "")), SIZE.small, INNER.width) * LINE.small, 0);
-        else errors.push(`slide 1, the title slide, holds ${describe(el)}; it holds the <h1>, the opening paragraph (<p class="standfirst">) and a facts list (<ul class="facts">)`);
+        else error("deck.body", `slide 1, the title slide, holds ${describe(el)}; it holds the <h1>, the opening paragraph (<p class="standfirst">) and a facts list (<ul class="facts">)`);
       }
     } else {
-      if (body.length > 1) errors.push(`${name} has ${body.length} bodies (${body.map(describe).join(", ")}); a slide holds one body: ${BODIES}. Move the rest to another slide, to the speaker notes or to the report`);
+      if (body.length > 1) error("deck.body", `${name} has ${body.length} bodies (${body.map(describe).join(", ")}); a slide holds one body: ${BODIES}. Move the rest to another slide, to the speaker notes or to the report`);
       const found = body.length ? measureBody(body[0], INNER.height - height - GAP) : null;
-      if (body.length && !found) errors.push(`${name} holds ${describe(body[0])}, which is not a slide body; a slide holds ${BODIES}`);
+      if (body.length && !found) error("deck.body", `${name} holds ${describe(body[0])}, which is not a slide body; a slide holds ${BODIES}`);
       if (found) {
-        found.problems.forEach((p) => errors.push(`${name}: ${p}`));
+        found.problems.forEach((p) => error("deck.fit", `${name}: ${p}`));
         height += GAP + found.height;
         measured.push({ n, ...found });
       }
     }
-    if (px(height) > INNER.height) errors.push(`${name} is about ${px(height)}px tall, and a slide holds ${INNER.height}px. Cut a point, or move the detail to the speaker notes or to the report`);
+    if (px(height) > INNER.height) error("deck.fit", `${name} is about ${px(height)}px tall, and a slide holds ${INNER.height}px. Cut a point, or move the detail to the speaker notes or to the report`);
     slide.height = height;
   });
   return { errors, slides: slides.map((s, i) => ({ n: i + 1, id: attrOf(s.attrs, "id"), height: px(s.height || 0) })), measured };

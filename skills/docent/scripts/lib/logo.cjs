@@ -3,6 +3,8 @@
 // plain shapes in groups, solid hex colors, and gradients with hex stops. No reference between parts (no use, symbol or clip path),
 // no opacity, nothing that runs code, loads a file or holds text. The agent flattens a logo to this subset before it pastes it.
 
+const { say } = require("./rules.cjs");
+
 const MOST = 24000; // characters of an SVG logo, or of the data URI of a raster logo
 const MOST_ELEMENTS = 400; // elements in an SVG logo
 const DEEPEST = 8; // levels of elements inside one another, the <svg> counted
@@ -74,7 +76,7 @@ const TWICE = (name, attr) => `<${name}> has the attribute "${attr}" twice; the 
 
 /** Checks one inline SVG logo. Returns { error } or { colors, ids, ratio, width, height, label, role, hidden, forTheme }. */
 function svgLogo(markup) {
-  if (markup.length > MOST) return { error: `it has ${markup.length} characters; a logo has at most ${MOST}` };
+  if (markup.length > MOST) return { rule: "logo.size", error: `it has ${markup.length} characters; a logo has at most ${MOST}` };
   const stack = [], ids = new Map(), stops = new Map(), shapes = [], paints = [];
   let root = null, at = 0, gradient = null, count = 0;
   for (const m of markup.matchAll(TAG)) {
@@ -175,7 +177,7 @@ function rasterLogo(tag) {
     if (!["class", "src", "width", "height", "alt", "data-for"].includes(attr)) return { error: `the <img> has the attribute "${attr}", which a logo does not take` };
   }
   const src = attrs.src || "";
-  if (src.length > MOST) return { error: `its data URI has ${src.length} characters; a logo has at most ${MOST}` };
+  if (src.length > MOST) return { rule: "logo.size", error: `its data URI has ${src.length} characters; a logo has at most ${MOST}` };
   const data = src.match(/^data:image\/(png|webp);base64,([A-Za-z0-9+/=\s]+)$/);
   if (!data) {
     const kind = (src.match(/^data:image\/([\w+.-]+)/) || [])[1];
@@ -186,7 +188,7 @@ function rasterLogo(tag) {
   }
   const size = rasterSize(data[1], Buffer.from(data[2], "base64"));
   if (!size || !size.width || !size.height) return { error: `its data is not a ${data[1].toUpperCase()} image` };
-  if (attrs.alt == null) return { error: "the <img> has no alt; write the host's name for a wordmark, or alt=\"\" beside the name" };
+  if (attrs.alt == null) return { rule: "logo.name", error: "the <img> has no alt; write the host's name for a wordmark, or alt=\"\" beside the name" };
   return { ratio: size.width / size.height, natural: size, width: Number(attrs.width), height: Number(attrs.height), label: attrs.alt, hidden: attrs.alt === "", forTheme: attrs["data-for"], raster: true };
 }
 
@@ -204,57 +206,57 @@ function findLogos(markup) {
 
 /** Tests every logo of a page. Returns { errors, warnings, name, logos } where name is the host name a wordmark carries. */
 function checkLogos(markup, PAGES = DOCENT_PAGES) {
-  const errors = [], warnings = [];
+  const errors = [], warnings = [], error = (id, text) => errors.push(say(id, text)), warn = (id, text) => warnings.push(say(id, text));
   const { host, found } = findLogos(markup);
   const logos = [];
   for (const item of found) {
-    if (!item.inHost) { errors.push("a logo stands outside the top bar; it appears once, in the top bar, before the host's name"); continue; }
+    if (!item.inHost) { error("logo.place", "a logo stands outside the top bar; it appears once, in the top bar, before the host's name"); continue; }
     // The kit's rules select .host > .logo, so a logo inside another element in the host (a link, a span) would show in every theme.
     const before = markup.slice(host.index + host[0].indexOf(">") + 1, item.start).replace(/<svg\b[\s\S]*?<\/svg>|<img\b[^>]*>/gi, "");
     const open = (before.match(/<[a-z][\w-]*\b[^>]*>/gi) || []).filter((t) => !/\/>$/.test(t)).length - (before.match(/<\/[a-z][\w-]*\s*>/gi) || []).length;
-    if (open > 0) { errors.push("a logo stands inside another element in the host's name; it stands directly inside <span class=\"host\">, because the kit's rules for its themes and its tile select it there"); continue; }
+    if (open > 0) { error("logo.place", "a logo stands inside another element in the host's name; it stands directly inside <span class=\"host\">, because the kit's rules for its themes and its tile select it there"); continue; }
     const kind = /^<svg\b/i.test(item.text) ? "svg" : /^<img\b/i.test(item.text) ? "img" : null;
-    if (!kind) { errors.push(`the top bar holds a logo that is not an <svg> or an <img>: ${item.text.slice(0, 40)}`); continue; }
+    if (!kind) { error("logo.place", `the top bar holds a logo that is not an <svg> or an <img>: ${item.text.slice(0, 40)}`); continue; }
     // The kit's rules for the size, the theme versions and the tile all select .logo, so a logo without the class would show in every theme.
-    if (!/^<(svg|img)\b[^>]*\bclass\s*=\s*["'](?:[^"']*\s)?logo(?:\s[^"']*)?["']/i.test(item.text)) { errors.push(`the ${kind === "svg" ? "<svg>" : "<img>"} in the top bar has no class="logo"; the kit shows each version of a logo in its own theme by that class`); continue; }
+    if (!/^<(svg|img)\b[^>]*\bclass\s*=\s*["'](?:[^"']*\s)?logo(?:\s[^"']*)?["']/i.test(item.text)) { error("logo.place", `the ${kind === "svg" ? "<svg>" : "<img>"} in the top bar has no class="logo"; the kit shows each version of a logo in its own theme by that class`); continue; }
     const result = kind === "svg" ? svgLogo(item.text) : rasterLogo(item.text);
-    if (result.error) { errors.push(`the logo in the top bar is refused: ${result.error}`); continue; }
+    if (result.error) { error(result.rule || "logo.markup", `the logo in the top bar is refused: ${result.error}`); continue; }
     logos.push({ ...item, ...result });
   }
   const text = host ? host[2].replace(/<svg\b[\s\S]*?<\/svg>|<img\b[^>]*>/gi, "").replace(/<[^>]*>/g, "").replace(/&amp;/g, "&").replace(/\s+/g, " ").trim() : "";
   if (!logos.length) return { errors, warnings, logos, name: host ? text : null };
   // At most one logo for each theme, or one for both.
   const themes = logos.map((l) => l.forTheme || "both");
-  for (const theme of themes) if (!["both", "light", "dark"].includes(theme)) errors.push(`a logo has data-for="${theme}"; it is "light" or "dark"`);
-  if (logos.length > 2 || (logos.length === 2 && themes.sort().join() !== "dark,light")) errors.push(`the top bar has ${logos.length} logos; it has one, or one with data-for="light" and one with data-for="dark"`);
+  for (const theme of themes) if (!["both", "light", "dark"].includes(theme)) error("logo.place", `a logo has data-for="${theme}"; it is "light" or "dark"`);
+  if (logos.length > 2 || (logos.length === 2 && themes.sort().join() !== "dark,light")) error("logo.place", `the top bar has ${logos.length} logos; it has one, or one with data-for="light" and one with data-for="dark"`);
   // An id is page-wide: two logos, or a logo and the page, that share an id can draw each other's gradient or break a link.
   for (const id of new Set(logos.flatMap((l) => l.ids || []))) {
     const count = (markup.match(new RegExp(`\\bid\\s*=\\s*["']${id}["']`, "g")) || []).length;
-    if (count > 1) errors.push(`the id "${id}" in a logo is used ${count} times in the page; an id is page-wide, so give each logo its own ids, such as "${id}-dark"`);
+    if (count > 1) error("logo.id", `the id "${id}" in a logo is used ${count} times in the page; an id is page-wide, so give each logo its own ids, such as "${id}-dark"`);
   }
   for (const logo of logos) {
     const what = logo.forTheme ? `the ${logo.forTheme} logo` : "the logo";
     // The slot: 24px high and at most 160px wide; the logo keeps its shape.
     const want = slotSize(logo.ratio);
-    if (!(Math.abs(logo.width - want.width) <= 0.5 && Math.abs(logo.height - want.height) <= 0.5)) errors.push(`${what} needs width="${want.width}" height="${want.height}": the slot is ${SLOT.height}px high and at most ${SLOT.width}px wide, and a logo keeps its shape`);
-    else if (want.height < SLOT.lowest) warnings.push(`${what} is ${want.height}px high, because it is very wide; below ${SLOT.lowest}px a wordmark is hard to read. A symbol, or a less wide version, reads better`);
-    if (logo.raster && logo.natural.height < SHARP * want.height) errors.push(`${what} is ${logo.natural.width} × ${logo.natural.height} pixels; it shows ${want.height}px high, so it needs at least ${Math.ceil(SHARP * want.height)} pixels of height to stay sharp on a phone and on paper`);
+    if (!(Math.abs(logo.width - want.width) <= 0.5 && Math.abs(logo.height - want.height) <= 0.5)) error("logo.slot", `${what} needs width="${want.width}" height="${want.height}": the slot is ${SLOT.height}px high and at most ${SLOT.width}px wide, and a logo keeps its shape`);
+    else if (want.height < SLOT.lowest) warn("logo.slot", `${what} is ${want.height}px high, because it is very wide; below ${SLOT.lowest}px a wordmark is hard to read. A symbol, or a less wide version, reads better`);
+    if (logo.raster && logo.natural.height < SHARP * want.height) error("logo.sharp", `${what} is ${logo.natural.width} × ${logo.natural.height} pixels; it shows ${want.height}px high, so it needs at least ${Math.ceil(SHARP * want.height)} pixels of height to stay sharp on a phone and on paper`);
     // Light and dark: a logo shows on the page it sits on. A raster logo cannot be read here; the agent looks at it.
     if (logo.raster) continue;
     const reads = (ground) => logo.colors.has("currentColor") || [...logo.colors].some((c) => c !== "currentColor" && contrast(c, ground) >= MARK);
-    if (logo.forTheme !== "dark" && !reads(PAGES.light)) errors.push(`${what} has no color with ${MARK}:1 on the light page (${PAGES.light}); give it a light version${logo.forTheme ? "" : ", or mark it data-for=\"dark\" so the light page shows it on a tile"}`);
-    if (logo.forTheme !== "light" && !reads(PAGES.dark)) errors.push(`${what} has no color with ${MARK}:1 on the dark page (${PAGES.dark}); give it a dark version with data-for="dark"${logo.forTheme ? "" : ", or mark it data-for=\"light\" so dark mode shows it on a tile"}`);
+    if (logo.forTheme !== "dark" && !reads(PAGES.light)) error("logo.contrast", `${what} has no color with ${MARK}:1 on the light page (${PAGES.light}); give it a light version${logo.forTheme ? "" : ", or mark it data-for=\"dark\" so the light page shows it on a tile"}`);
+    if (logo.forTheme !== "light" && !reads(PAGES.dark)) error("logo.contrast", `${what} has no color with ${MARK}:1 on the dark page (${PAGES.dark}); give it a dark version with data-for="dark"${logo.forTheme ? "" : ", or mark it data-for=\"light\" so dark mode shows it on a tile"}`);
   }
   // The name: a symbol stands before the host's name and is hidden from a screen reader; a wordmark stands alone and carries the name.
   let name = text || null;
   for (const logo of logos) {
     const what = logo.forTheme ? `the ${logo.forTheme} logo` : "the logo";
-    if (text && !logo.hidden) errors.push(`${what} stands before the host's name, so a screen reader would read the name twice; write ${logo.raster ? 'alt=""' : 'aria-hidden="true"'} on it`);
+    if (text && !logo.hidden) error("logo.name", `${what} stands before the host's name, so a screen reader would read the name twice; write ${logo.raster ? 'alt=""' : 'aria-hidden="true"'} on it`);
     if (!text) {
       const label = (logo.label || "").trim();
-      if (logo.hidden && !logo.raster) errors.push(`${what} stands alone, so it is the only place that names the host; take out aria-hidden="true", which hides it from a screen reader`);
-      else if (!label || (!logo.raster && logo.role !== "img")) errors.push(`${what} stands alone, so it carries the host's name: write ${logo.raster ? 'alt="Host name"' : 'role="img" aria-label="Host name"'} on it`);
-      else if (name && label !== name) errors.push(`the two logos carry two names, "${name}" and "${label}"`);
+      if (logo.hidden && !logo.raster) error("logo.name", `${what} stands alone, so it is the only place that names the host; take out aria-hidden="true", which hides it from a screen reader`);
+      else if (!label || (!logo.raster && logo.role !== "img")) error("logo.name", `${what} stands alone, so it carries the host's name: write ${logo.raster ? 'alt="Host name"' : 'role="img" aria-label="Host name"'} on it`);
+      else if (name && label !== name) error("logo.name", `the two logos carry two names, "${name}" and "${label}"`);
       else name = label;
     }
   }

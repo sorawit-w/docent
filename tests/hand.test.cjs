@@ -6,6 +6,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const { checkDocument } = require("../skills/docent/scripts/check.cjs");
 const { checkDrawing, TYPES, CLASSES } = require("../skills/docent/scripts/lib/hand.cjs");
+const { split } = require("../skills/docent/scripts/lib/rules.cjs");
 
 const specimen = fs.readFileSync(path.join(__dirname, "..", "skills", "docent", "assets", "specimen.html"), "utf8");
 const kitCss = fs.readFileSync(path.join(__dirname, "..", "skills", "docent", "assets", "kit.css"), "utf8");
@@ -20,7 +21,7 @@ const HEAD = '<text class="hd-name" text-anchor="middle" x="556" y="146">';
 test("a valid hand-drawn fishbone passes check, and check names it as hand-drawn and asks for a look in a browser", () => {
   const { errors, warnings } = checkDocument(page());
   assert.deepEqual(errors, []);
-  assert.deepEqual(warnings.filter((w) => /hand-drawn/.test(w)), ["Figure 9, why a bug report cannot be repeated is hand-drawn (fishbone); check cannot see its layout, so open the page in a browser in light and in dark, at 375px and in print preview, and look at it. Tell the user this figure is hand-drawn"]);
+  assert.deepEqual(warnings.filter((w) => /hand-drawn/.test(w)), ["[hand.look] Figure 9, why a bug report cannot be repeated is hand-drawn (fishbone); check cannot see its layout, so open the page in a browser in light and in dark, at 375px and in print preview, and look at it. Tell the user this figure is hand-drawn"]);
   assert.deepEqual(TYPES, ["quadrant", "nested", "venn", "fishbone", "wardley-map", "user-journey", "story-map"]);
   for (const type of TYPES) assert.equal(errs(swap('data-type="fishbone"', `data-type="${type}"`)), "", `${type} is in the list`);
 });
@@ -54,11 +55,16 @@ const BROKEN = [
   ["a left-out type", swap('data-type="fishbone"', 'data-type="radar"'), /rule 1, a marker: it is a hand-drawn radar, which Docent leaves out: the area of the shape depends on the order of the spokes; .*\("Position and length" in DESIGN\.md\)\. .*If the user asks for it after you name this rule, it is the user's call/],
 ];
 
+// The ID of each rule of the contract in check's list, by its number in the message.
+const ID = { 1: "hand.marker", 2: "hand.classes", 3: "hand.text-size", 4: "hand.size", 5: "hand.font", 6: "hand.network", 7: "hand.dashed", 8: "hand.name", 9: "hand.words" };
+const idOf = (what, message) => ({ "a built-in type": "hand.built", "a left-out type": "hand.left-out.radar" })[what] || ID[message.source.match(/rule (\d)/)[1]];
+
 for (const [what, change, message] of BROKEN) {
-  test(`check refuses a hand-drawn figure with ${what}, with its own message`, () => {
+  test(`check refuses a hand-drawn figure with ${what}, with its own message and rule ID`, () => {
     const errors = hand(checkDocument(page(change)).errors);
     assert.equal(errors.length, 1, errors.join("\n"));
-    assert.match(errors[0], /^Figure 9, why a bug report cannot be repeated, hand-drawn: /);
+    assert.equal(split(errors[0]).id, idOf(what, message));
+    assert.match(split(errors[0]).text, /^Figure 9, why a bug report cannot be repeated, hand-drawn: /);
     assert.match(errors[0], message);
   });
 }

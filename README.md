@@ -34,7 +34,7 @@ Version 0.18.0. The design is settled, and the three scripts exist with tests.
 | `render`: draws diagrams from data | Built: Route wide, Route tall, Plates, a single-track form for phones, a column form for phones for data that is not a route, sequence diagrams and flowcharts, and UML diagrams: sequence (UML notation), activity, state machine, interaction overview, timing, use case, class, object, package, profile, component, composite structure, deployment and communication; and charts on a numeric scale: range chart, layout to scale, plan, funnel, bar chart (with the dumbbell form), line chart (with the slopegraph form and small multiples), heat map, heat plan and status grid |
 | `render`: builds widgets from data | Built: chooser, value picker, checklist, decision helper. Each is readable with scripts off and on paper |
 | `stamp`: puts the styles and the page script into a document | Built |
-| `check`: tests a document against the rules | Built. It reads the source only; it does not open a browser |
+| `check`: tests a document against the rules | Built. It reads the source only; it does not open a browser. Each error and warning names its rule, such as `[cards.count]`, and `check.cjs --rules` lists every rule |
 | Built-in icon set | 15 icons |
 | Sample page ([`specimen.html`](skills/docent/assets/specimen.html)) | Made by the scripts |
 | Starting page ([`template.html`](skills/docent/assets/template.html)) | Not built on purpose: content and data only, so that an agent reads little. The scripts build it |
