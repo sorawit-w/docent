@@ -437,3 +437,20 @@ test("status words: each listed word in its own state passes; a listed word in a
   assert.match(warned(["err", "Superseded by this record"]).join("\n"), /"Superseded by this record" takes the state info/, "the word then by …");
   assert.match(warned(["ok", "open question"]).join("\n"), /takes the state plan \(not yet\), not ok/, "a word in lowercase");
 });
+
+test("key findings: each item opens with one <strong> sentence; check warns about a missing lead, no period, a long lead, 1 or 7 items, no label, and a link in the lead", () => {
+  const item = (lead, support = "412 of 1,090 reports, 38%.") => `<li>${lead == null ? "" : `<strong>${lead}</strong> `}${support}</li>`;
+  const page = (items, attrs = ' aria-label="Key findings"') => specimen.replace("</main>", `<section id="f" aria-labelledby="f-h"><h2 id="f-h">What we found</h2><ol class="findings"${attrs}>${items.join("")}</ol></section></main>`);
+  const warned = (...args) => checkDocument(page(...args)).warnings.filter((w) => /finding/.test(w)).join("\n");
+  const two = [item("Sign-in had the most bug reports."), item("About one report in five could not be repeated.")];
+  assert.equal(warned(two), "", "a good list");
+  assert.equal(warned([...two, item("Ask for the steps.", 'Reports with steps were repeated more often. <span class="state plan">Proposed</span> <a href="#f">The evidence</a>')]), "", "a state and a link after the lead");
+  assert.match(warned([two[0], item(null, "Sign-in had the most bug reports.")]), /item 2 of the findings list "Key findings" does not start with <strong>; each key finding starts with one sentence in <strong>/, "a missing <strong>");
+  assert.match(warned([two[0], item("Sign-in")]), /the lead sentence of item 2 of the findings list "Key findings" \("Sign-in"\) does not end with a period/, "a lead with no period");
+  assert.match(warned([two[0], item(`${"word ".repeat(25)}more.`)]), /has 26 words; it has at most 25/, "a lead of 26 words");
+  assert.match(warned([two[0]]), /the findings list "Key findings" has 1 item; it holds 2 to 6/, "one item");
+  assert.match(warned(Array(7).fill(two[0])), /has 7 items; it holds 2 to 6/, "seven items");
+  assert.match(warned(two, ""), /a findings list \(<ol class="findings">\) has no aria-label/, "no aria-label");
+  assert.match(warned([two[0], item('Sign-in had <a href="#f">the most reports</a>.')]), /\("Sign-in had the most reports\."\) holds a link or a state/, "a link inside the lead");
+  assert.match(warned([two[0], item('Sign-in is done. <span class="state ok">Done</span>')]), /holds a link or a state/, "a state inside the lead");
+});

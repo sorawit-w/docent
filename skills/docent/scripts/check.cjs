@@ -18,6 +18,8 @@ const { wordsOf, findNumberText, findNumberColumn, findBigNumber } = require("./
 
 const MOST_WIDGETS = 4; // more widgets than this in one document gives a warning
 const CARDS = [3, 8]; // a card grid holds 3 to 8 cards
+const FINDINGS = [2, 6]; // a findings list holds 2 to 6 items
+const LEAD_WORDS = 25; // the lead sentence of a key finding has at most this many words
 const TAGLINE = 90; // characters: the tagline is one line
 // Each host color, the theme it shows in, and the contrast it needs: text needs 4.5:1, the dot is a mark and needs 3:1 (WCAG 1.4.11).
 const HOST = { "host-accent": ["light", 4.5], "host-accent-dark": ["dark", 4.5], "host-ink": ["light", 4.5], "host-dot-dark": ["dark", 3] };
@@ -471,6 +473,23 @@ function checkDocument(html) {
     if (!word || !got || got === STATUS_WORDS[word][0]) continue;
     const [want, why] = STATUS_WORDS[word];
     warnings.push(`"${label}" takes the state ${want} (${why}), not ${got}; write ${got} with words that say why, such as "In progress, late" (see "Status notes" in SKILL.md)`);
+  }
+
+  // 10i. Key findings (<ol class="findings">): 2 to 6 items, each opening with one sentence in <strong>, the finding itself. check cannot
+  // tell a finding from a topic, or whether the answer is on the page; those stay with the author.
+  for (const list of withClass(markup, "findings").filter((l) => l.tag === "ol")) {
+    const label = attrOf(list.attrs, "aria-label"), name = label ? `the findings list "${label}"` : "a findings list";
+    if (!label) warnings.push(`a findings list (<ol class="findings">) has no aria-label; give it aria-label="Key findings" or "Recommendations", so a screen reader does not name it only "list"`);
+    const items = [...list.inner.matchAll(/<li\b[^>]*>([\s\S]*?)(?=<li\b|$)/gi)].map(([, body]) => body.replace(/<\/li>\s*$/i, "").trim());
+    if (items.length < FINDINGS[0] || items.length > FINDINGS[1]) warnings.push(`${name} has ${items.length} item${items.length === 1 ? "" : "s"}; it holds ${FINDINGS[0]} to ${FINDINGS[1]}. One finding is a sentence or a status note, and more than ${FINDINGS[1]} are not key`);
+    items.forEach((body, i) => {
+      const lead = (body.match(/^<strong\b[^>]*>([\s\S]*?)<\/strong>/i) || [])[1], item = `item ${i + 1} of ${name}`;
+      if (lead == null) return warnings.push(`${item} does not start with <strong>; each key finding starts with one sentence in <strong>, the finding itself`);
+      const text = plain(lead), count = text.split(" ").filter(Boolean).length, quoted = `"${text.length > 60 ? `${text.slice(0, 60)}…` : text}"`;
+      if (!/\.$/.test(text)) warnings.push(`the lead sentence of ${item} (${quoted}) does not end with a period; it is one full sentence, with a subject and a verb`);
+      if (count > LEAD_WORDS) warnings.push(`the lead sentence of ${item} (${quoted}) has ${count} words; it has at most ${LEAD_WORDS}. Move the detail into the sentences after it`);
+      if (/<a\b/i.test(lead) || /\bclass="(?:[^"]*\s)?state(?:\s[^"]*)?"/.test(lead)) warnings.push(`the lead sentence of ${item} (${quoted}) holds a link or a state; put it in the sentences after the <strong>, so a list of links names each link once`);
+    });
   }
 
   // 11. Personal data: email addresses and phone numbers, in the page text and in the data of each diagram and widget. A warning only:

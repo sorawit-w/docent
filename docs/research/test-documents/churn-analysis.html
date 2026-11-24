@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Why customers left in the third quarter — Example Planner</title>
 <style>
-/* docent:kit 0.27.0 */
+/* docent:kit 0.28.0 */
 /* Docent page styles. Tokens come from references/DESIGN.md. One file, no network. */
 :root {
   color-scheme: light;
@@ -129,6 +129,11 @@ code { font: 0.875rem/1.55 var(--mono); background: var(--panel); padding: 0.1em
 /* Lists in the text flow: points, or numbers for steps that one actor does. The rules are weak on purpose, so the lists of the kit's own blocks keep their styles. */
 :where(main) :where(ul, ol):not(.steps, .facts, .cards) { max-width: var(--measure); margin: 0 0 16px; padding-left: 24px; }
 :where(main) :where(ul, ol):not(.steps, .facts, .cards) > :where(li + li) { margin-top: 4px; }
+/* Key findings: each item opens with one sentence in weight 600 on its own line, so the eye reads the findings down the page like
+   headings. 12px between items, as between two pairs of a definition list. The number is the list's own marker, muted. No box, no line. */
+ol.findings > li + li { margin-top: 12px; }
+ol.findings > li::marker { color: var(--muted); font-variant-numeric: tabular-nums; }
+ol.findings > li > strong:first-child { display: block; font-weight: 600; }
 /* A block heading in the text flow has more space above it than below it. A step heading of a walkthrough has none. */
 :where(main) h3 { margin: 32px 0 8px; }
 h2 + h3, h3 + h4 { margin-top: 0; }
@@ -428,7 +433,7 @@ footer p { margin: 0; }
   .state::before, .steps::before, .fig, pre, code { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   /* Paper cannot scroll, and a drawing cannot split across pages. So a drawing that is wider than the paper, or taller than a page, shrinks to fit, under its caption, on A4 and on Letter. */
   .fig > svg { width: auto; height: auto; max-width: 100%; max-height: 220mm; }
-  figure, tr, .status, pre, .checks li, .cards > li { break-inside: avoid; }
+  figure, tr, .status, pre, .checks li, .cards > li, .findings > li { break-inside: avoid; }
   h2, h3 { break-after: avoid; }
   /* Page numbers: Chrome and Edge print them; other browsers print their own footer. */
   @page { margin: 18mm; @bottom-right { content: counter(page) " / " counter(pages); font: 9pt system-ui, sans-serif; color: #575d75; } }
@@ -1607,7 +1612,7 @@ footer p { margin: 0; }
   </div>
 </footer>
 <script>
-// docent:kit 0.27.0
+// docent:kit 0.28.0
 (() => {
   const root = document.documentElement;
   root.classList.add('js');
