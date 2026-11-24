@@ -291,6 +291,39 @@ Corners are soft and consistent. Controls use `sm` (6px). Code blocks use `md` (
 - Say what happens, not how to feel about it. No praise words, no hype.
 - Write for a reader whose first language is not English. No idioms.
 
+### Numbers
+
+These rules hold in the text, in tables, in captions and source lines, in the data of a chart, and in cards. Code and quoted output keep their own form.
+
+| # | Rule | Do | Don't |
+|---|---|---|---|
+| 1 | **Digits and units.** Every measured number is in digits, also below 10. A space goes between a number and its unit; a percent has none. One form of each unit in a document. | `3 reports`, `320 ms`, `4.2 GB`, `18%` | `three reports`, `320ms` beside `250 ms`, `18 %`, a number with no unit |
+| 2 | **Rounding.** Round to what the reader needs: two or three digits that matter. In a column, every number has the same decimals. A share near 0 or 100 keeps one decimal, as the funnel does, so it stays true. | `18%`, `1.2 s` and `0.9 s` in one column, `0.4%` | `17.98%`, `1.2 s` and `0.95 s` in one column, `0%` for 3 of 1,090 |
+| 3 | **Thousands.** A comma every three digits, from 1,000 up. A point for decimals. Years and codes have no comma. | `1,090`, `12,400`, `2026`, `build 10452` in code | `1090` beside `12,400`, `12400`, `1.090` |
+| 4 | **Negative numbers.** A minus sign (−, U+2212), not a hyphen. In the text, a word is clearer. No brackets for a negative. | `−12` in a table; "fell by 12" in the text | `-12`, `(12)` |
+| 5 | **Ranges.** In a table, a chart and a source line: an en dash with no spaces. In the text: "from … to". With a negative number: always "to". Both ends keep the unit when it is a percent. | `45–76`; "from 45 to 76 characters"; `−5 to 10`; "16% to 20%" | `45-76`, `45 – 76`, `−5–10`, "16 to 20%" |
+| 6 | **Percent and percentage points.** A change in a rate is in percentage points, written in full. A relative change may follow, with its base. | "The fix rate rose from 40% to 46%: up 6 percentage points." | "The fix rate rose 6%." (for 40% to 46%); `6 pp`; `6 pts` |
+| 7 | **Sample size.** In a source line: `n =` with spaces, the number and the unit. In the text: the words. | `n = 1,090 reports`; "from 1,090 reports" | `n=1090`; `n = 1,090` with no unit; "a large sample" |
+| 8 | **Change against a period.** Name the value, the direction as a word, the amount, the period it is compared with, and, in brackets, the earlier value. | "1,090 reports, up 12% against Q2 2026 (973)" | `+12%`; "up 12%" with no period; "12% growth" |
+| 9 | **Dates.** Day, month as a word, year. A range of dates is "from … to", with the year once when it is the same. A quarter names its year the first time. ISO dates are allowed in a table of data. | `1 July 2026`; "1 July to 30 September 2026"; `Q3 2026`; `2026-07-01` in a table | `7/1/2026`, `01.07.26`, "Q3" with no year the first time |
+| 10 | **"About" and "times".** Plain words for an estimate and a ratio. | "about 250"; "3 times as many"; "a third as many" | `~250`, `c. 250`, "3x more", "3 times fewer" |
+
+**Why these rules.** Readers of English as a second language read in many local number styles: some use a comma for decimals, some write the day first and some the month. Docent's text is English, so it uses one English style and writes the parts that differ most (dates, ratios) in words. A hyphen as a minus is read as "dash" or not at all by some screen readers, and a minus sign is read as "minus". "3 times fewer" has no clear meaning in English, and "6%" for a change from 40% to 46% is wrong by a factor of 2.5 (the relative change is 15%).
+
+**What `check` tests.** It warns, never refuses, and it reads the author's words only: not code, not a drawing, not the data of a chart or a widget, and not a web address. Each warning quotes the text it found and names the rule.
+
+| Rule | `check` warns about |
+|---|---|
+| 2, rounding | Numbers with different decimals in one column marked `num` (compared among cells with the same unit); a percent with more than 2 decimals, unless it is within 1 of 0 or 100 |
+| 3, thousands | In a column marked `num` and in a card's large number: a number of 5 or more digits with no comma; in such a column, a 4-digit number with no comma when another number has one |
+| 4, minus | A hyphen just before a digit, after a space or a bracket or at the start of a cell, so `COVID-19` and `fn-1` pass |
+| 5, ranges | A hyphen between two numbers (`45-76`). It skips ISO dates, numbers with more than one hyphen, a time of day and a number such as `555-0100`. It may still find a part number |
+| 6, points | `pp` or `pts` after a number |
+| 9, dates | Day, month and year split by slashes, in either order, or a month and a year (`7/2026`); not two small numbers such as `3/4` or `24/7`, which are a fraction or a ratio |
+| 10, about | `~` before a number |
+
+It cannot test the meaning: whether a number needs a unit (rule 1), whether a change of a rate is written in percent (rule 6), whether n is there (rule 7), or whether the text names a period (rule 8). Those stay with the author.
+
 ## Motion
 
 Motion in Docent has one job: to show where to look or what comes next. If a motion does neither, remove it. The dot is the one moving part that belongs to Docent.

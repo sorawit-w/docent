@@ -331,3 +331,22 @@ test("a source line: a chart of measured numbers needs one in its caption; check
   assert.match(warned(page(figure(bar, '<figcaption><strong>Figure 9</strong>Two amounts. <span class="source">Source: </span></figcaption>'))).join("\n"), /a source line is empty \("Source:"\)/);
   assert.match(warned(page(figure(bar, '<figcaption><strong>Figure 9</strong>Two amounts. <span class="source"></span></figcaption>'))).join("\n"), /a source line is empty;/);
 });
+
+test("the number rules: check warns about each tested rule, quotes what it found, and reads no code, web address or look-alike", () => {
+  const fixture = (name) => fs.readFileSync(path.join(__dirname, "fixtures", `numbers-${name}.html`), "utf8");
+  const warned = (name) => checkDocument(specimen.replace("</main>", `${fixture(name)}</main>`)).warnings.filter((w) => /^numbers, rule/.test(w));
+  assert.deepEqual(checkDocument(specimen).warnings.filter((w) => /^numbers, rule/.test(w)), [], "the sample page keeps the rules");
+  const found = warned("break");
+  const expect = [
+    [2, '"1.2 s" and "0.95 s" in the column "Time" of the table "Times and counts"'], [2, '"17.981%" in "…the rules The share was 17.981% of reports, and the gro…", "123.456%" in "…reports, and the growth 123.456%. The count fell to -12…"'], [3, '"1090" in the column "Reports"'], [3, '"12400" in a card'],
+    [4, '"-12"'], [5, '"45-76"'], [6, '"6 pp"'], [9, '"7/1/2026"'], [10, '"~250"'],
+  ];
+  assert.equal(found.length, expect.length, found.join("\n"));
+  expect.forEach(([rule, text], i) => {
+    assert.ok(found[i].startsWith(`numbers, rule ${rule} (`), found[i]);
+    assert.ok(found[i].includes(text), `${found[i]} names ${text}`);
+    assert.match(found[i], /\(see "Numbers" in DESIGN\.md\)$/);
+  });
+  assert.match(found[6], /"6 pp" in "…orts\. The fix rate rose 6 pp\. It closed on 7\/1\/2026,…", "6\.3 pts" in "[^"]*", "1\.2 pts" in "[^"]*"; write "percentage points" in full/, "one warning for each rule, with up to three places");
+  assert.deepEqual(warned("keep"), [], "code, a web address, an ISO date, a time, a phone number, a fraction, a share near 0 or 100, a year, a column of mixed measures, and code in a number cell or a card pass");
+});
