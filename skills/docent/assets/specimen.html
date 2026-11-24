@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex">
 <title>Report a bug and get a fix — Example project</title>
 <style>
-/* docent:kit 0.21.0 */
+/* docent:kit 0.22.0 */
 /* Docent page styles. Tokens come from references/DESIGN.md. One file, no network. */
 :root {
   color-scheme: light;
@@ -225,6 +225,10 @@ figure > .table-wrap { margin-top: 0; }
 .cards h3 { margin: 0 0 4px; font-size: 1rem; line-height: 1.5; }
 .cards p { margin: 0; font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
 .cards .big { margin-bottom: 4px; font: 700 1.875rem/1.2 var(--serif); font-weight: var(--heading-weight, 700); color: var(--ink); font-variant-numeric: tabular-nums; }
+/* A number with its change: a third line in a card. The direction is a word in the text color at weight 600, and the rest is muted.
+   No arrow and no color: up is not always good, and green, amber and red mean status only. */
+.cards .change { margin-top: 4px; }
+.change .dir { font-weight: 600; color: var(--text); }
 /* Every block after a card grid stands 24px below it, or more when its own space is larger: the two margins overlap. */
 .cards:last-child { margin-bottom: 0; }
 
@@ -1364,6 +1368,11 @@ footer p { margin: 0; }
         <span class="source">Source: invented sample data.</span></figcaption>
     </figure>
     <p>Fewer new reports have come in each month since June, when the report form began to ask for the steps.</p>
+    <ul class="cards">
+      <li><p class="big">88</p><p>new bug reports in December</p><p class="change"><span class="dir">Down</span> 2 reports against November (90)</p></li>
+      <li><p class="big">92</p><p>reports closed in December</p><p class="change"><span class="dir">Down</span> 6 reports against November (98)</p></li>
+      <li><p class="big">1,351</p><p>new bug reports in the whole year</p></li>
+    </ul>
     <figure>
       <div class="fig" role="region" aria-label="Figure 6, new and closed reports each month" tabindex="0">
         <!-- docent:diagram
@@ -2058,7 +2067,7 @@ grep -i password bug.log</code></pre>
 </footer>
 
 <script>
-// docent:kit 0.21.0
+// docent:kit 0.22.0
 (() => {
   const root = document.documentElement;
   root.classList.add('js');

@@ -319,10 +319,11 @@ These rules hold in the text, in tables, in captions and source lines, in the da
 | 4, minus | A hyphen just before a digit, after a space or a bracket or at the start of a cell, so `COVID-19` and `fn-1` pass |
 | 5, ranges | A hyphen between two numbers (`45-76`). It skips ISO dates, numbers with more than one hyphen, a time of day and a number such as `555-0100`. It may still find a part number |
 | 6, points | `pp` or `pts` after a number |
+| 8, change | In a card's change line: no direction word first ("Up", "Down" or "No change"), or no "against" before the period; a change line outside a card, before the line that says what the number counts, or with a status or a color (see Card grid) |
 | 9, dates | Day, month and year split by slashes, in either order, or a month and a year (`7/2026`); not two small numbers such as `3/4` or `24/7`, which are a fraction or a ratio |
 | 10, about | `~` before a number |
 
-It cannot test the meaning: whether a number needs a unit (rule 1), whether a change of a rate is written in percent (rule 6), whether n is there (rule 7), or whether the text names a period (rule 8). Those stay with the author.
+It cannot test the meaning: whether a number needs a unit (rule 1), whether a change of a rate is written in percent (rule 6), whether n is there (rule 7), or whether a change in the text names a period (rule 8). Those stay with the author.
 
 ## Motion
 
@@ -384,6 +385,8 @@ A document has few widgets. More than four is a sign that some are not needed.
 ## Card grid
 
 A card grid shows 3 to 8 short items side by side, when the reader should see them together: the parts of a good report, or three numbers that sum up a result. Each card is a heading (16px, weight 600) or a large number (30px serif, in ink), and one line of small muted text. A card has a line above it and no box, like a margin note. At most four cards stand in a row; on a phone two, and on the narrowest screen one. A card grid uses the block width. When the items need more than one line each, or the reader must compare facts across them, use a list or a table.
+
+**A number with its change.** A card with a large number may take a third line, its change against an earlier period: the direction as a word ("Up", "Down" or "No change"), the amount (a percent, percentage points, or a count with its unit), the word "against", the period, and the earlier value in brackets, so the reader can check it: "Up 12% against Q2 2026 (973)". The line is 14px, like the card's other line; the direction word is in the text color at weight 600, so it can be found at a glance, and the rest is muted. It has no arrow, no color and no fill, because up is not always good (more bug reports is bad news), and green, amber and red mean status only. Whether the change is good news is the author's sentence beside the cards; when the change crosses a target, a status note says so in words. A card has at most one change, against one period: two comparisons, such as against last quarter and last year, are a table. A card with a change keeps the line that says what its number counts. In a sentence the change takes the same parts in the same order, with no markup: "Reports rose to 1,090 in Q3 2026, up 12% against Q2 (973)." On paper it prints as text, and a screen reader reads the card in its order, so the direction is heard as a word.
 
 ## Host tokens
 

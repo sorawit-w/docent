@@ -722,7 +722,7 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     const rows = {};
     for (const width of [1280, 390, 320]) {
       const view = await open({ width, height: 900 });
-      rows[width] = await view.page.evaluate(() => ({ tops: new Set([...document.querySelectorAll(".cards > li")].map((li) => Math.round(li.getBoundingClientRect().top))).size, page: document.documentElement.scrollWidth, view: innerWidth }));
+      rows[width] = await view.page.evaluate(() => ({ tops: new Set([...[...document.querySelectorAll(".cards")].find((grid) => grid.children.length === 4).children].map((li) => Math.round(li.getBoundingClientRect().top))).size, page: document.documentElement.scrollWidth, view: innerWidth }));
       await view.context.close();
     }
     ok("a card grid of four shows 4 in a row at 1280px, 2 at 390px and 1 at 320px", rows[1280].tops === 1 && rows[390].tops === 2 && rows[320].tops === 4 && [1280, 390, 320].every((w) => rows[w].page === rows[w].view), rows);
@@ -998,6 +998,20 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
       // The margin is 4px; the gap between the two lines of text adds the line height's own space, about 2px.
       ok(`source line, ${name}: each of ${lines.length} stands on its own line, 4px under the caption sentence, in the caption's color, size and weight; a table in a figure has no space above it`, lines.length >= 6 && lines.every((l) => l.display === "block" && l.margin === "4px" && l.gap >= 4 && l.gap <= 8 && l.color && l.size && l.weight) && space === 0, { lines, space });
     }
+  }
+
+  // A number with its change: the third line of a card, in the size and muted color of the card's other line, 4px under it; the direction
+  // word in the text color at weight 600; no arrow, no color of its own.
+  for (const [name, opts] of [["desktop light", { width: 1280 }], ["desktop dark", { width: 1280, theme: "dark" }], ["320px", { width: 320 }], ["print", { width: 794, media: "print" }], ["forced colors", { width: 1280, forcedColors: "active" }]]) {
+    const { page, context } = await open(opts);
+    const lines = await page.evaluate(() => [...document.querySelectorAll(".cards .change")].map((c) => {
+      const other = c.previousElementSibling, dir = c.querySelector(".dir"), [cs, os, ds, ts] = [c, other, dir, document.body].map((e) => getComputedStyle(e));
+      const marks = [c, dir].flatMap((e) => ["::before", "::after"].map((p) => getComputedStyle(e, p).content)).filter((v) => v !== "none" && v !== "normal");
+      return { size: cs.fontSize === os.fontSize, muted: cs.color === os.color, gap: Math.round(c.getBoundingClientRect().top - other.getBoundingClientRect().bottom), dir: ds.fontWeight === "600" && ds.color === ts.color, marks: marks.length, fill: cs.backgroundColor };
+    }));
+    if (name === "desktop light" || name === "320px") await page.locator(".cards:has(.change)").first().screenshot({ path: `${out}/change-${name.split(" ")[0]}.png` });
+    await context.close();
+    ok(`a number with its change, ${name}: each of ${lines.length} change lines has the card line's size and muted color, 4px below it, the direction word in the text color at weight 600, and no arrow or fill`, lines.length >= 2 && lines.every((l) => l.size && l.muted && l.gap === 4 && l.dir && l.marks === 0 && /^(transparent|rgba\(.*, 0\))$/.test(l.fill)), lines);
   }
 
   // A hand-drawn figure (a fishbone under the contract in diagrams.md): no accessibility problem in either theme, its real size on a

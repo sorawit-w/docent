@@ -350,3 +350,17 @@ test("the number rules: check warns about each tested rule, quotes what it found
   assert.match(found[6], /"6 pp" in "…orts\. The fix rate rose 6 pp\. It closed on 7\/1\/2026,…", "6\.3 pts" in "[^"]*", "1\.2 pts" in "[^"]*"; write "percentage points" in full/, "one warning for each rule, with up to three places");
   assert.deepEqual(warned("keep"), [], "code, a web address, an ISO date, a time, a phone number, a fraction, a share near 0 or 100, a year, a column of mixed measures, and code in a number cell or a card pass");
 });
+
+test("a number with its change: the third line of a card, with the direction as a word and the period after against, and no status or color", () => {
+  const warned = (html) => checkDocument(specimen.replace("</main>", `<section id="x" aria-labelledby="x-h"><h2 id="x-h">X</h2>${html}</section></main>`)).warnings.filter((w) => /a change line/.test(w));
+  const cards = (third) => `<ul class="cards"><li><p class="big">1,090</p><p>bug reports in Q3 2026</p>${third}</li><li><p class="big">46%</p><p>of reports fixed</p></li><li><p class="big">18%</p><p>of reports could not be repeated</p><p class="change"><span class="dir">No change</span> against Q2 2026 (18%)</p></li></ul>`;
+  assert.ok(/<p class="change"><span class="dir">Down<\/span>/.test(specimen), "the sample page shows a change line");
+  assert.deepEqual(checkDocument(specimen).warnings.filter((w) => /a change line/.test(w)), []);
+  assert.deepEqual(warned(cards('<p class="change"><span class="dir">Up</span> 12% against Q2 2026 (973)</p>')), []);
+  assert.match(warned('<p class="change"><span class="dir">Up</span> 12% against Q2 2026 (973)</p>').join("\n"), /\("Up 12% against Q2 2026 \(973\)"\) stands outside a card grid; in a sentence, write the same parts with no markup/);
+  assert.match(warned(cards("").replace("<p>bug reports in Q3 2026</p>", '<p class="change"><span class="dir">Up</span> 12% against Q2 2026 (973)</p><p>bug reports in Q3 2026</p>')).join("\n"), /comes before the line that says what the card's number counts/);
+  assert.match(warned(cards('<p class="change">12% more than in Q2 2026</p>')).join("\n"), /\("12% more than in Q2 2026"\) starts with the direction as a word/);
+  assert.match(warned(cards('<p class="change"><span class="dir">Up</span> 12%</p>')).join("\n"), /\("Up 12%"\) starts with the direction as a word \("Up", "Down" or "No change"\) and names the period/);
+  for (const bad of ['<p class="change warn">', '<p class="change" style="color: #1a7f37">']) assert.match(warned(cards(`${bad}<span class="dir">Up</span> 12% against Q2 2026 (973)</p>`)).join("\n"), /takes a status or a color; the direction is not a status/, bad);
+  assert.match(warned(cards('<p class="change"><span class="state err">Up</span> 12% against Q2 2026 (973)</p>')).join("\n"), /takes a status or a color/);
+});
