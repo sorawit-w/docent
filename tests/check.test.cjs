@@ -475,3 +475,21 @@ test("a total row: a <tfoot> row with a row heading; data-sum adds up its column
   assert.match(warned(rows, total("1,090", "196").repeat(3)), /has 3 rows in its <tfoot>; it holds one or two/);
   assert.equal(checkDocument(specimen).warnings.filter((w) => /total|tfoot/.test(w)).length, 0);
 });
+
+test("a quote with its speaker: check warns about a blockquote alone, no speaker, typed quotation marks, more than 80 words, and code in the speaker line", () => {
+  const quote = (said = "<p>I wrote the steps twice, and nobody could repeat the bug.</p>", speaker = "<figcaption>P3, tester</figcaption>") => `<figure class="quote"><blockquote>${said}</blockquote>${speaker}</figure>`;
+  const warned = (...blocks) => checkDocument(specimen.replace("</main>", `<section id="q" aria-labelledby="q-h"><h2 id="q-h">Q</h2>${blocks.join("")}</section></main>`)).warnings.filter((w) => /quote|speaker/.test(w)).join("\n");
+  assert.equal(warned(quote(), quote("<p>Setup never felt finished.</p><p>We gave up in week two.</p>", "<figcaption>Starter, 9 seats</figcaption>")), "", "two good quotes, one with two paragraphs");
+  assert.equal(warned("<p>Five teams said setup <q>never felt finished</q>.</p>"), "", "a short phrase in a <q>");
+  assert.match(warned("<blockquote><p>I wrote the steps twice.</p></blockquote>"), /a <blockquote> stands outside a quote figure; a quote needs its speaker/, "a blockquote alone");
+  assert.match(warned(quote(undefined, "")), /the quote "I wrote the steps twice, and nobody…" has no speaker after its <blockquote>; a quote needs its speaker/, "no speaker");
+  assert.match(warned(quote(undefined, "<figcaption></figcaption>")), /has no speaker/, "an empty speaker line");
+  assert.match(warned(quote("<p>“I wrote the steps twice.”</p>")), /starts or ends with a quotation mark; the kit draws the quotation marks/, "typed curly marks");
+  assert.match(warned(quote('<p>"I wrote the steps twice."</p>')), /starts or ends with a quotation mark/, "typed straight marks");
+  assert.equal(warned(quote("<p>We call it the teams’ calendar.</p>")), "", "an apostrophe is not a quotation mark");
+  assert.match(warned(quote(`<p>${"word ".repeat(80)}more.</p>`)), /has 81 words; a quote has at most 80/, "81 words");
+  assert.equal(warned(quote(`<p>${"word ".repeat(79)}more.</p>`)), "", "80 words pass");
+  assert.match(warned(quote(undefined, "<figcaption><code>P3</code>, tester</figcaption>")), /the speaker line of the quote "I wrote the steps twice, and nobody…" holds a <code> or a link; it is plain text/, "a <code> in the speaker line");
+  assert.match(warned(quote("<p>One.</p></blockquote><blockquote><p>Two.</p>")), /holds more than one <blockquote>; a quote figure holds one <blockquote> and its speaker/, "two blockquotes");
+  assert.match(warned(quote("<p>One.</p><table><tr><td>1</td></tr></table>")), /holds a table/, "a table in a quote");
+});
