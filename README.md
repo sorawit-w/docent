@@ -83,7 +83,7 @@ node skills/docent/scripts/stamp.cjs document.html
 node skills/docent/scripts/check.cjs document.html
 ```
 
-A host repo may hold one file, `.docent/config.json`, with the path to its `DESIGN.md` and host-token values that win over it, each with a reason. `brand`, with no argument, and `check` read the nearest one above the page, up to the root of the repo, and refuse a bad one. `--config <path>` names another file, and `--no-config` reads none.
+A host repo may hold one file, `.docent/config.json`, with the path to its `DESIGN.md` and host-token values that win over it, each with a reason. `brand`, with no argument, and `check` read the nearest one above the page, up to the root of the repo, and refuse a bad one. The file may also turn off a house-style rule, with a reason; `check` then reports that rule as a note, and refuses a file that tries to change a guarantee, such as contrast or no network. `--config <path>` names another file, and `--no-config` reads none.
 
 [`SKILL.md`](skills/docent/SKILL.md) says how an agent works with them. [`diagrams.md`](skills/docent/references/diagrams.md) says how to write a diagram as data, and [`widgets.md`](skills/docent/references/widgets.md) says the same for a widget.
 

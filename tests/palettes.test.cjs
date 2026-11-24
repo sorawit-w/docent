@@ -63,7 +63,7 @@ test("render paints each drawing with the palette's light values, so a drawing c
 });
 
 test("check: a known palette name, the kit and drawings of that palette, and host colors on the palette's pages", () => {
-  for (const name of NAMES) assert.deepEqual(checkDocument(build(named(name))), { errors: [], warnings: [] }, name);
+  for (const name of NAMES) assert.deepEqual(checkDocument(build(named(name))), { errors: [], warnings: [], notes: [] }, name);
   assert.equal(paletteOf('<html lang="en" data-palette="plum">'), "plum");
   assert.deepEqual([`<html data-palette='plum'>`, "<html data-palette=plum>", '<html lang="en" DATA-PALETTE = "plum">', '<html lang="en">'].map(paletteOf), ["plum", "plum", "plum", null], "single quotes, no quotes and capitals name a palette too");
   const plum = build(named("plum"));

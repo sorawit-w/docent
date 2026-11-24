@@ -146,3 +146,43 @@ test("a reason or a font from the files cannot end the style block that brand pr
   assert.equal(stack('Brand Sans, "Bad</style>", Evil;x, Other /* y', "sans-serif"), '"Brand Sans", sans-serif', "a font name from DESIGN.md that could end the value or the style is left out");
   assert.equal(errorsOf({ version: 1, tokens: { "host-sans": { value: "Inter /* x", reason: "r" } } }).length, 1, "a font token cannot open a comment");
 });
+
+// Rule changes (sections 4 and 5): the file may turn off a house-style rule, with a reason; check then reports it as a note.
+const CARDS = '<section id="x" aria-labelledby="x-h"><h2 id="x-h">Ten numbers</h2><ul class="cards">' + Array.from({ length: 10 }, (_, i) => `<li><p class="big">${i + 1}</p><p>service ${i + 1}</p></li>`).join("") + "</ul></section>";
+const OFF = (reason = "The weekly review shows 10 service numbers side by side.") => ({ off: true, reason });
+
+test("the file may turn off a house-style rule, and is refused for a guarantee, an unknown ID, a missing reason or a value", () => {
+  assert.deepEqual(errorsOf({ version: 1, rules: { "cards.count": OFF() } }), []);
+  assert.deepEqual(errorsOf({ version: 1, rules: { "host.contrast": OFF() } }), ['"rules"."host.contrast": a guarantee, which the repo file cannot change; it is a promise to the reader of every page (see "Rule changes" in DESIGN.md)']);
+  assert.deepEqual(errorsOf({ version: 1, rules: { "ground.pure": OFF() } }).length, 1, "pure white or black is a guarantee");
+  assert.deepEqual(errorsOf({ version: 1, rules: { "cards.cuont": OFF() } }), ['"rules"."cards.cuont": no rule has this ID; node check.cjs --rules lists them']);
+  assert.deepEqual(errorsOf({ version: 1, rules: { "cards.count": { off: true } } }), ['"rules"."cards.count": no "reason"; write why the team changes this rule']);
+  assert.deepEqual(errorsOf({ version: 1, rules: { "cards.count": { max: 10, reason: "r" } } }), ['"rules"."cards.count"."max": no field has this name; a rule change holds "off": true and "reason", and a rule is on or off', '"rules"."cards.count": "off" is undefined; a rule change is "off": true, and a rule that stays on has no entry']);
+});
+
+test("check reports a rule that the file turns off as one note for each page, with the line of the file and its reason", () => {
+  const config = { version: 1, rules: { "cards.count": OFF(), "flat.gradient": OFF("Our charts' legend uses the brand's gradient."), "text.uppercase": OFF("Short labels in capitals are our look.") } };
+  const root = repo({ ".docent/config.json": config, "docs/a.html": specimen.replace("</main>", `${CARDS}${CARDS}</main>`).replace("</head>", "<style>.legend { background: linear-gradient(#fff, #eee); }</style></head>") });
+  const { code, out } = run("check.cjs", ["docs/a.html"], root);
+  assert.equal(code, 0, `a gradient is an error, and with the rule off the page passes:\n${out}`);
+  const line = (id) => JSON.stringify(config, null, 2).split("\n").findIndex((l) => l.includes(`"${id}"`)) + 1;
+  assert.match(out, new RegExp(`check docs/a\\.html: note \\[cards\\.count\\]: off in \\.docent/config\\.json, line ${line("cards.count")} \\("The weekly review shows 10 service numbers side by side\\."\\); 2 places on the page, the first: a card grid has 10 cards; it holds 3 to 8`));
+  assert.match(out, /note \[flat\.gradient\]: off in \.docent\/config\.json, line \d+ \("Our charts' legend uses the brand's gradient\."\); 1 place on the page, the first: a style uses a gradient; the page is flat/);
+  assert.ok(!/text\.uppercase/.test(out), "a rule change that the page does not use says nothing");
+  assert.ok(!/warning \[cards\.count\]|error \[flat\.gradient\]/.test(out), "the rule is not reported as a warning or an error as well");
+  assert.match(out, /check docs\/a\.html: 0 errors, 2 warnings, 2 notes/);
+  assert.match(run("check.cjs", ["--no-config", "docs/a.html"], root).out, /error \[flat\.gradient\][\s\S]*warning \[cards\.count\]/, "without the file, the rules hold");
+});
+
+test("a chart type that the file lets through still keeps the whole contract of a hand-drawn figure", () => {
+  const { checkDocument } = require("../skills/docent/scripts/check.cjs");
+  const figure = fs.readFileSync(path.join(__dirname, "fixtures", "hand-fishbone.html"), "utf8").replace('data-type="fishbone"', 'data-type="pie"');
+  const page = (f) => specimen.replace('<section id="report"', `${f}<section id="report"`);
+  const config = { label: ".docent/config.json", lines: {}, data: { version: 1, rules: { "hand.left-out.pie": OFF("The board asks for the budget split as a pie each quarter.") } } };
+  const good = checkDocument(page(figure), { config });
+  assert.deepEqual(good.errors, [], "with the rule off, a pie that keeps the contract passes");
+  assert.match(good.notes.join("\n"), /\[hand\.left-out\.pie\] off in \.docent\/config\.json/);
+  assert.ok(good.warnings.some((w) => /^\[hand\.look\]/.test(w)), "and check still asks for a look in a browser");
+  const bad = checkDocument(page(figure.replace(' role="img"', "").replace('<rect class="hd-box"', '<rect class="hd-box" fill="#cf222e"')), { config });
+  assert.deepEqual(bad.errors.map((e) => e.match(/^\[([\w.-]+)\]/)[1]).sort(), ["hand.classes", "hand.name"], "the guarantees of the contract still hold");
+});
