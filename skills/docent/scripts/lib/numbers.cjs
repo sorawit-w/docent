@@ -12,7 +12,7 @@ function looksLikeDate(found) {
 
 // Each rule: its number in DESIGN.md, its name, what finds it, and what to write instead.
 const TEXT_RULES = [
-  { rule: 2, name: "rounding", re: /(?<![\d.])\d+\.\d{3,}\s?%/g, keep: (f) => { const v = parseFloat(f); return v > 1 && v < 99; }, fix: "a percent keeps at most 2 decimals; round to the digits the reader needs, such as \"18%\". A share near 0 or 100 may keep more" },
+  { rule: 2, name: "rounding", re: /(?<![\d.])\d+\.\d{3,}\s?%/g, keep: (f) => { const v = parseFloat(f); return v > 1 && Math.abs(v - 100) > 1; }, fix: "a percent keeps at most 2 decimals; round to the digits the reader needs, such as \"18%\". A share near 0 or 100 may keep more" },
   { rule: 4, name: "negative numbers", re: new RegExp(String.raw`(?<=^|[\s(\[])-(?=\d)${NUM}`, "g"), fix: "a hyphen is not a minus; write the minus sign, as in \"−12\" (U+2212), or a word, such as \"fell by 12\"" },
   { rule: 5, name: "ranges", re: new RegExp(String.raw`(?<![\w.,:/−-])${NUM}-${NUM}(?:%|[a-zA-Z]{1,3})?(?![\w/-])`, "g"), keep: (f) => !/^\d{3}-\d{4}$/.test(f), fix: "a range takes an en dash, as in \"45–76\", in a table, a chart or a source line, and \"from 45 to 76\" in the text" },
   { rule: 6, name: "percentage points", re: /(?<![\w.])\d+(?:\.\d+)?\s?(?:pp|pts)\b/g, fix: "write \"percentage points\" in full, as in \"up 6 percentage points\"" },

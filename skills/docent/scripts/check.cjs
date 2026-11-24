@@ -337,14 +337,14 @@ function checkDocument(html) {
     const head = (table[1].match(/<thead\b[^>]*>([\s\S]*?)<\/thead>/i) || [])[1] || "";
     const body = table[1].replace(/<thead\b[^>]*>[\s\S]*?<\/thead>/i, "");
     if (/\b(colspan|rowspan)=/i.test(body)) continue; // the columns of a merged cell are not clear from the source
-    const cells = (rows) => [...rows.matchAll(/<tr\b[^>]*>([\s\S]*?)<\/tr>/gi)].map(([, row]) => [...row.matchAll(/<(td|th)\b([^>]*)>([\s\S]*?)<\/\1>/gi)].map(([, tag, attrs, inner]) => ({ tag: tag.toLowerCase(), attrs, text: plain(inner) })));
+    const cells = (rows) => [...rows.matchAll(/<tr\b[^>]*>([\s\S]*?)<\/tr>/gi)].map(([, row]) => [...row.matchAll(/<(td|th)\b([^>]*)>([\s\S]*?)<\/\1>/gi)].map(([, tag, attrs, inner]) => ({ tag: tag.toLowerCase(), attrs, text: plain(inner), code: /<(code|kbd|samp)\b/i.test(inner) })));
     const rows = cells(body), names = (cells(head)[0] || []).map((c) => c.text);
     const label = (markup.slice(0, table.index).match(/aria-label="([^"]*)"[^>]*>\s*$/) || [])[1];
     for (let c = 0; c < Math.max(0, ...rows.map((r) => r.length)); c += 1) {
       const column = rows.map((r) => r[c]).filter(Boolean);
       if (column.some((cell) => cell.tag === "th")) continue; // a row heading names its row, like an id, even when it is a number
       const where = `in the column ${names[c] ? `"${names[c]}"` : c + 1} of ${label ? `the table "${label}"` : "a table"}`;
-      for (const found of findNumberColumn(column.filter((cell) => hasClass(cell.attrs, "num") && NUMBER.test(cell.text)).map((cell) => cell.text))) numberIssues.push({ ...found, found: `${found.found} ${where}` });
+      for (const found of findNumberColumn(column.filter((cell) => hasClass(cell.attrs, "num") && !cell.code && NUMBER.test(cell.text)).map((cell) => cell.text))) numberIssues.push({ ...found, found: `${found.found} ${where}` });
       const numbers = column.filter((cell) => NUMBER.test(cell.text));
       if (!numbers.length || !column.every((cell) => NUMBER.test(cell.text) || BLANK.test(cell.text)) || numbers.every((cell) => hasClass(cell.attrs, "num"))) continue;
       warnings.push(`${label ? `the table "${label}"` : "a table"}: the column ${names[c] ? `"${names[c]}"` : c + 1} holds numbers only; add class="num" to its th and td cells, so the numbers line up on the right`);
@@ -361,7 +361,7 @@ function checkDocument(html) {
   // 10c. Numbers are written by the rules of "Numbers" in DESIGN.md. check reads the author's words, with no code, drawing, data block
   // or web address, and gives one warning for each rule, with up to three places that break it.
   for (const found of findNumberText(wordsOf(markup))) numberIssues.push({ ...found, found: `"${found.found}" in "${found.context}"` });
-  for (const { inner } of withClass(markup, "big")) for (const found of findBigNumber(plain(inner))) numberIssues.push({ ...found, found: `${found.found} in a card` });
+  for (const { inner } of withClass(markup, "big").filter((b) => !/<(code|kbd|samp)\b/i.test(b.inner))) for (const found of findBigNumber(plain(inner))) numberIssues.push({ ...found, found: `${found.found} in a card` });
   const byRule = new Map();
   for (const issue of numberIssues) byRule.set(`${issue.rule} ${issue.fix}`, [...(byRule.get(`${issue.rule} ${issue.fix}`) || []), issue]);
   for (const list of [...byRule.values()].sort((a, b) => a[0].rule - b[0].rule)) {
