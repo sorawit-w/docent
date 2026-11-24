@@ -94,3 +94,12 @@ test("after stamp, a page's own host color still wins over the file's, as it doe
   run("stamp.cjs", ["docs/b.html"], root);
   assert.match(run("check.cjs", ["--no-config", "docs/b.html"], root).out, /error \[host\.contrast\]: --host-ink #9a8fb5 from the docent:host block has a contrast/, "a stamped value that the page does not override is tested");
 });
+
+test("the host block holds host tokens only, and stays in every other test of check", () => {
+  const page = fs.readFileSync(path.join(assets, "sample-repo", "docs", "report-a-bug.html"), "utf8");
+  const errors = checkDocument(page.replace(":where(:root) {", "@import url(https://example.com/remote.css);\n:where(:root) {")).errors.join("\n");
+  assert.match(errors, /\[kit\.blocks\] the docent:host block holds more than host tokens, or was changed by hand; run stamp/);
+  assert.match(errors, /\[network\.import\]/, "a style inside the block is still tested for the network");
+  assert.match(errors, /\[network\.url\]/);
+  assert.deepEqual(checkDocument(stampHtml(page, { host: [["host-sans", '"Brand Sans", system-ui, sans-serif'], ["host-ink", "#3b2a5c"]] }).html).errors, [], "a block with a font stack has the right shape");
+});

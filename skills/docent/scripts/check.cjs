@@ -236,9 +236,12 @@ function checkDocument(html, options = {}) {
 
   // From here on, test the author's own content: everything except the kit, the drawings and the widgets.
   for (const k of findKit(rest)) rest = rest.replace(k.text, "");
-  // The host block that stamp writes is not the author's own style: a --host-* value of the page wins over it, as in the browser.
+  // The host block that stamp writes holds the host tokens and nothing else, and stays in the page for every other test. Its values are
+  // not the author's own: a --host-* value of the page wins over them, as in the browser.
   const stampedBlock = hostOf(rest);
-  if (stampedBlock) rest = rest.replace(stampedBlock, "");
+  const HOST_SHAPE = /^\/\* docent:host \*\/\n\/\* (?:(?!\*\/)[^<])*\*\/\n:where\(:root\) \{(?: --host-(?:accent-dark|accent|ink|dot-dark|serif|sans|mono): [^;{}<>\\/*]+;)+ \}\n\/\* \/docent:host \*\/$/;
+  if ((html.match(/\/\* docent:host \*\//g) || []).length > 1) error("kit.blocks", "the document has more than one docent:host block; it must have one; run stamp");
+  else if (stampedBlock && !HOST_SHAPE.test(stampedBlock)) error("kit.blocks", "the docent:host block holds more than host tokens, or was changed by hand; run stamp, and keep your own styles outside the markers");
   const stamped = stampedBlock ? [...stampedBlock.matchAll(/--(host-accent-dark|host-accent|host-ink|host-dot-dark)\s*:\s*([^;}]+)/g)].map(([, name, value]) => [name, value.trim()]) : [];
   const noComments = rest.replace(/<!--[\s\S]*?-->/g, "");
   const css = [...noComments.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/g)].map((m) => m[1]).concat([...noComments.matchAll(/\bstyle="([^"]*)"/g)].map((m) => m[1])).join("\n");
@@ -260,7 +263,7 @@ function checkDocument(html, options = {}) {
   for (const [, name] of css.matchAll(/(?:^|[;{\s])--(bg|panel|fig|text|muted|line|primary|ink|dot|ok|warn|err|heat-[1-5]|heat-text|heat-page|serif|sans|mono)\s*:/g)) warn("tokens.kit", `a style sets --${name}; the kit sets it in four places, so your value is lost in dark mode or in print. Use the --host-* tokens, or a palette for the page and the grays (see SKILL.md)`);
   const hosts = {};
   // The page's own host colors, then each one of the repo file that the page does not set itself: the page's own value wins.
-  const own = [...css.matchAll(/--(host-accent-dark|host-accent|host-ink|host-dot-dark)\s*:\s*([^;}]+)/g)].map(([, name, value]) => [name, value.trim(), ""]);
+  const own = [...(stampedBlock ? css.replace(stampedBlock, "") : css).matchAll(/--(host-accent-dark|host-accent|host-ink|host-dot-dark)\s*:\s*([^;}]+)/g)].map(([, name, value]) => [name, value.trim(), ""]);
   const brandValue = htmlAttr(html, "data-brand"); // "off": a page about another product takes no brand field of the repo file
   const fileTokens = (brandValue !== "off" && options.config && options.config.data && options.config.data.tokens) || {};
   // Then each one of the host block of stamp, then each one of the repo file: the page's own value wins, as it does in the browser.
