@@ -20,6 +20,7 @@ const MOST_WIDGETS = 4; // more widgets than this in one document gives a warnin
 const CARDS = [3, 8]; // a card grid holds 3 to 8 cards
 const FINDINGS = [2, 6]; // a findings list holds 2 to 6 items
 const LEAD_WORDS = 25; // the lead sentence of a key finding has at most this many words
+const QUOTE_WORDS = 80; // a quote has at most this many words
 const TAGLINE = 90; // characters: the tagline is one line
 // Each host color, the theme it shows in, and the contrast it needs: text needs 4.5:1, the dot is a mark and needs 3:1 (WCAG 1.4.11).
 const HOST = { "host-accent": ["light", 4.5], "host-accent-dark": ["dark", 4.5], "host-ink": ["light", 4.5], "host-dot-dark": ["dark", 3] };
@@ -520,6 +521,22 @@ function checkDocument(html) {
         if (Math.abs(sum - total) > allowed + 1e-9) warnings.push(`${name}: the total ${cell.text} in column ${column} is not the sum of its column, ${sum.toLocaleString("en-US", { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}${mode === "rounded" ? `, within ${Number(allowed.toFixed(decimals + 1))} for rounded parts` : ""}`);
       });
     }
+  }
+
+  // 10k. A quote with its speaker: <figure class="quote"> holds one <blockquote> and, after it, a <figcaption> with the speaker in plain text.
+  // check cannot tell a code from a person's name, or whether the words are what the person said.
+  const quotes = withClass(markup, "quote").filter((f) => f.tag === "figure");
+  const inQuote = (i) => quotes.some((q) => { const from = q.index + q.tag.length + q.attrs.length + 2; return from <= i && i < from + q.inner.length; }); // inside the figure's own markup
+  for (const m of markup.matchAll(/<blockquote\b/gi)) if (!inQuote(m.index)) warnings.push(`a <blockquote> stands outside a quote figure; a quote needs its speaker: <figure class="quote"><blockquote><p>…</p></blockquote><figcaption>P3, tester</figcaption></figure>`);
+  for (const { inner } of quotes) {
+    const said = (inner.match(/<blockquote\b[^>]*>([\s\S]*?)<\/blockquote>/i) || [])[1], speaker = inner.match(/<\/blockquote>[\s\S]*?<figcaption\b[^>]*>([\s\S]*?)<\/figcaption>/i);
+    const text = plain((said || "").replace(/<\/p>\s*<p\b[^>]*>/gi, " ")), quoted = `"${text.length > 40 ? `${text.replace(/^(.{0,40})\s[\s\S]*$/, "$1")}…` : text}"`; // cut at a word
+    if (said == null || !speaker || !plain(speaker[1])) warnings.push(`the quote ${said == null ? "figure" : quoted} has no speaker after its <blockquote>; a quote needs its speaker: a <figcaption> after the <blockquote>, such as "P3, tester"`);
+    if ((inner.match(/<blockquote\b/gi) || []).length > 1 || /<table\b/i.test(inner) || wells(inner).length) warnings.push(`the quote ${quoted} holds ${/<table\b/i.test(inner) ? "a table" : wells(inner).length ? "a figure well" : "more than one <blockquote>"}; a quote figure holds one <blockquote> and its speaker, nothing else`);
+    if (/^["“”«»„]|["“”«»„]$|^['‘’][\s\S]*['‘’]$/.test(text)) warnings.push(`the quote ${quoted} starts or ends with a quotation mark; the kit draws the quotation marks, so leave them out`);
+    const count = text.split(" ").filter(Boolean).length;
+    if (count > QUOTE_WORDS) warnings.push(`the quote ${quoted} has ${count} words; a quote has at most ${QUOTE_WORDS}. A longer passage belongs in the text, in the author's words`);
+    if (speaker && /<(?:code|a)\b/i.test(speaker[1])) warnings.push(`the speaker line of the quote ${quoted} holds a <code> or a link; it is plain text, such as "P3, tester"`);
   }
 
   // 11. Personal data: email addresses and phone numbers, in the page text and in the data of each diagram and widget. A warning only:

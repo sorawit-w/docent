@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Incident review: sync errors on 12 November — Example Planner</title>
 <style>
-/* docent:kit 0.29.0 */
+/* docent:kit 0.30.0 */
 /* Docent page styles. Tokens come from references/DESIGN.md. One file, no network. */
 :root {
   color-scheme: light;
@@ -218,6 +218,15 @@ svg[data-drawn="hand"] .hd-name { font-weight: 600; }
 svg[data-drawn="hand"] .hd-note { font-size: 12px; fill: var(--muted); }
 figcaption { margin-top: 12px; font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
 figcaption strong { font-weight: 600; color: var(--text); margin-right: 8px; }
+/* A quote with its speaker: text, so it keeps the text column and has no well. It is indented 24px like a list and set in the serif at body
+   size, which tells a person's voice from the author's text with no color, line or box. The kit draws the curly quotation marks, so every
+   page has the same marks. The speaker stands 4px below, like a caption. */
+figure.quote { min-width: 0; width: auto; max-width: var(--measure); margin-top: 24px; padding-left: 24px; }
+figure.quote blockquote { margin: 0; font: 400 1rem/1.65 var(--serif); color: var(--text); }
+figure.quote blockquote > :last-child { margin-bottom: 0; }
+figure.quote blockquote > :first-child::before { content: "\201C"; }
+figure.quote blockquote > :last-child::after { content: "\201D"; }
+figure.quote figcaption { margin-top: 4px; }
 /* The source line: the last line of a caption, in the caption's size and color, says where the numbers come from. A table of outside data
    stands in a figure too, with "Table n" in its caption, so the figure's own space is the only space above it. */
 figcaption .source { display: block; margin-top: 4px; }
@@ -1204,7 +1213,7 @@ database:
   </div>
 </footer>
 <script>
-// docent:kit 0.29.0
+// docent:kit 0.30.0
 (() => {
   const root = document.documentElement;
   root.classList.add('js');
