@@ -423,6 +423,39 @@ function checkDocument(html) {
     if (count > 60) warnings.push(`note ${note.n} has ${count} words; a note is one to three sentences. Longer detail belongs in the text, or in "Method and limits"`);
   }
 
+  // 10f. The list of sources (<ul class="sources">): each citation links to an entry, each entry is cited, in order by its id (family name
+  // and year), with its year in brackets and its address as the link's own text, because paper has no link. Written by hand (decision 8).
+  const sourceLists = withClass(markup, "sources").filter((l) => l.tag === "ul");
+  if (sourceLists.length > 1) warnings.push(`the page has ${sourceLists.length} lists of sources; it has one, in a section titled "Sources" after "Method and limits"`);
+  const entries = sourceLists.flatMap((list) => [...list.inner.matchAll(/<li\b([^>]*)>([\s\S]*?)(?=<li\b|$)/gi)].map(([, attrs, body]) => ({ id: attrOf(attrs, "id"), body: body.replace(/<\/li>\s*$/i, "") })));
+  const cites = [...markup.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/gi)].map(([, attrs, inner]) => ({ raw: attrOf(attrs, "href") || "", text: plain(inner) })).filter((c) => /^#?src-/.test(c.raw)).map((c) => ({ ...c, href: c.raw.startsWith("#") ? c.raw.slice(1) : null }));
+  for (const cite of cites) if (!entries.some((e) => e.id && e.id === cite.href)) errors.push(`the citation "${cite.text}" links to "${cite.raw}", which is no entry in the list of sources (<ul class="sources">)${cite.href ? "" : `; a link to a place on the page starts with #, as in href="#${cite.raw}"`}`);
+  const short = (e) => `"${plain(e.body).slice(0, 40)}…"`;
+  for (const entry of entries) {
+    if (!cites.some((c) => c.href === entry.id)) warnings.push(`the source ${entry.id ? `"${entry.id}"` : short(entry)} is not cited in the text; cite it as a link to its entry, such as (<a href="#${entry.id || "src-name-2026"}">Name, 2026</a>), or take it out`);
+    if (!/\((?:\d{4}[a-z]?|no date)\)/.test(plain(entry.body))) warnings.push(`the source ${entry.id ? `"${entry.id}"` : short(entry)} has no year in brackets; write it after the authors, such as "(2024)", or "(no date)"`);
+    for (const [, attrs, inner] of entry.body.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/gi)) {
+      const href = attrOf(attrs, "href") || "";
+      if (plain(inner) !== plain(href)) warnings.push(`a link in the source ${entry.id ? `"${entry.id}"` : short(entry)} reads "${plain(inner)}"; paper has no link, so write the address as the link's text: <a href="${href}">${href}</a>`);
+    }
+  }
+  const sourceKey = (id) => { const m = (id || "").match(/^src-(.+)-(\d{4}[a-z]?|no-date)$/); return m ? [m[1], m[2]] : null; };
+  const keys = entries.map((e) => sourceKey(e.id));
+  for (const [i, entry] of entries.entries()) if (entry.id && !keys[i]) warnings.push(`the source id "${entry.id}" is not "src-" with the first family name and the year, such as "src-cleveland-1984"; the list is ordered by it`);
+  const sorted = keys.filter(Boolean);
+  if (sorted.some((k, i) => i && (k[0] < sorted[i - 1][0] || (k[0] === sorted[i - 1][0] && k[1] < sorted[i - 1][1])))) warnings.push(`the list of sources is not in order: ${sorted.map((k) => `${k[0]} ${k[1]}`).join(", ")}; order it by the first family name, then the year`);
+
+  // 10g. "Method and limits" holds four parts, each a block heading, in this order. A page without the section gets no warning: whether it
+  // needs one is the author's judgment.
+  for (const [i, [, inner]] of [...markup.matchAll(/<h2\b[^>]*>([\s\S]*?)<\/h2>/gi)].entries()) {
+    if (plain(inner).toLowerCase() !== "method and limits") continue;
+    const start = [...markup.matchAll(/<h2\b[^>]*>/gi)][i].index, own = sectionOf(start), part = own ? markup.slice(start, own[1]) : markup.slice(start).split(/<h2\b/i)[1] || "";
+    const found = [...part.matchAll(/<h3\b[^>]*>([\s\S]*?)<\/h3>/gi)].map(([, h]) => plain(h).toLowerCase()), want = ["method", "data", "what was left out", "how sure the result is"];
+    let at = 0;
+    for (const h of found) if (h === want[at]) at += 1;
+    if (at < want.length) warnings.push(`"Method and limits" has the block headings ${found.length ? found.map((h) => `"${h}"`).join(", ") : "none"}; it holds four, in this order: "Method", "Data", "What was left out" and "How sure the result is". A part with nothing to say keeps its heading and says so`);
+  }
+
   // 11. Personal data: email addresses and phone numbers, in the page text and in the data of each diagram and widget. A warning only:
   // the author decides. Reserved example names (example.com, .test, 555-0100 to 555-0199) pass. Names and postal addresses are not found.
   const pageText = [textOf(markup), ...[...markup.matchAll(/\b(?:alt|title|aria-label)="([^"]*)"/gi)].map((m) => m[1])].join(" \n ");

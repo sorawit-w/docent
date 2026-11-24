@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Why customers left in the third quarter — Example Planner</title>
 <style>
-/* docent:kit 0.23.0 */
+/* docent:kit 0.24.0 */
 /* Docent page styles. Tokens come from references/DESIGN.md. One file, no network. */
 :root {
   color-scheme: light;
@@ -223,6 +223,11 @@ figure > .table-wrap { margin-top: 0; }
 ol.notes { margin: 32px 0 0; font-size: 0.875rem; line-height: 1.5; color: var(--muted); font-variant-numeric: tabular-nums; }
 .notes li:target { color: var(--text); }
 .fn:target { text-decoration-thickness: 2px; }
+/* The list of sources: one author-year entry each, written by hand, at body size with no bullets and a hanging indent of 24px, 8px apart.
+   The address is the link's own text, because paper has no link, and it breaks at any character, so no page scrolls sideways. */
+ul.sources { list-style: none; }
+.sources > li { text-indent: -24px; overflow-wrap: anywhere; }
+.sources > li + li { margin-top: 8px; }
 
 /* Card grid: 3 to 8 short items side by side, each a heading or a large number and a line of text. A card is a label, like a margin note: a line above it, and no box. At most four in a row. */
 .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(max(160px, calc((100% - 72px) / 4)), 1fr)); gap: 24px; margin: 24px 0; padding: 0; list-style: none; }
@@ -463,7 +468,7 @@ footer p { margin: 0; }
         <strong>Customer analysis</strong>
         <ul class="facts">
           <li>8 minutes to read</li>
-          <li>Covers 1 July to 30 September 2026</li>
+          <li>Data: 1 July to 30 September 2026</li>
           <li>Updated 9 October 2026</li>
           <li>Owner: Customer insights team</li>
           <li>Every name and number in this report is invented</li>
@@ -1563,7 +1568,9 @@ footer p { margin: 0; }
   </section>
 
   <section id="method" aria-labelledby="method-h">
-    <h2 id="method-h">Method and data</h2>
+    <h2 id="method-h">Method and limits</h2>
+    <h3>Method</h3>
+    <p>We counted every paying account that cancelled from 1 July to 30 September 2026, by its plan and its seats on 1 July, and compared it with the second quarter. The main reason for leaving comes from the cancel form, and the setup steps from each account's product events in its first month.</p>
     <dl>
       <dt>Churn rate</dt>
       <dd>Paying accounts that cancelled in a period, divided by paying accounts on the first day of the period.</dd>
@@ -1572,14 +1579,19 @@ footer p { margin: 0; }
       <dt>Cohort</dt>
       <dd>The accounts that started to pay in the same calendar month.</dd>
       <dt>Paused account</dt>
-      <dd>An account that stopped paying for up to 3 months and kept its data. It is not counted as churn. 96 accounts paused in Q3.</dd>
+      <dd>An account that stopped paying for up to 3 months and kept its data. It is not counted as churn.</dd>
     </dl>
-    <h3>Sources</h3>
-    <ul>
-      <li>Billing system export, 2 October 2026: plans, seats, start and cancel dates, prices.</li>
-      <li>Cancel form answers, 1 July to 30 September 2026: 734 answers.</li>
-      <li>Product events, 1 April to 30 September 2026: the setup steps in Figure 5.</li>
-    </ul>
+    <h3>Data</h3>
+    <dl>
+      <dt>Sources</dt><dd>The billing system export of 2 October 2026: plans, seats, start and cancel dates, prices. The cancel form. The product events, for the setup steps in Figure 5.</dd>
+      <dt>Dates</dt><dd>1 July to 30 September 2026, against 1 April to 30 June 2026; product events from 1 April 2026</dd>
+      <dt>Size</dt><dd>n = 8,420 paying accounts on 1 July; 1,212 of them cancelled, and 734 answered the cancel form</dd>
+      <dt>Who is counted</dt><dd>Every paying account; not free trials, and not paused accounts</dd>
+    </dl>
+    <h3>What was left out</h3>
+    <p>Paused accounts are not counted as churn: 96 accounts paused in Q3. Free trials that never paid are not in the data. 478 of the 1,212 accounts that cancelled did not answer the cancel form, so the reasons in Figure 4 come from 734 answers.</p>
+    <h3>How sure the result is</h3>
+    <p>The rates count every account, not a sample, so they have no interval. The reasons are less sure: the accounts that answered the form may differ from the 478 that did not. The Business rate rests on 43 cancellations; without the one customer that moved 12 accounts to a single contract, it is 6.6%.</p>
     <details>
       <summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>Why do the plan rates not add up to 14.4%?</summary>
       <p>Each plan's rate uses the accounts of that plan as its base. The rate for all plans uses all 8,420 accounts. Starter has the most accounts and the highest rate, so it pulls the total up. 18.2% of 5,310, plus 7.6% of 2,640, plus 9.1% of 470, is 1,212 accounts, or 14.4% of 8,420.</p>
@@ -1593,7 +1605,7 @@ footer p { margin: 0; }
   </div>
 </footer>
 <script>
-// docent:kit 0.23.0
+// docent:kit 0.24.0
 (() => {
   const root = document.documentElement;
   root.classList.add('js');

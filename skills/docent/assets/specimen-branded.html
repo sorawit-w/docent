@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex">
 <title>Report a bug and get a fix — Example project</title>
 <style>
-/* docent:kit 0.23.0 */
+/* docent:kit 0.24.0 */
 /* Docent page styles. Tokens come from references/DESIGN.md. One file, no network. */
 :root {
   color-scheme: light;
@@ -224,6 +224,11 @@ figure > .table-wrap { margin-top: 0; }
 ol.notes { margin: 32px 0 0; font-size: 0.875rem; line-height: 1.5; color: var(--muted); font-variant-numeric: tabular-nums; }
 .notes li:target { color: var(--text); }
 .fn:target { text-decoration-thickness: 2px; }
+/* The list of sources: one author-year entry each, written by hand, at body size with no bullets and a hanging indent of 24px, 8px apart.
+   The address is the link's own text, because paper has no link, and it breaks at any character, so no page scrolls sideways. */
+ul.sources { list-style: none; }
+.sources > li { text-indent: -24px; overflow-wrap: anywhere; }
+.sources > li + li { margin-top: 8px; }
 
 /* Card grid: 3 to 8 short items side by side, each a heading or a large number and a line of text. A card is a label, like a margin note: a line above it, and no box. At most four in a row. */
 .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(max(160px, calc((100% - 72px) / 4)), 1fr)); gap: 24px; margin: 24px 0; padding: 0; list-style: none; }
@@ -451,6 +456,7 @@ footer p { margin: 0; }
         <li><a href="#results">Results</a></li>
         <li><a href="#report">Your report</a></li>
         <li><a href="#commands">Commands</a></li>
+        <li><a href="#sources">Sources</a></li>
       </ol>
     </nav>
     <button class="theme" type="button">
@@ -1201,7 +1207,7 @@ footer p { margin: 0; }
       <span class="state warn">Warning</span>
       <p>A report with no steps often waits a long time. Send the steps with the first report when you can.</p>
     </div>
-    <p>Some parts of the program get more reports than others. Before you file a report about Install, search the list: the bug may be there already.</p>
+    <p>Some parts of the program get more reports than others. Before you file a report about Install, search the list: the bug may be there already. The chart uses bars, because readers compare lengths more accurately than angles (<a href="#src-cleveland-1984">Cleveland and McGill, 1984</a>).</p>
     <figure>
       <div class="fig" role="region" aria-label="Figure 5, last month's reports by part" tabindex="0">
         <!-- docent:diagram
@@ -2080,6 +2086,13 @@ grep -i password bug.log</code></pre>
       <p>A fix needs a test. The test repeats your steps, and it fails before the fix. After the fix, the same test passes. The test stays, so the same bug cannot come back unseen.</p>
     </details>
   </section>
+
+  <section id="sources" aria-labelledby="sources-h">
+    <h2 id="sources-h">Sources</h2>
+    <ul class="sources">
+      <li id="src-cleveland-1984">Cleveland, W. S., and McGill, R. (1984). "Graphical Perception: Theory, Experimentation, and Application to the Development of Graphical Methods." <cite>Journal of the American Statistical Association</cite>, 79(387), 531–554. <a href="https://doi.org/10.1080/01621459.1984.10478080">https://doi.org/10.1080/01621459.1984.10478080</a></li>
+    </ul>
+  </section>
 </main>
 
 <footer>
@@ -2090,7 +2103,7 @@ grep -i password bug.log</code></pre>
 </footer>
 
 <script>
-// docent:kit 0.23.0
+// docent:kit 0.24.0
 (() => {
   const root = document.documentElement;
   root.classList.add('js');

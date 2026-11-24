@@ -27,6 +27,8 @@
         <li><a href="#walk">Walkthrough</a></li>
         <li><a href="#widgets">Widgets</a></li>
         <li><a href="#more">More</a></li>
+        <li><a href="#method">Method</a></li>
+        <li><a href="#sources">Sources</a></li>
       </ol>
     </nav>
     <button class="theme" type="button">
@@ -51,6 +53,7 @@
           <li>3 minutes to read</li>
           <li>Updated 1 January 2026</li>
           <li>Owner: Team name</li>
+          <li>Data: 1 July to 30 September 2026</li>
         </ul>
       </div>
     </div>
@@ -63,7 +66,7 @@
     <div class="row">
       <div>
         <p>Body text goes here. A <span class="term">highlighted term</span> has an underline in the ink color, and <code>code</code> sits in a small well.</p>
-        <p>A second paragraph. A link to <a href="#more">another section</a> looks like this.<a class="fn" id="fn-1-ref" href="#fn-1" aria-label="Note 1">[1]</a></p>
+        <p>A second paragraph. A link to <a href="#more">another section</a> looks like this. A citation names the authors and the year (<a href="#src-family-2024">Family and Other, 2024</a>).<a class="fn" id="fn-1-ref" href="#fn-1" aria-label="Note 1">[1]</a></p>
       </div>
       <div class="note" role="note">
         <strong>Note</strong>
@@ -287,6 +290,33 @@ command --option value</code></pre>
       <summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>A closed section with a question as its title</summary>
       <p>Its text opens when the reader asks for it, and it opens for printing.</p>
     </details>
+  </section>
+
+  <!-- METHOD AND LIMITS. After the findings, in every profile. Four parts, always in this order; a part with nothing to say keeps its heading and says so. -->
+  <section id="method" aria-labelledby="method-h">
+    <h2 id="method-h">Method and limits</h2>
+    <h3>Method</h3>
+    <p>What was done, in a few steps.</p>
+    <h3>Data</h3>
+    <dl>
+      <dt>Source</dt><dd>The system or survey</dd>
+      <dt>Dates</dt><dd>1 July to 30 September 2026</dd>
+      <dt>Size</dt><dd>n = 1,247 reports</dd>
+      <dt>Who is counted</dt><dd>Who or what is in the data, and who is not</dd>
+    </dl>
+    <h3>What was left out</h3>
+    <p>What was not counted, and why.</p>
+    <h3>How sure the result is</h3>
+    <p>The ranges, and what could make the result wrong.</p>
+  </section>
+
+  <!-- SOURCES. Outside work that a reader can look up, cited in the text as (Family, 2024). Order by family name, then year.
+       Write the address as the link's own text, because paper has no link. A web page ends with the date it was read. -->
+  <section id="sources" aria-labelledby="sources-h">
+    <h2 id="sources-h">Sources</h2>
+    <ul class="sources">
+      <li id="src-family-2024">Family, A. B., and Other, C. (2024). "Title of the work." <cite>Journal or site</cite>, 12(3), 45–67. <a href="https://example.org/work">https://example.org/work</a></li>
+    </ul>
   </section>
 </main>
 
