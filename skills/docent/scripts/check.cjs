@@ -1,10 +1,13 @@
 #!/usr/bin/env node
 // check: tests a Docent document against the rules that can be tested from its source.
-// Usage: node check.cjs <document.html> [more.html ...]
+// Usage: node check.cjs [--config <path> | --no-config] <document.html> [more.html ...]
 //        node check.cjs --rules   lists every rule, with its ID and its group
+// It reads the repo file, the nearest .docent/config.json above each page, and refuses a bad one (docs/proposals/repo-config.md).
 // It does not open a browser. So it cannot test contrast, the phone layout, print or motion as a reader sees them.
 require("./lib/node.cjs").warnOldNode(); // first, so that an old Node is named before anything else can fail
 const fs = require("node:fs");
+const path = require("node:path");
+const { findConfig, readConfig } = require("./lib/config.cjs");
 const { VERSION, cssBlock, jsBlock, findKit, isDeck } = require("./lib/kit.cjs");
 const { checkDeck, roomAt } = require("./lib/slide.cjs");
 const { renderDiagram, slideRoomsOf } = require("./lib/diagram.cjs");
@@ -91,8 +94,9 @@ function withClass(markup, name) {
 // to scale and a plan describe a design, not data (decision 2 in docs/proposals/sources.md).
 const MEASURED = { range: "range chart", bar: "bar chart", line: "line chart", funnel: "funnel", heatmap: "heat map", heatplan: "heat plan", statusgrid: "status grid" };
 
-/** Returns { errors, warnings }: two lists of plain sentences, each starting with the ID of its rule, as "[cards.count] …". */
-function checkDocument(html) {
+/** Returns { errors, warnings }: two lists of plain sentences, each starting with the ID of its rule, as "[cards.count] …".
+    options.config is the repo file that holds for the page, { data, label }; its host colors are tested as the page's own. */
+function checkDocument(html, options = {}) {
   const errors = [], warnings = [];
   const error = (id, text) => errors.push(say(id, text)), warn = (id, text) => warnings.push(say(id, text));
   // A palette turns Docent's own tokens to one hue. A host color is tested on the palette's pages, and each drawing carries its light values.
@@ -250,13 +254,16 @@ function checkDocument(html) {
   // Host colors and fonts go through the --host-* tokens. The kit sets its own tokens in four places (light, dark by the system, dark by the switch, print), so an author's value for one of them is lost in some of them.
   for (const [, name] of css.matchAll(/(?:^|[;{\s])--(bg|panel|fig|text|muted|line|primary|ink|dot|ok|warn|err|heat-[1-5]|heat-text|heat-page|serif|sans|mono)\s*:/g)) warn("tokens.kit", `a style sets --${name}; the kit sets it in four places, so your value is lost in dark mode or in print. Use the --host-* tokens, or a palette for the page and the grays (see SKILL.md)`);
   const hosts = {};
-  for (const [, name, value] of css.matchAll(/--(host-accent-dark|host-accent|host-ink|host-dot-dark)\s*:\s*([^;}]+)/g)) {
-    const color = value.trim();
+  // The page's own host colors, then each one of the repo file that the page does not set itself: the page's own value wins.
+  const own = [...css.matchAll(/--(host-accent-dark|host-accent|host-ink|host-dot-dark)\s*:\s*([^;}]+)/g)].map(([, name, value]) => [name, value.trim(), ""]);
+  const fileTokens = (options.config && options.config.data && options.config.data.tokens) || {};
+  for (const name of Object.keys(HOST)) if (Object.hasOwn(fileTokens, name) && !own.some(([n]) => n === name)) own.push([name, fileTokens[name].value.toLowerCase(), ` from ${options.config.label}`]);
+  for (const [name, color, from] of own) {
     if (!/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(color)) { warn("host.hex", `--${name} is "${color}"; check tests the contrast of a hex color only, such as #2f3fd0`); hosts[name] = null; continue; }
     hosts[name] = color;
     const [theme, need] = HOST[name];
     const low = GROUNDS[theme].map((ground) => [ground, contrast(color, ground)]).filter(([, ratio]) => ratio < need);
-    if (low.length) error("host.contrast", `--${name} ${color} has a contrast of ${low.map(([g, r]) => `${r.toFixed(2)}:1 on ${g}`).join(" and ")}; ${need === 3 ? "the dot is a mark and needs 3:1" : "text needs 4.5:1"}`);
+    if (low.length) error("host.contrast", `--${name} ${color}${from} has a contrast of ${low.map(([g, r]) => `${r.toFixed(2)}:1 on ${g}`).join(" and ")}; ${need === 3 ? "the dot is a mark and needs 3:1" : "text needs 4.5:1"}`);
   }
   // An accent can pass contrast and still mislead: it looks like a status, or like the body text, or dark mode falls back to Docent's own accent.
   for (const [name, theme] of [["host-accent", "light"], ["host-accent-dark", "dark"]]) {
@@ -587,20 +594,34 @@ function listRules() {
 /** One line of the output: "error [cards.count]: …". */
 const line = (file, level, entry) => { const { id, text } = split(entry); return `check ${file}: ${level}${id ? ` [${id}]` : ""}: ${text}`; };
 
-function main(files) {
-  if (files[0] === "--rules" && files.length === 1) {
+const USAGE = "usage: node check.cjs [--config <path> | --no-config] <document.html> [more.html ...]\n       node check.cjs --rules";
+
+function main(args) {
+  if (args[0] === "--rules" && args.length === 1) {
     console.log(`${RULES.size} rules. A guarantee is a promise to the reader of every page; house style is Docent's own choice, which a team may make differently.`);
     console.log(listRules());
     return 0;
   }
-  if (!files.length || files.some((f) => f.startsWith("--"))) {
-    console.error("usage: node check.cjs <document.html> [more.html ...]\n       node check.cjs --rules");
-    return 2;
-  }
+  const files = [...args], noConfig = files.includes("--no-config") && files.splice(files.indexOf("--no-config"), 1);
+  const at = files.indexOf("--config"), given = at >= 0 ? files.splice(at, 2)[1] : null;
+  if (!files.length || files.some((f) => f.startsWith("--")) || (at >= 0 && !given) || (noConfig && at >= 0)) { console.error(USAGE); return 2; }
   let failed = 0;
+  // The repo file of each page, read once before the pages: a problem in it is reported once, and the pages are checked without it.
+  const configs = new Map(), configOf = new Map();
+  for (const file of files) {
+    const found = noConfig ? null : given ? path.resolve(given) : findConfig(path.dirname(path.resolve(file)));
+    if (found && !configs.has(found)) {
+      const config = readConfig(found, { palettes: PALETTES, profiles: PROFILES });
+      config.label = path.relative(process.cwd(), config.file) || config.file;
+      config.errors.forEach((e) => console.log(`check: error: ${config.label}, ${e}`));
+      if (config.errors.length) failed += 1;
+      configs.set(found, config);
+    }
+    configOf.set(file, found && configs.get(found).data ? configs.get(found) : null);
+  }
   for (const file of files) {
     let result;
-    try { result = checkDocument(fs.readFileSync(file, "utf8")); } catch (error) { result = { errors: [say("check.file", error.message)], warnings: [] }; }
+    try { result = checkDocument(fs.readFileSync(file, "utf8"), { config: configOf.get(file) }); } catch (error) { result = { errors: [say("check.file", error.message)], warnings: [] }; }
     result.errors.forEach((e) => console.log(line(file, "error", e)));
     result.warnings.forEach((w) => console.log(line(file, "warning", w)));
     const count = (n, word) => `${n} ${word}${n === 1 ? "" : "s"}`;

@@ -3,6 +3,7 @@
 // fallback colors of each drawing, so a drawing copied out of the page keeps the palette. tests/contrast.py tests every pair.
 const fs = require("node:fs");
 const path = require("node:path");
+const { distance } = require("./color.cjs");
 
 const PALETTES = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "..", "assets", "palettes.json"), "utf8"));
 const NAMES = Object.keys(PALETTES);
@@ -71,4 +72,11 @@ function grounds(name) {
   return p ? { light: [p.light.bg, p.light.panel], dark: [p.dark.bg, p.dark.panel] } : { light: ["#fbfbfe", "#f2f3f9"], dark: ["#12141f", "#0b0d15"] };
 }
 
-module.exports = { PALETTES, NAMES, DOCENT, PAPER_HEAT, paletteOf, paletteCss, presentCss, paint, grounds };
+/** The tested light pages, Docent's own first, from the closest to a host's page color: [{ name, page, distance }], by CIE76 distance.
+    The distance, not the hue alone, because a near-gray has almost no hue to compare. */
+function closest(hex) {
+  const pages = [["docent", DOCENT.bg], ...NAMES.map((n) => [n, PALETTES[n].light.bg])];
+  return pages.map(([name, page]) => ({ name, page, distance: distance(hex, page) })).sort((a, b) => a.distance - b.distance);
+}
+
+module.exports = { PALETTES, NAMES, DOCENT, PAPER_HEAT, paletteOf, paletteCss, presentCss, paint, grounds, closest };

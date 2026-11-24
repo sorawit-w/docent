@@ -1,11 +1,17 @@
 #!/usr/bin/env node
 // brand: reads a host project's DESIGN.md and prints the host tokens for a Docent page. It writes nothing.
-// Usage: node brand.cjs <DESIGN.md>
+// Usage: node brand.cjs [DESIGN.md] [--config <path> | --no-config]
+// With no DESIGN.md, it reads the one that the repo file names: the nearest .docent/config.json at or above the current folder.
+// The file's "tokens" win over the values worked out from DESIGN.md (docs/proposals/repo-config.md, section 2).
 // It reads the front matter only, and of that only "colors" and "typography". Six host tokens come out, and nothing else:
 // a host's page, text and status colors would break dark mode, print and the contrast that Docent tests (see DESIGN.md, Host tokens).
 require("./lib/node.cjs").warnOldNode(); // first, so that an old Node is named before anything else can fail
 const fs = require("node:fs");
+const path = require("node:path");
 const { PAGE, contrast, lab, atLightness, darkAccent, nearestStatus } = require("./lib/color.cjs");
+const { findConfig, readConfig, COLORS, FONTS } = require("./lib/config.cjs");
+const { NAMES: PALETTES, PALETTES: NAMED, closest } = require("./lib/palettes.cjs");
+const { PROFILES } = require("./lib/profile.cjs");
 
 const INK_L = 16.6; // the CIELAB lightness of Docent's own heading color (#1b2260)
 const STACK = {
@@ -70,7 +76,8 @@ function mend(hex) {
 const low = (hex, grounds) => Math.min(...grounds.map((g) => contrast(hex, g)));
 const fmt = (n) => `${n.toFixed(2)}:1`;
 
-/** Works out the host tokens from the text of a DESIGN.md. Returns { tokens: [[name, value, note]], unused: [keys], notes: [lines] } or { error }. */
+/** Works out the host tokens from the text of a DESIGN.md. Returns { tokens: [[name, value, note]], unused: [keys], notes: [lines], page } or
+    { error }. page is the host's page color, when DESIGN.md has one, with the tested light pages from the closest. */
 function brand(text) {
   const data = frontMatter(text);
   if (!data) return { error: "the file has no front matter (a block between two --- lines at the top), so it holds no colors or fonts that brand can read" };
@@ -119,7 +126,38 @@ function brand(text) {
 
   const used = new Set(["primary", "secondary", "dark-primary", "primary-dark"].filter((k) => colors[k]));
   const unused = [...Object.keys(colors).filter((k) => !used.has(k)).map((k) => `colors.${k}`), ...Object.keys(data).filter((k) => !["colors", "typography", "version", "name", "description"].includes(k))];
-  return { tokens, unused, notes };
+  const pageKey = ["surface", "neutral"].find((k) => color(k)); // a page color, which Docent does not take: it offers the closest palette
+  const page = pageKey ? { key: `colors.${pageKey}`, color: color(pageKey), closest: closest(color(pageKey)) } : null;
+  return { tokens, unused, notes, page };
+}
+
+// The pages each host color is read on, and the contrast it needs, as check tests it (HOST in check.cjs), on Docent's own pages.
+const NEEDS = { "host-accent": [[PAGE.light, PAGE.well], 4.5], "host-accent-dark": [[PAGE.dark, PAGE.darkWell], 4.5], "host-ink": [[PAGE.light, PAGE.well], 4.5], "host-dot-dark": [[PAGE.dark, PAGE.darkWell], 3] };
+const ORDER = [...COLORS, ...FONTS];
+
+/** The result of brand with the repo file's tokens over it: each one wins, and names the file and its reason. A color that fails is kept,
+    because it is the team's choice, and a note says that check will refuse it. */
+function withFile(result, tokens, label) {
+  const out = { ...result, tokens: [...result.tokens], notes: [...result.notes] };
+  for (const name of ORDER.filter((n) => tokens && Object.hasOwn(tokens, n))) {
+    const { value, reason } = tokens[name];
+    let note = `from ${label}: ${reason}`;
+    if (NEEDS[name]) {
+      const [grounds, need] = NEEDS[name], worst = low(value, grounds);
+      note = `from ${label}, ${fmt(worst)} on the ${name === "host-accent-dark" || name === "host-dot-dark" ? "dark " : ""}well: ${reason}`;
+      if (worst < need) out.notes.push(`--${name} ${value} from ${label} has ${fmt(worst)} on Docent's ${name === "host-accent-dark" || name === "host-dot-dark" ? "dark " : ""}well, below ${need}:1; check will refuse it. Change the value in ${label}`);
+    }
+    const at = out.tokens.findIndex(([n]) => n === name), entry = [name, NEEDS[name] ? value.toLowerCase() : value, note];
+    if (at >= 0) out.tokens[at] = entry;
+    else out.tokens.splice(out.tokens.filter(([n]) => ORDER.indexOf(n) < ORDER.indexOf(name)).length, 0, entry);
+  }
+  return out;
+}
+
+/** The line about a host's page color: one plain reason, and the closest tested palette as a choice, picked by distance. */
+function pageNote(page) {
+  const [first, ...rest] = page.closest, name = (p) => (p.name === "docent" ? "Docent's own page" : NAMED[p.name].name);
+  return `${page.key} ${page.color} is a page color. Docent keeps its own page color, because some text would become hard to read in dark mode and on paper. The closest tested page is ${name(first)} (${first.page}), a distance of ${first.distance.toFixed(1)}; then ${rest.map((p) => `${name(p)} ${p.distance.toFixed(1)}`).join(", ")}. Offer it to the user as a choice; never swap it in without asking`;
 }
 
 /** The style block to copy into a page, with a comment for each value. */
@@ -130,18 +168,37 @@ function print(result) {
   return `<style>\n:root {\n${lines.join("\n")}\n}\n</style>`;
 }
 
+const USAGE = "usage: node brand.cjs [DESIGN.md] [--config <path> | --no-config]\n       with no DESIGN.md, brand reads the one that .docent/config.json names";
+
 function main(args) {
-  if (args.length !== 1) { console.error("usage: node brand.cjs <DESIGN.md>"); return 2; }
-  let text;
-  try { text = fs.readFileSync(args[0], "utf8"); } catch (error) { console.error(`brand ${args[0]}: ${error.message}`); return 1; }
-  const result = brand(text);
-  if (result.error) { console.error(`brand ${args[0]}: ${result.error}`); return 1; }
+  const rest = [...args], flag = (name) => { const i = rest.indexOf(name); return i >= 0 ? rest.splice(i, 1).length : 0; };
+  const noConfig = flag("--no-config"), at = rest.indexOf("--config"), given = at >= 0 ? rest.splice(at, 2)[1] : null;
+  if ((at >= 0 && !given) || (noConfig && at >= 0) || rest.length > 1 || rest.some((a) => a.startsWith("--"))) { console.error(USAGE); return 2; }
+  const file = noConfig ? null : given || findConfig(process.cwd());
+  let config = null;
+  if (file) {
+    config = readConfig(file, { palettes: PALETTES, profiles: PROFILES });
+    const label = path.relative(process.cwd(), config.file) || config.file;
+    if (config.errors.length) { for (const e of config.errors) console.error(`brand: error: ${label}, ${e}`); return 1; }
+    config.label = label;
+  }
+  const design = rest[0] || (config && config.data.design ? path.resolve(config.base, config.data.design) : null);
+  if (!design && !config) { console.error(USAGE); return 2; }
+  let result = { tokens: [], unused: [], notes: [], page: null };
+  if (design) {
+    let text;
+    try { text = fs.readFileSync(design, "utf8"); } catch (error) { console.error(`brand ${design}: ${error.message}`); return 1; }
+    result = brand(text);
+    if (result.error) { console.error(`brand ${design}: ${result.error}`); return 1; }
+  } else result.notes.push(`${config.label} names no DESIGN.md ("design" is ${config.data.design === null ? "null" : "missing"}), so only its own tokens are used`);
+  if (config) result = withFile(result, config.data.tokens, config.label);
   const style = print(result);
   if (style) console.log(style);
   for (const note of result.notes) console.log(`brand: ${note}`);
+  if (result.page) console.log(`brand: ${pageNote(result.page)}`);
   if (result.unused.length) console.log(`brand: not used, so dark mode, print and the tested contrast stay as they are: ${result.unused.join(", ")}`);
   return 0;
 }
 
 if (require.main === module) process.exitCode = main(process.argv.slice(2));
-module.exports = { brand, frontMatter, stack, mend, print, main };
+module.exports = { brand, frontMatter, stack, mend, print, withFile, pageNote, main };
