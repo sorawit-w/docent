@@ -103,3 +103,29 @@ test("the host block holds host tokens only, and stays in every other test of ch
   assert.match(errors, /\[network\.url\]/);
   assert.deepEqual(checkDocument(stampHtml(page, { host: [["host-sans", '"Brand Sans", system-ui, sans-serif'], ["host-ink", "#3b2a5c"]] }).html).errors, [], "a block with a font stack has the right shape");
 });
+
+test("check notes a page whose palette, logo, tagline, credit or profile differs from the repo file, in one note", () => {
+  const root = path.join(assets, "sample-repo");
+  const config = { ...readConfig(path.join(root, ".docent", "config.json"), { palettes: PALETTES, profiles: PROFILES }), label: ".docent/config.json" };
+  const page = fs.readFileSync(path.join(root, "docs", "report-a-bug.html"), "utf8");
+  const notes = (change, c = config) => checkDocument(change(page), { config: c }).notes;
+  assert.deepEqual(notes((h) => h), [], "the sample page follows its file");
+  assert.deepEqual(notes((h) => h.replace("Small tools for careful teams.", "Small tools for busy teams.")), ['[brand.differs] the tagline (the page has "Small tools for busy teams.", the file "Small tools for careful teams.") differs from .docent/config.json. A page keeps its own brand when the file changes; if the page should follow the file, change the page, or write data-brand="off" on a page about another product']);
+  const many = notes((h) => h.replace('data-palette="sepia"', 'data-palette="harbor"').replace("Made with Docent</p>", 'Made with <a href="https://github.com/sorawit-w/docent">Docent</a></p>').replace('data-profile="standard"', 'data-profile="brief"').replace(/<svg class="logo"[\s\S]*?<\/svg>/, ""));
+  assert.equal(many.length, 1, "one note for the page");
+  assert.match(many[0], /^\[brand\.differs\] the palette \(the page has "harbor", the file "sepia"\), the logo \(the page has none\), the credit \(the page has "link", the file "text"\) and the profile \(the page has "brief", the file "standard"\) differ from \.docent\/config\.json\./);
+  assert.match(notes((h) => h.replace(/(<svg class="logo"[^>]*>[\s\S]*?)rx="2"/, '$1rx="3"'))[0], /^\[brand\.differs\] the logo differs/, "a logo whose shapes differ from the file's");
+  assert.deepEqual(notes((h) => h.replace("Small tools for careful teams.", "x").replace('<html lang="en"', '<html lang="en" data-brand="off"')), [], "a page about another product takes nothing from the file");
+  const off = { ...config, data: { ...config.data, rules: { "brand.differs": { off: true, reason: "Old release notes keep their brand." } } } };
+  assert.deepEqual(notes((h) => h.replace("Small tools for careful teams.", "x"), off), [], "a team may turn the note off");
+  const unbranded = { label: ".docent/config.json", base: root, data: { version: 1 } };
+  assert.deepEqual(checkDocument(specimen, { config: unbranded }).notes, [], "a file with no brand fields and a page with none agree: Docent's own colors, no logo, no tagline, the credit as a link");
+});
+
+test("a page that differs from the file passes check, with the note in the output", () => {
+  const root = repo({ ".docent/config.json": { version: 1, palette: "plum", tagline: "Small tools for careful teams." }, "docs/a.html": specimen });
+  const { code, out } = run("check.cjs", ["docs/a.html"], root);
+  assert.equal(code, 0, out);
+  assert.match(out, /check docs\/a\.html: note \[brand\.differs\]: the palette \(the page has none, the file "plum"\) and the tagline \(the page has none, the file "Small tools for careful teams\."\) differ from \.docent\/config\.json\./);
+  assert.match(out, /check docs\/a\.html: 0 errors, 2 warnings, 1 note/);
+});

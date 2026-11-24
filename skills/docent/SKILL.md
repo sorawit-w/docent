@@ -241,7 +241,7 @@ A host project may set its accent, its heading color and its fonts, with these t
 - its `tagline` in the footer, and its `credit`: `"text"` takes out the link, `"none"` takes out the credit;
 - then run `stamp`: it writes the host tokens, from the `DESIGN.md` the file names and the file's own `tokens`, between `docent:host` markers. Do not copy a style block from `brand` as well.
 
-Find the host's name as below; the file does not keep it. An existing page keeps its palette, logo, tagline, credit and profile when the file changes; only the host tokens change, on its next `stamp`.
+Find the host's name as below; the file does not keep it. An existing page keeps its palette, logo, tagline, credit and profile when the file changes; only the host tokens change, on its next `stamp`. `check` names each difference in one note, `[brand.differs]`: tell the user, and change the page only when they want it to follow the file, because some pages are kept as they were on purpose, such as last year's release notes.
 
 **Without a repo file,** when the repo already has a Docent page (it carries the `docent:kit` marker), copy the brand from the newest one: the logo, the host tokens, the tagline and the credit. Then ask one question only: "Use the same brand as `docs/onboarding.html`?" When the repo has no Docent page yet, ask about the brand once, as below.
 

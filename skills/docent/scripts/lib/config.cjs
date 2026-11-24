@@ -107,6 +107,17 @@ function readConfig(file, { palettes = [], profiles = [] } = {}) {
   return { file: abs, base, data: errors.length ? null : data, errors, lines: errors.length ? {} : linesOf(fs.readFileSync(abs, "utf8"), data) };
 }
 
+/** What a logo draws, to compare a page's logo with a file: an SVG's shapes, without its own <svg> tag and the space between tags. */
+const logoShapes = (svg) => svg.trim().replace(/^<svg\b[^>]*>/i, "").replace(/<\/svg>\s*$/i, "").replace(/>\s+</g, "><").trim();
+
+/** The logos that a good repo file names, as a page carries them: { both | light | dark: shapes of an SVG, or a data URI }. */
+function logosOf(config) {
+  const logo = config.data && config.data.logo;
+  if (logo == null) return null;
+  const read = (p) => { const full = path.resolve(config.base, p), ext = path.extname(p).slice(1).toLowerCase(); return ext === "svg" ? logoShapes(fs.readFileSync(full, "utf8")) : `data:image/${ext};base64,${fs.readFileSync(full).toString("base64")}`; };
+  return typeof logo === "string" ? { both: read(logo) } : Object.fromEntries(Object.entries(logo).map(([k, p]) => [k, read(p)]));
+}
+
 /** The line of the file where each rule change stands, so a note can name it: { id: line }. */
 function linesOf(text, data) {
   const out = {}, rows = text.split(/\r?\n/), start = rows.findIndex((r) => /"rules"\s*:/.test(r));
@@ -117,4 +128,4 @@ function linesOf(text, data) {
   return out;
 }
 
-module.exports = { NAME, VERSION, COLORS, FONTS, FIELDS, repoRoot, findConfig, readConfig };
+module.exports = { NAME, VERSION, COLORS, FONTS, FIELDS, repoRoot, findConfig, readConfig, logoShapes, logosOf };

@@ -64,6 +64,7 @@ const LIST = [
   H("credit.missing", D("Logo, tagline and credit")),
   H("tagline.length", D("Logo, tagline and credit")),
   H("tagline.markup", D("Logo, tagline and credit")),
+  H("brand.differs", S("Ask about the brand once")),
   // Diagrams
   G("diagram.data", DG("The block")),
   G("diagram.id", DG("The block")),
