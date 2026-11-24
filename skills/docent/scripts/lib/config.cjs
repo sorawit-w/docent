@@ -113,7 +113,9 @@ const PAGE_ONLY = /^(class|width|height|role|aria-[\w-]+|data-for|xmlns(:\w+)?|f
 /** What a logo draws, to compare a page's logo with a file: the drawing attributes of its <svg>, in order, and its shapes, without the
     space between tags. */
 function logoShapes(svg) {
-  const text = svg.trim(), root = (text.match(/^<svg\b([^>]*)>/i) || ["", ""])[1];
+  // A file may start with an XML declaration, a comment or a doctype, and end with a comment: none of them is drawn.
+  const text = svg.replace(/^(?:\s|<\?xml[\s\S]*?\?>|<!--[\s\S]*?-->|<!DOCTYPE[^>]*>)+/i, "").replace(/(?:\s|<!--[\s\S]*?-->)+$/, "");
+  const root = (text.match(/^<svg\b([^>]*)>/i) || ["", ""])[1];
   const attrs = [...root.matchAll(/([^\s"'=]+)\s*=\s*(?:"([^"]*)"|'([^']*)')/g)].filter(([, name]) => !PAGE_ONLY.test(name)).map(([, name, a, b]) => `${name}="${a ?? b}"`).sort();
   return `${attrs.join(" ")}|${text.replace(/^<svg\b[^>]*>/i, "").replace(/<\/svg>\s*$/i, "").replace(/>\s+</g, "><").trim()}`;
 }
