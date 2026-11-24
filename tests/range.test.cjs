@@ -149,7 +149,8 @@ test("wrong range data is refused with a plain reason", () => {
   bad((d) => (d.scale.to = 40), /"scale" must run forward/);
   bad((d) => (d.scale.step = 7), /a whole number of steps/);
   bad((d) => (d.rows[0].to = 120), /row 1 \("Readers prefer"\) has "to": 120; it must be a number on the scale, from 40 to 100/);
-  bad((d) => (d.rows[0].at = 50), /has "at" and also "from" or "to"/);
+  bad((d) => { d.rows[0].at = 50; delete d.rows[0].to; }, /has "at" and one of "from" and "to"/);
+  bad((d) => (d.rows[0].at = 80), /has its estimate 80 outside its interval, 45–76/); // with from and to, "at" is an estimate inside its interval
   bad((d) => (d.rows[0].to = 45), /starts and ends at 45; write it as a point/);
   bad((d) => (d.rows[0].to = 44), /ends before it starts/);
   bad((d) => (d.rows[1] = { name: "Nothing", group: "evidence" }), /row 2 \("Nothing"\) has no numbers/);
@@ -306,4 +307,47 @@ test("a large offset is refused only when two tick labels would be the same", ()
 
 test("a scale with far too many steps is refused at once by the step limit", () => {
   assert.throws(() => readScale({ from: 0, to: 4294967296, step: 1 }, { needStep: true }), /at most 20/);
+});
+
+test("an estimate row: a point inside its interval, in both forms, with its table in words", () => {
+  const estimate = () => JSON.parse(fs.readFileSync(path.join(__dirname, "fixtures", "range-estimate.json"), "utf8"));
+  const { svg, scene, phone, warnings } = renderDiagram(estimate());
+  const file = path.join(__dirname, "expected", "range-estimate.svg");
+  if (process.env.UPDATE) fs.writeFileSync(file, svg + "\n");
+  assert.equal(svg + "\n", fs.readFileSync(file, "utf8"), "range-estimate.svg changed; look at the drawing, then run with UPDATE=1");
+  assert.deepEqual(warnings, []);
+  for (const s of [scene, phone]) {
+    assert.equal(s.parts.length, 5, "one mark per row");
+    for (const p of s.parts) {
+      const bar = p.svg.match(/<rect x="([\d.]+)" y="([\d.]+)" width="([\d.]+)" height="16" rx="4" class="r-bar"\/>/), dot = p.svg.match(/<circle cx="([\d.]+)" cy="([\d.]+)" r="5" class="r-pt"\/>$/);
+      assert.ok(bar && dot, `${p.id}: a bar, and the point drawn last, over the bar and its lines`);
+      assert.ok(+dot[1] >= +bar[1] && +dot[1] <= +bar[1] + +bar[3] && +dot[2] === +bar[2] + 8, `${p.id}: the point stands on its bar, inside the interval`);
+      assert.ok(+bar[3] >= 16, `${p.id}: the interval is wide enough to show its point (${bar[3]}px)`);
+    }
+  }
+  const signIn = (s) => +s.parts[0].svg.match(/width="([\d.]+)"/)[1];
+  assert.ok(signIn(scene) > 79 && signIn(phone) > 32, `Sign-in's interval is ${signIn(scene)}px on a desktop and ${signIn(phone)}px on a phone`);
+  for (const value of ["14 (11–18)", "23 (18–28)", "9 (4–19)"]) assert.ok(scene.notes.some((n) => n.cls === "val" && n.s === value), `the value beside the mark reads ${value}`);
+  const words = svg.split('<details class="dg-words">')[1];
+  assert.match(words, /<th scope="col">Row<\/th><th scope="col" class="num">Estimate, in %<\/th><th scope="col" class="num">Low<\/th><th scope="col" class="num">High<\/th><\/tr>/, "three columns: estimate, low and high");
+  assert.match(words, /<tr><th scope="row">Sign-in<\/th><td class="num">14<\/td><td class="num">11<\/td><td class="num">18<\/td><\/tr>/);
+  assert.match(words, /<li>A line at 18 %: all areas\.<\/li>/);
+});
+
+test("an estimate row: render refuses an estimate outside its interval, and an interval too narrow for its point", () => {
+  const estimate = () => JSON.parse(fs.readFileSync(path.join(__dirname, "fixtures", "range-estimate.json"), "utf8"));
+  const withRow = (row) => { const d = estimate(); d.rows[0] = { name: "Sign-in", ...row }; return d; };
+  assert.throws(() => renderDiagram(withRow({ at: 20, from: 11, to: 18 })), /row 1 \("Sign-in"\) has its estimate 20 outside its interval, 11–18; an estimate stands inside its interval/);
+  assert.throws(() => renderDiagram(withRow({ at: 14, from: 18, to: 11 })), /an interval that ends before it starts/);
+  assert.throws(() => renderDiagram(withRow({ at: 14, from: 13.5, to: 14.5 })), /the interval 13\.5–14\.5 of the row "Sign-in" is [\d.]+px wide on a desktop and on paper, too narrow to show its estimate inside it; write the estimate as a point, and give its interval in the text/);
+  assert.throws(() => renderDiagram(withRow({ at: 14, from: 13, to: 15 })), /the interval 13–15 of the row "Sign-in" is [\d.]+px wide on a phone, too narrow/, "the phone form is tested too");
+  assert.throws(() => renderDiagram(withRow({ at: 14, from: 11 })), /has "at" and one of "from" and "to"/);
+  const ends = renderDiagram(withRow({ at: 11, from: 11, to: 18 }));
+  assert.ok(ends.scene.parts[0].svg.includes('class="r-pt"'), "an estimate at an end of its interval is allowed");
+  const decimals = estimate(); decimals.rows[0] = { name: "Sign-in", at: 14.25, from: 11.5, to: 18 };
+  const shown = renderDiagram(decimals);
+  assert.ok(shown.scene.notes.some((n) => n.s === "14.25 (11.50–18.00)") && shown.scene.notes.some((n) => n.s === "23.00 (18.00–28.00)"), "the estimates of one chart keep the same decimals");
+  assert.match(shown.svg, /<td class="num">14\.25<\/td><td class="num">11\.50<\/td><td class="num">18\.00<\/td>/);
+  const mixed = estimate(); mixed.rows[1] = { name: "Search", from: 18, to: 28 };
+  assert.match(renderDiagram(mixed).svg.split('<details class="dg-words">')[1], /<th scope="col">Value, in %<\/th>[\s\S]*<tr><th scope="row">Sign-in<\/th><td>14 \(11–18\)<\/td><\/tr>/, "a chart with other rows keeps one Value column");
 });

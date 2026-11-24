@@ -1,5 +1,5 @@
 // Range charts: values and ranges on one numeric scale, one row each. A row is a range (from and to), a point (at),
-// an upper limit (to alone) or a lower limit (from alone). Nothing moves: a range chart has no order.
+// an estimate inside its interval (at, from and to), an upper limit (to alone) or a lower limit (from alone). Nothing moves: a range chart has no order.
 // It is drawn twice with text at its real size: 640px wide for a desktop and for paper, and 264px wide for a phone,
 // where each row name stands on its own line above its mark. Its rows are also written as a table, in words.
 const { fail, words, id } = require("./blocks.cjs");
@@ -8,6 +8,7 @@ const { WIDE, PHONE, esc, wrapName, readScale, makeScale, drawHead, drawGrid, li
 
 const MOST = { rows: 12, groups: 3, name: 28, note: 24, group: 20 };
 const ROW = 32; // the height of one mark's strip
+const ESTIMATE = 16; // px: the narrowest interval that shows its estimate's point inside it
 
 /** Checks range data and returns the model. */
 function readRange(data) {
@@ -24,6 +25,9 @@ function readRange(data) {
   groups.forEach((g, i) => { if (groups.findIndex((o) => o.id === g.id) !== i) fail(`two groups have the id "${g.id}"`); });
   if (!Array.isArray(data.rows)) fail(`"rows" must be a list`);
   if (data.rows.length < 2 || data.rows.length > MOST.rows) fail(`a range chart has 2 to ${MOST.rows} rows; this one has ${data.rows.length}`);
+  // The estimates of one chart keep the same decimals, as a column of numbers does: 0.20 beside 0.25, not 0.2.
+  const places = Math.max(0, ...data.rows.filter((r) => r && isNum(r.at) && isNum(r.from) && isNum(r.to)).flatMap((r) => [r.at, r.from, r.to]).map((v) => (String(v).split(".")[1] || "").length));
+  const est = (v) => fmt(v.toFixed(places));
   const rows = data.rows.map((r, i) => {
     if (!r || typeof r !== "object") fail(`row ${i + 1} must be an object with a "name" and its numbers`);
     const name = words(r.name, `the name of row ${i + 1}`, MOST.name);
@@ -31,8 +35,12 @@ function readRange(data) {
     const has = (k) => r[k] != null;
     for (const k of ["from", "to", "at"]) if (has(k) && (!isNum(r[k]) || r[k] < scale.from || r[k] > scale.to)) fail(`${what} has "${k}": ${JSON.stringify(r[k])}; it must be a number on the scale, from ${fmt(scale.from)} to ${fmt(scale.to)}`);
     let type;
-    if (has("at")) {
-      if (has("from") || has("to")) fail(`${what} has "at" and also "from" or "to"; a row has one mark: a point ("at"), a range ("from" and "to"), or one limit ("from" or "to" alone)`);
+    if (has("at") && has("from") && has("to")) {
+      if (r.to <= r.from) fail(`${what} has an interval that ends before it starts: "to" must be more than "from"`);
+      if (r.at < r.from || r.at > r.to) fail(`${what} has its estimate ${fmt(r.at)} outside its interval, ${fmt(r.from)}–${fmt(r.to)}; an estimate stands inside its interval`);
+      type = "estimate";
+    } else if (has("at")) {
+      if (has("from") || has("to")) fail(`${what} has "at" and one of "from" and "to"; a row has one mark: a point ("at"), an estimate in its interval ("at", "from" and "to"), a range ("from" and "to"), or one limit ("from" or "to" alone)`);
       type = "point";
     } else if (has("from") && has("to")) {
       if (r.to === r.from) fail(`${what} starts and ends at ${fmt(r.from)}; write it as a point, with "at"`);
@@ -47,8 +55,9 @@ function readRange(data) {
       if (r.group == null) fail(`${what} names no group; when a chart has groups, every row names one in "group"`);
       group = groups.find((g) => g.id === r.group) || fail(`${what} names the group "${r.group}", which does not exist`);
     } else if (r.group != null) fail(`${what} names a group, but the chart has no "groups"`);
-    const value = { range: () => `${fmt(r.from)}–${fmt(r.to)}`, point: () => fmt(r.at), upper: () => `up to ${fmt(r.to)}`, lower: () => `at least ${fmt(r.from)}` }[type]();
-    return { name, type, from: r.from, to: r.to, at: r.at, note, group, value: note ? `${value}, ${note}` : value };
+    const value = { range: () => `${fmt(r.from)}–${fmt(r.to)}`, point: () => fmt(r.at), estimate: () => `${est(r.at)} (${est(r.from)}–${est(r.to)})`, upper: () => `up to ${fmt(r.to)}`, lower: () => `at least ${fmt(r.from)}` }[type]();
+    const shown = type === "estimate" ? { at: est(r.at), from: est(r.from), to: est(r.to) } : null;
+    return { name, type, from: r.from, to: r.to, at: r.at, shown, note, group, value: note ? `${value}, ${note}` : value };
   });
   // The rows of one group stand together, so each group is one band; the bands follow the order of the rows.
   for (const g of groups) {
@@ -64,6 +73,12 @@ function readRange(data) {
 /** The pixels of a row's mark, the sides where its value may stand, and its width check. */
 function extent(r, sc, x0, x1, where) {
   if (r.type === "point") return { a: sc.x(r.at) - 5, b: sc.x(r.at) + 5, sides: ["right", "left"] };
+  if (r.type === "estimate") {
+    // The point (10px across) must show inside its bar, with the bar's outline beside it.
+    const a = sc.x(r.from), b = sc.x(r.to);
+    if (b - a < ESTIMATE) fail(`the interval ${fmt(r.from)}–${fmt(r.to)} of the row "${r.name}" is ${num(b - a)}px wide ${where}, too narrow to show its estimate inside it; write the estimate as a point, and give its interval in the text`);
+    return { a: Math.min(a, sc.x(r.at) - 5), b: Math.max(b, sc.x(r.at) + 5), sides: ["right", "left"] };
+  }
   if (r.type === "range") {
     const a = sc.x(r.from), b = sc.x(r.to);
     if (b - a < 4) fail(`the range ${r.value} is ${num(b - a)}px wide ${where}; write it as a point, with "at", or narrow the scale`);
@@ -81,6 +96,7 @@ function extent(r, sc, x0, x1, where) {
 /** The mark of one row, as SVG, on the line cy. */
 function markSvg(r, sc, x0, x1, cy) {
   if (r.type === "point") return `<circle cx="${num(sc.x(r.at))}" cy="${num(cy)}" r="5" class="r-pt"/>`;
+  if (r.type === "estimate") return `<rect x="${num(sc.x(r.from))}" y="${num(cy - 8)}" width="${num(sc.x(r.to) - sc.x(r.from))}" height="16" rx="4" class="r-bar"/>`;
   if (r.type === "range") return `<rect x="${num(sc.x(r.from))}" y="${num(cy - 8)}" width="${num(sc.x(r.to) - sc.x(r.from))}" height="16" rx="4" class="r-bar"/>`;
   if (r.type === "upper") return `<path d="M${num(x0)},${num(cy)} H${num(sc.x(r.to))} M${num(sc.x(r.to))},${num(cy - 8)} V${num(cy + 8)}" class="r-lim"/>`;
   return `<path d="M${num(sc.x(r.from))},${num(cy - 8)} V${num(cy + 8)} M${num(sc.x(r.from))},${num(cy)} H${num(x1)}" class="r-lim"/>`;
@@ -133,8 +149,10 @@ function layoutRange(model, phone = false) {
       const ty = place.side === "above" ? cy - 14 : cy + 4;
       const left = place.anchor === "end" ? place.x - tw : place.anchor === "middle" ? place.x - tw / 2 : place.x;
       s.notes.push({ x: place.x, y: ty, s: r.value, cls: "val", anchor: place.anchor, knock: { x: left - 4, y: ty - 12, w: tw + 8, h: 16 } });
-      const through = r.type === "range" ? linesIn(scale, sc, sc.x(r.from), cy - 8, sc.x(r.to) - sc.x(r.from), 16) : "";
-      s.parts.push({ id: r.name, svg: markSvg(r, sc, x0, x1, cy) + through, texts: [] });
+      const through = r.type === "range" || r.type === "estimate" ? linesIn(scale, sc, sc.x(r.from), cy - 8, sc.x(r.to) - sc.x(r.from), 16) : "";
+      // An estimate's point is drawn last, over its bar and the lines through it.
+      const point = r.type === "estimate" ? `<circle cx="${num(sc.x(r.at))}" cy="${num(cy)}" r="5" class="r-pt"/>` : "";
+      s.parts.push({ id: r.name, svg: markSvg(r, sc, x0, x1, cy) + through + point, texts: [] });
       if (phone) spans.push([cy - 14, cy + 14]);
       yy += ROW;
     }
@@ -152,8 +170,16 @@ function layoutRange(model, phone = false) {
 function wordsOf(model) {
   const { scale, groups } = model;
   const unit = scale.unit ? ` ${scale.unit}` : "";
-  const head = `<tr><th scope="col">Row</th><th scope="col">${scale.unit ? `Value, in ${esc(scale.unit)}` : "Value"}</th>${groups.length ? '<th scope="col">Group</th>' : ""}</tr>`;
-  const body = model.rows.map((r) => `<tr><th scope="row">${esc(r.name)}</th><td>${esc(r.value)}</td>${groups.length ? `<td>${esc(r.group.name)}</td>` : ""}</tr>`).join("");
+  const group = (r) => (groups.length ? `<td>${esc(r.group.name)}</td>` : "");
+  const groupHead = groups.length ? '<th scope="col">Group</th>' : "";
+  // A chart of estimates only gives each row's estimate, low and high in columns of their own.
+  const estimates = model.rows.every((r) => r.type === "estimate");
+  const head = estimates
+    ? `<tr><th scope="col">Row</th><th scope="col" class="num">${scale.unit ? `Estimate, in ${esc(scale.unit)}` : "Estimate"}</th><th scope="col" class="num">Low</th><th scope="col" class="num">High</th>${model.rows.some((r) => r.note) ? '<th scope="col">Note</th>' : ""}${groupHead}</tr>`
+    : `<tr><th scope="col">Row</th><th scope="col">${scale.unit ? `Value, in ${esc(scale.unit)}` : "Value"}</th>${groupHead}</tr>`;
+  const body = model.rows.map((r) => (estimates
+    ? `<tr><th scope="row">${esc(r.name)}</th><td class="num">${esc(r.shown.at)}</td><td class="num">${esc(r.shown.from)}</td><td class="num">${esc(r.shown.to)}</td>${model.rows.some((x) => x.note) ? `<td>${esc(r.note || "")}</td>` : ""}${group(r)}</tr>`
+    : `<tr><th scope="row">${esc(r.name)}</th><td>${esc(r.value)}</td>${group(r)}</tr>`)).join("");
   const marks = scale.marks.map((m) => `<li>A line at ${esc(fmt(m.at))}${esc(unit)}: ${esc(m.name)}.</li>`).join("");
   return `<div class="table-wrap is-text" role="region" aria-label="The rows of the range chart" tabindex="0"><table><thead>${head}</thead><tbody>${body}</tbody></table></div>${marks ? `\n<ul>${marks}</ul>` : ""}`;
 }

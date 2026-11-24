@@ -1,0 +1,152 @@
+<svg id="dg-not-repeated" class="dg dg-range dg-auto" xmlns="http://www.w3.org/2000/svg" width="640" height="240" viewBox="0 0 640 240" role="img" aria-label="About 18% of all reports could not be repeated. Search, Checkout and Settings had the highest shares, about 21% to 23%. Profile had the lowest, 9%, but its interval is wide, from 4% to 19%.">
+<style>
+#dg-not-repeated{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-not-repeated .ground{fill:var(--fig,#f2f3f9)}
+#dg-not-repeated .band{fill:var(--bg,#fbfbfe)}
+#dg-not-repeated .track{stroke:var(--line,#d3d6e3)}
+#dg-not-repeated .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-not-repeated .head{fill:var(--text,#1c1f2e)}
+#dg-not-repeated .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-not-repeated .stop.end{fill:var(--text,#1c1f2e)}
+#dg-not-repeated .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-not-repeated .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-not-repeated .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-not-repeated .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-not-repeated .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-not-repeated .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-not-repeated .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-not-repeated .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-not-repeated .sub,#dg-not-repeated .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-not-repeated .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-not-repeated .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-not-repeated .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-not-repeated .r-bar{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-not-repeated .r-pt{fill:var(--text,#1c1f2e)}
+#dg-not-repeated .r-lim{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2}
+#dg-not-repeated .r-ref{stroke:var(--muted,#575d75)}
+@media (prefers-reduced-motion:reduce){#dg-not-repeated .pulse{animation:none!important}#dg-not-repeated .pulse{display:none!important}}
+@media print{#dg-not-repeated{max-width:100%;height:auto}#dg-not-repeated .pulse{display:none!important}}
+#dg-not-repeated-phone{display:none}
+</style>
+<rect width="640" height="240" class="ground"/>
+<rect x="8" y="56" width="624" height="176" rx="10" class="band"/>
+<line x1="319.85" y1="56" x2="319.85" y2="232" class="r-ref"/>
+<line x1="107" y1="56" x2="107" y2="232" class="track"/>
+<line x1="225.25" y1="56" x2="225.25" y2="232" class="track"/>
+<line x1="343.5" y1="56" x2="343.5" y2="232" class="track"/>
+<line x1="461.75" y1="56" x2="461.75" y2="232" class="track"/>
+<line x1="580" y1="56" x2="580" y2="232" class="track"/>
+<text x="319.85" y="24" class="sub" text-anchor="middle">all areas</text>
+<text x="107" y="44" class="val" text-anchor="middle">0</text>
+<text x="225.25" y="44" class="val" text-anchor="middle">10</text>
+<text x="343.5" y="44" class="val" text-anchor="middle">20</text>
+<text x="461.75" y="44" class="val" text-anchor="middle">30</text>
+<text x="580" y="44" class="val" text-anchor="middle">40</text>
+<text x="93.04" y="44" class="sub" text-anchor="end">%</text>
+<text x="20" y="85" class="row" text-anchor="start">Sign-in</text>
+<rect x="323.85" y="72" width="81.52" height="16" class="band"/><text x="327.85" y="84" class="val" text-anchor="start">14 (11–18)</text>
+<text x="20" y="117" class="row" text-anchor="start">Search</text>
+<rect x="442.1" y="104" width="81.52" height="16" class="band"/><text x="446.1" y="116" class="val" text-anchor="start">23 (18–28)</text>
+<text x="20" y="149" class="row" text-anchor="start">Checkout</text>
+<rect x="430.28" y="136" width="81.52" height="16" class="band"/><text x="434.28" y="148" class="val" text-anchor="start">21 (16–27)</text>
+<text x="20" y="181" class="row" text-anchor="start">Settings</text>
+<rect x="489.4" y="168" width="81.52" height="16" class="band"/><text x="493.4" y="180" class="val" text-anchor="start">23 (16–32)</text>
+<text x="20" y="213" class="row" text-anchor="start">Profile</text>
+<rect x="335.67" y="200" width="65.68" height="16" class="band"/><text x="339.67" y="212" class="val" text-anchor="start">9 (4–19)</text>
+<rect x="237.08" y="72" width="82.78" height="16" rx="4" class="r-bar"/><circle cx="272.55" cy="80" r="5" class="r-pt"/>
+<rect x="319.85" y="104" width="118.25" height="16" rx="4" class="r-bar"/><line x1="343.5" y1="104.75" x2="343.5" y2="119.25" class="track"/><circle cx="378.98" cy="112" r="5" class="r-pt"/>
+<rect x="296.2" y="136" width="130.07" height="16" rx="4" class="r-bar"/><line x1="343.5" y1="136.75" x2="343.5" y2="151.25" class="track"/><line x1="319.85" y1="136.75" x2="319.85" y2="151.25" class="track"/><circle cx="355.33" cy="144" r="5" class="r-pt"/>
+<rect x="296.2" y="168" width="189.2" height="16" rx="4" class="r-bar"/><line x1="343.5" y1="168.75" x2="343.5" y2="183.25" class="track"/><line x1="461.75" y1="168.75" x2="461.75" y2="183.25" class="track"/><line x1="319.85" y1="168.75" x2="319.85" y2="183.25" class="track"/><circle cx="378.98" cy="176" r="5" class="r-pt"/>
+<rect x="154.3" y="200" width="177.37" height="16" rx="4" class="r-bar"/><line x1="225.25" y1="200.75" x2="225.25" y2="215.25" class="track"/><line x1="319.85" y1="200.75" x2="319.85" y2="215.25" class="track"/><circle cx="213.43" cy="208" r="5" class="r-pt"/>
+</svg>
+<svg id="dg-not-repeated-phone" class="dg dg-range dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="350" viewBox="0 0 264 350" role="img" aria-label="About 18% of all reports could not be repeated. Search, Checkout and Settings had the highest shares, about 21% to 23%. Profile had the lowest, 9%, but its interval is wide, from 4% to 19%.">
+<style>
+#dg-not-repeated-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-not-repeated-phone .ground{fill:var(--fig,#f2f3f9)}
+#dg-not-repeated-phone .band{fill:var(--bg,#fbfbfe)}
+#dg-not-repeated-phone .track{stroke:var(--line,#d3d6e3)}
+#dg-not-repeated-phone .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-not-repeated-phone .head{fill:var(--text,#1c1f2e)}
+#dg-not-repeated-phone .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-not-repeated-phone .stop.end{fill:var(--text,#1c1f2e)}
+#dg-not-repeated-phone .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-not-repeated-phone .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-not-repeated-phone .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-not-repeated-phone .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-not-repeated-phone .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-not-repeated-phone .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-not-repeated-phone .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-not-repeated-phone .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-not-repeated-phone .sub,#dg-not-repeated-phone .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-not-repeated-phone .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-not-repeated-phone .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-not-repeated-phone .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-not-repeated-phone .r-bar{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-not-repeated-phone .r-pt{fill:var(--text,#1c1f2e)}
+#dg-not-repeated-phone .r-lim{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2}
+#dg-not-repeated-phone .r-ref{stroke:var(--muted,#575d75)}
+@media (prefers-reduced-motion:reduce){#dg-not-repeated-phone .pulse{animation:none!important}#dg-not-repeated-phone .pulse{display:none!important}}
+@media print{#dg-not-repeated-phone{max-width:100%;height:auto}#dg-not-repeated-phone .pulse{display:none!important}}
+@media (max-width:736px){#dg-not-repeated{display:none}#dg-not-repeated-phone{display:block}}
+@media print{#dg-not-repeated{display:block!important}#dg-not-repeated-phone{display:none!important}}
+</style>
+<rect width="264" height="350" class="ground"/>
+<rect x="8" y="76" width="248" height="266" rx="10" class="band"/>
+<line x1="106.4" y1="104" x2="106.4" y2="132" class="r-ref"/>
+<line x1="106.4" y1="154" x2="106.4" y2="182" class="r-ref"/>
+<line x1="106.4" y1="204" x2="106.4" y2="232" class="r-ref"/>
+<line x1="106.4" y1="254" x2="106.4" y2="282" class="r-ref"/>
+<line x1="106.4" y1="304" x2="106.4" y2="332" class="r-ref"/>
+<line x1="20" y1="104" x2="20" y2="132" class="track"/>
+<line x1="68" y1="104" x2="68" y2="132" class="track"/>
+<line x1="116" y1="104" x2="116" y2="132" class="track"/>
+<line x1="164" y1="104" x2="164" y2="132" class="track"/>
+<line x1="212" y1="104" x2="212" y2="132" class="track"/>
+<line x1="20" y1="154" x2="20" y2="182" class="track"/>
+<line x1="68" y1="154" x2="68" y2="182" class="track"/>
+<line x1="116" y1="154" x2="116" y2="182" class="track"/>
+<line x1="164" y1="154" x2="164" y2="182" class="track"/>
+<line x1="212" y1="154" x2="212" y2="182" class="track"/>
+<line x1="20" y1="204" x2="20" y2="232" class="track"/>
+<line x1="68" y1="204" x2="68" y2="232" class="track"/>
+<line x1="116" y1="204" x2="116" y2="232" class="track"/>
+<line x1="164" y1="204" x2="164" y2="232" class="track"/>
+<line x1="212" y1="204" x2="212" y2="232" class="track"/>
+<line x1="20" y1="254" x2="20" y2="282" class="track"/>
+<line x1="68" y1="254" x2="68" y2="282" class="track"/>
+<line x1="116" y1="254" x2="116" y2="282" class="track"/>
+<line x1="164" y1="254" x2="164" y2="282" class="track"/>
+<line x1="212" y1="254" x2="212" y2="282" class="track"/>
+<line x1="20" y1="304" x2="20" y2="332" class="track"/>
+<line x1="68" y1="304" x2="68" y2="332" class="track"/>
+<line x1="116" y1="304" x2="116" y2="332" class="track"/>
+<line x1="164" y1="304" x2="164" y2="332" class="track"/>
+<line x1="212" y1="304" x2="212" y2="332" class="track"/>
+<text x="106.4" y="24" class="sub" text-anchor="middle">all areas</text>
+<text x="20" y="44" class="sub" text-anchor="start">%</text>
+<text x="20" y="64" class="val" text-anchor="middle">0</text>
+<text x="68" y="64" class="val" text-anchor="middle">10</text>
+<text x="116" y="64" class="val" text-anchor="middle">20</text>
+<text x="164" y="64" class="val" text-anchor="middle">30</text>
+<text x="212" y="64" class="val" text-anchor="middle">40</text>
+<text x="20" y="100" class="row" text-anchor="start">Sign-in</text>
+<rect x="110.4" y="110" width="81.52" height="16" class="band"/><text x="114.4" y="122" class="val" text-anchor="start">14 (11–18)</text>
+<text x="20" y="150" class="row" text-anchor="start">Search</text>
+<rect x="158.4" y="160" width="81.52" height="16" class="band"/><text x="162.4" y="172" class="val" text-anchor="start">23 (18–28)</text>
+<text x="20" y="200" class="row" text-anchor="start">Checkout</text>
+<rect x="153.6" y="210" width="81.52" height="16" class="band"/><text x="157.6" y="222" class="val" text-anchor="start">21 (16–27)</text>
+<text x="20" y="250" class="row" text-anchor="start">Settings</text>
+<rect x="11.28" y="260" width="81.52" height="16" class="band"/><text x="88.8" y="272" class="val" text-anchor="end">23 (16–32)</text>
+<text x="20" y="300" class="row" text-anchor="start">Profile</text>
+<rect x="115.2" y="310" width="65.68" height="16" class="band"/><text x="119.2" y="322" class="val" text-anchor="start">9 (4–19)</text>
+<rect x="72.8" y="110" width="33.6" height="16" rx="4" class="r-bar"/><circle cx="87.2" cy="118" r="5" class="r-pt"/>
+<rect x="106.4" y="160" width="48" height="16" rx="4" class="r-bar"/><line x1="116" y1="160.75" x2="116" y2="175.25" class="track"/><circle cx="130.4" cy="168" r="5" class="r-pt"/>
+<rect x="96.8" y="210" width="52.8" height="16" rx="4" class="r-bar"/><line x1="116" y1="210.75" x2="116" y2="225.25" class="track"/><line x1="106.4" y1="210.75" x2="106.4" y2="225.25" class="track"/><circle cx="120.8" cy="218" r="5" class="r-pt"/>
+<rect x="96.8" y="260" width="76.8" height="16" rx="4" class="r-bar"/><line x1="116" y1="260.75" x2="116" y2="275.25" class="track"/><line x1="164" y1="260.75" x2="164" y2="275.25" class="track"/><line x1="106.4" y1="260.75" x2="106.4" y2="275.25" class="track"/><circle cx="130.4" cy="268" r="5" class="r-pt"/>
+<rect x="39.2" y="310" width="72" height="16" rx="4" class="r-bar"/><line x1="68" y1="310.75" x2="68" y2="325.25" class="track"/><line x1="106.4" y1="310.75" x2="106.4" y2="325.25" class="track"/><circle cx="63.2" cy="318" r="5" class="r-pt"/>
+</svg>
+<details class="dg-words">
+<summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>The diagram in words</summary>
+<div class="table-wrap is-text" role="region" aria-label="The rows of the range chart" tabindex="0"><table><thead><tr><th scope="col">Row</th><th scope="col" class="num">Estimate, in %</th><th scope="col" class="num">Low</th><th scope="col" class="num">High</th></tr></thead><tbody><tr><th scope="row">Sign-in</th><td class="num">14</td><td class="num">11</td><td class="num">18</td></tr><tr><th scope="row">Search</th><td class="num">23</td><td class="num">18</td><td class="num">28</td></tr><tr><th scope="row">Checkout</th><td class="num">21</td><td class="num">16</td><td class="num">27</td></tr><tr><th scope="row">Settings</th><td class="num">23</td><td class="num">16</td><td class="num">32</td></tr><tr><th scope="row">Profile</th><td class="num">9</td><td class="num">4</td><td class="num">19</td></tr></tbody></table></div>
+<ul><li>A line at 18 %: all areas.</li></ul>
+</details>
