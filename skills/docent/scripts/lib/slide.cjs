@@ -26,7 +26,19 @@ const plain = (s) => s.replace(/\s+/g, " ").replace(/<br\b[^>]*>/gi, "\n").repla
 const hasClass = (attrs, name) => new RegExp(`\\bclass="(?:[^"]*\\s)?${name}(?:\\s[^"]*)?"`).test(attrs);
 const attrOf = (attrs, name) => (attrs.match(new RegExp(`\\b${name}="([^"]*)"`)) || [])[1];
 const px = (n) => Math.round(n);
-const lines = (text, size, width, weight = 400) => text.split("\n").reduce((n, line) => n + Math.max(1, Math.ceil(textWidth(line, size, weight) / width)), 0);
+/** The lines a text takes in a width, wrapped word by word as a browser does. A word longer than the line breaks inside. */
+function lines(text, size, width, weight = 400) {
+  const space = textWidth("a b", size, weight) - textWidth("ab", size, weight);
+  return text.split("\n").reduce((count, line) => {
+    let n = 1, at = 0;
+    for (const word of line.split(" ").filter(Boolean)) {
+      const w = textWidth(word, size, weight);
+      if (w > width) { n += at ? Math.ceil(w / width) : Math.ceil(w / width) - 1; at = w % width; continue; }
+      if (at && at + space + w > width) { n += 1; at = w; } else at += (at ? space : 0) + w;
+    }
+    return count + n;
+  }, 0);
+}
 const oneLine = (text, size, width) => !text.includes("\n") && textWidth(text, size) <= width;
 const quote = (text) => { const t = text.replace(/\n/g, " "); return `"${t.length > 50 ? `${t.slice(0, 50)}…` : t}"`; };
 

@@ -122,6 +122,13 @@ test("a deck has no widget, no walkthrough and no closed section other than a fi
   assert.ok(widget.some((e) => e.startsWith("the deck has 1 widget; a slide shows one point to a room, so a deck has no widget")), widget.join("\n"));
 });
 
+test("check counts lines word by word, as a browser wraps them", () => {
+  // Four columns leave 264px for a cell. "documentation" is 148px, so three of them take three lines, one word each, though their
+  // total width (455px) would fill only two. Five such rows make the slide too tall; dividing the width would let it pass.
+  const table = `<h2>Questions</h2>\n<div class="table-wrap"><table><thead><tr><th>A</th><th>B</th><th>C</th><th>D</th></tr></thead><tbody>${"<tr><td>documentation documentation documentation</td><td>b</td><td>c</td><td>d</td></tr>".repeat(5)}</tbody></table></div>`;
+  assert.ok(errorsOf(slide(9, table)).some((e) => /^slide 9 is about 7\d\dpx tall/.test(e)), errorsOf(slide(9, table)).join("\n"));
+});
+
 test("check estimates each slide's height on the 1280 × 720 frame", () => {
   const { slides, measured } = checkDeck(deck.replace(/<!--[\s\S]*?-->/g, (c) => " ".repeat(c.length)));
   assert.equal(slides.length, 9);
