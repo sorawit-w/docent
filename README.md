@@ -6,6 +6,24 @@ Docent is a design kit for documents written as single HTML files: design docs, 
 
 Docent is packaged as an agent skill. An agent that writes a document loads the skill, follows its rules, and runs its scripts.
 
+## When Docent fits, and when it does not
+
+Docent does the better job for:
+
+- **Documents with many parts.** Reports, guides, runbooks, analyses and decision records, where text, tables, charts and steps work together.
+- **Readers on phones, with screen readers or on paper.** Every chart has a phone form and a table in words, and the page prints cleanly.
+- **Reports that repeat.** Charts are drawn from data, so next month's report looks the same, and `check` can test it.
+- **Numbers that people must trust.** Each chart and data table has a source line, numbers line up in tables, and the chart types do not mislead: there are no pie charts.
+- **Use with no network.** A document is one file that opens offline.
+
+Another tool fits better for:
+
+- **One picture to paste into another tool,** such as a slide, a wiki page or a blog post. Docent makes whole pages, not image files.
+- **A picture whose main job is a brand's style,** such as the main picture of a landing page, a pitch page or a marketing picture in the brand's own fonts and colors. Docent's drawings use the system font.
+- **A chart type that Docent leaves out on purpose,** such as a Sankey, treemap or radar chart, when the reader knows why and still wants one. The reason is the rule "Position and length" in [`DESIGN.md`](skills/docent/references/DESIGN.md).
+- **An existing diagram file from another drawing tool,** to draw again.
+- **A sketchy or magazine style** for an essay.
+
 ## Status
 
 Version 0.18.0. The design is settled, and the three scripts exist with tests.
