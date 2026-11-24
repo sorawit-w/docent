@@ -1,6 +1,6 @@
 # Proposal: a repo file for Docent — the brand and the author's rule changes, kept once for every page
 
-Status: **proposed on 2026-11-25, with each open question decided** (see "Decisions" at the end). No code is written yet. **The user decided three of the four open points on 2026-11-25:** the custom palette comes as PRs 6 and 7, the reversal of white-label decision 5 is confirmed, and an exact page color stays on one page. **One point still waits:** the list of rules that the file may change. A talk on 2026-11-25 set the direction: a file in the host repo holds a pointer to the host's `DESIGN.md` and the author's changes to Docent's rules, each with a reason, and no copy of the tokens that come from `DESIGN.md`. Later that day the user named the real need: **a page background color and a heading color that differ from the host's `DESIGN.md`.** The proposal is built around that case (section 2).
+Status: **proposed on 2026-11-25, with every open question decided and confirmed by the user** (see "Decisions" at the end). No code is written yet. **The user decided all four open points on 2026-11-25:** the custom palette comes as PRs 6 and 7, the reversal of white-label decision 5 is confirmed, an exact page color stays on one page, and the list of rules that the file may change is set. No point is open. A talk on 2026-11-25 set the direction: a file in the host repo holds a pointer to the host's `DESIGN.md` and the author's changes to Docent's rules, each with a reason, and no copy of the tokens that come from `DESIGN.md`. Later that day the user named the real need: **a page background color and a heading color that differ from the host's `DESIGN.md`.** The proposal is built around that case (section 2).
 
 ## The answer first
 
@@ -223,7 +223,7 @@ A rule is a **guarantee** when it is a promise to the reader: the page opens wit
 
 A rule is **house style** when Docent chose it for its own pages, out of taste or habit, and another team can choose differently without hurting a reader. The file can change these.
 
-The tables below sort the rules that `check` tests today (`scripts/check.cjs` and the parts of `scripts/lib/` that it calls), by family. The IDs are proposed; PR 1 makes them real. **A question mark** marks a rule whose group I am not sure of, with the reason.
+The tables below sort the rules that `check` tests today (`scripts/check.cjs` and the parts of `scripts/lib/` that it calls), by family. The IDs are proposed; PR 1 makes them real. The user decided the group of each rule on 2026-11-25; the last column gives the reason where the choice was not plain.
 
 ### House style: the file can change these
 
@@ -232,10 +232,9 @@ The tables below sort the rules that `check` tests today (`scripts/check.cjs` an
 | Host tokens (a setting, not a rule) | `tokens` in the file: the heading color, the accents, the dark dot and the fonts | Tests each host color's contrast, as today | A page can set them today; the file keeps them for every page (section 2) |
 | A palette (a setting, not a rule) | `palette` in the file | Refuses an unknown name, as today | The one way to change the page color (section 2) |
 | Number style | `numbers.rounding`, `numbers.thousands`, `numbers.ranges`, `numbers.points`, `numbers.change`, `numbers.dates`, `numbers.about` | Warns (rules 2, 3, 5, 6, 8, 9 and 10 of "Numbers" in `DESIGN.md`) | These rules have numbers already |
-| Chart types left out | `hand.left-out.pie`, `.donut`, `.radar`, `.spider`, `.polar`, `.pyramid`, `.treemap`, `.bubble`, `.sankey`, `.ridgeline` | Refuses a hand-drawn figure of that type | ? The contract of a hand-drawn figure still holds: no colors of its own, and the words beside it. So a pie's slices are told apart by their labels, not by colors. Whether that gives a pie worth having is not tested |
+| Chart types left out | `hand.left-out.pie`, `.donut`, `.radar`, `.spider`, `.polar`, `.pyramid`, `.treemap`, `.bubble`, `.sankey`, `.ridgeline` | Refuses a hand-drawn figure of that type | The contract of a hand-drawn figure still holds: no colors of its own, and the words beside it. So the reader is still protected, and a pie's slices are told apart by their labels |
 | A flat page | `flat.gradient`, `flat.shadow`, `flat.filter` | Refuses | The page's look, not the reader's access |
-| Uppercase | `text.uppercase` | Refuses | ? Text in capitals is slower to read, also for readers of English as a second language. It may be a guarantee |
-| Pure white or black | `ground.pure` | Refuses | ? Light text on pure black blurs for some readers. It may be a guarantee |
+| Uppercase | `text.uppercase` | Refuses | The harm is small for short labels, and capitals are a common brand look |
 | The title | `title.format`, `title.h1`, `title.host`, `title.docent` | Warns; refuses a title that names Docent | |
 | The credit and the tagline | `credit.missing`, `tagline.length`, `tagline.markup` | Warns | `credit` in the file sets the credit |
 | Counts | `cards.count`, `findings.count`, `widgets.most` | Warns | |
@@ -249,9 +248,9 @@ The tables below sort the rules that `check` tests today (`scripts/check.cjs` an
 | "Method and limits" | `method.parts` | Warns | |
 | Status words | `status.words` | Warns | A team may use its own words for its own process |
 | Quotes | `quote.speaker`, `quote.marks`, `quote.length`, `quote.speaker-markup`, `quote.outside` | Warns | |
-| A host accent that misleads | `accent.status`, `accent.gray` | Warns | ? A brand whose color is red reads as "error" in every link. It is about meaning, not access, but a reader is misled |
+| A brand color that looks like a status | `accent.status`, `accent.gray` | Warns | A red brand is the brand's choice. Docent's status always carries a word and a mark, so color alone never carries the meaning |
 | A deck | `deck.widget` | Refuses | |
-| The size of a logo | `logo.size` | Refuses above 24,000 characters | ? The limit is a judgment (white-label section 1), but a large logo makes every page larger |
+| The size of a logo | `logo.size` | Refuses above 24,000 characters | It changes the size of the file, not what the reader sees |
 
 ### Guarantees: the file cannot change these
 
@@ -273,12 +272,13 @@ The tables below sort the rules that `check` tests today (`scripts/check.cjs` an
 | A source link whose text is not its address (`sources.link-text`) | Warns | Paper has no link, so the address must be printed |
 | A slide that does not fit, a walkthrough or a closed section in a deck | Refuses | A slide can be read on a shared screen |
 | A script outside the kit | Warns | The page reads with scripts off |
-| Personal data | Warns | ? A repo-wide "off" would hide every email address on every page. The author still decides on each page, as today |
-| A minus written as a hyphen (`numbers.minus`, rule 4) | Warns | ? Some screen readers read a hyphen as "dash" or not at all (`DESIGN.md`, "Why these rules"). It is a number rule, but its reason is access |
-| A total that is not the sum of its column (`table.sum`) | Warns | ? A wrong total is a wrong fact, and "numbers that people must trust" is a promise in the README |
-| A chart of measured numbers with no source line (`source.chart`) | Warns | ? The same promise in the README: "each chart and data table has a source line" |
+| Personal data | Warns | Turning it off for the whole repo would hide every warning on every page. The author still decides on each page, as today |
+| A minus written as a hyphen (`numbers.minus`, rule 4) | Warns | Some screen readers read a hyphen as "dash" or skip it (`DESIGN.md`, "Why these rules"). It is a number rule, but its reason is access |
+| Pure white or black as the page (`ground.pure`) | Refuses | Light text on pure black blurs for some readers, such as people with astigmatism, and a palette can give any page tone a brand needs |
+| A total that is not the sum of its column (`table.sum`) | Warns | A wrong total is a wrong fact, and "numbers that people must trust" is a promise in the README |
+| A chart of measured numbers with no source line (`source.chart`) | Warns | The README promises a source line for each chart: "each chart and data table has a source line" |
 
-About 55 rules are house style, in 21 families. The ten chart types left out count as one rule, with an ID for each type. Section 9 counts the rest.
+About 54 rules are house style, in 20 families. The ten chart types left out count as one rule, with an ID for each type. Section 9 counts the rest.
 
 ---
 
@@ -369,7 +369,7 @@ This follows white-label decision 8, which accepted that a branded page changes 
 
 Today a rule has no name: each error or warning is a sentence written where `check` finds the problem. Only the number rules have numbers (2 to 10). The repo file needs a stable name for each rule it may change, so PR 1 comes first.
 
-**How many.** `check.cjs` has 135 places that report an error or a warning; `logo.cjs` has 17, `slide.cjs` 19, `hand.cjs` 4 (and 5 more as error pairs), and `diagram.cjs` 10. That is about 190 places (see "Measured"). Many places belong to one rule: the six messages about the kit are one rule, and the ten chart types left out are one family. I estimate **120 to 140 rules**, of which **about 55 are house style**.
+**How many.** `check.cjs` has 135 places that report an error or a warning; `logo.cjs` has 17, `slide.cjs` 19, `hand.cjs` 4 (and 5 more as error pairs), and `diagram.cjs` 10. That is about 190 places (see "Measured"). Many places belong to one rule: the six messages about the kit are one rule, and the ten chart types left out are one family. I estimate **120 to 140 rules**, of which **about 54 are house style**.
 
 **Only the house-style rules need an ID for the file to work.** Every other name is refused. But a refusal is clearer when `check` can say "a guarantee" rather than "no rule has this ID", and an ID on every line of the output helps a reader search for a rule. So PR 1 gives every rule an ID.
 
@@ -475,7 +475,7 @@ The columns are: the page, its color, its hue, the hue distance from the host's 
 
 The numbers on a page color alone (4.33:1, 4.19:1, 1.10:1 and 1.07:1) come from white-label section 4 and its "Measured" output, not from a new run.
 
-A place that reports is not always one rule: some places report one of several problems from a list (the four kinds of a flat page), and some rules report from several places (the six messages about the kit). The estimate of 120 to 140 rules and about 55 house-style rules comes from reading each place, as the tables in section 4 sort them. Rule 8 of "Numbers" is tested in the change line of a card (section 10d of `check.cjs`), not in `numbers.cjs`, so it does not show in the list of numbered rules.
+A place that reports is not always one rule: some places report one of several problems from a list (the four kinds of a flat page), and some rules report from several places (the six messages about the kit). The estimate of 120 to 140 rules and about 54 house-style rules comes from reading each place, as the tables in section 4 sort them. Rule 8 of "Numbers" is tested in the change line of a card (section 10d of `check.cjs`), not in `numbers.cjs`, so it does not show in the list of numbered rules.
 
 ---
 
@@ -485,7 +485,7 @@ A place that reports is not always one rule: some places report one of several p
 
 **The user decided three more points on 2026-11-25:** the custom palette comes as PRs 6 and 7 (decision 4), the reversal of white-label decision 5 is confirmed (decision 6), and an exact page color stays on one page (decision 15).
 
-**One point still waits for the user:** the list of rules that the file may change (decision 7 and the tables of section 4), and most of all the rules marked with a question mark.
+**The user decided the last point on 2026-11-25:** the list of rules that the file may change (decision 7 and the tables of section 4). Pure white or black moved from house style to the guarantees. No point is open.
 
 Decided on 2026-11-25, so that the work can go on. Each one can be changed in review, because no code exists yet.
 
@@ -495,7 +495,7 @@ Decided on 2026-11-25, so that the work can go on. Each one can be changed in re
 4. **The page color comes from a palette only: the named palettes now, and a palette from the host's own hue in PRs 6 and 7.** Decided by the user on 2026-11-25. The guarantee is that every tested pair passes in light, dark and print, so the page color changes only together with the grays, the dark forms and the heat steps, after a test. The three named palettes need no new code; the custom palette stores its input only, `{ "hue": "#…" }`, and a script works out the rest and refuses it when a pair fails.
 5. **The file saves only the interview's answers that are house style:** the palette, the logo path, the tagline, the credit and the default profile. The user agreed to this limit. The host's name is found again each time.
 6. **The repo file is the record, and white-label decision 5 changes.** Confirmed by the user on 2026-11-25. A page records values but not reasons, and the newest page can be the wrong one. The interview stays once per repo; its answers go into the file, but only with the user's OK. Without it, the agent copies the newest page, as today.
-7. **Two groups: house style can change; guarantees cannot.** A guarantee is a promise to a reader who never sees the repo file. A file that names a guarantee is refused with an error.
+7. **Two groups: house style can change; guarantees cannot.** Confirmed by the user on 2026-11-25, with the tables of section 4. A guarantee is a promise to a reader who never sees the repo file. A file that names a guarantee is refused with an error.
 8. **A rule change is on or off.** No values in this first version: a value form is more code and more tests, and no real repo has asked for one yet.
 9. **`check` reports each rule change as a note:** one for each rule on each page, with the line of the file and its reason. A rule change stays visible to the next reviewer.
 10. **The order: defaults, palette, `DESIGN.md`, the repo file, the page.** The page always wins, because a page may need to stay as it was.
@@ -507,7 +507,7 @@ Decided on 2026-11-25, so that the work can go on. Each one can be changed in re
 
 ## Not in this proposal
 
-- Code. PR 1 comes in its own pull request, after the user's answer on the rule list.
+- Code. PR 1 comes in its own pull request.
 - A change to any rule. The file can turn a house-style rule off, but each rule stays as it is.
 - A rule change for one page, a rule change with a value, a file for the user, merged files in a monorepo, and a JSON Schema (section 10).
 - A page color set by the file.
