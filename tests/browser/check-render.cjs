@@ -1056,6 +1056,22 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     ok("footnotes with scripts off: a mark jumps to its note and Back jumps to the mark, each 88px from the top, below the top bar", there.hash === "#fn-1" && there.top === 88 && home.hash === "#fn-1-ref" && home.top === 88, { there, home });
   }
 
+  // The list of sources: no bullets, a hanging indent of 24px, 8px between entries, at body size; a long address breaks, so the page does
+  // not scroll sideways at 320px; on paper the address prints in full as text.
+  for (const [name, opts] of [["desktop light", { width: 1280 }], ["desktop dark", { width: 1280, theme: "dark" }], ["320px", { width: 320 }], ["print", { width: 794, media: "print" }], ["forced colors", { width: 1280, forcedColors: "active" }]]) {
+    const { page, context } = await open(opts);
+    const src = await page.evaluate(() => {
+      const ul = document.querySelector("ul.sources"), li = [...ul.children], body = getComputedStyle(document.querySelector("section p"));
+      const range = document.createRange(); range.selectNodeContents(li[0]);
+      const lines = [...range.getClientRects()].filter((r) => r.width > 0), first = Math.min(...lines.slice(0, 1).map((r) => r.left)), rest = Math.min(...lines.slice(1).map((r) => r.left));
+      const a = li[0].querySelector("a");
+      return { bullets: getComputedStyle(ul).listStyleType, size: getComputedStyle(li[0]).fontSize === body.fontSize, hang: Math.round(rest - first), link: a.textContent === a.getAttribute("href"), inside: Math.round(a.getBoundingClientRect().right - ul.getBoundingClientRect().right) <= 0, page: document.documentElement.scrollWidth, view: innerWidth };
+    });
+    if (name === "desktop light" || name === "320px") await page.locator("ul.sources").screenshot({ path: `${out}/sources-${name.split(" ")[0]}.png` });
+    await context.close();
+    ok(`list of sources, ${name}: no bullets, body size, a hanging indent of 24px, the address as the link's text inside the column${name === "320px" ? ", and the page does not scroll sideways" : ""}`, src.bullets === "none" && src.size && src.hang === 24 && src.link && src.inside && (name !== "320px" || src.page === src.view), src);
+  }
+
   // A hand-drawn figure (a fishbone under the contract in diagrams.md): no accessibility problem in either theme, its real size on a
   // desktop and on paper (no shrink), the drawing tokens in dark, forced colors and more contrast, and at 320px it scrolls inside its
   // well while the page does not scroll sideways.

@@ -21,7 +21,7 @@ test("the sample page is the output of stamp and render, and it passes check", (
 test("the starting page holds content and data only; render and stamp build it into a page that passes check with no warning", () => {
   const template = fs.readFileSync(path.join(__dirname, "..", "skills", "docent", "assets", "template.html"), "utf8");
   assert.ok(!/docent:kit|<svg id="dg-|class="(choose|checks|decide|values)"|<var data-v="[^"]+">[^<]/.test(template), "the starting page is not built: it has no kit, no drawing and no widget markup");
-  assert.ok(template.length < 16000, `the starting page has ${template.length} bytes; an agent reads all of it, so it stays below 16000`);
+  assert.ok(template.length < 18000, `the starting page has ${template.length} bytes; an agent reads all of it, so it stays below 18000 (raised from 16000 for "Method and limits" and "Sources")`);
   const made = renderDocument(template);
   assert.deepEqual([...made.results, ...made.widgets].map((r) => [r.id, r.error, r.warnings.length]), [["glance", null, 0], ["steps", null, 0], ["case", null, 0], ["list", null, 0], ["choice", null, 0], ["where", null, 0]]);
   assert.deepEqual(made.places, { count: 2, unknown: [], clash: [] }, "render fills both places of the value picker");
@@ -396,4 +396,30 @@ test("footnotes: each mark links to its note, each note links back, and the note
   assert.match(result(section("a", `<p>One.<a class="fn" id="fn-1-ref" href="#fn-1">[1]</a></p>${notes(1, `<li id="fn-1">A detail. <a class="back" href="#fn-1-ref">Back</a></li>`)}`)).warnings, /has no aria-label; give it aria-label="Note 1"[\s\S]*the link back of note 1 has no aria-label/, "the names a screen reader hears");
   assert.match(result(section("a", `<p>One.${mark(1)}</p>${notes(1, note(1, "word ".repeat(61)))}`)).warnings, /note 1 has 61 words; a note is one to three sentences/);
   assert.match(checkDocument(page(section("a", `<p>One.<sup>${mark(1)}</sup></p>${notes(1, note(1))}`))).errors.join("\n"), /<sup> makes text smaller than its line/, "a raised mark stays refused");
+});
+
+test("the list of sources: each citation links to an entry, each entry is cited, in order, with its year and its address as the link's text", () => {
+  const entry = (id, text = "Family, A. (2024). \"A title.\" <cite>A journal</cite>, 1(2), 3–4.", url = "https://example.org/a") => `<li id="${id}">${text} <a href="${url}">${url}</a></li>`;
+  const page = (cites, ...entries) => specimen.replace(/\(<a href="#src-[^"]*">[^<]*<\/a>\)/g, "").replace(/\n  <section id="sources"[\s\S]*?<\/section>\n/, "\n").replace("</main>", `<section id="x" aria-labelledby="x-h"><h2 id="x-h">X</h2><p>${cites}</p></section><section id="sources" aria-labelledby="sources-h"><h2 id="sources-h">Sources</h2><ul class="sources">${entries.join("")}</ul></section></main>`);
+  const result = (...args) => { const r = checkDocument(page(...args)); return { errors: r.errors.join("\n"), warnings: r.warnings.filter((w) => /source|citation/.test(w)).join("\n") }; };
+  const cite = (id, words) => `(<a href="#${id}">${words}</a>)`;
+  assert.ok(/<ul class="sources">/.test(specimen) && /href="#src-cleveland-1984"/.test(specimen), "the sample page cites a source and lists it");
+  assert.deepEqual(result(`${cite("src-cleveland-1984", "Cleveland and McGill, 1984")} ${cite("src-family-2024", "Family, 2024")}`, entry("src-cleveland-1984"), entry("src-family-2024")), { errors: "", warnings: "" });
+  assert.match(result(cite("src-nobody-2020", "Nobody, 2020"), entry("src-family-2024")).errors, /the citation "Nobody, 2020" links to "#src-nobody-2020", which is no entry in the list of sources/, "a citation with no entry");
+  assert.match(result('(<a href="src-family-2024">Family, 2024</a>)', entry("src-family-2024")).errors, /links to "src-family-2024", which is no entry[^\n]*starts with #, as in href="#src-family-2024"/, "a citation with no #");
+  assert.match(result(cite("src-family-2024", "Family, 2024"), entry("src-family-2024"), entry("src-other-2020")).warnings, /the source "src-other-2020" is not cited in the text/, "an entry never cited");
+  assert.match(result(`${cite("src-family-2024", "F")} ${cite("src-cleveland-1984", "C")}`, entry("src-family-2024"), entry("src-cleveland-1984")).warnings, /the list of sources is not in order: family 2024, cleveland 1984; order it by the first family name, then the year/, "entries out of order");
+  assert.match(result(`${cite("src-family-2024a", "F")} ${cite("src-family-2021", "F")}`, entry("src-family-2024a"), entry("src-family-2021")).warnings, /not in order: family 2024a, family 2021/, "the same name orders by year");
+  assert.match(result(cite("src-family-2024", "F"), entry("src-family-2024", "Family, A. \"A title.\"", "https://example.org/a").replace('">https://example.org/a</a>', '">this study</a>')).warnings, /has no year in brackets[\s\S]*a link in the source "src-family-2024" reads "this study"; paper has no link, so write the address as the link's text/, "an address hidden behind words, and no year");
+  assert.equal(result(cite("src-family-2024", "F"), entry("src-family-2024", "Family, A. (no date). \"A title.\"")).warnings, "", "(no date) is a year");
+  assert.match(checkDocument(page(cite("src-family-2024", "F"), entry("src-family-2024")).replace("</main>", '<ul class="sources"><li>X</li></ul></main>')).warnings.join("\n"), /the page has 2 lists of sources; it has one/);
+});
+
+test("\"Method and limits\" holds its four parts in order; a page without it gets no warning", () => {
+  const page = (parts) => specimen.replace("</main>", `<section id="method" aria-labelledby="method-h"><h2 id="method-h">Method and limits</h2>${parts.map((p) => `<h3>${p}</h3><p>Text.</p>`).join("")}</section></main>`);
+  const warned = (parts) => checkDocument(page(parts)).warnings.filter((w) => /Method and limits/.test(w));
+  assert.deepEqual(warned(["Method", "Data", "What was left out", "How sure the result is"]), []);
+  assert.match(warned(["Method", "What was left out", "Data", "How sure the result is"]).join("\n"), /"Method and limits" has the block headings "method", "what was left out", "data", "how sure the result is"; it holds four, in this order/, "the four parts out of order");
+  assert.match(warned(["Method", "Data", "How sure the result is"]).join("\n"), /it holds four, in this order/, "a part missing");
+  assert.deepEqual(checkDocument(specimen).warnings.filter((w) => /Method and limits/.test(w)), [], "no section, no warning");
 });

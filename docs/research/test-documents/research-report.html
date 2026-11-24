@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Worked examples in API reference pages — Example Lab</title>
 <style>
-/* docent:kit 0.23.0 */
+/* docent:kit 0.24.0 */
 /* Docent page styles. Tokens come from references/DESIGN.md. One file, no network. */
 :root {
   color-scheme: light;
@@ -223,6 +223,11 @@ figure > .table-wrap { margin-top: 0; }
 ol.notes { margin: 32px 0 0; font-size: 0.875rem; line-height: 1.5; color: var(--muted); font-variant-numeric: tabular-nums; }
 .notes li:target { color: var(--text); }
 .fn:target { text-decoration-thickness: 2px; }
+/* The list of sources: one author-year entry each, written by hand, at body size with no bullets and a hanging indent of 24px, 8px apart.
+   The address is the link's own text, because paper has no link, and it breaks at any character, so no page scrolls sideways. */
+ul.sources { list-style: none; }
+.sources > li { text-indent: -24px; overflow-wrap: anywhere; }
+.sources > li + li { margin-top: 8px; }
 
 /* Card grid: 3 to 8 short items side by side, each a heading or a large number and a line of text. A card is a label, like a margin note: a line above it, and no box. At most four in a row. */
 .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(max(160px, calc((100% - 72px) / 4)), 1fr)); gap: 24px; margin: 24px 0; padding: 0; list-style: none; }
@@ -437,11 +442,10 @@ footer p { margin: 0; }
     <nav class="route" aria-label="On this page">
       <ol>
         <li><a href="#question">Question</a></li>
-        <li><a href="#method">Method</a></li>
         <li><a href="#results">Results</a></li>
         <li><a href="#discussion">Discussion</a></li>
-        <li><a href="#limits">Limits</a></li>
-        <li><a href="#references">References</a></li>
+        <li><a href="#method">Method</a></li>
+        <li><a href="#sources">Sources</a></li>
       </ol>
     </nav>
     <button class="theme" type="button">
@@ -462,7 +466,7 @@ footer p { margin: 0; }
         <strong>Research report</strong>
         <ul class="facts">
           <li>12 minutes to read</li>
-          <li>Study run 2 to 20 September 2026</li>
+          <li>Data: 2 to 20 September 2026</li>
           <li>Plan registered 28 August 2026</li>
           <li>Authors: Example Lab, documentation group</li>
           <li>Every name, number and source is invented</li>
@@ -476,7 +480,7 @@ footer p { margin: 0; }
     <div class="row">
       <div>
         <p>Reference pages list what an API offers: each call, its parameters and its answers. Many teams add a worked example to each call, a short piece of code that does one real task. Writing and testing these examples costs time, so teams ask whether they help.</p>
-        <p>Earlier studies found that developers look for examples first (Ortega and Lindqvist, 2019), and that tutorials with examples shorten the time to a first working call (Haddad et al., 2021). Fewer studies tested examples inside the reference pages themselves, for tasks beyond the first call.</p>
+        <p>Earlier studies found that developers look for examples first (<a href="#src-ortega-2019">Ortega and Lindqvist, 2019</a>), and that tutorials with examples shorten the time to a first working call (<a href="#src-haddad-2021">Haddad and others, 2021</a>). Fewer studies tested examples inside the reference pages themselves, for tasks beyond the first call.</p>
         <p>We tested three expectations, written down before the study:</p>
         <ol>
           <li>With worked examples, developers finish more tasks.</li>
@@ -486,38 +490,11 @@ footer p { margin: 0; }
       </div>
       <div class="note" role="note">
         <strong>Registered plan</strong>
-        The expectations, the measures and the analysis were registered before the first session. One change from the plan is named under <a href="#method">Method</a>.
+        The expectations, the measures and the analysis were registered before the first session (<a href="#src-example-lab-2026">Example Lab, 2026</a>). One change from the plan is named under <a href="#method">Method</a>.
       </div>
     </div>
   </section>
 
-  <section id="method" aria-labelledby="method-h">
-    <h2 id="method-h">Method</h2>
-    <h3>Participants</h3>
-    <p>24 developers took part, recruited through a developer mailing list. They had 2 to 15 years of work experience (median 6). None had used the test API before. Each received a $40 gift card.</p>
-    <h3>Materials</h3>
-    <p>We wrote reference pages for an invented payments API with 14 calls. Version A had a description, a parameter table and an answer table for each call. Version B was the same, with one worked example under each call: 8 to 20 lines of code that run as written.</p>
-    <h3>Design and tasks</h3>
-    <p>Each participant did four tasks: sign a request, read a long list page by page, check a webhook, and handle an error and try again. Each did two tasks with version A and two with version B. The order of the tasks and of the versions followed a Latin square, so each task was done equally often with each version and in each position.</p>
-    <dl>
-      <dt>Finished</dt>
-      <dd>The task's test passed within 15 minutes.</dd>
-      <dt>Time</dt>
-      <dd>Minutes from the start of the task to a passing test, for finished tasks only.</dd>
-      <dt>Confidence</dt>
-      <dd>The answer to "How sure are you that your code is correct?", from 1 (not at all) to 7 (completely), asked after each task.</dd>
-    </dl>
-    <h3>Analysis</h3>
-    <p>We compared the two versions within each participant. For each measure we report the difference between the versions and a 95% confidence interval from a bootstrap with 10,000 samples of participants.<a class="fn" id="fn-1-ref" href="#fn-1" aria-label="Note 1">[1]</a> We also give each difference as a standardized effect, d, so the three measures can be shown on one scale.</p>
-    <div class="status">
-      <span class="state info">Change from the plan</span>
-      <p>The plan named a mixed model for the time measure. It did not converge with 24 participants, so we used the paired bootstrap for all three measures.</p>
-    </div>
-    <ol class="notes" aria-label="Notes to this section">
-      <li id="fn-1">A bootstrap draws 24 participants at random from the 24, with repeats allowed, and works out the difference again. After 10,000 draws, the interval holds the middle 95% of those differences.
-        <a class="back" href="#fn-1-ref" aria-label="Back to the text of note 1">Back</a></li>
-    </ol>
-  </section>
 
   <section id="results" aria-labelledby="results-h">
     <h2 id="results-h">Results</h2>
@@ -856,10 +833,10 @@ footer p { margin: 0; }
         </tbody>
       </table>
     </div>
-    <p>Of the 24 participants, 19 were faster with examples on the tasks they finished with both versions, 4 were slower, and 1 finished no task without examples.<a class="fn" id="fn-2-ref" href="#fn-2" aria-label="Note 2">[2]</a></p>
-    <ol class="notes" start="2" aria-label="Notes to this section">
-      <li id="fn-2">This participant counts in the tasks finished, but not in the time, because a time needs a finished task with both versions.
-        <a class="back" href="#fn-2-ref" aria-label="Back to the text of note 2">Back</a></li>
+    <p>Of the 24 participants, 19 were faster with examples on the tasks they finished with both versions, 4 were slower, and 1 finished no task without examples.<a class="fn" id="fn-1-ref" href="#fn-1" aria-label="Note 1">[1]</a></p>
+    <ol class="notes" aria-label="Notes to this section">
+      <li id="fn-1">This participant counts in the tasks finished, but not in the time, because a time needs a finished task with both versions.
+        <a class="back" href="#fn-1-ref" aria-label="Back to the text of note 1">Back</a></li>
     </ol>
   </section>
 
@@ -868,7 +845,7 @@ footer p { margin: 0; }
     <div class="row">
       <div>
         <p>All three expectations held. Worked examples helped most where the reference left out a step that the code needs, such as asking for the next page of a list. Where the description already said each step, as for signing a request, the examples helped little.</p>
-        <p>The effect on time agrees with the earlier tutorial study (Haddad et al., 2021), which found that examples cut the time to a first call by about a third. Our tasks were later steps, and the cut was about a quarter.</p>
+        <p>The effect on time agrees with the earlier tutorial study (<a href="#src-haddad-2021">Haddad and others, 2021</a>), which found that examples cut the time to a first call by about a third. Our tasks were later steps, and the cut was about a quarter.</p>
         <p>For a team that writes reference pages, the results suggest an order: write examples first for the calls whose use needs more than one step. Those are the calls where a description alone fails most often.</p>
       </div>
       <div class="note" role="note">
@@ -878,8 +855,47 @@ footer p { margin: 0; }
     </div>
   </section>
 
-  <section id="limits" aria-labelledby="limits-h">
-    <h2 id="limits-h">Limits</h2>
+
+  <section id="method" aria-labelledby="method-h">
+    <h2 id="method-h">Method and limits</h2>
+    <h3>Method</h3>
+    <h4>Participants</h4>
+    <p>24 developers took part, recruited through a developer mailing list. They had 2 to 15 years of work experience (median 6). None had used the test API before. Each received a $40 gift card.</p>
+    <h4>Materials</h4>
+    <p>We wrote reference pages for an invented payments API with 14 calls. Version A had a description, a parameter table and an answer table for each call. Version B was the same, with one worked example under each call: 8 to 20 lines of code that run as written.</p>
+    <h4>Design and tasks</h4>
+    <p>Each participant did four tasks: sign a request, read a long list page by page, check a webhook, and handle an error and try again. Each did two tasks with version A and two with version B. The order of the tasks and of the versions followed a Latin square, so each task was done equally often with each version and in each position.</p>
+    <dl>
+      <dt>Finished</dt>
+      <dd>The task's test passed within 15 minutes.</dd>
+      <dt>Time</dt>
+      <dd>Minutes from the start of the task to a passing test, for finished tasks only.</dd>
+      <dt>Confidence</dt>
+      <dd>The answer to "How sure are you that your code is correct?", from 1 (not at all) to 7 (completely), asked after each task.</dd>
+    </dl>
+    <h4>Analysis</h4>
+    <p>We compared the two versions within each participant. For each measure we report the difference between the versions and a 95% confidence interval from a bootstrap with 10,000 samples of participants.<a class="fn" id="fn-2-ref" href="#fn-2" aria-label="Note 2">[2]</a> We also give each difference as a standardized effect, d, so the three measures can be shown on one scale.</p>
+    <div class="status">
+      <span class="state info">Change from the plan</span>
+      <p>The plan named a mixed model for the time measure. It did not converge with 24 participants, so we used the paired bootstrap for all three measures.</p>
+    </div>
+    <details>
+      <summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>How d is worked out</summary>
+      <p>For each participant, we took the difference between the two versions, then divided the mean of those differences by their standard deviation. For tasks finished, a participant's value is the share of their two tasks that they finished with each version.</p>
+<pre tabindex="0" role="region" aria-label="The formula for d"><code><span class="cm"># d for paired measures</span>
+d = mean(differences) / sd(differences)</code></pre>
+    </details>
+    <h3>Data</h3>
+    <dl>
+      <dt>Source</dt><dd>Our study sessions: the test results, the times and the answers of each participant</dd>
+      <dt>Dates</dt><dd>2 to 20 September 2026</dd>
+      <dt>Size</dt><dd>n = 24 developers, 48 tasks for each version</dd>
+      <dt>Who is counted</dt><dd>Developers from one developer mailing list, with 2 to 15 years of work experience, none of whom had used the test API</dd>
+    </dl>
+    <h3>What was left out</h3>
+    <p>No participant and no task was left out. The time measure counts finished tasks only, so one participant, who finished no task without examples, is not in it.</p>
+    <h3>How sure the result is</h3>
+    <p>Each range is a 95% interval: with the same method on many samples, about 95 of 100 such intervals would hold the true value. These limits could make the result wrong:</p>
     <ul>
       <li><strong>A small sample.</strong> With 24 participants the intervals are wide. A study of about 80 would narrow the interval for tasks finished by half.</li>
       <li><strong>One API.</strong> The test API was small and invented. A large API with many ways to do one task may give a different result.</li>
@@ -887,22 +903,20 @@ footer p { margin: 0; }
       <li><strong>A lab session.</strong> Participants worked alone, in one session, with no search engine and no forum. At work, a developer who lacks an example can often find one.</li>
       <li><strong>Who took part.</strong> People on a developer mailing list may read documentation more than most.</li>
     </ul>
+    <ol class="notes" start="2" aria-label="Notes to this section">
+      <li id="fn-2">A bootstrap draws 24 participants at random from the 24, with repeats allowed, and works out the difference again. After 10,000 draws, the interval holds the middle 95% of those differences.
+        <a class="back" href="#fn-2-ref" aria-label="Back to the text of note 2">Back</a></li>
+    </ol>
   </section>
 
-  <section id="references" aria-labelledby="references-h">
-    <h2 id="references-h">References</h2>
+  <section id="sources" aria-labelledby="sources-h">
+    <h2 id="sources-h">Sources</h2>
     <p>Every source below is invented for this test document. The addresses point to example.org, which holds no papers.</p>
-    <ul>
-      <li>Haddad, R., Mbeki, T., and Sørensen, L. (2021). Examples first: tutorial structure and the time to a first API call. <em>Journal of Example Software Studies</em>, 12(3), 201–219. https://example.org/doi/10.0000/jess.2021.0312</li>
-      <li>Ortega, M., and Lindqvist, P. (2019). Where developers look first in API documentation. In <em>Proceedings of the Example Conference on Program Comprehension</em>, 44–53. https://example.org/doi/10.0000/ecpc.2019.044</li>
-      <li>Example Lab (2026). Study plan: worked examples in API reference pages. Registered 28 August 2026. https://example.org/plans/2026-08-worked-examples</li>
+    <ul class="sources">
+      <li id="src-example-lab-2026">Example Lab (2026). "Study plan: worked examples in API reference pages." <cite>Example Lab</cite>, registered 28 August 2026. <a href="https://example.org/plans/2026-08-worked-examples">https://example.org/plans/2026-08-worked-examples</a> Read on 20 November 2026.</li>
+      <li id="src-haddad-2021">Haddad, R., Mbeki, T., and Sørensen, L. (2021). "Examples first: tutorial structure and the time to a first API call." <cite>Journal of Example Software Studies</cite>, 12(3), 201–219. <a href="https://example.org/doi/10.0000/jess.2021.0312">https://example.org/doi/10.0000/jess.2021.0312</a></li>
+      <li id="src-ortega-2019">Ortega, M., and Lindqvist, P. (2019). "Where developers look first in API documentation." <cite>Proceedings of the Example Conference on Program Comprehension</cite>, 44–53. <a href="https://example.org/doi/10.0000/ecpc.2019.044">https://example.org/doi/10.0000/ecpc.2019.044</a></li>
     </ul>
-    <details>
-      <summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>How d is worked out</summary>
-      <p>For each participant, we took the difference between the two versions, then divided the mean of those differences by their standard deviation. For tasks finished, a participant's value is the share of their two tasks that they finished with each version.</p>
-<pre tabindex="0" role="region" aria-label="The formula for d"><code><span class="cm"># d for paired measures</span>
-d = mean(differences) / sd(differences)</code></pre>
-    </details>
   </section>
 </main>
 
@@ -912,7 +926,7 @@ d = mean(differences) / sd(differences)</code></pre>
   </div>
 </footer>
 <script>
-// docent:kit 0.23.0
+// docent:kit 0.24.0
 (() => {
   const root = document.documentElement;
   root.classList.add('js');
