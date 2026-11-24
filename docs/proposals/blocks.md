@@ -1,6 +1,6 @@
 # Proposal: blocks from the test documents — findings, quotes, status words, totals and events
 
-Status: **proposed on 2026-11-24**, waiting for the user's approval. No code is written yet. Five test documents (PR 65, [`../research/test-documents.md`](../research/test-documents.md)) found gaps that no proposal covers. This proposal covers five of them: gaps 7, 8, 10, 12 and 13 of the ranked table, and gap 18 in short. The sources proposal ([`sources.md`](sources.md), approved on 2026-11-24) already covers source lines, the number rules, a number with its change, footnotes, the list of sources, "Method and limits" and the estimate row, so this proposal does not repeat them. The sample content is invented, on the "Report a bug" topic, and agrees with the numbers in `charts.md` and `sources.md`. The before-and-after examples quote the five test documents, whose names and numbers are invented too.
+Status: **approved on 2026-11-24**, as written, with the recommended answer to each decision (see "Decided" near the end). No code is written yet. The items are built in the order of section 7, each in its own pull request. Five test documents (PR 65, [`../research/test-documents.md`](../research/test-documents.md)) found gaps that no proposal covers. This proposal covers five of them: gaps 7, 8, 10, 12 and 13 of the ranked table, and gap 18 in short. The sources proposal ([`sources.md`](sources.md), approved on 2026-11-24) already covers source lines, the number rules, a number with its change, footnotes, the list of sources, "Method and limits" and the estimate row, so this proposal does not repeat them. The sample content is invented, on the "Report a bug" topic, and agrees with the numbers in `charts.md` and `sources.md`. The before-and-after examples quote the five test documents, whose names and numbers are invented too.
 
 ## The answer first
 
@@ -562,6 +562,22 @@ Each decision has a recommended answer, which the proposal above follows, and th
 9. **A quote is set in the serif at 16px, and the kit draws its quotation marks.** Recommended: yes. The serif marks a person's voice with no line or color, and drawn marks are the same on every page. The other choice: the sans-serif with the indent only, and marks typed by the author, which is plainer but leaves the quote marked only by its indent.
 10. **The participant code in a speaker line is plain text, not `<code>`.** Recommended: plain text, because in a speaker line the code is a name, read once, not a key to look up in a table. The other choice: `<code>`, as `SKILL.md` asks for codes elsewhere, which keeps one rule but puts a small well in every speaker line.
 11. **An event stands at one of the chart's points, and there is no step line for now.** Recommended: yes. An event between two points takes the nearest point and gives its exact time in its name. The other choices: an event at any position between two points, which is more exact but needs a time scale that the line chart does not have (its points are labels, not times); and `"step": true` on a series that is not the focus, for a setting that changes at one moment.
+
+## Decided
+
+Approved on 2026-11-24, each with the recommended answer:
+
+1. **Key findings get a class, `ol.findings`,** with a lead sentence on its own line and a class that `check` can test.
+2. **Recommendations use the findings list, a table or a status note,** by how many facts each has; there is no separate block.
+3. **"In progress" takes `info`,** the muted dot. There is no sixth state.
+4. **"Rejected" takes `info`,** not `err`.
+5. **"Open question" and "Proposed" take `plan`,** and `plan` now means "not yet": planned, proposed, or not decided.
+6. **`check` warns when a known status word takes another state,** for the words in the table only, when the label is the word alone or the word then "by …".
+7. **The total row is a `tfoot`,** with a 1px rule in the text color above it and its cells in weight 600.
+8. **`check` adds up a column when a cell has `data-sum`:** opt-in for each cell, exact by default, with an allowance for `data-sum="rounded"`.
+9. **A quote is set in the serif at 16px,** and the kit draws its quotation marks.
+10. **The participant code in a speaker line is plain text,** not `<code>`.
+11. **An event stands at one of the chart's points,** and there is no step line for now.
 
 ## Not in this proposal
 
