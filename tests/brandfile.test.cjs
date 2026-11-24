@@ -115,6 +115,8 @@ test("check notes a page whose palette, logo, tagline, credit or profile differs
   assert.equal(many.length, 1, "one note for the page");
   assert.match(many[0], /^\[brand\.differs\] the palette \(the page has "harbor", the file "sepia"\), the logo \(the page has none\), the credit \(the page has "link", the file "text"\) and the profile \(the page has "brief", the file "standard"\) differ from \.docent\/config\.json\./);
   assert.match(notes((h) => h.replace(/(<svg class="logo"[^>]*>[\s\S]*?)rx="2"/, '$1rx="3"'))[0], /^\[brand\.differs\] the logo differs/, "a logo whose shapes differ from the file's");
+  assert.match(notes((h) => h.replace('<svg class="logo" viewBox="0 0 24 24"', '<svg class="logo" viewBox="0 0 48 48"'))[0], /^\[brand\.differs\] the logo differs/, "a logo whose viewBox differs: it draws at another size");
+  assert.match(notes((h) => h.replace('<svg class="logo" viewBox="0 0 24 24"', '<svg class="logo" viewBox="0 0 24 24" fill="#5b3fa8"'))[0], /^\[brand\.differs\] the logo differs/, "an inherited fill changes the drawing too");
   assert.deepEqual(notes((h) => h.replace("Small tools for careful teams.", "x").replace('<html lang="en"', '<html lang="en" data-brand="off"')), [], "a page about another product takes nothing from the file");
   const off = { ...config, data: { ...config.data, rules: { "brand.differs": { off: true, reason: "Old release notes keep their brand." } } } };
   assert.deepEqual(notes((h) => h.replace("Small tools for careful teams.", "x"), off), [], "a team may turn the note off");

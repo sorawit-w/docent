@@ -107,8 +107,16 @@ function readConfig(file, { palettes = [], profiles = [] } = {}) {
   return { file: abs, base, data: errors.length ? null : data, errors, lines: errors.length ? {} : linesOf(fs.readFileSync(abs, "utf8"), data) };
 }
 
-/** What a logo draws, to compare a page's logo with a file: an SVG's shapes, without its own <svg> tag and the space between tags. */
-const logoShapes = (svg) => svg.trim().replace(/^<svg\b[^>]*>/i, "").replace(/<\/svg>\s*$/i, "").replace(/>\s+</g, "><").trim();
+// The attributes of a logo's <svg> that belong to the page, not to the drawing: the slot size, the class, the theme, and the name for a
+// screen reader. Every other one, such as viewBox, fill, stroke or transform, changes what the reader sees.
+const PAGE_ONLY = /^(class|width|height|role|aria-[\w-]+|data-for|xmlns(:\w+)?|focusable|id)$/i;
+/** What a logo draws, to compare a page's logo with a file: the drawing attributes of its <svg>, in order, and its shapes, without the
+    space between tags. */
+function logoShapes(svg) {
+  const text = svg.trim(), root = (text.match(/^<svg\b([^>]*)>/i) || ["", ""])[1];
+  const attrs = [...root.matchAll(/([^\s"'=]+)\s*=\s*(?:"([^"]*)"|'([^']*)')/g)].filter(([, name]) => !PAGE_ONLY.test(name)).map(([, name, a, b]) => `${name}="${a ?? b}"`).sort();
+  return `${attrs.join(" ")}|${text.replace(/^<svg\b[^>]*>/i, "").replace(/<\/svg>\s*$/i, "").replace(/>\s+</g, "><").trim()}`;
+}
 
 /** The logos that a good repo file names, as a page carries them: { both | light | dark: shapes of an SVG, or a data URI }. */
 function logosOf(config) {
