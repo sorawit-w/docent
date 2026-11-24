@@ -162,6 +162,16 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     ok(`${width}px screen: back in the stack, the drawing keeps its real size and its words`, (width < 737 || after.width === 640) && after.words !== "none", after);
     await context.close();
   }
+  // A chart whose own id is "phone" shows in present mode: the desktop form is the one render wrote the slide size on.
+  {
+    const { page, context } = await open({ content: build(source.replace('"id": "reports-by-area"', '"id": "phone"')) });
+    await page.click(".present");
+    await page.keyboard.press("ArrowRight");
+    await page.keyboard.press("ArrowRight");
+    const shown = await page.evaluate(() => [...document.querySelectorAll(".slide.is-current .fig > svg")].filter((v) => getComputedStyle(v).display !== "none").map((v) => v.id));
+    ok('a chart with the id "phone" shows its desktop form, and only that', shown.join() === "dg-phone", shown);
+    await context.close();
+  }
   // A hand-drawn figure: the deck script measures the room and sets its size, from 1.25 to 1.5 times; back in the stack it has its real size.
   {
     const hand = fs.readFileSync(path.join(root, "tests", "fixtures", "hand-fishbone.html"), "utf8").match(/<figure>[\s\S]*<\/figure>/)[0];

@@ -153,7 +153,9 @@ function measureBody(el, room) {
   if (tag === "figure") {
     const size = drawingSize(inner), caption = captionHeight(inner);
     // One drawing: a desktop form (not a phone form), a hand-drawn figure or a picture.
-    const drawings = [...inner.matchAll(/<svg\b([^>]*)>/gi)].filter(([, a]) => (/\bclass="dg\b/.test(a) && !/\bid="[^"]*-phone"/.test(a)) || /\bdata-drawn="hand"/.test(a)).length + (inner.match(/<img\b/gi) || []).length;
+    // A phone form is the drawing whose id is another drawing's id with "-phone" after it; an author's own id may end in "-phone" too.
+    const svgs = [...inner.matchAll(/<svg\b([^>]*)>/gi)].map(([, a]) => ({ a, id: attrOf(a, "id") })), ids = new Set(svgs.map((v) => v.id));
+    const drawings = svgs.filter(({ a, id }) => (/\bclass="dg\b/.test(a) && !(id && id.endsWith("-phone") && ids.has(id.slice(0, -6)))) || /\bdata-drawn="hand"/.test(a)).length + (inner.match(/<img\b/gi) || []).length;
     if (drawings > 1) problems.push(`its figure holds ${drawings} drawings; a figure on a slide holds one. Two charts on one slide are two points: give each its own slide`);
     if (!size && /<(?:img|svg)\b/i.test(inner)) problems.push("its drawing has no width and height, so check cannot test that it fits the slide; give the <img> or <svg> its width and height in pixels");
     const sources = (((inner.match(/<figcaption\b[^>]*>([\s\S]*?)<\/figcaption>/i) || [])[1] || "").match(/\bclass="(?:[^"]*\s)?source(?:\s[^"]*)?"/g) || []).length;

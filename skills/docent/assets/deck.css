@@ -53,10 +53,10 @@ html[data-profile="deck"] main { counter-reset: slide; }
      wide, so the desktop form shows on every screen. The figure's words do not show: the room cannot read a table at that size, and the
      drawing's label is still its name for a screen reader. */
   html.presenting .slide .fig { padding: 4px; overflow: visible; }
-  html.presenting .slide .fig > svg.dg:not([id$="-phone"]) { display: block !important; }
+  html.presenting .slide .fig > svg.dg[style*="--fw"] { display: block !important; } /* render writes the slide size on the desktop form only */
   /* render writes the drawing's size on the frame, at its slide scale, as --fw and --fh in frame pixels. */
   html.presenting .slide .fig > svg.dg[style*="--fw"] { width: calc(var(--fw) * 1px); height: calc(var(--fh) * 1px); }
-  html.presenting .slide .fig > svg.dg[id$="-phone"], html.presenting .slide .dg-words { display: none !important; }
+  html.presenting .slide .fig > svg.dg:not([style*="--fw"]), html.presenting .slide .dg-words { display: none !important; }
   html.presenting .slide figcaption .source { display: inline; margin: 0; }
   html.presenting .slide figure.quote blockquote { font-size: 30px; line-height: 1.3; }
   html.presenting .slide figure.quote figcaption { margin-top: 4px; }

@@ -237,3 +237,10 @@ test("a figure on a slide holds one drawing and at most one source line; a hand-
   const hand = fs.readFileSync(path.join(__dirname, "fixtures", "hand-fishbone.html"), "utf8").match(/<figure>[\s\S]*<\/figure>/)[0].replace("width=\"640\" height=\"290\"", "width=\"640\" height=\"500\"").replace('viewBox="0 0 640 290"', 'viewBox="0 0 640 500"');
   assert.ok(errorsOf(slide(3, `<h2>Why a report cannot be repeated</h2>\n${hand}`)).some((e) => e.startsWith("slide 3: the drawing is 640 × 500px; a slide holds 915 ×")), "a hand-drawn figure 500px high does not fit");
 });
+
+test("a chart whose own id ends in phone is one drawing, not a phone form", () => {
+  const page = source.replace('"id": "reports-by-area"', '"id": "phone"');
+  assert.deepEqual(checkDocument(build(page)).errors, []);
+  const two = build(page.replace("<!-- /docent:diagram -->", '<!-- /docent:diagram -->\n<img src="data:image/png;base64,AA==" alt="Two" width="300" height="100">'));
+  assert.ok(checkDocument(two).errors.some((e) => e.includes("its figure holds 2 drawings")), "the chart and the picture are two drawings");
+});
