@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Page layout for generated documents — Docent</title>
 <style>
-/* docent:kit 0.20.0 */
+/* docent:kit 0.21.0 */
 /* Docent page styles. Tokens come from references/DESIGN.md. One file, no network. */
 :root {
   color-scheme: light;
@@ -875,7 +875,7 @@ footer p { margin: 0; }
             <tr><td>Reading preference does not predict reading speed (fonts)</td><td><a href="https://jeffhuang.com/papers/Readability_TOCHI22.pdf">jeffhuang.com</a></td><td>study</td><td>high</td></tr>
             <tr><td>ESL adults (N=459): font width and spacing changes had little effect; line length not tested</td><td><a href="https://stars.library.ucf.edu/etd2024/62">stars.library.ucf.edu</a></td><td>study</td><td>medium</td></tr>
             <tr><td>Dyslexia and general readers: sizes up to 18pt read better; 12pt was slower [secondary]</td><td><a href="https://de.slideshare.net/mpielot/make-it-big-the-effect-of-font-size-and-line-spacing-on-online-readability-62004998">de.slideshare.net</a></td><td>study</td><td>medium</td></tr>
-            <tr><td>Dyslexia line length 50-75 cpl (no study cited)</td><td><a href="https://dyslexiascotland.org.uk/dyslexia-friendly-typed-formats">dyslexiascotland.org.uk</a></td><td>convention</td><td>low</td></tr>
+            <tr><td>Dyslexia line length 50–75 cpl (no study cited)</td><td><a href="https://dyslexiascotland.org.uk/dyslexia-friendly-typed-formats">dyslexiascotland.org.uk</a></td><td>convention</td><td>low</td></tr>
             <tr><td>Older adults: 19px / 14pt body text</td><td><a href="https://health.gov/healthliteracyonline/display/full">health.gov</a></td><td>convention</td><td>medium</td></tr>
             <tr><td>WCAG 1.4.10: reflow at 320 CSS px; side columns stack</td><td><a href="https://www.w3.org/WAI/WCAG22/Understanding/reflow.html">w3.org</a></td><td>standard</td><td>high</td></tr>
             <tr><td>WCAG 1.4.4: text resizes to 200%; vw parts do not grow with zoom; max ≤ 2.5× min passes</td><td><a href="https://smashingmagazine.com/2023/11/addressing-accessibility-concerns-fluid-type">smashingmagazine.com</a></td><td>standard + convention</td><td>medium</td></tr>
@@ -883,7 +883,7 @@ footer p { margin: 0; }
             <tr><td>80% of fixations on the left half at 1920px; peak near 600px from the left</td><td><a href="https://www.nngroup.com/articles/horizontal-attention-leans-left/">nngroup.com</a></td><td>study</td><td>high</td></tr>
             <tr><td>Centered, left-fixed and fluid layouts: no performance difference (2001, old screens)</td><td><a href="https://www.humanfactors.com/newsletters/web_site_layout.asp">humanfactors.com</a></td><td>study</td><td>low</td></tr>
             <tr><td>Right-rail contents lists: "caution advised" (qualitative)</td><td><a href="https://www.nngroup.com/articles/table-of-contents/">nngroup.com</a></td><td>convention</td><td>medium</td></tr>
-            <tr><td>MDN centers a 1440px page: nav left, contents right, content 31-48rem</td><td><a href="https://developer.mozilla.org/en-US/docs/Web/CSS/grid-template-columns">developer.mozilla.org</a></td><td>convention</td><td>high</td></tr>
+            <tr><td>MDN centers a 1440px page: nav left, contents right, content 31–48rem</td><td><a href="https://developer.mozilla.org/en-US/docs/Web/CSS/grid-template-columns">developer.mozilla.org</a></td><td>convention</td><td>high</td></tr>
             <tr><td>Tufte CSS: shared left edge, notes right, wide blocks grow right, body shifted to balance</td><td><a href="https://edwardtufte.github.io/tufte-css/tufte.css">edwardtufte.github.io</a></td><td>convention</td><td>high</td></tr>
             <tr><td>Observable: prose 640px, code 960px, same left edge, contents list right</td><td><a href="https://github.com/observablehq/framework/blob/main/src/style/global.css">github.com</a></td><td>convention</td><td>high</td></tr>
             <tr><td>Distill: text centered, symmetric wide tracks, notes gutter right</td><td><a href="https://distill.pub/template.v2.js">distill.pub</a></td><td>convention</td><td>high</td></tr>
@@ -896,7 +896,7 @@ footer p { margin: 0; }
             <tr><td>Zero-shot LLMs often match trained models on web genre</td><td><a href="https://arxiv.org/html/2511.07989v2">arxiv.org</a></td><td>study</td><td>medium</td></tr>
             <tr><td>Diataxis classifier: rules first, LLM only when unsure, LLM capped at medium</td><td><a href="https://rolfedh.github.io/doc-utils/tools/classify-guides">rolfedh.github.io</a></td><td>convention</td><td>medium</td></tr>
             <tr><td>Readability formulas can only warn; remove headings and lists first</td><td><a href="https://www.ahrq.gov/talkingquality/resources/writing/tip6.html">ahrq.gov</a></td><td>standard</td><td>medium</td></tr>
-            <tr><td>Print body 10-12pt; 45-90 characters per line</td><td><a href="https://practicaltypography.com/point-size.html">practicaltypography.com</a></td><td>convention</td><td>high</td></tr>
+            <tr><td>Print body 10–12pt; 45–90 characters per line</td><td><a href="https://practicaltypography.com/point-size.html">practicaltypography.com</a></td><td>convention</td><td>high</td></tr>
             <tr><td>1in = 96px = 72pt, so 16px = 12pt</td><td><a href="https://www.w3.org/TR/css-values-4/#absolute-lengths">w3.org</a></td><td>standard</td><td>high</td></tr>
             <tr><td><code>@page</code> size and margin work in Chrome, Firefox and Safari 18.2+ (Dec 2024)</td><td><a href="https://raw.githubusercontent.com/mdn/browser-compat-data/main/css/at-rules/page.json">raw.githubusercontent.com</a></td><td>data</td><td>high</td></tr>
             <tr><td>Margin boxes and <code>counter(page)</code>: Chrome 131+ only; Firefox and Safari no (2026-11-21)</td><td><a href="https://developer.chrome.com/blog/print-margins">developer.chrome.com</a></td><td>data</td><td>high</td></tr>
@@ -1559,7 +1559,7 @@ footer p { margin: 0; }
   </div>
 </footer>
 <script>
-// docent:kit 0.20.0
+// docent:kit 0.21.0
 (() => {
   const root = document.documentElement;
   root.classList.add('js');
