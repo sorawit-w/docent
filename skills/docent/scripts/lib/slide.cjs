@@ -15,6 +15,8 @@ const INDENT = 40; // the indent of a list of points
 const CARD_GAP = 24; // between two cards
 const ROW_PAD = 2 * 12; // a table row: its lines at 21px, with 12px above and below
 const CELL_GAP = 24; // the space after each table cell
+const QUOTE_INDENT = 24; // a quote is indented like a list
+const CODE_CHARS = Math.floor((INNER.width - 2 * 20) / (21 * 0.6)); // a monospace character is about 0.6em wide: 88 characters at 21px
 const WELL = 16; // a figure well's padding, above and below
 const CAPTION_GAP = 12;
 const SCALE = { most: 1.5, least: 1.25 }; // a drawing on a slide stands at 1.5 times, or down to 1.25 times when it needs room
@@ -107,12 +109,19 @@ function measureBody(el, room) {
     // The cards share the width of the slide equally: three cards take a third each, two take half each.
     const across = Math.max(1, Math.min(cards.length, LIMIT.cards)), width = (INNER.width - (across - 1) * CARD_GAP) / across;
     if (cards.length > LIMIT.cards) problems.push(`its card grid has ${cards.length} cards; a slide holds at most ${LIMIT.cards} large numbers`);
+    let tallest = 0;
     raw.forEach((card, i) => {
+      // The number is set like the heading, and estimated like it, with the sans-serif at weight 600; it may wrap in its card, and each line makes the grid taller.
+      const big = plain((card.match(/<p\b[^>]*\bclass="(?:[^"]*\s)?big(?:\s[^"]*)?"[^>]*>([\s\S]*?)<\/p>/i) || [, ""])[1]);
+      const bigLines = big ? lines(big, SIZE.heading, width, 600) : 0;
+      if (bigLines > 1) problems.push(`the number of card ${i + 1} (${quote(big)}) is longer than one line of a card at 52px (${px(width)}px); a large number is one short line`);
       const said = [...card.matchAll(/<p\b([^>]*)>([\s\S]*?)<\/p>/gi)].filter(([, a]) => !hasClass(a, "big")).map(([, , t]) => plain(t));
       if (said.length > 1) problems.push(`card ${i + 1} has ${said.length} lines under its number; a card on a slide has one`);
       else if (said.length && !oneLine(said[0], SIZE.small, width)) problems.push(`the line of card ${i + 1} (${quote(said[0])}) is longer than one line of a card at 21px (${px(width)}px); say it in fewer words`);
+      const text = said.reduce((sum, line) => sum + lines(line, SIZE.small, width), 0);
+      tallest = Math.max(tallest, 13 + bigLines * LINE.heading + (bigLines ? 4 : 0) + text * LINE.small);
     });
-    return { kind: "large numbers", height: 13 + LINE.heading + 4 + LINE.small, problems };
+    return { kind: "large numbers", height: tallest, problems };
   }
   if (tag === "ul" || tag === "ol") {
     const points = items(inner);
@@ -126,13 +135,18 @@ function measureBody(el, room) {
     return { kind: "a short paragraph", height: count * LINE.large, problems };
   }
   if (tag === "figure" && hasClass(attrs, "quote")) {
-    const said = plain((inner.match(/<blockquote\b[^>]*>([\s\S]*?)<\/blockquote>/i) || [, ""])[1]), count = lines(said, SIZE.large, INNER.width);
+    // A quote is indented 24px. Its speaker line, after the quote, wraps at 21px like any caption.
+    const said = plain((inner.match(/<blockquote\b[^>]*>([\s\S]*?)<\/blockquote>/i) || [, ""])[1]), count = lines(said, SIZE.large, INNER.width - QUOTE_INDENT);
+    const speaker = plain((inner.match(/<\/blockquote>[\s\S]*?<figcaption\b[^>]*>([\s\S]*?)<\/figcaption>/i) || [, ""])[1]);
     if (count > LIMIT.paragraphLines) problems.push(`its quote is about ${count} lines at 30px; a quote on a slide is at most ${LIMIT.paragraphLines} lines`);
-    return { kind: "a short paragraph", height: count * LINE.large + 4 + LINE.small, problems };
+    return { kind: "a short paragraph", height: count * LINE.large + (speaker ? 4 + lines(speaker, SIZE.small, INNER.width - QUOTE_INDENT) * LINE.small : 0), problems };
   }
   if (tag === "pre") {
-    const count = plain(inner.replace(/<[^>]*>/g, "")).length ? inner.replace(/<[^>]*>/g, "").replace(/\n+$/, "").split("\n").length : 0;
+    const code = inner.replace(/<[^>]*>/g, "").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, "&").replace(/\n+$/, "");
+    const rows = code.trim() ? code.split("\n") : [], count = rows.length;
     if (count > LIMIT.codeLines) problems.push(`its code block has ${count} lines; a code block on a slide has at most ${LIMIT.codeLines}`);
+    // A line of code does not wrap on the screen, and a slide does not scroll: each line fits the width, about 88 characters at 21px.
+    rows.forEach((row, i) => { if (row.length > CODE_CHARS) problems.push(`line ${i + 1} of its code block has ${row.length} characters; a line of code on a slide has at most ${CODE_CHARS}, because it cannot wrap or scroll there`); });
     return { kind: "a code block", height: count * LINE.code + 2 * 16, problems };
   }
   if (tag === "table" || (tag === "div" && hasClass(attrs, "table-wrap"))) return { kind: "a small table", height: table(inner), problems };

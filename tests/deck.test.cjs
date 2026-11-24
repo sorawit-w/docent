@@ -103,6 +103,15 @@ test("a figure on a slide holds one drawing, and a title slide's facts count eve
   assert.ok(facts.some((e) => /^slide 1 is about \d+px tall, and a slide holds 592px/.test(e)), facts.join("\n"));
 });
 
+test("every text on a slide is measured with its wrapped lines: a card's number, a quote's speaker, a line of code", () => {
+  const big = errorsOf(slide(9, `<h2>Questions</h2>\n<ul class="cards">${`<li><p class="big">${"2 days<br>".repeat(12)}</p><p>Days</p></li>`.repeat(3)}</ul>`));
+  assert.ok(big.some((e) => e.startsWith("slide 9: the number of card 1")) && big.some((e) => /^slide 9 is about \d+px tall/.test(e)), big.join("\n"));
+  const speaker = errorsOf(slide(9, `<h2>Questions</h2>\n<figure class="quote"><blockquote><p>Ask the reporter.</p></blockquote><figcaption>${"Support team<br>".repeat(20)}</figcaption></figure>`));
+  assert.ok(speaker.some((e) => /^slide 9 is about \d+px tall/.test(e)), speaker.join("\n"));
+  const code = errorsOf(slide(9, `<h2>Questions</h2>\n<pre><code>report attach --log ${"a".repeat(80)}.log</code></pre>`));
+  assert.ok(code.some((e) => /^slide 9: line 1 of its code block has \d+ characters; a line of code on a slide has at most 88/.test(e)), code.join("\n"));
+});
+
 test("a slide that is taller than the frame is refused, with its height", () => {
   const table = (rows, text) => `<h2>Ask for three things in every bug report, and say why each one matters</h2>\n<div class="table-wrap"><table><thead><tr><th>Part</th><th>Why</th><th>Who</th><th>When</th></tr></thead><tbody>${`<tr><td>${text}</td><td>${text}</td><td>${text}</td><td>${text}</td></tr>`.repeat(rows)}</tbody></table></div>`;
   // Two heading lines and a table of five short rows: fits, as the proposal measured.
