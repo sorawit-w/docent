@@ -89,6 +89,8 @@ test("the logo check refuses every attribute that can run code or load a file, a
     '<path d="M0 0h1" transform="expression(alert(1)):x"/>': /holds characters that a shape does not need/,
     '<path id="a b" d="M0 0h1"/>': /the id "a b" holds characters/,
     '<path id="a" d="M0 0h1"/><path id="a" d="M0 0h1"/>': /the id "a" is used twice/,
+    '<path d="M0 0h1" fill="#ffffff" fill="#000000"/>': /<path> has the attribute "fill" twice; the browser keeps the first/,
+    '<path d="M0 0h1" fill="#ffffff" FILL="#000000"/>': /<path> has the attribute "FILL" twice/,
   };
   for (const [inner, pattern] of Object.entries(refused)) assert.match(why(inner), pattern, inner);
   assert.match(svgLogo('<svg class="logo" viewBox="0 0 24 24" width="24" height="24" xmlns="http://evil.example/">x</svg>').error, /xmlns="http:\/\/evil.example\/"/);
@@ -111,6 +113,7 @@ test("a raster logo is a PNG or WebP data URI with enough pixels; JPEG, GIF, an 
   assert.match(rasterLogo('<img class="logo" src="data:image/svg+xml;base64,PHN2Zz4=" width="24" height="24" alt="">').error, /an SVG inside a data URI/);
   assert.match(rasterLogo('<img class="logo" src="brand/logo.png" width="96" height="24" alt="">').error, /not a data URI/);
   assert.match(rasterLogo(img(png(288, 72), "png", 'width="96" height="24" alt="" onerror="alert(1)"')).error, /event attribute "onerror"/);
+  assert.match(rasterLogo(img(png(288, 72), "png", 'width="96" height="24" alt="" alt="Example project"')).error, /<img> has the attribute "alt" twice; the browser keeps the first/);
   assert.match(rasterLogo(img(Buffer.from("<svg onload=alert(1)>"), "png")).error, /its data is not a PNG image/, "the bytes must be the kind of image the data URI names");
   assert.match(rasterLogo(img(png(288, 72), "png", 'width="96" height="24"')).error, /no alt/);
   assert.match(rasterLogo(`<img class="logo" src="data:image/png;base64,${"A".repeat(MOST)}" width="96" height="24" alt="">`).error, /at most 24000/);

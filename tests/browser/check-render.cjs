@@ -249,6 +249,26 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     await context.close();
   }
 
+  // A long web address breaks in body text, list items, definitions, captions, notes and facts, so the page does not scroll sideways
+  // at 320px (WCAG 1.4.10). A text row after a card grid stands 24px below it, on a screen and on paper.
+  {
+    const address = "https://research.example.org/papers/2026/developer-tooling-study/supplementary-materials/appendix-b-full-data.csv";
+    const card = (s) => `<li><h3>${s}</h3><p>Text.</p></li>`;
+    const blocks = `<section id="long" aria-labelledby="long-h"><h2 id="long-h">Long words</h2><ul class="cards">${card("One")}${card("Two")}${card("Three")}</ul>`
+      + `<div class="row" id="after-cards"><p>Read it at ${address}.</p><div class="note" role="note"><strong>Source</strong>${address}<ul class="facts"><li>${address}</li></ul></div></div>`
+      + `<ul><li>${address}</li></ul><dl><dt>${address}</dt><dd>${address}</dd></dl><figure aria-label="Figure"><div class="fig"><p>Drawing</p></div><figcaption>${address}</figcaption></figure></section>\n`;
+    const content = html.replace('<section id="report"', `${blocks}<section id="report"`);
+    const look = async (opts) => {
+      const view = await open({ ...opts, content });
+      const r = await view.page.evaluate(() => ({ page: document.documentElement.scrollWidth, view: document.documentElement.clientWidth, gap: Math.round(document.getElementById("after-cards").getBoundingClientRect().top - document.querySelector("#long .cards").getBoundingClientRect().bottom), wide: [...document.querySelectorAll("#long :is(p, li, dt, dd, figcaption, .note)")].filter((e) => e.scrollWidth > e.clientWidth + 1).length }));
+      await view.context.close();
+      return r;
+    };
+    const narrow = await look({ width: 320, height: 800 }), desk = await look({ width: 1280 }), paper = await look({ width: 658, height: 900, media: "print" });
+    ok("at 320px a long web address breaks in a paragraph, a list, a definition, a caption, a note and the facts, so the page does not scroll sideways", narrow.page === narrow.view && narrow.wide === 0, narrow);
+    ok("a text row after a card grid stands 24px below it, on a desktop and on paper", desk.gap === 24 && paper.gap === 24, { desk, paper });
+  }
+
   // On a phone each route shows its single-track form, at real size, and it fits its well.
   {
     const { page, context } = await open({ width: 390, height: 844 });
