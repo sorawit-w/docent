@@ -275,3 +275,21 @@ test("the kit's script opens closed sections for printing, except speaker notes;
   assert.match(deckCss, /html\.presenting \.slide > details\.notes \{ display: none; \}/);
   assert.match(deckCss, /@media print \{ \.slide > details\.notes \{ display: none !important; \} \}/, "also when open, and also when the deck prints as the stack");
 });
+
+test("SKILL.md offers decks, and no longer names slide decks among what Docent is not for; its description stays within 1024 characters", () => {
+  const skill = fs.readFileSync(path.join(__dirname, "..", "skills", "docent", "SKILL.md"), "utf8");
+  const description = skill.match(/^description: (.*)$/m)[1];
+  assert.ok(description.length <= 1024, `the description has ${description.length} characters`);
+  assert.match(description, /It also makes a short slide deck, to present a report's findings in a meeting\. Do not use it for app screens or marketing pages\.$/);
+  assert.ok(!/slide decks? or marketing|a slide deck or a marketing/.test(skill), "no line refuses decks");
+  assert.match(skill, /\| `deck` \| Slides to present findings in a meeting \|/);
+  assert.match(skill, /## Write a deck/);
+});
+
+test("the sample deck is the output of render and stamp, and passes check with no error and no warning", () => {
+  const sample = fs.readFileSync(path.join(assets, "specimen-deck.html"), "utf8");
+  assert.equal(build(sample), sample, "run render and stamp on specimen-deck.html, then commit it");
+  assert.deepEqual(checkDocument(sample), { errors: [], warnings: [] });
+  assert.match(sample, /data-profile="deck"/);
+  assert.match(sample, /"kind": "bar"/, "the bar chart of charts.md");
+});

@@ -1,0 +1,1249 @@
+<!doctype html>
+<html lang="en" data-profile="deck">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Better bug reports — Example project</title>
+<style>
+/* docent:kit 0.36.0 */
+/* Docent page styles. Tokens come from references/DESIGN.md. One file, no network. */
+:root {
+  color-scheme: light;
+  --bg: #fbfbfe; --panel: #f2f3f9; --fig: #f2f3f9;
+  --text: #1c1f2e; --muted: #575d75; --line: #d3d6e3;
+  --primary: var(--host-accent, #2f3fd0); --ink: var(--host-ink, #1b2260); --dot: var(--host-accent, #2f3fd0);
+  --ok: #1a7f37; --warn: #7d4e00; --err: #cf222e;
+  /* The heat steps fill the cells of a heat map and the boxes of a heat plan, and nothing else: from the least (1) to the most (5). One teal on screen; the print block sets five grays for paper. */
+  --heat-1: #c6e9ef; --heat-2: #86c9d5; --heat-3: #3da6b6; --heat-4: #00707e; --heat-5: #004a53;
+  /* The text on a heat step: the kit's own text and page colors. They equal --text and --bg, except with the reader's high contrast mode, where the kit gives those two the system colors and only its own are tested against the steps. */
+  --heat-text: #1c1f2e; --heat-page: #fbfbfe;
+  /* A host's logo for one theme (data-for) shows in that theme. A logo with no version for this theme stands on a tile in the page color of its own theme. */
+  --logo-light: block; --logo-dark: none; --tile-light: transparent; --tile-dark: #12141f;
+  /* A host project sets its own accent, heading color and fonts with the --host-* tokens. The kit never sets them, so they hold in every theme and in print.
+     In dark mode the dot follows the host's dark accent, or --host-dot-dark; on Docent's own pages it is the lamp. */
+  --serif: var(--host-serif, Charter, "Bitstream Charter", "Sitka Heading", "Sitka Text", Cambria, Georgia, serif);
+  --sans: var(--host-sans, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif);
+  --mono: var(--host-mono, ui-monospace, "SF Mono", "Cascadia Code", Consolas, Menlo, monospace);
+  --ease: cubic-bezier(0.23, 1, 0.32, 1);
+  --measure: 31rem; --margin-col: 220px; --gap: 48px; --wide: 1120px;
+  /* The profile of a page sets these. Standard is the default: code and tables end at the right edge of the notes. */
+  --block: calc(var(--measure) + var(--gap) + var(--margin-col)); --section-space: 72px; --cell-y: 12px; --step-space: 36px;
+}
+/* Profiles: one attribute on <html> sets the width of code and tables, and the spacing. A profile never changes the text column. */
+html[data-profile="task"] { --section-space: 56px; --step-space: 28px; }
+html[data-profile="reference"] { --block: var(--wide); --section-space: 56px; --cell-y: 8px; }
+html[data-profile="brief"] { --block: var(--wide); --section-space: 64px; }
+/* A page for the public: every size is in rem, so the text and the text column grow together, on top of the reader's own setting. */
+html[data-text="large"] { font-size: 112.5%; }
+/* Dark: the reader's system setting decides, unless the reader chose a theme with the switch. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #12141f; --panel: #0b0d15; --fig: #0b0d15;
+    --text: #e7e9f3; --muted: #959bb3; --line: #2d3146;
+    --primary: var(--host-accent-dark, #8e9bff); --ink: #e7e9f3; --dot: var(--host-dot-dark, var(--host-accent-dark, #f2b824));
+    --ok: #3fb950; --warn: #d29922; --err: #f85149;
+    --heat-1: #093339; --heat-2: #054e58; --heat-3: #006b78; --heat-4: #36a0b1; --heat-5: #80cad7; --heat-text: #e7e9f3; --heat-page: #12141f;
+    --logo-light: none; --logo-dark: block; --tile-light: #fbfbfe; --tile-dark: transparent;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #12141f; --panel: #0b0d15; --fig: #0b0d15;
+  --text: #e7e9f3; --muted: #959bb3; --line: #2d3146;
+  --primary: var(--host-accent-dark, #8e9bff); --ink: #e7e9f3; --dot: var(--host-dot-dark, var(--host-accent-dark, #f2b824));
+  --ok: #3fb950; --warn: #d29922; --err: #f85149;
+  --heat-1: #093339; --heat-2: #054e58; --heat-3: #006b78; --heat-4: #36a0b1; --heat-5: #80cad7; --heat-text: #e7e9f3; --heat-page: #12141f;
+  --logo-light: none; --logo-dark: block; --tile-light: #fbfbfe; --tile-dark: transparent;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-padding-top: 88px; -webkit-text-size-adjust: 100%; }
+/* A word that cannot fit on a line by itself, such as a long web address, breaks inside, so no page scrolls sideways on a phone. Other words wrap as before. */
+body { margin: 0; background: var(--bg); color: var(--text); font: 400 1rem/1.65 var(--sans); caret-color: var(--primary); overflow-wrap: break-word; }
+::selection { background: color-mix(in srgb, var(--primary) 22%, transparent); }
+:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
+a { color: var(--primary); text-decoration-thickness: 1px; text-underline-offset: 0.2em; }
+a:hover { text-decoration-thickness: 2px; }
+/* The skip link: the first thing a keyboard reaches. It is hidden until it has focus; then it stands at the upper left, over the top bar, and jumps to the main element. */
+.skip { position: absolute; top: 12px; left: 12px; z-index: 3; display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); font-size: 0.875rem; }
+.skip:not(:focus) { width: 1px; height: 1px; padding: 0; border: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+/* One left edge for the whole page. On a wide screen the text and its notes sit in the middle as a group; wide blocks start at the same edge and grow to the right, up to --wide. */
+.shell {
+  --left: max(40px, min((100% - var(--measure) - var(--gap) - var(--margin-col)) / 2, 100% - var(--wide) - 40px));
+  padding: 0 max(40px, 100% - var(--left) - var(--wide)) 0 var(--left);
+}
+
+/* Top bar. Its bottom line is the route; the dot marks the current section. */
+.topbar { position: sticky; top: 0; z-index: 2; background: var(--bg); border-bottom: 1px solid var(--line); }
+.topbar .shell { position: relative; display: flex; align-items: center; gap: 32px; height: 56px; }
+.host { display: inline-flex; align-items: center; gap: 10px; font-weight: 600; font-size: 0.875rem; white-space: nowrap; }
+/* The host's logo: 24px high and at most 160px wide; its width and height are written on it. One color (currentColor) takes the heading color. */
+.logo { display: block; flex: none; box-sizing: content-box; color: var(--ink); }
+.host:has(> .logo[data-for="dark"]) > .logo[data-for="light"] { display: var(--logo-light); }
+.host:has(> .logo[data-for="light"]) > .logo[data-for="dark"] { display: var(--logo-dark); }
+/* A logo for one theme only stands on a tile in the other theme: corners of 6px, 4px around it. The outline takes no space, so nothing moves. */
+/* A logo in one color (currentColor) keeps the ink of its own theme, so it reads on its tile too. */
+.host:not(:has(> .logo[data-for="dark"])) > .logo[data-for="light"] { background: var(--tile-light); outline: 4px solid var(--tile-light); border-radius: 2px; color: var(--host-ink, #1b2260); }
+.host:not(:has(> .logo[data-for="light"])) > .logo[data-for="dark"] { background: var(--tile-dark); outline: 4px solid var(--tile-dark); border-radius: 2px; color: #e7e9f3; }
+.route { flex: 1; min-width: 0; }
+.route ol { display: flex; gap: 28px; margin: 0; padding: 0; list-style: none; }
+.route a { display: block; padding: 6px 0; font-size: 0.875rem; color: var(--muted); text-decoration: none; white-space: nowrap; }
+.route a:hover, .route a[aria-current] { color: var(--text); }
+.route-dot { position: absolute; left: 0; bottom: -4px; width: 7px; height: 7px; border-radius: 50%; background: var(--dot); opacity: 0; transform: translateX(var(--x, 0px)); }
+.ready .route-dot, .ready .rail-dot { transition: transform 320ms var(--ease); }
+.js .route-dot { opacity: 1; }
+.theme, .wd-btn { display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px; border: 1px solid var(--line); border-radius: 6px; background: none; color: var(--text); font: 400 0.875rem/1 var(--sans); cursor: pointer; }
+.theme:hover, .wd-btn:hover { border-color: var(--muted); }
+.theme:active, .wd-btn:active { transform: translateY(1px); }
+.theme svg { width: 15px; height: 15px; }
+html:not(.js) .theme, .theme[hidden] { display: none; }
+.theme[data-next="dark"] .icon-sun, .theme[data-next="light"] .icon-moon { display: none; }
+
+/* Title block: the title leads; facts about the document sit below it. */
+.title { padding: 80px 0 8px; }
+.title .row { margin-top: 24px; }
+/* The serif headings take weight 700. A palette with sans-serif headings sets 600, so the sans-serif keeps two weights. */
+h1, h2 { font-family: var(--serif); font-weight: var(--heading-weight, 700); color: var(--ink); text-wrap: balance; margin: 0; }
+h1 { font-size: 3.25rem; line-height: 1.06; letter-spacing: -0.02em; }
+.standfirst { font: 400 1.3125rem/1.5 var(--serif); margin: 0; text-wrap: pretty; }
+.facts { margin: 0; padding-left: 0; list-style: none; font-variant-numeric: tabular-nums; }
+
+section { padding-top: var(--section-space); }
+h2 { font-size: 1.875rem; line-height: 1.2; margin-bottom: 16px; }
+h3 { font: 600 1.125rem/1.35 var(--sans); margin: 0; text-wrap: balance; }
+/* A small heading inside a part of a section: body size, weight 600. */
+h4 { font: 600 1rem/1.5 var(--sans); margin: 24px 0 4px; }
+/* A definition list: each term in weight 600, its meaning below it. */
+dl { max-width: var(--measure); margin: 0 0 16px; }
+dt { font-weight: 600; }
+dd { margin: 0 0 12px; }
+dd:last-child { margin-bottom: 0; }
+p { margin: 0 0 16px; max-width: var(--measure); text-wrap: pretty; }
+.term { text-decoration: underline; text-decoration-color: var(--primary); text-decoration-thickness: 2px; text-underline-offset: 0.22em; }
+/* A place that shows a value of a value picker. A dotted line under it says that it changes with the choice. */
+var { font-style: normal; }
+var[data-v] { text-decoration: underline dotted var(--muted); text-decoration-thickness: 1px; text-underline-offset: 0.25em; }
+code { font: 0.875rem/1.55 var(--mono); background: var(--panel); padding: 0.1em 0.38em; border-radius: 6px; }
+.standfirst code { font-size: 1.125rem; }
+
+/* Lists in the text flow: points, or numbers for steps that one actor does. The rules are weak on purpose, so the lists of the kit's own blocks keep their styles. */
+:where(main) :where(ul, ol):not(.steps, .facts, .cards) { max-width: var(--measure); margin: 0 0 16px; padding-left: 24px; }
+:where(main) :where(ul, ol):not(.steps, .facts, .cards) > :where(li + li) { margin-top: 4px; }
+/* Key findings: each item opens with one sentence in weight 600 on its own line, so the eye reads the findings down the page like
+   headings. 12px between items, as between two pairs of a definition list. The number is the list's own marker, muted. No box, no line. */
+ol.findings > li + li { margin-top: 12px; }
+ol.findings > li::marker { color: var(--muted); font-variant-numeric: tabular-nums; }
+ol.findings > li > strong:first-child { display: block; font-weight: 600; }
+/* A block heading in the text flow has more space above it than below it. A step heading of a walkthrough has none. */
+:where(main) h3 { margin: 32px 0 8px; }
+h2 + h3, h3 + h4 { margin-top: 0; }
+.steps h3 { margin: 0; }
+/* A numbered block heading: one of several steps that one actor does, where a step holds a code block, a table or a widget. The kit writes the number, and the count starts again in each section. */
+section { counter-reset: block-step; }
+h3.step { counter-increment: block-step; }
+h3.step::before { content: counter(block-step); font-weight: 400; color: var(--muted); margin-right: 10px; font-variant-numeric: tabular-nums; }
+/* With scripts on, the page script writes the number as text, so that a screen reader reads it. It looks the same as the counted number. */
+h3.is-numbered::before { content: none !important; }
+.step-n { font-weight: 400; color: var(--muted); margin-right: 6px; font-variant-numeric: tabular-nums; }
+/* A code block, a table, a closed section, a walkthrough, a status note and a figure bring no space below them. Text that follows brings it. */
+:is(pre, .code, .table-wrap, details, .walk, .status, figure) + :is(p, ul, ol, dl) { margin-top: 24px; }
+
+/* Margin notes: the guide's remarks sit beside the text, like a wall label. */
+.row { display: grid; grid-template-columns: minmax(0, var(--measure)) var(--margin-col); column-gap: var(--gap); align-items: start; }
+.note { margin: 6px 0 16px; padding-top: 12px; border-top: 1px solid var(--line); font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
+.note strong { display: block; margin-bottom: 4px; font-weight: 600; color: var(--text); }
+/* A heading may stand in the text column, with the facts about its item beside it. The row brings the space above the heading, so the note lines up with the heading. */
+.row:has(> h3:first-child) { margin-top: 32px; }
+.row > h3:first-child { margin-top: 0; }
+
+/* Walkthrough: a rail with a node per step; one dot travels along it. */
+.walk { display: grid; grid-template-columns: minmax(0, 1fr) 536px; column-gap: 40px; align-items: start; margin-top: 24px; }
+.rail { position: relative; }
+.steps { position: relative; margin: 0; padding: 0; list-style: none; counter-reset: step; }
+.steps::before { content: ""; position: absolute; left: 4px; top: 10px; bottom: 10px; width: 1px; background: var(--line); }
+.steps li { position: relative; padding: 0 0 var(--step-space) 32px; counter-increment: step; }
+.steps li:last-child { padding-bottom: 0; }
+.steps li::before { content: ""; position: absolute; left: 0; top: 8px; width: 9px; height: 9px; border-radius: 50%; border: 1px solid var(--muted); background: var(--bg); }
+.steps h3::before { content: counter(step); font-weight: 400; color: var(--muted); margin-right: 10px; font-variant-numeric: tabular-nums; }
+.steps p { margin: 6px 0 0; }
+.js .steps li:not(.is-current) h3, .js .steps li:not(.is-current) p { color: var(--muted); }
+.ready .steps h3, .ready .steps p { transition: color 120ms; }
+.rail-dot { position: absolute; left: 0; top: 8px; width: 9px; height: 9px; border-radius: 50%; background: var(--dot); opacity: 0; transform: translateY(var(--y, 0px)); }
+.js .rail-dot { opacity: 1; }
+.walk figure { position: sticky; top: 88px; }
+
+/* Figures: a well that holds a Docent diagram, with a plain caption. A diagram carries its own styles. */
+/* A well is as wide as the profile's block. A wider drawing keeps its real size, and its well grows with it. */
+figure { margin: 0; min-width: min(100%, var(--block)); width: fit-content; max-width: 100%; }
+section > figure { margin-top: 24px; }
+/* Every drawing in a well keeps its real size and sits in the middle; a wider one scrolls inside the well. */
+.fig > svg { flex: none; margin-inline: auto; }
+.fig { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 16px 24px; background: var(--fig); border-radius: 12px; padding: 8px; overflow-x: auto; scrollbar-color: var(--line) transparent; }
+/* A well may hold two drawings, for two separate chains: side by side when both fit, else one below the other. */
+/* A drawing that is wider than its well scrolls sideways. The page script shows this line under it, because the part that shows can look complete. */
+.fig-more { margin: 8px 0 0; max-width: none; font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
+/* The steps of a diagram in words: a closed section in the well, under the drawing. It takes the width of the well, so a table
+   of several columns, such as the boxes of a heat plan, keeps its words whole; its sentences and lists keep the width of the text. */
+.dg-words { flex-basis: 100%; max-width: none; margin: 0; padding: 0 8px 4px; }
+.dg-words ol { margin: 8px 0 0; padding-left: 28px; }
+.dg-words li + li { margin-top: 4px; }
+.dg-words p { margin: 12px 0 0; font-weight: 600; }
+/* The rows of a range chart in words: a small table, as wide as its content, so it fits a phone. */
+.dg-words table { width: auto; min-width: 0; margin-top: 8px; }
+.dg-words :is(th, td) { padding-right: 16px; }
+/* A long name with no spaces breaks inside its cell, so the table never runs past a phone screen. */
+.dg-words tbody th { white-space: normal; }
+.dg-words :is(th, td) { overflow-wrap: anywhere; }
+/* A wide grid in words, such as the numbers of a heat map: each cell stays on one line, numbers line up on the right, and the
+   table scrolls inside its wrapper on a narrow screen. The lines under it keep the width of the text. */
+.dg-words > .table-wrap { margin-top: 8px; max-width: none; }
+.dg-words > .table-wrap :is(th, td) { white-space: nowrap; overflow-wrap: normal; padding-right: 12px; }
+.dg-words > .table-wrap :is(td, thead th) { text-align: right; font-variant-numeric: tabular-nums; }
+/* A wide table of words, such as the boxes of a heat plan: its cells wrap at spaces but never inside a word, and keep to the left. */
+.dg-words > .table-wrap.is-text :is(th, td) { white-space: normal; }
+.dg-words > .table-wrap.is-text :is(td, thead th) { text-align: left; }
+.dg-words:has(> .table-wrap) { min-width: 0; } /* a flex item: without this it grows to the table, and the wrapper never scrolls */
+/* A hand-drawn figure holds no colors and no styles of its own, only these classes, so the tokens give it every theme, print and the
+   reader's settings. A shape with no class is a 1.5px line in the text color, and a text with no class is 14px. No class is under 12px. */
+svg[data-drawn="hand"] { display: block; flex: none; margin-inline: auto; }
+svg[data-drawn="hand"] :is(path, line, polyline, polygon, rect, circle, ellipse), svg[data-drawn="hand"] .hd-line { fill: none; stroke: var(--text); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+svg[data-drawn="hand"] text, svg[data-drawn="hand"] .hd-text { fill: var(--text); stroke: none; font-size: 14px; font-weight: 400; }
+svg[data-drawn="hand"] .hd-strong { stroke-width: 2.5; }
+svg[data-drawn="hand"] .hd-muted { stroke: var(--muted); stroke-width: 1; }
+svg[data-drawn="hand"] .hd-rule { stroke: var(--line); stroke-width: 1; }
+svg[data-drawn="hand"] .hd-fill { fill: var(--text); stroke: none; }
+svg[data-drawn="hand"] .hd-box { fill: var(--bg); stroke: var(--text); }
+svg[data-drawn="hand"] .hd-band { fill: var(--bg); stroke: none; }
+svg[data-drawn="hand"] .hd-name { font-weight: 600; }
+svg[data-drawn="hand"] .hd-note { font-size: 12px; fill: var(--muted); }
+figcaption { margin-top: 12px; font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
+figcaption strong { font-weight: 600; color: var(--text); margin-right: 8px; }
+/* A quote with its speaker: text, so it keeps the text column and has no well. It is indented 24px like a list and set in the serif at body
+   size, which tells a person's voice from the author's text with no color, line or box. The kit draws the curly quotation marks, so every
+   page has the same marks. The speaker stands 4px below, like a caption. */
+figure.quote { min-width: 0; width: auto; max-width: var(--measure); margin-top: 24px; padding-left: 24px; }
+figure.quote blockquote { margin: 0; font: 400 1rem/1.65 var(--serif); color: var(--text); }
+figure.quote blockquote > :last-child { margin-bottom: 0; }
+figure.quote blockquote > :first-child::before { content: "\201C"; }
+figure.quote blockquote > :last-child::after { content: "\201D"; }
+figure.quote figcaption { margin-top: 4px; }
+/* The source line: the last line of a caption, in the caption's size and color, says where the numbers come from. A table of outside data
+   stands in a figure too, with "Table n" in its caption, so the figure's own space is the only space above it. */
+figcaption .source { display: block; margin-top: 4px; }
+figure > .table-wrap { margin-top: 0; }
+/* Footnotes: a mark in the line, [1], at full size with the link look, and the notes at the end of the section: 14px, muted, 32px under
+   the last block, with no heading, box or line. The note a jump lands on takes the text color; "Back" does not print. */
+.fn { white-space: nowrap; }
+ol.notes { margin: 32px 0 0; font-size: 0.875rem; line-height: 1.5; color: var(--muted); font-variant-numeric: tabular-nums; }
+.notes li:target { color: var(--text); }
+.fn:target { text-decoration-thickness: 2px; }
+/* The list of sources: one author-year entry each, written by hand, at body size with no bullets and a hanging indent of 24px, 8px apart.
+   The address is the link's own text, because paper has no link, and it breaks at any character, so no page scrolls sideways. */
+ul.sources { list-style: none; }
+.sources > li { text-indent: -24px; overflow-wrap: anywhere; }
+.sources > li + li { margin-top: 8px; }
+
+/* Card grid: 3 to 8 short items side by side, each a heading or a large number and a line of text. A card is a label, like a margin note: a line above it, and no box. At most four in a row. */
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(max(160px, calc((100% - 72px) / 4)), 1fr)); gap: 24px; margin: 24px 0; padding: 0; list-style: none; }
+.cards > li { min-width: 0; padding-top: 12px; border-top: 1px solid var(--line); }
+.cards h3 { margin: 0 0 4px; font-size: 1rem; line-height: 1.5; }
+.cards p { margin: 0; font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
+.cards .big { margin-bottom: 4px; font: 700 1.875rem/1.2 var(--serif); font-weight: var(--heading-weight, 700); color: var(--ink); font-variant-numeric: tabular-nums; }
+/* A number with its change: a third line in a card. The direction is a word in the text color at weight 600, and the rest is muted.
+   No arrow and no color: up is not always good, and green, amber and red mean status only. */
+.cards .change { margin-top: 4px; }
+.change .dir { font-weight: 600; color: var(--text); }
+/* Every block after a card grid stands 24px below it, or more when its own space is larger: the two margins overlap. */
+.cards:last-child { margin-bottom: 0; }
+
+/* Code, tables and cards end at the profile's block width. */
+:is(pre, .code, .table-wrap, .cards) { max-width: var(--block); }
+
+/* Tables: rules only, no boxes. */
+.table-wrap { overflow-x: auto; margin: 24px 0 0; scrollbar-color: var(--line) transparent; }
+table { width: 100%; min-width: 640px; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; vertical-align: top; padding: var(--cell-y) 24px var(--cell-y) 0; }
+thead th { border-bottom: 1px solid var(--text); padding-bottom: 10px; font-size: 0.875rem; line-height: 1.5; font-weight: 600; color: var(--muted); }
+tbody th { font-weight: 600; white-space: nowrap; }
+tbody tr { border-bottom: 1px solid var(--line); }
+/* A total row (tfoot): a 1px rule in the text color above it, the rule that stands under the headings, and every cell in weight 600; no fill.
+   The last body row loses its own line, so two rules never stand together. A second row, such as an average, has the line of a body row. */
+tbody:has(+ tfoot) > tr:last-child { border-bottom: 0; }
+tfoot tr:first-child { border-top: 1px solid var(--text); }
+tfoot tr + tr { border-top: 1px solid var(--line); }
+tfoot :is(th, td) { font-weight: 600; }
+/* A column of numbers (class "num" on its th and td cells): the numbers line up on the right, in tabular figures. The last column ends at the table's edge. */
+:is(th, td).num { text-align: right; font-variant-numeric: tabular-nums; }
+:is(th, td).num:last-child { padding-right: 0; }
+.state { display: inline-flex; align-items: baseline; gap: 8px; font-weight: 600; }
+.state::before { content: ""; flex: none; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.state.ok { color: var(--ok); } .state.warn { color: var(--warn); } .state.err { color: var(--err); }
+/* Two states with no status color: a fact with no judgment (plain information, work under way, a closed item) takes a muted dot, and "not yet" (planned, proposed, not decided) takes a muted ring. */
+.state.info, .state.plan { color: var(--text); }
+.state.info::before { background: var(--muted); }
+.state.plan::before { background: none; border: 1.5px solid var(--muted); }
+/* Code and links in a cell may break anywhere, so a long path, command or address does not make the table wider than its place. */
+:is(td, th) :is(code, a) { overflow-wrap: anywhere; }
+
+/* Status note: a dot and a word carry the status. */
+.status { max-width: var(--measure); margin: 32px 0 0; }
+.status p { margin: 4px 0 0; }
+
+pre { margin: 20px 0 0; padding: 16px 20px; background: var(--panel); border-radius: 10px; overflow-x: auto; font: 0.875rem/1.6 var(--mono); scrollbar-color: var(--line) transparent; }
+pre code { background: none; padding: 0; font-size: inherit; }
+/* With scripts on, a code block sits in a holder with a button that copies the code. The holder takes the place and the space of the code block. */
+.code { position: relative; margin: 20px 0 0; }
+.code > pre { margin: 0; }
+.copy { position: absolute; top: 0; right: 0; height: 30px; padding: 0 12px; border: solid var(--line); border-width: 0 0 1px 1px; border-radius: 0 10px 0 6px; background: var(--panel); color: var(--muted); font: 400 0.875rem/1 var(--sans); cursor: pointer; }
+.copy:hover { color: var(--text); }
+/* A line of code that reaches the button would sit under it. Then the code starts below the button. */
+.code.is-long > pre { padding-top: 40px; }
+.cm { color: var(--muted); }
+
+details { max-width: var(--measure); margin: 24px 0 0; }
+/* A closed section that holds a table, a code block or a figure takes the full width, like those blocks do outside it. Its text keeps the text column. */
+details:has(> .table-wrap, > pre, > .code, > figure) { max-width: none; }
+summary { display: flex; align-items: center; gap: 10px; padding: 4px 0; font-weight: 600; cursor: pointer; list-style: none; }
+summary::-webkit-details-marker { display: none; }
+summary svg { width: 12px; height: 12px; color: var(--muted); transition: transform 150ms var(--ease); }
+details[open] summary svg { transform: rotate(90deg); }
+details > p { margin: 8px 0 0 22px; }
+
+/* Widgets: the reader chooses, ticks or decides. A widget is plain controls and text, with no box. render makes its markup from data. */
+.choose, .checks, .decide, .values { position: relative; margin: 24px 0 0; }
+:is(.choose, .checks, .decide, .values) + * { margin-top: 24px; }
+.choose > input, .checks input, .decide input, .values > input { position: absolute; width: 1px; height: 1px; margin: 0; opacity: 0; pointer-events: none; }
+.wd-t { margin: 0; max-width: none; font-size: 0.875rem; line-height: 1.5; font-weight: 600; color: var(--muted); }
+.opt { display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px; border: 1px solid var(--line); border-radius: 6px; font-size: 0.875rem; line-height: 1; cursor: pointer; }
+.opt::before { content: ""; width: 9px; height: 9px; border-radius: 50%; border: 1px solid var(--muted); }
+.opt:hover { border-color: var(--muted); }
+input:checked + .opt { border-color: var(--text); }
+input:checked + .opt::before { border-color: var(--dot); background: var(--dot); }
+input:focus-visible + .opt, .checks input:focus-visible + label::before { outline: 2px solid var(--primary); outline-offset: 3px; }
+/* Chooser: radio buttons and one panel for each case. The styles alone show the chosen case, so it works with scripts off. */
+.choose { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.choose > .wd-t { margin-right: 4px; }
+.choose > .case { display: none; flex-basis: 100%; min-width: 0; margin-top: 8px; }
+.choose > input:nth-of-type(1):checked ~ div:nth-of-type(1), .choose > input:nth-of-type(2):checked ~ div:nth-of-type(2), .choose > input:nth-of-type(3):checked ~ div:nth-of-type(3), .choose > input:nth-of-type(4):checked ~ div:nth-of-type(4), .choose > input:nth-of-type(5):checked ~ div:nth-of-type(5) { display: block; }
+.case-t { display: none; margin: 0 0 4px; font-weight: 600; }
+.case > .case-t + * { margin-top: 0; }
+.case > :last-child { margin-bottom: 0; }
+/* Checklist: a box and a line of text. A ticked line takes the muted color. */
+.checks ul { max-width: var(--measure); margin: 0; padding: 0; list-style: none; }
+.checks li { position: relative; margin-top: 12px; }
+.checks label { display: block; position: relative; padding-left: 32px; cursor: pointer; }
+.checks label::before { content: ""; position: absolute; left: 0; top: 4px; width: 18px; height: 18px; border: 1.5px solid var(--muted); border-radius: 6px; }
+.checks label::after { content: ""; position: absolute; left: 6.5px; top: 7px; width: 5px; height: 9px; border: solid var(--text); border-width: 0 2px 2px 0; transform: rotate(45deg); opacity: 0; }
+.checks input:checked + label { color: var(--muted); }
+.checks input:checked + label::before { border-color: var(--text); }
+.checks input:checked + label::after { opacity: 1; }
+.checks .sub { display: block; font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
+.wd-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin: 16px 0 0; max-width: none; font-size: 0.875rem; line-height: 1.5; color: var(--muted); font-variant-numeric: tabular-nums; }
+.wd-foot[hidden] { display: none; }
+/* Decision helper: questions, the one answer that fits, and the table of all cases. The table is the still form. */
+.decide fieldset { position: relative; display: flex; flex-wrap: wrap; gap: 8px; min-width: 0; margin: 16px 0 0; padding: 0; border: 0; }
+.decide legend { margin-bottom: 8px; padding: 0; font-weight: 600; }
+.decide-out { display: block; max-width: var(--measure); margin-top: 16px; }
+.decide-out:empty { display: none; }
+.decide-out strong { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+.decide-out strong::before { content: ""; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--dot); }
+.decide details { max-width: none; margin-top: 16px; }
+.decide .table-wrap { margin-top: 8px; }
+.decide td strong { display: block; font-weight: 600; }
+.decide tr.is-out { color: var(--muted); }
+html:not(.js) .decide-ask, html:not(.js) .wd-foot output { display: none; }
+/* Value picker: options like a chooser, a line that names the chosen option, and the table of all values. With scripts off the options do nothing, so they are hidden, and the text shows the values of the first option. */
+.values { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.values > .wd-t { margin-right: 4px; }
+.values-now { flex-basis: 100%; max-width: none; margin: 4px 0 0; font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
+.values-now strong { font-weight: 600; color: var(--text); }
+.values details { flex-basis: 100%; min-width: 0; max-width: none; margin-top: 8px; }
+.values .table-wrap { margin-top: 8px; }
+html:not(.js) .values > input + .opt { display: none; }
+
+footer { margin-top: 96px; border-top: 1px solid var(--line); }
+footer .shell { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding-top: 24px; padding-bottom: 40px; font-size: 0.875rem; color: var(--muted); }
+footer p { margin: 0; }
+/* The credit: a one-color mark and "Made with Docent", at the right. The mark takes the muted color of the words beside it. */
+.credit { margin-left: auto; }
+.credit svg { width: 16px; height: 16px; margin-right: 8px; vertical-align: -3px; }
+/* Docent's own pages carry the mark's tile in the footer. */
+.brand { display: inline-flex; align-items: center; gap: 10px; font: 700 1rem/1 var(--serif); color: var(--text); }
+.brand svg { width: 24px; height: 24px; }
+
+@media (max-width: 1100px) {
+  .walk { grid-template-columns: minmax(0, 1fr); row-gap: 32px; }
+  .walk figure { position: static; order: -1; }
+}
+@media (max-width: 900px) {
+  .row { grid-template-columns: minmax(0, 1fr); }
+  .note { max-width: var(--measure); }
+  .title .note { margin-top: 28px; }
+}
+@media (max-width: 720px) {
+  .shell { padding: 0 20px; }
+  .topbar { position: static; }
+  .topbar .shell { flex-wrap: wrap; gap: 4px 16px; height: auto; padding-top: 10px; padding-bottom: 8px; }
+  .host { flex: 1; }
+  .route { flex: none; order: 3; width: 100%; }
+  .route ol { flex-wrap: wrap; gap: 0 20px; }
+  .route a[aria-current] { text-decoration: underline; text-decoration-color: var(--dot); text-decoration-thickness: 2px; text-underline-offset: 0.4em; }
+  .route-dot { display: none; }
+  .title { padding-top: 48px; }
+  h1 { font-size: 2rem; } h2 { font-size: 1.625rem; }
+  section { padding-top: 56px; }
+  footer .shell { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .credit { margin-left: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; }
+}
+/* More contrast (the reader's system setting): outlines, tracks and rules take the muted color, and muted text takes the text color. Screen
+   only, so paper keeps the print block; and not with forced colors, where the reader's system colors already decide. */
+@media screen and (prefers-contrast: more) and (forced-colors: none) {
+  html:root:not([data-never]) { --line: #575d75; --muted: #1c1f2e; }
+  html:root:not([data-never])[data-theme="dark"] { --line: #959bb3; --muted: #e7e9f3; }
+}
+@media screen and (prefers-contrast: more) and (forced-colors: none) and (prefers-color-scheme: dark) {
+  html:root:not([data-never]):not([data-theme="light"]) { --line: #959bb3; --muted: #e7e9f3; }
+}
+/* The reader's high contrast mode (forced colors, as in Windows): the browser gives the page the few colors the reader chose. The kit gives
+   its tokens the same system colors, so the drawings follow, and the marks that are backgrounds (dots, the rail) stay visible. The heat
+   steps and the status colors keep their own values, because there the color is the content; the text on a step keeps --heat-text. */
+@media (forced-colors: active) {
+  html:root:not([data-never]) { --bg: Canvas; --fig: Canvas; --text: CanvasText; --muted: CanvasText; --line: CanvasText; --primary: Highlight; --dot: Highlight; }
+  /* A status dot takes the color of its word, which the browser forces; a background in that color would turn into the page color. */
+  .state::before { background: CanvasText; }
+  /* All borders take the text color, so the chosen option takes the highlight color, as its dot does. */
+  input:checked + .opt { border-color: Highlight; }
+}
+@media print {
+  html:root:not([data-never]) { color-scheme: light; --bg: #ffffff; --panel: #f2f3f9; --fig: #f2f3f9; --text: #1c1f2e; --muted: #575d75; --line: #d3d6e3; --primary: var(--host-accent, #2f3fd0); --ink: var(--host-ink, #1b2260); --dot: var(--host-accent, #2f3fd0); --ok: #1a7f37; --warn: #7d4e00; --err: #cf222e; --heat-1: #dee2f0; --heat-2: #babecb; --heat-3: #9498a5; --heat-4: #616571; --heat-5: #3e424d; --heat-text: #1c1f2e; --heat-page: #ffffff; --logo-light: block; --logo-dark: none; --tile-light: transparent; --tile-dark: #12141f; }
+  /* Paper: 11pt text, the page margin as the edge, and the notes beside the text again. An A4 page holds the text (112mm), a gap and the notes (50mm). */
+  html { font-size: 11pt; } html[data-text="large"] { font-size: 12pt; }
+  html:root:not([data-never]) { --measure: 112mm; --gap: 8mm; --margin-col: 50mm; --block: 100%; }
+  .shell { padding: 0; }
+  .row { grid-template-columns: minmax(0, var(--measure)) var(--margin-col); }
+  .title .note { margin-top: 6px; }
+  p, li { orphans: 2; widows: 2; }
+  /* A browser may leave out the ground of a code well on paper. A thin line keeps it a well. */
+  /* Paper cannot scroll: a long line of code wraps. */
+  pre { border: 1px solid var(--line); white-space: pre-wrap; overflow-wrap: anywhere; }
+  /* The top bar prints as one line above the title: the logo and the host's name, with no links and no switch. */
+  .topbar { position: static; border-bottom: 0; } .topbar .shell { height: auto; } .title { padding-top: 32px; }
+  .logo { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  /* Paper has no link: the credit prints as text. */
+  .credit a { color: inherit; text-decoration: none; }
+  .skip, .route, .theme, .route-dot, .rail-dot, .choose > .opt, .values > .opt, .decide-ask, .wd-foot, .copy, .fig-more, .notes .back { display: none !important; }
+  .choose > .case { display: block !important; margin-top: 16px; } .case-t { display: block; }
+  .checks input:checked + label, .decide tr.is-out { color: var(--text) !important; }
+  .steps li h3, .steps li p { color: var(--text) !important; }
+  .walk { grid-template-columns: minmax(0, 1fr); row-gap: 32px; } .walk figure { position: static; order: -1; }
+  table { min-width: 0; } .table-wrap { overflow: visible; }
+  /* Paper cannot scroll: a long row heading wraps, as the other cells do. On screen it stays on one line, and the table scrolls inside itself. */
+  tbody th { white-space: normal; }
+  /* A browser may repeat a tfoot at the foot of each printed page; a total under half of the rows would mislead, so it prints once, at the end. */
+  tfoot { display: table-row-group; }
+  /* Paper cannot scroll, so a wide grid in words, such as the numbers of a heat map, takes the smallest text size and tighter cells; render splits a grid that is still too wide into several tables. */
+  .dg-words > .table-wrap table { font-size: 0.875rem; } .dg-words > .table-wrap thead th { font-size: inherit; } .dg-words > .table-wrap :is(th, td) { padding: 4px 6px 4px 0; }
+  /* A browser leaves out backgrounds on paper. These carry meaning, so they print: status dots, the rail of the steps, and the ground of figures and code. */
+  .state::before, .steps::before, .fig, pre, code { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  /* Paper cannot scroll, and a drawing cannot split across pages. So a drawing that is wider than the paper, or taller than a page, shrinks to fit, under its caption, on A4 and on Letter. */
+  .fig > svg { width: auto; height: auto; max-width: 100%; max-height: 220mm; }
+  figure, tr, .status, pre, .checks li, .cards > li, .findings > li { break-inside: avoid; }
+  h2, h3 { break-after: avoid; }
+  /* Page numbers: Chrome and Edge print them; other browsers print their own footer. */
+  @page { margin: 18mm; @bottom-right { content: counter(page) " / " counter(pages); font: 9pt system-ui, sans-serif; color: #575d75; } }
+}
+/* Deck: written only into a page with data-profile="deck". With scripts off, and before Present, a deck is the stack: a title slide
+   and a column of short sections at reading sizes, like any page. Each slide's number stands before its heading in the muted color,
+   as the number of a step does, so a reader can follow "on slide 4" in an email. */
+html[data-profile="deck"] .topbar .host { flex: 1; }
+html[data-profile="deck"] main { counter-reset: slide; }
+.slide { counter-increment: slide; }
+/* The title slide counts as slide 1 but shows no number: a "1" before the title reads as part of it. */
+.slide:not(.title) > h2:first-child:not(.is-numbered)::before { content: counter(slide); margin-right: 0.25em; font-weight: 400; color: var(--muted); font-variant-numeric: tabular-nums; }
+/* With scripts on, the deck script writes the number as text (is-numbered), so that a screen reader reads it. It looks the same as the counted number. */
+.slide-n { font-weight: 400; color: var(--muted); font-variant-numeric: tabular-nums; }
+.slide.title .standfirst, .slide.title .facts { margin-top: 24px; }
+/* Speaker notes: a closed section at the end of a slide, in the reading form, with scripts on or off. They never show on the shared
+   screen or on paper, also when the section is open; the kit's script does not open them for printing. */
+.slide > details.notes { margin-top: 24px; }
+html.presenting .slide > details.notes { display: none; }
+@media print { .slide > details.notes { display: none !important; } }
+/* The Present button: a control like the theme switch. The deck script adds it, so with scripts off there is none. */
+.present { display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px; border: 1px solid var(--line); border-radius: 6px; background: none; color: var(--text); font: 400 0.875rem/1 var(--sans); cursor: pointer; }
+.present:hover { border-color: var(--muted); }
+.present:active { transform: translateY(1px); }
+.present svg { width: 15px; height: 15px; }
+.deck-nav { display: none; }
+/* The slide form: one slide on a frame of 1280 × 720, with 64px margins, in present mode and on paper. Every size is a number of frame
+   pixels times --u: 1px in present mode, where the deck script scales the frame to fill the screen as one picture, and a 1280th of the
+   sheet's width on paper. So the reader's text size and data-text="large" do not apply: the text is already large. */
+:is(html.presenting, html.printing) .slide { padding: calc(64 * var(--u)); }
+:is(html.presenting, html.printing) .slide :is(p, ul, ol, dl, figure, blockquote, .table-wrap, .cards, pre, .code) { max-width: none; }
+:is(html.presenting, html.printing) .slide > :is(h1, h2) { margin: 0 0 calc(32 * var(--u)); font-size: calc(52 * var(--u)); line-height: 1.06; }
+:is(html.presenting, html.printing) .slide.title > h1 { margin-bottom: 0; }
+:is(html.presenting, html.printing) .slide-n { display: none; } /* the number stands in the corner */
+:is(html.presenting, html.printing) .slide:not(.title) > :is(p, ul, ol):not(.cards) { margin: 0; font-size: calc(30 * var(--u)); line-height: 1.3; }
+:is(html.presenting, html.printing) .slide:not(.title) > :is(ul, ol):not(.cards) { padding-left: calc(40 * var(--u)); }
+:is(html.presenting, html.printing) .slide:not(.title) > :is(ul, ol):not(.cards) > li + li { margin-top: calc(16 * var(--u)); }
+:is(html.presenting, html.printing) .slide .standfirst { margin-top: calc(24 * var(--u)); font-size: calc(30 * var(--u)); line-height: 1.3; }
+:is(html.presenting, html.printing) .slide .facts { margin-top: calc(24 * var(--u)); font-size: calc(21 * var(--u)); line-height: 1.5; }
+/* The cards share the width: a third each for three, half each for two. */
+:is(html.presenting, html.printing) .slide > .cards { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: calc(24 * var(--u)); margin: 0; }
+:is(html.presenting, html.printing) .slide > .cards > li { padding-top: calc(12 * var(--u)); }
+:is(html.presenting, html.printing) .slide > .cards .big { margin-bottom: calc(4 * var(--u)); font-size: calc(52 * var(--u)); line-height: 1.06; }
+:is(html.presenting, html.printing) .slide > .cards p { font-size: calc(21 * var(--u)); line-height: 1.5; }
+:is(html.presenting, html.printing) .slide :is(.table-wrap, .code, figure), :is(html.presenting, html.printing) .slide > pre { margin: 0; }
+:is(html.presenting, html.printing) .slide table { min-width: 0; font-size: calc(21 * var(--u)); line-height: 1.5; }
+:is(html.presenting, html.printing) .slide :is(th, td) { padding: calc(12 * var(--u)) calc(24 * var(--u)) calc(12 * var(--u)) 0; }
+:is(html.presenting, html.printing) .slide :is(th, td):last-child { padding-right: 0; }
+:is(html.presenting, html.printing) .slide thead th { font-size: calc(21 * var(--u)); }
+:is(html.presenting, html.printing) .slide pre { padding: calc(16 * var(--u)) calc(20 * var(--u)); font-size: calc(21 * var(--u)); line-height: 1.6; }
+:is(html.presenting, html.printing) .slide .code.is-long > pre { padding-top: calc(16 * var(--u)); }
+:is(html.presenting, html.printing) .slide :is(.copy, .fig-more) { display: none; }
+:is(html.presenting, html.printing) .slide code { font-size: 1em; } /* inline code takes the size of the text around it, not the page's smaller code size */
+:is(html.presenting, html.printing) .slide figcaption { margin-top: calc(4 * var(--u)); font-size: calc(21 * var(--u)); line-height: 1.5; }
+/* A figure on a slide: the drawing stands at 1.5 times, or less down to 1.25 times when it needs room. render writes the drawing's size
+   on the frame as --fw and --fh, in frame pixels; for a hand-drawn figure the deck script writes 1.25 times, and in present mode it
+   measures the room for more. The well is 4px around the drawing, the caption 4px under it, and the source line runs on in the
+   caption's line. The frame is always 1280 wide, so the desktop form shows on every screen and sheet. The figure's words do not show on
+   the slide: the room cannot read a table at that size, and the drawing's label is still its name for a screen reader. On paper the
+   words print on the page after the slide. */
+:is(html.presenting, html.printing) .slide .fig { padding: calc(4 * var(--u)); overflow: visible; }
+:is(html.presenting, html.printing) .slide .fig > svg.dg[style*="--fw"] { display: block !important; } /* render writes the slide size on the desktop form only */
+:is(html.presenting, html.printing) .slide .fig > :is(svg, img)[style*="--fw"] { width: calc(var(--fw) * var(--u)); height: calc(var(--fh) * var(--u)); max-width: none; max-height: none; }
+:is(html.presenting, html.printing) .slide .fig > svg.dg:not([style*="--fw"]), :is(html.presenting, html.printing) .slide .dg-words { display: none !important; }
+:is(html.presenting, html.printing) .slide figcaption .source { display: inline; margin: 0; }
+:is(html.presenting, html.printing) .slide figure.quote { padding-left: calc(24 * var(--u)); }
+:is(html.presenting, html.printing) .slide figure.quote blockquote { font-size: calc(30 * var(--u)); line-height: 1.3; }
+/* Present mode. A slide changes at once, with no animation. */
+@media screen {
+  html.presenting { --u: 1px; }
+  html.presenting, html.presenting body { overflow: hidden; }
+  html.presenting body > :not(main) { display: none !important; }
+  html.presenting main { position: fixed; left: 50%; top: 50%; width: 1280px; height: 720px; margin: 0; padding: 0; background: var(--bg); transform: translate(-50%, -50%) scale(var(--deck-scale, 1)); }
+  html.presenting .slide { display: none; position: absolute; inset: 0; overflow: hidden; }
+  html.presenting .slide.is-current { display: block; }
+  html.presenting .slide:focus { outline: none; } /* the slide takes the focus so a screen reader reads it; the room sees no ring */
+  /* A status word takes the text color, and only its dot the status color: the word is text and needs 7:1, the dot is a mark. */
+  html.presenting .state:is(.ok, .warn, .err) { color: var(--text); }
+  html.presenting .state.ok::before { background: var(--ok); } html.presenting .state.warn::before { background: var(--warn); } html.presenting .state.err::before { background: var(--err); }
+  /* The slide number at the lower right of the frame, with Previous and Next: 44px square, a thin outline, no fill. */
+  html.presenting .deck-nav { display: flex; position: absolute; right: 64px; bottom: 10px; align-items: center; gap: 12px; color: var(--text); font: 400 21px/1 var(--sans); font-variant-numeric: tabular-nums; }
+  .deck-nav button { display: inline-grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 1px solid var(--line); border-radius: 6px; background: none; color: var(--text); cursor: pointer; }
+  .deck-nav button:hover { border-color: var(--text); }
+  .deck-nav button:disabled { cursor: default; opacity: 0.35; }
+  .deck-nav svg { width: 20px; height: 20px; }
+  .deck-count { margin-right: 4px; }
+}
+/* Paper: when the deck script is on, each slide prints in the slide form, one to a landscape page that keeps the reader's choice of A4
+   or Letter, and the frame grows to the width of the sheet. A figure's words print on the page after its slide, under "Slide 4 in
+   words". The slide number prints at the lower right. Paper is light, as for every page. With scripts off the deck prints as the stack. */
+@media print {
+  @page slide { size: landscape; @bottom-right { content: none; } }
+  html.printing main { container-type: inline-size; }
+  html.printing .slide, html.printing .slide-words { --u: calc(100cqw / 1280); page: slide; }
+  html.printing body > :not(main) { display: none !important; }
+  html.printing .slide { position: relative; width: 100%; height: calc(720 * var(--u)); overflow: hidden; break-inside: avoid; }
+  html.printing :is(.slide, .slide-words) + :is(.slide, .slide-words) { break-before: page; }
+  html.printing .slide::after { content: attr(data-n); position: absolute; right: calc(64 * var(--u)); bottom: calc(20 * var(--u)); color: var(--text); font: 400 calc(21 * var(--u))/1 var(--sans); font-variant-numeric: tabular-nums; }
+  html.printing .slide-words { padding-top: 0; }
+  html.printing .slide-words > h2 { margin-bottom: 12px; }
+  /* Printed while presenting, the deck prints every slide, not only the one on the screen. */
+  html.presenting .slide[hidden] { display: block !important; }
+}
+/* Present mode is always light, with the "more contrast" tokens: the line takes the muted color, and muted text the text color, so every
+   text pair on a slide reaches 7:1 under a room's light (decks.md, section 4). A palette adds its own block after this one. Not with forced
+   colors, where the reader's system colors decide. */
+@media screen and (forced-colors: none) {
+  html:root.presenting:not([data-never]) { color-scheme: light; --bg: #fbfbfe; --panel: #f2f3f9; --fig: #f2f3f9; --text: #1c1f2e; --muted: #1c1f2e; --line: #575d75; --primary: var(--host-accent, #2f3fd0); --ink: var(--host-ink, #1b2260); --dot: var(--host-accent, #2f3fd0); --ok: #1a7f37; --warn: #7d4e00; --err: #cf222e; --heat-1: #c6e9ef; --heat-2: #86c9d5; --heat-3: #3da6b6; --heat-4: #00707e; --heat-5: #004a53; --heat-text: #1c1f2e; --heat-page: #fbfbfe; }
+}
+/* /docent:kit */
+</style>
+</head>
+<body>
+<a class="skip" href="#content">Skip to the content</a>
+<header class="topbar">
+  <div class="shell">
+    <span class="host">Example project</span>
+    <button class="theme" type="button">
+      <svg class="icon-moon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13.5 9.6A5.8 5.8 0 0 1 6.4 2.5a5.8 5.8 0 1 0 7.1 7.1Z"/></svg>
+      <svg class="icon-sun" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="8" cy="8" r="3"/><path d="M8 1.5v1.6M8 12.9v1.6M1.5 8h1.6M12.9 8h1.6M3.4 3.4l1.1 1.1M11.5 11.5l1.1 1.1M3.4 12.6l1.1-1.1M11.5 4.5l1.1-1.1"/></svg>
+      <span class="theme-text">Dark</span>
+    </button>
+  </div>
+</header>
+<main class="shell" id="content">
+  
+  <section class="slide title" id="s1" aria-labelledby="s1-h">
+    <h1 id="s1-h">Better bug reports</h1>
+    <p class="standfirst">What a good bug report holds, and why it is fixed sooner.</p>
+    <ul class="facts">
+      <li>Support team review, 1 October 2026</li>
+      <li>The full report: <a href="specimen.html">specimen.html</a></li>
+    </ul>
+  </section>
+
+  
+  <section class="slide" id="s2" aria-labelledby="s2-h">
+    <h2 id="s2-h">Ask for three things in every bug report</h2>
+    <ul>
+      <li>What you did, step by step</li>
+      <li>What you expected to happen</li>
+      <li>What happened instead, with the error text</li>
+    </ul>
+    <details class="notes"><summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>Speaker notes</summary>
+      <p>Most reports we get hold only the third point. Ask the team which of the three they miss most often.</p>
+    </details>
+  </section>
+
+  
+  <section class="slide" id="s3" aria-labelledby="s3-h">
+    <h2 id="s3-h">Sign-in gets the most bug reports</h2>
+    <figure>
+      <div class="fig" role="region" aria-label="Bug reports by area" tabindex="0">
+<!-- docent:diagram
+{
+  "id": "reports-by-area",
+  "kind": "bar",
+  "label": "Sign-in had the most bug reports in the third quarter, 412. Search and Checkout had about 250 each. Help pages had the fewest, 18. Notifications has no count, because reports had no area label for it before April.",
+  "scale": {"from": 0, "to": 500, "step": 100, "unit": "reports"},
+  "order": "largest",
+  "rows": [
+    {"name": "Sign-in", "value": 412},
+    {"name": "Search", "value": 268},
+    {"name": "Checkout", "value": 231},
+    {"name": "Settings", "value": 97},
+    {"name": "Profile", "value": 64},
+    {"name": "Help pages", "value": 18},
+    {"name": "Notifications", "value": null}
+  ]
+}
+-->
+<svg style="--fw: 958.7; --fh: 461.4" id="dg-reports-by-area" class="dg dg-bar dg-auto" xmlns="http://www.w3.org/2000/svg" width="640" height="308" viewBox="0 0 640 308" role="img" aria-label="Sign-in had the most bug reports in the third quarter, 412. Search and Checkout had about 250 each. Help pages had the fewest, 18. Notifications has no count, because reports had no area label for it before April.">
+<style>
+#dg-reports-by-area{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-reports-by-area .ground{fill:var(--fig,#f2f3f9)}
+#dg-reports-by-area .band{fill:var(--bg,#fbfbfe)}
+#dg-reports-by-area .track{stroke:var(--line,#d3d6e3)}
+#dg-reports-by-area .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-reports-by-area .head{fill:var(--text,#1c1f2e)}
+#dg-reports-by-area .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-reports-by-area .stop.end{fill:var(--text,#1c1f2e)}
+#dg-reports-by-area .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-reports-by-area .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-reports-by-area .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-reports-by-area .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-reports-by-area .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-reports-by-area .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-reports-by-area .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-reports-by-area .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-reports-by-area .sub,#dg-reports-by-area .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-reports-by-area .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-reports-by-area .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-reports-by-area .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-reports-by-area .r-bar{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-reports-by-area .r-ref{stroke:var(--muted,#575d75)}
+#dg-reports-by-area .r-pt{fill:var(--text,#1c1f2e)}
+#dg-reports-by-area .d-ring{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-reports-by-area .d-gap{stroke:var(--muted,#575d75);stroke-width:2}
+#dg-reports-by-area .d-lead{stroke:var(--muted,#575d75);stroke-width:1}
+@media (prefers-reduced-motion:reduce){#dg-reports-by-area .pulse{animation:none!important}#dg-reports-by-area .pulse{display:none!important}}
+@media print{#dg-reports-by-area{max-width:100%;height:auto}#dg-reports-by-area .pulse{display:none!important}}
+#dg-reports-by-area-phone{display:none}
+</style>
+<rect width="640" height="308" class="ground"/>
+<rect x="8" y="60" width="624" height="240" rx="10" class="band"/>
+<line x1="119" y1="60" x2="119" y2="300" class="track"/>
+<line x1="212.8" y1="60" x2="212.8" y2="300" class="track"/>
+<line x1="306.6" y1="60" x2="306.6" y2="300" class="track"/>
+<line x1="400.4" y1="60" x2="400.4" y2="300" class="track"/>
+<line x1="494.2" y1="60" x2="494.2" y2="300" class="track"/>
+<line x1="588" y1="60" x2="588" y2="300" class="track"/>
+<text x="20" y="24" class="sub" text-anchor="start">Reports, bars from 0. Largest first.</text>
+<text x="119" y="48" class="val" text-anchor="middle">0</text>
+<text x="212.8" y="48" class="val" text-anchor="middle">100</text>
+<text x="306.6" y="48" class="val" text-anchor="middle">200</text>
+<text x="400.4" y="48" class="val" text-anchor="middle">300</text>
+<text x="494.2" y="48" class="val" text-anchor="middle">400</text>
+<text x="588" y="48" class="val" text-anchor="middle">500</text>
+<text x="20" y="89" class="row" text-anchor="start">Sign-in</text>
+<rect x="509.46" y="76" width="31.76" height="16" class="band"/><text x="513.46" y="88" class="val" text-anchor="start">412</text>
+<text x="20" y="121" class="row" text-anchor="start">Search</text>
+<rect x="374.38" y="108" width="31.76" height="16" class="band"/><text x="378.38" y="120" class="val" text-anchor="start">268</text>
+<text x="20" y="153" class="row" text-anchor="start">Checkout</text>
+<rect x="339.68" y="140" width="31.76" height="16" class="band"/><text x="343.68" y="152" class="val" text-anchor="start">231</text>
+<text x="20" y="185" class="row" text-anchor="start">Settings</text>
+<rect x="213.99" y="172" width="23.84" height="16" class="band"/><text x="217.99" y="184" class="val" text-anchor="start">97</text>
+<text x="20" y="217" class="row" text-anchor="start">Profile</text>
+<rect x="183.03" y="204" width="23.84" height="16" class="band"/><text x="187.03" y="216" class="val" text-anchor="start">64</text>
+<text x="20" y="249" class="row" text-anchor="start">Help pages</text>
+<rect x="139.88" y="236" width="23.84" height="16" class="band"/><text x="143.88" y="248" class="val" text-anchor="start">18</text>
+<text x="20" y="281" class="row" text-anchor="start">Notifications</text>
+<rect x="115" y="268" width="52" height="16" class="band"/><text x="119" y="280" class="sub" text-anchor="start">no data</text>
+<rect x="119" y="76" width="386.46" height="16" rx="4" class="r-bar"/><line x1="212.8" y1="76.75" x2="212.8" y2="91.25" class="track"/><line x1="306.6" y1="76.75" x2="306.6" y2="91.25" class="track"/><line x1="400.4" y1="76.75" x2="400.4" y2="91.25" class="track"/><line x1="494.2" y1="76.75" x2="494.2" y2="91.25" class="track"/>
+<rect x="119" y="108" width="251.38" height="16" rx="4" class="r-bar"/><line x1="212.8" y1="108.75" x2="212.8" y2="123.25" class="track"/><line x1="306.6" y1="108.75" x2="306.6" y2="123.25" class="track"/>
+<rect x="119" y="140" width="216.68" height="16" rx="4" class="r-bar"/><line x1="212.8" y1="140.75" x2="212.8" y2="155.25" class="track"/><line x1="306.6" y1="140.75" x2="306.6" y2="155.25" class="track"/>
+<rect x="119" y="172" width="90.99" height="16" rx="4" class="r-bar"/>
+<rect x="119" y="204" width="60.03" height="16" rx="4" class="r-bar"/>
+<rect x="119" y="236" width="16.88" height="16" rx="4" class="r-bar"/>
+
+</svg>
+<svg id="dg-reports-by-area-phone" class="dg dg-bar dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="434" viewBox="0 0 264 434" role="img" aria-label="Sign-in had the most bug reports in the third quarter, 412. Search and Checkout had about 250 each. Help pages had the fewest, 18. Notifications has no count, because reports had no area label for it before April.">
+<style>
+#dg-reports-by-area-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-reports-by-area-phone .ground{fill:var(--fig,#f2f3f9)}
+#dg-reports-by-area-phone .band{fill:var(--bg,#fbfbfe)}
+#dg-reports-by-area-phone .track{stroke:var(--line,#d3d6e3)}
+#dg-reports-by-area-phone .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-reports-by-area-phone .head{fill:var(--text,#1c1f2e)}
+#dg-reports-by-area-phone .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-reports-by-area-phone .stop.end{fill:var(--text,#1c1f2e)}
+#dg-reports-by-area-phone .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-reports-by-area-phone .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-reports-by-area-phone .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-reports-by-area-phone .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-reports-by-area-phone .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-reports-by-area-phone .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-reports-by-area-phone .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-reports-by-area-phone .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-reports-by-area-phone .sub,#dg-reports-by-area-phone .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-reports-by-area-phone .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-reports-by-area-phone .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-reports-by-area-phone .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-reports-by-area-phone .r-bar{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-reports-by-area-phone .r-ref{stroke:var(--muted,#575d75)}
+#dg-reports-by-area-phone .r-pt{fill:var(--text,#1c1f2e)}
+#dg-reports-by-area-phone .d-ring{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-reports-by-area-phone .d-gap{stroke:var(--muted,#575d75);stroke-width:2}
+#dg-reports-by-area-phone .d-lead{stroke:var(--muted,#575d75);stroke-width:1}
+@media (prefers-reduced-motion:reduce){#dg-reports-by-area-phone .pulse{animation:none!important}#dg-reports-by-area-phone .pulse{display:none!important}}
+@media print{#dg-reports-by-area-phone{max-width:100%;height:auto}#dg-reports-by-area-phone .pulse{display:none!important}}
+@media (max-width:736px){#dg-reports-by-area{display:none}#dg-reports-by-area-phone{display:block}}
+@media print{#dg-reports-by-area{display:block!important}#dg-reports-by-area-phone{display:none!important}}
+</style>
+<rect width="264" height="434" class="ground"/>
+<rect x="8" y="60" width="248" height="366" rx="10" class="band"/>
+<line x1="20" y1="88" x2="20" y2="116" class="track"/>
+<line x1="96.8" y1="88" x2="96.8" y2="116" class="track"/>
+<line x1="173.6" y1="88" x2="173.6" y2="116" class="track"/>
+<line x1="20" y1="138" x2="20" y2="166" class="track"/>
+<line x1="96.8" y1="138" x2="96.8" y2="166" class="track"/>
+<line x1="173.6" y1="138" x2="173.6" y2="166" class="track"/>
+<line x1="20" y1="188" x2="20" y2="216" class="track"/>
+<line x1="96.8" y1="188" x2="96.8" y2="216" class="track"/>
+<line x1="173.6" y1="188" x2="173.6" y2="216" class="track"/>
+<line x1="20" y1="238" x2="20" y2="266" class="track"/>
+<line x1="96.8" y1="238" x2="96.8" y2="266" class="track"/>
+<line x1="173.6" y1="238" x2="173.6" y2="266" class="track"/>
+<line x1="20" y1="288" x2="20" y2="316" class="track"/>
+<line x1="96.8" y1="288" x2="96.8" y2="316" class="track"/>
+<line x1="173.6" y1="288" x2="173.6" y2="316" class="track"/>
+<line x1="20" y1="338" x2="20" y2="366" class="track"/>
+<line x1="96.8" y1="338" x2="96.8" y2="366" class="track"/>
+<line x1="173.6" y1="338" x2="173.6" y2="366" class="track"/>
+<line x1="20" y1="388" x2="20" y2="416" class="track"/>
+<line x1="96.8" y1="388" x2="96.8" y2="416" class="track"/>
+<line x1="173.6" y1="388" x2="173.6" y2="416" class="track"/>
+<text x="20" y="24" class="sub" text-anchor="start">Reports, bars from 0. Largest first.</text>
+<text x="20" y="48" class="val" text-anchor="middle">0</text>
+<text x="96.8" y="48" class="val" text-anchor="middle">200</text>
+<text x="173.6" y="48" class="val" text-anchor="middle">400</text>
+<text x="20" y="84" class="row" text-anchor="start">Sign-in</text>
+<rect x="182.21" y="94" width="31.76" height="16" class="band"/><text x="186.21" y="106" class="val" text-anchor="start">412</text>
+<text x="20" y="134" class="row" text-anchor="start">Search</text>
+<rect x="126.91" y="144" width="31.76" height="16" class="band"/><text x="130.91" y="156" class="val" text-anchor="start">268</text>
+<text x="20" y="184" class="row" text-anchor="start">Checkout</text>
+<rect x="112.7" y="194" width="31.76" height="16" class="band"/><text x="116.7" y="206" class="val" text-anchor="start">231</text>
+<text x="20" y="234" class="row" text-anchor="start">Settings</text>
+<rect x="61.25" y="244" width="23.84" height="16" class="band"/><text x="65.25" y="256" class="val" text-anchor="start">97</text>
+<text x="20" y="284" class="row" text-anchor="start">Profile</text>
+<rect x="48.58" y="294" width="23.84" height="16" class="band"/><text x="52.58" y="306" class="val" text-anchor="start">64</text>
+<text x="20" y="334" class="row" text-anchor="start">Help pages</text>
+<rect x="30.91" y="344" width="23.84" height="16" class="band"/><text x="34.91" y="356" class="val" text-anchor="start">18</text>
+<text x="20" y="384" class="row" text-anchor="start">Notifications</text>
+<rect x="16" y="394" width="52" height="16" class="band"/><text x="20" y="406" class="sub" text-anchor="start">no data</text>
+<rect x="20" y="94" width="158.21" height="16" rx="4" class="r-bar"/><line x1="96.8" y1="94.75" x2="96.8" y2="109.25" class="track"/><line x1="173.6" y1="94.75" x2="173.6" y2="109.25" class="track"/>
+<rect x="20" y="144" width="102.91" height="16" rx="4" class="r-bar"/><line x1="96.8" y1="144.75" x2="96.8" y2="159.25" class="track"/>
+<rect x="20" y="194" width="88.7" height="16" rx="4" class="r-bar"/><line x1="96.8" y1="194.75" x2="96.8" y2="209.25" class="track"/>
+<rect x="20" y="244" width="37.25" height="16" rx="4" class="r-bar"/>
+<rect x="20" y="294" width="24.58" height="16" rx="4" class="r-bar"/>
+<rect x="20" y="344" width="6.91" height="16" rx="4" class="r-bar"/>
+
+</svg>
+<details class="dg-words">
+<summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>The diagram in words</summary>
+<div class="table-wrap is-text" role="region" aria-label="The rows of the bar chart" tabindex="0"><table><thead><tr><th scope="col">Row</th><th scope="col">Value, in reports</th></tr></thead><tbody><tr><th scope="row">Sign-in</th><td>412</td></tr><tr><th scope="row">Search</th><td>268</td></tr><tr><th scope="row">Checkout</th><td>231</td></tr><tr><th scope="row">Settings</th><td>97</td></tr><tr><th scope="row">Profile</th><td>64</td></tr><tr><th scope="row">Help pages</th><td>18</td></tr><tr><th scope="row">Notifications</th><td>no data</td></tr></tbody></table></div>
+<ul><li>Reports, bars from 0. Largest first.</li><li>No data: Notifications.</li></ul>
+</details>
+<!-- /docent:diagram -->
+      </div>
+      <figcaption>Bug reports in the third quarter, by area. <span class="source">Source: invented sample data.</span></figcaption>
+    </figure>
+  </section>
+
+  
+  <section class="slide" id="s4" aria-labelledby="s4-h">
+    <h2 id="s4-h">Reports with steps are fixed in fewer days</h2>
+    <ul class="cards">
+      <li><p class="big">2 days</p><p>To fix a report with steps</p></li>
+      <li><p class="big">5 days</p><p>To fix a report without steps</p></li>
+      <li><p class="big">38%</p><p>Of reports have steps</p></li>
+    </ul>
+  </section>
+
+  
+  <section class="slide" id="s5" aria-labelledby="s5-h">
+    <h2 id="s5-h">Each area has one owner</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th scope="col">Area</th><th scope="col">Owner</th><th scope="col" class="num">Reports</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Sign-in</th><td>Accounts team</td><td class="num">412</td></tr>
+          <tr><th scope="row">Search</th><td>Search team</td><td class="num">268</td></tr>
+          <tr><th scope="row">Checkout</th><td>Payments team</td><td class="num">231</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  
+  <section class="slide" id="s6" aria-labelledby="s6-h">
+    <h2 id="s6-h">Most reports hold only the third point</h2>
+    <p>A report form that asks for the steps gets them in most reports.</p>
+  </section>
+
+  <section class="slide" id="s7" aria-labelledby="s7-h">
+    <h2 id="s7-h">A tester said it plainly</h2>
+    <figure class="quote">
+      <blockquote><p>I could not find the bug until the report told me which page to open.</p></blockquote>
+      <figcaption>P3, tester</figcaption>
+    </figure>
+  </section>
+
+  <section class="slide" id="s8" aria-labelledby="s8-h">
+    <h2 id="s8-h">One command attaches the log to a report</h2>
+<pre><code>report attach --log app.log --report 4021</code></pre>
+  </section>
+
+  <section class="slide" id="s9" aria-labelledby="s9-h">
+    <h2 id="s9-h">Questions</h2>
+  </section>
+</main>
+<footer>
+  <div class="shell">
+    <p class="credit"><svg viewBox="13 13 38 38" aria-hidden="true"><path d="M20 37V18H30A14 14 0 0 1 30 46H29" fill="none" stroke="currentColor" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="20" cy="46" r="4" fill="currentColor"/></svg>Made with <a href="https://github.com/sorawit-w/docent">Docent</a></p>
+  </div>
+</footer>
+<script>
+// docent:kit 0.36.0
+(() => {
+  const root = document.documentElement;
+  root.classList.add('js');
+  // A page saved from the browser ("Save page as") keeps what this script added. Take it out, so that the script adds each part once.
+  document.querySelectorAll('.fig-more, .step-n, button.copy').forEach((el) => el.remove());
+  document.querySelectorAll('div.code').forEach((holder) => holder.replaceWith(...holder.childNodes));
+  document.querySelectorAll('.is-numbered').forEach((h) => h.classList.remove('is-numbered'));
+  // A theme that the reader chose carries data-theme-reader. A saved page keeps it, and it is not a fixed theme.
+  if (root.hasAttribute('data-theme-reader')) { delete root.dataset.theme; delete root.dataset.themeReader; }
+  // Theme: the page follows the reader's system setting. The switch sets a choice that wins over the system and is remembered.
+  const button = document.querySelector('.theme');
+  const system = matchMedia('(prefers-color-scheme: dark)');
+  const theme = () => root.dataset.theme || (system.matches ? 'dark' : 'light');
+  const chooseTheme = (value) => { root.dataset.theme = value; root.dataset.themeReader = ''; };
+  // A theme written on <html> in the source is fixed: no saved choice and no switch.
+  const fixed = root.dataset.theme === 'light' || root.dataset.theme === 'dark';
+  if (fixed && button) button.hidden = true;
+  if (!fixed) try {
+    const saved = localStorage.getItem('docent-theme');
+    if (saved === 'dark' || saved === 'light') chooseTheme(saved);
+  } catch { /* no saved choice can be read: follow the system */ }
+  if (button && !fixed) {
+    const showSwitch = () => {
+      const next = theme() === 'dark' ? 'light' : 'dark';
+      button.dataset.next = next;
+      button.querySelector('.theme-text').textContent = next === 'dark' ? 'Dark' : 'Light';
+      button.setAttribute('aria-label', `Switch to the ${next} theme`);
+    };
+    showSwitch();
+    system.addEventListener('change', showSwitch);
+    button.addEventListener('click', () => {
+      chooseTheme(theme() === 'dark' ? 'light' : 'dark');
+      showSwitch();
+      try { localStorage.setItem('docent-theme', root.dataset.theme); } catch { /* private window: the choice lasts for this visit */ }
+    });
+  }
+  // Step numbers. The styles count the steps, but a screen reader in Chromium does not read a number that the styles count. So the script writes each number as text, in place of the counted one.
+  const number = (heading, n) => {
+    const span = document.createElement('span');
+    span.className = 'step-n';
+    span.textContent = `${n} `;
+    heading.prepend(span);
+    heading.classList.add('is-numbered');
+  };
+  const groups = new Map();
+  document.querySelectorAll('h3.step').forEach((h) => { const s = h.closest('section'); groups.set(s, [...(groups.get(s) || []), h]); });
+  groups.forEach((list) => list.forEach((h, i) => number(h, i + 1)));
+  document.querySelectorAll('.steps').forEach((ol) => [...ol.children].forEach((li, i) => { const h = li.querySelector('h3'); if (h) number(h, i + 1); }));
+  // A diagram outside a walkthrough runs its dot twice when it comes into view, then rests. Pointing at it runs it again.
+  const replay = (svg) => svg.querySelectorAll('.pulse').forEach((dot) => dot.getAnimations().forEach((run) => { run.cancel(); run.play(); }));
+  const seen = new IntersectionObserver((entries) => entries.forEach((entry) => {
+    if (!entry.isIntersecting) return;
+    entry.target.classList.add('is-playing');
+    seen.unobserve(entry.target);
+  }), { threshold: 0.6 });
+  document.querySelectorAll('svg.dg-auto').forEach((svg) => {
+    seen.observe(svg);
+    const well = svg.closest('.fig') || svg;
+    well.addEventListener('pointerenter', () => replay(svg));
+    well.addEventListener('focus', () => replay(svg));
+  });
+  // A drawing that is wider than its well scrolls sideways, and the part that shows can look complete. A line under the well says that more is to the side.
+  const wells = [...document.querySelectorAll('.fig')].map((well) => {
+    const note = document.createElement('p');
+    note.className = 'fig-more';
+    note.hidden = true;
+    note.textContent = 'The drawing is wider than the screen. Scroll it sideways to see all of it.';
+    well.after(note);
+    return { well, note };
+  });
+  // A code block gets a button that copies the code. The block moves into a holder, so the button stays in place when the code scrolls sideways.
+  const blocks = [...document.querySelectorAll('pre')].map((pre) => {
+    const holder = document.createElement('div'), button = document.createElement('button');
+    holder.className = 'code';
+    pre.before(holder);
+    holder.append(pre, button);
+    button.type = 'button';
+    button.className = 'copy';
+    button.textContent = 'Copy';
+    button.setAttribute('aria-live', 'polite');
+    button.addEventListener('click', async () => {
+      const text = (pre.querySelector('code') || pre).textContent;
+      let done = false;
+      try { await navigator.clipboard.writeText(text); done = true; } catch { /* no clipboard here: select the code and copy the selection */ }
+      if (!done) {
+        const range = document.createRange(), selection = getSelection();
+        range.selectNodeContents(pre);
+        selection.removeAllRanges();
+        selection.addRange(range);
+        try { done = document.execCommand('copy'); } catch { /* the code stays selected, so the reader can copy it by hand */ }
+        if (done) selection.removeAllRanges();
+      }
+      button.textContent = done ? 'Copied' : 'Select and copy';
+      setTimeout(() => (button.textContent = 'Copy'), 2000);
+    });
+    return { holder, pre, button };
+  });
+  const fit = () => {
+    wells.forEach(({ well, note }) => (note.hidden = well.scrollWidth <= well.clientWidth + 1));
+    // When the widest line of code reaches the button, the code starts below the button. A block that is hidden now has no size; it is measured when it shows.
+    blocks.forEach(({ holder, pre, button }) => {
+      if (!pre.clientWidth) return;
+      const code = pre.querySelector('code') || pre;
+      holder.classList.toggle('is-long', pre.scrollWidth > pre.clientWidth + 1 || code.getBoundingClientRect().right > button.getBoundingClientRect().left - 8);
+    });
+  };
+  // Measure again when a well or a code block changes its size: the window changes, a chooser shows another case, or a closed section opens.
+  if ('ResizeObserver' in window) {
+    const watch = new ResizeObserver(fit);
+    wells.forEach(({ well }) => watch.observe(well));
+    blocks.forEach(({ pre }) => watch.observe(pre));
+  }
+  addEventListener('resize', fit);
+  fit();
+  // Print: open every closed section so its text prints, then close it again. A deck's speaker notes do not print, so they stay closed.
+  let opened = [];
+  addEventListener('beforeprint', () => { opened = [...document.querySelectorAll('details:not([open]):not(.notes)')]; opened.forEach((d) => (d.open = true)); });
+  addEventListener('afterprint', () => { opened.forEach((d) => (d.open = false)); opened = []; });
+  // The route dot marks the current section. In each walkthrough, the rail dot marks the current step and the diagram lights the leg with the same number.
+  const bar = document.querySelector('.topbar .shell');
+  const routeDot = document.querySelector('.route-dot');
+  const links = [...document.querySelectorAll('.route a[href^="#"]')].filter((a) => document.getElementById(a.getAttribute('href').slice(1)));
+  const sections = links.map((a) => document.getElementById(a.getAttribute('href').slice(1)));
+  const walks = [...document.querySelectorAll('.walk')].map((walk) => ({
+    steps: [...walk.querySelectorAll('.steps > li')],
+    legs: [...walk.querySelectorAll('svg.dg .leg')],
+    dot: walk.querySelector('.rail-dot'),
+  })).filter((walk) => walk.steps.length);
+  const nearest = (items, line) => items.reduce((best, el) => (el.getBoundingClientRect().top <= line ? el : best), items[0]);
+  const update = () => {
+    if (sections.length) {
+      const section = nearest(sections, innerHeight * 0.35);
+      links.forEach((a, i) => (sections[i] === section ? a.setAttribute('aria-current', 'true') : a.removeAttribute('aria-current')));
+      if (bar && routeDot) {
+        const link = links[sections.indexOf(section)].getBoundingClientRect();
+        routeDot.style.setProperty('--x', `${link.left + link.width / 2 - bar.getBoundingClientRect().left - 3.5}px`);
+      }
+    }
+    walks.forEach(({ steps, legs, dot }) => {
+      const step = nearest(steps, innerHeight * 0.5);
+      const number = steps.indexOf(step) + 1;
+      steps.forEach((li) => li.classList.toggle('is-current', li === step));
+      legs.forEach((leg) => leg.classList.toggle('is-current', Number(leg.dataset.leg) === number));
+      if (dot) dot.style.setProperty('--y', `${step.offsetTop}px`);
+    });
+  };
+  let queued = false;
+  const schedule = () => { if (!queued) { queued = true; requestAnimationFrame(() => { queued = false; update(); }); } };
+  addEventListener('scroll', schedule, { passive: true });
+  addEventListener('resize', schedule);
+  // Widgets. Each one is readable without this script. The script adds memory, the count of a checklist and the answer of a decision helper.
+  const load = (key) => { try { return JSON.parse(localStorage.getItem(key)); } catch { return null; } };
+  const save = (key, value) => { try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* private window: it lasts for this visit */ } };
+  // Chooser: the choice is remembered, and choosers with the same options change together.
+  const choosers = [...document.querySelectorAll('.choose')].map((el) => ({
+    inputs: [...el.querySelectorAll(':scope > input')],
+    key: `docent-choice:${[...el.querySelectorAll(':scope > .opt')].map((label) => label.textContent).join('|')}`,
+  }));
+  const choose = (key, n) => choosers.forEach((c) => { if (c.key === key && c.inputs[n]) c.inputs[n].checked = true; });
+  choosers.forEach((c) => {
+    choose(c.key, load(c.key));
+    c.inputs.forEach((input, n) => input.addEventListener('change', () => {
+      const top = input.getBoundingClientRect().top;
+      choose(c.key, n);
+      scrollBy(0, input.getBoundingClientRect().top - top); // a chooser higher on the page changed its height: keep this one in place
+      save(c.key, n);
+      schedule();
+    }));
+  });
+  // Value picker: every place <var data-v="key"> shows the value of the chosen option. The values come from the table of all values. Pickers with the same options change together, and the choice is remembered.
+  const pickers = [...document.querySelectorAll('.values')].map((el) => ({
+    el,
+    inputs: [...el.querySelectorAll(':scope > input')],
+    names: [...el.querySelectorAll(':scope > .opt')].map((label) => label.textContent),
+    rows: [...el.querySelectorAll('tbody tr[data-v]')].map((tr) => ({ key: tr.dataset.v, cells: [...tr.querySelectorAll('td')].map((td) => td.textContent) })),
+  }));
+  const pick = (names, n) => pickers.forEach((p) => {
+    if (p.names.join('|') !== names || !p.inputs[n]) return;
+    p.inputs[n].checked = true;
+    p.el.querySelector('.values-now strong').textContent = p.names[n];
+    p.rows.forEach(({ key, cells }) => document.querySelectorAll(`var[data-v="${CSS.escape(key)}"]`).forEach((v) => (v.textContent = cells[n])));
+  });
+  pickers.forEach((p) => {
+    const key = `docent-values:${p.names.join('|')}`, saved = load(key);
+    if (Number.isInteger(saved)) pick(p.names.join('|'), saved);
+    p.inputs.forEach((input, n) => input.addEventListener('change', () => { pick(p.names.join('|'), n); save(key, n); }));
+    p.el.querySelector('details').open = false;
+  });
+  // Checklist: the ticks are remembered for this document, and the line below the list counts them.
+  document.querySelectorAll('form.checks').forEach((form) => {
+    const boxes = [...form.querySelectorAll('input')], out = form.querySelector('output'), key = `docent-ticks:${location.pathname}#${form.id}`;
+    const saved = load(key);
+    if (Array.isArray(saved) && saved.length === boxes.length) boxes.forEach((box, i) => (box.checked = saved[i] === true));
+    const show = () => { out.textContent = `${boxes.filter((box) => box.checked).length} of ${boxes.length} done`; };
+    const keep = () => { show(); save(key, boxes.map((box) => box.checked)); schedule(); };
+    form.addEventListener('change', keep);
+    form.addEventListener('reset', () => setTimeout(keep));
+    show();
+  });
+  // Decision helper: a row that no longer fits the answers takes the muted color. When every question has an answer, the one row that fits is shown as the answer.
+  document.querySelectorAll('.decide').forEach((el) => {
+    const form = el.querySelector('form'), out = el.querySelector('output'), again = el.querySelector('.wd-foot'), groups = [...el.querySelectorAll('fieldset')], rows = [...el.querySelectorAll('tbody tr')];
+    el.querySelector('details').open = false;
+    const show = () => {
+      const picked = groups.map((group) => [...group.querySelectorAll('input')].findIndex((input) => input.checked) + 1);
+      const fits = rows.filter((row) => {
+        const fit = row.dataset.when.split(',').every((option, q) => option === '0' || !picked[q] || Number(option) === picked[q]);
+        row.classList.toggle('is-out', !fit);
+        return fit;
+      });
+      out.innerHTML = picked.every(Boolean) && fits.length === 1 ? fits[0].lastElementChild.innerHTML : '';
+      again.hidden = !picked.some(Boolean);
+      schedule();
+    };
+    form.addEventListener('change', show);
+    form.addEventListener('reset', () => setTimeout(show));
+    show();
+  });
+  update();
+  requestAnimationFrame(() => requestAnimationFrame(() => root.classList.add('ready')));
+})();
+(() => {
+  // Deck: written only into a page with data-profile="deck". Each slide's number is written as text before its heading, as a step's is.
+  const root = document.documentElement, main = document.querySelector('main');
+  // A page saved from the browser keeps what this script added on the last visit. Take it out, so that the script adds each part once.
+  document.querySelectorAll('.slide-n, .present, .deck-nav').forEach((el) => el.remove());
+  root.classList.remove('presenting', 'printing');
+  root.style.removeProperty('--deck-scale');
+  const slides = [...document.querySelectorAll('main > section.slide')];
+  // A page saved while presenting keeps the slides' present state: show them all again, with the names of the stack.
+  slides.forEach((slide) => {
+    slide.hidden = false;
+    slide.classList.remove('is-current');
+    ['role', 'aria-roledescription', 'aria-label', 'tabindex'].forEach((name) => slide.removeAttribute(name));
+    const heading = slide.querySelector(':scope > h1[id], :scope > h2[id]');
+    if (heading && !slide.hasAttribute('aria-labelledby')) slide.setAttribute('aria-labelledby', heading.id);
+  });
+  slides.forEach((slide, i) => {
+    const heading = slide.firstElementChild;
+    if (i === 0 || !heading || heading.tagName !== 'H2') return; // the title slide counts as slide 1 and shows no number
+    const span = document.createElement('span');
+    span.className = 'slide-n';
+    span.textContent = `${i + 1} `;
+    heading.prepend(span);
+    heading.classList.add('is-numbered');
+  });
+  if (!main || !slides.length) return;
+
+  // Present mode. The Present button in the top bar shows one slide on the full screen. Escape, or leaving the full screen, returns to
+  // the stack at the same slide. The address names the slide (#s4) and replaces itself, so Back leaves the deck.
+  const icon = (d) => `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${d}"/></svg>`;
+  const present = document.createElement('button');
+  present.type = 'button';
+  present.className = 'present';
+  present.innerHTML = `${icon('M2 3h12v8H2zM6 14h4M8 11v3')}Present`;
+  const bar = document.querySelector('.topbar .shell');
+  if (bar) bar.insertBefore(present, bar.querySelector('.theme'));
+  const nav = document.createElement('div');
+  nav.className = 'deck-nav';
+  nav.innerHTML = `<span class="deck-count" aria-hidden="true"></span><button type="button" class="deck-prev" aria-label="Previous slide">${icon('M10 3 5 8l5 5')}</button><button type="button" class="deck-next" aria-label="Next slide">${icon('M6 3l5 5-5 5')}</button>`;
+  main.append(nav);
+  const [count, prev, next] = [nav.querySelector('.deck-count'), nav.querySelector('.deck-prev'), nav.querySelector('.deck-next')];
+  let at = 0, on = false, full = false;
+  const labels = new Map();
+  const fit = () => root.style.setProperty('--deck-scale', String(Math.min(innerWidth / 1280, innerHeight / 720)));
+  // A drawing on a slide stands at 1.5 times, or less when the room under the heading and above the caption needs it. render writes the
+  // size of a drawing it made on the frame (--fw and --fh, in frame pixels). For a hand-drawn figure or a picture the script writes it:
+  // 1.25 times at first, the scale check guarantees, and in present mode the real room is measured for more. The same frame size serves
+  // present mode and paper, because both lay the slide out on the same frame.
+  const drawings = (slide) => [...slide.querySelectorAll('.fig > svg[data-drawn="hand"], .fig > img')];
+  const size = (art, s) => { art.style.setProperty('--fw', String(Number(art.getAttribute('width')) * s)); art.style.setProperty('--fh', String(Number(art.getAttribute('height')) * s)); };
+  const sized = (art) => Number(art.getAttribute('width')) > 0 && Number(art.getAttribute('height')) > 0;
+  const scale = (slide) => drawings(slide).filter(sized).forEach((art) => {
+    const w = Number(art.getAttribute('width')), h = Number(art.getAttribute('height')), fig = art.closest('.fig'), figure = fig.closest('figure') || fig;
+    size(art, 1);
+    const below = figure.offsetTop + figure.offsetHeight - (fig.offsetTop + fig.offsetHeight); // the caption under the well
+    const room = { w: slide.clientWidth - 128 - 8, h: slide.clientHeight - 64 - fig.offsetTop - below - 8 };
+    size(art, Math.min(1.5, room.w / w, room.h / h));
+  });
+  slides.forEach((slide) => drawings(slide).forEach((art) => {
+    art.style.removeProperty('width'); // a page saved by an earlier kit may hold a size in pixels
+    art.style.removeProperty('height');
+    if (sized(art)) size(art, 1.25);
+  }));
+  const show = (n) => {
+    at = Math.max(0, Math.min(slides.length - 1, n));
+    slides.forEach((slide, i) => { slide.hidden = i !== at; slide.classList.toggle('is-current', i === at); });
+    count.textContent = `${at + 1} / ${slides.length}`;
+    prev.disabled = at === 0;
+    next.disabled = at === slides.length - 1;
+    if (slides[at].id) history.replaceState(history.state, '', `#${slides[at].id}`);
+    slides[at].focus({ preventScroll: true });
+    scale(slides[at]);
+    // A diagram's dot travels its route twice when its slide shows, as when a diagram comes into view on a page.
+    requestAnimationFrame(() => slides[at].querySelectorAll('svg.dg-auto').forEach((svg) => {
+      svg.classList.add('is-playing');
+      svg.querySelectorAll('.pulse').forEach((dot) => dot.getAnimations().forEach((run) => { run.cancel(); run.play(); }));
+    }));
+  };
+  const enter = () => {
+    if (on) return;
+    on = true;
+    // Start at the slide the reader is at: the first one that still shows at least 40px below the top bar, so a slide whose heading has
+    // scrolled away but whose body shows counts, and the space above the next slide's heading does not. Measured in the stack.
+    const line = (document.querySelector('.topbar')?.getBoundingClientRect().bottom || 0) + 40;
+    const found = slides.findIndex((slide) => slide.getBoundingClientRect().bottom > line);
+    const start = found < 0 ? slides.length - 1 : found;
+    // Each slide is a group named as a slide, "4 of 12", the pattern of a carousel; the slides that do not show are hidden.
+    slides.forEach((slide, i) => {
+      labels.set(slide, slide.getAttribute('aria-labelledby'));
+      slide.removeAttribute('aria-labelledby');
+      slide.setAttribute('role', 'group');
+      slide.setAttribute('aria-roledescription', 'slide');
+      slide.setAttribute('aria-label', `${i + 1} of ${slides.length}`);
+      slide.tabIndex = -1;
+    });
+    root.classList.add('presenting');
+    fit();
+    show(start);
+    const ask = root.requestFullscreen || root.webkitRequestFullscreen;
+    if (ask) Promise.resolve(ask.call(root)).then(() => { full = on; }, () => { /* no full screen here: the slide fills the window */ });
+  };
+  const leave = () => {
+    if (!on) return;
+    on = false;
+    full = false;
+    root.classList.remove('presenting');
+    root.style.removeProperty('--deck-scale');
+    slides.forEach((slide) => {
+      slide.hidden = false;
+      slide.classList.remove('is-current');
+      ['role', 'aria-roledescription', 'aria-label', 'tabindex'].forEach((name) => slide.removeAttribute(name));
+      if (labels.get(slide)) slide.setAttribute('aria-labelledby', labels.get(slide));
+    });
+    if (document.fullscreenElement || document.webkitFullscreenElement) (document.exitFullscreen || document.webkitExitFullscreen).call(document)?.catch?.(() => {});
+    slides[at].scrollIntoView({ block: 'start' });
+    present.focus({ preventScroll: true });
+  };
+  // A link to a slide, or to a place on it, shows that slide in present mode, as it scrolls to it in the stack.
+  const slideOf = (hash) => { const el = hash.length > 1 && document.getElementById(decodeURIComponent(hash.slice(1))); return el ? slides.indexOf(el.closest('main > section.slide')) : -1; };
+  document.addEventListener('click', (event) => {
+    const link = on && event.target instanceof Element && event.target.closest('a[href^="#"]');
+    const n = link ? slideOf(link.getAttribute('href')) : -1;
+    if (n < 0) return;
+    event.preventDefault();
+    show(n);
+  });
+  addEventListener('hashchange', () => { const n = on ? slideOf(location.hash) : -1; if (n >= 0 && n !== at) show(n); });
+  // Paper: one slide to a landscape page in the slide form, the slide number at the lower right, and each figure's words on the page
+  // after its slide (decks.md, section 6). The kit's script opens every closed section before this runs.
+  const moved = [];
+  addEventListener('beforeprint', () => {
+    root.classList.add('printing');
+    slides.forEach((slide, i) => {
+      slide.dataset.n = `${i + 1} / ${slides.length}`;
+      const words = [...slide.querySelectorAll('.fig .dg-words')];
+      if (!words.length) return;
+      const page = document.createElement('section');
+      page.className = 'slide-words';
+      page.innerHTML = `<h2>Slide ${i + 1} in words</h2>`;
+      words.forEach((el) => { moved.push([el, el.parentNode, el.nextSibling]); page.append(el); });
+      slide.after(page);
+    });
+  });
+  addEventListener('afterprint', () => {
+    moved.splice(0).forEach(([el, parent, next]) => parent.insertBefore(el, next));
+    document.querySelectorAll('.slide-words').forEach((el) => el.remove());
+    slides.forEach((slide) => delete slide.dataset.n);
+    root.classList.remove('printing');
+  });
+  present.addEventListener('click', enter);
+  prev.addEventListener('click', () => show(at - 1));
+  next.addEventListener('click', () => show(at + 1));
+  addEventListener('resize', () => on && fit());
+  // The browser's own key left the full screen that Present asked for: leave present mode too. A late event from an earlier exit, when the
+  // full screen is on again, changes nothing.
+  const changed = () => { if (full && !(document.fullscreenElement || document.webkitFullscreenElement)) leave(); };
+  document.addEventListener('fullscreenchange', changed);
+  document.addEventListener('webkitfullscreenchange', changed);
+  // Keys: most hand-held clickers send Page Down and Page Up. A space on a link or a button presses it, as usual.
+  addEventListener('keydown', (event) => {
+    if (!on || event.altKey || event.ctrlKey || event.metaKey || event.defaultPrevented) return;
+    const { key, shiftKey } = event;
+    if (key === 'Escape') { event.preventDefault(); leave(); return; }
+    const control = event.target instanceof Element && event.target.closest('a, button, input, select, textarea, summary');
+    if (key === ' ' && control) return;
+    const to = ['ArrowRight', 'ArrowDown', 'PageDown'].includes(key) || (key === ' ' && !shiftKey) ? at + 1
+      : ['ArrowLeft', 'ArrowUp', 'PageUp'].includes(key) || (key === ' ' && shiftKey) ? at - 1
+      : key === 'Home' ? 0 : key === 'End' ? slides.length - 1 : null;
+    if (to === null) return;
+    event.preventDefault();
+    show(to);
+  });
+  // A swipe to the left shows the next slide, and to the right the previous one. A tap does nothing, so a tap on a link opens it.
+  let touch = null;
+  main.addEventListener('touchstart', (event) => { touch = on && event.touches.length === 1 ? { x: event.touches[0].clientX, y: event.touches[0].clientY } : null; }, { passive: true });
+  main.addEventListener('touchend', (event) => {
+    if (!touch) return;
+    const end = event.changedTouches[0], dx = end.clientX - touch.x, dy = end.clientY - touch.y;
+    touch = null;
+    if (Math.abs(dx) > 40 && Math.abs(dx) > 1.5 * Math.abs(dy)) show(at + (dx < 0 ? 1 : -1));
+  }, { passive: true });
+})();
+// /docent:kit
+</script>
+</body>
+</html>

@@ -1,6 +1,6 @@
 ---
 name: docent
-description: Design kit for long documents as one self-contained HTML file that opens with no network, in light and dark, and prints well. Use it to write, restyle or check a document for a software team or a business team. Software teams use it for design docs and RFCs, decision records (ADRs), runbooks, incident reviews, release notes, migration guides, API and settings references, and onboarding guides. Business teams use it for customer and market analysis reports, metrics reviews, and customer research summaries. It gives a quiet page look, step-by-step walkthroughs, diagrams drawn from data (workflows, sequence and UML diagrams, funnels, heat maps, status grids), card grids, and four small widgets for the reader. Its scripts draw the diagrams, build the widgets, put the page styles into the file, and check the result. Also use it when the user asks for a document "with Docent" or "in the Docent style". Do not use it for app screens, slide decks or marketing pages.
+description: Design kit for long documents as one self-contained HTML file that opens with no network, in light and dark, and prints well. Use it to write, restyle or check a document for a software team or a business team. Software teams use it for design docs and RFCs, decision records (ADRs), runbooks, incident reviews, release notes, migration guides, API and settings references, and onboarding guides. Business teams use it for customer and market analysis reports, metrics reviews, and customer research summaries. It gives a quiet page look, step-by-step walkthroughs, diagrams drawn from data (workflows, sequence and UML diagrams, funnels, heat maps, status grids), card grids, and four small widgets for the reader. Its scripts draw the diagrams and widgets, add the page styles, and check the result. Also use it when the user asks for a document "with Docent" or "in the Docent style". It also makes a short slide deck, to present a report's findings in a meeting. Do not use it for app screens or marketing pages.
 ---
 
 # Docent
@@ -19,6 +19,8 @@ Docent is a design kit for documents: single HTML files that open without a netw
 | [`assets/template.html`](assets/template.html) | The starting page. It holds one of each block, and a comment names each block. It is not built yet: it has no page styles and no drawings until `render` and `stamp` run. It is short, so read all of it. |
 | [`assets/specimen.html`](assets/specimen.html) | The sample page: a full, built document that follows every rule. Open it in a browser to see the look. Do not read its source: it is long, and the starting page shows every block. |
 | [`assets/specimen-branded.html`](assets/specimen-branded.html) | The same sample page for a host with a brand: a logo in a light and a dark version, a tagline, and the Harbor palette. Open it in a browser; do not read its source. |
+| [`assets/deck.html`](assets/deck.html) | The starting page of a deck: a title slide and one slide of each common body, with comments. It is not built yet. Read all of it before you write a deck. |
+| [`assets/specimen-deck.html`](assets/specimen-deck.html) | The sample deck, on the "Report a bug" topic: a built deck with one slide of each body and speaker notes. Open it in a browser and press Present; do not read its source. |
 | `scripts/render.cjs` | Draws every diagram and builds every widget of a document, each from its data. |
 | `scripts/stamp.cjs` | Puts the page styles and the page script into a document. |
 | `scripts/check.cjs` | Tests a document against the rules. |
@@ -33,8 +35,9 @@ The scripts need Node 24 or newer and nothing else. They install no packages and
 - The user asks for a guide, a report or another long document "with Docent" or in the Docent look.
 - The user asks to restyle an existing HTML document with Docent.
 - The user asks whether a document follows the Docent rules.
+- The user asks for slides to present findings in a meeting or on a shared screen: write a deck (`data-profile="deck"`), and start from `assets/deck.html`.
 
-Do not use it for app screens, slide decks or marketing pages. For one picture to use in another tool, or a picture whose main job is a brand's style, see "When another skill fits better" below.
+Do not use it for app screens or marketing pages. For one picture to use in another tool, or a picture whose main job is a brand's style, see "When another skill fits better" below.
 
 ## When another skill fits better
 
@@ -136,6 +139,7 @@ A profile tells the kit how much space the page has and how wide code and tables
 | `task` | A how-to, a runbook, troubleshooting | What the reader needs, then the numbered steps, then what to do when a step fails | Like Standard, with less space between steps and sections |
 | `reference` | Commands, options, an API, settings, a log or a trace | One section for each item, its facts in a margin note, and tables | Code and tables up to 1120px, and tighter table rows |
 | `brief` | A report for managers, such as a business analysis report; an incident report, release notes | The outcome and its impact, then a timeline table and the actions | Code and tables up to 1120px |
+| `deck` | Slides to present findings in a meeting | One point per slide, as a sentence in the heading; the evidence below it | A stack of short sections; Present shows one slide on the full screen |
 
 Choose in this order:
 
@@ -159,7 +163,19 @@ It is not an appendix of raw data: long tables go in a closed section, or in a s
 
 **A page for the public.** When the readers are the public or older readers, also write `data-text="large"`: `<html lang="en" data-profile="standard" data-text="large">`. The body text is then 18px on screen and 12pt on paper, and the text column grows with it.
 
-When the user asks for something that a design rule forbids, follow the rule, say which rule it is, and offer the user's way. Do it the user's way when the user confirms. This holds for design rules only. When the user asks for an app screen, a slide deck or a marketing page, say that Docent is not made for it, and write nothing with Docent.
+When the user asks for something that a design rule forbids, follow the rule, say which rule it is, and offer the user's way. Do it the user's way when the user confirms. This holds for design rules only. When the user asks for an app screen or a marketing page, say that Docent is not made for it, and write nothing with Docent.
+
+## Write a deck
+
+A deck is its own file, made to present a report's findings in a meeting. It reads as a stack of short sections, and the Present button shows one slide on the full screen. Start from `assets/deck.html`, and see "Slides" in DESIGN.md.
+
+- Write a deck only when the user asks for slides, a deck, or something to present or share on a screen. Never choose a deck on your own for a report: the reader afterwards needs the report.
+- When the user asks for a report and slides, write the report first. Then write the deck from it, and copy each chart's data block from the report, with the same `id`.
+- One point per slide. A slide's heading is one sentence that says its point, at most two lines. The body is one figure, at most three points, up to three large numbers, one small table, a short paragraph or a code block. A heading alone starts a new part of the talk.
+- Put what you would say in the speaker notes (`<details class="notes">` at the end of the slide), not on the slide. Write nothing in the speaker notes that the readers of the file must not see: anyone with the file can open them.
+- Link the report from the title slide.
+- `check` refuses a slide that would not fit the screen, and `render` refuses a drawing that does not fit a slide, with the numbers: show a part of it on the slide, and the whole in the report.
+- Look at the deck in present mode, in the reading form, and in print preview. `check` cannot see a slide.
 
 ## Text blocks to know
 
