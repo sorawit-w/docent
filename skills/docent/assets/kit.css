@@ -250,7 +250,7 @@ tbody tr { border-bottom: 1px solid var(--line); }
 .state { display: inline-flex; align-items: baseline; gap: 8px; font-weight: 600; }
 .state::before { content: ""; flex: none; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
 .state.ok { color: var(--ok); } .state.warn { color: var(--warn); } .state.err { color: var(--err); }
-/* Two states with no status color: plain information takes a muted dot, and a thing that is planned or not on yet takes a muted ring. */
+/* Two states with no status color: a fact with no judgment (plain information, work under way, a closed item) takes a muted dot, and "not yet" (planned, proposed, not decided) takes a muted ring. */
 .state.info, .state.plan { color: var(--text); }
 .state.info::before { background: var(--muted); }
 .state.plan::before { background: none; border: 1.5px solid var(--muted); }
