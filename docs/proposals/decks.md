@@ -1,6 +1,6 @@
 # Proposal: slide decks — a `deck` profile in the same kit
 
-Status: **proposed on 2026-11-24, waiting for the user's review.** No code is written yet. On 2026-11-23 the user decided that the slide deck restriction will be removed, because analysts sometimes need to present their findings. The plan agreed then: a `deck` profile in the same kit, with the same `render`, `stamp` and `check`; and the words "slide decks" leave the "Do not use it for" line in `SKILL.md` when the deck profile is built, not before. This proposal says how. The sample content is invented, on the "Report a bug" topic, and it reuses the bar chart example of [`charts.md`](charts.md).
+Status: **approved on 2026-11-24**, as written, with the recommended answer to each decision (see "Decided" near the end). No code is written yet. The items are built in the order of section 10, each in its own pull request. On 2026-11-23 the user decided that the slide deck restriction will be removed, because analysts sometimes need to present their findings. The plan agreed then: a `deck` profile in the same kit, with the same `render`, `stamp` and `check`; and the words "slide decks" leave the "Do not use it for" line in `SKILL.md` when the deck profile is built, not before. This proposal says how. The sample content is invented, on the "Report a bug" topic, and it reuses the bar chart example of [`charts.md`](charts.md).
 
 ## The answer first
 
@@ -624,6 +624,20 @@ Each decision has a recommended answer, which the proposal above follows, and th
 7. **Speaker notes show in the reading form, as a closed section.** Recommended: yes (section 8). The reader afterwards gets the full sentences, and the presenter can read them in a second window. The other choice: notes show nowhere but the source, which keeps private remarks out of sight but hides the most useful text from the reader afterwards, and they are in the source anyway.
 8. **The walkthrough, the presenter view and the comparison with a report come later.** Recommended: yes (item 7), each with a short proposal. A deck without them is complete. The other choice: build the walkthrough as steps inside a slide in item 3, because it is Docent's own way to show a process.
 9. **Check the slide sizes against ANSI/INFOCOMM V202.01 before item 2 merges.** Recommended: yes, if a copy of the standard can be read; it is the one outside rule for text size on a shared screen, and this proposal did not read its formula. The other choice: keep the sizes of section 4, which are larger than a document's text, without an outside check.
+
+## Decided
+
+Approved on 2026-11-24, each with the recommended answer:
+
+1. **A deck is its own file,** not a "present" mode of a report.
+2. **The deck is a profile,** `data-profile="deck"`, and the profile rule in `DESIGN.md` gains one exception for it.
+3. **Present mode is always light.** The reading form still follows the reader's theme.
+4. **On a slide, muted text takes the text color, the lines take the muted color, and a status word takes the text color,** from the existing "more contrast" block, so every text pair reaches 7:1.
+5. **A drawing on a slide stands at 1.5 times its real size, or down to 1.25 times when it needs room.**
+6. **A figure's words on paper go on the page after its slide.**
+7. **Speaker notes show in the reading form, as a closed section,** and never on the shared screen or on paper.
+8. **The walkthrough inside a slide, the presenter view and the comparison with a report come later,** each with a short proposal of its own.
+9. **The slide sizes are checked against ANSI/INFOCOMM V202.01 before item 2 merges,** if a copy of the standard can be read.
 
 ## Not in this proposal
 
