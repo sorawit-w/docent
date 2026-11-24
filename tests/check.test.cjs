@@ -383,6 +383,9 @@ test("footnotes: each mark links to its note, each note links back, and the note
   assert.match(result(section("a", `<p>One.${mark(1)}</p>${notes(1, note(1).replace('href="#fn-1-ref"', 'href="fn-1-ref"'))}`)).errors, /the link back of note 1 points at "fn-1-ref", but its mark has id="fn-1-ref"; write href="#fn-1-ref"/, "a link back with no #");
   assert.match(result(good[0], section("b", `<p>Three.${mark(3)}</p>${notes(1, note(3))}`)).errors, /the notes run 1, 2, 1 down the page; they run 1, 2, 3 … with no gap and no repeat/, "a second list with no start");
   assert.match(result(good[0], section("b", `<p>Three.${mark(3)}</p>${notes(1, note(3))}`)).errors, /the footnote mark "\[3\]" links to note 1; write "\[1\]"/, "the mark's text names the note's number");
+  assert.match(result(section("a", `<p>One.${mark(1)}</p>${notes(1, note(1).replace('<li id="fn-1">', '<li id="fn-1" value="9">'))}`)).errors, /the notes run 9 down the page[\s\S]*the footnote mark "\[1\]" links to note 9/, "a note's own value is the number a reader sees");
+  assert.equal(result(good[0], section("b", `<p>Three.${mark(3)}</p>${notes(1, note(3).replace('<li id="fn-3">', '<li id="fn-3" value="3">'))}`)).errors, "", "a value that keeps the order passes");
+  assert.match(result(section("a", `<p>One.${mark(1)}</p>${notes(1, note(1)).replace('<ol class="notes"', '<ol class="notes" reversed')}`)).errors, /a notes list is reversed/);
   assert.match(result(section("a", `<p>Two.${mark(2)} One.${mark(1)}</p>${notes(1, note(1), note(2))}`)).warnings, /the footnote marks run 2, 1 down the page/, "numbers out of order");
   assert.match(result(section("a", `<p>One.${mark(1)} Again.<a class="fn" href="#fn-1" aria-label="Note 1">[1]</a></p>${notes(1, note(1))}`)).errors, /note 1 has 2 marks; a note has one mark/);
   assert.match(result(section("a", `<p>Text.</p>${notes(1, note(1))}`)).errors, /note 1 has no mark in the text that links to it \(href="#fn-1"\)/);

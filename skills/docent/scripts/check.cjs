@@ -391,8 +391,10 @@ function checkDocument(html) {
   const headings = [...markup.matchAll(/<h([1-6])\b[^>]*>[\s\S]*?<\/h\1>/gi)].map((m) => [m.index, m.index + m[0].length]);
   const attrOf = (attrs, name) => (attrs.match(new RegExp(`\\b${name}="([^"]*)"`)) || [])[1];
   const notes = withClass(markup, "notes").filter((l) => l.tag === "ol").flatMap((list) => {
-    const start = Number(attrOf(list.attrs, "start") || 1);
-    return [...list.inner.matchAll(/<li\b([^>]*)>([\s\S]*?)(?=<li\b|$)/gi)].map(([, attrs, body], i) => ({ n: start + i, id: attrOf(attrs, "id"), body: body.replace(/<\/li>\s*$/i, ""), at: list.index }));
+    // The number a reader sees: start, then one more for each item, or an item's own value; a reversed list counts down.
+    if (/\breversed\b/i.test(list.attrs)) errors.push('a notes list is reversed; the notes run 1, 2, 3 … down the page, so take out "reversed"');
+    let n = Number(attrOf(list.attrs, "start") || 1) - 1;
+    return [...list.inner.matchAll(/<li\b([^>]*)>([\s\S]*?)(?=<li\b|$)/gi)].map(([, attrs, body]) => ({ n: (n = attrOf(attrs, "value") != null ? Number(attrOf(attrs, "value")) : n + 1), id: attrOf(attrs, "id"), body: body.replace(/<\/li>\s*$/i, ""), at: list.index }));
   });
   const marks = withClass(markup, "fn").filter((m) => m.tag === "a").map((m) => ({ ...m, text: plain(m.inner), href: attrOf(m.attrs, "href") || "", target: ((attrOf(m.attrs, "href") || "").match(/^#(.+)/) || [])[1], id: attrOf(m.attrs, "id"), label: attrOf(m.attrs, "aria-label") }));
   if (notes.some((note, i) => note.n !== i + 1)) errors.push(`the notes run ${notes.map((note) => note.n).join(", ")} down the page; they run 1, 2, 3 … with no gap and no repeat, so a notes list after the first takes start="n", where n follows the last note before it`);
