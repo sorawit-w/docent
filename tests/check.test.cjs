@@ -309,3 +309,25 @@ test("check warns about personal data in the page text, in a link, and in the da
   const inWidget = renderDocument(specimen.replace('"Write the steps that lead to the problem.",', '"Write the steps that lead to the problem. Call +44 20 7946 0958.",')).html;
   assert.match(warned(inWidget).join("\n"), /the data of widget 3 \("ready"\) holds what looks like personal data: a phone number \+\*\* \*\* \*\*\*\* \*\*58/);
 });
+
+test("a source line: a chart of measured numbers needs one in its caption; check warns about one that is missing, empty or outside a caption", () => {
+  const warned = (html) => checkDocument(html).warnings.filter((w) => /source line/.test(w));
+  assert.deepEqual(warned(specimen), [], "every chart of the sample page has a source line");
+  const bare = specimen.replace(/\n\s*<span class="source">Source: invented sample data\.<\/span>(?=<\/figcaption>)/, "");
+  assert.deepEqual(warned(bare), ['figure 4 ("reports-month") is a funnel with no source line; add <span class="source">Source: …</span> to its caption, or write "Source: invented sample data." when the numbers are made up']);
+  // A workflow describes a design, not data, so it needs no source line; a chart with no caption is told to get one.
+  const flow = '{"id": "flow-x", "label": "A goes to B.", "lanes": [{"id": "l", "name": "Lane"}], "parts": [{"id": "a", "lane": "l", "name": "A"}, {"id": "b", "lane": "l", "name": "B"}], "legs": [{"from": "a", "to": "b", "verb": "send"}]}';
+  const bar = '{"id": "bar-x", "kind": "bar", "label": "Two amounts: A has 3 and B has 2.", "scale": {"from": 0, "to": 4, "step": 1, "unit": "reports"}, "rows": [{"name": "A", "value": 3}, {"name": "B", "value": 2}]}';
+  const figure = (json, caption) => `<figure><div class="fig" role="region" aria-label="Figure 9, x" tabindex="0">\n<!-- docent:diagram\n${json}\n-->\n<!-- /docent:diagram -->\n</div>${caption}</figure>`;
+  const page = (extra) => stampHtml(renderDocument(specimen.replace("</main>", `<section id="x" aria-labelledby="x-h"><h2 id="x-h">X</h2>${extra}</section></main>`)).html).html;
+  assert.deepEqual(warned(page(figure(flow, "<figcaption><strong>Figure 9</strong>A flow.</figcaption>"))), []);
+  assert.match(warned(page(figure(bar, ""))).join("\n"), /diagram 9 \("bar-x"\) is a bar chart with no source line; give its figure a <figcaption> that ends with <span class="source">/);
+  assert.match(warned(page(figure(bar, "").replace(/<\/?figure>/g, ""))).join("\n"), /diagram 9 \("bar-x"\) is a bar chart with no source line; put it in a <figure> with a <figcaption>/);
+  assert.deepEqual(warned(page(figure(bar, '<figcaption><strong>Figure 9</strong>Two amounts. <span class="source">Sources: the tracker; the survey, n = 5 reports.</span></figcaption>'))), []);
+  // A table of outside data in a figure, with "Table n" and a source line, passes; a source line elsewhere, or with no source, does not.
+  const table = '<figure><div class="table-wrap" role="region" aria-label="Table 1, reports" tabindex="0"><table><thead><tr><th scope="col">Area</th><th scope="col" class="num">Reports</th></tr></thead><tbody><tr><th scope="row">Sign-in</th><td class="num">412</td></tr></tbody></table></div><figcaption><strong>Table 1</strong>Reports by area. <span class="source">Source: the team\'s bug tracker, n = 412 reports.</span></figcaption></figure>';
+  assert.deepEqual(warned(page(table)), []);
+  assert.match(warned(page('<p><span class="source">Source: the tracker.</span></p>')).join("\n"), /stands outside a figure caption/);
+  assert.match(warned(page(figure(bar, '<figcaption><strong>Figure 9</strong>Two amounts. <span class="source">Source: </span></figcaption>'))).join("\n"), /a source line is empty \("Source:"\)/);
+  assert.match(warned(page(figure(bar, '<figcaption><strong>Figure 9</strong>Two amounts. <span class="source"></span></figcaption>'))).join("\n"), /a source line is empty;/);
+});

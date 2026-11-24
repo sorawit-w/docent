@@ -978,6 +978,28 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     ok("a column marked num lines up on the right, in tabular figures", nums.length >= 4 && nums.every((v) => v === "right tabular-nums"), nums);
   }
 
+  // The source line: the last line of a caption, on its own line 4px under the caption sentence, in the caption's size and color, in
+  // every view. A table in a figure (with "Table n") has no space of its own above it, so it stands where a figure's well would.
+  {
+    const table = '<figure><div class="table-wrap" role="region" aria-label="Table 9, reports" tabindex="0"><table><thead><tr><th scope="col">Area</th><th scope="col" class="num">Reports</th></tr></thead><tbody><tr><th scope="row">Sign-in</th><td class="num">412</td></tr></tbody></table></div><figcaption><strong>Table 9</strong>Reports by area. <span class="source">Source: invented sample data, n = 412 reports.</span></figcaption></figure>';
+    const content = html.replace('<section id="report"', `<section id="src" aria-labelledby="src-h"><h2 id="src-h">Sources</h2><p>Text.</p>${table}</section>\n<section id="report"`);
+    for (const [name, opts] of [["desktop light", { width: 1280 }], ["desktop dark", { width: 1280, theme: "dark" }], ["320px", { width: 320 }], ["print", { width: 794, media: "print" }], ["forced colors", { width: 1280, forcedColors: "active" }]]) {
+      const { page, context } = await open({ ...opts, content });
+      const lines = await page.evaluate(() => [...document.querySelectorAll("figcaption .source")].map((s) => {
+        const cap = s.closest("figcaption"), range = document.createRange();
+        range.setStart(cap, 0); range.setEndBefore(s);
+        const rects = [...range.getClientRects()].filter((r) => r.width > 0), above = Math.max(...rects.map((r) => r.bottom)), box = s.getBoundingClientRect();
+        const [cs, ss] = [getComputedStyle(cap), getComputedStyle(s)];
+        return { display: ss.display, margin: ss.marginTop, gap: Math.round(box.top - above), color: ss.color === cs.color, size: ss.fontSize === cs.fontSize, weight: ss.fontWeight === cs.fontWeight };
+      }));
+      const space = await page.evaluate(() => { const f = document.querySelector("#src figure"), w = f.querySelector(".table-wrap"); return Math.round(w.getBoundingClientRect().top - f.getBoundingClientRect().top); });
+      if (name === "desktop light" || name === "320px") await page.locator("#src figure").screenshot({ path: `${out}/source-${name.split(" ")[0]}.png` });
+      await context.close();
+      // The margin is 4px; the gap between the two lines of text adds the line height's own space, about 2px.
+      ok(`source line, ${name}: each of ${lines.length} stands on its own line, 4px under the caption sentence, in the caption's color, size and weight; a table in a figure has no space above it`, lines.length >= 6 && lines.every((l) => l.display === "block" && l.margin === "4px" && l.gap >= 4 && l.gap <= 8 && l.color && l.size && l.weight) && space === 0, { lines, space });
+    }
+  }
+
   // A hand-drawn figure (a fishbone under the contract in diagrams.md): no accessibility problem in either theme, its real size on a
   // desktop and on paper (no shrink), the drawing tokens in dark, forced colors and more contrast, and at 320px it scrolls inside its
   // well while the page does not scroll sideways.
