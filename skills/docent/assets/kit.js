@@ -112,9 +112,9 @@
   }
   addEventListener('resize', fit);
   fit();
-  // Print: open every closed section so its text prints, then close it again.
+  // Print: open every closed section so its text prints, then close it again. A deck's speaker notes do not print, so they stay closed.
   let opened = [];
-  addEventListener('beforeprint', () => { opened = [...document.querySelectorAll('details:not([open])')]; opened.forEach((d) => (d.open = true)); });
+  addEventListener('beforeprint', () => { opened = [...document.querySelectorAll('details:not([open]):not(.notes)')]; opened.forEach((d) => (d.open = true)); });
   addEventListener('afterprint', () => { opened.forEach((d) => (d.open = false)); opened = []; });
   // The route dot marks the current section. In each walkthrough, the rail dot marks the current step and the diagram lights the leg with the same number.
   const bar = document.querySelector('.topbar .shell');

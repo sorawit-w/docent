@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>What eight teams told us about planning — Example Planner</title>
 <style>
-/* docent:kit 0.35.0 */
+/* docent:kit 0.36.0 */
 /* Docent page styles. Tokens come from references/DESIGN.md. One file, no network. */
 :root {
   color-scheme: light;
@@ -1109,7 +1109,7 @@ footer p { margin: 0; }
   </div>
 </footer>
 <script>
-// docent:kit 0.35.0
+// docent:kit 0.36.0
 (() => {
   const root = document.documentElement;
   root.classList.add('js');
@@ -1224,9 +1224,9 @@ footer p { margin: 0; }
   }
   addEventListener('resize', fit);
   fit();
-  // Print: open every closed section so its text prints, then close it again.
+  // Print: open every closed section so its text prints, then close it again. A deck's speaker notes do not print, so they stay closed.
   let opened = [];
-  addEventListener('beforeprint', () => { opened = [...document.querySelectorAll('details:not([open])')]; opened.forEach((d) => (d.open = true)); });
+  addEventListener('beforeprint', () => { opened = [...document.querySelectorAll('details:not([open]):not(.notes)')]; opened.forEach((d) => (d.open = true)); });
   addEventListener('afterprint', () => { opened.forEach((d) => (d.open = false)); opened = []; });
   // The route dot marks the current section. In each walkthrough, the rail dot marks the current step and the diagram lights the leg with the same number.
   const bar = document.querySelector('.topbar .shell');

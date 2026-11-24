@@ -354,6 +354,36 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     await again.context.close();
   }
 
+  // Speaker notes: a closed section in the reading form; hidden in present mode, also from a screen reader; never on paper, not even open.
+  {
+    const { page, context } = await open({ width: 1280, height: 900 });
+    const reading = await page.evaluate(() => { const d = document.querySelector("#s2 > details.notes"); return { shown: d.getClientRects().length > 0, open: d.open, summary: d.querySelector("summary").textContent.trim() }; });
+    ok("the reading form: the speaker notes are a closed section named Speaker notes", reading.shown && !reading.open && reading.summary === "Speaker notes", reading);
+    await page.evaluate(() => { document.querySelector("#s2 > details.notes").open = true; });
+    await page.click(".present");
+    await page.keyboard.press("ArrowRight");
+    const shown = await page.evaluate(() => { const d = document.querySelector("#s2 > details.notes"); return { boxes: d.getClientRects().length, display: getComputedStyle(d).display }; });
+    ok("present mode: the notes do not show on the slide, also when they were open", shown.boxes === 0 && shown.display === "none", shown);
+    const tree = await page.accessibility.snapshot({ root: await page.$("#s2") });
+    ok("present mode: a screen reader does not reach the notes", !JSON.stringify(tree || {}).includes("Speaker notes"), tree);
+    await page.keyboard.press("Escape");
+    await page.evaluate(() => { document.querySelector("#s2 > details.notes").open = false; });
+    await page.emulateMedia({ media: "print" });
+    await page.evaluate(() => dispatchEvent(new Event("beforeprint")));
+    const paper = await page.evaluate(() => { const d = document.querySelector("#s2 > details.notes"), other = document.querySelector(".slide-words .dg-words"); return { open: d.open, boxes: d.getClientRects().length, words: other && other.open }; });
+    ok("paper: the notes stay closed and do not print, while the figure's words open and print", !paper.open && paper.boxes === 0 && paper.words === true, paper);
+    await page.evaluate(() => dispatchEvent(new Event("afterprint")));
+    await context.close();
+  }
+  {
+    const { page, context } = await open({ js: false, width: 1280, height: 900 });
+    await page.evaluate(() => { document.querySelector("#s2 > details.notes").open = true; });
+    await page.emulateMedia({ media: "print" });
+    const boxes = await page.evaluate(() => document.querySelector("#s2 > details.notes").getClientRects().length);
+    ok("scripts off, on paper: the notes do not print, also when they are open", boxes === 0, boxes);
+    await context.close();
+  }
+
   // axe in present mode, light.
   {
     const { page, context } = await open({});

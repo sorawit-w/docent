@@ -254,3 +254,24 @@ test("on paper a slide prints on a landscape page in the slide form, sized in on
   assert.match(deckJs, /addEventListener\('beforeprint'/);
   assert.match(deckJs, /Slide \$\{i \+ 1\} in words/);
 });
+
+test("speaker notes: at most one per slide, at its end, directly inside it, text only; personal data in them gives a warning", () => {
+  const notes = (inner) => `<details class="notes"><summary>Speaker notes</summary>${inner}</details>`;
+  const at = (n, body) => slide(n, `<h2>Questions</h2>\n${body}`);
+  assert.deepEqual(errorsOf(at(9, notes("<p>Ask the room.</p><ul><li>One</li></ul>"))), [], "paragraphs and lists");
+  assert.ok(errorsOf(at(9, notes("<p>A.</p>") + notes("<p>B.</p>"))).includes("slide 9 has 2 sections of speaker notes; a slide has at most one, at its end"));
+  assert.ok(errorsOf(at(9, `${notes("<p>A.</p>")}\n<p>After.</p>`)).includes('slide 9: the speaker notes are not the slide\'s last part; put <details class="notes"> at the end of the slide'));
+  assert.ok(errorsOf(at(9, `<figure class="quote"><blockquote><p>Said.</p>${notes("<p>A.</p>")}</blockquote><figcaption>P1</figcaption></figure>`)).some((e) => e.startsWith("slide 9 has speaker notes inside another part")));
+  for (const odd of ["<pre><code>x</code></pre>", '<div class="table-wrap"><table><tr><td>1</td></tr></table></div>', "<p><img src=\"data:image/png;base64,AA==\" alt=\"x\"></p>"]) {
+    assert.ok(errorsOf(at(9, notes(odd))).some((e) => e.startsWith("slide 9: the speaker notes hold")), odd);
+  }
+  const warned = checkDocument(build(at(9, notes("<p>Call 555-867-5309 after the talk.</p>"))(source))).warnings;
+  assert.ok(warned.some((w) => w.includes("looks like personal data")), warned.join("\n"));
+});
+
+test("the kit's script opens closed sections for printing, except speaker notes; the styles hide notes in present mode and on paper", () => {
+  const kitJs = fs.readFileSync(path.join(assets, "kit.js"), "utf8");
+  assert.match(kitJs, /querySelectorAll\('details:not\(\[open\]\):not\(\.notes\)'\)/);
+  assert.match(deckCss, /html\.presenting \.slide > details\.notes \{ display: none; \}/);
+  assert.match(deckCss, /@media print \{ \.slide > details\.notes \{ display: none !important; \} \}/, "also when open, and also when the deck prints as the stack");
+});
