@@ -417,7 +417,7 @@ A deck (`data-profile="deck"`) is a file of its own, made from a report to prese
 | A short paragraph, or a quote | At most two lines at 30px |
 | A code block | At most 8 lines |
 
-A slide may also have no body: a heading alone starts a new part of the talk. A deck has no widget, no walkthrough and no closed section other than a figure's words and the speaker notes.
+A slide may also have no body: a heading alone starts a new part of the talk. The sample deck, `assets/specimen-deck.html`, shows a title slide and one slide of each body, with speaker notes. A deck has no widget, no walkthrough and no closed section other than a figure's words and the speaker notes.
 
 **The frame.** A slide is laid out on a frame of 1280 × 720 CSS pixels with 64px margins, so 1152 × 592 inside. It uses three of the six sizes: the heading at the `h1` size (52px), points and a short paragraph at the `h2` size (30px), and small text at the `body-lg` size (21px). The heading has at most two lines. `check` estimates the height of each slide on the frame, with the renderer's text widths, and refuses a slide that would not fit.
 

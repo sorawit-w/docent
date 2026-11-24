@@ -17,7 +17,7 @@ Single self-contained HTML files. The skill's scripts are Node only, with no pac
 
 ## Product Purpose
 
-Docent is a design kit for documents: guides and reports written as single self-contained HTML files. It gives a document one calm look, a walkthrough that lights one step at a time, workflow diagrams where a dot travels the route, card grids, and four small widgets for the reader.
+Docent is a design kit for documents: guides, reports and the decks that present them, written as single self-contained HTML files. It gives a document one calm look, a walkthrough that lights one step at a time, workflow diagrams where a dot travels the route, card grids, and four small widgets for the reader.
 
 Success means two things. Every document made with Docent looks and behaves the same. A reader can follow a long document step by step.
 
