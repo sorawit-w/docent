@@ -1,6 +1,6 @@
 # Proposal: sources and number rules — where a number comes from, and how sure it is
 
-Status: **proposed on 2026-11-24.** No code is written yet. Each open question has a recommended answer under "Decisions" at the end, and waits for the user. On 2026-11-23 the user set Docent's audiences: software development and business first (especially customer and market data analysis), and research third, once source features exist. A team review then found that Docent cannot show where a number comes from. The sample numbers in this proposal are invented, on the "Report a bug" topic, and they agree with the bar chart example in [`charts.md`](charts.md) (section "Measured" shows the arithmetic).
+Status: **approved on 2026-11-24**, as written, with the recommended answer to each decision (see "Decided" near the end). No code is written yet. The items are built in the order of section 10, each in its own pull request. On 2026-11-23 the user set Docent's audiences: software development and business first (especially customer and market data analysis), and research third, once source features exist. A team review then found that Docent cannot show where a number comes from. The sample numbers in this proposal are invented, on the "Report a bug" topic, and they agree with the bar chart example in [`charts.md`](charts.md) (section "Measured" shows the arithmetic).
 
 ## The answer first
 
@@ -575,6 +575,20 @@ Each decision has a recommended answer, which the proposal above follows, and th
 7. **The direction of a change is a word, with no arrow.** Recommended: a word only (`Up`, `Down`, `No change`). The other choice: a small arrow in the text color before the word, hidden from a screen reader. It is faster to scan in a grid of many cards, and it is one more mark on a quiet page.
 8. **The list of sources is written by hand, and `check` tests it.** Recommended: yes. One style is short enough to write by hand, and `check` tests the links, the order and the visible addresses. The other choice: a data block that `render` formats into the style, which would be the same every time, at the cost of a new block kind and its code.
 9. **No band in a line chart now.** Recommended: not now. A band breaks "no area", is too faint in the outline color, and comes with the open question of how to mark a forecast. The other choice: a band around the focus series only, in the outline color, like the faint lines of small multiples, with low and high columns in the table in words.
+
+## Decided
+
+Approved on 2026-11-24, each with the recommended answer:
+
+1. **The source line is markup in the caption:** `<span class="source">` in the `figcaption`, one form for charts, hand-drawn figures and tables.
+2. **A chart with no source line gives a warning,** for the seven kinds that show measured numbers.
+3. **A table of outside data gets a figure frame,** with "Table n" in its caption and a source line.
+4. **Footnote marks are a full-size `[1]`.**
+5. **Notes stand at the end of each section.**
+6. **"Method and limits" comes after the findings in every profile,** also for research, with a "Data" fact in the title's margin and the one limit that matters beside its finding.
+7. **The direction of a change is a word,** `Up`, `Down` or `No change`, with no arrow.
+8. **The list of sources is written by hand,** and `check` tests it.
+9. **A line chart has no band for now.**
 
 ## Not in this proposal
 
