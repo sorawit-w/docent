@@ -480,6 +480,33 @@ test("a total row: a <tfoot> row with a row heading; data-sum adds up its column
   assert.equal(checkDocument(specimen).warnings.filter((w) => /total|tfoot/.test(w)).length, 0);
 });
 
+test("room on the line: check warns about a column of sentences in a table with too many columns for its profile", () => {
+  const { frameOf, estimateColumns } = require("../skills/docent/scripts/lib/measure.cjs");
+  assert.deepEqual([frameOf("standard"), frameOf("task"), frameOf("standard", true), frameOf("reference"), frameOf("brief")].map((f) => f.block), [828, 828, 898, 1120, 1120], "the block widths of kit.css");
+  assert.equal(frameOf("deck"), null, "a deck's slides are checked on their own");
+  const prose = ["The maintainers ask for the exact steps, because nobody could repeat the bug yet.", "Wait for the reply, then add the version and the operating system you use.", "Close the report when the fix ships, and say which version fixed it for you."];
+  const table = (cols, { cell = (r, c) => `<td>${prose[(r + c) % 3]}</td>`, attrs = "", wrap = (t) => t } = {}) => wrap(`<div class="table-wrap" role="region" aria-label="Next steps" tabindex="0"><table${attrs}><thead><tr>${Array.from({ length: cols }, (_, c) => `<th scope="col">${c ? `Step ${c}` : "Result"}</th>`).join("")}</tr></thead><tbody>${["Confirmed", "Needs steps", "Not a bug"].map((name, r) => `<tr><th scope="row">${name}</th>${Array.from({ length: cols - 1 }, (_, c) => cell(r, c)).join("")}</tr>`).join("")}</tbody></table></div>`);
+  const warned = (html, profile = 'data-profile="standard"') => checkDocument(specimen.replace('<html lang="en" data-profile="standard">', `<html lang="en" ${profile}>`).replace("</main>", `${html}</main>`)).warnings.filter((w) => /table\.measure/.test(w));
+  assert.deepEqual(warned(""), [], "the sample page keeps its cells short");
+  const five = warned(table(5));
+  assert.equal(five.length, 4, "each of the four columns of sentences");
+  assert.match(five[0], /the table "Next steps": the column "Step 1" holds cells of up to 15 words, but at the width of the "standard" profile a line of it has room for about 1\d characters/);
+  assert.match(five[0], /Use fewer columns, or move the sentences out of the table: one section for each row with its facts in a margin note, a definition list, or a card grid/);
+  assert.deepEqual(warned(table(3)), [], "the same sentences in fewer columns have room");
+  assert.deepEqual(warned(table(5, { cell: (r, c) => (c === 0 ? `<td>${prose[r]}</td>` : `<td>${["Web team", "Today", "Open"][c - 1]}</td>`) })), [], "one column of sentences beside short facts gets most of the width");
+  assert.equal(warned(table(5, { cell: (r, c) => `<td class="num">${prose[(r + c) % 3]}</td>` })).length, 0, "a column of numbers is never a column of sentences");
+  assert.equal(warned(table(5, { cell: (r, c) => `<td><code>${prose[(r + c) % 3]}</code></td>` })).length, 0, "a cell that is code only");
+  assert.equal(warned(table(5, { wrap: (t) => `<details class="dg-words"><summary>The diagram in words</summary>${t}</details>` })).length, 0, "render writes a diagram's table in words");
+  assert.equal(warned(table(5, { cell: (r, c) => (r === 0 && c === 0 ? `<td colspan="2">${prose[0]}</td>` : `<td>${prose[(r + c) % 3]}</td>`) })).length, 0, "a merged cell makes the columns unclear, so check does not guess");
+  const standard = warned(table(4)), reference = warned(table(4), 'data-profile="reference"');
+  assert.equal(standard.length, 3, "4 columns are too many for sentences in Standard");
+  assert.deepEqual(reference, [], "Reference has a block of 1120px, so the same table has room");
+  const head = ["Result", "Step 1", "Step 2", "Step 3"], rows = ["Confirmed", "Needs steps", "Not a bug"].map((name, r) => [{ tag: "th", text: name }, ...[0, 1, 2].map((c) => ({ tag: "td", text: prose[(r + c) % 3] }))]);
+  const [narrow, wide] = [frameOf("standard"), frameOf("reference")].map((f) => estimateColumns(head, rows, f)[1].chars);
+  assert.ok(narrow < 30 && wide >= 30 && wide > narrow, `Reference gives a wider estimate: ${narrow} and ${wide} characters`);
+  assert.match(warned(table(4), 'data-profile="standard" data-text="large"')[0] || "", /room for about \d+ characters/, "large text grows the block and the letters alike, so the line holds as few characters");
+});
+
 test("a quote with its speaker: check warns about a blockquote alone, no speaker, typed quotation marks, more than 80 words, and code in the speaker line", () => {
   const quote = (said = "<p>I wrote the steps twice, and nobody could repeat the bug.</p>", speaker = "<figcaption>P3, tester</figcaption>") => `<figure class="quote"><blockquote>${said}</blockquote>${speaker}</figure>`;
   const warned = (...blocks) => checkDocument(specimen.replace("</main>", `<section id="q" aria-labelledby="q-h"><h2 id="q-h">Q</h2>${blocks.join("")}</section></main>`)).warnings.filter((w) => /quote|speaker/.test(w)).join("\n");

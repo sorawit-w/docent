@@ -1160,6 +1160,36 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     ok("on screen, a total row stands under a 1px rule in the text color, in weight 600, and the last body row has no line of its own", onScreen.display === "table-footer-group" && onScreen.ruleColor === LIGHT.text && onScreen.ruleWidth === "1px" && onScreen.lastLine === "none" && onScreen.weight === "600", onScreen);
   }
 
+  // Room on the line: the estimate of check's table.measure (lib/measure.cjs) against the real width of each column of sentences, for 4,
+  // 5 and 6 columns in Standard and Reference at 1440px. The estimate may read a few characters short, never long: it uses the widths of
+  // text.cjs, which are wider than the system font. A real character is the cell's own text width over its length.
+  {
+    const { frameOf, estimateColumns } = require(path.join(root, "skills", "docent", "scripts", "lib", "measure.cjs"));
+    const prose = ["Calendar sync is the second reason to leave and the step where setup fails for most new teams.", "Teams that connect a calendar in the first week stay twice as long as teams that never connect one.", "The setup email on day three asks the owner to connect a calendar and links straight to the step."];
+    const names = ["Sign-in", "Calendar sync", "Setup email"];
+    const rows = (cols) => names.map((name, r) => [{ tag: "th", text: name }, ...Array.from({ length: cols - 1 }, (_, c) => ({ tag: "td", text: prose[(r + c) % 3] }))]);
+    const heads = (cols) => Array.from({ length: cols }, (_, c) => `Column ${c + 1}`);
+    const table = (cols) => `<section id="measure" aria-labelledby="measure-h"><h2 id="measure-h">Measure</h2><div class="table-wrap" role="region" aria-label="Measured" tabindex="0"><table><thead><tr>${heads(cols).map((h) => `<th scope="col">${h}</th>`).join("")}</tr></thead><tbody>${rows(cols).map((r) => `<tr>${r.map((c) => (c.tag === "th" ? `<th scope="row">${c.text}</th>` : `<td>${c.text}</td>`)).join("")}</tr>`).join("")}</tbody></table></div></section>`;
+    const results = [];
+    for (const profile of ["standard", "reference"]) for (const cols of [4, 5, 6]) {
+      const content = html.replace(/<html\b[^>]*>/, `<html lang="en" data-profile="${profile}">`).replace("</main>", `${table(cols)}</main>`);
+      const view = await open({ width: 1440, content });
+      const real = await view.page.evaluate(() => {
+        const ctx = document.createElement("canvas").getContext("2d");
+        return [...document.querySelector("#measure tbody tr").cells].slice(1).map((cell) => {
+          const s = getComputedStyle(cell), text = cell.textContent;
+          ctx.font = `${s.fontWeight} ${s.fontSize} ${s.fontFamily}`;
+          return Math.round((cell.getBoundingClientRect().width - parseFloat(s.paddingLeft) - parseFloat(s.paddingRight)) / (ctx.measureText(text).width / text.length));
+        });
+      });
+      await view.context.close();
+      const estimate = estimateColumns(heads(cols), rows(cols), frameOf(profile)).slice(1).map((c) => c.chars);
+      results.push({ profile, cols, real: real.join("/"), estimate: estimate.join("/"), under: real.map((r, i) => r - estimate[i]) });
+    }
+    for (const r of results) console.log(`note table.measure ${r.profile} ${r.cols} columns: real ${r.real} characters a line, estimate ${r.estimate}`);
+    ok("table.measure: the estimate of characters a line is at most 5 under the real width, and never over it, for 4 to 6 columns in Standard and Reference", results.every((r) => r.under.every((d) => d >= 0 && d <= 5)), results);
+  }
+
   // A hand-drawn figure (a fishbone under the contract in diagrams.md): no accessibility problem in either theme, its real size on a
   // desktop and on paper (no shrink), the drawing tokens in dark, forced colors and more contrast, and at 320px it scrolls inside its
   // well while the page does not scroll sideways.
