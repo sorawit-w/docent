@@ -22,6 +22,7 @@ const { findPersonal, findTel } = require("./lib/personal.cjs");
 const { wordsOf, findNumberText, findNumberColumn, findBigNumber } = require("./lib/numbers.cjs");
 const { RULES, NUMBER_RULES, say, split } = require("./lib/rules.cjs");
 const { frameOf, estimateColumns } = require("./lib/measure.cjs");
+const { evenPeriods } = require("./lib/periods.cjs");
 
 const MOST_WIDGETS = 4; // more widgets than this in one document gives a warning
 const CARDS = [3, 8]; // a card grid holds 3 to 8 cards
@@ -31,6 +32,7 @@ const QUOTE_WORDS = 80; // a quote has at most this many words
 const TAGLINE = 90; // characters: the tagline is one line
 const CELL_WORDS = 8; // a table cell with more words than this is a sentence, and a sentence needs room on its line
 const CELL_CHARS = 30; // characters on one line of a cell: fewer, and a sentence breaks into short pieces (readable text has about 45)
+const PROSE_WORDS = 400; // words of paragraphs in a section with nothing to look at: more, and check asks for the reader's question
 // Each host color, the theme it shows in, and the contrast it needs: text needs 4.5:1, the dot is a mark and needs 3:1 (WCAG 1.4.11).
 const HOST = { "host-accent": ["light", 4.5], "host-accent-dark": ["dark", 4.5], "host-ink": ["light", 4.5], "host-dot-dark": ["dark", 3] };
 const NEAR = 25; // CIE76: an accent closer than this to a status color reads as that status
@@ -606,6 +608,58 @@ function checkDocument(html, options = {}) {
       if (longest <= CELL_WORDS || col.chars >= CELL_CHARS) return;
       warn("table.measure", `${label ? `the table "${label}"` : "a table"}: the column ${head[c]?.text ? `"${head[c].text}"` : c + 1} holds cells of up to ${longest} words, but at the width of the "${shape}" profile a line of it has room for about ${col.chars} characters, so its sentences break into short pieces; a line needs ${CELL_CHARS} or more. Use fewer columns, or move the sentences out of the table: one section for each row with its facts in a margin note, a definition list, or a card grid (see "Tables hold short facts" in DESIGN.md).${more}`);
     });
+  }
+
+  // 10m. A visual that may be missing (SKILL.md, step 7): a table that a bar chart or a line chart would show at a glance, and a long run of
+  // paragraphs with nothing to look at. Hints only: check cannot read the reader's question. A section that already has a figure well is
+  // skipped, and so is a table in a closed section (the exact numbers under a chart), in a diagram's words, or in a deck.
+  if (!deck) {
+    const leaf = sections.filter(([a, b]) => !sections.some(([c, d]) => a < c && d < b)); // a section with no section inside it
+    const headingOf = (inner) => plain((inner.match(/<h([2-4])\b[^>]*>([\s\S]*?)<\/h\1>/i) || [])[2] || "");
+    const hasWell = (inner) => /<div\b[^>]*\bclass="(?:[^"]*\s)?fig(?:\s[^"]*)?"/i.test(inner);
+    const closed = [...markup.matchAll(/<details\b[^>]*>[\s\S]*?<\/details>/gi)].map((m) => [m.index, m.index + m[0].length]);
+    const inClosed = (i) => inWords(i) || closed.some(([c, d]) => c < i && i < d);
+    for (const table of markup.matchAll(/<table\b[^>]*>([\s\S]*?)<\/table>/gi)) {
+      const at = sectionOf(table.index);
+      if (!at || inClosed(table.index) || /\b(?:colspan|rowspan)=/i.test(table[1])) continue;
+      const inner = markup.slice(at[0], at[1]);
+      if (hasWell(inner)) continue;
+      const rowsOf = (part) => [...(part || "").matchAll(/<tr\b[^>]*>([\s\S]*?)<\/tr>/gi)].map(([, row]) => [...row.matchAll(/<(td|th)\b([^>]*)>([\s\S]*?)<\/\1>/gi)].map(([, tag, , cell]) => ({ tag: tag.toLowerCase(), text: plain(cell) })));
+      let head = rowsOf((table[1].match(/<thead\b[^>]*>([\s\S]*?)<\/thead>/i) || [])[1])[0];
+      let body = rowsOf(table[1].replace(/<(thead|tfoot)\b[^>]*>[\s\S]*?<\/\1>/gi, ""));
+      if (!head && body[0] && body[0].every((c) => c.tag === "th")) [head, body] = [body[0], body.slice(1)];
+      head = head || [];
+      if (body.length < 3 || body.some((r) => r.length !== body[0].length)) continue;
+      // A column of numbers: every body cell is a number (an empty cell may stand for no data), all in one unit, and not years or a count 1, 2, 3.
+      const numberColumn = (c) => {
+        const cells = body.map((r) => r[c].text).filter((t) => !BLANK.test(t));
+        if (cells.length < 3 || !cells.every((t) => NUMBER.test(t))) return false;
+        const unit = (t) => t.replace(/[\d.,\s−+-]/g, "");
+        if (new Set(cells.map(unit)).size !== 1 || cells.every((t) => /^(?:19|20)\d{2}$/.test(t))) return false;
+        const values = cells.map(sumValue).sort((a, b) => a - b);
+        return !values.every((v, i) => v === values[0] + i && (values[0] === 0 || values[0] === 1));
+      };
+      const numbers = body[0].map((_, c) => c).filter((c) => c > 0 && numberColumn(c));
+      if (!numbers.length) continue;
+      const name = (markup.slice(0, table.index).match(/aria-label="([^"]*)"[^>]*>\s*$/) || [])[1] || plain((table[1].match(/<caption\b[^>]*>([\s\S]*?)<\/caption>/i) || ["", ""])[1]);
+      const where = `${name ? `the table "${name}"` : "a table"} in the section "${headingOf(inner) || "with no heading"}"`;
+      const columns = numbers.map((c) => (head[c]?.text ? `"${head[c].text}"` : `${c + 1}`)).join(", ");
+      const exact = 'Keep the table in a closed section under the chart, for readers who need each exact number (see step 7 of "How to work" in SKILL.md).';
+      const firsts = body.map((r) => r[0].text), periods = evenPeriods(firsts);
+      if (periods && body.length <= 36) warn("visual.line", `${where}: its first column holds ${body.length} equally spaced points in time, from "${firsts[0]}" to "${firsts.at(-1)}", and the column${numbers.length > 1 ? "s" : ""} ${columns} hold${numbers.length > 1 ? "" : "s"} numbers. A line chart ("kind": "line") shows when the numbers rose and fell. ${exact}`);
+      // A bar chart fits a table that is all amounts: row names, one amount, and at most a share of it in percent. A column of words, such
+      // as what a case means or its state, says the rows matter for more than their size, so the table stays.
+      const shares = numbers.filter((c) => body.every((r) => BLANK.test(r[c].text) || /%$/.test(r[c].text)));
+      const amounts = numbers.filter((c) => !shares.includes(c)), allNumbers = numbers.length === body[0].length - 1;
+      if (!periods && allNumbers && amounts.length <= 1 && shares.length <= 1 && numbers.length && body.length <= 16) warn("visual.bar", `${where}: ${body.length} rows, each a name and one amount (the column${numbers.length > 1 ? "s" : ""} ${columns}). A bar chart ("kind": "bar") shows at a glance which is largest. ${exact}`);
+    }
+    for (const [a, b] of leaf) {
+      const inner = markup.slice(a, b);
+      if (/<(?:table|ul|ol|dl|pre|figure)\b/i.test(inner) || hasWell(inner) || /\bclass="(?:[^"]*\s)?(?:choose|checks|decide|values)(?:\s[^"]*)?"/.test(inner)) continue;
+      const prose = [...inner.replace(/<(aside|details)\b[^>]*>[\s\S]*?<\/\1>/gi, "").matchAll(/<p\b[^>]*>([\s\S]*?)<\/p>/gi)].map((m) => plain(m[1])).join(" ");
+      const count = prose.split(" ").filter(Boolean).length;
+      if (count > PROSE_WORDS) warn("visual.prose", `the section "${headingOf(inner) || "with no heading"}" has ${count} words of paragraphs and nothing to look at. Name the reader's question for it, find that question in the table in step 7 of "How to work" in SKILL.md, and draw the kind it gives, with the words under it; keep the paragraphs only when no kind fits.`);
+    }
   }
 
   // 11. Personal data: email addresses and phone numbers, in the page text and in the data of each diagram and widget. A warning only:

@@ -891,7 +891,7 @@ A funnel shows how many people reach each step of one flow, and how many leave b
 
 ## Bar charts
 
-A bar chart shows how large each amount is, and which is largest: how many bug reports each area of the app got last quarter. Write it with `"kind": "bar"` when there are 2 to 16 amounts in one unit, each for one named thing. For one or two amounts, write a sentence. For the steps of one flow, use a funnel. For values or ranges on a scale that does not start at 0, use a range chart. For amounts over time, use a line chart. When each exact number matters more than the picture, use a table.
+A bar chart shows how large each amount is, and which is largest: how many bug reports each area of the app got last quarter. Write it with `"kind": "bar"` when there are 2 to 16 amounts in one unit, each for one named thing. For one or two amounts, write a sentence. For the steps of one flow, use a funnel. For values or ranges on a scale that does not start at 0, use a range chart. For amounts over time, use a line chart. When the reader needs each exact number too, keep the chart: its words under it hold the numbers as a table, and a table of your own with the same numbers goes in a closed section under it.
 
 ```json
 {
@@ -1034,7 +1034,7 @@ The rules for gaps, for lines that are never smoothed, for names that move while
 
 ## Heat maps
 
-A heat map shows one number for each pair of a row and a column, such as sign-ups by weekday and hour, or errors by service and day. Write it with `"kind": "heatmap"` when there are 2 to 12 rows and 3 to 24 columns, one number in each cell, and the reader needs the pattern more than each number: the busy hours, the bad day, the one service that differs. For fewer than 12 cells, or when each exact number matters, write a table. For values on one scale, one row each, use a range chart. For change over time in one to five series, use a line chart. For numbers above and below a middle (such as change against last week), use a table.
+A heat map shows one number for each pair of a row and a column, such as sign-ups by weekday and hour, or errors by service and day. Write it with `"kind": "heatmap"` when there are 2 to 12 rows and 3 to 24 columns, one number in each cell, and the reader needs the pattern more than each number: the busy hours, the bad day, the one service that differs. For fewer than 12 cells, write a table. When each exact number matters too, keep the map: its words under it hold the numbers as a table, and a table of your own goes in a closed section under it. For values on one scale, one row each, use a range chart. For change over time in one to five series, use a line chart. For numbers above and below a middle (such as change against last week), use a table.
 
 ```json
 {

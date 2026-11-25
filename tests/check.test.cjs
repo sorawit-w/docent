@@ -463,7 +463,7 @@ test("a total row: a <tfoot> row with a row heading; data-sum adds up its column
   const rows = [["Sign-in", "412", "58"], ["Search", "268", "61"], ["Checkout", "231", "49"], ["Settings", "97", "22"], ["Profile", "64", "6"], ["Help pages", "18", "0"]];
   const row = (cells, head = true) => `<tr>${cells.map((c, i) => (i === 0 && head ? `<th scope="row">${c}</th>` : `<td class="num">${c}</td>`)).join("")}</tr>`;
   const table = (body, foot) => `<section id="t" aria-labelledby="t-h"><h2 id="t-h">T</h2><div class="table-wrap" role="region" aria-label="Bug reports by area" tabindex="0"><table><thead><tr><th scope="col">Area</th><th scope="col" class="num">Reports</th><th scope="col" class="num">Could not be repeated</th></tr></thead><tbody>${body.map((r) => row(r)).join("")}</tbody>${foot == null ? "" : `<tfoot>${foot}</tfoot>`}</table></div></section>`;
-  const warned = (body, foot) => checkDocument(specimen.replace("</main>", `${table(body, foot)}</main>`)).warnings.filter((w) => /Bug reports by area/.test(w)).join("\n");
+  const warned = (body, foot) => checkDocument(specimen.replace("</main>", `${table(body, foot)}</main>`)).warnings.filter((w) => /Bug reports by area/.test(w) && !/^\[visual\./.test(w)).join("\n");
   const total = (a, b, sum = "data-sum", head = '<th scope="row">All areas</th>') => `<tr>${head}<td class="num" ${sum}>${a}</td><td class="num" ${sum}>${b}</td></tr>`;
   assert.equal(warned(rows, total("1,090", "196")), "", "a right sum");
   assert.match(warned(rows, total("1,090", "195")), /the total 195 in column "Could not be repeated" is not the sum of its column, 196/, "a wrong sum");

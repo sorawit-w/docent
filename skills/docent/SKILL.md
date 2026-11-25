@@ -75,7 +75,17 @@ To choose, ask four questions:
 6. **Write in the Docent voice.** Plain words, one idea per sentence. A step heading is one sentence of at most six words. The `<title>` is `Document title — Host project`. When the `<h1>` is long, the left part may be shorter, made of the `<h1>`'s own words in the same order: `<h1>How to report a bug and get a fix</h1>` can have `<title>Report a bug — Host project</title>`.
 
    **Write numbers by the rules in "Numbers" in `references/DESIGN.md`.** They hold in the text, tables, captions, chart data and cards; code keeps its own form. In short: digits and a space before the unit (`320 ms`, but `18%`); two or three digits that matter, and the same decimals down a column; a comma from 1,000 up (`12,400`), but none in a year or a code; a minus sign (`−12`), or a word in the text ("fell by 12"); an en dash for a range in a table (`45–76`), and "from 45 to 76" in the text; "percentage points" in full for a change in a rate, never `pp` or `pts`; `n = 1,090 reports` in a source line; a change with its direction as a word, its amount and the period it is compared with ("up 12% against Q2 2026 (973)"); dates as `1 July 2026`, never `7/1/2026`; "about 250", not `~250`. `check` warns about rules 2 to 6, 9 and 10, and about rule 8 in a card, and quotes what it found. It cannot read the meaning: whether a number needs a unit, whether a change of a rate is in percent, whether n is given, or whether a change in the text names its period. Check those yourself.
-7. **Write each diagram as data.** Read `references/diagrams.md`. Draw a diagram only when it shows something that words cannot, and never draw the same thing twice. Pick the kind by what the reader needs to learn: find the reader's question in this table, and write what it says. Let the renderer pick the form.
+7. **Draw a visual wherever a kind fits.** A picture gives the reader the shape of a section at a glance, and the words under it explain the details. So a visual comes first, and text is what you write when no visual fits. Do this for each section:
+
+   1. Name the reader's question for the section in one line, such as "Which area got the most bug reports?"
+   2. Find that question in the table below, and draw the kind it gives. Read `references/diagrams.md` for its data, and let the renderer pick the form.
+   3. Put the words under the drawing: one or two sentences on what the reader should see in it, then the details. A built-in kind also writes its data in words, in a closed section under the drawing.
+
+   Write text with no visual only when no kind fits the question, or when there are only one or two values: a sentence reads faster than a chart of two bars. Draw nothing to decorate: each figure answers the question of its section. A section can have more than one question, and then more than one figure; a section whose question no kind answers keeps its text.
+
+   When a chart and a table hold the same numbers, keep the chart. The chart's words already hold its numbers as a table. A table of your own with the same numbers, such as one with more columns, goes in a closed section (`<details>`) under the chart, for readers who need each exact number. Never drop the chart for the table, and never draw the same drawing twice.
+
+   `check` points out a visual that may be missing: a table of amounts that a bar chart would show (`visual.bar`), a table over equally spaced dates or periods that a line chart would show (`visual.line`), and a section of more than 400 words of paragraphs with nothing to look at (`visual.prose`). It cannot read the reader's question, so read each hint and decide.
 
    | The reader asks | Write |
    |---|---|
@@ -100,9 +110,9 @@ To choose, ask four questions:
    | Where does each part sit along one width, how wide is it, and how big are the gaps? | A layout to scale (`"kind": "layout"`), for one axis only, such as a screen or a page |
    | Where do the parts of a page or screen sit, and what is next to what? | A plan (`"kind": "plan"`), a grid of named areas in rows and columns |
    | How many people reach each step of a flow, and where do they leave? | A funnel (`"kind": "funnel"`), for 3 to 8 steps that everyone takes in one order; a sentence for 2 |
-   | How large is each amount, and which is largest? Or how did each change between two times? | A bar chart (`"kind": "bar"`), for 2 to 16 amounts in one unit, bars from 0; with `"series"`, a dumbbell for two values in each row. A sentence for one or two amounts; a table when each exact number matters |
+   | How large is each amount, and which is largest? Or how did each change between two times? | A bar chart (`"kind": "bar"`), for 2 to 16 amounts in one unit, bars from 0; with `"series"`, a dumbbell for two values in each row. A sentence for one or two amounts. When each exact number matters too, keep the chart, with your table in a closed section under it |
    | How did an amount change over time, and when did it rise or fall? | A line chart (`"kind": "line"`), for 3 to 36 equally spaced points and 1 to 5 series in one unit, with `"focus"` on the series the text talks about; `"multiples": true` when several series matter equally; a slopegraph for two points. A table for points that are not equally spaced |
-   | Where are the numbers highest, across two sets of things, such as weekdays and hours? | A heat map (`"kind": "heatmap"`), for 2 to 12 rows and 3 to 24 columns; a table for fewer than 12 cells or when each number matters |
+   | Where are the numbers highest, across two sets of things, such as weekdays and hours? | A heat map (`"kind": "heatmap"`), for 2 to 12 rows and 3 to 24 columns; a table for fewer than 12 cells. When each number matters too, keep the map, with your table in a closed section under it |
    | How much happens in each area of a page or screen, such as clicks on each part? | A heat plan (`"kind": "heatplan"`), a plan whose 2 to 8 boxes each hold a number; a table of the counts for more areas. Never a blurred glow over a screenshot |
    | When, and where, did something fail its target, such as the uptime of each part by day? | A status grid (`"kind": "statusgrid"`), for 1 to 12 rows and 3 to 24 columns, with thresholds or states written directly; a heat map when the question is how much; a sentence when every cell is OK |
    | Where does each thing stand on two judged axes, what lies inside what, which sets overlap, what caused a problem, how mature is each part, how does a user feel at each stage, or which steps go into which release? | A hand-drawn figure (`data-drawn="hand"`), only for a quadrant, nested, Venn, fishbone, Wardley map, user journey or story map, under the contract below; a table or words when it says the same |
@@ -327,7 +337,7 @@ The starting page has a place for each one. See "Logo, tagline and credit" in `r
 
 | The scripts do | The agent does |
 |---|---|
-| Draw diagrams, pick the form, and keep the spacing rules | Decide whether a diagram is needed, and write its data |
+| Draw diagrams, pick the form, and keep the spacing rules | Name each section's question, pick the kind that answers it, and write its data |
 | Build widgets, and refuse data that is wrong or not complete | Decide whether the reader needs a widget, and write its data |
 | Put the same styles and page script into every document | Write the text |
 | Check a document and reject a bad icon | Pick or draw icons, and look at the result |
@@ -341,6 +351,7 @@ Say what was tested and what was not. Use these words:
 - When `render` refused a diagram or a widget, say which one and why.
 - Report each hand-drawn figure as hand-drawn, every time, with its type: "Figure 3 is a hand-drawn fishbone. `check` tested its contract; I looked at it in light, dark, at 375px and in print preview." Say which of those views you did not open. `check` names each one in a warning.
 - Name the profile you chose and one reason, in one sentence: "I used the Reference profile, because the page is mostly commands and option tables."
+- Give the number of figures, and for each section with no figure, one short reason: "The page has 4 figures. 'Context' has none (no kind fits: a timeline), and 'The decision' has none (one value)." Pass on each `visual.*` hint that you kept as text, with your reason.
 - When a script prints a warning that Node is older than 24, pass it on to the user every time, even if you told them before.
 - When `check` warns about personal data, tell the user what it found and where, as the warning names it (masked, such as `j***@company.com`). Ask whether to remove it, mask it, or keep it. Do not decide alone.
 
