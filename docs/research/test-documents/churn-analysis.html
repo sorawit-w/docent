@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Why customers left in the third quarter — Example Planner</title>
 <style>
-/* docent:kit 0.44.0 */
+/* docent:kit 0.45.0 */
 /* Docent page styles. Tokens come from references/DESIGN.md. One file, no network. */
 :root {
   color-scheme: light;
@@ -282,8 +282,11 @@ tfoot :is(th, td) { font-weight: 600; }
 .state.info, .state.plan { color: var(--text); }
 .state.info::before { background: var(--muted); }
 .state.plan::before { background: none; border: 1.5px solid var(--muted); }
-/* Code and links in a cell may break anywhere, so a long path, command or address does not make the table wider than its place. */
-:is(td, th) :is(code, a) { overflow-wrap: anywhere; }
+/* Code in a cell may break at any character, so a long path or command does not make the table wider than its place.
+   A link breaks only inside a word that cannot fit on a line by itself (break-word): "anywhere" would also let the table shrink a
+   column of short links to about one character, and split their words. */
+:is(td, th) code { overflow-wrap: anywhere; }
+:is(td, th) a { overflow-wrap: break-word; }
 
 /* Status note: a dot and a word carry the status. */
 .status { max-width: var(--measure); margin: 32px 0 0; }
@@ -1594,15 +1597,20 @@ footer p { margin: 0; }
   <section id="actions" aria-labelledby="actions-h">
     <h2 id="actions-h">What we propose</h2>
     <p>We propose three changes, in this order. Each has an owner and a measure that tells us within one quarter whether it worked.</p>
+    <ol>
+      <li>Give Starter accounts with 1 to 5 seats calendar sync for one calendar. Calendar sync is the second reason to leave and the step where setup fails.</li>
+      <li>Offer a yearly Starter price of $9 for each seat. Price is the first reason to leave, and a yearly price keeps the monthly list price.</li>
+      <li>Add a setup email on day 3 that asks to connect a calendar. Accounts that skip this step leave more often.</li>
+    </ol>
     <div class="table-wrap" role="region" aria-label="Proposed changes" tabindex="0">
       <table>
         <thead>
-          <tr><th scope="col">Change</th><th scope="col">Why</th><th scope="col">Owner</th><th scope="col">We expect</th><th scope="col">State</th></tr>
+          <tr><th scope="col">Change</th><th scope="col">Owner</th><th scope="col">We expect</th><th scope="col">State</th></tr>
         </thead>
         <tbody>
-          <tr><th scope="row">Give Starter accounts with 1 to 5 seats calendar sync for one calendar</th><td>Calendar sync is the second reason to leave and the step where setup fails.</td><td>Product, plans team</td><td>Starter monthly churn back under 4.5% by December</td><td><span class="state plan">Proposed</span></td></tr>
-          <tr><th scope="row">Offer a yearly Starter price of $9 for each seat</th><td>Price is the first reason to leave. A yearly price keeps the monthly list price.</td><td>Finance and growth</td><td>20% of Starter accounts on yearly billing by March</td><td><span class="state plan">Proposed</span></td></tr>
-          <tr><th scope="row">Add a setup email on day 3 that asks to connect a calendar</th><td>Accounts that skip this step leave more often.</td><td>Lifecycle marketing</td><td>Calendar connected in month 1 for 50% of new Starter accounts</td><td><span class="state ok">Approved</span></td></tr>
+          <tr><th scope="row">1. Calendar sync on Starter</th><td>Product, plans team</td><td>Starter monthly churn back under 4.5% by December</td><td><span class="state plan">Proposed</span></td></tr>
+          <tr><th scope="row">2. Yearly Starter price</th><td>Finance and growth</td><td>20% of Starter accounts on yearly billing by March</td><td><span class="state plan">Proposed</span></td></tr>
+          <tr><th scope="row">3. Setup email on day 3</th><td>Lifecycle marketing</td><td>50% of new Starter accounts connect a calendar in month 1</td><td><span class="state ok">Approved</span></td></tr>
         </tbody>
       </table>
     </div>
@@ -1650,7 +1658,7 @@ footer p { margin: 0; }
   </div>
 </footer>
 <script>
-// docent:kit 0.44.0
+// docent:kit 0.45.0
 (() => {
   const root = document.documentElement;
   root.classList.add('js');

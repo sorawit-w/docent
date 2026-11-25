@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Decision record 14: a queue for reminder jobs — Example Planner</title>
 <style>
-/* docent:kit 0.44.0 */
+/* docent:kit 0.45.0 */
 /* Docent page styles. Tokens come from references/DESIGN.md. One file, no network. */
 :root {
   color-scheme: light;
@@ -282,8 +282,11 @@ tfoot :is(th, td) { font-weight: 600; }
 .state.info, .state.plan { color: var(--text); }
 .state.info::before { background: var(--muted); }
 .state.plan::before { background: none; border: 1.5px solid var(--muted); }
-/* Code and links in a cell may break anywhere, so a long path, command or address does not make the table wider than its place. */
-:is(td, th) :is(code, a) { overflow-wrap: anywhere; }
+/* Code in a cell may break at any character, so a long path or command does not make the table wider than its place.
+   A link breaks only inside a word that cannot fit on a line by itself (break-word): "anywhere" would also let the table shrink a
+   column of short links to about one character, and split their words. */
+:is(td, th) code { overflow-wrap: anywhere; }
+:is(td, th) a { overflow-wrap: break-word; }
 
 /* Status note: a dot and a word carry the status. */
 .status { max-width: var(--measure); margin: 32px 0 0; }
@@ -894,10 +897,10 @@ footer p { margin: 0; }
         </thead>
         <tbody>
           <tr><th scope="row">Delay at twice the peak</th><td class="num">3</td><td class="num">1</td><td class="num">5</td><td class="num">5</td><td>Target: 99% within 5 seconds.</td></tr>
-          <tr><th scope="row">No lost reminders</th><td class="num">2</td><td class="num">4</td><td class="num">4</td><td class="num">5</td><td>B and C may send a reminder twice; the worker checks a key to skip a repeat.</td></tr>
-          <tr><th scope="row">The team can run it</th><td class="num">2</td><td class="num">5</td><td class="num">4</td><td class="num">1</td><td>Nobody on the team has run an event log cluster.</td></tr>
+          <tr><th scope="row">No lost reminders</th><td class="num">2</td><td class="num">4</td><td class="num">4</td><td class="num">5</td><td>B and C may send a reminder twice.</td></tr>
+          <tr><th scope="row">The team can run it</th><td class="num">2</td><td class="num">5</td><td class="num">4</td><td class="num">1</td><td>The team has never run an event log.</td></tr>
           <tr><th scope="row">Cost each month</th><td class="num">2</td><td class="num">5</td><td class="num">3</td><td class="num">2</td><td>See Figure 2.</td></tr>
-          <tr><th scope="row">Ready by 1 December</th><td class="num">1</td><td class="num">4</td><td class="num">4</td><td class="num">2</td><td>C needs three weeks to set up and test the cluster.</td></tr>
+          <tr><th scope="row">Ready by 1 December</th><td class="num">1</td><td class="num">4</td><td class="num">4</td><td class="num">2</td><td>C needs three weeks of setup and testing.</td></tr>
         </tbody>
         <tfoot>
           <tr><th scope="row">Weighted total</th><td class="num" data-sum>10</td><td class="num">35</td><td class="num">41</td><td class="num">33</td><td>Of 50.</td></tr>
@@ -1145,9 +1148,9 @@ footer p { margin: 0; }
           <tr><th scope="col">Measure</th><th scope="col">Target</th><th scope="col">If it fails</th><th scope="col">Owner</th></tr>
         </thead>
         <tbody>
-          <tr><th scope="row">Delay at the 99th percentile</th><td>Under 5 seconds at every peak</td><td>Add workers; if that does not help, look at option C again</td><td>Reminders team</td></tr>
+          <tr><th scope="row">Delay at the 99th percentile</th><td>Under 5 seconds at every peak</td><td>Add workers first, then look at option C</td><td>Reminders team</td></tr>
           <tr><th scope="row">Reminders sent twice</th><td>Under 1 in 100,000</td><td>Check the key writes in the worker</td><td>Reminders team</td></tr>
-          <tr><th scope="row">Queue cost</th><td>Under $3,600 a month</td><td>Group reminders of the same minute into one message</td><td>Platform team</td></tr>
+          <tr><th scope="row">Queue cost</th><td>Under $3,600 a month</td><td>Send each minute's reminders as one message</td><td>Platform team</td></tr>
         </tbody>
       </table>
     </div>
@@ -1183,7 +1186,7 @@ footer p { margin: 0; }
   </div>
 </footer>
 <script>
-// docent:kit 0.44.0
+// docent:kit 0.45.0
 (() => {
   const root = document.documentElement;
   root.classList.add('js');

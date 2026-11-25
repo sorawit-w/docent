@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex">
 <title>Report a bug and get a fix — Example project</title>
 <style>
-/* docent:kit 0.44.0 */
+/* docent:kit 0.45.0 */
 /* Docent page styles. Tokens come from references/DESIGN.md. One file, no network. */
 :root {
   color-scheme: light;
@@ -283,8 +283,11 @@ tfoot :is(th, td) { font-weight: 600; }
 .state.info, .state.plan { color: var(--text); }
 .state.info::before { background: var(--muted); }
 .state.plan::before { background: none; border: 1.5px solid var(--muted); }
-/* Code and links in a cell may break anywhere, so a long path, command or address does not make the table wider than its place. */
-:is(td, th) :is(code, a) { overflow-wrap: anywhere; }
+/* Code in a cell may break at any character, so a long path or command does not make the table wider than its place.
+   A link breaks only inside a word that cannot fit on a line by itself (break-word): "anywhere" would also let the table shrink a
+   column of short links to about one character, and split their words. */
+:is(td, th) code { overflow-wrap: anywhere; }
+:is(td, th) a { overflow-wrap: break-word; }
 
 /* Status note: a dot and a word carry the status. */
 .status { max-width: var(--measure); margin: 32px 0 0; }
@@ -1081,9 +1084,9 @@ footer p { margin: 0; }
           <tr><th scope="col">Result</th><th scope="col">What it means</th><th scope="col">What you do</th><th scope="col" class="num">Last month</th><th scope="col">State</th></tr>
         </thead>
         <tbody>
-          <tr><th scope="row">Confirmed</th><td>The maintainers can see the bug.</td><td>Wait for the fix, then install the new version.</td><td class="num">300</td><td><span class="state ok">Continue</span></td></tr>
+          <tr><th scope="row">Confirmed</th><td>The maintainers can see the bug.</td><td>Wait for the fix; install the new version.</td><td class="num">300</td><td><span class="state ok">Continue</span></td></tr>
           <tr><th scope="row">Needs steps</th><td>The maintainers cannot see the bug yet.</td><td>Send the steps, then wait.</td><td class="num">109</td><td><span class="state warn">Answer, then continue</span></td></tr>
-          <tr><th scope="row">Not a bug</th><td>The program works as designed.</td><td>Read the reply. Do not file the report again.</td><td class="num">71</td><td><span class="state err">Stop</span></td></tr>
+          <tr><th scope="row">Not a bug</th><td>The program works as designed.</td><td>Read the reply; do not file it again.</td><td class="num">71</td><td><span class="state err">Stop</span></td></tr>
         </tbody>
       </table>
     </div>
@@ -2120,7 +2123,7 @@ grep -i password bug.log</code></pre>
 </footer>
 
 <script>
-// docent:kit 0.44.0
+// docent:kit 0.45.0
 (() => {
   const root = document.documentElement;
   root.classList.add('js');

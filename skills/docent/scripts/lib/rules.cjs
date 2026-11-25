@@ -136,6 +136,7 @@ const LIST = [
   H("table.foot-rows", S("Text blocks to know")),
   G("table.foot-heading", S("Text blocks to know")),
   G("table.sum", S("Text blocks to know")),
+  H("table.measure", D("Layout")),
   H("numbers.rounding", D("Numbers")),
   H("numbers.thousands", D("Numbers")),
   G("numbers.minus", D("Numbers")),

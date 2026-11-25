@@ -1160,6 +1160,59 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     ok("on screen, a total row stands under a 1px rule in the text color, in weight 600, and the last body row has no line of its own", onScreen.display === "table-footer-group" && onScreen.ruleColor === LIGHT.text && onScreen.ruleWidth === "1px" && onScreen.lastLine === "none" && onScreen.weight === "600", onScreen);
   }
 
+  // Room on the line: the estimate of check's table.measure (lib/measure.cjs) against the real width of each column of sentences, for 4,
+  // 5 and 6 columns in Standard and Reference at 1440px. The estimate may read a few characters short, never long: it uses the widths of
+  // text.cjs, which are wider than the system font. A real character is the cell's own text width over its length.
+  {
+    const { frameOf, estimateColumns } = require(path.join(root, "skills", "docent", "scripts", "lib", "measure.cjs"));
+    const prose = ["Calendar sync is the second reason to leave and the step where setup fails for most new teams.", "Teams that connect a calendar in the first week stay twice as long as teams that never connect one.", "The setup email on day three asks the owner to connect a calendar and links straight to the step."];
+    const names = ["Sign-in", "Calendar sync", "Setup email"];
+    const rows = (cols) => names.map((name, r) => [{ tag: "th", text: name }, ...Array.from({ length: cols - 1 }, (_, c) => ({ tag: "td", text: prose[(r + c) % 3] }))]);
+    const heads = (cols) => Array.from({ length: cols }, (_, c) => `Column ${c + 1}`);
+    const table = (cols) => `<section id="measure" aria-labelledby="measure-h"><h2 id="measure-h">Measure</h2><div class="table-wrap" role="region" aria-label="Measured" tabindex="0"><table><thead><tr>${heads(cols).map((h) => `<th scope="col">${h}</th>`).join("")}</tr></thead><tbody>${rows(cols).map((r) => `<tr>${r.map((c) => (c.tag === "th" ? `<th scope="row">${c.text}</th>` : `<td>${c.text}</td>`)).join("")}</tr>`).join("")}</tbody></table></div></section>`;
+    const results = [];
+    for (const profile of ["standard", "reference"]) for (const cols of [4, 5, 6]) {
+      const content = html.replace(/<html\b[^>]*>/, `<html lang="en" data-profile="${profile}">`).replace("</main>", `${table(cols)}</main>`);
+      const view = await open({ width: 1440, content });
+      const real = await view.page.evaluate(() => {
+        const ctx = document.createElement("canvas").getContext("2d");
+        return [...document.querySelector("#measure tbody tr").cells].slice(1).map((cell) => {
+          const s = getComputedStyle(cell), text = cell.textContent;
+          ctx.font = `${s.fontWeight} ${s.fontSize} ${s.fontFamily}`;
+          return Math.round((cell.getBoundingClientRect().width - parseFloat(s.paddingLeft) - parseFloat(s.paddingRight)) / (ctx.measureText(text).width / text.length));
+        });
+      });
+      await view.context.close();
+      const estimate = estimateColumns(heads(cols), rows(cols), frameOf(profile)).slice(1).map((c) => c.chars);
+      results.push({ profile, cols, real: real.join("/"), estimate: estimate.join("/"), under: real.map((r, i) => r - estimate[i]) });
+    }
+    for (const r of results) console.log(`note table.measure ${r.profile} ${r.cols} columns: real ${r.real} characters a line, estimate ${r.estimate}`);
+    ok("table.measure: the estimate of characters a line is at most 5 under the real width, and never over it, for 4 to 6 columns in Standard and Reference", results.every((r) => r.under.every((d) => d >= 0 && d <= 5)), results);
+  }
+
+  // Links in table cells keep their words whole (overflow-wrap: break-word, not anywhere), so the table does not shrink a column of short
+  // links to a few characters. A long bare address as a link's text is one word too wide for any column: the table grows past its block,
+  // its wrapper scrolls sideways, and the page itself does not.
+  {
+    const rows = [["Accounts", "Can one person hold two accounts?", "Yes, but each account needs its own email address and its own password.", "Each account is billed on its own.", "Account types"], ["Accounts", "Can an account change its owner?", "Yes, the owner names a new owner in the settings, and the new owner accepts.", "The old owner keeps read access.", "Owners"], ["Billing", "When is a plan charged?", "Each plan is charged on the first day of each month for the month ahead.", "A plan bought mid-month is charged in part.", "Billing dates"], ["Billing", "Can a charge be refunded?", "Yes, within 14 days of the charge, when the plan was not used in that time.", "The refund goes back to the same card.", "Refunds and shipment rules"]];
+    const table = (link) => `<section id="links" aria-labelledby="links-h"><h2 id="links-h">Questions</h2><div class="table-wrap" role="region" aria-label="Questions and answers" tabindex="0"><table><thead><tr><th scope="col">Area</th><th scope="col">Question</th><th scope="col">Answer</th><th scope="col">What it changes</th><th scope="col">Read more</th></tr></thead><tbody>${rows.map((r, i) => `<tr><th scope="row">${r[0]}</th><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td><a href="#links">${link(r[4], i)}</a></td></tr>`).join("")}</tbody></table></div></section>`;
+    const look = (page) => page.evaluate(() => {
+      const wrap = document.querySelector("#links .table-wrap"), t = wrap.querySelector("table");
+      const split = [...wrap.querySelectorAll("td a")].flatMap((a) => { const node = a.firstChild, out = []; for (const m of node.textContent.matchAll(/\S+/g)) { const r = document.createRange(); r.setStart(node, m.index); r.setEnd(node, m.index + m[0].length); if (new Set([...r.getClientRects()].map((x) => Math.round(x.top))).size > 1) out.push(m[0]); } return out; });
+      return { split, widths: [...t.tHead.rows[0].cells].map((c) => Math.round(c.getBoundingClientRect().width)), table: Math.round(t.getBoundingClientRect().width), wrap: Math.round(wrap.getBoundingClientRect().width), scrolls: wrap.scrollWidth > wrap.clientWidth, page: document.documentElement.scrollWidth, view: innerWidth };
+    });
+    const results = {};
+    for (const [form, link, width] of [["words", (s) => s, 1440], ["words-phone", (s) => s, 390], ["address", (s, i) => (i === 0 ? "https://help.example.com/articles/accounts-and-account-types-for-teams" : s), 1440]]) {
+      const view = await open({ width, content: html.replace("</main>", `${table(link)}</main>`) });
+      results[form] = await look(view.page);
+      if (form === "address") await view.page.locator("#links .table-wrap").screenshot({ path: `${out}/links-address.png` });
+      await view.context.close();
+    }
+    console.log(`note links in cells: column widths ${results.words.widths.join("/")}px at 1440px; with a long address ${results.address.widths.join("/")}px, table ${results.address.table}px in a ${results.address.wrap}px wrapper`);
+    ok("a link's words in a table cell never split across lines, at 1440px and at 390px", results.words.split.length === 0 && results["words-phone"].split.length === 0, results);
+    ok("a long address as a link's text widens its table, which scrolls inside its wrapper; the page does not scroll sideways", results.address.scrolls === (results.address.table > results.address.wrap) && results.address.page === results.address.view && results.words.page === results.words.view, results.address);
+  }
+
   // A hand-drawn figure (a fishbone under the contract in diagrams.md): no accessibility problem in either theme, its real size on a
   // desktop and on paper (no shrink), the drawing tokens in dark, forced colors and more contrast, and at 320px it scrolls inside its
   // well while the page does not scroll sideways.

@@ -21,6 +21,7 @@ const { NAMES: PALETTES, paletteFor, keyOf, paint, grounds } = require("./lib/pa
 const { findPersonal, findTel } = require("./lib/personal.cjs");
 const { wordsOf, findNumberText, findNumberColumn, findBigNumber } = require("./lib/numbers.cjs");
 const { RULES, NUMBER_RULES, say, split } = require("./lib/rules.cjs");
+const { frameOf, estimateColumns } = require("./lib/measure.cjs");
 
 const MOST_WIDGETS = 4; // more widgets than this in one document gives a warning
 const CARDS = [3, 8]; // a card grid holds 3 to 8 cards
@@ -28,6 +29,8 @@ const FINDINGS = [2, 6]; // a findings list holds 2 to 6 items
 const LEAD_WORDS = 25; // the lead sentence of a key finding has at most this many words
 const QUOTE_WORDS = 80; // a quote has at most this many words
 const TAGLINE = 90; // characters: the tagline is one line
+const CELL_WORDS = 8; // a table cell with more words than this is a sentence, and a sentence needs room on its line
+const CELL_CHARS = 30; // characters on one line of a cell: fewer, and a sentence breaks into short pieces (readable text has about 45)
 // Each host color, the theme it shows in, and the contrast it needs: text needs 4.5:1, the dot is a mark and needs 3:1 (WCAG 1.4.11).
 const HOST = { "host-accent": ["light", 4.5], "host-accent-dark": ["dark", 4.5], "host-ink": ["light", 4.5], "host-dot-dark": ["dark", 3] };
 const NEAR = 25; // CIE76: an accent closer than this to a status color reads as that status
@@ -578,6 +581,31 @@ function checkDocument(html, options = {}) {
     const count = text.split(" ").filter(Boolean).length;
     if (count > QUOTE_WORDS) warn("quote.length", `the quote ${quoted} has ${count} words; a quote has at most ${QUOTE_WORDS}. A longer passage belongs in the text, in the author's words`);
     if (speaker && /<(?:code|a)\b/i.test(speaker[1])) warn("quote.speaker-markup", `the speaker line of the quote ${quoted} holds a <code> or a link; it is plain text, such as "P3, tester"`);
+  }
+
+  // 10l. Room on the line: a column whose cells hold sentences, in a table so wide in columns that each line of a cell holds only a few
+  // words. check estimates the characters on one line from the profile's block width, the columns and their texts (lib/measure.cjs).
+  // It skips a column of numbers, a cell that is code only, a diagram's table in words (render writes it) and a table with merged cells.
+  const shape = PROFILES.includes(profile) ? profile : "standard", frame = deck ? null : frameOf(shape, text === "large");
+  const inWordsBlocks = withClass(markup, "dg-words"), inWords = (i) => inWordsBlocks.some((w) => w.index <= i && i < w.index + w.tag.length + w.attrs.length + 2 + w.inner.length);
+  if (frame) for (const table of markup.matchAll(/<table\b[^>]*>([\s\S]*?)<\/table>/gi)) {
+    if (inWords(table.index) || /\b(?:colspan|rowspan)=/i.test(table[1])) continue;
+    const cellsOf = (rows) => [...(rows || "").matchAll(/<tr\b[^>]*>([\s\S]*?)<\/tr>/gi)].map(([, row]) => [...row.matchAll(/<(td|th)\b([^>]*)>([\s\S]*?)<\/\1>/gi)].map(([, tag, attrs, inner]) => ({ tag: tag.toLowerCase(), num: hasClass(attrs, "num"), text: plain(inner), code: /<(code|kbd|samp)\b/i.test(inner) && !plain(inner.replace(/<(code|kbd|samp)\b[^>]*>[\s\S]*?<\/\1>/gi, "")), link: /^\s*<a\b[^>]*>(?:(?!<a\b)[\s\S])*<\/a>\s*$/i.test(inner) })));
+    const head = cellsOf((table[1].match(/<thead\b[^>]*>([\s\S]*?)<\/thead>/i) || [])[1])[0] || [];
+    const rows = cellsOf(table[1].replace(/<(thead|tfoot)\b[^>]*>[\s\S]*?<\/\1>/gi, ""));
+    const label = (markup.slice(0, table.index).match(/aria-label="([^"]*)"[^>]*>\s*$/) || [])[1] || plain((table[1].match(/<caption\b[^>]*>([\s\S]*?)<\/caption>/i) || ["", ""])[1]);
+    // Two ways a table loses width that the advice can name: a column of links only, and a row heading repeated on several rows.
+    const links = head.map((h, c) => c).filter((c) => c > 0 && rows.every((r) => r[c]?.tag === "td" && r[c].link)).map((c) => (head[c]?.text ? `"${head[c].text}"` : `${c + 1}`));
+    const counts = new Map();
+    for (const r of rows) if (r[0]?.tag === "th" && r[0].text) counts.set(r[0].text, (counts.get(r[0].text) || 0) + 1);
+    const [same, times] = [...counts].sort((a, b) => b[1] - a[1])[0] || [];
+    const more = `${links.length ? ` The column ${links.join(", ")} holds only links: put each link on its row heading or on the cell it explains, and drop the column.` : ""}${times > 1 ? ` ${times} rows start with "${same}": group such rows under one heading, a block heading or a closed section for each group, so the heading does not take room on every row.` : ""}`;
+    estimateColumns(head.map((c) => c.text), rows, frame).forEach((col, c) => {
+      if (head[c]?.num || rows.some((r) => r[c]?.num)) return;
+      const longest = rows.map((r) => r[c]).filter((cell) => cell && cell.tag === "td" && !cell.code).map((cell) => cell.text.split(" ").filter(Boolean).length).reduce((a, b) => Math.max(a, b), 0);
+      if (longest <= CELL_WORDS || col.chars >= CELL_CHARS) return;
+      warn("table.measure", `${label ? `the table "${label}"` : "a table"}: the column ${head[c]?.text ? `"${head[c].text}"` : c + 1} holds cells of up to ${longest} words, but at the width of the "${shape}" profile a line of it has room for about ${col.chars} characters, so its sentences break into short pieces; a line needs ${CELL_CHARS} or more. Use fewer columns, or move the sentences out of the table: one section for each row with its facts in a margin note, a definition list, or a card grid (see "Tables hold short facts" in DESIGN.md).${more}`);
+    });
   }
 
   // 11. Personal data: email addresses and phone numbers, in the page text and in the data of each diagram and widget. A warning only:
