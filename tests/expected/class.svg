@@ -41,8 +41,8 @@
 #dg-order-classes-phone{display:none}
 </style>
 <rect width="552" height="720" class="ground"/>
-<g class="leg" data-leg="1"><polyline points="120,147 120,264 288,264" class="u-ln"/><polyline points="280,268.5 288,264 280,259.5" class="u-ln"/><text x="128" y="209.5" class="verb" text-anchor="start">places</text><text x="128" y="180.25" class="verb" text-anchor="start">1</text><text x="128" y="238.75" class="verb" text-anchor="start">0..*</text></g>
-<g class="leg" data-leg="2"><polyline points="120,439 120,288 272,288" class="u-ln"/><polygon points="288,288 280,294 272,288 280,282" class="u-face u-ink"/><text x="128" y="405.25" class="verb" text-anchor="start">lines 1..*</text><text x="246" y="305" class="verb" text-anchor="middle">1</text></g>
+<g class="leg" data-leg="1"><polyline points="120,147 120,276 288,276" class="u-ln"/><polyline points="280,280.5 288,276 280,271.5" class="u-ln"/><text x="128" y="215.5" class="verb" text-anchor="start">places</text><text x="128" y="183.25" class="verb" text-anchor="start">1</text><text x="128" y="247.75" class="verb" text-anchor="start">0..*</text></g>
+<g class="leg" data-leg="2"><polyline points="120,439 120,300 272,300" class="u-ln"/><polygon points="288,300 280,306 272,300 280,294" class="u-face u-ink"/><text x="128" y="408.25" class="verb" text-anchor="start">lines 1..*</text><text x="246" y="317" class="verb" text-anchor="middle">1</text></g>
 <g class="leg" data-leg="3"><polyline points="120,497 120,598" class="u-ln"/><polyline points="115.5,590 120,598 124.5,590" class="u-ln"/><text x="128" y="526.25" class="verb" text-anchor="start">*</text><text x="128" y="576.75" class="verb" text-anchor="start">1</text></g>
 <g class="leg" data-leg="4"><polyline points="396,594 396,524" class="u-ln u-dash"/><polygon points="403,524 389,524 396,512" class="u-face"/></g>
 <g class="leg" data-leg="5"><polyline points="396,348 396,424" class="u-ln u-dash"/><polyline points="391.5,416 396,424 400.5,416" class="u-ln"/><text x="404" y="390" class="verb" text-anchor="start">«use»</text></g>

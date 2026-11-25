@@ -1,0 +1,19 @@
+{
+  "id": "web-app-services",
+  "kind": "component",
+  "label": "The services the web app needs: email codes, a bot check, analytics tags and a device risk check, which the partner API also needs.",
+  "components": [
+    { "id": "web", "name": "Web app" },
+    { "id": "partner", "name": "Partner API" },
+    { "id": "signin", "name": "Sign-in service" },
+    { "id": "bots", "name": "Bot filter" },
+    { "id": "tags", "name": "Tag manager" },
+    { "id": "risk", "name": "Risk engine" }
+  ],
+  "interfaces": [
+    { "id": "email-codes", "name": "Email codes", "provider": "signin", "users": ["web"] },
+    { "id": "bot-check", "name": "Bot check", "provider": "bots", "users": ["web"] },
+    { "id": "analytics-tags", "name": "Analytics tags", "provider": "tags", "users": ["web"] },
+    { "id": "device-risk", "name": "Device risk check", "provider": "risk", "users": ["web", "partner"] }
+  ]
+}

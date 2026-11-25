@@ -28,11 +28,11 @@ function shape(n, degree, room = Infinity) {
       const w = Math.max(96, ...name.map((l) => textWidth(l, 14, 600) + 32), ...lines.map((l) => textWidth(l, 12) + 24));
       const top = 32 + 18 * (name.length - 1), h = lines.length ? top + 12 + 18 * lines.length : 40 + 18 * (name.length - 1);
       return {
-        w, h,
-        draw: (cx, cy) => {
-          const x = cx - w / 2, y = cy - h / 2;
-          if (!lines.length) return { svg: uml.shapes.rounded({ x, y, w, h }), texts: name.map((s, k) => ({ x: cx, y: cy + 5 - 9 * (name.length - 1) + 18 * k, s, cls: "name", anchor: "middle" })) };
-          return { svg: uml.shapes.rounded({ x, y, w, h }) + `<line x1="${x}" y1="${y + top}" x2="${x + w}" y2="${y + top}" class="u-ln"/>`, texts: [...name.map((s, k) => ({ x: cx, y: y + 21 + 18 * k, s, cls: "name", anchor: "middle" })), ...lines.map((s, k) => ({ x: x + 12, y: y + top + 18 + 18 * k, s, cls: "sub", anchor: "start" }))] };
+        w, h, grow: true,
+        draw: (cx, cy, W = w, H = h) => {
+          const x = cx - W / 2, y = cy - H / 2;
+          if (!lines.length) return { svg: uml.shapes.rounded({ x, y, w: W, h: H }), texts: name.map((s, k) => ({ x: cx, y: cy + 5 - 9 * (name.length - 1) + 18 * k, s, cls: "name", anchor: "middle" })) };
+          return { svg: uml.shapes.rounded({ x, y, w: W, h: H }) + `<line x1="${x}" y1="${y + top}" x2="${x + W}" y2="${y + top}" class="u-ln"/>`, texts: [...name.map((s, k) => ({ x: cx, y: y + 21 + 18 * k, s, cls: "name", anchor: "middle" })), ...lines.map((s, k) => ({ x: x + 12, y: y + top + 18 + 18 * k, s, cls: "sub", anchor: "start" }))] };
         },
       };
     }

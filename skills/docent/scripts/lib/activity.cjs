@@ -30,27 +30,27 @@ function shape(n, degree, room = Infinity) {
     case "object": {
       const ln = lines(32), st = n.state ? `[${n.state}]` : "";
       const w = Math.max(96, ...ln.map((l) => nameW(l) + 32), st ? textWidth(st, 12) + 32 : 0), h = 40 + 18 * (ln.length - 1) + (st ? 12 : 0);
-      return { w, h, draw: (cx, cy) => ({ svg: uml.shapes.compartments({ x: cx - w / 2, y: cy - h / 2, w, h }), texts: st ? [...stack(ln, cx, cy - 7), { x: cx, y: cy + h / 2 - 10, s: st, cls: "sub", anchor: "middle" }] : stack(ln, cx, cy) }) };
+      return { w, h, grow: true, draw: (cx, cy, W = w, H = h) => ({ svg: uml.shapes.compartments({ x: cx - W / 2, y: cy - H / 2, w: W, h: H }), texts: st ? [...stack(ln, cx, cy - 7), { x: cx, y: cy + H / 2 - 10, s: st, cls: "sub", anchor: "middle" }] : stack(ln, cx, cy) }) };
     }
     case "send": case "accept": {
       const ln = lines(44), w = Math.max(108, ...ln.map((l) => nameW(l) + 44)), h = 40 + 18 * (ln.length - 1);
-      return { w, h, draw: (cx, cy) => ({ svg: uml.shapes[n.type]({ x: cx - w / 2, y: cy - h / 2, w, h }), texts: stack(ln, cx, cy, n.type === "send" ? -6 : 6) }) };
+      return { w, h, grow: true, draw: (cx, cy, W = w, H = h) => ({ svg: uml.shapes[n.type]({ x: cx - W / 2, y: cy - H / 2, w: W, h: H }), texts: stack(ln, cx, cy, n.type === "send" ? -6 : 6) }) };
     }
     case "interaction": {
       // A ref frame: a box with the tab "ref" at its upper left and the interaction's name in the middle. With a diagram, the name links to it.
       const ln = lines(32), w = Math.max(120, ...ln.map((l) => nameW(l) + 32)), h = 52 + 18 * (ln.length - 1);
       return {
-        w, h,
-        draw: (cx, cy) => {
-          const x = cx - w / 2, y = cy - h / 2, t = stack(ln, cx, cy + 8);
+        w, h, grow: true,
+        draw: (cx, cy, W = w, H = h) => {
+          const x = cx - W / 2, y = cy - H / 2, t = stack(ln, cx, cy + 8);
           const name = t.map((q) => `<text x="${q.x}" y="${q.y}" class="name" text-anchor="middle">${esc(q.s)}</text>`).join("");
-          return { svg: `<rect x="${x}" y="${y}" width="${w}" height="${h}" class="u-face"/>${uml.shapes.tab({ x, y, w: 40, h: 20 })}<text x="${x + 10}" y="${y + 14}" class="u-op">ref</text>${name}`, texts: [] };
+          return { svg: `<rect x="${x}" y="${y}" width="${W}" height="${H}" class="u-face"/>${uml.shapes.tab({ x, y, w: 40, h: 20 })}<text x="${x + 10}" y="${y + 14}" class="u-op">ref</text>${name}`, texts: [] };
         },
       };
     }
     default: {
       const ln = lines(32), w = Math.max(96, ...ln.map((l) => nameW(l) + 32)), h = 40 + 18 * (ln.length - 1);
-      return { w, h, draw: (cx, cy) => ({ svg: uml.shapes.rounded({ x: cx - w / 2, y: cy - h / 2, w, h }), texts: stack(ln, cx, cy) }) };
+      return { w, h, grow: true, draw: (cx, cy, W = w, H = h) => ({ svg: uml.shapes.rounded({ x: cx - W / 2, y: cy - H / 2, w: W, h: H }), texts: stack(ln, cx, cy) }) };
     }
   }
 }
