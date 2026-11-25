@@ -507,6 +507,23 @@ test("room on the line: check warns about a column of sentences in a table with 
   assert.match(warned(table(4), 'data-profile="standard" data-text="large"')[0] || "", /room for about \d+ characters/, "large text grows the block and the letters alike, so the line holds as few characters");
 });
 
+test("room on the line: the warning names a column of links only and a row heading repeated on several rows, and the regrouped table passes", () => {
+  const rows = [
+    ["Accounts", "Can one person hold two accounts?", "Yes, but each account needs its own email address and its own password.", "Each account is billed on its own.", "#types", "Account types"],
+    ["Accounts", "Can an account change its owner?", "Yes, the owner names a new owner in the settings, and the new owner accepts.", "The old owner keeps read access.", "#owners", "Owners"],
+    ["Billing", "When is a plan charged?", "Each plan is charged on the first day of each month for the month ahead.", "A plan bought mid-month is charged in part.", "#dates", "Billing dates"],
+    ["Billing", "Can a charge be refunded?", "Yes, within 14 days of the charge, when the plan was not used in that time.", "The refund goes back to the same card.", "#refunds", "Refunds"],
+  ];
+  const narrow = `<div class="table-wrap" role="region" aria-label="Questions and answers" tabindex="0"><table><thead><tr><th scope="col">Area</th><th scope="col">Question</th><th scope="col">Answer</th><th scope="col">What it changes</th><th scope="col">Read more</th></tr></thead><tbody>${rows.map(([area, q, a, change, href, link]) => `<tr><th scope="row">${area}</th><td>${q}</td><td>${a}</td><td>${change}</td><td><a href="${href}">${link}</a></td></tr>`).join("")}</tbody></table></div>`;
+  const grouped = ["Accounts", "Billing"].map((area) => `<h3>${area}</h3><div class="table-wrap" role="region" aria-label="Questions about ${area.toLowerCase()}" tabindex="0"><table><thead><tr><th scope="col">Question</th><th scope="col">Answer</th></tr></thead><tbody>${rows.filter((r) => r[0] === area).map(([, q, a, , href]) => `<tr><th scope="row"><a href="${href}">${q}</a></th><td>${a}</td></tr>`).join("")}</tbody></table></div>`).join("");
+  const warned = (html) => checkDocument(specimen.replace("</main>", `<section id="faq" aria-labelledby="faq-h"><h2 id="faq-h">Questions</h2>${html}</section></main>`)).warnings.filter((w) => /table\.measure/.test(w));
+  const found = warned(narrow);
+  assert.ok(found.length >= 1, "the answers are sentences in a table of 5 columns");
+  assert.match(found[0], /The column "Read more" holds only links: put each link on its row heading or on the cell it explains, and drop the column\./);
+  assert.match(found[0], /2 rows start with "Accounts": group such rows under one heading, a block heading or a closed section for each group/);
+  assert.deepEqual(warned(grouped), [], "one block heading for each area, the link on the question, and two columns: the answers have room");
+});
+
 test("a quote with its speaker: check warns about a blockquote alone, no speaker, typed quotation marks, more than 80 words, and code in the speaker line", () => {
   const quote = (said = "<p>I wrote the steps twice, and nobody could repeat the bug.</p>", speaker = "<figcaption>P3, tester</figcaption>") => `<figure class="quote"><blockquote>${said}</blockquote>${speaker}</figure>`;
   const warned = (...blocks) => checkDocument(specimen.replace("</main>", `<section id="q" aria-labelledby="q-h"><h2 id="q-h">Q</h2>${blocks.join("")}</section></main>`)).warnings.filter((w) => /quote|speaker/.test(w)).join("\n");

@@ -282,8 +282,11 @@ tfoot :is(th, td) { font-weight: 600; }
 .state.info, .state.plan { color: var(--text); }
 .state.info::before { background: var(--muted); }
 .state.plan::before { background: none; border: 1.5px solid var(--muted); }
-/* Code and links in a cell may break anywhere, so a long path, command or address does not make the table wider than its place. */
-:is(td, th) :is(code, a) { overflow-wrap: anywhere; }
+/* Code in a cell may break at any character, so a long path or command does not make the table wider than its place.
+   A link breaks only inside a word that cannot fit on a line by itself (break-word): "anywhere" would also let the table shrink a
+   column of short links to about one character, and split their words. */
+:is(td, th) code { overflow-wrap: anywhere; }
+:is(td, th) a { overflow-wrap: break-word; }
 
 /* Status note: a dot and a word carry the status. */
 .status { max-width: var(--measure); margin: 32px 0 0; }

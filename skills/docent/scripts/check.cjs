@@ -590,15 +590,21 @@ function checkDocument(html, options = {}) {
   const inWordsBlocks = withClass(markup, "dg-words"), inWords = (i) => inWordsBlocks.some((w) => w.index <= i && i < w.index + w.tag.length + w.attrs.length + 2 + w.inner.length);
   if (frame) for (const table of markup.matchAll(/<table\b[^>]*>([\s\S]*?)<\/table>/gi)) {
     if (inWords(table.index) || /\b(?:colspan|rowspan)=/i.test(table[1])) continue;
-    const cellsOf = (rows) => [...(rows || "").matchAll(/<tr\b[^>]*>([\s\S]*?)<\/tr>/gi)].map(([, row]) => [...row.matchAll(/<(td|th)\b([^>]*)>([\s\S]*?)<\/\1>/gi)].map(([, tag, attrs, inner]) => ({ tag: tag.toLowerCase(), num: hasClass(attrs, "num"), text: plain(inner), code: /<(code|kbd|samp)\b/i.test(inner) && !plain(inner.replace(/<(code|kbd|samp)\b[^>]*>[\s\S]*?<\/\1>/gi, "")) })));
+    const cellsOf = (rows) => [...(rows || "").matchAll(/<tr\b[^>]*>([\s\S]*?)<\/tr>/gi)].map(([, row]) => [...row.matchAll(/<(td|th)\b([^>]*)>([\s\S]*?)<\/\1>/gi)].map(([, tag, attrs, inner]) => ({ tag: tag.toLowerCase(), num: hasClass(attrs, "num"), text: plain(inner), code: /<(code|kbd|samp)\b/i.test(inner) && !plain(inner.replace(/<(code|kbd|samp)\b[^>]*>[\s\S]*?<\/\1>/gi, "")), link: /^\s*<a\b[^>]*>(?:(?!<a\b)[\s\S])*<\/a>\s*$/i.test(inner) })));
     const head = cellsOf((table[1].match(/<thead\b[^>]*>([\s\S]*?)<\/thead>/i) || [])[1])[0] || [];
     const rows = cellsOf(table[1].replace(/<(thead|tfoot)\b[^>]*>[\s\S]*?<\/\1>/gi, ""));
     const label = (markup.slice(0, table.index).match(/aria-label="([^"]*)"[^>]*>\s*$/) || [])[1] || plain((table[1].match(/<caption\b[^>]*>([\s\S]*?)<\/caption>/i) || ["", ""])[1]);
+    // Two ways a table loses width that the advice can name: a column of links only, and a row heading repeated on several rows.
+    const links = head.map((h, c) => c).filter((c) => c > 0 && rows.every((r) => r[c]?.tag === "td" && r[c].link)).map((c) => (head[c]?.text ? `"${head[c].text}"` : `${c + 1}`));
+    const counts = new Map();
+    for (const r of rows) if (r[0]?.tag === "th" && r[0].text) counts.set(r[0].text, (counts.get(r[0].text) || 0) + 1);
+    const [same, times] = [...counts].sort((a, b) => b[1] - a[1])[0] || [];
+    const more = `${links.length ? ` The column ${links.join(", ")} holds only links: put each link on its row heading or on the cell it explains, and drop the column.` : ""}${times > 1 ? ` ${times} rows start with "${same}": group such rows under one heading, a block heading or a closed section for each group, so the heading does not take room on every row.` : ""}`;
     estimateColumns(head.map((c) => c.text), rows, frame).forEach((col, c) => {
       if (head[c]?.num || rows.some((r) => r[c]?.num)) return;
       const longest = rows.map((r) => r[c]).filter((cell) => cell && cell.tag === "td" && !cell.code).map((cell) => cell.text.split(" ").filter(Boolean).length).reduce((a, b) => Math.max(a, b), 0);
       if (longest <= CELL_WORDS || col.chars >= CELL_CHARS) return;
-      warn("table.measure", `${label ? `the table "${label}"` : "a table"}: the column ${head[c]?.text ? `"${head[c].text}"` : c + 1} holds cells of up to ${longest} words, but at the width of the "${shape}" profile a line of it has room for about ${col.chars} characters, so its sentences break into short pieces; a line needs ${CELL_CHARS} or more. Use fewer columns, or move the sentences out of the table: one section for each row with its facts in a margin note, a definition list, or a card grid (see "Tables hold short facts" in DESIGN.md)`);
+      warn("table.measure", `${label ? `the table "${label}"` : "a table"}: the column ${head[c]?.text ? `"${head[c].text}"` : c + 1} holds cells of up to ${longest} words, but at the width of the "${shape}" profile a line of it has room for about ${col.chars} characters, so its sentences break into short pieces; a line needs ${CELL_CHARS} or more. Use fewer columns, or move the sentences out of the table: one section for each row with its facts in a margin note, a definition list, or a card grid (see "Tables hold short facts" in DESIGN.md).${more}`);
     });
   }
 

@@ -22,7 +22,8 @@ test("status notes have five kinds: three with a status color, and two without o
 });
 
 test("a table cell lets code break, and a closed section that holds a table takes the full width", () => {
-  assert.match(rule(":is(td, th) :is(code, a)"), /overflow-wrap: anywhere/, "a long address in a cell breaks too");
+  assert.match(rule(":is(td, th) code"), /overflow-wrap: anywhere/, "a long path or command in a cell breaks at any character");
+  assert.match(rule(":is(td, th) a"), /overflow-wrap: break-word/, "a link keeps its words whole, so the table does not shrink a column of short links");
   assert.match(rule("details:has(> .table-wrap, > pre, > .code, > figure)"), /max-width: none/);
 });
 
