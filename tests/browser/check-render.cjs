@@ -139,12 +139,13 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
   // The reader's high contrast mode (emulated forced colors, light and dark): the marks that are backgrounds show in system colors,
   // a drawing's lines, text and ground take the system colors, and the heat steps keep theirs, with the kit's own text on them.
   // This is Chrome's emulation with its default system colors; real Windows themes are not tested here.
-  {
-    const fixture = (name) => fs.readFileSync(path.join(root, "tests", "fixtures", `${name}.json`), "utf8");
-    const figure = (id, name) => `<figure><div class="fig" role="region" aria-label="Figure, ${id}" tabindex="0">\n<!-- docent:diagram\n${fixture(name)}\n-->\n<!-- /docent:diagram -->\n</div><figcaption><strong>Figure</strong>${id}.</figcaption></figure>`;
-    const content = renderDocument(html.replace('<section id="report"', `<section id="heat" aria-labelledby="heat-h"><h2 id="heat-h">Heat</h2>${figure("errors", "heatmap-errors")}${figure("clicks", "heatplan-product")}${figure("help", "heatplan-help")}</section>\n<section id="report"`)).html;
-    const KIT = { light: { text: LIGHT.text, page: LIGHT.bg, steps: ["#c6e9ef", "#86c9d5", "#3da6b6", "#00707e", "#004a53"] }, dark: { text: DARK.text, page: DARK.bg, steps: ["#093339", "#054e58", "#006b78", "#36a0b1", "#80cad7"] } };
-    const rgb = (hex) => `rgb(${[1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)).join(", ")})`;
+  // The palette checks below run the same checks on a page with a palette from a hue, so they are one function.
+  const fixture = (name) => fs.readFileSync(path.join(root, "tests", "fixtures", `${name}.json`), "utf8");
+  const figure = (id, name) => `<figure><div class="fig" role="region" aria-label="Figure, ${id}" tabindex="0">\n<!-- docent:diagram\n${fixture(name)}\n-->\n<!-- /docent:diagram -->\n</div><figcaption><strong>Figure</strong>${id}.</figcaption></figure>`;
+  const withHeat = (h) => h.replace('<section id="report"', `<section id="heat" aria-labelledby="heat-h"><h2 id="heat-h">Heat</h2>${figure("errors", "heatmap-errors")}${figure("clicks", "heatplan-product")}${figure("help", "heatplan-help")}</section>\n<section id="report"`);
+  const rgb = (hex) => `rgb(${[1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)).join(", ")})`;
+  // colors: for each theme, the heat steps and the text and page colors on them, which forced colors keep. label names the page in each check.
+  const forcedColors = async (content, colors, label = "") => {
     for (const theme of ["light", "dark"]) {
       const { page, context } = await open({ width: 1280, theme, forcedColors: "active", content });
       await page.evaluate(() => { const li = document.querySelectorAll(".steps > li")[2]; window.scrollTo(0, li.getBoundingClientRect().top + scrollY - innerHeight * 0.5 + 4); });
@@ -177,20 +178,21 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
           chosen: css(document.querySelector(".choose > input:checked + .opt")).borderTopColor,
         };
       });
-      const { sys } = seen, kit = KIT[theme];
-      ok(`forced colors, ${theme}: every status dot and the info dot take the text color, and the planned ring keeps its shape`, seen.dots.length === 1 && seen.dots[0] === sys.text && seen.ring[0] === sys.text && /, 0\)$|transparent/.test(seen.ring[1]), seen);
-      ok(`forced colors, ${theme}: the rail shows in the text color, and the current step, the route dot and the current leg in the highlight color`, seen.rail === sys.text && seen.railDot === sys.hi && seen.routeDot === sys.hi && seen.leg.join() === sys.hi, seen);
-      ok(`forced colors, ${theme}: a drawing's tracks, outlines, lines and words take the text color, and its ground and bands the page color`, seen.lines.join() === sys.text && seen.words.join() === sys.text && seen.grounds.join() === sys.canvas, seen);
-      ok(`forced colors, ${theme}: the heat steps keep their own colors, the text on them keeps the kit's text and page colors, and a cell or box with no data takes the system colors`, seen.steps.join("|") === kit.steps.map(rgb).join("|") && seen.onStep.join() === kit.text && seen.onDark.join() === kit.page && seen.noData.join() === sys.text, seen);
-      ok(`forced colors, ${theme}: the chosen option takes the highlight color`, seen.chosen === sys.hi, seen);
+      const { sys } = seen, kit = colors[theme];
+      ok(`${label}forced colors, ${theme}: every status dot and the info dot take the text color, and the planned ring keeps its shape`, seen.dots.length === 1 && seen.dots[0] === sys.text && seen.ring[0] === sys.text && /, 0\)$|transparent/.test(seen.ring[1]), seen);
+      ok(`${label}forced colors, ${theme}: the rail shows in the text color, and the current step, the route dot and the current leg in the highlight color`, seen.rail === sys.text && seen.railDot === sys.hi && seen.routeDot === sys.hi && seen.leg.join() === sys.hi, seen);
+      ok(`${label}forced colors, ${theme}: a drawing's tracks, outlines, lines and words take the text color, and its ground and bands the page color`, seen.lines.join() === sys.text && seen.words.join() === sys.text && seen.grounds.join() === sys.canvas, seen);
+      ok(`${label}forced colors, ${theme}: the heat steps keep their own colors, the text on them keeps the kit's text and page colors, and a cell or box with no data takes the system colors`, seen.steps.join("|") === kit.steps.map(rgb).join("|") && seen.onStep.join() === kit.text && seen.onDark.join() === kit.page && seen.noData.join() === sys.text, seen);
+      ok(`${label}forced colors, ${theme}: the chosen option takes the highlight color`, seen.chosen === sys.hi, seen);
       // A heat plan stacked on a phone: the value beside each map sits on the band, so it takes the system text color, and so does the ring.
       await page.setViewportSize({ width: 390, height: 844 });
       const stack = await page.evaluate(() => ({ values: [...new Set([...document.querySelectorAll("#dg-help-clicks-phone .hv")].map((e) => getComputedStyle(e).fill))], ring: getComputedStyle(document.querySelector("#dg-help-clicks-phone .m-at")).stroke, shown: document.getElementById("dg-help-clicks-phone").getBoundingClientRect().width }));
-      ok(`forced colors, ${theme}: a stacked heat plan's values beside the maps, and its ring, take the system text color`, stack.shown > 0 && stack.values.join() === sys.text && stack.ring === sys.text, { sys, stack });
-      await page.screenshot({ path: `${out}/forced-${theme}.png`, fullPage: true });
+      ok(`${label}forced colors, ${theme}: a stacked heat plan's values beside the maps, and its ring, take the system text color`, stack.shown > 0 && stack.values.join() === sys.text && stack.ring === sys.text, { sys, stack });
+      await page.screenshot({ path: `${out}/${label.trim().replace(/\W+/g, "-")}${label ? "-" : ""}forced-${theme}.png`, fullPage: true });
       await context.close();
     }
-  }
+  };
+  await forcedColors(renderDocument(withHeat(html)).html, { light: { text: LIGHT.text, page: LIGHT.bg, steps: ["#c6e9ef", "#86c9d5", "#3da6b6", "#00707e", "#004a53"] }, dark: { text: DARK.text, page: DARK.bg, steps: ["#093339", "#054e58", "#006b78", "#36a0b1", "#80cad7"] } });
 
   // More contrast (emulated prefers-contrast: more): outlines, tracks and rules take the muted color, and muted text the text color,
   // in light, in dark by the system and in dark by the switch. Forced colors and paper keep their own colors.
@@ -790,31 +792,44 @@ const ok = (name, pass, detail = "") => { if (!pass) failed += 1; console.log(`$
     }
   }
 
-  // Palettes: each one sets the page, the heading color and the heat steps in light, in dark (by the system and by the switch) and on paper,
-  // where the page is white and the heat steps are Docent's grays. A drawing copied out of the page keeps the palette's light colors.
+  // Palettes: each one sets the page, the heading color, the accent and the heat steps in light, in dark (by the system and by the switch) and
+  // on paper, where the page is white and the heat steps are Docent's grays. A drawing copied out of the page keeps the palette's light colors.
+  // Two palettes from a hue (data-palette="custom" with data-palette-hue, one blue-violet and one magenta) are checked against what hue.cjs
+  // works out, and also get the axe scan at desktop and phone width with the full tag set, and the forced-colors checks above.
   {
     const { PALETTES } = require(path.join(root, "skills", "docent", "scripts", "lib", "palettes.cjs"));
+    const { customPalette } = require(path.join(root, "skills", "docent", "scripts", "lib", "hue.cjs"));
     const build = (name, change) => stampHtml(renderDocument(change(fs.readFileSync(path.join(root, name), "utf8"))).html).html;
-    const rgb = (hex) => `rgb(${[1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)).join(", ")})`;
-    for (const [name, p] of Object.entries(PALETTES)) {
-      const content = build("skills/docent/assets/specimen.html", (h) => h.replace('<html lang="en" data-profile="standard">', `<html lang="en" data-profile="standard" data-palette="${name}">`));
+    const named = Object.entries(PALETTES).map(([name, p]) => ({ name, p, attrs: `data-palette="${name}"` }));
+    const custom = ["#eef2ff", "#fdf2f8"].map((hue) => { const t = customPalette(hue); return { name: `custom ${hue}`, p: t.palette, attrs: `data-palette="custom" data-palette-hue="${hue}"`, hue, failing: t.failing }; });
+    for (const { name, p, attrs, hue, failing } of [...named, ...custom]) {
+      if (hue) ok(`${name}: the hue is accepted, with every tested pair passing`, failing.length === 0, failing.map((f) => f.words));
+      const withPalette = (h) => h.replace('<html lang="en" data-profile="standard">', `<html lang="en" data-profile="standard" ${attrs}>`);
+      const content = build("skills/docent/assets/specimen.html", withPalette);
       const look = async (opts, before) => { const v = await open({ ...opts, content }); if (before) await before(v.page); const r = await v.page.evaluate(() => { const cells = [...document.querySelectorAll("svg.dg-heatmap rect:is(.h1, .h2, .h3, .h4, .h5)")].filter((c) => c.getBoundingClientRect().width).map((c) => getComputedStyle(c).fill); return { bg: getComputedStyle(document.body).backgroundColor, h1: getComputedStyle(document.querySelector("h1")).color, link: getComputedStyle(document.querySelector("main a")).color, heat: [...new Set(cells)].sort() }; }); await v.context.close(); return r; };
       const steps = (mode) => [1, 2, 3, 4, 5].map((i) => rgb(p[mode][`heat-${i}`]));
       const light = await look({ width: 1280 }), dark = await look({ width: 1280, theme: "dark" }), switched = await look({ width: 1280 }, (pg) => pg.click("button.theme")), paper = await look({ width: 658, media: "print", theme: "dark" });
       const within = (r, list) => r.heat.length > 0 && r.heat.every((c) => list.includes(c));
-      ok(`${name}: the palette's page, heading color, accent and heat steps in light; its dark values in dark by the system and by the switch`, light.bg === rgb(p.light.bg) && light.h1 === rgb(p.light.ink) && light.link === rgb(p.light.primary) && within(light, steps("light")) && [dark, switched].every((d) => d.bg === rgb(p.dark.bg) && d.link === rgb(p.dark.primary) && within(d, steps("dark"))), { light, dark, switched });
-      ok(`${name} on paper: a white page, the palette's accent, and Docent's gray heat steps`, paper.bg === "rgb(255, 255, 255)" && paper.link === rgb(p.light.primary) && within(paper, ["#dee2f0", "#babecb", "#9498a5", "#616571", "#3e424d"].map(rgb)), paper);
+      ok(`${name}: the palette's page, heading color, accent and heat steps in light; its dark values in dark by the system and by the switch`, light.bg === rgb(p.light.bg) && light.h1 === rgb(p.light.ink) && light.link === rgb(p.light.primary) && within(light, steps("light")) && [dark, switched].every((d) => d.bg === rgb(p.dark.bg) && d.h1 === rgb(p.dark.text) && d.link === rgb(p.dark.primary) && within(d, steps("dark"))), { light, dark, switched });
+      ok(`${name} on paper: a white page, the palette's heading color and accent, and Docent's gray heat steps`, paper.bg === "rgb(255, 255, 255)" && paper.h1 === rgb(p.light.ink) && paper.link === rgb(p.light.primary) && within(paper, ["#dee2f0", "#babecb", "#9498a5", "#616571", "#3e424d"].map(rgb)), paper);
       const svg = content.match(/<svg id="dg-replies-by-hour" [\s\S]*?<\/svg>/)[0];
       const alone = await open({ width: 800, content: `<!doctype html><html><body style="margin:0">${svg}</body></html>` });
       const copied = await alone.page.evaluate(() => ({ cells: [...new Set([...document.querySelectorAll("rect:is(.h1, .h2, .h3, .h4, .h5)")].map((c) => getComputedStyle(c).fill))] }));
       await alone.context.close();
       ok(`${name}: a heat map copied out of the page keeps the palette's light heat steps`, copied.cells.length > 0 && copied.cells.every((c) => steps("light").includes(c)), copied);
-      for (const theme of ["light", "dark"]) {
-        const { page, context } = await open({ width: 1280, theme, content });
-        await page.addScriptTag({ path: axePath });
-        const result = await page.evaluate(async () => await window.axe.run(document, { runOnly: { type: "tag", values: ["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"] } }));
-        ok(`${name} ${theme}: 0 axe violations`, result.violations.length === 0, result.violations.map((v) => `${v.id}(${v.nodes.length}) ${v.nodes[0].target.join(" ")}`));
-        await context.close();
+      const tags = hue ? ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa", "best-practice"] : ["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"];
+      for (const [where, width, height] of hue ? [["desktop ", 1280, 900], ["phone ", 390, 844]] : [["", 1280, 900]]) {
+        for (const theme of ["light", "dark"]) {
+          const { page, context } = await open({ width, height, theme, content });
+          await page.addScriptTag({ path: axePath });
+          const result = await page.evaluate(async ({ tags, target }) => await window.axe.run(document, { runOnly: { type: "tag", values: tags }, rules: target ? { "target-size": { enabled: true } } : {} }), { tags, target: !!hue });
+          ok(`${name} ${where}${theme}: 0 axe violations`, result.violations.length === 0, result.violations.map((v) => `${v.id}(${v.nodes.length}) ${v.nodes[0].target.join(" ")}`));
+          await context.close();
+        }
+      }
+      if (hue) {
+        const on = (mode) => ({ text: rgb(p[mode].text), page: rgb(p[mode].bg), steps: [1, 2, 3, 4, 5].map((i) => p[mode][`heat-${i}`]) });
+        await forcedColors(build("skills/docent/assets/specimen.html", (h) => withHeat(withPalette(h))), { light: on("light"), dark: on("dark") }, `${name} `);
       }
     }
   }
