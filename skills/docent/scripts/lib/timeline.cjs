@@ -82,7 +82,8 @@ function readTimeline(data) {
   if (data.asOf != null) {
     const dayOnMonths = scale.grain === "month" && /^\d{4}-\d{2}-\d{2}$/.test(data.asOf);
     const t = readTime(data.asOf, dayOnMonths ? { ...scale, grain: "day" } : scale, `"asOf"`);
-    asOf = { at: t.at, written: data.asOf, shown: timeText(t.at, scale) };
+    // A day keeps its day, also on the 1st of a month: "2026-11-01" is "1 Nov", and only "2026-11" is "Nov 2026".
+    asOf = { at: t.at, written: data.asOf, shown: dayOnMonths ? dayText(t.at) : timeText(t.at, scale) };
     if (scale.marks.length + 1 > 2) fail(`a timeline has at most 2 named lines, and "asOf" is one of them; this one has ${scale.marks.length} marks and "asOf"`);
     scale.marks = [...scale.marks, { at: t.at, name: `As of ${asOf.shown}` }].sort((a, b) => a.at - b.at);
   }

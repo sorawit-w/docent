@@ -260,6 +260,15 @@ test("asOf at the minute and day grains, and its refusals", () => {
   assert.doesNotThrow(() => renderDiagram({ ...base, scale: { ...scale, marks: [{ at: "2026-11-26", name: "Known issue fixed" }] }, rows: [{ name: "A", at: "2026-11-02" }, { name: "B", at: "2026-11-09" }] }), "a name that only holds the letters 'now' is fine");
 });
 
+test("asOf on a scale of months keeps its day, also on the 1st, and a month-valued asOf names its month", () => {
+  const base = { id: "first", kind: "timeline", label: "As of the 1st.", scale: { from: "2026-07", to: "2027-06" }, rows: [{ name: "A", from: "2026-08", to: "2026-09" }, { name: "B", from: "2026-10" }, { name: "C", at: "2027-03" }] };
+  const day = renderDiagram({ ...base, asOf: "2026-11-01" });
+  assert.ok(day.scene.notes.some((n) => n.s === "As of 1 Nov"), "a day on the 1st is still a day");
+  assert.match(wordsOf(day.svg), /A line at 1 Nov: the day this page was written\./);
+  const month = renderDiagram({ ...base, asOf: "2026-11" });
+  assert.ok(month.scene.notes.some((n) => n.s === "As of Nov 2026"), "a month-valued asOf names its month");
+});
+
 test("the month grain: February is shorter than March, and a span of one month", () => {
   const { scene } = renderDiagram({ id: "months", kind: "timeline", label: "Months.", scale: { from: "2027-01", to: "2027-06" }, rows: [{ name: "February", from: "2027-02", to: "2027-02" }, { name: "March", from: "2027-03", to: "2027-03" }, { name: "Launch", at: "2027-05" }] });
   const width = (id) => +scene.parts.find((p) => p.id === id).svg.match(/width="([\d.]+)"/)[1];
