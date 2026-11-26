@@ -13,7 +13,8 @@ const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "
 const pad = (n) => String(n).padStart(2, "0");
 const dateOf = (day) => { const t = new Date(day * 86400000); return { y: t.getUTCFullYear(), m: t.getUTCMonth(), d: t.getUTCDate() }; };
 const dayText = (day, year) => { const p = dateOf(day); return `${p.d} ${MONTHS[p.m]}${year ? ` ${p.y}` : ""}`; };
-const clockText = (v) => `${pad(Math.floor((v % DAY) / 60))}:${pad(v % 60)}`;
+// Minutes since midnight, kept at or above 0, so a time before 1970 (a negative number) writes its clock right too.
+const clockText = (v) => { const m = ((v % DAY) + DAY) % DAY; return `${pad(Math.floor(m / 60))}:${pad(m % 60)}`; };
 
 /**
  * A time as the timeline writes it, beside a mark and in its table: "08:12" on the scale's first day and "13 Nov 01:00" after

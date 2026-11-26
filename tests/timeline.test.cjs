@@ -113,6 +113,14 @@ test("a scale over midnight writes the date of a later day, and the line above n
   assert.match(wordsOf(svg), /<td>22:40<\/td>[\s\S]*<td>13 Nov 00:10<\/td>[\s\S]*<td>\+1 h 30 min<\/td>/);
 });
 
+test("a time before 1970 writes its clock as on any other day", () => {
+  const { scene, svg } = renderDiagram({ id: "old", kind: "timeline", label: "An old night.", scale: { from: "08:00", to: "10:00", day: "1969-07-20", zone: "UTC" }, rows: [{ name: "A", at: "08:15" }, { name: "B", from: "08:30", to: "09:45" }, { name: "C", at: "09:50" }] });
+  assert.ok(scene.notes.some((n) => n.s === "08:15" && n.knock), "the time beside the mark");
+  assert.ok(scene.notes.some((n) => n.s === "08:30–09:45, 1 h 15 min"), "a span's times");
+  assert.match(wordsOf(svg), /from 08:15 to 09:50 UTC \(1 h 35 min\)/, "the line under the table");
+  assert.doesNotMatch(svg, /-\d+:-?\d+/, "no negative clock anywhere");
+});
+
 test("fit warnings: 2 rows, equal gaps, lanes always in one state, an empty stretch, a zone with clock changes", () => {
   const warns = (data) => renderDiagram({ id: "w", kind: "timeline", label: "Warnings.", ...data }).warnings.join("\n");
   const scale = { from: "08:00", to: "10:00", day: "2026-11-12", zone: "UTC" };
