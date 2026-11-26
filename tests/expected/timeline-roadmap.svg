@@ -1,0 +1,196 @@
+<svg id="dg-product-roadmap" class="dg dg-timeline dg-auto" xmlns="http://www.w3.org/2000/svg" width="640" height="480" viewBox="0 0 640 480" role="img" aria-label="As of 26 November 2026, search is in beta and offline sync is being built, both still running. Search reaches everyone in March 2027, the new mobile app is built from January to June, and sync for teams follows from June to September 2027.">
+<style>
+#dg-product-roadmap{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-product-roadmap .ground{fill:var(--fig,#f2f3f9)}
+#dg-product-roadmap .band{fill:var(--bg,#fbfbfe)}
+#dg-product-roadmap .track{stroke:var(--line,#d3d6e3)}
+#dg-product-roadmap .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-product-roadmap .head{fill:var(--text,#1c1f2e)}
+#dg-product-roadmap .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-product-roadmap .stop.end{fill:var(--text,#1c1f2e)}
+#dg-product-roadmap .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-product-roadmap .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-product-roadmap .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-product-roadmap .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-product-roadmap .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-product-roadmap .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-product-roadmap .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-product-roadmap .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-product-roadmap .sub,#dg-product-roadmap .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-product-roadmap .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-product-roadmap .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-product-roadmap .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-product-roadmap .r-bar{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-product-roadmap .r-pt{fill:var(--text,#1c1f2e)}
+#dg-product-roadmap .r-lim{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2}
+#dg-product-roadmap .r-ref{stroke:var(--muted,#575d75)}
+@media (prefers-reduced-motion:reduce){#dg-product-roadmap .pulse{animation:none!important}#dg-product-roadmap .pulse{display:none!important}}
+@media print{#dg-product-roadmap{max-width:100%;height:auto}#dg-product-roadmap .pulse{display:none!important}}
+#dg-product-roadmap-phone{display:none}
+</style>
+<rect width="640" height="480" class="ground"/>
+<rect x="8" y="80" width="624" height="136" rx="10" class="band"/>
+<rect x="8" y="224" width="624" height="136" rx="10" class="band"/>
+<rect x="8" y="368" width="624" height="104" rx="10" class="band"/>
+<line x1="292.95" y1="80" x2="292.95" y2="216" class="r-ref"/>
+<line x1="292.95" y1="224" x2="292.95" y2="360" class="r-ref"/>
+<line x1="292.95" y1="368" x2="292.95" y2="472" class="r-ref"/>
+<line x1="187" y1="80" x2="187" y2="216" class="track"/>
+<line x1="252.86" y1="80" x2="252.86" y2="216" class="track"/>
+<line x1="318.72" y1="80" x2="318.72" y2="216" class="track"/>
+<line x1="383.14" y1="80" x2="383.14" y2="216" class="track"/>
+<line x1="448.28" y1="80" x2="448.28" y2="216" class="track"/>
+<line x1="514.14" y1="80" x2="514.14" y2="216" class="track"/>
+<line x1="187" y1="224" x2="187" y2="360" class="track"/>
+<line x1="252.86" y1="224" x2="252.86" y2="360" class="track"/>
+<line x1="318.72" y1="224" x2="318.72" y2="360" class="track"/>
+<line x1="383.14" y1="224" x2="383.14" y2="360" class="track"/>
+<line x1="448.28" y1="224" x2="448.28" y2="360" class="track"/>
+<line x1="514.14" y1="224" x2="514.14" y2="360" class="track"/>
+<line x1="187" y1="368" x2="187" y2="472" class="track"/>
+<line x1="252.86" y1="368" x2="252.86" y2="472" class="track"/>
+<line x1="318.72" y1="368" x2="318.72" y2="472" class="track"/>
+<line x1="383.14" y1="368" x2="383.14" y2="472" class="track"/>
+<line x1="448.28" y1="368" x2="448.28" y2="472" class="track"/>
+<line x1="514.14" y1="368" x2="514.14" y2="472" class="track"/>
+<text x="20" y="24" class="sub" text-anchor="start">Months from Jul 2026 to Dec 2027.</text>
+<text x="292.95" y="48" class="sub" text-anchor="middle">As of 26 Nov</text>
+<text x="187" y="68" class="val" text-anchor="middle">Jul</text>
+<text x="252.86" y="68" class="val" text-anchor="middle">Oct</text>
+<text x="318.72" y="68" class="val" text-anchor="middle">2027</text>
+<text x="383.14" y="68" class="val" text-anchor="middle">Apr</text>
+<text x="448.28" y="68" class="val" text-anchor="middle">Jul</text>
+<text x="514.14" y="68" class="val" text-anchor="middle">Oct</text>
+<text x="20" y="104" class="name" text-anchor="start">Search</text>
+<text x="20" y="133" class="row" text-anchor="start">New search index</text>
+<rect x="279.05" y="120" width="153.6" height="16" class="band"/><text x="283.05" y="132" class="val" text-anchor="start">Jul–Oct 2026, 4 months</text>
+<text x="20" y="165" class="row" text-anchor="start">Search in beta</text>
+<rect x="296.95" y="152" width="171.68" height="16" class="band"/><text x="300.95" y="164" class="val" text-anchor="start">since Nov 2026, still running</text>
+<text x="20" y="197" class="row" text-anchor="start">Search for everyone</text>
+<rect x="369.95" y="184" width="65.68" height="16" class="band"/><text x="373.95" y="196" class="val" text-anchor="start">Mar 2027</text>
+<text x="20" y="248" class="name" text-anchor="start">Sync</text>
+<text x="20" y="277" class="row" text-anchor="start">Offline sync design</text>
+<rect x="256.86" y="264" width="161.6" height="16" class="band"/><text x="260.86" y="276" class="val" text-anchor="start">Aug–Sep 2026, 2 months</text>
+<text x="20" y="309" class="row" text-anchor="start">Offline sync build</text>
+<rect x="296.95" y="296" width="169.68" height="16" class="band"/><text x="300.95" y="308" class="val" text-anchor="start">since Oct 2026, still running</text>
+<text x="20" y="341" class="row" text-anchor="start">Sync for teams</text>
+<rect x="263.21" y="328" width="159.6" height="16" class="band"/><text x="418.81" y="340" class="val" text-anchor="end">Jun–Sep 2027, 4 months</text>
+<text x="20" y="392" class="name" text-anchor="start">Mobile app</text>
+<text x="20" y="421" class="row" text-anchor="start">Mobile app, version 2</text>
+<rect x="452.28" y="408" width="157.6" height="16" class="band"/><text x="456.28" y="420" class="val" text-anchor="start">Jan–Jun 2027, 6 months</text>
+<text x="20" y="453" class="row" text-anchor="start">App store release</text>
+<rect x="457.28" y="440" width="60.68" height="16" class="band"/><text x="461.28" y="452" class="val" text-anchor="start">Jul 2027</text>
+<rect x="187" y="120" width="88.05" height="16" rx="4" class="r-bar"/><line x1="252.86" y1="120.75" x2="252.86" y2="135.25" class="track"/>
+<path d="M292.95,152 H279.05 A4,4 0 0 0 275.05,156 V164 A4,4 0 0 0 279.05,168 H292.95" class="r-bar"/>
+<circle cx="360.95" cy="192" r="5" class="r-pt"/>
+<rect x="209.19" y="264" width="43.67" height="16" rx="4" class="r-bar"/>
+<path d="M292.95,296 H256.86 A4,4 0 0 0 252.86,300 V308 A4,4 0 0 0 256.86,312 H292.95" class="r-bar"/>
+<rect x="426.81" y="328" width="87.33" height="16" rx="4" class="r-bar"/><line x1="448.28" y1="328.75" x2="448.28" y2="343.25" class="track"/>
+<rect x="318.72" y="408" width="129.57" height="16" rx="4" class="r-bar"/><line x1="383.14" y1="408.75" x2="383.14" y2="423.25" class="track"/>
+<circle cx="448.28" cy="448" r="5" class="r-pt"/>
+</svg>
+<svg id="dg-product-roadmap-phone" class="dg dg-timeline dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="656" viewBox="0 0 264 656" role="img" aria-label="As of 26 November 2026, search is in beta and offline sync is being built, both still running. Search reaches everyone in March 2027, the new mobile app is built from January to June, and sync for teams follows from June to September 2027.">
+<style>
+#dg-product-roadmap-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-product-roadmap-phone .ground{fill:var(--fig,#f2f3f9)}
+#dg-product-roadmap-phone .band{fill:var(--bg,#fbfbfe)}
+#dg-product-roadmap-phone .track{stroke:var(--line,#d3d6e3)}
+#dg-product-roadmap-phone .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-product-roadmap-phone .head{fill:var(--text,#1c1f2e)}
+#dg-product-roadmap-phone .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-product-roadmap-phone .stop.end{fill:var(--text,#1c1f2e)}
+#dg-product-roadmap-phone .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-product-roadmap-phone .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-product-roadmap-phone .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-product-roadmap-phone .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-product-roadmap-phone .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-product-roadmap-phone .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-product-roadmap-phone .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-product-roadmap-phone .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-product-roadmap-phone .sub,#dg-product-roadmap-phone .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-product-roadmap-phone .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-product-roadmap-phone .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-product-roadmap-phone .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-product-roadmap-phone .r-bar{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-product-roadmap-phone .r-pt{fill:var(--text,#1c1f2e)}
+#dg-product-roadmap-phone .r-lim{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2}
+#dg-product-roadmap-phone .r-ref{stroke:var(--muted,#575d75)}
+@media (prefers-reduced-motion:reduce){#dg-product-roadmap-phone .pulse{animation:none!important}#dg-product-roadmap-phone .pulse{display:none!important}}
+@media print{#dg-product-roadmap-phone{max-width:100%;height:auto}#dg-product-roadmap-phone .pulse{display:none!important}}
+@media (max-width:736px){#dg-product-roadmap{display:none}#dg-product-roadmap-phone{display:block}}
+@media print{#dg-product-roadmap{display:block!important}#dg-product-roadmap-phone{display:none!important}}
+</style>
+<rect width="264" height="656" class="ground"/>
+<rect x="8" y="80" width="248" height="190" rx="10" class="band"/>
+<rect x="8" y="278" width="248" height="206" rx="10" class="band"/>
+<rect x="8" y="492" width="248" height="156" rx="10" class="band"/>
+<line x1="72.49" y1="132" x2="72.49" y2="160" class="r-ref"/>
+<line x1="72.49" y1="182" x2="72.49" y2="210" class="r-ref"/>
+<line x1="72.49" y1="232" x2="72.49" y2="260" class="r-ref"/>
+<line x1="72.49" y1="330" x2="72.49" y2="358" class="r-ref"/>
+<line x1="72.49" y1="380" x2="72.49" y2="408" class="r-ref"/>
+<line x1="72.49" y1="446" x2="72.49" y2="474" class="r-ref"/>
+<line x1="72.49" y1="560" x2="72.49" y2="588" class="r-ref"/>
+<line x1="72.49" y1="610" x2="72.49" y2="638" class="r-ref"/>
+<line x1="21" y1="132" x2="21" y2="160" class="track"/>
+<line x1="85.01" y1="132" x2="85.01" y2="160" class="track"/>
+<line x1="147.99" y1="132" x2="147.99" y2="160" class="track"/>
+<line x1="21" y1="182" x2="21" y2="210" class="track"/>
+<line x1="85.01" y1="182" x2="85.01" y2="210" class="track"/>
+<line x1="147.99" y1="182" x2="147.99" y2="210" class="track"/>
+<line x1="21" y1="232" x2="21" y2="260" class="track"/>
+<line x1="85.01" y1="232" x2="85.01" y2="260" class="track"/>
+<line x1="147.99" y1="232" x2="147.99" y2="260" class="track"/>
+<line x1="21" y1="330" x2="21" y2="358" class="track"/>
+<line x1="85.01" y1="330" x2="85.01" y2="358" class="track"/>
+<line x1="147.99" y1="330" x2="147.99" y2="358" class="track"/>
+<line x1="21" y1="380" x2="21" y2="408" class="track"/>
+<line x1="85.01" y1="380" x2="85.01" y2="408" class="track"/>
+<line x1="147.99" y1="380" x2="147.99" y2="408" class="track"/>
+<line x1="21" y1="446" x2="21" y2="474" class="track"/>
+<line x1="85.01" y1="446" x2="85.01" y2="474" class="track"/>
+<line x1="147.99" y1="446" x2="147.99" y2="474" class="track"/>
+<line x1="21" y1="560" x2="21" y2="588" class="track"/>
+<line x1="85.01" y1="560" x2="85.01" y2="588" class="track"/>
+<line x1="147.99" y1="560" x2="147.99" y2="588" class="track"/>
+<line x1="21" y1="610" x2="21" y2="638" class="track"/>
+<line x1="85.01" y1="610" x2="85.01" y2="638" class="track"/>
+<line x1="147.99" y1="610" x2="147.99" y2="638" class="track"/>
+<text x="20" y="24" class="sub" text-anchor="start">Months from Jul 2026 to Dec 2027.</text>
+<text x="72.49" y="48" class="sub" text-anchor="middle">As of 26 Nov</text>
+<text x="21" y="68" class="val" text-anchor="middle">Jul</text>
+<text x="85.01" y="68" class="val" text-anchor="middle">2027</text>
+<text x="147.99" y="68" class="val" text-anchor="middle">Jul</text>
+<text x="20" y="104" class="name" text-anchor="start">Search</text>
+<text x="20" y="128" class="row" text-anchor="start">New search index</text>
+<rect x="67.79" y="138" width="153.6" height="16" class="band"/><text x="71.79" y="150" class="val" text-anchor="start">Jul–Oct 2026, 4 months</text>
+<text x="20" y="178" class="row" text-anchor="start">Search in beta</text>
+<rect x="76.49" y="188" width="171.68" height="16" class="band"/><text x="80.49" y="200" class="val" text-anchor="start">since Nov 2026, still running</text>
+<text x="20" y="228" class="row" text-anchor="start">Search for everyone</text>
+<rect x="114.54" y="238" width="65.68" height="16" class="band"/><text x="118.54" y="250" class="val" text-anchor="start">Mar 2027</text>
+<text x="20" y="302" class="name" text-anchor="start">Sync</text>
+<text x="20" y="326" class="row" text-anchor="start">Offline sync design</text>
+<rect x="57.01" y="336" width="161.6" height="16" class="band"/><text x="61.01" y="348" class="val" text-anchor="start">Aug–Sep 2026, 2 months</text>
+<text x="20" y="376" class="row" text-anchor="start">Offline sync build</text>
+<rect x="76.49" y="386" width="169.68" height="16" class="band"/><text x="80.49" y="398" class="val" text-anchor="start">since Oct 2026, still running</text>
+<text x="20" y="426" class="row" text-anchor="start">Sync for teams</text>
+<rect x="96.4" y="434" width="159.6" height="16" class="band"/><text x="100.4" y="446" class="val" text-anchor="start">Jun–Sep 2027, 4 months</text>
+<text x="20" y="516" class="name" text-anchor="start">Mobile app</text>
+<text x="20" y="540" class="row" text-anchor="start">Mobile app, version 2</text>
+<rect x="81.01" y="548" width="157.6" height="16" class="band"/><text x="85.01" y="560" class="val" text-anchor="start">Jan–Jun 2027, 6 months</text>
+<text x="20" y="606" class="row" text-anchor="start">App store release</text>
+<rect x="156.99" y="616" width="60.68" height="16" class="band"/><text x="160.99" y="628" class="val" text-anchor="start">Jul 2027</text>
+<rect x="21" y="138" width="42.79" height="16" rx="4" class="r-bar"/>
+<path d="M72.49,188 H67.79 A4,4 0 0 0 63.79,192 V200 A4,4 0 0 0 67.79,204 H72.49" class="r-bar"/>
+<circle cx="105.54" cy="246" r="5" class="r-pt"/>
+<rect x="31.79" y="336" width="21.22" height="16" rx="4" class="r-bar"/>
+<path d="M72.49,386 H57.01 A4,4 0 0 0 53.01,390 V398 A4,4 0 0 0 57.01,402 H72.49" class="r-bar"/>
+<rect x="137.55" y="452" width="42.44" height="16" rx="4" class="r-bar"/><line x1="147.99" y1="452.75" x2="147.99" y2="467.25" class="track"/>
+<rect x="85.01" y="566" width="62.97" height="16" rx="4" class="r-bar"/>
+<circle cx="147.99" cy="624" r="5" class="r-pt"/>
+</svg>
+<details class="dg-words">
+<summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>The diagram in words</summary>
+<div class="table-wrap is-text" role="region" aria-label="The rows of the timeline" tabindex="0"><table><thead><tr><th scope="col">Month</th><th scope="col">Lane</th><th scope="col">What happened</th><th scope="col">Note</th><th scope="col">Since the last</th></tr></thead><tbody><tr><td>Jul – Oct 2026, 4 months</td><td>Search</td><th scope="row" class="whole">New search index</th><td></td><td></td></tr><tr><td>Aug – Sep 2026, 2 months</td><td>Sync</td><th scope="row" class="whole">Offline sync design</th><td></td><td>+1 month</td></tr><tr><td>since Oct 2026, still running</td><td>Sync</td><th scope="row" class="whole">Offline sync build</th><td>About half done; two weeks late.</td><td>+2 months</td></tr><tr><td>since Nov 2026, still running</td><td>Search</td><th scope="row" class="whole">Search in beta</th><td>Open to every team that turns it on.</td><td>+1 month</td></tr><tr><td>Jan – Jun 2027, 6 months</td><td>Mobile app</td><th scope="row" class="whole">Mobile app, version 2</th><td></td><td>+2 months</td></tr><tr><td>Mar 2027</td><td>Search</td><th scope="row" class="whole">Search for everyone</th><td></td><td>+2 months</td></tr><tr><td>Jun – Sep 2027, 4 months</td><td>Sync</td><th scope="row" class="whole">Sync for teams</th><td>Starts when offline sync is released.</td><td>+3 months</td></tr><tr><td>Jul 2027</td><td>Mobile app</td><th scope="row" class="whole">App store release</th><td></td><td>+1 month</td></tr></tbody></table></div>
+<ul><li>8 rows: 2 events and 6 spans, from Jul 2026 to Sep 2027 (15 months).</li><li>Longest span: Mobile app, version 2, 6 months.</li><li>2 spans are still running on 26 Nov.</li><li>A line at 26 Nov: the day this page was written.</li></ul>
+</details>

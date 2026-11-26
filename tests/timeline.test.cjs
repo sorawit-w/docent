@@ -27,7 +27,9 @@ const meet = (a, b) => a.x0 < b.x1 && a.x1 > b.x0 && a.y0 < b.y1 && a.y1 > b.y0;
 const ticksOf = (s) => s.notes.filter((n) => n.cls === "val" && !n.knock).map((n) => n.s);
 const wordsOf = (svg) => svg.split('<details class="dg-words">')[1];
 
-for (const [name, data] of [["timeline-incident", incident], ["timeline-release", release]]) {
+const roadmap = load("timeline-roadmap");
+
+for (const [name, data] of [["timeline-incident", incident], ["timeline-release", release], ["timeline-roadmap", roadmap]]) {
   test(`a timeline matches the stored drawing: ${name}`, () => {
     const { svg, form } = renderDiagram(data());
     assert.equal(form, "timeline");
@@ -158,7 +160,7 @@ test("wrong timeline data is refused with a plain reason that names the row", ()
   bad((d) => (d.rows[3].to = "08:40"), /row 4 \("Saving failed"\) starts and ends at 08:40; write it as an event, with "at"/);
   bad((d) => (d.rows[3].to = "08:41"), /the span "Saving failed" is [\d.]+px wide on a desktop and on paper; write it as an event, or shorten the scale/);
   bad((d) => (d.rows[3].to = "08:43"), /the span "Saving failed" is [\d.]+px wide on a phone; write it as an event, or shorten the scale/);
-  bad((d) => delete d.rows[3].to, /row 4 \("Saving failed"\) has "from" but no "to"; a span needs both, or write it as an event, with "at"/);
+  bad((d) => delete d.rows[3].to, /row 4 \("Saving failed"\) has "from" but no "to"; a span still running needs "asOf", the date the page was written, or write it as an event, with "at"/);
   bad((d) => delete d.rows[3].from, /row 4 \("Saving failed"\) has "to" but no "from"/);
   bad((d) => (d.rows[0].from = "08:00"), /row 1 \("Change merged"\) has "at" and one of "from" and "to"/);
   bad((d) => (d.rows[1] = { name: "Nothing", lane: "system" }), /row 2 \("Nothing"\) has no time/);
@@ -173,7 +175,6 @@ test("wrong timeline data is refused with a plain reason that names the row", ()
   bad((d) => (d.rows[0].lane = "other"), /names the lane "other", which does not exist/);
   bad((d) => { delete d.lanes; }, /row 1 \("Change merged"\) names a lane, but the timeline has no "lanes"/);
   bad((d) => d.lanes.push({ id: "spare", name: "Spare" }), /the lane "spare" has no rows/);
-  bad((d) => (d.scale = { from: "2026-11", to: "2027-04" }), /a timeline of months is not built yet/);
   bad((d) => (d.place = "walk"), /a timeline sits in the text flow/);
   bad((d) => (d.form = "wide"), /a timeline has no "form"/);
 });
@@ -207,4 +208,62 @@ test("a timeline takes every color from the page tokens, uses no ultramarine, an
   assert.doesNotMatch(bare, /(fill|stroke)="(?!none|currentColor)[^"]*"/, "no color written on an element");
   assert.doesNotMatch(svg, /gradient|filter|shadow|stroke-dasharray/i, "flat, and nothing dashed");
   assert.doesNotMatch(svg, /class="pulse/, "no dot");
+});
+
+test("a roadmap over 18 months: the month grain, an as-of line, and spans still running", () => {
+  const { scene, phone, svg, warnings } = renderDiagram(roadmap());
+  assert.deepEqual(warnings, []);
+  for (const s of [scene, phone]) {
+    assert.equal(s.notes[0].s, "Months from Jul 2026 to Dec 2027.", "the line above names the months and their years");
+    assert.equal(s.bands.length, 3, "one band per workstream");
+    assert.ok(s.notes.some((n) => n.s === "As of 26 Nov" && n.cls === "sub"), "the as-of line is named from its date");
+  }
+  assert.equal(scene.under.filter((u) => u.includes('class="r-ref"')).length, 3, "on a desktop, a muted line through each band");
+  assert.equal(phone.under.filter((u) => u.includes('class="r-ref"')).length, 8, "on a phone, through each row's strip");
+  assert.deepEqual(ticksOf(scene), ["Jul", "Oct", "2027", "Apr", "Jul", "Oct"], "quarters, and January writes its year");
+  assert.deepEqual(ticksOf(phone), ["Jul", "2027", "Jul"], "every 6 months on a phone");
+  assert.ok(scene.notes.some((n) => n.s === "Jul–Oct 2026, 4 months"), "two months of one year share the year");
+  assert.ok(scene.notes.some((n) => n.s === "Mar 2027" && n.knock), "a milestone at the month grain says the month and the year");
+  const words = wordsOf(svg);
+  assert.match(words, /<th scope="col">Month<\/th>/);
+  assert.match(words, /<tr><td>since Oct 2026, still running<\/td><td>Sync<\/td><th scope="row" class="whole">Offline sync build<\/th><td>About half done; two weeks late\.<\/td><td>\+2 months<\/td><\/tr>/);
+  assert.match(words, /<li>8 rows: 2 events and 6 spans, from Jul 2026 to Sep 2027 \(15 months\)\.<\/li><li>Longest span: Mobile app, version 2, 6 months\.<\/li><li>2 spans are still running on 26 Nov\.<\/li><li>A line at 26 Nov: the day this page was written\.<\/li>/, "no gap after a span still running, whose end is not known");
+});
+
+test("a span still running ends at the as-of line, with no outline on its right side", () => {
+  const { scene } = renderDiagram(roadmap());
+  const asOf = scene.notes.find((n) => n.s === "As of 26 Nov").x;
+  const part = scene.parts.find((p) => p.id === "Search in beta").svg;
+  const m = part.match(/^<path d="M([\d.]+),([\d.]+) H([\d.]+) A4,4 0 0 0 ([\d.]+),([\d.]+) V([\d.]+) A4,4 0 0 0 ([\d.]+),([\d.]+) H([\d.]+)" class="r-bar"\/>/);
+  assert.ok(m, `an open path, not a closed bar: ${part}`);
+  assert.equal(m[1], m[9], "it starts and ends at the same x, the as-of line, and the stroke is not closed there");
+  assert.ok(Math.abs(+m[1] - asOf) < 0.02, "its open end stands on the as-of line");
+  assert.ok(scene.notes.some((n) => n.s === "since Nov 2026, still running" && n.knock), "its value says it is still running");
+  assert.match(scene.parts.find((p) => p.id === "New search index").svg, /^<rect /, "a span that ended is the closed bar");
+});
+
+test("asOf at the minute and day grains, and its refusals", () => {
+  const base = { id: "asof", kind: "timeline", label: "As of." };
+  const minutes = renderDiagram({ ...base, scale: { from: "08:00", to: "10:00", day: "2026-11-12", zone: "UTC" }, asOf: "09:30", rows: [{ name: "Deploy", at: "08:10" }, { name: "Errors", from: "08:20" }, { name: "Paged", at: "08:40" }] });
+  assert.ok(minutes.scene.notes.some((n) => n.s === "As of 09:30"), "a time names the line");
+  assert.ok(minutes.scene.notes.some((n) => n.s === "since 08:20, still running"));
+  assert.match(wordsOf(minutes.svg), /1 span is still running on 09:30\./);
+  const days = renderDiagram({ ...base, scale: { from: "2026-11-01", to: "2026-12-31" }, asOf: "2026-11-26", rows: [{ name: "Beta", from: "2026-11-03" }, { name: "Review", at: "2026-11-20" }, { name: "Release", at: "2026-12-15" }] });
+  assert.ok(days.scene.notes.some((n) => n.s === "As of 26 Nov") && days.scene.notes.some((n) => n.s === "since 3 Nov, still running"));
+  const bad = (data, reason) => assert.throws(() => renderDiagram({ ...base, ...data }), reason);
+  const scale = { from: "2026-11-01", to: "2026-12-31" };
+  bad({ scale, asOf: "2026-11-26", rows: [{ name: "Late", from: "2026-11-28" }, { name: "A", at: "2026-11-02" }] }, /row 1 \("Late"\) starts at 2026-11-28, not before "asOf" \(2026-11-26\); a span still running started before the page was written/);
+  bad({ scale, asOf: "2027-01-05", rows: [{ name: "A", at: "2026-11-02" }, { name: "B", at: "2026-11-09" }] }, /"asOf" is "2027-01-05", outside the scale/);
+  bad({ scale, asOf: "2026-11", rows: [{ name: "A", at: "2026-11-02" }, { name: "B", at: "2026-11-09" }] }, /"asOf" is "2026-11", which is in months; every time of this chart is in days/);
+  bad({ scale: { ...scale, marks: [{ at: "2026-11-10", name: "Freeze" }, { at: "2026-11-20", name: "Review" }] }, asOf: "2026-11-26", rows: [{ name: "A", at: "2026-11-02" }, { name: "B", at: "2026-11-09" }] }, /a timeline has at most 2 named lines, and "asOf" is one of them; this one has 2 marks and "asOf"/);
+  for (const name of ["Today", "now", "Today (26 Nov)"]) bad({ scale: { ...scale, marks: [{ at: "2026-11-26", name }] }, rows: [{ name: "A", at: "2026-11-02" }, { name: "B", at: "2026-11-09" }] }, /a page is read after it is written, so write "asOf", and the line is named from its date/);
+  assert.doesNotThrow(() => renderDiagram({ ...base, scale: { ...scale, marks: [{ at: "2026-11-26", name: "Known issue fixed" }] }, rows: [{ name: "A", at: "2026-11-02" }, { name: "B", at: "2026-11-09" }] }), "a name that only holds the letters 'now' is fine");
+});
+
+test("the month grain: February is shorter than March, and a span of one month", () => {
+  const { scene } = renderDiagram({ id: "months", kind: "timeline", label: "Months.", scale: { from: "2027-01", to: "2027-06" }, rows: [{ name: "February", from: "2027-02", to: "2027-02" }, { name: "March", from: "2027-03", to: "2027-03" }, { name: "Launch", at: "2027-05" }] });
+  const width = (id) => +scene.parts.find((p) => p.id === id).svg.match(/width="([\d.]+)"/)[1];
+  assert.ok(width("February") < width("March"), `February (${width("February")}px) is shorter than March (${width("March")}px)`);
+  assert.ok(Math.abs(width("February") / width("March") - 28 / 31) < 0.001, "in proportion to their real days");
+  assert.ok(scene.notes.some((n) => n.s === "Feb 2027, 1 month"), "a span of one month");
 });
