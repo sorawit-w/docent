@@ -1,0 +1,22 @@
+{
+  "id": "product-roadmap",
+  "kind": "timeline",
+  "label": "As of 26 November 2026, search is in beta and offline sync is being built, both still running. Search reaches everyone in March 2027, the new mobile app is built from January to June, and sync for teams follows from June to September 2027.",
+  "scale": {"from": "2026-07", "to": "2027-12"},
+  "asOf": "2026-11-26",
+  "lanes": [
+    {"id": "search", "name": "Search"},
+    {"id": "sync", "name": "Sync"},
+    {"id": "mobile", "name": "Mobile app"}
+  ],
+  "rows": [
+    {"name": "New search index", "from": "2026-07", "to": "2026-10", "lane": "search"},
+    {"name": "Search in beta", "from": "2026-11", "lane": "search", "note": "Open to every team that turns it on."},
+    {"name": "Search for everyone", "at": "2027-03", "lane": "search"},
+    {"name": "Offline sync design", "from": "2026-08", "to": "2026-09", "lane": "sync"},
+    {"name": "Offline sync build", "from": "2026-10", "lane": "sync", "note": "About half done; two weeks late."},
+    {"name": "Sync for teams", "from": "2027-06", "to": "2027-09", "lane": "sync", "note": "Starts when offline sync is released."},
+    {"name": "Mobile app, version 2", "from": "2027-01", "to": "2027-06", "lane": "mobile"},
+    {"name": "App store release", "at": "2027-07", "lane": "mobile"}
+  ]
+}

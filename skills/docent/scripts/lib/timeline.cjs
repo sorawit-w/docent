@@ -13,15 +13,19 @@ const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "
 const pad = (n) => String(n).padStart(2, "0");
 const dateOf = (day) => { const t = new Date(day * 86400000); return { y: t.getUTCFullYear(), m: t.getUTCMonth(), d: t.getUTCDate() }; };
 const dayText = (day, year) => { const p = dateOf(day); return `${p.d} ${MONTHS[p.m]}${year ? ` ${p.y}` : ""}`; };
+const monthText = (day) => { const p = dateOf(day); return `${MONTHS[p.m]} ${p.y}`; };
+const isMonthStart = (day) => dateOf(day).d === 1;
+const monthsBetween = (a, b) => { const p = dateOf(a), q = dateOf(b); return (q.y - p.y) * 12 + q.m - p.m; };
 // Minutes since midnight, kept at or above 0, so a time before 1970 (a negative number) writes its clock right too.
 const clockText = (v) => { const m = ((v % DAY) + DAY) % DAY; return `${pad(Math.floor(m / 60))}:${pad(m % 60)}`; };
 
 /**
  * A time as the timeline writes it, beside a mark and in its table: "08:12" on the scale's first day and "13 Nov 01:00" after
- * it; "12 Nov" in the scale's first year and "4 Jan 2027" after it. `full` always writes the date and the year, for the line
- * above the chart.
+ * it; "12 Nov" in the scale's first year and "4 Jan 2027" after it; a month always with its year, "Mar 2027". `full` always
+ * writes the date and the year, for the line above the chart. An "as of" day on a scale of months is a day, "26 Nov".
  */
 function timeText(v, ts, full = false) {
+  if (ts.grain === "month" && isMonthStart(v)) return monthText(v);
   if (ts.grain === "minute") {
     const day = Math.floor(v / DAY);
     if (full) return `${dayText(day, true)} ${clockText(v)}`;
@@ -30,8 +34,11 @@ function timeText(v, ts, full = false) {
   return dayText(v, full || dateOf(v).y !== dateOf(ts.from).y);
 }
 
-/** A length of time in words: "47 min", "1 h 3 min", "2 h"; "1 day", "12 days". */
-function lengthText(n, grain) {
+/** The length from a to b in words: "47 min", "1 h 3 min", "2 h"; "1 day", "12 days"; "1 month", "6 months" between the
+ * starts of two months, and days on a scale of months when one end is an "as of" day. */
+function lengthText(a, b, grain) {
+  const n = b - a;
+  if (grain === "month" && isMonthStart(a) && isMonthStart(b)) { const k = monthsBetween(a, b); return k === 1 ? "1 month" : `${k} months`; }
   if (grain === "minute") {
     if (n < 60) return `${n} min`;
     const h = Math.floor(n / 60), m = n % 60;
@@ -40,30 +47,46 @@ function lengthText(n, grain) {
   return n === 1 ? "1 day" : `${n} days`;
 }
 
-/** The gap since the row before, as the table writes it: "+13 min", "+1 h 3 min", "+3 days", or "same time" and "same day". */
-const sinceText = (n, grain) => (n === 0 ? (grain === "minute" ? "same time" : "same day") : `+${lengthText(n, grain)}`);
+/** The gap since the row before, as the table writes it: "+13 min", "+1 h 3 min", "+3 days", "+2 months", or "same time",
+ * "same day" and "same month". */
+const sinceText = (a, b, grain) => (a === b ? `same ${{ minute: "time", day: "day", month: "month" }[grain]}` : `+${lengthText(a, b, grain)}`);
 
 /**
  * The longest stretch between two rows that holds no mark, inside the scale: { from, to, length, shown }, or null when none.
- * `shown` is where the stretch starts as the author wrote it: a span of days ends at the start of the next day, but the
- * stretch reads "from 30 Nov", the last day the span covers. An event at that same moment wins, since it is written there.
+ * `shown` is where the stretch starts as the author wrote it: a span of days or months ends at the start of the next one,
+ * but the stretch reads "from 30 Nov", the last day the span covers. A span still running has no end yet, so no stretch
+ * after it is empty. An event at the moment a stretch starts wins, since it is written there.
  */
 function longestGap(rows) {
   const marks = [...rows].sort((a, b) => a.at - b.at);
+  const reachOf = (r) => (r.running ? Infinity : r.end);
   let best = null, reach = marks[0];
   for (const r of marks.slice(1)) {
-    if (r.at > reach.end && (!best || r.at - reach.end > best.length)) best = { from: reach.end, to: r.at, length: r.at - reach.end, shown: reach.last };
-    if (r.end > reach.end || (r.end === reach.end && r.type === "event")) reach = r;
+    if (r.at > reachOf(reach) && (!best || r.at - reach.end > best.length)) best = { from: reach.end, to: r.at, length: r.at - reach.end, shown: reach.last };
+    if (reachOf(r) > reachOf(reach) || (reachOf(r) === reachOf(reach) && r.type === "event")) reach = r;
   }
   return best;
 }
+
+const NOT_A_DATE = /^\s*(today|now)\b/i;
 
 /** Checks timeline data and returns the model. */
 function readTimeline(data) {
   if (data.place != null && data.place !== "flow") fail(`a timeline sits in the text flow; "place" must be "flow"`);
   if (data.form != null) fail(`a timeline has no "form"; the renderer draws it 640px wide, and 264px wide on a phone`);
   const scale = readTimeScale(data.scale);
-  if (scale.grain === "month") fail(`a timeline of months is not built yet; write the times as days, such as "2026-11-01"`);
+  for (const m of scale.marks) if (NOT_A_DATE.test(m.name)) fail(`a line is named "${m.name}"; a page is read after it is written, so write "asOf", and the line is named from its date`);
+  // "asOf" is the time or date the page was written: a named line, where every span still running ends. On a scale of months
+  // it may be a day, "2026-11-26", since a page is written on a day.
+  let asOf = null;
+  if (data.asOf != null) {
+    const dayOnMonths = scale.grain === "month" && /^\d{4}-\d{2}-\d{2}$/.test(data.asOf);
+    const t = readTime(data.asOf, dayOnMonths ? { ...scale, grain: "day" } : scale, `"asOf"`);
+    // A day keeps its day, also on the 1st of a month: "2026-11-01" is "1 Nov", and only "2026-11" is "Nov 2026".
+    asOf = { at: t.at, written: data.asOf, shown: dayOnMonths ? dayText(t.at) : timeText(t.at, scale) };
+    if (scale.marks.length + 1 > 2) fail(`a timeline has at most 2 named lines, and "asOf" is one of them; this one has ${scale.marks.length} marks and "asOf"`);
+    scale.marks = [...scale.marks, { at: t.at, name: `As of ${asOf.shown}` }].sort((a, b) => a.at - b.at);
+  }
   if (data.lanes != null && !Array.isArray(data.lanes)) fail(`"lanes" must be a list`);
   const lanes = (data.lanes || []).map((l, i) => {
     const what = `lane ${i + 1}`;
@@ -85,15 +108,23 @@ function readTimeline(data) {
       if (has("from") || has("to")) fail(`${what} has "at" and one of "from" and "to"; a row is an event ("at") or a span ("from" and "to")`);
       const t = readTime(r.at, scale, `"at" of ${what}`);
       row = { type: "event", at: t.at, end: t.at, last: t.at, value: timeText(t.at, scale) };
+    } else if (has("from") && !has("to")) {
+      // A span still running: it ends at the "as of" line, with no outline on its right side, so it claims no end.
+      if (!asOf) fail(`${what} has "from" but no "to"; a span still running needs "asOf", the date the page was written, or write it as an event, with "at"`);
+      const a = readTime(r.from, scale, `"from" of ${what}`);
+      if (a.at >= asOf.at) fail(`${what} starts at ${r.from}, not before "asOf" (${asOf.written}); a span still running started before the page was written`);
+      const since = `since ${timeText(a.at, scale)}, still running`;
+      row = { type: "span", running: true, at: a.at, end: asOf.at, last: asOf.at, value: since, short: "still running", length: lengthText(a.at, asOf.at, scale.grain) };
     } else if (has("from")) {
-      if (!has("to")) fail(`${what} has "from" but no "to"; a span needs both, or write it as an event, with "at"`);
       const a = readTime(r.from, scale, `"from" of ${what}`), b = readTime(r.to, scale, `"to" of ${what}`);
       if (b.at < a.at) fail(`${what} ends before it starts: "to" is earlier than "from"`);
       if (scale.grain === "minute" && b.at === a.at) fail(`${what} starts and ends at ${r.from}; write it as an event, with "at"`);
-      const length = lengthText(b.end - a.at, scale.grain);
+      const length = lengthText(a.at, b.end, scale.grain);
       // Beside its bar a span reads "08:40–09:27, 47 min", as a range chart writes a range; its table cell takes spaces around
       // the dash, as the proposal writes it, so a narrow column wraps at the spaces and never inside the times.
       const ends = b.at === a.at ? [timeText(a.at, scale)] : [timeText(a.at, scale), timeText(b.at, scale)];
+      // Two months of one year share the year: "Jul–Oct 2026".
+      if (scale.grain === "month" && ends.length === 2 && ends[0].slice(-4) === ends[1].slice(-4)) ends[0] = ends[0].slice(0, -5);
       // When both times carry a date, the value can be wider than a phone; then the drawing writes the length alone.
       row = { type: "span", at: a.at, end: b.end, last: b.at, value: `${ends.join("–")}, ${length}`, short: length, cell: `${ends.join(" – ")}, ${length}`, length };
     } else if (has("to")) fail(`${what} has "to" but no "from"; a span needs both, or write it as an event, with "at"`);
@@ -113,7 +144,7 @@ function readTimeline(data) {
     if (!l.rows.length) fail(`the lane "${l.id}" has no rows; remove it, or give it a row`);
   }
   return {
-    id: id(data.id, '"id"'), label: words(data.label, '"label"', 400), kind: "timeline", scale, lanes,
+    id: id(data.id, '"id"'), label: words(data.label, '"label"', 400), kind: "timeline", scale, lanes, asOf,
     rows: lanes.length ? lanes.flatMap((l) => l.rows) : byTime, byTime, gap: longestGap(rows),
   };
 }
@@ -126,9 +157,14 @@ function extent(r, sc, x0, x1, where) {
   return { a, b, sides: ["right", "left"] };
 }
 
-/** The mark of one row, as SVG, on the line cy: a filled circle for an event, the range chart's bar for a span. */
+/** The mark of one row, as SVG, on the line cy: a filled circle for an event, the range chart's bar for a span. A span still
+ * running is the same bar with no outline on its right side: a path filled to the "as of" line, its stroke left open there. */
 function markSvg(r, sc, x0, x1, cy, through) {
   if (r.type === "event") return `<circle cx="${num(sc.x(r.at))}" cy="${num(cy)}" r="5" class="r-pt"/>`;
+  if (r.running) {
+    const a = sc.x(r.at), b = sc.x(r.end), y0 = cy - 8, y1 = cy + 8;
+    return `<path d="M${num(b)},${num(y0)} H${num(a + 4)} A4,4 0 0 0 ${num(a)},${num(y0 + 4)} V${num(y1 - 4)} A4,4 0 0 0 ${num(a + 4)},${num(y1)} H${num(b)}" class="r-bar"/>${through}`;
+  }
   return `<rect x="${num(sc.x(r.at))}" y="${num(cy - 8)}" width="${num(sc.x(r.end) - sc.x(r.at))}" height="16" rx="4" class="r-bar"/>${through}`;
 }
 
@@ -138,6 +174,7 @@ function headOf(ts) {
     const first = Math.floor(ts.from / DAY), last = Math.floor(ts.to / DAY);
     return first === last ? `Times in ${ts.zone} on ${dayText(first, true)}.` : `Times in ${ts.zone}, from ${timeText(ts.from, ts, true)} to ${timeText(ts.to, ts, true)}.`;
   }
+  if (ts.grain === "month") return `Months from ${monthText(ts.from)} to ${monthText(ts.last)}.`;
   return `Dates from ${dayText(ts.from, true)} to ${dayText(ts.last, true)}.`;
 }
 
@@ -161,9 +198,9 @@ function layoutTimeline(model, phone = false) {
 function wordsOf(model) {
   const ts = model.scale, grain = ts.grain;
   const lanes = model.lanes.length > 0, notes = model.rows.some((r) => r.note);
-  const head = `<tr><th scope="col">${grain === "minute" ? `Time, ${esc(ts.zone)}` : "Date"}</th>${lanes ? '<th scope="col">Lane</th>' : ""}<th scope="col">What happened</th>${notes ? '<th scope="col">Note</th>' : ""}<th scope="col">Since the last</th></tr>`;
+  const head = `<tr><th scope="col">${{ minute: `Time, ${esc(ts.zone)}`, day: "Date", month: "Month" }[grain]}</th>${lanes ? '<th scope="col">Lane</th>' : ""}<th scope="col">What happened</th>${notes ? '<th scope="col">Note</th>' : ""}<th scope="col">Since the last</th></tr>`;
   const body = model.byTime.map((r, i) => {
-    const since = i ? sinceText(r.at - model.byTime[i - 1].at, grain) : "";
+    const since = i ? sinceText(model.byTime[i - 1].at, r.at, grain) : "";
     return `<tr><td>${esc(r.cell || r.value)}</td>${lanes ? `<td>${esc(r.lane.name)}</td>` : ""}<th scope="row" class="whole">${esc(r.name)}</th>${notes ? `<td>${esc(r.note || "")}</td>` : ""}<td>${esc(since)}</td></tr>`;
   }).join("");
   const events = model.rows.filter((r) => r.type === "event").length, spans = model.rows.length - events;
@@ -171,12 +208,15 @@ function wordsOf(model) {
   const first = model.byTime[0];
   // The row that ends last; an event at the same moment as a span's end wins, since it is written at that moment.
   const last = model.rows.reduce((a, b) => (b.end > a.end || (b.end === a.end && b.type === "event") ? b : a));
-  const lastAt = last.type === "span" && grain === "day" ? last.end - 1 : last.end;
   const zone = grain === "minute" ? ` ${esc(ts.zone)}` : "";
-  const lines = [`${model.rows.length} rows: ${[events && count(events, "event"), spans && count(spans, "span")].filter(Boolean).join(" and ")}, from ${esc(timeText(first.at, ts))} to ${esc(timeText(lastAt, ts))}${zone} (${lengthText(last.end - first.at, grain)}).`];
-  if (model.gap) lines.push(`Longest gap: ${lengthText(model.gap.length, grain)}, from ${esc(timeText(model.gap.shown, ts))} to ${esc(timeText(model.gap.to, ts))}.`);
-  if (spans) { const long = model.rows.filter((r) => r.type === "span").reduce((a, b) => (b.end - b.at > a.end - a.at ? b : a)); lines.push(`Longest span: ${esc(long.name)}, ${long.length}.`); }
-  for (const m of ts.marks) lines.push(`A line at ${esc(timeText(m.at, ts))}: ${esc(m.name)}.`);
+  const lines = [`${model.rows.length} rows: ${[events && count(events, "event"), spans && count(spans, "span")].filter(Boolean).join(" and ")}, from ${esc(timeText(first.at, ts))} to ${esc(timeText(last.last, ts))}${zone} (${lengthText(first.at, last.end, grain)}).`];
+  if (model.gap) lines.push(`Longest gap: ${lengthText(model.gap.from, model.gap.to, grain)}, from ${esc(timeText(model.gap.shown, ts))} to ${esc(timeText(model.gap.to, ts))}.`);
+  // The longest span that has ended; a span still running has no length yet.
+  const ended = model.rows.filter((r) => r.type === "span" && !r.running);
+  if (ended.length) { const long = ended.reduce((a, b) => (b.end - b.at > a.end - a.at ? b : a)); lines.push(`Longest span: ${esc(long.name)}, ${long.length}.`); }
+  const running = model.rows.filter((r) => r.running).length;
+  if (running) lines.push(`${running === 1 ? "1 span is" : `${running} spans are`} still running on ${esc(model.asOf.shown)}.`);
+  for (const m of ts.marks) lines.push(model.asOf && m.at === model.asOf.at && m.name === `As of ${model.asOf.shown}` ? `A line at ${esc(model.asOf.shown)}: the ${grain === "minute" ? "time" : "day"} this page was written.` : `A line at ${esc(timeText(m.at, ts))}: ${esc(m.name)}.`);
   return `<div class="table-wrap is-text" role="region" aria-label="The rows of the timeline" tabindex="0"><table><thead>${head}</thead><tbody>${body}</tbody></table></div>\n<ul>${lines.map((l) => `<li>${l}</li>`).join("")}</ul>`;
 }
 
