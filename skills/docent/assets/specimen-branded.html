@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex">
 <title>Report a bug and get a fix — Example project</title>
 <style>
-/* docent:kit 0.51.0 */
+/* docent:kit 0.52.0 */
 /* Docent page styles. Tokens come from references/DESIGN.md. One file, no network. */
 :root {
   color-scheme: light;
@@ -910,13 +910,191 @@ footer p { margin: 0; }
         <figcaption><strong>Figure 2</strong>The path of a bug report, step by step. The colored leg is the current step.</figcaption>
       </figure>
     </div>
+    <figure>
+      <div class="fig" role="region" aria-label="Figure 3, the life of one bug report" tabindex="0">
+<!-- docent:diagram
+{
+  "id": "one-report",
+  "kind": "timeline",
+  "label": "One bug report took 22 days from the report to the release. The maintainers asked for steps the next day, the reporter sent them 3 days later, and the bug was confirmed 2 days after that. The fix was in review for 8 days, version 2.4.1 came out on 27 October, and the report was closed the next day.",
+  "scale": {"from": "2026-10-01", "to": "2026-10-31"},
+  "lanes": [
+    {"id": "reporter", "name": "The reporter"},
+    {"id": "maintainers", "name": "The maintainers"}
+  ],
+  "rows": [
+    {"name": "Report filed", "at": "2026-10-05", "lane": "reporter", "note": "The export drops the last row of a table."},
+    {"name": "Steps asked for", "at": "2026-10-06", "lane": "maintainers", "note": "Triage result: needs steps."},
+    {"name": "Steps sent", "at": "2026-10-09", "lane": "reporter", "note": "Five steps, and the version, 2.4.0."},
+    {"name": "Bug confirmed", "at": "2026-10-11", "lane": "maintainers"},
+    {"name": "Fix in review", "from": "2026-10-13", "to": "2026-10-20", "lane": "maintainers"},
+    {"name": "Released in 2.4.1", "at": "2026-10-27", "lane": "maintainers"},
+    {"name": "Report closed", "at": "2026-10-28", "lane": "maintainers", "note": "The reporter checked the fix in 2.4.1."}
+  ]
+}
+-->
+<svg id="dg-one-report" class="dg dg-timeline dg-auto" xmlns="http://www.w3.org/2000/svg" width="640" height="380" viewBox="0 0 640 380" role="img" aria-label="One bug report took 22 days from the report to the release. The maintainers asked for steps the next day, the reporter sent them 3 days later, and the bug was confirmed 2 days after that. The fix was in review for 8 days, version 2.4.1 came out on 27 October, and the report was closed the next day.">
+<style>
+#dg-one-report{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-one-report .ground{fill:var(--fig,#e9f6fa)}
+#dg-one-report .band{fill:var(--bg,#f6fcfe)}
+#dg-one-report .track{stroke:var(--line,#c0dbe3)}
+#dg-one-report .line{fill:none;stroke:var(--text,#152225);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-one-report .head{fill:var(--text,#152225)}
+#dg-one-report .stop{fill:var(--bg,#f6fcfe);stroke:var(--text,#152225);stroke-width:1.5}
+#dg-one-report .stop.end{fill:var(--text,#152225)}
+#dg-one-report .mark{fill:var(--bg,#f6fcfe);stroke:var(--text,#152225);stroke-width:1.25}
+#dg-one-report .card{fill:var(--bg,#f6fcfe);stroke:var(--line,#c0dbe3)}
+#dg-one-report .icon{fill:none;stroke:var(--text,#152225);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-one-report .icon.on-end{stroke:var(--bg,#f6fcfe)}
+#dg-one-report .icon.lane-icon{stroke:var(--muted,#526064)}
+#dg-one-report .num{font-size:12px;font-weight:600;fill:var(--text,#152225);font-variant-numeric:tabular-nums}
+#dg-one-report .name{font-size:14px;font-weight:600;fill:var(--text,#152225)}
+#dg-one-report .lane{font-size:14px;font-weight:600;fill:var(--muted,#526064)}
+#dg-one-report .sub,#dg-one-report .verb{font-size:12px;fill:var(--muted,#526064)}
+#dg-one-report .pulse{display:none;fill:var(--dot,#0a5f8a);stroke:var(--bg,#f6fcfe);stroke-width:2.5}
+#dg-one-report .row{font-size:14px;fill:var(--text,#152225)}
+#dg-one-report .val{font-size:12px;fill:var(--muted,#526064);font-variant-numeric:tabular-nums}
+#dg-one-report .r-bar{fill:var(--bg,#f6fcfe);stroke:var(--text,#152225);stroke-width:1.5}
+#dg-one-report .r-pt{fill:var(--text,#152225)}
+#dg-one-report .r-lim{fill:none;stroke:var(--text,#152225);stroke-width:2}
+#dg-one-report .r-ref{stroke:var(--muted,#526064)}
+@media (prefers-reduced-motion:reduce){#dg-one-report .pulse{animation:none!important}#dg-one-report .pulse{display:none!important}}
+@media print{#dg-one-report{max-width:100%;height:auto}#dg-one-report .pulse{display:none!important}}
+#dg-one-report-phone{display:none}
+</style>
+<rect width="640" height="380" class="ground"/>
+<rect x="8" y="60" width="624" height="104" rx="10" class="band"/>
+<rect x="8" y="172" width="624" height="200" rx="10" class="band"/>
+<line x1="215.94" y1="60" x2="215.94" y2="164" class="track"/>
+<line x1="310.32" y1="60" x2="310.32" y2="164" class="track"/>
+<line x1="404.71" y1="60" x2="404.71" y2="164" class="track"/>
+<line x1="499.1" y1="60" x2="499.1" y2="164" class="track"/>
+<line x1="215.94" y1="172" x2="215.94" y2="372" class="track"/>
+<line x1="310.32" y1="172" x2="310.32" y2="372" class="track"/>
+<line x1="404.71" y1="172" x2="404.71" y2="372" class="track"/>
+<line x1="499.1" y1="172" x2="499.1" y2="372" class="track"/>
+<text x="20" y="24" class="sub" text-anchor="start">Dates from 1 Oct 2026 to 31 Oct 2026.</text>
+<text x="215.94" y="48" class="val" text-anchor="middle">5 Oct</text>
+<text x="310.32" y="48" class="val" text-anchor="middle">12 Oct</text>
+<text x="404.71" y="48" class="val" text-anchor="middle">19 Oct</text>
+<text x="499.1" y="48" class="val" text-anchor="middle">26 Oct</text>
+<text x="20" y="84" class="name" text-anchor="start">The reporter</text>
+<text x="20" y="113" class="row" text-anchor="start">Report filed</text>
+<rect x="224.94" y="100" width="40.92" height="16" class="band"/><text x="228.94" y="112" class="val" text-anchor="start">5 Oct</text>
+<text x="20" y="145" class="row" text-anchor="start">Steps sent</text>
+<rect x="278.87" y="132" width="40.92" height="16" class="band"/><text x="282.87" y="144" class="val" text-anchor="start">9 Oct</text>
+<text x="20" y="196" class="name" text-anchor="start">The maintainers</text>
+<text x="20" y="225" class="row" text-anchor="start">Steps asked for</text>
+<rect x="238.42" y="212" width="40.92" height="16" class="band"/><text x="242.42" y="224" class="val" text-anchor="start">6 Oct</text>
+<text x="20" y="257" class="row" text-anchor="start">Bug confirmed</text>
+<rect x="305.84" y="244" width="48.84" height="16" class="band"/><text x="309.84" y="256" class="val" text-anchor="start">11 Oct</text>
+<text x="20" y="289" class="row" text-anchor="start">Fix in review</text>
+<rect x="435.68" y="276" width="146.6" height="16" class="band"/><text x="439.68" y="288" class="val" text-anchor="start">13 Oct–20 Oct, 8 days</text>
+<text x="20" y="321" class="row" text-anchor="start">Released in 2.4.1</text>
+<rect x="521.58" y="308" width="48.84" height="16" class="band"/><text x="525.58" y="320" class="val" text-anchor="start">27 Oct</text>
+<text x="20" y="353" class="row" text-anchor="start">Report closed</text>
+<rect x="535.06" y="340" width="48.84" height="16" class="band"/><text x="539.06" y="352" class="val" text-anchor="start">28 Oct</text>
+<circle cx="215.94" cy="108" r="5" class="r-pt"/>
+<circle cx="269.87" cy="140" r="5" class="r-pt"/>
+<circle cx="229.42" cy="220" r="5" class="r-pt"/>
+<circle cx="296.84" cy="252" r="5" class="r-pt"/>
+<rect x="323.81" y="276" width="107.87" height="16" rx="4" class="r-bar"/><line x1="404.71" y1="276.75" x2="404.71" y2="291.25" class="track"/>
+<circle cx="512.58" cy="316" r="5" class="r-pt"/>
+<circle cx="526.06" cy="348" r="5" class="r-pt"/>
+</svg>
+<svg id="dg-one-report-phone" class="dg dg-timeline dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="522" viewBox="0 0 264 522" role="img" aria-label="One bug report took 22 days from the report to the release. The maintainers asked for steps the next day, the reporter sent them 3 days later, and the bug was confirmed 2 days after that. The fix was in review for 8 days, version 2.4.1 came out on 27 October, and the report was closed the next day.">
+<style>
+#dg-one-report-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-one-report-phone .ground{fill:var(--fig,#e9f6fa)}
+#dg-one-report-phone .band{fill:var(--bg,#f6fcfe)}
+#dg-one-report-phone .track{stroke:var(--line,#c0dbe3)}
+#dg-one-report-phone .line{fill:none;stroke:var(--text,#152225);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-one-report-phone .head{fill:var(--text,#152225)}
+#dg-one-report-phone .stop{fill:var(--bg,#f6fcfe);stroke:var(--text,#152225);stroke-width:1.5}
+#dg-one-report-phone .stop.end{fill:var(--text,#152225)}
+#dg-one-report-phone .mark{fill:var(--bg,#f6fcfe);stroke:var(--text,#152225);stroke-width:1.25}
+#dg-one-report-phone .card{fill:var(--bg,#f6fcfe);stroke:var(--line,#c0dbe3)}
+#dg-one-report-phone .icon{fill:none;stroke:var(--text,#152225);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-one-report-phone .icon.on-end{stroke:var(--bg,#f6fcfe)}
+#dg-one-report-phone .icon.lane-icon{stroke:var(--muted,#526064)}
+#dg-one-report-phone .num{font-size:12px;font-weight:600;fill:var(--text,#152225);font-variant-numeric:tabular-nums}
+#dg-one-report-phone .name{font-size:14px;font-weight:600;fill:var(--text,#152225)}
+#dg-one-report-phone .lane{font-size:14px;font-weight:600;fill:var(--muted,#526064)}
+#dg-one-report-phone .sub,#dg-one-report-phone .verb{font-size:12px;fill:var(--muted,#526064)}
+#dg-one-report-phone .pulse{display:none;fill:var(--dot,#0a5f8a);stroke:var(--bg,#f6fcfe);stroke-width:2.5}
+#dg-one-report-phone .row{font-size:14px;fill:var(--text,#152225)}
+#dg-one-report-phone .val{font-size:12px;fill:var(--muted,#526064);font-variant-numeric:tabular-nums}
+#dg-one-report-phone .r-bar{fill:var(--bg,#f6fcfe);stroke:var(--text,#152225);stroke-width:1.5}
+#dg-one-report-phone .r-pt{fill:var(--text,#152225)}
+#dg-one-report-phone .r-lim{fill:none;stroke:var(--text,#152225);stroke-width:2}
+#dg-one-report-phone .r-ref{stroke:var(--muted,#526064)}
+@media (prefers-reduced-motion:reduce){#dg-one-report-phone .pulse{animation:none!important}#dg-one-report-phone .pulse{display:none!important}}
+@media print{#dg-one-report-phone{max-width:100%;height:auto}#dg-one-report-phone .pulse{display:none!important}}
+@media (max-width:736px){#dg-one-report{display:none}#dg-one-report-phone{display:block}}
+@media print{#dg-one-report{display:block!important}#dg-one-report-phone{display:none!important}}
+</style>
+<rect width="264" height="522" class="ground"/>
+<rect x="8" y="60" width="248" height="140" rx="10" class="band"/>
+<rect x="8" y="208" width="248" height="306" rx="10" class="band"/>
+<line x1="29" y1="112" x2="29" y2="140" class="track"/>
+<line x1="206.1" y1="112" x2="206.1" y2="140" class="track"/>
+<line x1="29" y1="162" x2="29" y2="190" class="track"/>
+<line x1="206.1" y1="162" x2="206.1" y2="190" class="track"/>
+<line x1="29" y1="260" x2="29" y2="288" class="track"/>
+<line x1="206.1" y1="260" x2="206.1" y2="288" class="track"/>
+<line x1="29" y1="310" x2="29" y2="338" class="track"/>
+<line x1="206.1" y1="310" x2="206.1" y2="338" class="track"/>
+<line x1="29" y1="376" x2="29" y2="404" class="track"/>
+<line x1="206.1" y1="376" x2="206.1" y2="404" class="track"/>
+<line x1="29" y1="426" x2="29" y2="454" class="track"/>
+<line x1="206.1" y1="426" x2="206.1" y2="454" class="track"/>
+<line x1="29" y1="476" x2="29" y2="504" class="track"/>
+<line x1="206.1" y1="476" x2="206.1" y2="504" class="track"/>
+<text x="20" y="24" class="sub" text-anchor="start">Dates from 1 Oct 2026 to 31 Oct 2026.</text>
+<text x="29" y="48" class="val" text-anchor="middle">1 Oct</text>
+<text x="206.1" y="48" class="val" text-anchor="middle">31 Oct</text>
+<text x="20" y="84" class="name" text-anchor="start">The reporter</text>
+<text x="20" y="108" class="row" text-anchor="start">Report filed</text>
+<rect x="61.61" y="118" width="40.92" height="16" class="band"/><text x="65.61" y="130" class="val" text-anchor="start">5 Oct</text>
+<text x="20" y="158" class="row" text-anchor="start">Steps sent</text>
+<rect x="85.23" y="168" width="40.92" height="16" class="band"/><text x="89.23" y="180" class="val" text-anchor="start">9 Oct</text>
+<text x="20" y="232" class="name" text-anchor="start">The maintainers</text>
+<text x="20" y="256" class="row" text-anchor="start">Steps asked for</text>
+<rect x="67.52" y="266" width="40.92" height="16" class="band"/><text x="71.52" y="278" class="val" text-anchor="start">6 Oct</text>
+<text x="20" y="306" class="row" text-anchor="start">Bug confirmed</text>
+<rect x="97.03" y="316" width="48.84" height="16" class="band"/><text x="101.03" y="328" class="val" text-anchor="start">11 Oct</text>
+<text x="20" y="356" class="row" text-anchor="start">Fix in review</text>
+<rect x="95.84" y="364" width="146.6" height="16" class="band"/><text x="99.84" y="376" class="val" text-anchor="start">13 Oct–20 Oct, 8 days</text>
+<text x="20" y="422" class="row" text-anchor="start">Released in 2.4.1</text>
+<rect x="191.48" y="432" width="48.84" height="16" class="band"/><text x="195.48" y="444" class="val" text-anchor="start">27 Oct</text>
+<text x="20" y="472" class="row" text-anchor="start">Report closed</text>
+<rect x="197.39" y="482" width="48.84" height="16" class="band"/><text x="201.39" y="494" class="val" text-anchor="start">28 Oct</text>
+<circle cx="52.61" cy="126" r="5" class="r-pt"/>
+<circle cx="76.23" cy="176" r="5" class="r-pt"/>
+<circle cx="58.52" cy="274" r="5" class="r-pt"/>
+<circle cx="88.03" cy="324" r="5" class="r-pt"/>
+<rect x="99.84" y="382" width="47.23" height="16" rx="4" class="r-bar"/>
+<circle cx="182.48" cy="440" r="5" class="r-pt"/>
+<circle cx="188.39" cy="490" r="5" class="r-pt"/>
+</svg>
+<details class="dg-words">
+<summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>The diagram in words</summary>
+<div class="table-wrap is-text" role="region" aria-label="The rows of the timeline" tabindex="0"><table><thead><tr><th scope="col">Date</th><th scope="col">Lane</th><th scope="col">What happened</th><th scope="col">Note</th><th scope="col">Since the last</th></tr></thead><tbody><tr><td>5 Oct</td><td>The reporter</td><th scope="row" class="whole">Report filed</th><td>The export drops the last row of a table.</td><td></td></tr><tr><td>6 Oct</td><td>The maintainers</td><th scope="row" class="whole">Steps asked for</th><td>Triage result: needs steps.</td><td>+1 day</td></tr><tr><td>9 Oct</td><td>The reporter</td><th scope="row" class="whole">Steps sent</th><td>Five steps, and the version, 2.4.0.</td><td>+3 days</td></tr><tr><td>11 Oct</td><td>The maintainers</td><th scope="row" class="whole">Bug confirmed</th><td></td><td>+2 days</td></tr><tr><td>13 Oct – 20 Oct, 8 days</td><td>The maintainers</td><th scope="row" class="whole">Fix in review</th><td></td><td>+2 days</td></tr><tr><td>27 Oct</td><td>The maintainers</td><th scope="row" class="whole">Released in 2.4.1</th><td></td><td>+14 days</td></tr><tr><td>28 Oct</td><td>The maintainers</td><th scope="row" class="whole">Report closed</th><td>The reporter checked the fix in 2.4.1.</td><td>+1 day</td></tr></tbody></table></div>
+<ul><li>7 rows: 6 events and 1 span, from 5 Oct to 28 Oct (23 days).</li><li>Longest gap: 6 days, from 20 Oct to 27 Oct.</li><li>Longest span: Fix in review, 8 days.</li></ul>
+</details>
+<!-- /docent:diagram -->
+      </div>
+      <figcaption><strong>Figure 3</strong>One bug report from October 2026, from the report to the release: 22 days, and the longest wait was for the next version.</figcaption>
+    </figure>
+    <p>The steps came back in 3 days, and the fix took 8 days of review. The longest wait came after the fix: 6 days until the next version.</p>
   </section>
 
   <section id="parts" aria-labelledby="parts-h">
     <h2 id="parts-h">The parts</h2>
     <p>Five parts take part in a bug report. Two belong to the reporter, and three belong to the maintainers.</p>
     <figure>
-      <div class="fig" role="region" aria-label="Figure 3, the parts of a bug report" tabindex="0">
+      <div class="fig" role="region" aria-label="Figure 4, the parts of a bug report" tabindex="0">
         <!-- docent:diagram
 {
   "id": "parts",
@@ -1081,7 +1259,7 @@ footer p { margin: 0; }
 </svg>
 <!-- /docent:diagram -->
       </div>
-      <figcaption><strong>Figure 3</strong>The parts of a bug report and the four moves between them.</figcaption>
+      <figcaption><strong>Figure 4</strong>The parts of a bug report and the four moves between them.</figcaption>
     </figure>
   </section>
 
@@ -1102,7 +1280,7 @@ footer p { margin: 0; }
     </div>
     <p>Most reports that stop do so before the maintainers can see the bug.</p>
     <figure>
-      <div class="fig" role="region" aria-label="Figure 4, where last month's reports stopped" tabindex="0">
+      <div class="fig" role="region" aria-label="Figure 5, where last month's reports stopped" tabindex="0">
         <!-- docent:diagram
 {
   "id": "reports-month",
@@ -1231,7 +1409,7 @@ footer p { margin: 0; }
 </details>
 <!-- /docent:diagram -->
       </div>
-      <figcaption><strong>Figure 4</strong>Where last month's bug reports stopped, from filed to released.
+      <figcaption><strong>Figure 5</strong>Where last month's bug reports stopped, from filed to released.
         <span class="source">Source: invented sample data.</span></figcaption>
     </figure>
     <div class="status">
@@ -1240,7 +1418,7 @@ footer p { margin: 0; }
     </div>
     <p>Some parts of the program get more reports than others. Before you file a report about Install, search the list: the bug may be there already. The chart uses bars, because readers compare lengths more accurately than angles (<a href="#src-cleveland-1984">Cleveland and McGill, 1984</a>).</p>
     <figure>
-      <div class="fig" role="region" aria-label="Figure 5, last month's reports by part" tabindex="0">
+      <div class="fig" role="region" aria-label="Figure 6, last month's reports by part" tabindex="0">
         <!-- docent:diagram
 {
   "id": "reports-by-part",
@@ -1419,7 +1597,7 @@ footer p { margin: 0; }
 </details>
 <!-- /docent:diagram -->
       </div>
-      <figcaption><strong>Figure 5</strong>Last month's bug reports by the part of the program they were about.
+      <figcaption><strong>Figure 6</strong>Last month's bug reports by the part of the program they were about.
         <span class="source">Source: invented sample data.</span></figcaption>
     </figure>
     <p>Fewer new reports have come in each month since June, when the report form began to ask for the steps.</p>
@@ -1429,7 +1607,7 @@ footer p { margin: 0; }
       <li><p class="big">1,351</p><p>new bug reports in the whole year</p></li>
     </ul>
     <figure>
-      <div class="fig" role="region" aria-label="Figure 6, new and closed reports each month" tabindex="0">
+      <div class="fig" role="region" aria-label="Figure 7, new and closed reports each month" tabindex="0">
         <!-- docent:diagram
 {
   "id": "reports-over-year",
@@ -1575,12 +1753,12 @@ footer p { margin: 0; }
 </details>
 <!-- /docent:diagram -->
       </div>
-      <figcaption><strong>Figure 6</strong>New and closed bug reports in each month of the last year.
+      <figcaption><strong>Figure 7</strong>New and closed bug reports in each month of the last year.
         <span class="source">Source: invented sample data.</span></figcaption>
     </figure>
     <p>The time of day matters too. The maintainers answer in their working hours, and few answer on a weekend.</p>
     <figure>
-      <div class="fig" role="region" aria-label="Figure 7, when the maintainers reply" tabindex="0">
+      <div class="fig" role="region" aria-label="Figure 8, when the maintainers reply" tabindex="0">
         <!-- docent:diagram
 {
   "id": "replies-by-hour",
@@ -1755,7 +1933,7 @@ footer p { margin: 0; }
 </details>
 <!-- /docent:diagram -->
       </div>
-      <figcaption><strong>Figure 7</strong>When the maintainers replied last month, by weekday and hour in their time zone.
+      <figcaption><strong>Figure 8</strong>When the maintainers replied last month, by weekday and hour in their time zone.
         <span class="source">Source: invented sample data.</span></figcaption>
     </figure>
     <div class="status">
@@ -1764,7 +1942,7 @@ footer p { margin: 0; }
     </div>
     <p>The bug tracker can fail too. Each day its parts are measured, and a day counts as OK when a part was up for 99.9% of it.</p>
     <figure>
-      <div class="fig" role="region" aria-label="Figure 8, uptime of the bug tracker" tabindex="0">
+      <div class="fig" role="region" aria-label="Figure 9, uptime of the bug tracker" tabindex="0">
         <!-- docent:diagram
 {
   "id": "bug-tracker-uptime",
@@ -1931,7 +2109,7 @@ footer p { margin: 0; }
 </details>
 <!-- /docent:diagram -->
       </div>
-      <figcaption><strong>Figure 8</strong>Uptime of the bug tracker's parts, day by day, from 3 to 16 November.
+      <figcaption><strong>Figure 9</strong>Uptime of the bug tracker's parts, day by day, from 3 to 16 November.
         <span class="source">Source: invented sample data.</span></figcaption>
     </figure>
     <div class="status">
@@ -2134,7 +2312,7 @@ grep -i password bug.log</code></pre>
 </footer>
 
 <script>
-// docent:kit 0.51.0
+// docent:kit 0.52.0
 (() => {
   const root = document.documentElement;
   root.classList.add('js');
