@@ -91,7 +91,7 @@ To choose, ask four questions:
 
    When a chart and a table hold the same numbers, keep the chart. The chart's words already hold its numbers as a table. A table of your own with the same numbers, such as one with more columns, goes in a closed section (`<details>`) under the chart, for readers who need each exact number. Never drop the chart for the table, and never draw the same drawing twice.
 
-   `check` points out a visual that may be missing: a table of amounts that a bar chart would show (`visual.bar`), a table over equally spaced dates or periods that a line chart would show (`visual.line`), and a section of more than 400 words of paragraphs with nothing to look at (`visual.prose`). It cannot read the reader's question, so read each hint and decide. Keeping the text is a right answer when the question has no kind, such as a price list that the reader looks up. Then write the reason on the table, or on the section for `visual.prose`, as `data-no-visual`: `<table data-no-visual="Readers look up one price">`. The reader never sees it. `check` then names the reason in one note instead of the warning, on every run. A mark with no reason keeps the warning.
+   `check` points out a visual that may be missing: a table of amounts that a bar chart would show (`visual.bar`), a table over equally spaced dates or periods that a line chart would show (`visual.line`), a table of 4 or more times or dates in order, not equally spaced, that a timeline would show (`visual.timeline`), and a section of more than 400 words of paragraphs with nothing to look at (`visual.prose`). It cannot read the reader's question, so read each hint and decide. Keeping the text is a right answer when the question has no kind, such as a price list that the reader looks up. Then write the reason on the table, or on the section for `visual.prose`, as `data-no-visual`: `<table data-no-visual="Readers look up one price">`. The reader never sees it. `check` then names the reason in one note instead of the warning, on every run. A mark with no reason keeps the warning.
 
    | The reader asks | Write |
    |---|---|
@@ -156,14 +156,14 @@ A profile tells the kit how much space the page has and how wide code and tables
 | `standard` | An explanation, a tutorial, a policy, a guide, a decision record (ADR), a research report, a customer research summary | What the reader will understand, then the parts, with figures | Code and tables end at the right edge of the notes |
 | `task` | A how-to, a runbook, troubleshooting | What the reader needs, then the numbered steps, then what to do when a step fails | Like Standard, with less space between steps and sections |
 | `reference` | Commands, options, an API, settings, a log or a trace | One section for each item, its facts in a margin note, and tables | Code and tables up to 1120px, and tighter table rows |
-| `brief` | A report for managers, such as a business analysis report; an incident report, release notes | The outcome and its impact, then a timeline table and the actions | Code and tables up to 1120px |
+| `brief` | A report for managers, such as a business analysis report; an incident report, release notes | The outcome and its impact, then a timeline and the actions | Code and tables up to 1120px |
 | `deck` | Slides to present findings in a meeting | One point per slide, as a sentence in the heading; the evidence below it | A stack of short sections; Present shows one slide on the full screen |
 
 Choose in this order:
 
 1. The profile that the author names.
 2. The kind of document that the user asks for, or the readers that they name.
-3. The content. `check` names a profile when the page clearly looks like one: code blocks and tables that hold more text than the paragraphs, numbered steps, many times of day, or the kind of document in the title block's margin note. A timeline table counts toward Brief, not Reference.
+3. The content. `check` names a profile when the page clearly looks like one: code blocks and tables that hold more text than the paragraphs, numbered steps, many times of day, or the kind of document in the title block's margin note. A timeline, as a table or as a figure, counts toward Brief, not Reference.
 4. Standard.
 
 Choose on your own. Ask the author only when two profiles fit equally and the choice matters, such as a page that will be printed or read on phones. Code alone does not make a Reference page: a tutorial and a runbook hold code too, and they are Standard and Task. A word in the name does not choose either: a research report, a customer research summary and a decision record explain a result or a choice, so they are Standard, although they are called a report, a summary or a record. A business analysis report is Brief, because its readers are managers who want the outcome first, and its tables of segments and plans need the wider block.

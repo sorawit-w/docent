@@ -22,7 +22,7 @@ const { findPersonal, findTel } = require("./lib/personal.cjs");
 const { wordsOf, findNumberText, findNumberColumn, findBigNumber } = require("./lib/numbers.cjs");
 const { RULES, NUMBER_RULES, say, split } = require("./lib/rules.cjs");
 const { frameOf, estimateColumns } = require("./lib/measure.cjs");
-const { evenPeriods } = require("./lib/periods.cjs");
+const { evenPeriods, readPeriod } = require("./lib/periods.cjs");
 
 const MOST_WIDGETS = 4; // more widgets than this in one document gives a warning
 const CARDS = [3, 8]; // a card grid holds 3 to 8 cards
@@ -610,7 +610,7 @@ function checkDocument(html, options = {}) {
     });
   }
 
-  // 10m. A visual that may be missing (SKILL.md, step 7): a table that a bar chart or a line chart would show at a glance, and a long run of
+  // 10m. A visual that may be missing (SKILL.md, step 7): a table that a bar chart, a line chart or a timeline would show at a glance, and a long run of
   // paragraphs with nothing to look at. Hints only: check cannot read the reader's question. A table is skipped when a chart on the page
   // already holds its numbers, or when it stands in a closed section (the exact numbers under a chart), in a diagram's words, or in a deck.
   // A table or a section kept as text on purpose carries data-no-visual="<the reason>": its hint becomes a note that names the reason.
@@ -629,6 +629,10 @@ function checkDocument(html, options = {}) {
     const hasWell = (inner) => /<div\b[^>]*\bclass="(?:[^"]*\s)?fig(?:\s[^"]*)?"/i.test(inner);
     const closed = [...markup.matchAll(/<details\b[^>]*>[\s\S]*?<\/details>/gi)].map((m) => [m.index, m.index + m[0].length]);
     const inClosed = (i) => inWords(i) || closed.some(([c, d]) => c < i && i < d);
+    // The ids of the sections that hold a timeline. Diagram blocks are gone from this markup, so they are found in the full page.
+    const pageSections = [], opening = [];
+    for (const m of html.matchAll(/<(\/?)section\b([^>]*)>/gi)) if (!m[1]) opening.push([m.index, m[2]]); else if (opening.length) { const [a, attrs] = opening.pop(); pageSections.push([a, m.index, attrs]); }
+    const timelineSections = new Set(diagrams.filter((f) => /"kind"\s*:\s*"timeline"/.test(f.json)).map((f) => (pageSections.filter(([a, b]) => a < f.start && f.start < b).sort((x, y) => y[0] - x[0])[0] || [])[2]).filter(Boolean).map((attrs) => attrOf(attrs, "id")));
     for (const table of markup.matchAll(/<table\b[^>]*>([\s\S]*?)<\/table>/gi)) {
       const at = sectionOf(table.index);
       if (!at || inClosed(table.index) || /\b(?:colspan|rowspan)=/i.test(table[1])) continue;
@@ -639,6 +643,18 @@ function checkDocument(html, options = {}) {
       if (!head && body[0] && body[0].every((c) => c.tag === "th")) [head, body] = [body[0], body.slice(1)];
       head = head || [];
       if (body.length < 3 || body.some((r) => r.length !== body[0].length)) continue;
+      const tag = table[0].match(/^<table\b[^>]*>/i)[0];
+      const name = (markup.slice(0, table.index).match(/aria-label="([^"]*)"[^>]*>\s*$/) || [])[1] || plain((table[1].match(/<caption\b[^>]*>([\s\S]*?)<\/caption>/i) || ["", ""])[1]);
+      const where = `${name ? `the table "${name}"` : "a table"} in the section "${headingOf(inner) || "with no heading"}"`;
+      // A timeline table: 4 or more rows whose first column holds times of day or dates of one form, in order and not equally spaced,
+      // in a section with no timeline. Equally spaced times with numbers get the line chart's hint below instead.
+      const firsts = body.map((r) => r[0].text), read = firsts.map(readPeriod);
+      const dated = read.every((p) => p && ["time", "date"].includes(p.form)) && new Set(read.map((p) => p.form)).size === 1;
+      const place = (p) => (p.form === "date" ? p.day : p.at);
+      if (body.length >= 4 && dated && read.every((p, i) => !i || place(p) >= place(read[i - 1])) && place(read.at(-1)) > place(read[0]) && !evenPeriods(firsts) && !timelineSections.has(attrOf(inner.match(/^<section\b([^>]*)>/i)[1], "id"))) {
+        const what = read[0].form === "time" ? "times" : "dates";
+        hint("visual.timeline", tag, where, `${where}: its first column lists ${body.length} ${what} in order, from "${firsts[0]}" to "${firsts.at(-1)}", not equally spaced. When the reader asks when each thing happened and how long the gaps were, a timeline ("kind": "timeline") shows the gaps between them as lengths; each row's text goes in its note, which the diagram in words keeps, so the table can go. When the reader looks up one row instead, keep the table and write the reason on it, <table data-no-visual="Readers look up one event">, so check names it in a note (see step 7 of "How to work" in SKILL.md).`);
+      }
       // A column of numbers: every body cell is a number (an empty cell may stand for no data), all in one unit, and not years or a count 1, 2, 3.
       const numberColumn = (c) => {
         const cells = body.map((r) => r[c].text).filter((t) => !BLANK.test(t));
@@ -653,12 +669,9 @@ function checkDocument(html, options = {}) {
       // A table whose row names and numbers a chart on the page already holds is that chart's exact numbers, so it gets no hint here.
       const values = numbers.flatMap((c) => body.map((r) => sumValue(r[c].text))).filter((v) => v != null);
       if (drawn.some((d) => body.every((r) => d.text.includes(JSON.stringify(r[0].text.toLowerCase()).slice(1, -1))) && values.every((v) => d.numbers.has(v)))) continue;
-      const name = (markup.slice(0, table.index).match(/aria-label="([^"]*)"[^>]*>\s*$/) || [])[1] || plain((table[1].match(/<caption\b[^>]*>([\s\S]*?)<\/caption>/i) || ["", ""])[1]);
-      const where = `${name ? `the table "${name}"` : "a table"} in the section "${headingOf(inner) || "with no heading"}"`;
       const columns = numbers.map((c) => (head[c]?.text ? `"${head[c].text}"` : `${c + 1}`)).join(", ");
       const exact = 'Keep the table in a closed section under the chart, for readers who need each exact number. When the reader looks up one value in the table instead, such as a price, keep the table and write the reason on it, <table data-no-visual="Readers look up one price">, so check names it in a note (see step 7 of "How to work" in SKILL.md).';
-      const tag = table[0].match(/^<table\b[^>]*>/i)[0];
-      const firsts = body.map((r) => r[0].text), periods = evenPeriods(firsts);
+      const periods = evenPeriods(firsts);
       if (periods && body.length <= 36) hint("visual.line", tag, where, `${where}: its first column holds ${body.length} equally spaced points in time, from "${firsts[0]}" to "${firsts.at(-1)}", and the column${numbers.length > 1 ? "s" : ""} ${columns} hold${numbers.length > 1 ? "" : "s"} numbers. When the reader asks how the numbers changed over time, a line chart ("kind": "line") shows when they rose and fell. ${exact}`);
       // A bar chart fits a table that is all amounts: row names, one amount, and at most a share of it in percent. A column of words, such
       // as what a case means or its state, says the rows matter for more than their size, so the table stays.
