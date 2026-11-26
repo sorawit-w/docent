@@ -613,6 +613,14 @@ function checkDocument(html, options = {}) {
   // 10m. A visual that may be missing (SKILL.md, step 7): a table that a bar chart or a line chart would show at a glance, and a long run of
   // paragraphs with nothing to look at. Hints only: check cannot read the reader's question. A table is skipped when a chart on the page
   // already holds its numbers, or when it stands in a closed section (the exact numbers under a chart), in a diagram's words, or in a deck.
+  // A table or a section kept as text on purpose carries data-no-visual="<the reason>": its hint becomes a note that names the reason.
+  // A mark with no reason does not quiet the hint. A mark where no hint applies does nothing.
+  const kept = [];
+  const hint = (id, tag, where, text) => {
+    const marked = /\bdata-no-visual\b/i.test(tag), reason = plain(attrOf(tag, "data-no-visual") || "");
+    if (reason) kept.push(say(id, `${where} is kept as text on purpose (${JSON.stringify(reason)}).`));
+    else warn(id, `${text}${marked ? ' It has data-no-visual with no reason, so the hint stays: write the reason as its value, such as data-no-visual="Readers look up one price".' : ""}`);
+  };
   if (!deck) {
     // The data of each diagram on the page: its text in lowercase, and the set of its numbers.
     const drawn = diagrams.map((found) => ({ text: found.json.toLowerCase(), numbers: new Set((found.json.match(/-?\d+(?:\.\d+)?/g) || []).map(Number)) }));
@@ -648,21 +656,23 @@ function checkDocument(html, options = {}) {
       const name = (markup.slice(0, table.index).match(/aria-label="([^"]*)"[^>]*>\s*$/) || [])[1] || plain((table[1].match(/<caption\b[^>]*>([\s\S]*?)<\/caption>/i) || ["", ""])[1]);
       const where = `${name ? `the table "${name}"` : "a table"} in the section "${headingOf(inner) || "with no heading"}"`;
       const columns = numbers.map((c) => (head[c]?.text ? `"${head[c].text}"` : `${c + 1}`)).join(", ");
-      const exact = 'Keep the table in a closed section under the chart, for readers who need each exact number. When the reader looks up one value in the table instead, such as a price, keep the table and give the reason in your reply (see step 7 of "How to work" in SKILL.md).';
+      const exact = 'Keep the table in a closed section under the chart, for readers who need each exact number. When the reader looks up one value in the table instead, such as a price, keep the table and write the reason on it, <table data-no-visual="Readers look up one price">, so check names it in a note (see step 7 of "How to work" in SKILL.md).';
+      const tag = table[0].match(/^<table\b[^>]*>/i)[0];
       const firsts = body.map((r) => r[0].text), periods = evenPeriods(firsts);
-      if (periods && body.length <= 36) warn("visual.line", `${where}: its first column holds ${body.length} equally spaced points in time, from "${firsts[0]}" to "${firsts.at(-1)}", and the column${numbers.length > 1 ? "s" : ""} ${columns} hold${numbers.length > 1 ? "" : "s"} numbers. When the reader asks how the numbers changed over time, a line chart ("kind": "line") shows when they rose and fell. ${exact}`);
+      if (periods && body.length <= 36) hint("visual.line", tag, where, `${where}: its first column holds ${body.length} equally spaced points in time, from "${firsts[0]}" to "${firsts.at(-1)}", and the column${numbers.length > 1 ? "s" : ""} ${columns} hold${numbers.length > 1 ? "" : "s"} numbers. When the reader asks how the numbers changed over time, a line chart ("kind": "line") shows when they rose and fell. ${exact}`);
       // A bar chart fits a table that is all amounts: row names, one amount, and at most a share of it in percent. A column of words, such
       // as what a case means or its state, says the rows matter for more than their size, so the table stays.
       const shares = numbers.filter((c) => body.every((r) => BLANK.test(r[c].text) || /%$/.test(r[c].text)));
       const amounts = numbers.filter((c) => !shares.includes(c)), allNumbers = numbers.length === body[0].length - 1;
-      if (!periods && allNumbers && amounts.length <= 1 && shares.length <= 1 && numbers.length && body.length <= 16) warn("visual.bar", `${where}: ${body.length} rows, each a name and one amount (the column${numbers.length > 1 ? "s" : ""} ${columns}). When the reader asks which is largest, a bar chart ("kind": "bar") shows it at a glance. ${exact}`);
+      if (!periods && allNumbers && amounts.length <= 1 && shares.length <= 1 && numbers.length && body.length <= 16) hint("visual.bar", tag, where, `${where}: ${body.length} rows, each a name and one amount (the column${numbers.length > 1 ? "s" : ""} ${columns}). When the reader asks which is largest, a bar chart ("kind": "bar") shows it at a glance. ${exact}`);
     }
     for (const [a, b] of leaf) {
       const inner = markup.slice(a, b);
       if (/<(?:table|ul|ol|dl|pre|figure)\b/i.test(inner) || hasWell(inner) || /\bclass="(?:[^"]*\s)?(?:choose|checks|decide|values)(?:\s[^"]*)?"/.test(inner)) continue;
       const prose = [...inner.replace(/<(aside|details)\b[^>]*>[\s\S]*?<\/\1>/gi, "").matchAll(/<p\b[^>]*>([\s\S]*?)<\/p>/gi)].map((m) => plain(m[1])).join(" ");
       const count = prose.split(" ").filter(Boolean).length;
-      if (count > PROSE_WORDS) warn("visual.prose", `the section "${headingOf(inner) || "with no heading"}" has ${count} words of paragraphs and nothing to look at. Name the reader's question for it, find that question in the table in step 7 of "How to work" in SKILL.md, and draw the kind it gives, with the words under it; keep the paragraphs only when no kind fits.`);
+      const where = `the section "${headingOf(inner) || "with no heading"}"`;
+      if (count > PROSE_WORDS) hint("visual.prose", inner.match(/^<section\b[^>]*>/i)[0], where, `${where} has ${count} words of paragraphs and nothing to look at. Name the reader's question for it, find that question in the table in step 7 of "How to work" in SKILL.md, and draw the kind it gives, with the words under it; keep the paragraphs only when no kind fits, and then write the reason on the section, <section data-no-visual="…">.`);
     }
   }
 
@@ -715,7 +725,7 @@ function checkDocument(html, options = {}) {
     if (file.profile != null && (profile ?? "standard") !== file.profile) differs.push(`the profile (the page has ${q(profile ?? "standard")}, the file ${q(file.profile)})`);
     if (differs.length) changed.push(say("brand.differs", `${differs.length === 1 ? differs[0] : `${differs.slice(0, -1).join(", ")} and ${differs.at(-1)}`} differ${differs.length === 1 ? "s" : ""} from ${options.config.label}. A page keeps its own brand when the file changes; if the page should follow the file, change the page, or write data-brand="off" on a page about another product`));
   }
-  return { errors, warnings, notes: changed };
+  return { errors, warnings, notes: [...kept, ...changed] };
 }
 
 /** The list of rules, one line each: the ID, the group, and the part of the docs that explains it. */

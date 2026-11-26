@@ -577,3 +577,25 @@ test("a visual that may be missing: check hints at a table of amounts, a table o
   assert.deepEqual(hints(section(para.repeat(5), "<ul><li>One point.</li><li>Another point.</li></ul>")), [], "a list breaks up the text");
   assert.deepEqual(checkDocument(specimen).warnings.filter((w) => /^\[visual\./.test(w)), [], "the sample page gets no hint");
 });
+
+test("a table or a section kept as text on purpose: data-no-visual with a reason turns the hint into a note", () => {
+  const table = (attrs = "", rows = [["Free", "0"], ["Team", "12"], ["Business", "30"], ["Enterprise", "55"]]) => `<div class="table-wrap" role="region" aria-label="Prices" tabindex="0"><table${attrs}><thead><tr><th scope="col">Plan</th><th scope="col" class="num">Price</th></tr></thead><tbody>${rows.map(([name, n]) => `<tr><th scope="row">${name}</th><td class="num">${n}</td></tr>`).join("")}</tbody></table></div>`;
+  const section = (attrs, ...blocks) => `<section id="k" aria-labelledby="k-h"${attrs}><h2 id="k-h">Plans and prices</h2>${blocks.join("")}</section>`;
+  const run = (html) => { const r = checkDocument(specimen.replace("</main>", `${html}</main>`)); return { hints: r.warnings.filter((w) => /^\[visual\./.test(w)), notes: r.notes.filter((n) => /^\[visual\./.test(n)) }; };
+
+  assert.deepEqual(run(section("", table(' data-no-visual="Readers look up one price"'))), { hints: [], notes: ['[visual.bar] the table "Prices" in the section "Plans and prices" is kept as text on purpose ("Readers look up one price").'] }, "a marked table gives a note");
+  for (const attrs of [' data-no-visual=""', ' data-no-visual="  "', " data-no-visual"]) {
+    const { hints, notes } = run(section("", table(attrs)));
+    assert.equal(hints.length, 1, `a mark with no reason (${attrs}) warns`);
+    assert.match(hints[0], /^\[visual\.bar\] the table "Prices".* It has data-no-visual with no reason, so the hint stays/);
+    assert.deepEqual(notes, []);
+  }
+  const plain = run(section("", table()));
+  assert.equal(plain.hints.length, 1, "an unmarked table still warns");
+  assert.doesNotMatch(plain.hints[0], /with no reason/);
+  assert.deepEqual(run(section("", table(' data-no-visual="Readers look up one price"', [["Free", "0"], ["Team", "12"]]))), { hints: [], notes: [] }, "a mark on a table that no hint applies to does nothing");
+
+  const para = `<p>${"The team read each report and wrote down where it came from and what it asked for. ".repeat(6)}</p>`.repeat(5);
+  assert.deepEqual(run(section(' data-no-visual="A story told in order; no kind fits"', para)), { hints: [], notes: ['[visual.prose] the section "Plans and prices" is kept as text on purpose ("A story told in order; no kind fits").'] }, "a marked section gives a note");
+  assert.match(run(section(' data-no-visual=""', para)).hints[0], /^\[visual\.prose\] the section "Plans and prices" has 510 words.* with no reason/);
+});
