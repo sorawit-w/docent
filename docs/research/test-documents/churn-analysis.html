@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Why customers left in the third quarter — Example Planner</title>
 <style>
-/* docent:kit 0.49.0 */
+/* docent:kit 0.50.0 */
 /* Docent page styles. Tokens come from references/DESIGN.md. One file, no network. */
 :root {
   color-scheme: light;
@@ -202,6 +202,8 @@ section > figure { margin-top: 24px; }
 /* A wide table of words, such as the boxes of a heat plan: its cells wrap at spaces but never inside a word, and keep to the left. */
 .dg-words > .table-wrap.is-text :is(th, td) { white-space: normal; }
 .dg-words > .table-wrap.is-text :is(td, thead th) { text-align: left; }
+/* A timeline's row names are short labels, so each stays on one line, also at a hyphen ("on-call"); its notes wrap. */
+.dg-words > .table-wrap.is-text tbody th.whole { white-space: nowrap; }
 .dg-words:has(> .table-wrap) { min-width: 0; } /* a flex item: without this it grows to the table, and the wrapper never scrolls */
 /* A hand-drawn figure holds no colors and no styles of its own, only these classes, so the tokens give it every theme, print and the
    reader's settings. A shape with no class is a 1.5px line in the text color, and a text with no class is 14px. No class is under 12px. */
@@ -1658,7 +1660,7 @@ footer p { margin: 0; }
   </div>
 </footer>
 <script>
-// docent:kit 0.49.0
+// docent:kit 0.50.0
 (() => {
   const root = document.documentElement;
   root.classList.add('js');

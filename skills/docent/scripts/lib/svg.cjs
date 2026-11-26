@@ -97,8 +97,8 @@ function styles(scene, id, mode, swap) {
     `${s} .sub,${s} .verb{font-size:12px;fill:${v("muted")}}`,
     `${s} .pulse{display:none;fill:${v("dot")};stroke:${v("bg")};stroke-width:2.5}`,
   ];
-  // A range chart: row names in weight 400, values and ticks with tabular figures, its marks in the text color, and a named line in the muted color.
-  if (scene.form === "range") css.push(`${s} .row{font-size:14px;fill:${v("text")}}`, `${s} .val{font-size:12px;fill:${v("muted")};font-variant-numeric:tabular-nums}`, `${s} .r-bar{fill:${v("bg")};stroke:${v("text")};stroke-width:1.5}`, `${s} .r-pt{fill:${v("text")}}`, `${s} .r-lim{fill:none;stroke:${v("text")};stroke-width:2}`, `${s} .r-ref{stroke:${v("muted")}}`);
+  // A range chart, and a timeline, which draws with its rows: row names in weight 400, values and ticks with tabular figures, its marks in the text color, and a named line in the muted color.
+  if (scene.form === "range" || scene.form === "timeline") css.push(`${s} .row{font-size:14px;fill:${v("text")}}`, `${s} .val{font-size:12px;fill:${v("muted")};font-variant-numeric:tabular-nums}`, `${s} .r-bar{fill:${v("bg")};stroke:${v("text")};stroke-width:1.5}`, `${s} .r-pt{fill:${v("text")}}`, `${s} .r-lim{fill:none;stroke:${v("text")};stroke-width:2}`, `${s} .r-ref{stroke:${v("muted")}}`);
   // A layout to scale: box names in weight 400 like the rows of a range chart, measures with tabular figures, its boxes and the ticks to their names in the text color.
   // A plan: the box names, widths and boxes of a layout to scale, with no ticks and no named lines.
   if (scene.form === "plan") css.push(`${s} .row{font-size:14px;fill:${v("text")}}`, `${s} .val{font-size:12px;fill:${v("muted")};font-variant-numeric:tabular-nums}`, `${s} .box{fill:${v("bg")};stroke:${v("text")};stroke-width:1.5}`);

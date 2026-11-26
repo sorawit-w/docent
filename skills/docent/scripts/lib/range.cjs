@@ -4,7 +4,7 @@
 // where each row name stands on its own line above its mark. Its rows are also written as a table, in words.
 const { fail, words, id } = require("./blocks.cjs");
 const { textWidth } = require("./text.cjs");
-const { WIDE, PHONE, esc, wrapName, readScale, makeScale, drawHead, drawGrid, linesIn, placeLabel, valueWidth, fmt, isNum, num } = require("./chart.cjs");
+const { WIDE, PHONE, esc, wrapName, headLines, readScale, makeScale, drawHead, drawGrid, linesIn, placeLabel, valueWidth, fmt, isNum, num } = require("./chart.cjs");
 
 const MOST = { rows: 12, groups: 3, name: 28, note: 24, group: 20 };
 const ROW = 32; // the height of one mark's strip
@@ -104,33 +104,41 @@ function markSvg(r, sc, x0, x1, cy) {
   return `<path d="M${num(sc.x(r.from))},${num(cy - 8)} V${num(cy + 8)} M${num(sc.x(r.from))},${num(cy)} H${num(x1)}" class="r-lim"/>`;
 }
 
-/** The drawing: 640px wide with the row names in a column at the left, or 264px wide with each name above its mark. */
-function layoutRange(model, phone = false) {
+/**
+ * Rows on one scale, drawn the range chart's way: 640px wide with the row names in a column at the left, or 264px wide with
+ * each name on its own line above its mark. One band for each group, a value beside each mark (or on a line above it), and the
+ * grid. A timeline draws with this code too. `opts` gives what is the kind's own: the scene's `form`, `scaleOn(x0, x1, room)`
+ * for the ticks, the labels at the two `ends` of the scale and its `unit`, so both ends leave room for them, the `groups`,
+ * `extent` and `markSvg` of a row, `bar(r, sc)` for the pixels of a bar that grid lines pass through (or null), and `head`,
+ * the sentences of the line above the chart.
+ */
+function layoutRows(model, phone, opts) {
   const { scale, rows } = model;
+  const { form, scaleOn, ends, unit, extent, markSvg, bar, head = [] } = opts;
   const W = phone ? PHONE : WIDE;
   const where = phone ? "on a phone" : "on a desktop and on paper";
-  const s = { form: "range", w: W, h: 0, bands: [], gaps: [], tracks: [], lanes: [], parts: [], legs: [], notes: [], under: [] };
+  const s = { form, w: W, h: 0, bands: [], gaps: [], tracks: [], lanes: [], parts: [], legs: [], notes: [], under: [] };
   // The first and the last tick label are centred on their ticks, so each end of the scale leaves room for half of its own
   // label. The labels between them are checked against the edges when the ticks are chosen.
-  const firstHalf = valueWidth(fmt(scale.from)) / 2;
-  const lastHalf = valueWidth(fmt(scale.to)) / 2;
+  const firstHalf = valueWidth(ends[0]) / 2;
+  const lastHalf = valueWidth(ends[1]) / 2;
   let x0, x1, lo;
   if (phone) [x0, x1, lo] = [Math.ceil(Math.max(20, 12 + firstHalf)), Math.floor(Math.min(W - 20 - 32, W - 12 - lastHalf)), 12];
   else {
-    const nameW = Math.max(...rows.map((r) => textWidth(r.name, 14)), ...model.groups.map((g) => textWidth(g.name, 14, 600)));
+    const nameW = Math.max(...rows.map((r) => textWidth(r.name, 14)), ...opts.groups.map((g) => textWidth(g.name, 14, 600)));
     // The unit stands left of the first tick label, so the scale also leaves room for the unit there.
-    const unitRoom = scale.unit ? 12 + textWidth(scale.unit, 12) + 10 + firstHalf : 0;
+    const unitRoom = unit ? 12 + textWidth(unit, 12) + 10 + firstHalf : 0;
     [x0, x1] = [Math.ceil(Math.max(20 + nameW + 24, unitRoom, 12 + firstHalf)), Math.floor(Math.min(W - 20 - 40, W - 12 - lastHalf))];
     lo = x0 - 12; // a value on the left of its mark stays clear of the row names
   }
   const hi = W - 12;
-  const sc = makeScale(scale, x0, x1, { lo: 12, hi: W - 12 });
-  let y = drawHead(s, scale, sc, { W, x0, phone, where });
+  const sc = scaleOn(x0, x1, { lo: 12, hi: W - 12 });
+  let y = drawHead(s, scale, sc, { W, x0, phone, where, top: head.length ? headLines(s, head, W) : 12 });
 
   // One band for each group (or one band for all rows), with the rows in it. Grid lines run through the band on a
   // desktop, and through each row's strip on a phone, where the row names stand in the scale's room.
   const spans = [];
-  const groups = model.groups.length ? model.groups : [{ name: "", rows }];
+  const groups = opts.groups.length ? opts.groups : [{ name: "", rows }];
   for (const g of groups) {
     const top = y;
     let yy = top + 8;
@@ -142,19 +150,19 @@ function layoutRange(model, phone = false) {
     for (const r of g.rows) {
       if (phone) for (const line of wrapName(r.name, W - 40)) { s.notes.push({ x: 20, y: yy + 16, s: line, cls: "row", anchor: "start" }); yy += 18; }
       const { a, b, sides } = extent(r, sc, x0, x1, where);
-      const tw = valueWidth(r.value);
-      const place = placeLabel({ a, b, w: tw, lo, hi, sides });
+      // A row may carry a shorter value (r.short), used only when the full one is wider than the drawing; the table keeps the full one.
+      let value = r.value, tw = valueWidth(value), place = placeLabel({ a, b, w: tw, lo, hi, sides });
+      if (!place && r.short) [value, tw] = [r.short, valueWidth(r.short)], place = placeLabel({ a, b, w: tw, lo, hi, sides });
       if (!place) fail(`the value "${r.value}" of the row "${r.name}" has no free place ${where}; shorten its note`);
       if (place.side === "above") yy += 16;
       const cy = yy + ROW / 2;
       if (!phone) s.notes.push({ x: 20, y: cy + 5, s: r.name, cls: "row", anchor: "start" });
       const ty = place.side === "above" ? cy - 14 : cy + 4;
       const left = place.anchor === "end" ? place.x - tw : place.anchor === "middle" ? place.x - tw / 2 : place.x;
-      s.notes.push({ x: place.x, y: ty, s: r.value, cls: "val", anchor: place.anchor, knock: { x: left - 4, y: ty - 12, w: tw + 8, h: 16 } });
-      const through = r.type === "range" || r.type === "estimate" ? linesIn(scale, sc, sc.x(r.from), cy - 8, sc.x(r.to) - sc.x(r.from), 16) : "";
-      // An estimate's point is drawn last, over its bar and the lines through it.
-      const point = r.type === "estimate" ? `<circle cx="${num(sc.x(r.at))}" cy="${num(cy)}" r="5" class="r-pt"/>` : "";
-      s.parts.push({ id: r.name, svg: markSvg(r, sc, x0, x1, cy) + through + point, texts: [] });
+      s.notes.push({ x: place.x, y: ty, s: value, cls: "val", anchor: place.anchor, knock: { x: left - 4, y: ty - 12, w: tw + 8, h: 16 } });
+      const px = bar(r, sc);
+      const through = px ? linesIn(scale, sc, px[0], cy - 8, px[1] - px[0], 16) : "";
+      s.parts.push({ id: r.name, svg: markSvg(r, sc, x0, x1, cy, through), texts: [] });
       if (phone) spans.push([cy - 14, cy + 14]);
       yy += ROW;
     }
@@ -166,6 +174,22 @@ function layoutRange(model, phone = false) {
   drawGrid(s, scale, sc, spans);
   s.h = y;
   return s;
+}
+
+/** The drawing of a range chart, in either form. */
+function layoutRange(model, phone = false) {
+  const { scale } = model;
+  return layoutRows(model, phone, {
+    form: "range",
+    scaleOn: (x0, x1, room) => makeScale(scale, x0, x1, room),
+    ends: [fmt(scale.from), fmt(scale.to)],
+    unit: scale.unit,
+    groups: model.groups,
+    extent,
+    // An estimate's point is drawn last, over its bar and the lines through it.
+    markSvg: (r, sc, x0, x1, cy, through) => markSvg(r, sc, x0, x1, cy) + through + (r.type === "estimate" ? `<circle cx="${num(sc.x(r.at))}" cy="${num(cy)}" r="5" class="r-pt"/>` : ""),
+    bar: (r, sc) => (r.type === "range" || r.type === "estimate" ? [sc.x(r.from), sc.x(r.to)] : null),
+  });
 }
 
 /** The rows in words: a table of each row's name, its value and its group, and a line for each named mark. */
@@ -186,4 +210,4 @@ function wordsOf(model) {
   return `<div class="table-wrap is-text" role="region" aria-label="The rows of the range chart" tabindex="0"><table><thead>${head}</thead><tbody>${body}</tbody></table></div>${marks ? `\n<ul>${marks}</ul>` : ""}`;
 }
 
-module.exports = { readRange, layoutRange, wordsOf, MOST };
+module.exports = { readRange, layoutRange, layoutRows, wordsOf, MOST, ROW };

@@ -273,13 +273,13 @@ test("wrong side legs are refused with a plain reason", () => {
 test("the full examples in references/diagrams.md are drawn without an error", () => {
   const guide = fs.readFileSync(path.join(__dirname, "..", "skills", "docent", "references", "diagrams.md"), "utf8");
   const examples = [...guide.matchAll(/```json\n(\{\n  "id"[\s\S]*?)```/g)].map((m) => JSON.parse(m[1]));
-  assert.deepEqual(examples.map((d) => renderDiagram(d).form), ["sequence", "flow", "activity", "state", "interaction-overview", "timing", "usecase", "class", "object", "package", "profile", "component", "composite", "deployment", "communication", "range", "layout", "plan", "funnel", "bar", "bar", "line", "line", "heatmap", "heatplan", "statusgrid"]);
+  assert.deepEqual(examples.map((d) => renderDiagram(d).form), ["sequence", "flow", "activity", "state", "interaction-overview", "timing", "usecase", "class", "object", "package", "profile", "component", "composite", "deployment", "communication", "range", "timeline", "layout", "plan", "funnel", "bar", "bar", "line", "line", "heatmap", "heatplan", "statusgrid"]);
 });
 
 test("render --data draws a diagram of any kind, and builds a widget only from a widget kind", () => {
   const { spawnSync } = require("node:child_process");
   const run = (name) => spawnSync(process.execPath, [path.join(__dirname, "../skills/docent/scripts/render.cjs"), "--data", path.join(__dirname, "fixtures", `${name}.json`)], { encoding: "utf8" });
-  for (const name of ["bug-report", "sequence", "flow", "state", "class", "range", "layout-a4", "funnel", "bar-reports", "line-reports", "heatmap-errors", "heatplan-product", "statusgrid-uptime"]) {
+  for (const name of ["bug-report", "sequence", "flow", "state", "class", "range", "layout-a4", "funnel", "bar-reports", "line-reports", "heatmap-errors", "heatplan-product", "statusgrid-uptime", "timeline-incident"]) {
     const r = run(name);
     assert.equal(r.status, 0, `${name}: ${r.stderr}`);
     assert.match(r.stdout, /^<svg/, `${name} is drawn as a diagram`);

@@ -1,0 +1,227 @@
+<svg id="dg-incident-timeline" class="dg dg-timeline dg-auto" xmlns="http://www.w3.org/2000/svg" width="640" height="604" viewBox="0 0 640 604" role="img" aria-label="The change was merged at 08:12 and deployed at 08:31. Errors passed 5% at 08:40, and saving failed for 47 minutes, until 09:27. The page came at 08:44; the cause was found at 09:14, after 8 minutes spent on read replicas, and the rollback started at 09:19.">
+<style>
+#dg-incident-timeline{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-incident-timeline .ground{fill:var(--fig,#f2f3f9)}
+#dg-incident-timeline .band{fill:var(--bg,#fbfbfe)}
+#dg-incident-timeline .track{stroke:var(--line,#d3d6e3)}
+#dg-incident-timeline .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-incident-timeline .head{fill:var(--text,#1c1f2e)}
+#dg-incident-timeline .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-incident-timeline .stop.end{fill:var(--text,#1c1f2e)}
+#dg-incident-timeline .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-incident-timeline .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-incident-timeline .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-incident-timeline .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-incident-timeline .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-incident-timeline .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-incident-timeline .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-incident-timeline .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-incident-timeline .sub,#dg-incident-timeline .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-incident-timeline .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-incident-timeline .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-incident-timeline .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-incident-timeline .r-bar{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-incident-timeline .r-pt{fill:var(--text,#1c1f2e)}
+#dg-incident-timeline .r-lim{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2}
+#dg-incident-timeline .r-ref{stroke:var(--muted,#575d75)}
+@media (prefers-reduced-motion:reduce){#dg-incident-timeline .pulse{animation:none!important}#dg-incident-timeline .pulse{display:none!important}}
+@media print{#dg-incident-timeline{max-width:100%;height:auto}#dg-incident-timeline .pulse{display:none!important}}
+#dg-incident-timeline-phone{display:none}
+</style>
+<rect width="640" height="604" class="ground"/>
+<rect x="8" y="60" width="624" height="232" rx="10" class="band"/>
+<rect x="8" y="300" width="624" height="296" rx="10" class="band"/>
+<line x1="204" y1="60" x2="204" y2="292" class="track"/>
+<line x1="272.36" y1="60" x2="272.36" y2="292" class="track"/>
+<line x1="340.73" y1="60" x2="340.73" y2="292" class="track"/>
+<line x1="409.09" y1="60" x2="409.09" y2="292" class="track"/>
+<line x1="477.45" y1="60" x2="477.45" y2="292" class="track"/>
+<line x1="545.82" y1="60" x2="545.82" y2="292" class="track"/>
+<line x1="204" y1="300" x2="204" y2="596" class="track"/>
+<line x1="272.36" y1="300" x2="272.36" y2="596" class="track"/>
+<line x1="340.73" y1="300" x2="340.73" y2="596" class="track"/>
+<line x1="409.09" y1="300" x2="409.09" y2="596" class="track"/>
+<line x1="477.45" y1="300" x2="477.45" y2="596" class="track"/>
+<line x1="545.82" y1="300" x2="545.82" y2="596" class="track"/>
+<text x="20" y="24" class="sub" text-anchor="start">Times in UTC on 12 Nov 2026.</text>
+<text x="204" y="48" class="val" text-anchor="middle">08:00</text>
+<text x="272.36" y="48" class="val" text-anchor="middle">08:30</text>
+<text x="340.73" y="48" class="val" text-anchor="middle">09:00</text>
+<text x="409.09" y="48" class="val" text-anchor="middle">09:30</text>
+<text x="477.45" y="48" class="val" text-anchor="middle">10:00</text>
+<text x="545.82" y="48" class="val" text-anchor="middle">10:30</text>
+<text x="20" y="84" class="name" text-anchor="start">The system</text>
+<text x="20" y="113" class="row" text-anchor="start">Deployed to all regions</text>
+<rect x="283.64" y="100" width="44.68" height="16" class="band"/><text x="287.64" y="112" class="val" text-anchor="start">08:31</text>
+<text x="20" y="145" class="row" text-anchor="start">Errors pass 5%</text>
+<rect x="304.15" y="132" width="44.68" height="16" class="band"/><text x="308.15" y="144" class="val" text-anchor="start">08:40</text>
+<text x="20" y="177" class="row" text-anchor="start">Saving failed</text>
+<rect x="406.25" y="164" width="140.2" height="16" class="band"/><text x="410.25" y="176" class="val" text-anchor="start">08:40–09:27, 47 min</text>
+<text x="20" y="209" class="row" text-anchor="start">Alert pages on-call</text>
+<rect x="313.27" y="196" width="44.68" height="16" class="band"/><text x="317.27" y="208" class="val" text-anchor="start">08:44</text>
+<text x="20" y="241" class="row" text-anchor="start">Errors peak at 61%</text>
+<rect x="338.33" y="228" width="44.68" height="16" class="band"/><text x="342.33" y="240" class="val" text-anchor="start">08:55</text>
+<text x="20" y="273" class="row" text-anchor="start">Errors under 1%</text>
+<rect x="404.42" y="260" width="44.68" height="16" class="band"/><text x="408.42" y="272" class="val" text-anchor="start">09:24</text>
+<text x="20" y="324" class="name" text-anchor="start">The people</text>
+<text x="20" y="353" class="row" text-anchor="start">Change merged</text>
+<rect x="240.35" y="340" width="44.68" height="16" class="band"/><text x="244.35" y="352" class="val" text-anchor="start">08:12</text>
+<text x="20" y="385" class="row" text-anchor="start">Page acknowledged</text>
+<rect x="324.66" y="372" width="44.68" height="16" class="band"/><text x="328.66" y="384" class="val" text-anchor="start">08:49</text>
+<text x="20" y="417" class="row" text-anchor="start">Incident declared, sev 2</text>
+<rect x="345.17" y="404" width="44.68" height="16" class="band"/><text x="349.17" y="416" class="val" text-anchor="start">08:58</text>
+<text x="20" y="449" class="row" text-anchor="start">Read replicas added</text>
+<rect x="363.4" y="436" width="44.68" height="16" class="band"/><text x="367.4" y="448" class="val" text-anchor="start">09:06</text>
+<text x="20" y="481" class="row" text-anchor="start">Cause found in the logs</text>
+<rect x="381.63" y="468" width="44.68" height="16" class="band"/><text x="385.63" y="480" class="val" text-anchor="start">09:14</text>
+<text x="20" y="513" class="row" text-anchor="start">Rollback starts</text>
+<rect x="393.02" y="500" width="44.68" height="16" class="band"/><text x="397.02" y="512" class="val" text-anchor="start">09:19</text>
+<text x="20" y="545" class="row" text-anchor="start">Incident resolved</text>
+<rect x="411.25" y="532" width="44.68" height="16" class="band"/><text x="415.25" y="544" class="val" text-anchor="start">09:27</text>
+<text x="20" y="577" class="row" text-anchor="start">Status page closed</text>
+<rect x="554.82" y="564" width="44.68" height="16" class="band"/><text x="558.82" y="576" class="val" text-anchor="start">10:30</text>
+<circle cx="274.64" cy="108" r="5" class="r-pt"/>
+<circle cx="295.15" cy="140" r="5" class="r-pt"/>
+<rect x="295.15" y="164" width="107.1" height="16" rx="4" class="r-bar"/><line x1="340.73" y1="164.75" x2="340.73" y2="179.25" class="track"/>
+<circle cx="304.27" cy="204" r="5" class="r-pt"/>
+<circle cx="329.33" cy="236" r="5" class="r-pt"/>
+<circle cx="395.42" cy="268" r="5" class="r-pt"/>
+<circle cx="231.35" cy="348" r="5" class="r-pt"/>
+<circle cx="315.66" cy="380" r="5" class="r-pt"/>
+<circle cx="336.17" cy="412" r="5" class="r-pt"/>
+<circle cx="354.4" cy="444" r="5" class="r-pt"/>
+<circle cx="372.63" cy="476" r="5" class="r-pt"/>
+<circle cx="384.02" cy="508" r="5" class="r-pt"/>
+<circle cx="402.25" cy="540" r="5" class="r-pt"/>
+<circle cx="545.82" cy="572" r="5" class="r-pt"/>
+</svg>
+<svg id="dg-incident-timeline-phone" class="dg dg-timeline dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="872" viewBox="0 0 264 872" role="img" aria-label="The change was merged at 08:12 and deployed at 08:31. Errors passed 5% at 08:40, and saving failed for 47 minutes, until 09:27. The page came at 08:44; the cause was found at 09:14, after 8 minutes spent on read replicas, and the rollback started at 09:19.">
+<style>
+#dg-incident-timeline-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-incident-timeline-phone .ground{fill:var(--fig,#f2f3f9)}
+#dg-incident-timeline-phone .band{fill:var(--bg,#fbfbfe)}
+#dg-incident-timeline-phone .track{stroke:var(--line,#d3d6e3)}
+#dg-incident-timeline-phone .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-incident-timeline-phone .head{fill:var(--text,#1c1f2e)}
+#dg-incident-timeline-phone .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-incident-timeline-phone .stop.end{fill:var(--text,#1c1f2e)}
+#dg-incident-timeline-phone .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-incident-timeline-phone .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-incident-timeline-phone .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-incident-timeline-phone .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-incident-timeline-phone .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-incident-timeline-phone .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-incident-timeline-phone .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-incident-timeline-phone .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-incident-timeline-phone .sub,#dg-incident-timeline-phone .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-incident-timeline-phone .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-incident-timeline-phone .row{font-size:14px;fill:var(--text,#1c1f2e)}
+#dg-incident-timeline-phone .val{font-size:12px;fill:var(--muted,#575d75);font-variant-numeric:tabular-nums}
+#dg-incident-timeline-phone .r-bar{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-incident-timeline-phone .r-pt{fill:var(--text,#1c1f2e)}
+#dg-incident-timeline-phone .r-lim{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2}
+#dg-incident-timeline-phone .r-ref{stroke:var(--muted,#575d75)}
+@media (prefers-reduced-motion:reduce){#dg-incident-timeline-phone .pulse{animation:none!important}#dg-incident-timeline-phone .pulse{display:none!important}}
+@media print{#dg-incident-timeline-phone{max-width:100%;height:auto}#dg-incident-timeline-phone .pulse{display:none!important}}
+@media (max-width:736px){#dg-incident-timeline{display:none}#dg-incident-timeline-phone{display:block}}
+@media print{#dg-incident-timeline{display:block!important}#dg-incident-timeline-phone{display:none!important}}
+</style>
+<rect width="264" height="872" class="ground"/>
+<rect x="8" y="60" width="248" height="356" rx="10" class="band"/>
+<rect x="8" y="424" width="248" height="440" rx="10" class="band"/>
+<line x1="31" y1="112" x2="31" y2="140" class="track"/>
+<line x1="96.82" y1="112" x2="96.82" y2="140" class="track"/>
+<line x1="162.64" y1="112" x2="162.64" y2="140" class="track"/>
+<line x1="31" y1="162" x2="31" y2="190" class="track"/>
+<line x1="96.82" y1="162" x2="96.82" y2="190" class="track"/>
+<line x1="162.64" y1="162" x2="162.64" y2="190" class="track"/>
+<line x1="31" y1="228" x2="31" y2="256" class="track"/>
+<line x1="96.82" y1="228" x2="96.82" y2="256" class="track"/>
+<line x1="162.64" y1="228" x2="162.64" y2="256" class="track"/>
+<line x1="31" y1="278" x2="31" y2="306" class="track"/>
+<line x1="96.82" y1="278" x2="96.82" y2="306" class="track"/>
+<line x1="162.64" y1="278" x2="162.64" y2="306" class="track"/>
+<line x1="31" y1="328" x2="31" y2="356" class="track"/>
+<line x1="96.82" y1="328" x2="96.82" y2="356" class="track"/>
+<line x1="162.64" y1="328" x2="162.64" y2="356" class="track"/>
+<line x1="31" y1="378" x2="31" y2="406" class="track"/>
+<line x1="96.82" y1="378" x2="96.82" y2="406" class="track"/>
+<line x1="162.64" y1="378" x2="162.64" y2="406" class="track"/>
+<line x1="31" y1="476" x2="31" y2="504" class="track"/>
+<line x1="96.82" y1="476" x2="96.82" y2="504" class="track"/>
+<line x1="162.64" y1="476" x2="162.64" y2="504" class="track"/>
+<line x1="31" y1="526" x2="31" y2="554" class="track"/>
+<line x1="96.82" y1="526" x2="96.82" y2="554" class="track"/>
+<line x1="162.64" y1="526" x2="162.64" y2="554" class="track"/>
+<line x1="31" y1="576" x2="31" y2="604" class="track"/>
+<line x1="96.82" y1="576" x2="96.82" y2="604" class="track"/>
+<line x1="162.64" y1="576" x2="162.64" y2="604" class="track"/>
+<line x1="31" y1="626" x2="31" y2="654" class="track"/>
+<line x1="96.82" y1="626" x2="96.82" y2="654" class="track"/>
+<line x1="162.64" y1="626" x2="162.64" y2="654" class="track"/>
+<line x1="31" y1="676" x2="31" y2="704" class="track"/>
+<line x1="96.82" y1="676" x2="96.82" y2="704" class="track"/>
+<line x1="162.64" y1="676" x2="162.64" y2="704" class="track"/>
+<line x1="31" y1="726" x2="31" y2="754" class="track"/>
+<line x1="96.82" y1="726" x2="96.82" y2="754" class="track"/>
+<line x1="162.64" y1="726" x2="162.64" y2="754" class="track"/>
+<line x1="31" y1="776" x2="31" y2="804" class="track"/>
+<line x1="96.82" y1="776" x2="96.82" y2="804" class="track"/>
+<line x1="162.64" y1="776" x2="162.64" y2="804" class="track"/>
+<line x1="31" y1="826" x2="31" y2="854" class="track"/>
+<line x1="96.82" y1="826" x2="96.82" y2="854" class="track"/>
+<line x1="162.64" y1="826" x2="162.64" y2="854" class="track"/>
+<text x="20" y="24" class="sub" text-anchor="start">Times in UTC on 12 Nov 2026.</text>
+<text x="31" y="48" class="val" text-anchor="middle">08:00</text>
+<text x="96.82" y="48" class="val" text-anchor="middle">09:00</text>
+<text x="162.64" y="48" class="val" text-anchor="middle">10:00</text>
+<text x="20" y="84" class="name" text-anchor="start">The system</text>
+<text x="20" y="108" class="row" text-anchor="start">Deployed to all regions</text>
+<rect x="74.01" y="118" width="44.68" height="16" class="band"/><text x="78.01" y="130" class="val" text-anchor="start">08:31</text>
+<text x="20" y="158" class="row" text-anchor="start">Errors pass 5%</text>
+<rect x="83.88" y="168" width="44.68" height="16" class="band"/><text x="87.88" y="180" class="val" text-anchor="start">08:40</text>
+<text x="20" y="208" class="row" text-anchor="start">Saving failed</text>
+<rect x="70.88" y="216" width="140.2" height="16" class="band"/><text x="74.88" y="228" class="val" text-anchor="start">08:40–09:27, 47 min</text>
+<text x="20" y="274" class="row" text-anchor="start">Alert pages on-call</text>
+<rect x="88.27" y="284" width="44.68" height="16" class="band"/><text x="92.27" y="296" class="val" text-anchor="start">08:44</text>
+<text x="20" y="324" class="row" text-anchor="start">Errors peak at 61%</text>
+<rect x="100.33" y="334" width="44.68" height="16" class="band"/><text x="104.33" y="346" class="val" text-anchor="start">08:55</text>
+<text x="20" y="374" class="row" text-anchor="start">Errors under 1%</text>
+<rect x="132.15" y="384" width="44.68" height="16" class="band"/><text x="136.15" y="396" class="val" text-anchor="start">09:24</text>
+<text x="20" y="448" class="name" text-anchor="start">The people</text>
+<text x="20" y="472" class="row" text-anchor="start">Change merged</text>
+<rect x="53.16" y="482" width="44.68" height="16" class="band"/><text x="57.16" y="494" class="val" text-anchor="start">08:12</text>
+<text x="20" y="522" class="row" text-anchor="start">Page acknowledged</text>
+<rect x="93.75" y="532" width="44.68" height="16" class="band"/><text x="97.75" y="544" class="val" text-anchor="start">08:49</text>
+<text x="20" y="572" class="row" text-anchor="start">Incident declared, sev 2</text>
+<rect x="103.62" y="582" width="44.68" height="16" class="band"/><text x="107.62" y="594" class="val" text-anchor="start">08:58</text>
+<text x="20" y="622" class="row" text-anchor="start">Read replicas added</text>
+<rect x="112.4" y="632" width="44.68" height="16" class="band"/><text x="116.4" y="644" class="val" text-anchor="start">09:06</text>
+<text x="20" y="672" class="row" text-anchor="start">Cause found in the logs</text>
+<rect x="121.18" y="682" width="44.68" height="16" class="band"/><text x="125.18" y="694" class="val" text-anchor="start">09:14</text>
+<text x="20" y="722" class="row" text-anchor="start">Rollback starts</text>
+<rect x="126.66" y="732" width="44.68" height="16" class="band"/><text x="130.66" y="744" class="val" text-anchor="start">09:19</text>
+<text x="20" y="772" class="row" text-anchor="start">Incident resolved</text>
+<rect x="135.44" y="782" width="44.68" height="16" class="band"/><text x="139.44" y="794" class="val" text-anchor="start">09:27</text>
+<text x="20" y="822" class="row" text-anchor="start">Status page closed</text>
+<rect x="204.55" y="832" width="44.68" height="16" class="band"/><text x="208.55" y="844" class="val" text-anchor="start">10:30</text>
+<circle cx="65.01" cy="126" r="5" class="r-pt"/>
+<circle cx="74.88" cy="176" r="5" class="r-pt"/>
+<rect x="74.88" y="234" width="51.56" height="16" rx="4" class="r-bar"/><line x1="96.82" y1="234.75" x2="96.82" y2="249.25" class="track"/>
+<circle cx="79.27" cy="292" r="5" class="r-pt"/>
+<circle cx="91.33" cy="342" r="5" class="r-pt"/>
+<circle cx="123.15" cy="392" r="5" class="r-pt"/>
+<circle cx="44.16" cy="490" r="5" class="r-pt"/>
+<circle cx="84.75" cy="540" r="5" class="r-pt"/>
+<circle cx="94.62" cy="590" r="5" class="r-pt"/>
+<circle cx="103.4" cy="640" r="5" class="r-pt"/>
+<circle cx="112.18" cy="690" r="5" class="r-pt"/>
+<circle cx="117.66" cy="740" r="5" class="r-pt"/>
+<circle cx="126.44" cy="790" r="5" class="r-pt"/>
+<circle cx="195.55" cy="840" r="5" class="r-pt"/>
+</svg>
+<details class="dg-words">
+<summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>The diagram in words</summary>
+<div class="table-wrap is-text" role="region" aria-label="The rows of the timeline" tabindex="0"><table><thead><tr><th scope="col">Time, UTC</th><th scope="col">Lane</th><th scope="col">What happened</th><th scope="col">Note</th><th scope="col">Since the last</th></tr></thead><tbody><tr><td>08:12</td><td>The people</td><th scope="row" class="whole">Change merged</th><td>Platform engineer. A change to the shared configuration template moves the pool size into a new section, where a default of 20 applies.</td><td></td></tr><tr><td>08:31</td><td>The system</td><th scope="row" class="whole">Deployed to all regions</th><td>The deploy pipeline sends the new configuration to all three regions at once.</td><td>+19 min</td></tr><tr><td>08:40</td><td>The system</td><th scope="row" class="whole">Errors pass 5%</th><td></td><td>+9 min</td></tr><tr><td>08:40 – 09:27, 47 min</td><td>The system</td><th scope="row" class="whole">Saving failed</th><td>People could not save changes. Up to 61% of requests failed.</td><td>same time</td></tr><tr><td>08:44</td><td>The system</td><th scope="row" class="whole">Alert pages on-call</th><td>Monitoring. The alert &quot;sync errors above 5% for 3 minutes&quot; pages the on-call engineer.</td><td>+4 min</td></tr><tr><td>08:49</td><td>The people</td><th scope="row" class="whole">Page acknowledged</th><td></td><td>+5 min</td></tr><tr><td>08:55</td><td>The system</td><th scope="row" class="whole">Errors peak at 61%</th><td></td><td>+6 min</td></tr><tr><td>08:58</td><td>The people</td><th scope="row" class="whole">Incident declared, sev 2</th><td>The status page says saving is failing.</td><td>+3 min</td></tr><tr><td>09:06</td><td>The people</td><th scope="row" class="whole">Read replicas added</th><td>On the guess that the database is overloaded. Errors do not change.</td><td>+8 min</td></tr><tr><td>09:14</td><td>The people</td><th scope="row" class="whole">Cause found in the logs</th><td>Database engineer. &quot;Connection pool exhausted, limit 20&quot; in the API logs, and the change in the deploy history.</td><td>+8 min</td></tr><tr><td>09:19</td><td>The people</td><th scope="row" class="whole">Rollback starts</th><td></td><td>+5 min</td></tr><tr><td>09:24</td><td>The system</td><th scope="row" class="whole">Errors under 1%</th><td></td><td>+5 min</td></tr><tr><td>09:27</td><td>The people</td><th scope="row" class="whole">Incident resolved</th><td>The app sends its kept changes again.</td><td>+3 min</td></tr><tr><td>10:30</td><td>The people</td><th scope="row" class="whole">Status page closed</th><td>Support lead, after an hour with no errors.</td><td>+1 h 3 min</td></tr></tbody></table></div>
+<ul><li>14 rows: 13 events and 1 span, from 08:12 to 10:30 UTC (2 h 18 min).</li><li>Longest gap: 1 h 3 min, from 09:27 to 10:30.</li><li>Longest span: Saving failed, 47 min.</li></ul>
+</details>

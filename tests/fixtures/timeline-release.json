@@ -1,0 +1,17 @@
+{
+  "id": "release-support",
+  "kind": "timeline",
+  "label": "Version 4 is in beta for all of November and is released on 1 December 2026. From then, version 3 gets security fixes only, until its support ends on 1 April 2027: four months to move.",
+  "scale": {"from": "2026-11-01", "to": "2027-04-30"},
+  "lanes": [
+    {"id": "v4", "name": "Version 4"},
+    {"id": "v3", "name": "Version 3"}
+  ],
+  "rows": [
+    {"name": "Beta", "from": "2026-11-02", "to": "2026-11-30", "lane": "v4", "note": "Anyone can turn on the beta in the settings."},
+    {"name": "Released", "at": "2026-12-01", "lane": "v4"},
+    {"name": "Last feature release", "at": "2026-11-16", "lane": "v3"},
+    {"name": "Security fixes only", "from": "2026-12-01", "to": "2027-03-31", "lane": "v3", "note": "No new features; fixes for security problems only."},
+    {"name": "End of support", "at": "2027-04-01", "lane": "v3", "note": "Version 3 gets no more updates."}
+  ]
+}

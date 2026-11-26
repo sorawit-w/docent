@@ -56,13 +56,13 @@ function renderTiming(data) {
 }
 
 /**
- * A scale chart (a range chart, a layout to scale, a plan, a funnel, a bar chart, a line chart, a heat map, a heat plan or a status grid): one form 640px wide for a desktop and for paper, one 264px wide for
+ * A scale chart (a range chart, a layout to scale, a plan, a funnel, a bar chart, a line chart, a heat map, a heat plan, a status grid or a timeline): one form 640px wide for a desktop and for paper, one 264px wide for
  * a phone, and its rows as a table in words.
  */
 function renderScaleChart(data) {
   const kind = data.kind;
   const lib = require(`./${kind}.cjs`);
-  const [read, draw] = { range: [lib.readRange, lib.layoutRange], layout: [lib.readLayout, lib.drawLayout], plan: [lib.readPlan, lib.drawPlan], funnel: [lib.readFunnel, lib.drawFunnel], bar: [lib.readBar, lib.drawBar], line: [lib.readLine, lib.drawLine], heatmap: [lib.readHeatmap, lib.drawHeatmap], heatplan: [lib.readHeatplan, lib.drawHeatplan], statusgrid: [lib.readStatusgrid, lib.drawStatusgrid] }[kind];
+  const [read, draw] = { range: [lib.readRange, lib.layoutRange], layout: [lib.readLayout, lib.drawLayout], plan: [lib.readPlan, lib.drawPlan], funnel: [lib.readFunnel, lib.drawFunnel], bar: [lib.readBar, lib.drawBar], line: [lib.readLine, lib.drawLine], heatmap: [lib.readHeatmap, lib.drawHeatmap], heatplan: [lib.readHeatplan, lib.drawHeatplan], statusgrid: [lib.readStatusgrid, lib.drawStatusgrid], timeline: [lib.readTimeline, lib.layoutTimeline] }[kind];
   const model = read(data);
   const scene = draw(model), phone = draw(model, true);
   const id = `dg-${model.id}`;
@@ -206,9 +206,9 @@ function renderFlow(data) {
 
 // On a slide (decks.md, section 7), a drawing stands at 1.5 times, or down to 1.25 times when it needs room. A drawing that does not fit
 // at 1.25 times is refused, with its size and the room, and the author shows a part of it on the slide.
-const SLIDE_NAMES = { sequence: "sequence diagram", flow: "flowchart", timing: "timing diagram", range: "range chart", layout: "layout", plan: "plan", funnel: "funnel", bar: "bar chart", line: "line chart", heatmap: "heat map", heatplan: "heat plan", statusgrid: "status grid" };
+const SLIDE_NAMES = { sequence: "sequence diagram", flow: "flowchart", timing: "timing diagram", range: "range chart", layout: "layout", plan: "plan", funnel: "funnel", bar: "bar chart", line: "line chart", heatmap: "heat map", heatplan: "heat plan", statusgrid: "status grid", timeline: "timeline" };
 const SLIDE_FEWER = { sequence: "Show fewer messages on the slide, and the full diagram in the report", workflow: "Show fewer parts and legs on the slide, and the full diagram in the report" };
-const fewer = (kind) => SLIDE_FEWER[kind] || (["range", "bar", "line", "heatmap", "statusgrid", "funnel"].includes(kind) ? "Show fewer rows on the slide, and the full chart in the report" : "Show a part of it on the slide, and the full diagram in the report");
+const fewer = (kind) => SLIDE_FEWER[kind] || (["range", "bar", "line", "heatmap", "statusgrid", "funnel", "timeline"].includes(kind) ? "Show fewer rows on the slide, and the full chart in the report" : "Show a part of it on the slide, and the full diagram in the report");
 
 /** Draws one diagram. slide is the room on a slide ({ n, w, h } on the frame), or null on a page. */
 function renderDiagram(data, slide = null) {
@@ -227,8 +227,8 @@ function drawDiagram(data, slide) {
     if (data.kind === "flow") return renderFlow(data);
     if (Object.hasOwn(GRAPH_KINDS, data.kind)) return renderGraphKind(data);
     if (data.kind === "timing") return renderTiming(data);
-    if (["range", "layout", "plan", "funnel", "bar", "line", "heatmap", "heatplan", "statusgrid"].includes(data.kind)) return renderScaleChart(data);
-    fail(`"kind" must be one of ${["sequence", "flow", ...Object.keys(GRAPH_KINDS), "timing", "range", "layout", "plan", "funnel", "bar", "line", "heatmap", "heatplan", "statusgrid"].map((k) => `"${k}"`).join(", ")}, or left out for a workflow diagram`);
+    if (["range", "layout", "plan", "funnel", "bar", "line", "heatmap", "heatplan", "statusgrid", "timeline"].includes(data.kind)) return renderScaleChart(data);
+    fail(`"kind" must be one of ${["sequence", "flow", ...Object.keys(GRAPH_KINDS), "timing", "range", "layout", "plan", "funnel", "bar", "line", "heatmap", "heatplan", "statusgrid", "timeline"].map((k) => `"${k}"`).join(", ")}, or left out for a workflow diagram`);
   }
   const { model, warnings } = readData(data);
   const icons = warnings.filter((w) => !w.startsWith("every part has the state") && !w.startsWith("no leg has a verb")); // these warnings are about icons; check reports them as errors
