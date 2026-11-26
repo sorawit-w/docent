@@ -74,6 +74,26 @@ function fitWarnings(kind, model, scene) {
     if (!model.calendar && scene && scene.labels && scene.labels.every > 1) out.push(`only every ${scene.labels.every}${scene.labels.every === 2 ? "nd" : scene.labels.every === 3 ? "rd" : "th"} column label fits on a desktop; when the columns are names, not a series such as days, turn the grid so that the names are rows`);
   }
   if (kind === "range" && model.rows.length < 3) out.push(`the range chart has ${model.rows.length} rows; a sentence says this more simply`);
+  if (kind === "timeline") out.push(...timelineWarnings(model));
+  return out;
+}
+
+// A zone with no clock changes: UTC, GMT or Z, alone or with a fixed offset such as UTC+7 or UTC−03:30.
+const FIXED_ZONE = /^(?:UTC|GMT|Z)(?:[+−-]\d{1,2}(?::?\d{2})?)?$/i;
+
+/** The fit warnings of a timeline: 2 rows, events equally spaced, lanes always in one state, an empty stretch, a zone with clock changes. */
+function timelineWarnings(model) {
+  const { timeText } = require("./timeline.cjs");
+  const { scale: ts, rows } = model, out = [];
+  if (rows.length === 2) out.push("a timeline of 2 rows; a sentence says this more simply");
+  const steps = model.byTime.slice(1).map((r, i) => r.at - model.byTime[i].at);
+  if (rows.length >= 3 && model.lanes.length <= 1 && rows.every((r) => r.type === "event") && steps[0] > 0 && steps.every((d) => d === steps[0])) out.push("the events are equally spaced, so the drawing shows only their order; a numbered list says the same");
+  const lanes = model.lanes.length ? model.lanes.map((l) => l.rows) : [model.byTime];
+  const always = (list) => list.every((r) => r.type === "span") && list[0].at === ts.from && list[list.length - 1].end === ts.to && list.every((r, i) => !i || r.at === list[i - 1].end);
+  if (lanes.every(always)) out.push("each lane is always in one state; this reads as a timing diagram (\"kind\": \"timing\")");
+  const gap = model.gap, length = ts.to - ts.from;
+  if (gap && gap.length * 100 > length * 60) out.push(`the stretch from ${timeText(gap.from, ts)} to ${timeText(gap.to, ts)} is ${Math.round((gap.length * 100) / length)}% of the scale and holds nothing; draw the busy part as its own timeline, and say the rest in a sentence`);
+  if (ts.grain === "minute" && length > 24 * 60 && !FIXED_ZONE.test(ts.zone)) out.push(`the scale runs over 24 hours in the zone "${ts.zone}", whose clocks may change; write the times in UTC, or in a fixed offset such as UTC+1`);
   return out;
 }
 

@@ -775,6 +775,59 @@ A range chart shows values and ranges on one numeric scale, one row each, so the
 - `render` refuses an estimate outside its interval, and an interval narrower than 16px in either form, where the point would not show inside it ("write the estimate as a point, and give its interval in the text").
 - `render` refuses a range narrower than 4px in either form ("the range 63–64 is 3.2px wide on a phone; write it as a point"), and a value that has no free place beside its mark or above it. When a value does not fit on the right of its mark, it stands on the left, or on a line above.
 
+## Timelines
+
+A timeline shows events (a point at a time) and spans (a bar from a start to an end), one row each, on a time scale that is true: equal time is always equal length. The reader sees when each thing happened, how long the gaps were, and what overlapped, such as the 13 minutes from a deploy to the alert in an incident. Write it with `"kind": "timeline"` when there are 3 to 20 events and spans on one time scale, and the gaps or the overlaps matter. A Gantt chart is the same kind, with more spans than events: a task is a span, a phase is a lane, a milestone is an event.
+
+Do not use it when only the order matters (write a numbered list), for an amount over time (a line chart, which may mark 1 to 3 events), for which part was OK in each period (a status grid), when each lane is always in exactly one state (a timing diagram), for who calls whom (a sequence diagram), or for two events or one span (a sentence).
+
+```json
+{
+  "id": "incident-timeline",
+  "kind": "timeline",
+  "label": "The change was merged at 08:12 and deployed at 08:31. Errors passed 5% at 08:40, and saving failed for 47 minutes, until 09:27. The page came at 08:44; the cause was found at 09:14, after 8 minutes spent on read replicas, and the rollback started at 09:19.",
+  "scale": {"from": "08:00", "to": "10:45", "day": "2026-11-12", "zone": "UTC"},
+  "lanes": [
+    {"id": "system", "name": "The system"},
+    {"id": "people", "name": "The people"}
+  ],
+  "rows": [
+    {"name": "Change merged", "at": "08:12", "lane": "people", "note": "Platform engineer. A change to the shared configuration template moves the pool size into a new section, where a default of 20 applies."},
+    {"name": "Deployed to all regions", "at": "08:31", "lane": "system", "note": "The deploy pipeline sends the new configuration to all three regions at once."},
+    {"name": "Errors pass 5%", "at": "08:40", "lane": "system"},
+    {"name": "Saving failed", "from": "08:40", "to": "09:27", "lane": "system", "note": "People could not save changes. Up to 61% of requests failed."},
+    {"name": "Alert pages on-call", "at": "08:44", "lane": "system", "note": "Monitoring. The alert \"sync errors above 5% for 3 minutes\" pages the on-call engineer."},
+    {"name": "Page acknowledged", "at": "08:49", "lane": "people"},
+    {"name": "Errors peak at 61%", "at": "08:55", "lane": "system"},
+    {"name": "Incident declared, sev 2", "at": "08:58", "lane": "people", "note": "The status page says saving is failing."},
+    {"name": "Read replicas added", "at": "09:06", "lane": "people", "note": "On the guess that the database is overloaded. Errors do not change."},
+    {"name": "Cause found in the logs", "at": "09:14", "lane": "people", "note": "Database engineer. \"Connection pool exhausted, limit 20\" in the API logs, and the change in the deploy history."},
+    {"name": "Rollback starts", "at": "09:19", "lane": "people"},
+    {"name": "Errors under 1%", "at": "09:24", "lane": "system"},
+    {"name": "Incident resolved", "at": "09:27", "lane": "people", "note": "The app sends its kept changes again."},
+    {"name": "Status page closed", "at": "10:30", "lane": "people", "note": "Support lead, after an hour with no errors."}
+  ]
+}
+```
+
+| Field | What it is |
+|---|---|
+| `scale` | `from` and `to` in the chart's grain, and `to` is later than `from`. **Minutes:** `"08:12"` with `"day": "2026-11-12"`, or `"2026-11-12 08:12"` without a `day`, so the scale may pass midnight; a scale of minutes needs a `zone`, a label of at most 12 characters such as `"UTC"` or `"UTC+7"`, and holds at most 72 hours. **Days:** `"2026-11-12"`, at most 2 years (731 days). `step` is optional: the finest calendar step the ticks may take, such as `"30 min"` or `"1 week"`; with none, `render` picks one for each form. `marks` is optional: at most 2 named lines, each with `at` in the grain and a `name` of at most 20 characters. |
+| `lanes` | Optional, at most 3, each with an `id` and a `name` (at most 20 characters), written as a workflow diagram writes its lanes. With lanes, every row names one in `lane`, and each lane is a band. |
+| `rows` | 2 to 20. Each has a `name` (at most 28 characters), and either `at` (an **event**) or `from` and `to` (a **span**). A `note` is optional, at most 200 characters. Write them in any order: `render` puts the rows of each lane together and sorts them by time, a span by its start, because in a timeline the order is the time. Rows at the same time keep the order they were written in. |
+
+- **The grains.** Every time in one chart has the scale's grain; a chart never mixes them. A minute is a point, so a span of minutes runs from its `from` minute to its `to` minute, and a span that starts and ends at the same minute is refused ("write it as an event"). A day stands at its start, and a span of days runs to the end of its `to` day, so `from` and `to` may be the same day: a span one day long. Days are counted as days, so a month on the scale is as long as its real days: February is shorter than March.
+- **The marks** are the range chart's: an event is a filled circle, a span is a bar with a small round corner. A milestone is an event, never a diamond (a diamond is a decision). Beside each mark `render` writes its time: `08:12`, or `08:40–09:27, 47 min` for a span. A time on a later day writes its date (`13 Nov 01:00`), and a date in a later year writes its year (`4 Jan 2027`).
+- **The scale is true in every form,** and has no break: close events stand on separate rows, so they never collide. When one empty stretch between rows fills more than 60% of the scale, `render` warns: draw the busy part as its own timeline, and say the rest in a sentence.
+- **Ticks** keep calendar steps, at least 48px apart: 5, 10, 15 or 30 minutes, or 1, 2, 3, 6 or 12 hours; 1 day, 2 days, 1 week (Mondays), 2 weeks or 1 month (the 1st). The first tick of a new day writes its date (`13 Nov`), and a new year adds the year. When no step keeps three labels, the scale keeps two: its first and last time.
+- **The zone is written, never guessed.** `render` converts nothing: the line above the chart says "Times in UTC on 12 Nov 2026", and the table's head says "Time, UTC". A timeline that crosses a change of the clocks should be written in UTC; `render` warns when a scale of minutes longer than 24 hours uses a zone that is not UTC or a fixed offset.
+- **Who did it** goes at the start of the note ("Platform engineer."). When there are 3 or fewer actors, they can be the lanes instead.
+- **The notes live in the table in words,** in the closed section under the drawing, not in the drawing, so the desktop and phone forms hold the same text and the page needs no second timeline table. The table holds every row in one time order across the lanes: the time (or "From – To" with the length), the lane, what happened, the note, and "Since the last", the gap since the row before ("+13 min", "+1 h 3 min"). Lines under it give the count of rows, the first and last time, the longest gap and the longest span.
+- On a desktop and on paper the timeline is 640px wide: the row names in a column at the left, the scale at the right, and it prints at that size. On a phone it is 264px wide, with each row name on its own line above its mark; the page scrolls down, never sideways. 20 rows in 3 lanes fit one A4 page with their caption.
+- A timeline has no state, no color, no dot and no walkthrough, and nothing in it is dashed. It sits in the text flow and has no `form`.
+- A Gantt chart drawn as a timeline has no arrows from one task to the next (a workflow or an activity diagram shows what waits on what; the note can say "Starts when the backfill ends"), no progress fill inside a bar (write the percent in the name or the note), and no critical path in a color.
+- `render` refuses a time that is not in the scale's grain or lies outside the scale; a span that ends before it starts, or a span of minutes that starts and ends at the same minute; a span narrower than 4px in either form ("the span "Code freeze" is 3px wide on a phone; write it as an event, or shorten the scale"); a span with no `to`; a scale of minutes with no `zone`; a scale longer than its grain allows ("this timeline spans 9 days at the minute grain …; write days"); fewer than 2 rows or more than 20, more than 3 lanes, a name over 28 characters ("move the rest to its note"), and a note over 200.
+
 ## Layouts to scale
 
 A layout to scale shows where each part sits along one measured width, how wide it is, and how big the gaps are: the text, the notes and the wide blocks on a 1920px screen, or the margins and columns of an A4 page. Write it with `"kind": "layout"` when the parts sit along one width and their positions are known numbers. It has one axis only: for a page with a header, two columns and a footer, write a plan (below). For steps in order, use a workflow; for states over time, a timing diagram.
@@ -994,7 +1047,7 @@ A line chart shows how an amount changed over time, and when it rose or fell: ho
 - **A gap stays a gap.** A `null` breaks the line, and a point alone between two gaps is a dot. Lines are straight from point to point and never smoothed. The line above the chart says "A gap in a line is a time with no data."
 - `render` refuses a value outside the scale, a series whose number of values is not the number of points, two series with the same name, and two series that are equal at every point: they cannot be told apart, so write one and say in the text that both are the same.
 - The forms: 640px on a desktop and on paper, with the value labels at the left of the plot and the points along the bottom; and 264px on a phone, where the value labels stand inside the plot, above their grid lines at the left edge, so they take no width. On a phone a name wider than 96px wraps onto two lines, so the plot keeps 120px. The time labels follow the heat map's rule (one line, two lines, then every 2nd, 3rd, 4th, 6th or 12th label), and a time axis may keep two labels as its last step. It prints at 640px, with no shrink.
-- **An event is a thin muted upright line at its point, named above the plot.** It runs from the bottom of the plot up to its name, over the grid lines and under the series lines. The name starts at the line and runs right, or ends at it near the right edge. Names that would stand closer than 8px take rows 16px apart, ordered so that no line crosses a name; the rows add height, never width. Name the events in the `label` too. `render` refuses an `at` that is not one of the `points` or is a label used more than once, two events at one point, an empty name or one longer than 20 characters, more than 3 events, and names that cannot stand without crossing another event's line: "shorten an event name, or leave one event out". More events are a timeline, which stays a table; a period is two events.
+- **An event is a thin muted upright line at its point, named above the plot.** It runs from the bottom of the plot up to its name, over the grid lines and under the series lines. The name starts at the line and runs right, or ends at it near the right edge. Names that would stand closer than 8px take rows 16px apart, ordered so that no line crosses a name; the rows add height, never width. Name the events in the `label` too. `render` refuses an `at` that is not one of the `points` or is a label used more than once, two events at one point, an empty name or one longer than 20 characters, more than 3 events, and names that cannot stand without crossing another event's line: "shorten an event name, or leave one event out". More events are a timeline (`"kind": "timeline"`; see "Timelines" above); a period is two events.
 - `render` also writes the values as a table under the drawing, a row for each point and a column for each series, and one line for each series: "Sign-in: 62 in Jan, 66 in Dec; highest 138 in Jun; lowest 62 in Jan." With events, the table gets a last column, "Event", with each name in the row of its point, and a line: "Events: New sign-in page, May; Sign-in fix, Jul." A label used more than once is named with its place, such as "Feb (point 14)".
 
 ### Several series that matter equally: small multiples
@@ -1190,7 +1243,7 @@ A few rare types have no built-in kind. For these seven only, you may draw the S
 Every other type is refused, with a message that says what to do:
 
 - **A type that Docent draws from data,** such as `bar`, `line`, `flowchart`, `sequence`, `swimlane` or `funnel`: write its data in a block with the kind that the message names, and run `render`.
-- **A type that Docent plans as a kind:** `scatter`, `timeline`, `gantt`, `roadmap`, `tree`, `org-chart` and `schema`. Until the kind is built, write the data as a table or in words.
+- **A type that Docent plans as a kind:** `scatter`, `tree`, `org-chart` and `schema`. Until the kind is built, write the data as a table or in words. A `timeline`, `gantt` or `roadmap` is a timeline (`"kind": "timeline"`).
 - **A type that Docent leaves out:** `pie`, `donut`, `radar`, `polar`, `pyramid`, `treemap`, `bubble`, `sankey` and `ridgeline`. These show an amount by an angle or an area, or claim more than the data says (see "Position and length" in `DESIGN.md`). Use a bar chart, small multiples or a table. If the user asks for one after you name the rule, it is their call, and `check` still reports it.
   When the user wants one as a separate picture, outside the document, see "When another skill fits better" in `SKILL.md`.
 - **Any other name** is not in the list.
@@ -1316,6 +1369,11 @@ An icon may hold only these shapes and attributes: `path` (`d`), `circle` (`cx`,
   - `... warning: the class diagram has no relations; this is a table of the classes and their members` — the same for an object diagram with no links.
   - `... warning: the links form one chain, so they add little; ... a sequence diagram reads better` — a communication diagram earns its place when its links branch.
   - `... warning: the range chart has 2 rows; a sentence says this more simply` — two values read better in a sentence than on a scale.
+  - `... warning: a timeline of 2 rows; a sentence says this more simply` — two moments read better in a sentence.
+  - `... warning: the events are equally spaced, so the drawing shows only their order; a numbered list says the same` — every row is an event, in one lane, the same time apart.
+  - `... warning: each lane is always in one state; this reads as a timing diagram ("kind": "timing")` — in every lane the spans fill the scale end to end, with no gap and no overlap.
+  - `... warning: the stretch from 09:30 to 15:00 is 69% of the scale and holds nothing; draw the busy part as its own timeline, and say the rest in a sentence` — one empty stretch between rows fills more than 60% of the scale. The scale has no break, because a break would hide the length of a wait.
+  - `... warning: the scale runs over 24 hours in the zone "Europe/Paris", whose clocks may change; write the times in UTC, or in a fixed offset such as UTC+1` — `render` converts nothing, so a change of the clocks inside the scale would put two times at one place.
   - `... warning: every row has one box; a range chart says this more simply` — a layout earns its place when a row holds parts side by side.
   - `... warning: the funnel has 2 steps; a sentence says this more simply` — two counts read better in a sentence: "1,860 of 12,480 people finished".
   - `... warning: no step loses anyone; a sentence says this more simply` — every count is the same, so the bars show nothing.

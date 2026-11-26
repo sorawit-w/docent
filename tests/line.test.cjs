@@ -379,7 +379,7 @@ test("render refuses events that cannot stand: names that run both ways over eac
   assert.throws(withEvents([{ at: "May", name: "   " }]), /the name of event 1 is empty/);
   assert.throws(withEvents([{ at: "May", name: "Twenty-one characters" }]), /the name of event 1 is 21 characters long; the most is 20/);
   assert.throws(withEvents([]), /"events" is a list of 1 to 3 moments/);
-  assert.throws(withEvents(["Jan", "Feb", "Mar", "Apr"].map((at) => ({ at, name: at }))), /"events" is a list of 1 to 3 moments[^\n]*more events are a timeline, which stays a table/);
+  assert.throws(withEvents(["Jan", "Feb", "Mar", "Apr"].map((at) => ({ at, name: at }))), /"events" is a list of 1 to 3 moments[^\n]*more events are a timeline \(\"kind\": \"timeline\"\)/);
   assert.throws(withEvents(["May"]), /event 1 must be an object with "at", one of the "points", and a "name"/);
   assert.throws(withEvents([{ at: "Feb", name: "A" }], (d) => ({ ...d, points: ["Jan", "Feb", "Mar", "Jan", "Feb", "Mar", "Jan", "Feb", "Mar", "Jan", "Feb", "Mar"] })), /a label used more than once in "points"/);
   assert.throws(() => renderDiagram({ ...panels(), events: [{ at: panels().points[1], name: "A" }] }), /small multiples have no "events"/);

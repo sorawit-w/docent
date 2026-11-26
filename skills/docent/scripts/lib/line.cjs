@@ -70,7 +70,7 @@ function readLine(data) {
 function readEvents(list, points, slope, multiples) {
   if (list == null) return [];
   if (slope || multiples) fail(`${slope ? "a slopegraph has" : "small multiples have"} no "events": their panels have little room above. Say the moment in the text, or draw one line chart`);
-  if (!Array.isArray(list) || list.length < 1 || list.length > MOST.events) fail(`"events" is a list of 1 to ${MOST.events} moments, each with "at" and a "name"; more events are a timeline, which stays a table`);
+  if (!Array.isArray(list) || list.length < 1 || list.length > MOST.events) fail(`"events" is a list of 1 to ${MOST.events} moments, each with "at" and a "name"; more events are a timeline (\"kind\": \"timeline\")`);
   const events = list.map((e, i) => {
     if (!e || typeof e !== "object" || Array.isArray(e)) fail(`event ${i + 1} must be an object with "at", one of the "points", and a "name"`);
     const name = words(e.name, `the name of event ${i + 1}`, MOST.event);

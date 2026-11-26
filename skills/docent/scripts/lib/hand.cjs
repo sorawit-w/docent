@@ -17,10 +17,11 @@ const BUILT = {
   composite: "composite", deployment: "deployment", communication: "communication", "interaction-overview": "interaction-overview",
   range: "range", "dot-plot": "range", layout: "layout", plan: "plan", funnel: "funnel", heatmap: "heatmap", "heat-map": "heatmap",
   heatplan: "heatplan", "heat-plan": "heatplan", statusgrid: "statusgrid", "status-grid": "statusgrid",
+  timeline: "timeline", gantt: "timeline", "gantt-chart": "timeline", roadmap: "timeline",
   workflow: "", swimlane: "", process: "", "data-flow": "", loop: "", flywheel: "", "layer-stack": "",
 };
 // Types that Docent plans as built-in kinds: until one is built, a table or words.
-const PLANNED = { scatter: "a scatter plot", timeline: "a timeline", gantt: "a Gantt chart", roadmap: "a roadmap", tree: "a tree", "org-chart": "an org chart", schema: "a database schema" };
+const PLANNED = { scatter: "a scatter plot", tree: "a tree", "org-chart": "an org chart", schema: "a database schema" };
 // Types that Docent leaves out, and why ("Position and length" in DESIGN.md, and funnels.md for the Sankey).
 const LEFT_OUT = {
   pie: "an angle and an area show the amounts, which the eye reads poorly; a bar chart shows the same parts",
