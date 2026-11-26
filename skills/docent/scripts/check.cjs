@@ -611,9 +611,11 @@ function checkDocument(html, options = {}) {
   }
 
   // 10m. A visual that may be missing (SKILL.md, step 7): a table that a bar chart or a line chart would show at a glance, and a long run of
-  // paragraphs with nothing to look at. Hints only: check cannot read the reader's question. A section that already has a figure well is
-  // skipped, and so is a table in a closed section (the exact numbers under a chart), in a diagram's words, or in a deck.
+  // paragraphs with nothing to look at. Hints only: check cannot read the reader's question. A table is skipped when a chart on the page
+  // already holds its numbers, or when it stands in a closed section (the exact numbers under a chart), in a diagram's words, or in a deck.
   if (!deck) {
+    // The data of each diagram on the page: its text in lowercase, and the set of its numbers.
+    const drawn = diagrams.map((found) => ({ text: found.json.toLowerCase(), numbers: new Set((found.json.match(/-?\d+(?:\.\d+)?/g) || []).map(Number)) }));
     const leaf = sections.filter(([a, b]) => !sections.some(([c, d]) => a < c && d < b)); // a section with no section inside it
     const headingOf = (inner) => plain((inner.match(/<h([2-4])\b[^>]*>([\s\S]*?)<\/h\1>/i) || [])[2] || "");
     const hasWell = (inner) => /<div\b[^>]*\bclass="(?:[^"]*\s)?fig(?:\s[^"]*)?"/i.test(inner);
@@ -623,7 +625,6 @@ function checkDocument(html, options = {}) {
       const at = sectionOf(table.index);
       if (!at || inClosed(table.index) || /\b(?:colspan|rowspan)=/i.test(table[1])) continue;
       const inner = markup.slice(at[0], at[1]);
-      if (hasWell(inner)) continue;
       const rowsOf = (part) => [...(part || "").matchAll(/<tr\b[^>]*>([\s\S]*?)<\/tr>/gi)].map(([, row]) => [...row.matchAll(/<(td|th)\b([^>]*)>([\s\S]*?)<\/\1>/gi)].map(([, tag, , cell]) => ({ tag: tag.toLowerCase(), text: plain(cell) })));
       let head = rowsOf((table[1].match(/<thead\b[^>]*>([\s\S]*?)<\/thead>/i) || [])[1])[0];
       let body = rowsOf(table[1].replace(/<(thead|tfoot)\b[^>]*>[\s\S]*?<\/\1>/gi, ""));
@@ -641,6 +642,9 @@ function checkDocument(html, options = {}) {
       };
       const numbers = body[0].map((_, c) => c).filter((c) => c > 0 && numberColumn(c));
       if (!numbers.length) continue;
+      // A table whose row names and numbers a chart on the page already holds is that chart's exact numbers, so it gets no hint here.
+      const values = numbers.flatMap((c) => body.map((r) => sumValue(r[c].text))).filter((v) => v != null);
+      if (drawn.some((d) => body.every((r) => d.text.includes(JSON.stringify(r[0].text.toLowerCase()).slice(1, -1))) && values.every((v) => d.numbers.has(v)))) continue;
       const name = (markup.slice(0, table.index).match(/aria-label="([^"]*)"[^>]*>\s*$/) || [])[1] || plain((table[1].match(/<caption\b[^>]*>([\s\S]*?)<\/caption>/i) || ["", ""])[1]);
       const where = `${name ? `the table "${name}"` : "a table"} in the section "${headingOf(inner) || "with no heading"}"`;
       const columns = numbers.map((c) => (head[c]?.text ? `"${head[c].text}"` : `${c + 1}`)).join(", ");

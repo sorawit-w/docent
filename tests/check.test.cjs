@@ -556,11 +556,12 @@ test("a visual that may be missing: check hints at a table of amounts, a table o
   assert.deepEqual(hints(section(table(areas.map(([a, n]) => [a, "The team checks it.", n]), ["Area", "What it means", "Reports"]))), [], "a column of words: the rows matter for more than their size");
   assert.deepEqual(hints(section(table(areas.map(([a, n]) => [a, n, String(n * 2)]), ["Area", "Reports", "Comments"]))), [], "two amounts in each row");
   assert.deepEqual(hints(section(table(areas.map(([a], i) => [a, String(i + 1)]), ["Area", "Rank"]))), [], "a count 1, 2, 3 is an order, not an amount");
-  assert.deepEqual(hints(section('<figure><div class="fig" role="region" aria-label="Figure 9" tabindex="0"></div></figure>', table(areas))), [], "the section already has a figure");
+  assert.deepEqual(hints(section(table([["Install", "152"], ["Settings", "117"], ["Search", "84"], ["Export", "51"]]))), [], "a chart on the page already holds these numbers");
+  assert.equal(hints(section('<figure><div class="fig" role="region" aria-label="Figure 9" tabindex="0"></div></figure>', table(areas))).length, 1, "a figure of other data in the same section does not stand for this table");
   assert.deepEqual(hints(section(`<details><summary>The numbers</summary>${table(areas)}</details>`)), [], "the exact numbers in a closed section");
   assert.deepEqual(hints(section(table(areas)), fs.readFileSync(path.join(__dirname, "fixtures", "deck.html"), "utf8")).filter((w) => /visual/.test(w)), [], "a deck is never hinted");
 
-  const months = [["Jan 2026", "96"], ["Feb 2026", "104"], ["Mar 2026", "99"], ["Apr 2026", "121"], ["May 2026", "118"]];
+  const months = [["Jan 2026", "86"], ["Feb 2026", "94"], ["Mar 2026", "109"], ["Apr 2026", "131"], ["May 2026", "128"]];
   const line = hints(section(table(months, ["Month", "Reports"], "Reports by month")));
   assert.equal(line.length, 1, "not also a bar chart");
   assert.match(line[0], /^\[visual\.line\] the table "Reports by month" in the section "Where the reports came from": its first column holds 5 equally spaced points in time, from "Jan 2026" to "May 2026", and the column "Reports" holds numbers\. A line chart \("kind": "line"\)/);
