@@ -129,6 +129,13 @@ test("a span whose times both carry a date writes its length alone where the ful
   assert.match(wordsOf(svg), /<td>13 Nov 00:10 – 14 Nov 23:59, 47 h 49 min<\/td>/, "the table keeps the full times");
 });
 
+test("the longest gap starts at the last mark before it, as the author wrote it", () => {
+  const base = { id: "gap", kind: "timeline", label: "Gaps.", scale: { from: "2026-11-01", to: "2026-11-30" } };
+  const words = (rows) => wordsOf(renderDiagram({ ...base, rows }).svg);
+  assert.match(words([{ name: "Span", from: "2026-11-01", to: "2026-11-03" }, { name: "Next day", at: "2026-11-04" }, { name: "Later", at: "2026-11-10" }]), /Longest gap: 6 days, from 4 Nov to 10 Nov\./, "an event on the day after a span ends is where the gap starts");
+  assert.match(words([{ name: "Span", from: "2026-11-01", to: "2026-11-03" }, { name: "Later", at: "2026-11-10" }]), /Longest gap: 6 days, from 3 Nov to 10 Nov\./, "after a span, the gap starts after its last day");
+});
+
 test("fit warnings: 2 rows, equal gaps, lanes always in one state, an empty stretch, a zone with clock changes", () => {
   const warns = (data) => renderDiagram({ id: "w", kind: "timeline", label: "Warnings.", ...data }).warnings.join("\n");
   const scale = { from: "08:00", to: "10:00", day: "2026-11-12", zone: "UTC" };

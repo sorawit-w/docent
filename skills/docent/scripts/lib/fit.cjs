@@ -92,7 +92,7 @@ function timelineWarnings(model) {
   const always = (list) => list.every((r) => r.type === "span") && list[0].at === ts.from && list[list.length - 1].end === ts.to && list.every((r, i) => !i || r.at === list[i - 1].end);
   if (lanes.every(always)) out.push("each lane is always in one state; this reads as a timing diagram (\"kind\": \"timing\")");
   const gap = model.gap, length = ts.to - ts.from;
-  if (gap && gap.length * 100 > length * 60) out.push(`the stretch from ${timeText(gap.from, ts)} to ${timeText(gap.to, ts)} is ${Math.round((gap.length * 100) / length)}% of the scale and holds nothing; draw the busy part as its own timeline, and say the rest in a sentence`);
+  if (gap && gap.length * 100 > length * 60) out.push(`the stretch from ${timeText(gap.shown, ts)} to ${timeText(gap.to, ts)} is ${Math.round((gap.length * 100) / length)}% of the scale and holds nothing; draw the busy part as its own timeline, and say the rest in a sentence`);
   if (ts.grain === "minute" && length > 24 * 60 && !FIXED_ZONE.test(ts.zone)) out.push(`the scale runs over 24 hours in the zone "${ts.zone}", whose clocks may change; write the times in UTC, or in a fixed offset such as UTC+1`);
   return out;
 }

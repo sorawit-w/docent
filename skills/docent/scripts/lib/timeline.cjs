@@ -43,13 +43,17 @@ function lengthText(n, grain) {
 /** The gap since the row before, as the table writes it: "+13 min", "+1 h 3 min", "+3 days", or "same time" and "same day". */
 const sinceText = (n, grain) => (n === 0 ? (grain === "minute" ? "same time" : "same day") : `+${lengthText(n, grain)}`);
 
-/** The longest stretch between two rows that holds no mark, inside the scale: { from, to, length }, or null when none. */
+/**
+ * The longest stretch between two rows that holds no mark, inside the scale: { from, to, length, shown }, or null when none.
+ * `shown` is where the stretch starts as the author wrote it: a span of days ends at the start of the next day, but the
+ * stretch reads "from 30 Nov", the last day the span covers. An event at that same moment wins, since it is written there.
+ */
 function longestGap(rows) {
-  const marks = rows.map((r) => [r.at, r.end]).sort((a, b) => a[0] - b[0]);
-  let best = null, reach = marks[0][1];
-  for (const [a, b] of marks.slice(1)) {
-    if (a > reach && (!best || a - reach > best.length)) best = { from: reach, to: a, length: a - reach };
-    reach = Math.max(reach, b);
+  const marks = [...rows].sort((a, b) => a.at - b.at);
+  let best = null, reach = marks[0];
+  for (const r of marks.slice(1)) {
+    if (r.at > reach.end && (!best || r.at - reach.end > best.length)) best = { from: reach.end, to: r.at, length: r.at - reach.end, shown: reach.last };
+    if (r.end > reach.end || (r.end === reach.end && r.type === "event")) reach = r;
   }
   return best;
 }
@@ -80,7 +84,7 @@ function readTimeline(data) {
     if (has("at")) {
       if (has("from") || has("to")) fail(`${what} has "at" and one of "from" and "to"; a row is an event ("at") or a span ("from" and "to")`);
       const t = readTime(r.at, scale, `"at" of ${what}`);
-      row = { type: "event", at: t.at, end: t.at, value: timeText(t.at, scale) };
+      row = { type: "event", at: t.at, end: t.at, last: t.at, value: timeText(t.at, scale) };
     } else if (has("from")) {
       if (!has("to")) fail(`${what} has "from" but no "to"; a span needs both, or write it as an event, with "at"`);
       const a = readTime(r.from, scale, `"from" of ${what}`), b = readTime(r.to, scale, `"to" of ${what}`);
@@ -91,7 +95,7 @@ function readTimeline(data) {
       // the dash, as the proposal writes it, so a narrow column wraps at the spaces and never inside the times.
       const ends = b.at === a.at ? [timeText(a.at, scale)] : [timeText(a.at, scale), timeText(b.at, scale)];
       // When both times carry a date, the value can be wider than a phone; then the drawing writes the length alone.
-      row = { type: "span", at: a.at, end: b.end, value: `${ends.join("–")}, ${length}`, short: length, cell: `${ends.join(" – ")}, ${length}`, length };
+      row = { type: "span", at: a.at, end: b.end, last: b.at, value: `${ends.join("–")}, ${length}`, short: length, cell: `${ends.join(" – ")}, ${length}`, length };
     } else if (has("to")) fail(`${what} has "to" but no "from"; a span needs both, or write it as an event, with "at"`);
     else fail(`${what} has no time; give it "at" for an event, or "from" and "to" for a span`);
     const note = words(r.note, `the note of ${what}`, MOST.note, false);
@@ -170,7 +174,7 @@ function wordsOf(model) {
   const lastAt = last.type === "span" && grain === "day" ? last.end - 1 : last.end;
   const zone = grain === "minute" ? ` ${esc(ts.zone)}` : "";
   const lines = [`${model.rows.length} rows: ${[events && count(events, "event"), spans && count(spans, "span")].filter(Boolean).join(" and ")}, from ${esc(timeText(first.at, ts))} to ${esc(timeText(lastAt, ts))}${zone} (${lengthText(last.end - first.at, grain)}).`];
-  if (model.gap) lines.push(`Longest gap: ${lengthText(model.gap.length, grain)}, from ${esc(timeText(model.gap.from - (grain === "day" && model.rows.some((r) => r.type === "span" && r.end === model.gap.from) ? 1 : 0), ts))} to ${esc(timeText(model.gap.to, ts))}.`);
+  if (model.gap) lines.push(`Longest gap: ${lengthText(model.gap.length, grain)}, from ${esc(timeText(model.gap.shown, ts))} to ${esc(timeText(model.gap.to, ts))}.`);
   if (spans) { const long = model.rows.filter((r) => r.type === "span").reduce((a, b) => (b.end - b.at > a.end - a.at ? b : a)); lines.push(`Longest span: ${esc(long.name)}, ${long.length}.`); }
   for (const m of ts.marks) lines.push(`A line at ${esc(timeText(m.at, ts))}: ${esc(m.name)}.`);
   return `<div class="table-wrap is-text" role="region" aria-label="The rows of the timeline" tabindex="0"><table><thead>${head}</thead><tbody>${body}</tbody></table></div>\n<ul>${lines.map((l) => `<li>${l}</li>`).join("")}</ul>`;
