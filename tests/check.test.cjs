@@ -541,3 +541,38 @@ test("a quote with its speaker: check warns about a blockquote alone, no speaker
   assert.match(warned(quote("<p>One.</p></blockquote><blockquote><p>Two.</p>")), /holds more than one <blockquote>; a quote figure holds one <blockquote> and its speaker/, "two blockquotes");
   assert.match(warned(quote("<p>One.</p><table><tr><td>1</td></tr></table>")), /holds a table/, "a table in a quote");
 });
+
+test("a visual that may be missing: check hints at a table of amounts, a table over equally spaced periods, and a long section with nothing to look at", () => {
+  const table = (rows, head = ["Area", "Reports"], label = "Reports by area") => `<div class="table-wrap" role="region" aria-label="${label}" tabindex="0"><table><thead><tr>${head.map((h, i) => `<th scope="col"${i ? ' class="num"' : ""}>${h}</th>`).join("")}</tr></thead><tbody>${rows.map(([name, ...cells]) => `<tr><th scope="row">${name}</th>${cells.map((c) => `<td${/^[\d.,%−-]+$/.test(c) ? ' class="num"' : ""}>${c}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
+  const section = (...blocks) => `<section id="v" aria-labelledby="v-h"><h2 id="v-h">Where the reports came from</h2>${blocks.join("")}</section>`;
+  const hints = (html, base = specimen) => checkDocument(base.replace("</main>", `${html}</main>`)).warnings.filter((w) => /^\[visual\./.test(w));
+  const areas = [["Sign-in", "412"], ["Search", "268"], ["Checkout", "231"], ["Settings", "97"]];
+
+  const bar = hints(section(table(areas)));
+  assert.equal(bar.length, 1);
+  assert.match(bar[0], /^\[visual\.bar\] the table "Reports by area" in the section "Where the reports came from": 4 rows, each a name and one amount \(the column "Reports"\)\. A bar chart \("kind": "bar"\)/);
+  assert.equal(hints(section(table(areas.map(([a, n]) => [a, n, `${Math.round(n / 10)}%`]), ["Area", "Reports", "Share"]))).length, 1, "an amount and its share in percent is still a bar chart");
+  assert.deepEqual(hints(section(table(areas.slice(0, 2)))), [], "two amounts are a sentence");
+  assert.deepEqual(hints(section(table(areas.map(([a, n]) => [a, "The team checks it.", n]), ["Area", "What it means", "Reports"]))), [], "a column of words: the rows matter for more than their size");
+  assert.deepEqual(hints(section(table(areas.map(([a, n]) => [a, n, String(n * 2)]), ["Area", "Reports", "Comments"]))), [], "two amounts in each row");
+  assert.deepEqual(hints(section(table(areas.map(([a], i) => [a, String(i + 1)]), ["Area", "Rank"]))), [], "a count 1, 2, 3 is an order, not an amount");
+  assert.deepEqual(hints(section('<figure><div class="fig" role="region" aria-label="Figure 9" tabindex="0"></div></figure>', table(areas))), [], "the section already has a figure");
+  assert.deepEqual(hints(section(`<details><summary>The numbers</summary>${table(areas)}</details>`)), [], "the exact numbers in a closed section");
+  assert.deepEqual(hints(section(table(areas)), fs.readFileSync(path.join(__dirname, "fixtures", "deck.html"), "utf8")).filter((w) => /visual/.test(w)), [], "a deck is never hinted");
+
+  const months = [["Jan 2026", "96"], ["Feb 2026", "104"], ["Mar 2026", "99"], ["Apr 2026", "121"], ["May 2026", "118"]];
+  const line = hints(section(table(months, ["Month", "Reports"], "Reports by month")));
+  assert.equal(line.length, 1, "not also a bar chart");
+  assert.match(line[0], /^\[visual\.line\] the table "Reports by month" in the section "Where the reports came from": its first column holds 5 equally spaced points in time, from "Jan 2026" to "May 2026", and the column "Reports" holds numbers\. A line chart \("kind": "line"\)/);
+  assert.equal(hints(section(table([["Q3 2025", "4", "1"], ["Q4 2025", "6", "2"], ["Q1 2026", "9", "2"]], ["Quarter", "Open", "Closed"]))).length, 1, "quarters across a year, two series");
+  assert.deepEqual(hints(section(table([["1 July 2026", "96"], ["3 July 2026", "104"], ["20 July 2026", "99"]], ["Day", "Reports"]))).filter((w) => /visual\.line/.test(w)), [], "dates that are not equally spaced");
+  assert.deepEqual(hints(section(table([["08:12", "A deploy started"], ["08:31", "Alerts fired"], ["09:40", "Fixed"]], ["Time", "What happened"]))), [], "a timeline of events has no numbers");
+
+  const para = `<p>${"The team read each report and wrote down where it came from and what it asked for. ".repeat(6)}</p>`;
+  const prose = hints(section(para.repeat(5)));
+  assert.equal(prose.length, 1);
+  assert.match(prose[0], /^\[visual\.prose\] the section "Where the reports came from" has 510 words of paragraphs and nothing to look at\. Name the reader's question for it/);
+  assert.deepEqual(hints(section(para.repeat(3))), [], "306 words is not too long");
+  assert.deepEqual(hints(section(para.repeat(5), "<ul><li>One point.</li><li>Another point.</li></ul>")), [], "a list breaks up the text");
+  assert.deepEqual(checkDocument(specimen).warnings.filter((w) => /^\[visual\./.test(w)), [], "the sample page gets no hint");
+});
