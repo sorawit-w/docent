@@ -121,6 +121,14 @@ test("a time before 1970 writes its clock as on any other day", () => {
   assert.doesNotMatch(svg, /-\d+:-?\d+/, "no negative clock anywhere");
 });
 
+test("a span whose times both carry a date writes its length alone where the full value is wider than the drawing", () => {
+  const data = { id: "days", kind: "timeline", label: "Three days.", scale: { from: "2026-11-12 00:00", to: "2026-11-15 00:00", zone: "UTC" }, rows: [{ name: "Start", at: "2026-11-12 00:00" }, { name: "Long job", from: "2026-11-13 00:10", to: "2026-11-14 23:59" }, { name: "Done", at: "2026-11-14 23:59" }] };
+  const { scene, phone, svg } = renderDiagram(data);
+  assert.ok(scene.notes.some((n) => n.s === "13 Nov 00:10–14 Nov 23:59, 47 h 49 min"), "the full value on a desktop");
+  assert.ok(phone.notes.some((n) => n.s === "47 h 49 min" && n.knock), "the length alone on a phone");
+  assert.match(wordsOf(svg), /<td>13 Nov 00:10 – 14 Nov 23:59, 47 h 49 min<\/td>/, "the table keeps the full times");
+});
+
 test("fit warnings: 2 rows, equal gaps, lanes always in one state, an empty stretch, a zone with clock changes", () => {
   const warns = (data) => renderDiagram({ id: "w", kind: "timeline", label: "Warnings.", ...data }).warnings.join("\n");
   const scale = { from: "08:00", to: "10:00", day: "2026-11-12", zone: "UTC" };

@@ -90,7 +90,8 @@ function readTimeline(data) {
       // Beside its bar a span reads "08:40–09:27, 47 min", as a range chart writes a range; its table cell takes spaces around
       // the dash, as the proposal writes it, so a narrow column wraps at the spaces and never inside the times.
       const ends = b.at === a.at ? [timeText(a.at, scale)] : [timeText(a.at, scale), timeText(b.at, scale)];
-      row = { type: "span", at: a.at, end: b.end, value: `${ends.join("–")}, ${length}`, cell: `${ends.join(" – ")}, ${length}`, length };
+      // When both times carry a date, the value can be wider than a phone; then the drawing writes the length alone.
+      row = { type: "span", at: a.at, end: b.end, value: `${ends.join("–")}, ${length}`, short: length, cell: `${ends.join(" – ")}, ${length}`, length };
     } else if (has("to")) fail(`${what} has "to" but no "from"; a span needs both, or write it as an event, with "at"`);
     else fail(`${what} has no time; give it "at" for an event, or "from" and "to" for a span`);
     const note = words(r.note, `the note of ${what}`, MOST.note, false);

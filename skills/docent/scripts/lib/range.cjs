@@ -150,15 +150,16 @@ function layoutRows(model, phone, opts) {
     for (const r of g.rows) {
       if (phone) for (const line of wrapName(r.name, W - 40)) { s.notes.push({ x: 20, y: yy + 16, s: line, cls: "row", anchor: "start" }); yy += 18; }
       const { a, b, sides } = extent(r, sc, x0, x1, where);
-      const tw = valueWidth(r.value);
-      const place = placeLabel({ a, b, w: tw, lo, hi, sides });
+      // A row may carry a shorter value (r.short), used only when the full one is wider than the drawing; the table keeps the full one.
+      let value = r.value, tw = valueWidth(value), place = placeLabel({ a, b, w: tw, lo, hi, sides });
+      if (!place && r.short) [value, tw] = [r.short, valueWidth(r.short)], place = placeLabel({ a, b, w: tw, lo, hi, sides });
       if (!place) fail(`the value "${r.value}" of the row "${r.name}" has no free place ${where}; shorten its note`);
       if (place.side === "above") yy += 16;
       const cy = yy + ROW / 2;
       if (!phone) s.notes.push({ x: 20, y: cy + 5, s: r.name, cls: "row", anchor: "start" });
       const ty = place.side === "above" ? cy - 14 : cy + 4;
       const left = place.anchor === "end" ? place.x - tw : place.anchor === "middle" ? place.x - tw / 2 : place.x;
-      s.notes.push({ x: place.x, y: ty, s: r.value, cls: "val", anchor: place.anchor, knock: { x: left - 4, y: ty - 12, w: tw + 8, h: 16 } });
+      s.notes.push({ x: place.x, y: ty, s: value, cls: "val", anchor: place.anchor, knock: { x: left - 4, y: ty - 12, w: tw + 8, h: 16 } });
       const px = bar(r, sc);
       const through = px ? linesIn(scale, sc, px[0], cy - 8, px[1] - px[0], 16) : "";
       s.parts.push({ id: r.name, svg: markSvg(r, sc, x0, x1, cy, through), texts: [] });
