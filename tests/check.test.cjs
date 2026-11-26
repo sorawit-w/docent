@@ -550,7 +550,7 @@ test("a visual that may be missing: check hints at a table of amounts, a table o
 
   const bar = hints(section(table(areas)));
   assert.equal(bar.length, 1);
-  assert.match(bar[0], /^\[visual\.bar\] the table "Reports by area" in the section "Where the reports came from": 4 rows, each a name and one amount \(the column "Reports"\)\. A bar chart \("kind": "bar"\)/);
+  assert.match(bar[0], /^\[visual\.bar\] the table "Reports by area" in the section "Where the reports came from": 4 rows, each a name and one amount \(the column "Reports"\)\. When the reader asks which is largest, a bar chart \("kind": "bar"\)/);
   assert.equal(hints(section(table(areas.map(([a, n]) => [a, n, `${Math.round(n / 10)}%`]), ["Area", "Reports", "Share"]))).length, 1, "an amount and its share in percent is still a bar chart");
   assert.deepEqual(hints(section(table(areas.slice(0, 2)))), [], "two amounts are a sentence");
   assert.deepEqual(hints(section(table(areas.map(([a, n]) => [a, "The team checks it.", n]), ["Area", "What it means", "Reports"]))), [], "a column of words: the rows matter for more than their size");
@@ -564,7 +564,7 @@ test("a visual that may be missing: check hints at a table of amounts, a table o
   const months = [["Jan 2026", "86"], ["Feb 2026", "94"], ["Mar 2026", "109"], ["Apr 2026", "131"], ["May 2026", "128"]];
   const line = hints(section(table(months, ["Month", "Reports"], "Reports by month")));
   assert.equal(line.length, 1, "not also a bar chart");
-  assert.match(line[0], /^\[visual\.line\] the table "Reports by month" in the section "Where the reports came from": its first column holds 5 equally spaced points in time, from "Jan 2026" to "May 2026", and the column "Reports" holds numbers\. A line chart \("kind": "line"\)/);
+  assert.match(line[0], /^\[visual\.line\] the table "Reports by month" in the section "Where the reports came from": its first column holds 5 equally spaced points in time, from "Jan 2026" to "May 2026", and the column "Reports" holds numbers\. When the reader asks how the numbers changed over time, a line chart \("kind": "line"\)/);
   assert.equal(hints(section(table([["Q3 2025", "4", "1"], ["Q4 2025", "6", "2"], ["Q1 2026", "9", "2"]], ["Quarter", "Open", "Closed"]))).length, 1, "quarters across a year, two series");
   assert.deepEqual(hints(section(table([["1 July 2026", "96"], ["3 July 2026", "104"], ["20 July 2026", "99"]], ["Day", "Reports"]))).filter((w) => /visual\.line/.test(w)), [], "dates that are not equally spaced");
   assert.deepEqual(hints(section(table([["08:12", "A deploy started"], ["08:31", "Alerts fired"], ["09:40", "Fixed"]], ["Time", "What happened"]))), [], "a timeline of events has no numbers");

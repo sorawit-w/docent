@@ -81,11 +81,17 @@ To choose, ask four questions:
    2. Find that question in the table below, and draw the kind it gives. Read `references/diagrams.md` for its data, and let the renderer pick the form.
    3. Put the words under the drawing: one or two sentences on what the reader should see in it, then the details. A built-in kind also writes its data in words, in a closed section under the drawing.
 
-   Write text with no visual only when no kind fits the question, or when there are only one or two values: a sentence reads faster than a chart of two bars. Draw nothing to decorate: each figure answers the question of its section. A section can have more than one question, and then more than one figure; a section whose question no kind answers keeps its text.
+   Write text with no visual only when no kind fits the question, or when there are only one or two values: a sentence reads faster than a chart of two bars. Draw nothing to decorate: each figure answers the question of its section, with the numbers or steps that the source gives. Three ways to decorate, each one refused:
+
+   - joining facts that answer different questions into one chart, such as a team's vote and its count of maintainers, to get past "one or two values";
+   - working out a new number only to have something to draw, such as the days between the dates of a plan;
+   - drawing a table that the reader uses to look up one value, such as a price list or a list of settings. It stays a table.
+
+   A section can have more than one question, and then more than one figure; a section whose question no kind answers keeps its text.
 
    When a chart and a table hold the same numbers, keep the chart. The chart's words already hold its numbers as a table. A table of your own with the same numbers, such as one with more columns, goes in a closed section (`<details>`) under the chart, for readers who need each exact number. Never drop the chart for the table, and never draw the same drawing twice.
 
-   `check` points out a visual that may be missing: a table of amounts that a bar chart would show (`visual.bar`), a table over equally spaced dates or periods that a line chart would show (`visual.line`), and a section of more than 400 words of paragraphs with nothing to look at (`visual.prose`). It cannot read the reader's question, so read each hint and decide.
+   `check` points out a visual that may be missing: a table of amounts that a bar chart would show (`visual.bar`), a table over equally spaced dates or periods that a line chart would show (`visual.line`), and a section of more than 400 words of paragraphs with nothing to look at (`visual.prose`). It cannot read the reader's question, so read each hint and decide. Keeping the text is a right answer when the question has no kind, such as a price list that the reader looks up; then give the reason in your reply.
 
    | The reader asks | Write |
    |---|---|

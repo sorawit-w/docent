@@ -648,14 +648,14 @@ function checkDocument(html, options = {}) {
       const name = (markup.slice(0, table.index).match(/aria-label="([^"]*)"[^>]*>\s*$/) || [])[1] || plain((table[1].match(/<caption\b[^>]*>([\s\S]*?)<\/caption>/i) || ["", ""])[1]);
       const where = `${name ? `the table "${name}"` : "a table"} in the section "${headingOf(inner) || "with no heading"}"`;
       const columns = numbers.map((c) => (head[c]?.text ? `"${head[c].text}"` : `${c + 1}`)).join(", ");
-      const exact = 'Keep the table in a closed section under the chart, for readers who need each exact number (see step 7 of "How to work" in SKILL.md).';
+      const exact = 'Keep the table in a closed section under the chart, for readers who need each exact number. When the reader looks up one value in the table instead, such as a price, keep the table and give the reason in your reply (see step 7 of "How to work" in SKILL.md).';
       const firsts = body.map((r) => r[0].text), periods = evenPeriods(firsts);
-      if (periods && body.length <= 36) warn("visual.line", `${where}: its first column holds ${body.length} equally spaced points in time, from "${firsts[0]}" to "${firsts.at(-1)}", and the column${numbers.length > 1 ? "s" : ""} ${columns} hold${numbers.length > 1 ? "" : "s"} numbers. A line chart ("kind": "line") shows when the numbers rose and fell. ${exact}`);
+      if (periods && body.length <= 36) warn("visual.line", `${where}: its first column holds ${body.length} equally spaced points in time, from "${firsts[0]}" to "${firsts.at(-1)}", and the column${numbers.length > 1 ? "s" : ""} ${columns} hold${numbers.length > 1 ? "" : "s"} numbers. When the reader asks how the numbers changed over time, a line chart ("kind": "line") shows when they rose and fell. ${exact}`);
       // A bar chart fits a table that is all amounts: row names, one amount, and at most a share of it in percent. A column of words, such
       // as what a case means or its state, says the rows matter for more than their size, so the table stays.
       const shares = numbers.filter((c) => body.every((r) => BLANK.test(r[c].text) || /%$/.test(r[c].text)));
       const amounts = numbers.filter((c) => !shares.includes(c)), allNumbers = numbers.length === body[0].length - 1;
-      if (!periods && allNumbers && amounts.length <= 1 && shares.length <= 1 && numbers.length && body.length <= 16) warn("visual.bar", `${where}: ${body.length} rows, each a name and one amount (the column${numbers.length > 1 ? "s" : ""} ${columns}). A bar chart ("kind": "bar") shows at a glance which is largest. ${exact}`);
+      if (!periods && allNumbers && amounts.length <= 1 && shares.length <= 1 && numbers.length && body.length <= 16) warn("visual.bar", `${where}: ${body.length} rows, each a name and one amount (the column${numbers.length > 1 ? "s" : ""} ${columns}). When the reader asks which is largest, a bar chart ("kind": "bar") shows it at a glance. ${exact}`);
     }
     for (const [a, b] of leaf) {
       const inner = markup.slice(a, b);
