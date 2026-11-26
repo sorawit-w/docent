@@ -79,3 +79,14 @@ test("check names no wrong profile for any of the five test documents", () => {
     assert.ok(!s.sure || s.profile === "standard" || s.profile === chosen, `${file} has ${chosen}; the guess is ${s.profile}: ${s.reasons}`);
   }
 });
+
+test("a timeline figure counts toward Brief, as a timeline table does: its times of day count, and it is not Reference text", () => {
+  const figure = (scale, n) => `<figure><div class="fig">\n<!-- docent:diagram\n${JSON.stringify({ id: "t", kind: "timeline", label: "L", scale, rows: Array.from({ length: n }, (_, i) => ({ name: `R${i}`, at: scale.day ? `09:${String(10 + i * 3).padStart(2, "0")}` : `2026-11-${String(2 + i * 3).padStart(2, "0")}` })) })}\n-->\n<svg class="dg"><text>09:10 09:13</text></svg>\n</div></figure>`;
+  const minutes = suggestProfile(page(para(2) + figure({ from: "09:00", to: "10:00", day: "2026-11-12", zone: "UTC" }, 6)));
+  assert.equal(minutes.signals.timelines, 1);
+  assert.equal(minutes.signals.times, 6, "each row of a scale of minutes is a time of day; the drawing's own text is not counted");
+  assert.equal(minutes.profile, "brief");
+  const days = suggestProfile(page(para(2) + figure({ from: "2026-11-01", to: "2026-11-30" }, 6)));
+  assert.equal(days.signals.timelines, 1);
+  assert.equal(days.signals.times, 0, "a scale of days holds no times of day");
+});

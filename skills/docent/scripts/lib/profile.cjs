@@ -13,8 +13,18 @@ const KINDS = [
   ["brief", /report|brief|summary|release|analysis|incident|post-?mortem/i],
 ];
 
+/** The timeline figures in a page's data blocks: how many, and how many of their rows are times of day (a scale of minutes). A
+ * timeline figure counts toward Brief as a timeline table does: it is not Reference text, and its times of day count as times. */
+function timelineFigures(source) {
+  const blocks = [...source.matchAll(/<!-- docent:diagram[ \t]*\n([\s\S]*?)\n[ \t]*-->/g)].map((m) => { try { return JSON.parse(m[1]); } catch { return null; } });
+  const timelines = blocks.filter((d) => d && d.kind === "timeline");
+  const times = timelines.filter((d) => d.scale && /\d{2}:\d{2}$/.test(String(d.scale.from))).reduce((n, d) => n + (Array.isArray(d.rows) ? d.rows.length : 0), 0);
+  return { count: timelines.length, times };
+}
+
 /** Counts from the <main> of a page, without drawings and without the steps of a diagram in words. */
 function profileSignals(source) {
+  const figures = timelineFigures((source.match(/<main\b[^>]*>([\s\S]*?)<\/main>/i) || [, source])[1]);
   const markup = source.replace(/<!--[\s\S]*?-->/g, "");
   const main = (markup.match(/<main\b[^>]*>([\s\S]*?)<\/main>/i) || [, markup])[1]
     .replace(/<svg\b[\s\S]*?<\/svg>/gi, "")
@@ -28,10 +38,10 @@ function profileSignals(source) {
     numberedItems: all(main, /<ol>([\s\S]*?)<\/ol>/gi).reduce((n, list) => n + (list.match(/<li\b/gi) || []).length, 0),
     code: (main.match(/<pre\b/gi) || []).length,
     tables: (main.match(/<table\b/gi) || []).length - timelines,
-    timelines,
+    timelines: timelines + figures.count,
     blockText: blocks.map(plain).join(" ").length,
     prose: all(main, /<p\b[^>]*>([\s\S]*?)<\/p>/gi).map(plain).join(" ").length,
-    times: (plain(outsideCode).match(new RegExp(TIME.source, "g")) || []).length,
+    times: (plain(outsideCode).match(new RegExp(TIME.source, "g")) || []).length + figures.times,
     kind: plain(kind),
   };
 }

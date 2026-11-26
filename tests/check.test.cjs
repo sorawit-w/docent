@@ -599,3 +599,23 @@ test("a table or a section kept as text on purpose: data-no-visual with a reason
   assert.deepEqual(run(section(' data-no-visual="A story told in order; no kind fits"', para)), { hints: [], notes: ['[visual.prose] the section "Plans and prices" is kept as text on purpose ("A story told in order; no kind fits").'] }, "a marked section gives a note");
   assert.match(run(section(' data-no-visual=""', para)).hints[0], /^\[visual\.prose\] the section "Plans and prices" has 510 words.* with no reason/);
 });
+
+test("visual.timeline: a table of times or dates in order, not equally spaced, with no timeline in its section", () => {
+  const rows = (firsts) => firsts.map((t, i) => `<tr><th scope="row">${t}</th><td>Event ${i + 1} happened</td></tr>`).join("");
+  const table = (firsts, attrs = "") => `<div class="table-wrap" role="region" aria-label="Timeline, UTC" tabindex="0"><table${attrs}><thead><tr><th scope="col">Time</th><th scope="col">What happened</th></tr></thead><tbody>${rows(firsts)}</tbody></table></div>`;
+  const section = (...blocks) => `<section id="tl" aria-labelledby="tl-h"><h2 id="tl-h">What happened</h2>${blocks.join("")}</section>`;
+  const warned = (html) => checkDocument(specimen.replace("</main>", `${html}</main>`)).warnings.filter((w) => /^\[visual\.timeline\]/.test(w));
+  const noted = (html) => checkDocument(specimen.replace("</main>", `${html}</main>`)).notes.filter((w) => /^\[visual\.timeline\]/.test(w));
+  const uneven = ["08:12", "08:31", "08:40", "08:44", "09:27"];
+  assert.deepEqual(warned(section(table(uneven))), ['[visual.timeline] the table "Timeline, UTC" in the section "What happened": its first column lists 5 times in order, from "08:12" to "09:27", not equally spaced. When the reader asks when each thing happened and how long the gaps were, a timeline ("kind": "timeline") shows the gaps between them as lengths; each row\'s text goes in its note, which the diagram in words keeps, so the table can go. When the reader looks up one row instead, keep the table and write the reason on it, <table data-no-visual="Readers look up one event">, so check names it in a note (see step 7 of "How to work" in SKILL.md).']);
+  assert.match(warned(section(table(["2026-11-02", "2026-11-16", "2026-12-01", "2027-04-01"]))).join(), /lists 4 dates in order, from "2026-11-02" to "2027-04-01"/, "dates count too");
+  assert.equal(warned(section(table(["08:40", "08:40", "08:44", "09:27"]))).length, 1, "two rows at the same time are still in order");
+  assert.deepEqual(warned(section(table(["08:00", "08:15", "08:30", "08:45"]))), [], "equally spaced times are a list or a line chart");
+  assert.deepEqual(warned(section(table(["08:12", "09:27", "08:40", "08:44"]))), [], "times out of order");
+  assert.deepEqual(warned(section(table(["08:12", "08:31", "09:27"]))), [], "3 rows are too few");
+  assert.deepEqual(warned(section(table(["08:12", "2026-11-12", "08:40", "08:44"]))), [], "a mix of forms");
+  const drawn = `<figure><div class="fig" role="region" aria-label="Figure 9, timeline" tabindex="0">\n<!-- docent:diagram\n${fs.readFileSync(path.join(__dirname, "fixtures", "timeline-incident.json"), "utf8")}\n-->\n<!-- /docent:diagram -->\n</div><figcaption><strong>Figure 9</strong>The incident.</figcaption></figure>`;
+  const built = renderDocument(specimen.replace("</main>", `${section(drawn, table(uneven))}</main>`)).html;
+  assert.deepEqual(checkDocument(built).warnings.filter((w) => /^\[visual\.timeline\]/.test(w)), [], "a section that already has a timeline");
+  assert.deepEqual(noted(section(table(uneven, ' data-no-visual="Readers look up one event"'))), ['[visual.timeline] the table "Timeline, UTC" in the section "What happened" is kept as text on purpose ("Readers look up one event").'], "a reason turns the hint into a note");
+});

@@ -78,6 +78,7 @@ const LIST = [
   H("visual.bar", S("How to work")),
   H("visual.line", S("How to work")),
   H("visual.prose", S("How to work")),
+  H("visual.timeline", S("How to work")),
   // Hand-drawn figures
   G("hand.unmade", DG("Hand-drawn figures")),
   G("hand.outside", DG("Hand-drawn figures")),
