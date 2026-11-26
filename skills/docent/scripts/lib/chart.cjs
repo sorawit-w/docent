@@ -1,12 +1,13 @@
 // The chart core: the parts that every scale chart shares, so each kind holds only what is its own. It gives the two forms'
 // widths, text escaped for SVG, names that wrap (also in scripts written without spaces), counts and shares as written,
 // column labels that keep apart (also along a time axis), the value axis that runs up the page, the line above a chart, labels that move apart from their points, and the table in words
-// that splits for paper. The numeric scale stays in scale.cjs, and
-// this file passes it on, so a chart kind needs this one file for its scale, its ticks and the places of its labels.
+// that splits for paper. The numeric scale stays in scale.cjs and the time scale in time.cjs, and
+// this file passes both on, so a chart kind needs this one file for its scale, its ticks and the places of its labels.
 const { fail } = require("./blocks.cjs");
 const { textWidth } = require("./text.cjs");
 const { wrap } = require("./graph.cjs");
 const { readScale, makeScale, tickAt, drawHead, drawGrid, linesIn, placeLabel, valueWidth, fmt, isNum, num, diff } = require("./scale.cjs");
+const { readTimeScale, readTime, makeTimeScale, endLabels } = require("./time.cjs");
 
 const WIDE = 640; // the desktop and paper form: it fits an A4 figure well (about 641.6px) with no shrink
 const PHONE = 264; // the phone form: it fits a 320px screen
@@ -184,4 +185,6 @@ module.exports = {
   WIDE, PHONE, esc, graphemes, NO_SPACES, wrapName, comma, share, EVERY, onLines, labelsOf, upAxis, headLines, apart, PAPER, tablesOf, gridTables,
   // The numeric scale, from scale.cjs.
   readScale, makeScale, tickAt, drawHead, drawGrid, linesIn, placeLabel, valueWidth, fmt, isNum, num, diff,
+  // The time scale, from time.cjs.
+  readTimeScale, readTime, makeTimeScale, endLabels,
 };
