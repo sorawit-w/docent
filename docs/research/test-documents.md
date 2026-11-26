@@ -18,17 +18,17 @@ Items 1, 3 and 5 are covered by the sources proposal (`docs/proposals/sources.md
 
 ## How we tested
 
-Each document is one HTML file in [`test-documents/`](test-documents/), copied from `assets/template.html` with a file copy. For each one we read `DESIGN.md`, chose a profile, wrote every diagram as data, and ran `render`, `stamp` and `check`. We changed nothing under `skills/docent/` or `tests/`. Every name, number, quote and source is invented, and each page says so in its margin note.
+Each document is one HTML file in [`examples/`](../../examples/), copied from `assets/template.html` with a file copy. For each one we read `DESIGN.md`, chose a profile, wrote every diagram as data, and ran `render`, `stamp` and `check`. We changed nothing under `skills/docent/` or `tests/`. Every name, number, quote and source is invented, and each page says so in its margin note.
 
 We opened each document in Chrome at 1366px and 320px, in light and dark, and with print styles at A4 width (794px), and took a screenshot of each view and of each figure. We could not open the A4 PDFs that Chrome made, because the PDF reader on this machine failed, so the print view is the print-media screenshot, not Chrome's print preview dialog.
 
 | Document | Audience | Profile | Kinds used | `check` |
 |---|---|---|---|---|
-| [Churn analysis](test-documents/churn-analysis.html) | Business | Brief | line chart, heat map, dumbbell, bar chart, two funnels, card grid | 0 errors, 0 warnings |
-| [Customer interview summary](test-documents/interview-summary.html) | Business | Standard | bar chart (two), hand-drawn user journey | 0 errors, 1 warning |
-| [Decision record](test-documents/decision-record.html) | Software | Standard | range chart, bar chart, sequence diagram | 0 errors, 0 warnings |
-| [Incident review](test-documents/incident-review.html) | Software | Brief, Harbor palette | status grid, line chart, walkthrough, hand-drawn fishbone, card grid | 0 errors, 2 warnings |
-| [Research report](test-documents/research-report.html) | Research | Standard | range chart, dumbbell | 0 errors, 1 warning |
+| [Churn analysis](../../examples/churn-analysis.html) | Business | Brief | line chart, heat map, dumbbell, bar chart, two funnels, card grid | 0 errors, 0 warnings |
+| [Customer interview summary](../../examples/interview-summary.html) | Business | Standard | bar chart (two), hand-drawn user journey | 0 errors, 1 warning |
+| [Decision record](../../examples/decision-record.html) | Software | Standard | range chart, bar chart, sequence diagram | 0 errors, 0 warnings |
+| [Incident review](../../examples/incident-review.html) | Software | Brief, Harbor palette | status grid, line chart, walkthrough, hand-drawn fishbone, card grid | 0 errors, 2 warnings |
+| [Research report](../../examples/research-report.html) | Research | Standard | range chart, dumbbell | 0 errors, 1 warning |
 
 ## 1. Churn analysis
 

@@ -1,6 +1,6 @@
 # Proposal: the timeline — events and spans on a true time scale, in lanes
 
-Status: **proposed on 2026-11-26.** Nothing is built. Each decision at the end has a recommended answer, which the proposal follows. This is the "short proposal first" that item 5 of [`charts.md`](charts.md) asks for, and it changes one part of that plan (decision 1). The worked example is the timeline table of [`docs/research/test-documents/incident-review.html`](../research/test-documents/incident-review.html). All sample content is invented.
+Status: **proposed on 2026-11-26.** Nothing is built. Each decision at the end has a recommended answer, which the proposal follows. This is the "short proposal first" that item 5 of [`charts.md`](charts.md) asks for, and it changes one part of that plan (decision 1). The worked example is the timeline table of [`examples/incident-review.html`](../../examples/incident-review.html). All sample content is invented.
 
 ## The answer first
 
