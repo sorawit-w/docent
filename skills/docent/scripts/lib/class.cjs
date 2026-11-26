@@ -37,13 +37,13 @@ function boxShape({ name, stereotype, italic, under, lists }, room = Infinity) {
   const heights = parts.map((list) => Math.max(12, 8 + 18 * list.reduce((n, m) => n + m.lines.length, 0)));
   const h = head + heights.reduce((a, b) => a + b, 0);
   return {
-    w, h,
-    draw: (cx, cy) => {
-      const x = cx - w / 2, y = cy - h / 2;
+    w, h, grow: true,
+    draw: (cx, cy, W = w, H = h) => {
+      const x = cx - W / 2, y = cy - H / 2;
       const rules = [];
       let yy = y + head;
       for (const hh of heights) { rules.push(yy); yy += hh; }
-      let svg = uml.shapes.compartments({ x, y, w, h }, rules);
+      let svg = uml.shapes.compartments({ x, y, w: W, h: H }, rules);
       let ty = y + 20;
       if (stereotype) { svg += `<text x="${num(cx)}" y="${num(ty - 2)}" class="u-mem" text-anchor="middle">«${esc(stereotype)}»</text>`; ty += 18; }
       for (const l of nameLines) { svg += `<text x="${num(cx)}" y="${num(ty)}" class="name${italic ? " u-it" : ""}${under ? " u-ul" : ""}" text-anchor="middle">${esc(l)}</text>`; ty += 18; }
@@ -61,8 +61,8 @@ function noteShape(n, room = 200) {
   const lines = wrap(n.text, "sub", Math.min(room, 200) - 28);
   const w = Math.max(80, ...lines.map((l) => textWidth(l, 12) + 28)), h = 16 + 18 * lines.length;
   return {
-    w, h,
-    draw: (cx, cy) => ({ svg: uml.shapes.note({ x: cx - w / 2, y: cy - h / 2, w, h }), texts: lines.map((s, k) => ({ x: cx - w / 2 + 12, y: cy - h / 2 + 22 + 18 * k, s, cls: "sub", anchor: "start" })) }),
+    w, h, grow: true,
+    draw: (cx, cy, W = w, H = h) => ({ svg: uml.shapes.note({ x: cx - W / 2, y: cy - H / 2, w: W, h: H }), texts: lines.map((s, k) => ({ x: cx - W / 2 + 12, y: cy - H / 2 + 22 + 18 * k, s, cls: "sub", anchor: "start" })) }),
   };
 }
 

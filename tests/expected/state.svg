@@ -35,9 +35,9 @@
 #dg-order-states .u-op{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e)}
 .js #dg-order-states .pulse{display:block;animation:10.8s linear 2 both}
 .js #dg-order-states:not(.is-playing) .pulse{animation-play-state:paused}
-@keyframes dg-order-states-1{0%{transform:translate(132px,56px);opacity:0}1.11%{transform:translate(132px,56px);opacity:1}12.5%{transform:translate(132px,137px);opacity:1}14.81%{transform:translate(132px,137px);opacity:0}100%{transform:translate(132px,137px);opacity:0}}
+@keyframes dg-order-states-1{0%{transform:translate(132px,56px);opacity:0}1.11%{transform:translate(132px,56px);opacity:1}12.5%{transform:translate(132px,132px);opacity:1}14.81%{transform:translate(132px,132px);opacity:0}100%{transform:translate(132px,132px);opacity:0}}
 .js #dg-order-states .pulse-1{animation-name:dg-order-states-1}
-@keyframes dg-order-states-2{0%{transform:translate(132px,199px);opacity:0}14.81%{transform:translate(132px,199px);opacity:0}15.93%{transform:translate(132px,199px);opacity:1}27.31%{transform:translate(132px,288px);opacity:1}29.63%{transform:translate(132px,288px);opacity:0}100%{transform:translate(132px,288px);opacity:0}}
+@keyframes dg-order-states-2{0%{transform:translate(120px,204px);opacity:0}14.81%{transform:translate(120px,204px);opacity:0}15.93%{transform:translate(120px,204px);opacity:1}20.2%{transform:translate(120px,240px);opacity:1}21.62%{transform:translate(132px,240px);opacity:1}27.31%{transform:translate(132px,288px);opacity:1}29.63%{transform:translate(132px,288px);opacity:0}100%{transform:translate(132px,288px);opacity:0}}
 .js #dg-order-states .pulse-2{animation-name:dg-order-states-2}
 @keyframes dg-order-states-3{0%{transform:translate(132px,312px);opacity:0}29.63%{transform:translate(132px,312px);opacity:0}30.74%{transform:translate(132px,312px);opacity:1}42.13%{transform:translate(132px,401px);opacity:1}44.44%{transform:translate(132px,401px);opacity:0}100%{transform:translate(132px,401px);opacity:0}}
 .js #dg-order-states .pulse-3{animation-name:dg-order-states-3}
@@ -54,24 +54,24 @@
 <rect width="1056" height="1200" class="ground"/>
 <rect x="660" y="588" width="360" height="312" rx="10" class="u-face"/><line x1="840" y1="588" x2="840" y2="900" class="u-ln u-dash"/>
 <text x="672" y="609" class="name" text-anchor="start">Shipping</text>
-<g class="leg" data-leg="1"><polyline points="132,56 132,137" class="u-ln"/><polyline points="127.5,129 132,137 136.5,129" class="u-ln"/><circle r="6" class="pulse pulse-1"/></g>
-<g class="leg" data-leg="2"><polyline points="132,199 132,288" class="u-ln"/><polyline points="127.5,280 132,288 136.5,280" class="u-ln"/><circle r="6" class="pulse pulse-2"/><text x="140" y="247.5" class="verb" text-anchor="start">pay</text></g>
+<g class="leg" data-leg="1"><polyline points="132,56 132,132" class="u-ln"/><polyline points="127.5,124 132,132 136.5,124" class="u-ln"/><circle r="6" class="pulse pulse-1"/></g>
+<g class="leg" data-leg="2"><polyline points="120,204 120,240 132,240 132,288" class="u-ln"/><polyline points="127.5,280 132,288 136.5,280" class="u-ln"/><circle r="6" class="pulse pulse-2"/><text x="140" y="268" class="verb" text-anchor="start">pay</text></g>
 <g class="leg" data-leg="3"><polyline points="132,312 132,401" class="u-ln"/><polyline points="127.5,393 132,401 136.5,393" class="u-ln"/><circle r="6" class="pulse pulse-3"/><text x="140" y="360.5" class="verb" text-anchor="start">[card valid]</text></g>
 <g class="leg" data-leg="5"><polyline points="217,432 816,432 816,588" class="u-ln"/><polyline points="811.5,580 816,588 820.5,580" class="u-ln"/><circle r="6" class="pulse pulse-5"/><text x="516.5" y="449" class="verb" text-anchor="middle">pick</text></g>
 <g class="leg" data-leg="10"><polyline points="816,900 816,1032 581,1032" class="u-ln"/><polyline points="589,1027.5 581,1032 589,1036.5" class="u-ln"/><circle r="6" class="pulse pulse-10"/><text x="824" y="970" class="verb" text-anchor="start">hand over</text></g>
 <g class="leg" data-leg="11"><polyline points="492,1063 492,1142" class="u-ln"/><polyline points="487.5,1134 492,1142 496.5,1134" class="u-ln"/><circle r="6" class="pulse pulse-11"/></g>
-<g class="leg" data-leg="4"><polyline points="148,300 180,300 180,199" class="u-ln"/><polyline points="184.5,207 180,199 175.5,207" class="u-ln"/><text x="188" y="253.5" class="verb" text-anchor="start">[else] / show error</text></g>
+<g class="leg" data-leg="4"><polyline points="148,300 168,300 168,252 144,252 144,204" class="u-ln"/><polyline points="148.5,212 144,204 139.5,212" class="u-ln"/><text x="176" y="280" class="verb" text-anchor="start">[else] / show error</text></g>
 <g class="leg" data-leg="6"><polyline points="732,656 732,736" class="u-ln"/><polyline points="727.5,728 732,736 736.5,728" class="u-ln"/></g>
 <g class="leg" data-leg="7"><polyline points="732,776 732,854" class="u-ln"/><polyline points="727.5,846 732,854 736.5,846" class="u-ln"/><text x="740" y="819" class="verb" text-anchor="start">boxed</text></g>
 <g class="leg" data-leg="8"><polyline points="948,656 948,736" class="u-ln"/><polyline points="943.5,728 948,736 952.5,728" class="u-ln"/></g>
 <g class="leg" data-leg="9"><polyline points="948,776 948,854" class="u-ln"/><polyline points="943.5,846 948,854 952.5,846" class="u-ln"/><text x="956" y="819" class="verb" text-anchor="start">printed</text></g>
 <g class="leg" data-leg="12"><polyline points="203,192 492,192 492,280" class="u-ln"/><polyline points="487.5,272 492,280 496.5,272" class="u-ln"/><text x="347.5" y="209" class="verb" text-anchor="middle">after 7 days</text></g>
-<g class="leg" data-leg="13"><polyline points="203,156 252,156 252,180 203,180" class="u-ln"/><polyline points="211,175.5 203,180 211,184.5" class="u-ln"/><text x="260" y="172" class="verb" text-anchor="start">edit</text></g>
+<g class="leg" data-leg="13"><polyline points="203,144 252,144 252,168 203,168" class="u-ln"/><polyline points="211,163.5 203,168 211,172.5" class="u-ln"/><text x="260" y="160" class="verb" text-anchor="start">edit</text></g>
 <g class="leg" data-leg="14"><polyline points="440,300 384,300 384,1152 482,1152" class="u-ln"/><polyline points="474,1156.5 482,1152 474,1147.5" class="u-ln"/></g>
 <circle cx="132" cy="48" r="8" class="u-ink"/>
-<rect x="61" y="137" width="142" height="62" rx="10" class="u-face"/><line x1="61" y1="169" x2="203" y2="169" class="u-ln"/>
-<text x="132" y="158" class="name" text-anchor="middle">New</text>
-<text x="73" y="187" class="sub" text-anchor="start">entry / reserve stock</text>
+<rect x="61" y="132" width="142" height="72" rx="10" class="u-face"/><line x1="61" y1="164" x2="203" y2="164" class="u-ln"/>
+<text x="132" y="153" class="name" text-anchor="middle">New</text>
+<text x="73" y="182" class="sub" text-anchor="start">entry / reserve stock</text>
 <polygon points="132,288 148,300 132,312 116,300" class="u-face"/>
 <rect x="47" y="401" width="170" height="62" rx="10" class="u-face"/><line x1="47" y1="433" x2="217" y2="433" class="u-ln"/>
 <text x="132" y="422" class="name" text-anchor="middle">Paid</text>

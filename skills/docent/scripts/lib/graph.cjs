@@ -4,7 +4,9 @@
 //      never holds a node of another group. Inside a group the nodes of a row are ordered to cut crossings.
 //   3. Lines. Everything sits on a 12px lattice. A line walks the free lattice points: shortest, few bends, never on
 //      another line, crossing only at a right angle. It leaves a node by a port and ends on a straight stem that is
-//      long enough for its end mark (references/DESIGN.md, the spacing rules).
+//      long enough for its end mark (references/DESIGN.md, the spacing rules). It meets the side of a node at least 12px
+//      from each corner; two or more lines on one side are 24px apart and centered on its middle (a second pass spreads
+//      them, from the counts of the first), and a box grows when a side is too short for its lines.
 //   4. Labels. Each label takes the first place beside its line that keeps clear of every line, node and label.
 // When a step finds no room, the gaps grow and the layout runs again. The result is the same every time.
 const uml = require("./uml.cjs");
@@ -12,6 +14,13 @@ const { textBox, segSeg, pointSeg, dist } = require("./geometry.cjs");
 
 const U = 12; // the lattice
 const BEND = 30, CROSS = 14;
+// A line meets a side of a node at least one lattice step from each corner: the widest end mark that meets a node (the
+// hollow triangle, 7px each way) then keeps 5px of the side beside it, and a 48px side still holds two lines, 24px apart.
+const MARGIN = U;
+const PLAN = 120; // the cost of a spot that does not follow the plan of the pass before
+// The spots of n lines on one side: 24px apart, centered on the middle. A side of length L holds floor(L / 24) of them.
+const spread = (n) => Array.from({ length: n }, (_, i) => (2 * i - n + 1) * U);
+const holds = (L) => Math.max(1, Math.floor(L / (2 * U) + 1e-9));
 const DIRS = [[1, 0], [0, 1], [-1, 0], [0, -1]]; // right, down, left, up
 const SIDE = { right: 0, bottom: 1, left: 2, top: 3 };
 const up = (v, s = U) => Math.ceil(v / s - 1e-9) * s;
@@ -128,9 +137,10 @@ function hit(node, side, off) {
 
 /**
  * Lays out a graph. g: { nodes, edges, groups, lanes? } (see layoutGraph). k: the extra room, in lattice steps.
+ * plan: how many lines met each side of each node in the pass before ("node:side" -> n), or null in the first pass.
  * Returns the scene parts: node centers, routed lines, placed labels and group rectangles. Throws GraphError.
  */
-function draw(g, k) {
+function draw(g, k, plan = null) {
   const { nodes, edges, groups } = g;
   const { rank, back } = g.rows || rows(g);
   const { col, span, C, R } = columns(g, rank);
@@ -230,6 +240,25 @@ function draw(g, k) {
   const markStep = (i, j, d) => { const ni = i + DIRS[d][0], nj = j + DIRS[d][1]; if (d === 0) hUsed[P(i, j)] = 1; else if (d === 2) hUsed[P(ni, nj)] = 1; else if (d === 1) vUsed[P(i, j)] = 1; else vUsed[P(i, nj)] = 1; };
   const portUsed = new Set();
   const bus = new Map(); // bus name -> the lattice points of its lines so far, where a later line of the bus may branch off
+  const ends = []; // where each line meets a node or a frame: { key, node?, group?, side, a, mid? }
+  const sideUse = new Map(); // "node:side" -> the places taken on that side, so two line ends stay 24px apart
+  const take = (end) => { ends.push(end); if (!sideUse.has(end.key)) sideUse.set(end.key, []); sideUse.get(end.key).push(end.a); };
+
+  /** The offsets from the middle of a side that a line may meet, each with an extra cost. */
+  function spots(node, key, L) {
+    if (node && node.ports === "mid") return [[0, 0]];
+    // The first pass, and a frame: 24px apart from the middle out, so two arrowheads never touch.
+    if (!node || !plan) return [0, 1, -1, 2, -2, 3, -3, 4, -4, 5, -5, 6, -6].map((s) => [s * 2 * U, 0]);
+    // Then the lines of a side spread evenly over it, as many as met it in the pass before; one more or one less costs more.
+    // A lone line may meet any lattice point of its side clear of the corners, the middle first.
+    const fit = holds(L), n = Math.min(plan.get(key) || 0, fit), out = [];
+    const lone = [0];
+    for (let s = U; s <= L / 2 - MARGIN + 1e-6; s += U) lone.push(s, -s);
+    for (const [m, extra] of n ? [[n, 0], [n + 1, PLAN], [n - 1, PLAN]] : [[1, 0]]) { // an empty side is free to take a line that leaves a crowded one
+      if (m >= 1 && m <= fit) for (const off of m === 1 ? lone : spread(m)) if (!out.some(([o]) => o === off)) out.push([off, extra]);
+    }
+    return out;
+  }
 
   /** The ports of an end: on the lattice, on the border of the node's room (or of the group's frame). */
   function ports(end, toward, isEnd, edge, inner) {
@@ -241,11 +270,13 @@ function draw(g, k) {
       const d = inner ? (SIDE[side] + 2) % 4 : SIDE[side]; // a line to a node inside the frame leaves the frame inward
       const horiz = side === "top" || side === "bottom";
       const lo = horiz ? r.x0 : r.y0, hi = horiz ? r.x1 : r.y1, mid = node ? (horiz ? node.cx : node.cy) : (lo + hi) / 2;
-      const offs = node && node.ports === "mid" ? [0] : [0, 1, -1, 2, -2, 3, -3, 4, -4, 5, -5, 6, -6].map((s) => s * 2 * U); // 24px apart, so two arrowheads never touch
-      for (const off of offs) {
-        const at = up(mid + off - U / 2) ; // the lattice line nearest the middle
+      const key = node ? `${end.node}:${side}` : `frame${end.group}:${side}`;
+      const even = node && plan && node.ports !== "mid"; // the spots already keep clear of the corners of the visible node
+      for (const [off, extra] of spots(node, key, horiz ? node && node.w : node && node.h)) {
+        const at = even ? mid + off : up(mid + off - U / 2); // the lattice line nearest the middle
         const a = node && node.ports === "mid" ? mid : at;
-        if (a <= lo + U - 1e-6 || a >= hi - U + 1e-6) continue;
+        if (!even && (a <= lo + U - 1e-6 || a >= hi - U + 1e-6)) continue;
+        if (even && (sideUse.get(key) || []).some((b) => Math.abs(a - b) < 2 * U - 1e-6)) continue;
         if (end.group != null && side === "top" && names.some((nm) => a >= nm.x0 - U && a <= nm.x1 + U)) continue;
         if (end.group != null && horiz && dividers[lead[end.group]].some((dx) => Math.abs(a - dx) < 2 * U)) continue; // never on a region's dashed line
         const pt = horiz ? [a, side === "top" ? r.y0 : r.y1] : [side === "left" ? r.x0 : r.x1, a];
@@ -257,7 +288,7 @@ function draw(g, k) {
         const L = Math.max(U, up(need - gap));
         // The side that faces the other end costs nothing; the sides across cost a little; the far side costs more.
         const want = inner ? Math.hypot(pt[0] - inner.cx, pt[1] - inner.cy) / 4 : toward[d];
-        out.push({ side, d, pt, vis, L, pen: want + Math.abs(a - mid) * 1.2 });
+        out.push({ side, d, pt, vis, L, pen: want + Math.abs(a - mid) * 1.2 + extra, end: { key, node: end.node, group: end.group, side, a, mid: Boolean(node && node.ports === "mid") } });
       }
     }
     return out;
@@ -362,22 +393,26 @@ function draw(g, k) {
     for (const [i, j] of gs.slice(1)) use[P(i, j)] = 3; // the end stem
     if (st.p.branch) use[P(...lat[0])] = 3; // where a line of a bus branches off, nothing else may cross
     if (e.bus) { if (!bus.has(e.bus)) bus.set(e.bus, []); bus.get(e.bus).push(...lat.slice(1, -gs.length - 1)); }
+    for (const p of [st.p, best.gl.p]) if (p.end) take(p.end);
     const all = [...lat.map(([i, j]) => [i * U, j * U])];
     all.unshift(st.p.vis); all.push(best.gl.p.vis);
     return simplify(all);
   }
 
-  // Loops on one node first: out of the right side and back in, below.
+  // Loops on one node first: out of the right side and back in, below. Its two ends are the first two spots of that side,
+  // so the lines that also meet the right side take the spots below it.
   const legs = edges.map(() => null);
   edges.forEach((e, n) => {
     if (e.a !== e.b) return;
     const v = placed[e.a];
     if (v.y1 - v.y0 < 4 * U) throw new GraphError(`the node "${v.id}" is too short for a line to itself`);
-    const ya = v.cy - U, yb = v.cy + U, x1 = v.x1, L = 4 * U;
-    const pts = [hit(v, "right", -U), [x1, ya], [x1 + L, ya], [x1 + L, yb], [x1, yb], hit(v, "right", U)];
+    const m = plan ? Math.min(plan.get(`${e.a}:right`) || 2, holds(v.h)) : 2;
+    const [ya, yb] = m > 2 ? spread(m).slice(0, 2).map((o) => v.cy + o) : [v.cy - U, v.cy + U], x1 = v.x1, L = 4 * U;
+    const pts = [hit(v, "right", ya - v.cy), [x1, ya], [x1 + L, ya], [x1 + L, yb], [x1, yb], hit(v, "right", yb - v.cy)];
     for (let j = ya / U; j <= yb / U; j++) use[P((x1 + L) / U, j)] = 3;
     for (let i = x1 / U; i <= (x1 + L) / U; i++) { use[P(i, ya / U)] = 3; use[P(i, yb / U)] = 3; }
     portUsed.add(P(x1 / U, ya / U)); portUsed.add(P(x1 / U, yb / U));
+    for (const a of [ya, yb]) take({ key: `${e.a}:right`, node: e.a, side: "right", a, mid: false });
     legs[n] = simplify(pts);
   });
   // Then the other lines: the shortest first, each over the lattice that the lines before it left free.
@@ -439,7 +474,41 @@ function draw(g, k) {
       labelled[n].push(done.t);
     }
   });
-  return { W, H, placed, rects, lead, legs, labels: labelled, names, head, lanes, colX, rowY, back, rank, col };
+  return { W, H, placed, rects, lead, legs, labels: labelled, names, head, lanes, colX, rowY, back, rank, col, ends, groups };
+}
+
+/** The line ends on each side of a node: "node:side" -> the places along the side, in order. Balls and frames left out. */
+function sideEnds(out) {
+  const by = new Map();
+  for (const e of out.ends) if (e.node != null && !e.mid) { if (!by.has(e.key)) by.set(e.key, []); by.get(e.key).push(e.a); }
+  for (const list of by.values()) list.sort((p, q) => p - q);
+  return by;
+}
+
+/**
+ * Lays out a graph in passes. The first pass routes as before; it tells how many lines meet each side of each node.
+ * The next pass spreads that many spots evenly over each side, and grows a box whose side is too short for its lines.
+ * It stops when every side holds its lines evenly, or after a few passes; checkGraph then judges the result.
+ */
+function settle(g, k) {
+  const grown = new Map(); // node -> { w?, h? }
+  let plan = null, out;
+  for (let pass = 0; pass < 5; pass++) {
+    const nodes = g.nodes.map((v, i) => (grown.has(i) ? { ...v, ...grown.get(i) } : v));
+    out = draw({ ...g, nodes }, k, plan);
+    const by = sideEnds(out);
+    let even = pass > 0;
+    plan = new Map();
+    for (const [key, list] of by) {
+      const v = out.placed[Number(key.split(":")[0])], side = key.split(":")[1], horiz = side === "top" || side === "bottom";
+      const L = horiz ? v.w : v.h, mid = horiz ? v.cx : v.cy;
+      plan.set(key, list.length);
+      if (list.length > holds(L) && v.grow) grown.set(v.i, { ...grown.get(v.i), [horiz ? "w" : "h"]: 2 * U * list.length });
+      if (list.length > holds(L) || (list.length > 1 && spread(list.length).some((off, i) => Math.abs(mid + off - list[i]) > 1e-6))) even = false;
+    }
+    if (even) break;
+  }
+  return out;
 }
 
 const middleFirst = (pts) => { const n = pts.length - 1, m = Math.floor((n - 1) / 2), out = [m]; for (let s = 1; out.length < n; s++) { if (m + s < n) out.push(m + s); if (m - s >= 0) out.push(m - s); } return out; };
@@ -485,6 +554,7 @@ function checkGraph(out, edges) {
       }
     });
   });
+  bad.push(...sideProblems(out));
   const boxes = labels.flatMap((list) => list.map((t) => textBox(t)));
   boxes.forEach((b, i) => {
     if (b.x0 < 4 || b.y0 < 4 || b.x1 > W - 4 || b.y1 > H - 4) bad.push("a label is outside the drawing");
@@ -496,8 +566,47 @@ function checkGraph(out, edges) {
 }
 
 /**
+ * Where lines meet the sides of nodes and frames: each end at least MARGIN from the corners, two ends at least 24px
+ * apart, the ends on one side of a node evenly spaced and centered within a lattice step, and no line along a border.
+ */
+function sideProblems(out) {
+  const bad = [], e = 1e-6;
+  const { placed, rects, lead, legs } = out;
+  const frame = (gi) => out.groups[gi].kind === "box" && lead[gi] === gi;
+  const box = (end) => (end.node != null ? { x0: placed[end.node].cx - placed[end.node].w / 2, x1: placed[end.node].cx + placed[end.node].w / 2, y0: placed[end.node].cy - placed[end.node].h / 2, y1: placed[end.node].cy + placed[end.node].h / 2 } : rects[end.group]);
+  const name = (end) => (end.node != null ? placed[end.node].id : `the frame ${out.groups[end.group].id}`);
+  const by = new Map();
+  for (const end of out.ends) if (!end.mid) { if (!by.has(end.key)) by.set(end.key, []); by.get(end.key).push(end); }
+  for (const list of by.values()) {
+    const first = list[0], b = box(first), horiz = first.side === "top" || first.side === "bottom";
+    const lo = horiz ? b.x0 : b.y0, hi = horiz ? b.x1 : b.y1, at = list.map((x) => x.a).sort((p, q) => p - q);
+    for (const a of at) if (a < lo + MARGIN - e || a > hi - MARGIN + e) bad.push(`a line meets the ${first.side} side of "${name(first)}" ${Math.round(Math.min(a - lo, hi - a))}px from a corner`);
+    const gaps = at.slice(1).map((a, i) => a - at[i]);
+    if (gaps.some((d) => d < 2 * U - e)) bad.push(`two lines meet the ${first.side} side of "${name(first)}" less than 24px apart`);
+    if (first.node != null && at.length > 1) {
+      const mid = horiz ? placed[first.node].cx : placed[first.node].cy;
+      if (Math.max(...gaps) - Math.min(...gaps) > U + e || Math.abs((at[0] + at[at.length - 1]) / 2 - mid) > U / 2 + e) bad.push(`the lines on the ${first.side} side of "${name(first)}" are not evenly spaced`);
+    }
+  }
+  // No line runs along the border of a node or a frame: a run parallel to a border, closer than 8px, and beside it.
+  const borders = [...placed.map((v) => ({ id: v.id, ...box({ node: v.i }) })), ...rects.map((r, i) => ({ id: `the frame ${out.groups[i].id}`, ...r })).filter((_, i) => frame(i))];
+  legs.forEach((pts, n) => {
+    for (let i = 0; i + 1 < pts.length; i++) {
+      const [p, q] = [pts[i], pts[i + 1]], flat = Math.abs(p[1] - q[1]) < e, upright = Math.abs(p[0] - q[0]) < e;
+      if (flat === upright) continue;
+      for (const r of borders) {
+        const [c, s0, s1, b0, b1, lines] = flat ? [p[1], Math.min(p[0], q[0]), Math.max(p[0], q[0]), r.x0, r.x1, [r.y0, r.y1]] : [p[0], Math.min(p[1], q[1]), Math.max(p[1], q[1]), r.y0, r.y1, [r.x0, r.x1]];
+        if (Math.min(s1, b1) - Math.max(s0, b0) > 1 && lines.some((l) => Math.abs(c - l) < 8)) bad.push(`line ${n + 1} runs along the border of "${r.id}"`);
+      }
+    }
+  });
+  return bad;
+}
+
+/**
  * Lays out a graph and returns a scene that toSvg draws.
- * g.nodes: [{ id, w, h, group?, rank?, col?, ports?: "mid" | "tb" | "lr", round?, hit?, draw(cx, cy) -> { svg, texts } }]
+ * g.nodes: [{ id, w, h, group?, rank?, col?, ports?: "mid" | "tb" | "lr", round?, hit?, grow?, draw(cx, cy, w, h) -> { svg, texts } }]
+ *   grow: the box may grow when a side is too short for the lines that meet it; draw then gets the new w and h.
  * g.edges: [{ from, to, end?, dashed?, labels?: [{ s, at?: "start" | "mid" | "end", cls?, near?, arrow?: "forward" | "back" }], still?, len?, up?, firsfirst?, port?: "start" | "end" | "both" }]
  *   port: a small square where the line meets the border of its node or frame (a port of a component or a part).
  *   from and to are node ids, or group ids for a line to a whole frame. up: the line points up, so in the rows its
@@ -542,7 +651,7 @@ function layoutGraph(g, form) {
   let last;
   for (let tries = 0; tries < 6; tries++) {
     try {
-      const out = draw({ nodes, edges, groups, rows: { rank: R.rank, back }, texts: g.texts }, k);
+      const out = settle({ nodes, edges, groups, rows: { rank: R.rank, back }, texts: g.texts }, k);
       const problems = checkGraph(out, edges);
       if (problems.length) throw new GraphError(problems[0], { cause: { grow: "gap" } });
       return scene(out, nodes, edges, groups, form);
@@ -571,7 +680,7 @@ function scene(out, nodes, edges, groups, form) {
     }
   });
   for (const v of out.placed) {
-    const made = v.draw(v.cx, v.cy);
+    const made = v.draw(v.cx, v.cy, v.w, v.h); // a node that grew (grow: true) draws itself at its new size
     s.parts.push({ id: v.id, shape: "raw", svg: made.svg, texts: made.texts, x: v.cx - v.w / 2, y: v.cy - v.h / 2, w: v.w, h: v.h });
   }
   // The lines that move come first, in order, so the dot travels them; the others keep still.
@@ -652,4 +761,4 @@ function layoutColumnGraph(items, form) {
 
 const PHONE_NODE = 264 - 2 * 32; // the widest node in the column form, inside a band
 
-module.exports = { layoutGraph, layoutColumnGraph, GraphError, U, hit, wrap, PHONE_NODE };
+module.exports = { layoutGraph, layoutColumnGraph, GraphError, U, MARGIN, hit, wrap, sideProblems, PHONE_NODE };

@@ -23,11 +23,11 @@ function folderShape(p, room = Infinity) {
   const w = Math.max(120, tabW + 24, ...members.map((m) => textWidth(m, 12) + 24)), body = Math.max(36, 12 + 18 * members.length);
   const h = tabH + body;
   return {
-    w, h,
-    hit: (side, off, v) => (side === "top" && Math.abs(off) <= w / 2 && v.cx + off > v.cx - w / 2 + tabW ? [v.cx + off, v.cy - h / 2 + tabH] : { top: [v.cx + off, v.cy - h / 2], bottom: [v.cx + off, v.cy + h / 2], left: [v.cx - w / 2, v.cy + off], right: [v.cx + w / 2, v.cy + off] }[side]),
-    draw: (cx, cy) => {
-      const x = cx - w / 2, y = cy - h / 2;
-      let svg = uml.shapes.folder({ x, y, w, h }, tabW, tabH);
+    w, h, grow: true,
+    hit: (side, off, v) => (side === "top" && Math.abs(off) <= v.w / 2 && v.cx + off > v.cx - v.w / 2 + tabW ? [v.cx + off, v.cy - v.h / 2 + tabH] : { top: [v.cx + off, v.cy - v.h / 2], bottom: [v.cx + off, v.cy + v.h / 2], left: [v.cx - v.w / 2, v.cy + off], right: [v.cx + v.w / 2, v.cy + off] }[side]),
+    draw: (cx, cy, W = w, H = h) => {
+      const x = cx - W / 2, y = cy - H / 2;
+      let svg = uml.shapes.folder({ x, y, w: W, h: H }, tabW, tabH);
       name.forEach((l, k) => (svg += `<text x="${num(x + 12)}" y="${num(y + 16 + 18 * k)}" class="name">${esc(l)}</text>`));
       members.forEach((m, k) => (svg += `<text x="${num(x + 12)}" y="${num(y + tabH + 22 + 18 * k)}" class="u-mem">${esc(m)}</text>`));
       return { svg, texts: [] };

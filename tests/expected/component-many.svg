@@ -1,0 +1,147 @@
+<svg id="dg-web-app-services" class="dg dg-component dg-auto" xmlns="http://www.w3.org/2000/svg" width="1080" height="408" viewBox="0 0 1080 408" role="img" aria-label="The services the web app needs: email codes, a bot check, analytics tags and a device risk check, which the partner API also needs.">
+<style>
+#dg-web-app-services{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-web-app-services .ground{fill:var(--fig,#f2f3f9)}
+#dg-web-app-services .band{fill:var(--bg,#fbfbfe)}
+#dg-web-app-services .track{stroke:var(--line,#d3d6e3)}
+#dg-web-app-services .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-web-app-services .head{fill:var(--text,#1c1f2e)}
+#dg-web-app-services .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-web-app-services .stop.end{fill:var(--text,#1c1f2e)}
+#dg-web-app-services .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-web-app-services .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-web-app-services .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-web-app-services .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-web-app-services .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-web-app-services .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-web-app-services .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-web-app-services .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-web-app-services .sub,#dg-web-app-services .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-web-app-services .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-web-app-services .u-ln{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-web-app-services .u-bold{stroke-width:2.5}
+#dg-web-app-services .u-dash{stroke-dasharray:6 4;stroke-linecap:butt}
+#dg-web-app-services .u-face{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linejoin:round}
+#dg-web-app-services .u-ink{fill:var(--text,#1c1f2e)}
+#dg-web-app-services .u-name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-web-app-services .leg .line{stroke-width:1.5}
+#dg-web-app-services .leg.is-reply .line{stroke-dasharray:6 4;stroke-linecap:butt}
+#dg-web-app-services .ohead{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.js #dg-web-app-services .leg.is-current .ohead{stroke:var(--primary,#2f3fd0)}
+#dg-web-app-services .u-bar{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-web-app-services .u-frame{fill:none;stroke:var(--muted,#575d75);stroke-width:1}
+#dg-web-app-services .u-frame.is-filled{fill:var(--bg,#fbfbfe)}
+#dg-web-app-services .u-div{stroke:var(--muted,#575d75);stroke-width:1;stroke-dasharray:6 4}
+#dg-web-app-services .u-op{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-web-app-services .u-mem{font-size:12px;fill:var(--text,#1c1f2e)}
+#dg-web-app-services .u-it{font-style:italic}
+#dg-web-app-services .u-ul{text-decoration:underline}
+@media (prefers-reduced-motion:reduce){#dg-web-app-services .pulse{animation:none!important}#dg-web-app-services .pulse{display:none!important}}
+@media print{#dg-web-app-services{max-width:100%;height:auto}#dg-web-app-services .pulse{display:none!important}}
+#dg-web-app-services-phone{display:none}
+</style>
+<rect width="1080" height="408" class="ground"/>
+<g class="leg" data-leg="1"><polyline points="560,60 228,60 228,204 143,204" class="u-ln"/><path d="M132,193 A11,11 0 0 1 132,215" class="u-ln"/></g>
+<g class="leg" data-leg="2"><polyline points="132,211 132,311" class="u-ln"/></g>
+<g class="leg" data-leg="3"><polyline points="560,84 384,84 384,193" class="u-ln"/><path d="M373,204 A11,11 0 0 1 395,204" class="u-ln"/></g>
+<g class="leg" data-leg="4"><polyline points="384,211 384,311" class="u-ln"/></g>
+<g class="leg" data-leg="5"><polyline points="636,97 636,193" class="u-ln"/><path d="M625,204 A11,11 0 0 1 647,204" class="u-ln"/></g>
+<g class="leg" data-leg="6"><polyline points="636,211 636,311" class="u-ln"/></g>
+<g class="leg" data-leg="7"><polyline points="712,72 792,72 792,204 913,204" class="u-ln"/><path d="M924,215 A11,11 0 0 1 924,193" class="u-ln"/></g>
+<g class="leg" data-leg="8"><polyline points="924,97 924,193" class="u-ln"/><path d="M913,204 A11,11 0 0 1 935,204" class="u-ln"/></g>
+<g class="leg" data-leg="9"><polyline points="924,211 924,311" class="u-ln"/></g>
+<rect x="560" y="47" width="152" height="50" class="u-face"/><rect x="691" y="55" width="13" height="16" class="u-face"/><rect x="688" y="58" width="7" height="3" class="u-face"/><rect x="688" y="65" width="7" height="3" class="u-face"/><text x="636" y="65" class="u-mem" text-anchor="middle">«component»</text><text x="636" y="85" class="name" text-anchor="middle">Web app</text>
+<rect x="848" y="47" width="152" height="50" class="u-face"/><rect x="979" y="55" width="13" height="16" class="u-face"/><rect x="976" y="58" width="7" height="3" class="u-face"/><rect x="976" y="65" width="7" height="3" class="u-face"/><text x="924" y="65" class="u-mem" text-anchor="middle">«component»</text><text x="924" y="85" class="name" text-anchor="middle">Partner API</text>
+<rect x="45" y="311" width="174" height="50" class="u-face"/><rect x="198" y="319" width="13" height="16" class="u-face"/><rect x="195" y="322" width="7" height="3" class="u-face"/><rect x="195" y="329" width="7" height="3" class="u-face"/><text x="132" y="329" class="u-mem" text-anchor="middle">«component»</text><text x="132" y="349" class="name" text-anchor="middle">Sign-in service</text>
+<rect x="308" y="311" width="152" height="50" class="u-face"/><rect x="439" y="319" width="13" height="16" class="u-face"/><rect x="436" y="322" width="7" height="3" class="u-face"/><rect x="436" y="329" width="7" height="3" class="u-face"/><text x="384" y="329" class="u-mem" text-anchor="middle">«component»</text><text x="384" y="349" class="name" text-anchor="middle">Bot filter</text>
+<rect x="556.5" y="311" width="159" height="50" class="u-face"/><rect x="694.5" y="319" width="13" height="16" class="u-face"/><rect x="691.5" y="322" width="7" height="3" class="u-face"/><rect x="691.5" y="329" width="7" height="3" class="u-face"/><text x="636" y="329" class="u-mem" text-anchor="middle">«component»</text><text x="636" y="349" class="name" text-anchor="middle">Tag manager</text>
+<rect x="848" y="311" width="152" height="50" class="u-face"/><rect x="979" y="319" width="13" height="16" class="u-face"/><rect x="976" y="322" width="7" height="3" class="u-face"/><rect x="976" y="329" width="7" height="3" class="u-face"/><text x="924" y="329" class="u-mem" text-anchor="middle">«component»</text><text x="924" y="349" class="name" text-anchor="middle">Risk engine</text>
+<circle cx="132" cy="204" r="7" class="u-face"/><text x="145" y="191" class="u-mem">Email codes</text>
+<circle cx="384" cy="204" r="7" class="u-face"/><text x="397" y="191" class="u-mem">Bot check</text>
+<circle cx="636" cy="204" r="7" class="u-face"/><text x="649" y="191" class="u-mem">Analytics tags</text>
+<circle cx="924" cy="204" r="7" class="u-face"/><text x="937" y="191" class="u-mem">Device risk check</text>
+</svg>
+<svg id="dg-web-app-services-phone" class="dg dg-component dg-auto" xmlns="http://www.w3.org/2000/svg" width="264" height="870" viewBox="0 0 264 870" role="img" aria-label="The services the web app needs: email codes, a bot check, analytics tags and a device risk check, which the partner API also needs.">
+<style>
+#dg-web-app-services-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-web-app-services-phone .ground{fill:var(--fig,#f2f3f9)}
+#dg-web-app-services-phone .band{fill:var(--bg,#fbfbfe)}
+#dg-web-app-services-phone .track{stroke:var(--line,#d3d6e3)}
+#dg-web-app-services-phone .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-web-app-services-phone .head{fill:var(--text,#1c1f2e)}
+#dg-web-app-services-phone .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-web-app-services-phone .stop.end{fill:var(--text,#1c1f2e)}
+#dg-web-app-services-phone .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-web-app-services-phone .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-web-app-services-phone .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-web-app-services-phone .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-web-app-services-phone .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-web-app-services-phone .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-web-app-services-phone .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-web-app-services-phone .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-web-app-services-phone .sub,#dg-web-app-services-phone .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-web-app-services-phone .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-web-app-services-phone .u-ln{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-web-app-services-phone .u-bold{stroke-width:2.5}
+#dg-web-app-services-phone .u-dash{stroke-dasharray:6 4;stroke-linecap:butt}
+#dg-web-app-services-phone .u-face{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linejoin:round}
+#dg-web-app-services-phone .u-ink{fill:var(--text,#1c1f2e)}
+#dg-web-app-services-phone .u-name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-web-app-services-phone .leg .line{stroke-width:1.5}
+#dg-web-app-services-phone .leg.is-reply .line{stroke-dasharray:6 4;stroke-linecap:butt}
+#dg-web-app-services-phone .ohead{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.js #dg-web-app-services-phone .leg.is-current .ohead{stroke:var(--primary,#2f3fd0)}
+#dg-web-app-services-phone .u-bar{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-web-app-services-phone .u-frame{fill:none;stroke:var(--muted,#575d75);stroke-width:1}
+#dg-web-app-services-phone .u-frame.is-filled{fill:var(--bg,#fbfbfe)}
+#dg-web-app-services-phone .u-div{stroke:var(--muted,#575d75);stroke-width:1;stroke-dasharray:6 4}
+#dg-web-app-services-phone .u-op{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-web-app-services-phone .u-mem{font-size:12px;fill:var(--text,#1c1f2e)}
+#dg-web-app-services-phone .u-it{font-style:italic}
+#dg-web-app-services-phone .u-ul{text-decoration:underline}
+@media (prefers-reduced-motion:reduce){#dg-web-app-services-phone .pulse{animation:none!important}#dg-web-app-services-phone .pulse{display:none!important}}
+@media print{#dg-web-app-services-phone{max-width:100%;height:auto}#dg-web-app-services-phone .pulse{display:none!important}}
+@media (max-width:1176px){#dg-web-app-services{display:none}#dg-web-app-services-phone{display:block}}
+</style>
+<rect width="264" height="870" class="ground"/>
+<rect x="31" y="16" width="152" height="50" class="u-face"/><rect x="162" y="24" width="13" height="16" class="u-face"/><rect x="159" y="27" width="7" height="3" class="u-face"/><rect x="159" y="34" width="7" height="3" class="u-face"/><text x="107" y="34" class="u-mem" text-anchor="middle">«component»</text><text x="107" y="54" class="name" text-anchor="middle">Web app</text>
+<polyline points="20,85 64,85" class="u-ln"/><path d="M75,96 A11,11 0 0 1 75,74" class="u-ln"/>
+<text x="80" y="89" class="verb" text-anchor="start">needs</text>
+<text x="80" y="107" class="name" text-anchor="start">Email codes</text>
+<polyline points="20,127 64,127" class="u-ln"/><path d="M75,138 A11,11 0 0 1 75,116" class="u-ln"/>
+<text x="80" y="131" class="verb" text-anchor="start">needs</text>
+<text x="80" y="149" class="name" text-anchor="start">Bot check</text>
+<polyline points="20,169 64,169" class="u-ln"/><path d="M75,180 A11,11 0 0 1 75,158" class="u-ln"/>
+<text x="80" y="173" class="verb" text-anchor="start">needs</text>
+<text x="80" y="191" class="name" text-anchor="start">Analytics tags</text>
+<polyline points="20,211 64,211" class="u-ln"/><path d="M75,222 A11,11 0 0 1 75,200" class="u-ln"/>
+<text x="80" y="215" class="verb" text-anchor="start">needs</text>
+<text x="80" y="233" class="name" text-anchor="start">Device risk check</text>
+<rect x="31" y="264" width="152" height="50" class="u-face"/><rect x="162" y="272" width="13" height="16" class="u-face"/><rect x="159" y="275" width="7" height="3" class="u-face"/><rect x="159" y="282" width="7" height="3" class="u-face"/><text x="107" y="282" class="u-mem" text-anchor="middle">«component»</text><text x="107" y="302" class="name" text-anchor="middle">Partner API</text>
+<polyline points="20,333 64,333" class="u-ln"/><path d="M75,344 A11,11 0 0 1 75,322" class="u-ln"/>
+<text x="80" y="337" class="verb" text-anchor="start">needs</text>
+<text x="80" y="355" class="name" text-anchor="start">Device risk check</text>
+<rect x="20" y="386" width="174" height="50" class="u-face"/><rect x="173" y="394" width="13" height="16" class="u-face"/><rect x="170" y="397" width="7" height="3" class="u-face"/><rect x="170" y="404" width="7" height="3" class="u-face"/><text x="107" y="404" class="u-mem" text-anchor="middle">«component»</text><text x="107" y="424" class="name" text-anchor="middle">Sign-in service</text>
+<polyline points="20,455 68,455" class="u-ln"/>
+<text x="80" y="459" class="verb" text-anchor="start">offers</text>
+<text x="80" y="477" class="name" text-anchor="start">Email codes</text>
+<rect x="31" y="508" width="152" height="50" class="u-face"/><rect x="162" y="516" width="13" height="16" class="u-face"/><rect x="159" y="519" width="7" height="3" class="u-face"/><rect x="159" y="526" width="7" height="3" class="u-face"/><text x="107" y="526" class="u-mem" text-anchor="middle">«component»</text><text x="107" y="546" class="name" text-anchor="middle">Bot filter</text>
+<polyline points="20,577 68,577" class="u-ln"/>
+<text x="80" y="581" class="verb" text-anchor="start">offers</text>
+<text x="80" y="599" class="name" text-anchor="start">Bot check</text>
+<rect x="27.5" y="630" width="159" height="50" class="u-face"/><rect x="165.5" y="638" width="13" height="16" class="u-face"/><rect x="162.5" y="641" width="7" height="3" class="u-face"/><rect x="162.5" y="648" width="7" height="3" class="u-face"/><text x="107" y="648" class="u-mem" text-anchor="middle">«component»</text><text x="107" y="668" class="name" text-anchor="middle">Tag manager</text>
+<polyline points="20,699 68,699" class="u-ln"/>
+<text x="80" y="703" class="verb" text-anchor="start">offers</text>
+<text x="80" y="721" class="name" text-anchor="start">Analytics tags</text>
+<rect x="31" y="752" width="152" height="50" class="u-face"/><rect x="162" y="760" width="13" height="16" class="u-face"/><rect x="159" y="763" width="7" height="3" class="u-face"/><rect x="159" y="770" width="7" height="3" class="u-face"/><text x="107" y="770" class="u-mem" text-anchor="middle">«component»</text><text x="107" y="790" class="name" text-anchor="middle">Risk engine</text>
+<polyline points="20,821 68,821" class="u-ln"/>
+<text x="80" y="825" class="verb" text-anchor="start">offers</text>
+<text x="80" y="843" class="name" text-anchor="start">Device risk check</text>
+</svg>
+<details class="dg-words">
+<summary><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>The diagram in words</summary>
+<ul><li>The component Web app.</li><li>The component Partner API.</li><li>The component Sign-in service.</li><li>The component Bot filter.</li><li>The component Tag manager.</li><li>The component Risk engine.</li></ul>
+<ul><li>The interface Email codes: Sign-in service offers it, and Web app needs it.</li><li>The interface Bot check: Bot filter offers it, and Web app needs it.</li><li>The interface Analytics tags: Tag manager offers it, and Web app needs it.</li><li>The interface Device risk check: Risk engine offers it, and Web app, Partner API need it.</li></ul>
+<p>Key to the marks:</p>
+<ul><li>A box marked «component», with the component icon: a part of the system that can be replaced as a whole.</li><li>A ball on a line: a service, an interface, that the component at the line's other end offers.</li><li>A half circle around a ball: the component at the line's other end needs that service.</li></ul>
+</details>

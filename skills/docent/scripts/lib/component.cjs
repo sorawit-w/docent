@@ -30,10 +30,10 @@ function keywordShape({ keyword, name, icon, lines = [] }, room = Infinity) {
   const w = Math.max(120, textWidth(`«${keyword}»`, 12) + 64, ...nameLines.map((l) => textWidth(l, 14, 600) + 64), ...items.map((l) => textWidth(l, 12) + 44));
   const head = 18 + 18 * nameLines.length + 14, h = head + (items.length ? 8 + 18 * items.length : 0);
   return {
-    w, h,
-    draw: (cx, cy) => {
-      const x = cx - w / 2, y = cy - h / 2;
-      let svg = uml.shapes.compartments({ x, y, w, h }, items.length ? [y + head] : []) + icon(x + w - 24, y + 8);
+    w, h, grow: true,
+    draw: (cx, cy, W = w, H = h) => {
+      const x = cx - W / 2, y = cy - H / 2;
+      let svg = uml.shapes.compartments({ x, y, w: W, h: H }, items.length ? [y + head] : []) + icon(x + W - 24, y + 8);
       svg += `<text x="${num(cx)}" y="${num(y + 18)}" class="u-mem" text-anchor="middle">«${esc(keyword)}»</text>`;
       nameLines.forEach((l, k) => (svg += `<text x="${num(cx)}" y="${num(y + 38 + 18 * k)}" class="name" text-anchor="middle">${esc(l)}</text>`));
       items.forEach((l, k) => (svg += uml.signs.artifact(x + 12, y + head + 9 + 18 * k) + `<text x="${num(x + 32)}" y="${num(y + head + 21 + 18 * k)}" class="u-mem">${esc(l)}</text>`));
@@ -50,10 +50,10 @@ function nodeShape(n, room = Infinity) {
   const w = Math.max(132, textWidth(kw, 12) + 24 + D, ...nameLines.map((l) => textWidth(l, 14, 600) + 24 + D), ...items.map((l) => textWidth(l, 12) + 44 + D));
   const head = D + 18 + 18 * nameLines.length + 10, h = head + (items.length ? 18 * items.length + 6 : 0);
   return {
-    w, h,
-    draw: (cx, cy) => {
-      const x = cx - w / 2, y = cy - h / 2, fx = x + (w - D) / 2;
-      let svg = uml.shapes.node({ x, y, w: w - D, h }, D);
+    w, h, grow: true,
+    draw: (cx, cy, W = w, H = h) => {
+      const x = cx - W / 2, y = cy - H / 2, fx = x + (W - D) / 2;
+      let svg = uml.shapes.node({ x, y, w: W - D, h: H }, D);
       svg += `<text x="${num(fx)}" y="${num(y + D + 18)}" class="u-mem" text-anchor="middle">${esc(kw)}</text>`;
       nameLines.forEach((l, k) => (svg += `<text x="${num(fx)}" y="${num(y + D + 38 + 18 * k)}" class="name" text-anchor="middle">${esc(l)}</text>`));
       items.forEach((l, k) => (svg += uml.signs.artifact(x + 12, y + head + 3 + 18 * k) + `<text x="${num(x + 32)}" y="${num(y + head + 15 + 18 * k)}" class="u-mem">${esc(l)}</text>`));
@@ -82,8 +82,8 @@ function partShape(p, room = Infinity) {
   const lines = textWidth(title, 14, 600) + 32 <= room ? [title] : wrap(title, "name", room - 32);
   const w = Math.max(120, ...lines.map((l) => textWidth(l, 14, 600) + 32)), h = 24 + 18 * lines.length;
   return {
-    w, h,
-    draw: (cx, cy) => ({ svg: uml.shapes.compartments({ x: cx - w / 2, y: cy - h / 2, w, h }) + lines.map((l, k) => `<text x="${num(cx)}" y="${num(cy - h / 2 + 26 + 18 * k)}" class="name" text-anchor="middle">${esc(l)}</text>`).join(""), texts: [] }),
+    w, h, grow: true,
+    draw: (cx, cy, W = w, H = h) => ({ svg: uml.shapes.compartments({ x: cx - W / 2, y: cy - H / 2, w: W, h: H }) + lines.map((l, k) => `<text x="${num(cx)}" y="${num(cy - H / 2 + 26 + 18 * k)}" class="name" text-anchor="middle">${esc(l)}</text>`).join(""), texts: [] }),
   };
 }
 const partTitle = (p) => `${p.name} : ${p.type}${p.multiplicity ? ` [${p.multiplicity}]` : ""}`;
