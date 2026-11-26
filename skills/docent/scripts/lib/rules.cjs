@@ -75,6 +75,9 @@ const LIST = [
   G("diagram.outside", DG("The block")),
   H("diagram.advice", DG("What the renderer says")),
   H("diagram.twice", S("How to work")),
+  H("visual.bar", S("How to work")),
+  H("visual.line", S("How to work")),
+  H("visual.prose", S("How to work")),
   // Hand-drawn figures
   G("hand.unmade", DG("Hand-drawn figures")),
   G("hand.outside", DG("Hand-drawn figures")),
