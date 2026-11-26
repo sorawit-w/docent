@@ -91,7 +91,7 @@ To choose, ask four questions:
 
    When a chart and a table hold the same numbers, keep the chart. The chart's words already hold its numbers as a table. A table of your own with the same numbers, such as one with more columns, goes in a closed section (`<details>`) under the chart, for readers who need each exact number. Never drop the chart for the table, and never draw the same drawing twice.
 
-   `check` points out a visual that may be missing: a table of amounts that a bar chart would show (`visual.bar`), a table over equally spaced dates or periods that a line chart would show (`visual.line`), and a section of more than 400 words of paragraphs with nothing to look at (`visual.prose`). It cannot read the reader's question, so read each hint and decide. Keeping the text is a right answer when the question has no kind, such as a price list that the reader looks up; then give the reason in your reply.
+   `check` points out a visual that may be missing: a table of amounts that a bar chart would show (`visual.bar`), a table over equally spaced dates or periods that a line chart would show (`visual.line`), and a section of more than 400 words of paragraphs with nothing to look at (`visual.prose`). It cannot read the reader's question, so read each hint and decide. Keeping the text is a right answer when the question has no kind, such as a price list that the reader looks up. Then write the reason on the table, or on the section for `visual.prose`, as `data-no-visual`: `<table data-no-visual="Readers look up one price">`. The reader never sees it. `check` then names the reason in one note instead of the warning, on every run. A mark with no reason keeps the warning.
 
    | The reader asks | Write |
    |---|---|
@@ -357,7 +357,7 @@ Say what was tested and what was not. Use these words:
 - When `render` refused a diagram or a widget, say which one and why.
 - Report each hand-drawn figure as hand-drawn, every time, with its type: "Figure 3 is a hand-drawn fishbone. `check` tested its contract; I looked at it in light, dark, at 375px and in print preview." Say which of those views you did not open. `check` names each one in a warning.
 - Name the profile you chose and one reason, in one sentence: "I used the Reference profile, because the page is mostly commands and option tables."
-- Give the number of figures, and for each section with no figure, one short reason: "The page has 4 figures. 'Context' has none (no kind fits: a timeline), and 'The decision' has none (one value)." Pass on each `visual.*` hint that you kept as text, with your reason.
+- Give the number of figures, and for each section with no figure, one short reason: "The page has 4 figures. 'Context' has none (no kind fits: a timeline), and 'The decision' has none (one value)." Pass on each `visual.*` note, with its reason: a table or a section that you kept as text.
 - When a script prints a warning that Node is older than 24, pass it on to the user every time, even if you told them before.
 - When `check` warns about personal data, tell the user what it found and where, as the warning names it (masked, such as `j***@company.com`). Ask whether to remove it, mask it, or keep it. Do not decide alone.
 
