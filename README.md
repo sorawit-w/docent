@@ -6,6 +6,8 @@ Docent is a design kit for documents written as single HTML files: design docs, 
 
 Docent is packaged as an agent skill. An agent that writes a document loads the skill, follows its rules, and runs its scripts.
 
+To see finished pages, open the ones in [`examples/`](examples/): a runbook, an incident review, a page with every diagram Docent draws, and more.
+
 ## When Docent fits, and when it does not
 
 Docent does the better job for:
@@ -26,7 +28,7 @@ Another tool fits better for:
 
 ## Status
 
-Version 0.18.0. The design is settled, and the three scripts exist with tests.
+The current version is in [`skills/docent/VERSION`](skills/docent/VERSION). The design is settled, and the three scripts exist with tests.
 
 | Part | State |
 |---|---|

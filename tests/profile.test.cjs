@@ -70,8 +70,8 @@ test("a research or decision document is Standard, also when it is called a repo
   for (const kind of ["Business analysis report", "Customer analysis", "Incident review", "Postmortem", "Release notes"]) assert.equal(suggestProfile(page(para(4), kind)).profile, "brief", kind);
 });
 
-test("check names no wrong profile for any of the five test documents", () => {
-  const dir = path.join(__dirname, "..", "docs", "research", "test-documents");
+test("check names no wrong profile for any example page", () => {
+  const dir = path.join(__dirname, "..", "examples");
   for (const file of fs.readdirSync(dir).filter((f) => f.endsWith(".html"))) {
     const source = fs.readFileSync(path.join(dir, file), "utf8");
     const chosen = source.match(/<html\b[^>]*\bdata-profile="([^"]*)"/)[1];

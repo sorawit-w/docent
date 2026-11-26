@@ -1,0 +1,1056 @@
+<!doctype html>
+<html lang="en" data-profile="task">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Restore a deleted project — Example Planner</title>
+<style>
+/* docent:kit 0.53.0 */
+/* Docent page styles. Tokens come from references/DESIGN.md. One file, no network. */
+:root {
+  color-scheme: light;
+  --bg: #fbfbfe; --panel: #f2f3f9; --fig: #f2f3f9;
+  --text: #1c1f2e; --muted: #575d75; --line: #d3d6e3;
+  --primary: var(--host-accent, #2f3fd0); --ink: var(--host-ink, #1b2260); --dot: var(--host-accent, #2f3fd0);
+  --ok: #1a7f37; --warn: #7d4e00; --err: #cf222e;
+  /* The heat steps fill the cells of a heat map and the boxes of a heat plan, and nothing else: from the least (1) to the most (5). One teal on screen; the print block sets five grays for paper. */
+  --heat-1: #c6e9ef; --heat-2: #86c9d5; --heat-3: #3da6b6; --heat-4: #00707e; --heat-5: #004a53;
+  /* The text on a heat step: the kit's own text and page colors. They equal --text and --bg, except with the reader's high contrast mode, where the kit gives those two the system colors and only its own are tested against the steps. */
+  --heat-text: #1c1f2e; --heat-page: #fbfbfe;
+  /* A host's logo for one theme (data-for) shows in that theme. A logo with no version for this theme stands on a tile in the page color of its own theme. */
+  --logo-light: block; --logo-dark: none; --tile-light: transparent; --tile-dark: #12141f;
+  /* A host project sets its own accent, heading color and fonts with the --host-* tokens. The kit never sets them, so they hold in every theme and in print.
+     In dark mode the dot follows the host's dark accent, or --host-dot-dark; on Docent's own pages it is the lamp. */
+  --serif: var(--host-serif, Charter, "Bitstream Charter", "Sitka Heading", "Sitka Text", Cambria, Georgia, serif);
+  --sans: var(--host-sans, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif);
+  --mono: var(--host-mono, ui-monospace, "SF Mono", "Cascadia Code", Consolas, Menlo, monospace);
+  --ease: cubic-bezier(0.23, 1, 0.32, 1);
+  --measure: 35rem; --margin-col: 220px; --gap: 48px; --wide: 1120px;
+  /* The profile of a page sets these. Standard is the default: code and tables end at the right edge of the notes. */
+  --block: calc(var(--measure) + var(--gap) + var(--margin-col)); --section-space: 72px; --cell-y: 12px; --step-space: 36px;
+}
+/* Profiles: one attribute on <html> sets the width of code and tables, and the spacing. A profile never changes the text column. */
+html[data-profile="task"] { --section-space: 56px; --step-space: 28px; }
+html[data-profile="reference"] { --block: var(--wide); --section-space: 56px; --cell-y: 8px; }
+html[data-profile="brief"] { --block: var(--wide); --section-space: 64px; }
+/* A page for the public: every size is in rem, so the text and the text column grow together, on top of the reader's own setting. */
+html[data-text="large"] { font-size: 112.5%; }
+/* Dark: the reader's system setting decides, unless the reader chose a theme with the switch. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #12141f; --panel: #0b0d15; --fig: #0b0d15;
+    --text: #e7e9f3; --muted: #959bb3; --line: #2d3146;
+    --primary: var(--host-accent-dark, #8e9bff); --ink: #e7e9f3; --dot: var(--host-dot-dark, var(--host-accent-dark, #f2b824));
+    --ok: #3fb950; --warn: #d29922; --err: #f85149;
+    --heat-1: #093339; --heat-2: #054e58; --heat-3: #006b78; --heat-4: #36a0b1; --heat-5: #80cad7; --heat-text: #e7e9f3; --heat-page: #12141f;
+    --logo-light: none; --logo-dark: block; --tile-light: #fbfbfe; --tile-dark: transparent;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #12141f; --panel: #0b0d15; --fig: #0b0d15;
+  --text: #e7e9f3; --muted: #959bb3; --line: #2d3146;
+  --primary: var(--host-accent-dark, #8e9bff); --ink: #e7e9f3; --dot: var(--host-dot-dark, var(--host-accent-dark, #f2b824));
+  --ok: #3fb950; --warn: #d29922; --err: #f85149;
+  --heat-1: #093339; --heat-2: #054e58; --heat-3: #006b78; --heat-4: #36a0b1; --heat-5: #80cad7; --heat-text: #e7e9f3; --heat-page: #12141f;
+  --logo-light: none; --logo-dark: block; --tile-light: #fbfbfe; --tile-dark: transparent;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-padding-top: 88px; -webkit-text-size-adjust: 100%; }
+/* A word that cannot fit on a line by itself, such as a long web address, breaks inside, so no page scrolls sideways on a phone. Other words wrap as before. */
+body { margin: 0; background: var(--bg); color: var(--text); font: 400 1.125rem/1.65 var(--sans); caret-color: var(--primary); overflow-wrap: break-word; }
+::selection { background: color-mix(in srgb, var(--primary) 22%, transparent); }
+:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
+a { color: var(--primary); text-decoration-thickness: 1px; text-underline-offset: 0.2em; }
+a:hover { text-decoration-thickness: 2px; }
+/* The skip link: the first thing a keyboard reaches. It is hidden until it has focus; then it stands at the upper left, over the top bar, and jumps to the main element. */
+.skip { position: absolute; top: 12px; left: 12px; z-index: 3; display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); font-size: 0.875rem; }
+.skip:not(:focus) { width: 1px; height: 1px; padding: 0; border: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+/* One left edge for the whole page. On a wide screen the text and its notes sit in the middle as a group; wide blocks start at the same edge and grow to the right, up to --wide. */
+.shell {
+  --left: max(40px, min((100% - var(--measure) - var(--gap) - var(--margin-col)) / 2, 100% - var(--wide) - 40px));
+  padding: 0 max(40px, 100% - var(--left) - var(--wide)) 0 var(--left);
+}
+
+/* Top bar. Its bottom line is the route; the dot marks the current section. */
+.topbar { position: sticky; top: 0; z-index: 2; background: var(--bg); border-bottom: 1px solid var(--line); }
+.topbar .shell { position: relative; display: flex; align-items: center; gap: 32px; height: 56px; }
+.host { display: inline-flex; align-items: center; gap: 10px; font-weight: 600; font-size: 0.875rem; white-space: nowrap; }
+/* The host's logo: 24px high and at most 160px wide; its width and height are written on it. One color (currentColor) takes the heading color. */
+.logo { display: block; flex: none; box-sizing: content-box; color: var(--ink); }
+.host:has(> .logo[data-for="dark"]) > .logo[data-for="light"] { display: var(--logo-light); }
+.host:has(> .logo[data-for="light"]) > .logo[data-for="dark"] { display: var(--logo-dark); }
+/* A logo for one theme only stands on a tile in the other theme: corners of 6px, 4px around it. The outline takes no space, so nothing moves. */
+/* A logo in one color (currentColor) keeps the ink of its own theme, so it reads on its tile too. */
+.host:not(:has(> .logo[data-for="dark"])) > .logo[data-for="light"] { background: var(--tile-light); outline: 4px solid var(--tile-light); border-radius: 2px; color: var(--host-ink, #1b2260); }
+.host:not(:has(> .logo[data-for="light"])) > .logo[data-for="dark"] { background: var(--tile-dark); outline: 4px solid var(--tile-dark); border-radius: 2px; color: #e7e9f3; }
+.route { flex: 1; min-width: 0; }
+.route ol { display: flex; gap: 28px; margin: 0; padding: 0; list-style: none; }
+.route a { display: block; padding: 6px 0; font-size: 0.875rem; color: var(--muted); text-decoration: none; white-space: nowrap; }
+.route a:hover, .route a[aria-current] { color: var(--text); }
+.route-dot { position: absolute; left: 0; bottom: -4px; width: 7px; height: 7px; border-radius: 50%; background: var(--dot); opacity: 0; transform: translateX(var(--x, 0px)); }
+.ready .route-dot, .ready .rail-dot { transition: transform 320ms var(--ease); }
+.js .route-dot { opacity: 1; }
+.theme, .wd-btn { display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px; border: 1px solid var(--line); border-radius: 6px; background: none; color: var(--text); font: 400 0.875rem/1 var(--sans); cursor: pointer; }
+.theme:hover, .wd-btn:hover { border-color: var(--muted); }
+.theme:active, .wd-btn:active { transform: translateY(1px); }
+.theme svg { width: 15px; height: 15px; }
+html:not(.js) .theme, .theme[hidden] { display: none; }
+.theme[data-next="dark"] .icon-sun, .theme[data-next="light"] .icon-moon { display: none; }
+
+/* Title block: the title leads; facts about the document sit below it. */
+.title { padding: 80px 0 8px; }
+.title .row { margin-top: 24px; }
+/* The serif headings take weight 700. A palette with sans-serif headings sets 600, so the sans-serif keeps two weights. */
+h1, h2 { font-family: var(--serif); font-weight: var(--heading-weight, 700); color: var(--ink); text-wrap: balance; margin: 0; }
+h1 { font-size: 3.25rem; line-height: 1.06; letter-spacing: -0.02em; }
+.standfirst { font: 400 1.3125rem/1.5 var(--serif); margin: 0; text-wrap: pretty; }
+.facts { margin: 0; padding-left: 0; list-style: none; font-variant-numeric: tabular-nums; }
+
+section { padding-top: var(--section-space); }
+h2 { font-size: 1.875rem; line-height: 1.2; margin-bottom: 16px; }
+h3 { font: 600 1.125rem/1.35 var(--sans); margin: 0; text-wrap: balance; }
+/* A small heading inside a part of a section: body size, weight 600. */
+h4 { font: 600 1.125rem/1.5 var(--sans); margin: 24px 0 4px; }
+/* A definition list: each term in weight 600, its meaning below it. */
+dl { max-width: var(--measure); margin: 0 0 16px; }
+dt { font-weight: 600; }
+dd { margin: 0 0 12px; }
+dd:last-child { margin-bottom: 0; }
+p { margin: 0 0 16px; max-width: var(--measure); text-wrap: pretty; }
+.term { text-decoration: underline; text-decoration-color: var(--primary); text-decoration-thickness: 2px; text-underline-offset: 0.22em; }
+/* A place that shows a value of a value picker. A dotted line under it says that it changes with the choice. */
+var { font-style: normal; }
+var[data-v] { text-decoration: underline dotted var(--muted); text-decoration-thickness: 1px; text-underline-offset: 0.25em; }
+code { font: 0.875rem/1.55 var(--mono); background: var(--panel); padding: 0.1em 0.38em; border-radius: 6px; }
+.standfirst code { font-size: 1.125rem; }
+
+/* Lists in the text flow: points, or numbers for steps that one actor does. The rules are weak on purpose, so the lists of the kit's own blocks keep their styles. */
+:where(main) :where(ul, ol):not(.steps, .facts, .cards) { max-width: var(--measure); margin: 0 0 16px; padding-left: 24px; }
+:where(main) :where(ul, ol):not(.steps, .facts, .cards) > :where(li + li) { margin-top: 4px; }
+/* Key findings: each item opens with one sentence in weight 600 on its own line, so the eye reads the findings down the page like
+   headings. 12px between items, as between two pairs of a definition list. The number is the list's own marker, muted. No box, no line. */
+ol.findings > li + li { margin-top: 12px; }
+ol.findings > li::marker { color: var(--muted); font-variant-numeric: tabular-nums; }
+ol.findings > li > strong:first-child { display: block; font-weight: 600; }
+/* A block heading in the text flow has more space above it than below it. A step heading of a walkthrough has none. */
+:where(main) h3 { margin: 32px 0 8px; }
+h2 + h3, h3 + h4 { margin-top: 0; }
+.steps h3 { margin: 0; }
+/* A numbered block heading: one of several steps that one actor does, where a step holds a code block, a table or a widget. The kit writes the number, and the count starts again in each section. */
+section { counter-reset: block-step; }
+h3.step { counter-increment: block-step; }
+h3.step::before { content: counter(block-step); font-weight: 400; color: var(--muted); margin-right: 10px; font-variant-numeric: tabular-nums; }
+/* With scripts on, the page script writes the number as text, so that a screen reader reads it. It looks the same as the counted number. */
+h3.is-numbered::before { content: none !important; }
+.step-n { font-weight: 400; color: var(--muted); margin-right: 6px; font-variant-numeric: tabular-nums; }
+/* A code block, a table, a closed section, a walkthrough, a status note and a figure bring no space below them. Text that follows brings it. */
+:is(pre, .code, .table-wrap, details, .walk, .status, figure) + :is(p, ul, ol, dl) { margin-top: 24px; }
+
+/* Margin notes: the guide's remarks sit beside the text, like a wall label. */
+.row { display: grid; grid-template-columns: minmax(0, var(--measure)) var(--margin-col); column-gap: var(--gap); align-items: start; }
+.note { margin: 6px 0 16px; padding-top: 12px; border-top: 1px solid var(--line); font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
+.note strong { display: block; margin-bottom: 4px; font-weight: 600; color: var(--text); }
+/* A heading may stand in the text column, with the facts about its item beside it. The row brings the space above the heading, so the note lines up with the heading. */
+.row:has(> h3:first-child) { margin-top: 32px; }
+.row > h3:first-child { margin-top: 0; }
+
+/* Walkthrough: a rail with a node per step; one dot travels along it. */
+.walk { display: grid; grid-template-columns: minmax(0, 1fr) 536px; column-gap: 40px; align-items: start; margin-top: 24px; }
+.rail { position: relative; }
+.steps { position: relative; margin: 0; padding: 0; list-style: none; counter-reset: step; }
+.steps::before { content: ""; position: absolute; left: 4px; top: 10px; bottom: 10px; width: 1px; background: var(--line); }
+.steps li { position: relative; padding: 0 0 var(--step-space) 32px; counter-increment: step; }
+.steps li:last-child { padding-bottom: 0; }
+.steps li::before { content: ""; position: absolute; left: 0; top: 8px; width: 9px; height: 9px; border-radius: 50%; border: 1px solid var(--muted); background: var(--bg); }
+.steps h3::before { content: counter(step); font-weight: 400; color: var(--muted); margin-right: 10px; font-variant-numeric: tabular-nums; }
+.steps p { margin: 6px 0 0; }
+.js .steps li:not(.is-current) h3, .js .steps li:not(.is-current) p { color: var(--muted); }
+.ready .steps h3, .ready .steps p { transition: color 120ms; }
+.rail-dot { position: absolute; left: 0; top: 8px; width: 9px; height: 9px; border-radius: 50%; background: var(--dot); opacity: 0; transform: translateY(var(--y, 0px)); }
+.js .rail-dot { opacity: 1; }
+.walk figure { position: sticky; top: 88px; }
+
+/* Figures: a well that holds a Docent diagram, with a plain caption. A diagram carries its own styles. */
+/* A well is as wide as the profile's block. A wider drawing keeps its real size, and its well grows with it. */
+figure { margin: 0; min-width: min(100%, var(--block)); width: fit-content; max-width: 100%; }
+section > figure { margin-top: 24px; }
+/* Every drawing in a well keeps its real size and sits in the middle; a wider one scrolls inside the well. */
+.fig > svg { flex: none; margin-inline: auto; }
+.fig { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 16px 24px; background: var(--fig); border-radius: 12px; padding: 8px; overflow-x: auto; scrollbar-color: var(--line) transparent; }
+/* A well may hold two drawings, for two separate chains: side by side when both fit, else one below the other. */
+/* A drawing that is wider than its well scrolls sideways. The page script shows this line under it, because the part that shows can look complete. */
+.fig-more { margin: 8px 0 0; max-width: none; font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
+/* The steps of a diagram in words: a closed section in the well, under the drawing. It takes the width of the well, so a table
+   of several columns, such as the boxes of a heat plan, keeps its words whole; its sentences and lists keep the width of the text. */
+.dg-words { flex-basis: 100%; max-width: none; margin: 0; padding: 0 8px 4px; }
+.dg-words ol { margin: 8px 0 0; padding-left: 28px; }
+.dg-words li + li { margin-top: 4px; }
+.dg-words p { margin: 12px 0 0; font-weight: 600; }
+/* The rows of a range chart in words: a small table, as wide as its content, so it fits a phone. */
+.dg-words table { width: auto; min-width: 0; margin-top: 8px; }
+.dg-words :is(th, td) { padding-right: 16px; }
+/* A long name with no spaces breaks inside its cell, so the table never runs past a phone screen. */
+.dg-words tbody th { white-space: normal; }
+.dg-words :is(th, td) { overflow-wrap: anywhere; }
+/* A wide grid in words, such as the numbers of a heat map: each cell stays on one line, numbers line up on the right, and the
+   table scrolls inside its wrapper on a narrow screen. The lines under it keep the width of the text. */
+.dg-words > .table-wrap { margin-top: 8px; max-width: none; }
+.dg-words > .table-wrap :is(th, td) { white-space: nowrap; overflow-wrap: normal; padding-right: 12px; }
+.dg-words > .table-wrap :is(td, thead th) { text-align: right; font-variant-numeric: tabular-nums; }
+/* A wide table of words, such as the boxes of a heat plan: its cells wrap at spaces but never inside a word, and keep to the left. */
+.dg-words > .table-wrap.is-text :is(th, td) { white-space: normal; }
+.dg-words > .table-wrap.is-text :is(td, thead th) { text-align: left; }
+/* A timeline's row names are short labels, so each stays on one line, also at a hyphen ("on-call"); its notes wrap. */
+.dg-words > .table-wrap.is-text tbody th.whole { white-space: nowrap; }
+.dg-words:has(> .table-wrap) { min-width: 0; } /* a flex item: without this it grows to the table, and the wrapper never scrolls */
+/* A hand-drawn figure holds no colors and no styles of its own, only these classes, so the tokens give it every theme, print and the
+   reader's settings. A shape with no class is a 1.5px line in the text color, and a text with no class is 14px. No class is under 12px. */
+svg[data-drawn="hand"] { display: block; flex: none; margin-inline: auto; }
+svg[data-drawn="hand"] :is(path, line, polyline, polygon, rect, circle, ellipse), svg[data-drawn="hand"] .hd-line { fill: none; stroke: var(--text); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+svg[data-drawn="hand"] text, svg[data-drawn="hand"] .hd-text { fill: var(--text); stroke: none; font-size: 14px; font-weight: 400; }
+svg[data-drawn="hand"] .hd-strong { stroke-width: 2.5; }
+svg[data-drawn="hand"] .hd-muted { stroke: var(--muted); stroke-width: 1; }
+svg[data-drawn="hand"] .hd-rule { stroke: var(--line); stroke-width: 1; }
+svg[data-drawn="hand"] .hd-fill { fill: var(--text); stroke: none; }
+svg[data-drawn="hand"] .hd-box { fill: var(--bg); stroke: var(--text); }
+svg[data-drawn="hand"] .hd-band { fill: var(--bg); stroke: none; }
+svg[data-drawn="hand"] .hd-name { font-weight: 600; }
+svg[data-drawn="hand"] .hd-note { font-size: 12px; fill: var(--muted); }
+figcaption { margin-top: 12px; font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
+figcaption strong { font-weight: 600; color: var(--text); margin-right: 8px; }
+/* A quote with its speaker: text, so it keeps the text column and has no well. It is indented 24px like a list and set in the serif at body
+   size, which tells a person's voice from the author's text with no color, line or box. The kit draws the curly quotation marks, so every
+   page has the same marks. The speaker stands 4px below, like a caption. */
+figure.quote { min-width: 0; width: auto; max-width: var(--measure); margin-top: 24px; padding-left: 24px; }
+figure.quote blockquote { margin: 0; font: 400 1.125rem/1.65 var(--serif); color: var(--text); }
+figure.quote blockquote > :last-child { margin-bottom: 0; }
+figure.quote blockquote > :first-child::before { content: "\201C"; }
+figure.quote blockquote > :last-child::after { content: "\201D"; }
+figure.quote figcaption { margin-top: 4px; }
+/* The source line: the last line of a caption, in the caption's size and color, says where the numbers come from. A table of outside data
+   stands in a figure too, with "Table n" in its caption, so the figure's own space is the only space above it. */
+figcaption .source { display: block; margin-top: 4px; }
+figure > .table-wrap { margin-top: 0; }
+/* Footnotes: a mark in the line, [1], at full size with the link look, and the notes at the end of the section: 14px, muted, 32px under
+   the last block, with no heading, box or line. The note a jump lands on takes the text color; "Back" does not print. */
+.fn { white-space: nowrap; }
+ol.notes { margin: 32px 0 0; font-size: 0.875rem; line-height: 1.5; color: var(--muted); font-variant-numeric: tabular-nums; }
+.notes li:target { color: var(--text); }
+.fn:target { text-decoration-thickness: 2px; }
+/* The list of sources: one author-year entry each, written by hand, at body size with no bullets and a hanging indent of 24px, 8px apart.
+   The address is the link's own text, because paper has no link, and it breaks at any character, so no page scrolls sideways. */
+ul.sources { list-style: none; }
+.sources > li { text-indent: -24px; overflow-wrap: anywhere; }
+.sources > li + li { margin-top: 8px; }
+
+/* Card grid: 3 to 8 short items side by side, each a heading or a large number and a line of text. A card is a label, like a margin note: a line above it, and no box. At most four in a row. */
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(max(160px, calc((100% - 72px) / 4)), 1fr)); gap: 24px; margin: 24px 0; padding: 0; list-style: none; }
+.cards > li { min-width: 0; padding-top: 12px; border-top: 1px solid var(--line); }
+.cards h3 { margin: 0 0 4px; font-size: 1rem; line-height: 1.5; }
+.cards p { margin: 0; font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
+.cards .big { margin-bottom: 4px; font: 700 1.875rem/1.2 var(--serif); font-weight: var(--heading-weight, 700); color: var(--ink); font-variant-numeric: tabular-nums; }
+/* A number with its change: a third line in a card. The direction is a word in the text color at weight 600, and the rest is muted.
+   No arrow and no color: up is not always good, and green, amber and red mean status only. */
+.cards .change { margin-top: 4px; }
+.change .dir { font-weight: 600; color: var(--text); }
+/* Every block after a card grid stands 24px below it, or more when its own space is larger: the two margins overlap. */
+.cards:last-child { margin-bottom: 0; }
+
+/* Code, tables and cards end at the profile's block width. */
+:is(pre, .code, .table-wrap, .cards) { max-width: var(--block); }
+
+/* Tables: rules only, no boxes. */
+.table-wrap { overflow-x: auto; margin: 24px 0 0; scrollbar-color: var(--line) transparent; }
+table { width: 100%; min-width: 640px; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; vertical-align: top; padding: var(--cell-y) 24px var(--cell-y) 0; }
+thead th { border-bottom: 1px solid var(--text); padding-bottom: 10px; font-size: 0.875rem; line-height: 1.5; font-weight: 600; color: var(--muted); }
+tbody th { font-weight: 600; white-space: nowrap; }
+tbody tr { border-bottom: 1px solid var(--line); }
+/* A total row (tfoot): a 1px rule in the text color above it, the rule that stands under the headings, and every cell in weight 600; no fill.
+   The last body row loses its own line, so two rules never stand together. A second row, such as an average, has the line of a body row. */
+tbody:has(+ tfoot) > tr:last-child { border-bottom: 0; }
+tfoot tr:first-child { border-top: 1px solid var(--text); }
+tfoot tr + tr { border-top: 1px solid var(--line); }
+tfoot :is(th, td) { font-weight: 600; }
+/* A column of numbers (class "num" on its th and td cells): the numbers line up on the right, in tabular figures. The last column ends at the table's edge. */
+:is(th, td).num { text-align: right; font-variant-numeric: tabular-nums; }
+:is(th, td).num:last-child { padding-right: 0; }
+.state { display: inline-flex; align-items: baseline; gap: 8px; font-weight: 600; }
+.state::before { content: ""; flex: none; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.state.ok { color: var(--ok); } .state.warn { color: var(--warn); } .state.err { color: var(--err); }
+/* Two states with no status color: a fact with no judgment (plain information, work under way, a closed item) takes a muted dot, and "not yet" (planned, proposed, not decided) takes a muted ring. */
+.state.info, .state.plan { color: var(--text); }
+.state.info::before { background: var(--muted); }
+.state.plan::before { background: none; border: 1.5px solid var(--muted); }
+/* Code in a cell may break at any character, so a long path or command does not make the table wider than its place.
+   A link breaks only inside a word that cannot fit on a line by itself (break-word): "anywhere" would also let the table shrink a
+   column of short links to about one character, and split their words. */
+:is(td, th) code { overflow-wrap: anywhere; }
+:is(td, th) a { overflow-wrap: break-word; }
+
+/* Status note: a dot and a word carry the status. */
+.status { max-width: var(--measure); margin: 32px 0 0; }
+.status p { margin: 4px 0 0; }
+
+pre { margin: 20px 0 0; padding: 16px 20px; background: var(--panel); border-radius: 10px; overflow-x: auto; font: 0.875rem/1.6 var(--mono); scrollbar-color: var(--line) transparent; }
+pre code { background: none; padding: 0; font-size: inherit; }
+/* With scripts on, a code block sits in a holder with a button that copies the code. The holder takes the place and the space of the code block. */
+.code { position: relative; margin: 20px 0 0; }
+.code > pre { margin: 0; }
+.copy { position: absolute; top: 0; right: 0; height: 30px; padding: 0 12px; border: solid var(--line); border-width: 0 0 1px 1px; border-radius: 0 10px 0 6px; background: var(--panel); color: var(--muted); font: 400 0.875rem/1 var(--sans); cursor: pointer; }
+.copy:hover { color: var(--text); }
+/* A line of code that reaches the button would sit under it. Then the code starts below the button. */
+.code.is-long > pre { padding-top: 40px; }
+.cm { color: var(--muted); }
+
+details { max-width: var(--measure); margin: 24px 0 0; }
+/* A closed section that holds a table, a code block or a figure takes the full width, like those blocks do outside it. Its text keeps the text column. */
+details:has(> .table-wrap, > pre, > .code, > figure) { max-width: none; }
+summary { display: flex; align-items: center; gap: 10px; padding: 4px 0; font-weight: 600; cursor: pointer; list-style: none; }
+summary::-webkit-details-marker { display: none; }
+summary svg { width: 12px; height: 12px; color: var(--muted); transition: transform 150ms var(--ease); }
+details[open] summary svg { transform: rotate(90deg); }
+details > p { margin: 8px 0 0 22px; }
+
+/* Widgets: the reader chooses, ticks or decides. A widget is plain controls and text, with no box. render makes its markup from data. */
+.choose, .checks, .decide, .values { position: relative; margin: 24px 0 0; }
+:is(.choose, .checks, .decide, .values) + * { margin-top: 24px; }
+.choose > input, .checks input, .decide input, .values > input { position: absolute; width: 1px; height: 1px; margin: 0; opacity: 0; pointer-events: none; }
+.wd-t { margin: 0; max-width: none; font-size: 0.875rem; line-height: 1.5; font-weight: 600; color: var(--muted); }
+.opt { display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px; border: 1px solid var(--line); border-radius: 6px; font-size: 0.875rem; line-height: 1; cursor: pointer; }
+.opt::before { content: ""; width: 9px; height: 9px; border-radius: 50%; border: 1px solid var(--muted); }
+.opt:hover { border-color: var(--muted); }
+input:checked + .opt { border-color: var(--text); }
+input:checked + .opt::before { border-color: var(--dot); background: var(--dot); }
+input:focus-visible + .opt, .checks input:focus-visible + label::before { outline: 2px solid var(--primary); outline-offset: 3px; }
+/* Chooser: radio buttons and one panel for each case. The styles alone show the chosen case, so it works with scripts off. */
+.choose { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.choose > .wd-t { margin-right: 4px; }
+.choose > .case { display: none; flex-basis: 100%; min-width: 0; margin-top: 8px; }
+.choose > input:nth-of-type(1):checked ~ div:nth-of-type(1), .choose > input:nth-of-type(2):checked ~ div:nth-of-type(2), .choose > input:nth-of-type(3):checked ~ div:nth-of-type(3), .choose > input:nth-of-type(4):checked ~ div:nth-of-type(4), .choose > input:nth-of-type(5):checked ~ div:nth-of-type(5) { display: block; }
+.case-t { display: none; margin: 0 0 4px; font-weight: 600; }
+.case > .case-t + * { margin-top: 0; }
+.case > :last-child { margin-bottom: 0; }
+/* Checklist: a box and a line of text. A ticked line takes the muted color. */
+.checks ul { max-width: var(--measure); margin: 0; padding: 0; list-style: none; }
+.checks li { position: relative; margin-top: 12px; }
+.checks label { display: block; position: relative; padding-left: 32px; cursor: pointer; }
+.checks label::before { content: ""; position: absolute; left: 0; top: 4px; width: 18px; height: 18px; border: 1.5px solid var(--muted); border-radius: 6px; }
+.checks label::after { content: ""; position: absolute; left: 6.5px; top: 7px; width: 5px; height: 9px; border: solid var(--text); border-width: 0 2px 2px 0; transform: rotate(45deg); opacity: 0; }
+.checks input:checked + label { color: var(--muted); }
+.checks input:checked + label::before { border-color: var(--text); }
+.checks input:checked + label::after { opacity: 1; }
+.checks .sub { display: block; font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
+.wd-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin: 16px 0 0; max-width: none; font-size: 0.875rem; line-height: 1.5; color: var(--muted); font-variant-numeric: tabular-nums; }
+.wd-foot[hidden] { display: none; }
+/* Decision helper: questions, the one answer that fits, and the table of all cases. The table is the still form. */
+.decide fieldset { position: relative; display: flex; flex-wrap: wrap; gap: 8px; min-width: 0; margin: 16px 0 0; padding: 0; border: 0; }
+.decide legend { margin-bottom: 8px; padding: 0; font-weight: 600; }
+.decide-out { display: block; max-width: var(--measure); margin-top: 16px; }
+.decide-out:empty { display: none; }
+.decide-out strong { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+.decide-out strong::before { content: ""; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--dot); }
+.decide details { max-width: none; margin-top: 16px; }
+.decide .table-wrap { margin-top: 8px; }
+.decide td strong { display: block; font-weight: 600; }
+.decide tr.is-out { color: var(--muted); }
+html:not(.js) .decide-ask, html:not(.js) .wd-foot output { display: none; }
+/* Value picker: options like a chooser, a line that names the chosen option, and the table of all values. With scripts off the options do nothing, so they are hidden, and the text shows the values of the first option. */
+.values { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.values > .wd-t { margin-right: 4px; }
+.values-now { flex-basis: 100%; max-width: none; margin: 4px 0 0; font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
+.values-now strong { font-weight: 600; color: var(--text); }
+.values details { flex-basis: 100%; min-width: 0; max-width: none; margin-top: 8px; }
+.values .table-wrap { margin-top: 8px; }
+html:not(.js) .values > input + .opt { display: none; }
+
+footer { margin-top: 96px; border-top: 1px solid var(--line); }
+footer .shell { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding-top: 24px; padding-bottom: 40px; font-size: 0.875rem; color: var(--muted); }
+footer p { margin: 0; }
+/* The credit: a one-color mark and "Made with Docent", at the right. The mark takes the muted color of the words beside it. */
+.credit { margin-left: auto; }
+.credit svg { width: 16px; height: 16px; margin-right: 8px; vertical-align: -3px; }
+/* Docent's own pages carry the mark's tile in the footer. */
+.brand { display: inline-flex; align-items: center; gap: 10px; font: 700 1rem/1 var(--serif); color: var(--text); }
+.brand svg { width: 24px; height: 24px; }
+
+@media (max-width: 1100px) {
+  .walk { grid-template-columns: minmax(0, 1fr); row-gap: 32px; }
+  .walk figure { position: static; order: -1; }
+}
+@media (max-width: 900px) {
+  .row { grid-template-columns: minmax(0, 1fr); }
+  .note { max-width: var(--measure); }
+  .title .note { margin-top: 28px; }
+}
+@media (max-width: 720px) {
+  .shell { padding: 0 20px; }
+  .topbar { position: static; }
+  .topbar .shell { flex-wrap: wrap; gap: 4px 16px; height: auto; padding-top: 10px; padding-bottom: 8px; }
+  .host { flex: 1; }
+  .route { flex: none; order: 3; width: 100%; }
+  .route ol { flex-wrap: wrap; gap: 0 20px; }
+  .route a[aria-current] { text-decoration: underline; text-decoration-color: var(--dot); text-decoration-thickness: 2px; text-underline-offset: 0.4em; }
+  .route-dot { display: none; }
+  .title { padding-top: 48px; }
+  h1 { font-size: 2rem; } h2 { font-size: 1.625rem; }
+  section { padding-top: 56px; }
+  footer .shell { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .credit { margin-left: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; }
+}
+/* More contrast (the reader's system setting): outlines, tracks and rules take the muted color, and muted text takes the text color. Screen
+   only, so paper keeps the print block; and not with forced colors, where the reader's system colors already decide. */
+@media screen and (prefers-contrast: more) and (forced-colors: none) {
+  html:root:not([data-never]) { --line: #575d75; --muted: #1c1f2e; }
+  html:root:not([data-never])[data-theme="dark"] { --line: #959bb3; --muted: #e7e9f3; }
+}
+@media screen and (prefers-contrast: more) and (forced-colors: none) and (prefers-color-scheme: dark) {
+  html:root:not([data-never]):not([data-theme="light"]) { --line: #959bb3; --muted: #e7e9f3; }
+}
+/* The reader's high contrast mode (forced colors, as in Windows): the browser gives the page the few colors the reader chose. The kit gives
+   its tokens the same system colors, so the drawings follow, and the marks that are backgrounds (dots, the rail) stay visible. The heat
+   steps and the status colors keep their own values, because there the color is the content; the text on a step keeps --heat-text. */
+@media (forced-colors: active) {
+  html:root:not([data-never]) { --bg: Canvas; --fig: Canvas; --text: CanvasText; --muted: CanvasText; --line: CanvasText; --primary: Highlight; --dot: Highlight; }
+  /* A status dot takes the color of its word, which the browser forces; a background in that color would turn into the page color. */
+  .state::before { background: CanvasText; }
+  /* All borders take the text color, so the chosen option takes the highlight color, as its dot does. */
+  input:checked + .opt { border-color: Highlight; }
+}
+@media print {
+  html:root:not([data-never]) { color-scheme: light; --bg: #ffffff; --panel: #f2f3f9; --fig: #f2f3f9; --text: #1c1f2e; --muted: #575d75; --line: #d3d6e3; --primary: var(--host-accent, #2f3fd0); --ink: var(--host-ink, #1b2260); --dot: var(--host-accent, #2f3fd0); --ok: #1a7f37; --warn: #7d4e00; --err: #cf222e; --heat-1: #dee2f0; --heat-2: #babecb; --heat-3: #9498a5; --heat-4: #616571; --heat-5: #3e424d; --heat-text: #1c1f2e; --heat-page: #ffffff; --logo-light: block; --logo-dark: none; --tile-light: transparent; --tile-dark: #12141f; }
+  /* Paper: 11pt text, the page margin as the edge, and the notes beside the text again. An A4 page holds the text (112mm), a gap and the notes (50mm). */
+  html { font-size: 11pt; } html[data-text="large"] { font-size: 12pt; }
+  /* On paper the body and the two rules at body size stay at the root size (11pt, or 12pt for large text): 18px is for the screen. */
+  body, h4, figure.quote blockquote { font-size: 1rem; }
+  html:root:not([data-never]) { --measure: 112mm; --gap: 8mm; --margin-col: 50mm; --block: 100%; }
+  .shell { padding: 0; }
+  .row { grid-template-columns: minmax(0, var(--measure)) var(--margin-col); }
+  .title .note { margin-top: 6px; }
+  p, li { orphans: 2; widows: 2; }
+  /* A browser may leave out the ground of a code well on paper. A thin line keeps it a well. */
+  /* Paper cannot scroll: a long line of code wraps. */
+  pre { border: 1px solid var(--line); white-space: pre-wrap; overflow-wrap: anywhere; }
+  /* The top bar prints as one line above the title: the logo and the host's name, with no links and no switch. */
+  .topbar { position: static; border-bottom: 0; } .topbar .shell { height: auto; } .title { padding-top: 32px; }
+  .logo { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  /* Paper has no link: the credit prints as text. */
+  .credit a { color: inherit; text-decoration: none; }
+  .skip, .route, .theme, .route-dot, .rail-dot, .choose > .opt, .values > .opt, .decide-ask, .wd-foot, .copy, .fig-more, .notes .back { display: none !important; }
+  .choose > .case { display: block !important; margin-top: 16px; } .case-t { display: block; }
+  .checks input:checked + label, .decide tr.is-out { color: var(--text) !important; }
+  .steps li h3, .steps li p { color: var(--text) !important; }
+  .walk { grid-template-columns: minmax(0, 1fr); row-gap: 32px; } .walk figure { position: static; order: -1; }
+  table { min-width: 0; } .table-wrap { overflow: visible; }
+  /* Paper cannot scroll: a long row heading wraps, as the other cells do. On screen it stays on one line, and the table scrolls inside itself. */
+  tbody th { white-space: normal; }
+  /* A browser may repeat a tfoot at the foot of each printed page; a total under half of the rows would mislead, so it prints once, at the end. */
+  tfoot { display: table-row-group; }
+  /* Paper cannot scroll, so a wide grid in words, such as the numbers of a heat map, takes the smallest text size and tighter cells; render splits a grid that is still too wide into several tables. */
+  .dg-words > .table-wrap table { font-size: 0.875rem; } .dg-words > .table-wrap thead th { font-size: inherit; } .dg-words > .table-wrap :is(th, td) { padding: 4px 6px 4px 0; }
+  /* A browser leaves out backgrounds on paper. These carry meaning, so they print: status dots, the rail of the steps, and the ground of figures and code. */
+  .state::before, .steps::before, .fig, pre, code { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  /* Paper cannot scroll, and a drawing cannot split across pages. So a drawing that is wider than the paper, or taller than a page, shrinks to fit, under its caption, on A4 and on Letter. */
+  .fig > svg { width: auto; height: auto; max-width: 100%; max-height: 220mm; }
+  figure, tr, .status, pre, .checks li, .cards > li, .findings > li { break-inside: avoid; }
+  h2, h3 { break-after: avoid; }
+  /* Page numbers: Chrome and Edge print them; other browsers print their own footer. */
+  @page { margin: 18mm; @bottom-right { content: counter(page) " / " counter(pages); font: 9pt system-ui, sans-serif; color: #575d75; } }
+}
+/* /docent:kit */
+</style>
+</head>
+<body>
+<a class="skip" href="#content">Skip to the content</a>
+<header class="topbar">
+  <div class="shell">
+    <span class="host">Example Planner</span>
+    <nav class="route" aria-label="On this page">
+      <ol>
+        <li><a href="#need">What you need</a></li>
+        <li><a href="#steps">Steps</a></li>
+        <li><a href="#commands">Commands</a></li>
+        <li><a href="#fails">When a step fails</a></li>
+      </ol>
+    </nav>
+    <button class="theme" type="button">
+      <svg class="icon-moon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13.5 9.6A5.8 5.8 0 0 1 6.4 2.5a5.8 5.8 0 1 0 7.1 7.1Z"/></svg>
+      <svg class="icon-sun" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="8" cy="8" r="3"/><path d="M8 1.5v1.6M8 12.9v1.6M1.5 8h1.6M12.9 8h1.6M3.4 3.4l1.1 1.1M11.5 11.5l1.1 1.1M3.4 12.6l1.1-1.1M11.5 4.5l1.1-1.1"/></svg>
+      <span class="theme-text">Dark</span>
+    </button>
+    <span class="route-dot" aria-hidden="true"></span>
+  </div>
+</header>
+
+<main class="shell" id="content">
+  <div class="title">
+    <h1>Restore a deleted project from the nightly backup</h1>
+    <div class="row">
+      <p class="standfirst">A workspace admin deleted a project in Example Planner and wants it back. This runbook brings the project back from the nightly backup in five steps, without touching the rest of the workspace. It takes about 20 minutes.</p>
+      <div class="note" role="note" aria-label="About this document">
+        <strong>Runbook</strong>
+        <ul class="facts">
+          <li>About 20 minutes</li>
+          <li>Updated 27 November 2026</li>
+          <li>Owner: support engineering</li>
+          <li>Every name and command is invented</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <section id="need" aria-labelledby="need-h">
+    <h2 id="need-h">What you need</h2>
+    <div class="row">
+      <div>
+        <p>Example Planner keeps a backup of every workspace each night, for 30 days. A restore copies one project from that backup into a side database first. Nothing reaches the live workspace until you have compared the copy with what the admin expects.</p>
+        <p>Tick each line before you start. If one line is not true, stop and answer the ticket with what is missing.</p>
+      </div>
+      <div class="note" role="note">
+        <strong>Note</strong>
+        A project deleted more than 30 days ago is gone. Say so on the ticket; do not open an incident for it.
+      </div>
+    </div>
+<!-- docent:widget
+{
+  "id": "ready",
+  "kind": "checklist",
+  "label": "Before you start",
+  "items": [
+    {"text": "The ticket holds the admin's written request.", "note": "Only a workspace admin can ask for a restore."},
+    {"text": "The project was deleted less than 30 days ago.", "note": "The deletion date is in the workspace audit log."},
+    "You have the `restore` role in the admin console.",
+    {"text": "Nobody else is restoring this workspace.", "note": "Two restores at once write over each other. Look for an open restore ticket first."}
+  ]
+}
+-->
+<form class="checks" id="wd-ready" aria-labelledby="wd-ready-t">
+<p class="wd-t" id="wd-ready-t">Before you start</p>
+<ul>
+<li><input type="checkbox" id="wd-ready-1"><label for="wd-ready-1">The ticket holds the admin's written request.<span class="sub">Only a workspace admin can ask for a restore.</span></label></li>
+<li><input type="checkbox" id="wd-ready-2"><label for="wd-ready-2">The project was deleted less than 30 days ago.<span class="sub">The deletion date is in the workspace audit log.</span></label></li>
+<li><input type="checkbox" id="wd-ready-3"><label for="wd-ready-3">You have the <code>restore</code> role in the admin console.</label></li>
+<li><input type="checkbox" id="wd-ready-4"><label for="wd-ready-4">Nobody else is restoring this workspace.<span class="sub">Two restores at once write over each other. Look for an open restore ticket first.</span></label></li>
+</ul>
+<p class="wd-foot"><output></output><button class="wd-btn" type="reset">Clear the ticks</button></p>
+</form>
+<!-- /docent:widget -->
+  </section>
+
+  <section id="steps" aria-labelledby="steps-h">
+    <h2 id="steps-h">Restore the project</h2>
+    <p>Follow the dot. Each step names one arrow in the figure: you act on the left, and the systems act on the right.</p>
+    <div class="walk">
+      <div class="rail">
+      <ol class="steps">
+        <li>
+          <h3>Find the right backup.</h3>
+          <p>Look up the last backup made before the deletion time in the audit log. Write its date on the ticket.</p>
+        </li>
+        <li>
+          <h3>Restore it to a side database.</h3>
+          <p>Start the restore with <code>--target side</code>. It copies the one project and leaves the live workspace alone.</p>
+        </li>
+        <li>
+          <h3>Compare the copy.</h3>
+          <p>Open the copy in the console. The number of tasks and the latest due date should match what the admin wrote.</p>
+        </li>
+        <li>
+          <h3>Publish the copy.</h3>
+          <p>Publish the copy to the live workspace. The project comes back with its tasks, comments and files.</p>
+        </li>
+        <li>
+          <h3>Tell the admin.</h3>
+          <p>Answer the ticket with the backup date, so the admin knows which changes are not in it.</p>
+        </li>
+      </ol>
+      <span class="rail-dot" aria-hidden="true"></span>
+      </div>
+      <figure>
+        <div class="fig" role="region" aria-label="Figure 1, the five steps of a restore" tabindex="0">
+<!-- docent:diagram
+{
+  "id": "restore",
+  "place": "walk",
+  "label": "A restore in five steps: the engineer looks up the backup, the backup is restored to a side copy, the engineer compares the copy, the copy is published to the live workspace, and the engineer tells the admin.",
+  "lanes": [
+    {"id": "you", "name": "Support engineer", "icon": "person"},
+    {"id": "sys", "name": "Example Planner", "icon": "server"}
+  ],
+  "parts": [
+    {"id": "ticket", "lane": "you", "name": "Restore ticket", "note": "from the admin", "icon": "message"},
+    {"id": "backup", "lane": "sys", "name": "Nightly backup", "note": "kept 30 days", "icon": "store"},
+    {"id": "copy", "lane": "sys", "name": "Side copy", "note": "not live yet", "icon": "document"},
+    {"id": "check", "lane": "you", "name": "Your check", "note": "tasks and dates", "icon": "inspect"},
+    {"id": "live", "lane": "sys", "name": "Live workspace", "note": "project is back", "icon": "release", "state": "ok"},
+    {"id": "reply", "lane": "you", "name": "Reply", "note": "backup date", "icon": "check"}
+  ],
+  "legs": [
+    {"from": "ticket", "to": "backup", "verb": "look up"},
+    {"from": "backup", "to": "copy", "verb": "restore"},
+    {"from": "copy", "to": "check", "verb": "compare"},
+    {"from": "check", "to": "live", "verb": "publish"},
+    {"from": "live", "to": "reply", "verb": "tell the admin"}
+  ]
+}
+-->
+<svg id="dg-restore" class="dg dg-tall" xmlns="http://www.w3.org/2000/svg" width="482" height="673" viewBox="0 0 482 673" role="img" aria-label="A restore in five steps: the engineer looks up the backup, the backup is restored to a side copy, the engineer compares the copy, the copy is published to the live workspace, and the engineer tells the admin.">
+<style>
+#dg-restore{display:block;flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-restore .ground{fill:var(--fig,#f2f3f9)}
+#dg-restore .band{fill:var(--bg,#fbfbfe)}
+#dg-restore .track{stroke:var(--line,#d3d6e3)}
+#dg-restore .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-restore .head{fill:var(--text,#1c1f2e)}
+#dg-restore .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-restore .stop.end{fill:var(--text,#1c1f2e)}
+#dg-restore .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-restore .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-restore .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-restore .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-restore .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-restore .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-restore .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-restore .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-restore .sub,#dg-restore .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-restore .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-restore .stop.is-ok,#dg-restore .card.is-ok{stroke:var(--ok,#1a7f37);stroke-width:1.5}
+#dg-restore .flag.is-ok{fill:var(--ok,#1a7f37);stroke:var(--bg,#fbfbfe);stroke-width:2}
+.js #dg-restore .leg.is-current .line{stroke:var(--primary,#2f3fd0);stroke-width:2.5}
+.js #dg-restore .leg.is-current .head,.js #dg-restore .leg.is-current .num{fill:var(--primary,#2f3fd0)}
+.js #dg-restore .leg.is-current .mark{stroke:var(--primary,#2f3fd0)}
+.js #dg-restore .leg.is-current .pulse{display:block;animation:2.4s linear infinite}
+@keyframes dg-restore-1{0%{transform:translate(148px,111px);opacity:0}8%{transform:translate(148px,111px);opacity:1}10.43%{transform:translate(148px,120px);opacity:1}58.29%{transform:translate(323px,150px);opacity:1}68%{transform:translate(323px,186px);opacity:1}88%{transform:translate(323px,186px);opacity:1}100%{transform:translate(323px,186px);opacity:0}}
+#dg-restore .pulse-1{transform:translate(190px,127.2px)}
+.js #dg-restore .leg.is-current .pulse-1{animation-name:dg-restore-1}
+@keyframes dg-restore-2{0%{transform:translate(323px,216px);opacity:0}8%{transform:translate(323px,216px);opacity:1}68%{transform:translate(323px,291px);opacity:1}88%{transform:translate(323px,291px);opacity:1}100%{transform:translate(323px,291px);opacity:0}}
+#dg-restore .pulse-2{transform:translate(323px,225px)}
+.js #dg-restore .leg.is-current .pulse-2{animation-name:dg-restore-2}
+@keyframes dg-restore-3{0%{transform:translate(323px,321px);opacity:0}8%{transform:translate(323px,321px);opacity:1}10.43%{transform:translate(323px,330px);opacity:1}58.29%{transform:translate(148px,360px);opacity:1}68%{transform:translate(148px,396px);opacity:1}88%{transform:translate(148px,396px);opacity:1}100%{transform:translate(148px,396px);opacity:0}}
+#dg-restore .pulse-3{transform:translate(281px,337.2px)}
+.js #dg-restore .leg.is-current .pulse-3{animation-name:dg-restore-3}
+@keyframes dg-restore-4{0%{transform:translate(148px,426px);opacity:0}8%{transform:translate(148px,426px);opacity:1}10.43%{transform:translate(148px,435px);opacity:1}58.29%{transform:translate(323px,465px);opacity:1}68%{transform:translate(323px,501px);opacity:1}88%{transform:translate(323px,501px);opacity:1}100%{transform:translate(323px,501px);opacity:0}}
+#dg-restore .pulse-4{transform:translate(190px,442.2px)}
+.js #dg-restore .leg.is-current .pulse-4{animation-name:dg-restore-4}
+@keyframes dg-restore-5{0%{transform:translate(323px,531px);opacity:0}8%{transform:translate(323px,531px);opacity:1}10.43%{transform:translate(323px,540px);opacity:1}58.29%{transform:translate(148px,570px);opacity:1}68%{transform:translate(148px,606px);opacity:1}88%{transform:translate(148px,606px);opacity:1}100%{transform:translate(148px,606px);opacity:0}}
+#dg-restore .pulse-5{transform:translate(281px,547.2px)}
+.js #dg-restore .leg.is-current .pulse-5{animation-name:dg-restore-5}
+@media (prefers-reduced-motion:reduce){#dg-restore .pulse{animation:none!important}}
+@media print{#dg-restore{max-width:100%;height:auto}#dg-restore .pulse{display:none!important}#dg-restore .leg .line{stroke:var(--text,#1c1f2e)!important;stroke-width:2px!important}#dg-restore .leg .head,#dg-restore .leg .num{fill:var(--text,#1c1f2e)!important}#dg-restore .leg .mark{stroke:var(--text,#1c1f2e)!important}}
+#dg-restore-phone{display:none}
+</style>
+<rect width="482" height="673" class="ground"/>
+<rect x="8" y="12" width="216" height="649" rx="10" class="band"/>
+<rect x="248" y="12" width="226" height="649" rx="10" class="band"/>
+<line x1="148" y1="62" x2="148" y2="647" class="track"/>
+<line x1="323" y1="62" x2="323" y2="647" class="track"/>
+<g class="icon lane-icon" transform="translate(22,29)"><circle cx="8" cy="5" r="2.5"/><path d="M3 13.5c0-2.8 2.2-4.5 5-4.5s5 1.7 5 4.5"/></g>
+<text x="46" y="42" class="lane" text-anchor="start">Support engineer</text>
+<g class="icon lane-icon" transform="translate(262,29)"><rect x="2.5" y="2.5" width="11" height="4.5" rx="1"/><rect x="2.5" y="9" width="11" height="4.5" rx="1"/><path d="M5 4.75h.01M5 11.25h.01"/></g>
+<text x="286" y="42" class="lane" text-anchor="start">Example Planner</text>
+<g class="leg" data-leg="1"><path d="M148,111 L148,120 L323,150 L323,180" class="line"/><polygon points="318.5,178 327.5,178 323,186" class="head"/><circle r="6" class="pulse pulse-1"/><circle cx="236" cy="135.09" r="10" class="mark"/><text x="236" y="139.09" class="num" text-anchor="middle">1</text><text x="236" y="118.09" class="verb" text-anchor="middle">look up</text></g>
+<g class="leg" data-leg="2"><path d="M323,216 L323,285" class="line"/><polygon points="318.5,283 327.5,283 323,291" class="head"/><circle r="6" class="pulse pulse-2"/><circle cx="323" cy="249.5" r="10" class="mark"/><text x="323" y="253.5" class="num" text-anchor="middle">2</text><text x="344" y="253.5" class="verb" text-anchor="start">restore</text></g>
+<g class="leg" data-leg="3"><path d="M323,321 L323,330 L148,360 L148,390" class="line"/><polygon points="143.5,388 152.5,388 148,396" class="head"/><circle r="6" class="pulse pulse-3"/><circle cx="236" cy="344.91" r="10" class="mark"/><text x="236" y="348.91" class="num" text-anchor="middle">3</text><text x="236" y="327.91" class="verb" text-anchor="middle">compare</text></g>
+<g class="leg" data-leg="4"><path d="M148,426 L148,435 L323,465 L323,495" class="line"/><polygon points="318.5,493 327.5,493 323,501" class="head"/><circle r="6" class="pulse pulse-4"/><circle cx="236" cy="450.09" r="10" class="mark"/><text x="236" y="454.09" class="num" text-anchor="middle">4</text><text x="236" y="433.09" class="verb" text-anchor="middle">publish</text></g>
+<g class="leg" data-leg="5"><path d="M323,531 L323,540 L148,570 L148,600" class="line"/><polygon points="143.5,598 152.5,598 148,606" class="head"/><circle r="6" class="pulse pulse-5"/><circle cx="236" cy="554.91" r="10" class="mark"/><text x="236" y="558.91" class="num" text-anchor="middle">5</text><text x="236" y="537.91" class="verb" text-anchor="middle">tell the admin</text></g>
+<circle cx="148" cy="96" r="13" class="stop"/>
+<g class="icon" transform="translate(140,88)"><path d="M2.5 4a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v6.5a1 1 0 0 1-1 1H7l-3 2.5v-2.5h-.5a1 1 0 0 1-1-1z"/><path d="M5.5 6.25h5M5.5 8.5h3"/></g>
+<text x="127" y="101" class="name" text-anchor="end">Restore ticket</text>
+<text x="127" y="118" class="sub" text-anchor="end">from the admin</text>
+<circle cx="323" cy="201" r="13" class="stop"/>
+<g class="icon" transform="translate(315,193)"><path d="M3 4.5a5 2 0 0 0 10 0 5 2 0 0 0-10 0v7a5 2 0 0 0 10 0v-7"/><path d="M3 8a5 2 0 0 0 10 0"/></g>
+<text x="344" y="206" class="name" text-anchor="start">Nightly backup</text>
+<text x="344" y="223" class="sub" text-anchor="start">kept 30 days</text>
+<circle cx="323" cy="306" r="13" class="stop"/>
+<g class="icon" transform="translate(315,298)"><path d="M9.5 2.5h-5a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1v-7z"/><path d="M9.5 2.5v3h3M6 9h4M6 11.25h4"/></g>
+<text x="344" y="311" class="name" text-anchor="start">Side copy</text>
+<text x="344" y="328" class="sub" text-anchor="start">not live yet</text>
+<circle cx="148" cy="411" r="13" class="stop"/>
+<g class="icon" transform="translate(140,403)"><circle cx="7" cy="7" r="4"/><path d="M10 10l3.5 3.5"/></g>
+<text x="127" y="416" class="name" text-anchor="end">Your check</text>
+<text x="127" y="433" class="sub" text-anchor="end">tasks and dates</text>
+<circle cx="323" cy="516" r="13" class="stop is-ok"/>
+<g class="icon" transform="translate(315,508)"><path d="M2.5 8.4V3.5a1 1 0 0 1 1-1h4.9l5.1 5.1a1 1 0 0 1 0 1.4l-4.5 4.5a1 1 0 0 1-1.4 0z"/><path d="M5.6 5.6h.01"/></g>
+<circle cx="332.19" cy="506.81" r="3.5" class="flag is-ok"/>
+<text x="344" y="521" class="name" text-anchor="start">Live workspace</text>
+<text x="344" y="538" class="sub" text-anchor="start">project is back</text>
+<circle cx="148" cy="621" r="13" class="stop end"/>
+<g class="icon on-end" transform="translate(140,613)"><circle cx="8" cy="8" r="5.5"/><path d="M5.5 8.2l1.8 1.8 3.2-3.6"/></g>
+<text x="127" y="626" class="name" text-anchor="end">Reply</text>
+<text x="127" y="643" class="sub" text-anchor="end">backup date</text>
+</svg>
+<svg id="dg-restore-phone" class="dg dg-track" xmlns="http://www.w3.org/2000/svg" width="264" height="624" viewBox="0 0 264 624" role="img" aria-label="A restore in five steps: the engineer looks up the backup, the backup is restored to a side copy, the engineer compares the copy, the copy is published to the live workspace, and the engineer tells the admin.">
+<style>
+#dg-restore-phone{flex:none;margin-inline:auto;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+#dg-restore-phone .ground{fill:var(--fig,#f2f3f9)}
+#dg-restore-phone .band{fill:var(--bg,#fbfbfe)}
+#dg-restore-phone .track{stroke:var(--line,#d3d6e3)}
+#dg-restore-phone .line{fill:none;stroke:var(--text,#1c1f2e);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#dg-restore-phone .head{fill:var(--text,#1c1f2e)}
+#dg-restore-phone .stop{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.5}
+#dg-restore-phone .stop.end{fill:var(--text,#1c1f2e)}
+#dg-restore-phone .mark{fill:var(--bg,#fbfbfe);stroke:var(--text,#1c1f2e);stroke-width:1.25}
+#dg-restore-phone .card{fill:var(--bg,#fbfbfe);stroke:var(--line,#d3d6e3)}
+#dg-restore-phone .icon{fill:none;stroke:var(--text,#1c1f2e);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#dg-restore-phone .icon.on-end{stroke:var(--bg,#fbfbfe)}
+#dg-restore-phone .icon.lane-icon{stroke:var(--muted,#575d75)}
+#dg-restore-phone .num{font-size:12px;font-weight:600;fill:var(--text,#1c1f2e);font-variant-numeric:tabular-nums}
+#dg-restore-phone .name{font-size:14px;font-weight:600;fill:var(--text,#1c1f2e)}
+#dg-restore-phone .lane{font-size:14px;font-weight:600;fill:var(--muted,#575d75)}
+#dg-restore-phone .sub,#dg-restore-phone .verb{font-size:12px;fill:var(--muted,#575d75)}
+#dg-restore-phone .pulse{display:none;fill:var(--dot,#2f3fd0);stroke:var(--bg,#fbfbfe);stroke-width:2.5}
+#dg-restore-phone .stop.is-ok,#dg-restore-phone .card.is-ok{stroke:var(--ok,#1a7f37);stroke-width:1.5}
+#dg-restore-phone .flag.is-ok{fill:var(--ok,#1a7f37);stroke:var(--bg,#fbfbfe);stroke-width:2}
+.js #dg-restore-phone .leg.is-current .line{stroke:var(--primary,#2f3fd0);stroke-width:2.5}
+.js #dg-restore-phone .leg.is-current .head,.js #dg-restore-phone .leg.is-current .num{fill:var(--primary,#2f3fd0)}
+.js #dg-restore-phone .leg.is-current .mark{stroke:var(--primary,#2f3fd0)}
+.js #dg-restore-phone .leg.is-current .pulse{display:block;animation:2.4s linear infinite}
+@keyframes dg-restore-phone-1{0%{transform:translate(30px,71px);opacity:0}8%{transform:translate(30px,71px);opacity:1}68%{transform:translate(30px,145px);opacity:1}88%{transform:translate(30px,145px);opacity:1}100%{transform:translate(30px,145px);opacity:0}}
+#dg-restore-phone .pulse-1{transform:translate(30px,79.88px)}
+.js #dg-restore-phone .leg.is-current .pulse-1{animation-name:dg-restore-phone-1}
+@keyframes dg-restore-phone-2{0%{transform:translate(30px,175px);opacity:0}8%{transform:translate(30px,175px);opacity:1}68%{transform:translate(30px,249px);opacity:1}88%{transform:translate(30px,249px);opacity:1}100%{transform:translate(30px,249px);opacity:0}}
+#dg-restore-phone .pulse-2{transform:translate(30px,183.88px)}
+.js #dg-restore-phone .leg.is-current .pulse-2{animation-name:dg-restore-phone-2}
+@keyframes dg-restore-phone-3{0%{transform:translate(30px,279px);opacity:0}8%{transform:translate(30px,279px);opacity:1}68%{transform:translate(30px,353px);opacity:1}88%{transform:translate(30px,353px);opacity:1}100%{transform:translate(30px,353px);opacity:0}}
+#dg-restore-phone .pulse-3{transform:translate(30px,287.88px)}
+.js #dg-restore-phone .leg.is-current .pulse-3{animation-name:dg-restore-phone-3}
+@keyframes dg-restore-phone-4{0%{transform:translate(30px,383px);opacity:0}8%{transform:translate(30px,383px);opacity:1}68%{transform:translate(30px,457px);opacity:1}88%{transform:translate(30px,457px);opacity:1}100%{transform:translate(30px,457px);opacity:0}}
+#dg-restore-phone .pulse-4{transform:translate(30px,391.88px)}
+.js #dg-restore-phone .leg.is-current .pulse-4{animation-name:dg-restore-phone-4}
+@keyframes dg-restore-phone-5{0%{transform:translate(30px,487px);opacity:0}8%{transform:translate(30px,487px);opacity:1}68%{transform:translate(30px,561px);opacity:1}88%{transform:translate(30px,561px);opacity:1}100%{transform:translate(30px,561px);opacity:0}}
+#dg-restore-phone .pulse-5{transform:translate(30px,495.88px)}
+.js #dg-restore-phone .leg.is-current .pulse-5{animation-name:dg-restore-phone-5}
+@media (prefers-reduced-motion:reduce){#dg-restore-phone .pulse{animation:none!important}}
+@media print{#dg-restore-phone{max-width:100%;height:auto}#dg-restore-phone .pulse{display:none!important}#dg-restore-phone .leg .line{stroke:var(--text,#1c1f2e)!important;stroke-width:2px!important}#dg-restore-phone .leg .head,#dg-restore-phone .leg .num{fill:var(--text,#1c1f2e)!important}#dg-restore-phone .leg .mark{stroke:var(--text,#1c1f2e)!important}}
+@media (max-width:578px){#dg-restore{display:none}#dg-restore-phone{display:block}}
+</style>
+<rect width="264" height="624" class="ground"/>
+<rect x="8" y="12" width="248" height="80" rx="10" class="band"/>
+<rect x="8" y="116" width="248" height="184" rx="10" class="band"/>
+<rect x="8" y="324" width="248" height="80" rx="10" class="band"/>
+<rect x="8" y="428" width="248" height="80" rx="10" class="band"/>
+<rect x="8" y="532" width="248" height="80" rx="10" class="band"/>
+<g class="icon lane-icon" transform="translate(91,19)"><circle cx="8" cy="5" r="2.5"/><path d="M3 13.5c0-2.8 2.2-4.5 5-4.5s5 1.7 5 4.5"/></g>
+<text x="240" y="32" class="lane" text-anchor="end">Support engineer</text>
+<g class="icon lane-icon" transform="translate(95,123)"><rect x="2.5" y="2.5" width="11" height="4.5" rx="1"/><rect x="2.5" y="9" width="11" height="4.5" rx="1"/><path d="M5 4.75h.01M5 11.25h.01"/></g>
+<text x="240" y="136" class="lane" text-anchor="end">Example Planner</text>
+<g class="icon lane-icon" transform="translate(91,331)"><circle cx="8" cy="5" r="2.5"/><path d="M3 13.5c0-2.8 2.2-4.5 5-4.5s5 1.7 5 4.5"/></g>
+<text x="240" y="344" class="lane" text-anchor="end">Support engineer</text>
+<g class="icon lane-icon" transform="translate(95,435)"><rect x="2.5" y="2.5" width="11" height="4.5" rx="1"/><rect x="2.5" y="9" width="11" height="4.5" rx="1"/><path d="M5 4.75h.01M5 11.25h.01"/></g>
+<text x="240" y="448" class="lane" text-anchor="end">Example Planner</text>
+<g class="icon lane-icon" transform="translate(91,539)"><circle cx="8" cy="5" r="2.5"/><path d="M3 13.5c0-2.8 2.2-4.5 5-4.5s5 1.7 5 4.5"/></g>
+<text x="240" y="552" class="lane" text-anchor="end">Support engineer</text>
+<g class="leg" data-leg="1"><path d="M30,71 L30,139" class="line"/><polygon points="25.5,137 34.5,137 30,145" class="head"/><circle r="6" class="pulse pulse-1"/><circle cx="30" cy="104" r="10" class="mark"/><text x="30" y="108" class="num" text-anchor="middle">1</text><text x="51" y="108" class="verb" text-anchor="start">look up</text></g>
+<g class="leg" data-leg="2"><path d="M30,175 L30,243" class="line"/><polygon points="25.5,241 34.5,241 30,249" class="head"/><circle r="6" class="pulse pulse-2"/><circle cx="30" cy="208" r="10" class="mark"/><text x="30" y="212" class="num" text-anchor="middle">2</text><text x="51" y="212" class="verb" text-anchor="start">restore</text></g>
+<g class="leg" data-leg="3"><path d="M30,279 L30,347" class="line"/><polygon points="25.5,345 34.5,345 30,353" class="head"/><circle r="6" class="pulse pulse-3"/><circle cx="30" cy="312" r="10" class="mark"/><text x="30" y="316" class="num" text-anchor="middle">3</text><text x="51" y="316" class="verb" text-anchor="start">compare</text></g>
+<g class="leg" data-leg="4"><path d="M30,383 L30,451" class="line"/><polygon points="25.5,449 34.5,449 30,457" class="head"/><circle r="6" class="pulse pulse-4"/><circle cx="30" cy="416" r="10" class="mark"/><text x="30" y="420" class="num" text-anchor="middle">4</text><text x="51" y="420" class="verb" text-anchor="start">publish</text></g>
+<g class="leg" data-leg="5"><path d="M30,487 L30,555" class="line"/><polygon points="25.5,553 34.5,553 30,561" class="head"/><circle r="6" class="pulse pulse-5"/><circle cx="30" cy="520" r="10" class="mark"/><text x="30" y="524" class="num" text-anchor="middle">5</text><text x="51" y="524" class="verb" text-anchor="start">tell the admin</text></g>
+<circle cx="30" cy="56" r="13" class="stop"/>
+<g class="icon" transform="translate(22,48)"><path d="M2.5 4a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v6.5a1 1 0 0 1-1 1H7l-3 2.5v-2.5h-.5a1 1 0 0 1-1-1z"/><path d="M5.5 6.25h5M5.5 8.5h3"/></g>
+<text x="51" y="61" class="name" text-anchor="start">Restore ticket</text>
+<text x="51" y="78" class="sub" text-anchor="start">from the admin</text>
+<circle cx="30" cy="160" r="13" class="stop"/>
+<g class="icon" transform="translate(22,152)"><path d="M3 4.5a5 2 0 0 0 10 0 5 2 0 0 0-10 0v7a5 2 0 0 0 10 0v-7"/><path d="M3 8a5 2 0 0 0 10 0"/></g>
+<text x="51" y="165" class="name" text-anchor="start">Nightly backup</text>
+<text x="51" y="182" class="sub" text-anchor="start">kept 30 days</text>
+<circle cx="30" cy="264" r="13" class="stop"/>
+<g class="icon" transform="translate(22,256)"><path d="M9.5 2.5h-5a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1v-7z"/><path d="M9.5 2.5v3h3M6 9h4M6 11.25h4"/></g>
+<text x="51" y="269" class="name" text-anchor="start">Side copy</text>
+<text x="51" y="286" class="sub" text-anchor="start">not live yet</text>
+<circle cx="30" cy="368" r="13" class="stop"/>
+<g class="icon" transform="translate(22,360)"><circle cx="7" cy="7" r="4"/><path d="M10 10l3.5 3.5"/></g>
+<text x="51" y="373" class="name" text-anchor="start">Your check</text>
+<text x="51" y="390" class="sub" text-anchor="start">tasks and dates</text>
+<circle cx="30" cy="472" r="13" class="stop is-ok"/>
+<g class="icon" transform="translate(22,464)"><path d="M2.5 8.4V3.5a1 1 0 0 1 1-1h4.9l5.1 5.1a1 1 0 0 1 0 1.4l-4.5 4.5a1 1 0 0 1-1.4 0z"/><path d="M5.6 5.6h.01"/></g>
+<circle cx="39.19" cy="462.81" r="3.5" class="flag is-ok"/>
+<text x="51" y="477" class="name" text-anchor="start">Live workspace</text>
+<text x="51" y="494" class="sub" text-anchor="start">project is back</text>
+<circle cx="30" cy="576" r="13" class="stop end"/>
+<g class="icon on-end" transform="translate(22,568)"><circle cx="8" cy="8" r="5.5"/><path d="M5.5 8.2l1.8 1.8 3.2-3.6"/></g>
+<text x="51" y="581" class="name" text-anchor="start">Reply</text>
+<text x="51" y="598" class="sub" text-anchor="start">backup date</text>
+</svg>
+<!-- /docent:diagram -->
+        </div>
+        <figcaption><strong>Figure 1</strong>The five steps of a restore, one arrow for each step.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section id="commands" aria-labelledby="commands-h">
+    <h2 id="commands-h">The commands</h2>
+    <p>Run these from the admin console's shell. Replace the workspace and project names with the ones on the ticket.</p>
+    <h3 class="step">List the backups</h3>
+    <p>The list shows the newest backup first. Pick the last one made before the deletion time.</p>
+<pre tabindex="0" role="region" aria-label="Command to list the backups of a workspace"><code>planner-admin backup list --workspace acme-design</code></pre>
+    <h3 class="step">Restore to the side database</h3>
+    <p>The restore takes one to five minutes, by the size of the project. It prints the address of the copy when it is done.</p>
+<pre tabindex="0" role="region" aria-label="Command to restore one project to the side database"><code><span class="cm"># The date is the backup you picked; the project is its name on the ticket</span>
+planner-admin restore --workspace acme-design --project "Spring launch" \
+  --backup 2026-11-25 --target side</code></pre>
+    <h3 class="step">Publish the copy</h3>
+    <p>Publish only after your check. The command asks you to type the project name again.</p>
+<pre tabindex="0" role="region" aria-label="Command to publish the restored copy"><code>planner-admin restore publish --workspace acme-design --project "Spring launch"</code></pre>
+  </section>
+
+  <section id="fails" aria-labelledby="fails-h">
+    <h2 id="fails-h">When a step fails</h2>
+    <p>Each row names what you see, what it means, and what you do next.</p>
+    <div class="table-wrap" role="region" aria-label="What to do when a step fails" tabindex="0">
+      <table>
+        <thead>
+          <tr><th scope="col">You see</th><th scope="col">It means</th><th scope="col">You do</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row"><code>no backup before</code></th><td>The project was newer than the oldest backup.</td><td><span class="state err">Stop</span> and tell the admin.</td></tr>
+          <tr><th scope="row"><code>restore locked</code></th><td>Another restore runs on this workspace.</td><td><span class="state warn">Wait</span> for it, then try again.</td></tr>
+          <tr><th scope="row">The counts differ</th><td>The backup is older than the admin thinks.</td><td><span class="state warn">Ask</span> the admin before you publish.</td></tr>
+          <tr><th scope="row"><code>name taken</code></th><td>A new project has the same name.</td><td><span class="state info">Rename</span> the copy, then publish.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="status">
+      <span class="state info">Note</span>
+      <p>A failed restore never changes the live workspace. You can start again from step 1 at any time.</p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="shell">
+    <p class="credit"><svg viewBox="13 13 38 38" aria-hidden="true"><path d="M20 37V18H30A14 14 0 0 1 30 46H29" fill="none" stroke="currentColor" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="20" cy="46" r="4" fill="currentColor"/></svg>Made with <a href="https://github.com/sorawit-w/docent">Docent</a></p>
+  </div>
+</footer>
+<script>
+// docent:kit 0.53.0
+(() => {
+  const root = document.documentElement;
+  root.classList.add('js');
+  // A page saved from the browser ("Save page as") keeps what this script added. Take it out, so that the script adds each part once.
+  document.querySelectorAll('.fig-more, .step-n, button.copy').forEach((el) => el.remove());
+  document.querySelectorAll('div.code').forEach((holder) => holder.replaceWith(...holder.childNodes));
+  document.querySelectorAll('.is-numbered').forEach((h) => h.classList.remove('is-numbered'));
+  // A theme that the reader chose carries data-theme-reader. A saved page keeps it, and it is not a fixed theme.
+  if (root.hasAttribute('data-theme-reader')) { delete root.dataset.theme; delete root.dataset.themeReader; }
+  // Theme: the page follows the reader's system setting. The switch sets a choice that wins over the system and is remembered.
+  const button = document.querySelector('.theme');
+  const system = matchMedia('(prefers-color-scheme: dark)');
+  const theme = () => root.dataset.theme || (system.matches ? 'dark' : 'light');
+  const chooseTheme = (value) => { root.dataset.theme = value; root.dataset.themeReader = ''; };
+  // A theme written on <html> in the source is fixed: no saved choice and no switch.
+  const fixed = root.dataset.theme === 'light' || root.dataset.theme === 'dark';
+  if (fixed && button) button.hidden = true;
+  if (!fixed) try {
+    const saved = localStorage.getItem('docent-theme');
+    if (saved === 'dark' || saved === 'light') chooseTheme(saved);
+  } catch { /* no saved choice can be read: follow the system */ }
+  if (button && !fixed) {
+    const showSwitch = () => {
+      const next = theme() === 'dark' ? 'light' : 'dark';
+      button.dataset.next = next;
+      button.querySelector('.theme-text').textContent = next === 'dark' ? 'Dark' : 'Light';
+      button.setAttribute('aria-label', `Switch to the ${next} theme`);
+    };
+    showSwitch();
+    system.addEventListener('change', showSwitch);
+    button.addEventListener('click', () => {
+      chooseTheme(theme() === 'dark' ? 'light' : 'dark');
+      showSwitch();
+      try { localStorage.setItem('docent-theme', root.dataset.theme); } catch { /* private window: the choice lasts for this visit */ }
+    });
+  }
+  // Step numbers. The styles count the steps, but a screen reader in Chromium does not read a number that the styles count. So the script writes each number as text, in place of the counted one.
+  const number = (heading, n) => {
+    const span = document.createElement('span');
+    span.className = 'step-n';
+    span.textContent = `${n} `;
+    heading.prepend(span);
+    heading.classList.add('is-numbered');
+  };
+  const groups = new Map();
+  document.querySelectorAll('h3.step').forEach((h) => { const s = h.closest('section'); groups.set(s, [...(groups.get(s) || []), h]); });
+  groups.forEach((list) => list.forEach((h, i) => number(h, i + 1)));
+  document.querySelectorAll('.steps').forEach((ol) => [...ol.children].forEach((li, i) => { const h = li.querySelector('h3'); if (h) number(h, i + 1); }));
+  // A diagram outside a walkthrough runs its dot twice when it comes into view, then rests. Pointing at it runs it again.
+  const replay = (svg) => svg.querySelectorAll('.pulse').forEach((dot) => dot.getAnimations().forEach((run) => { run.cancel(); run.play(); }));
+  const seen = new IntersectionObserver((entries) => entries.forEach((entry) => {
+    if (!entry.isIntersecting) return;
+    entry.target.classList.add('is-playing');
+    seen.unobserve(entry.target);
+  }), { threshold: 0.6 });
+  document.querySelectorAll('svg.dg-auto').forEach((svg) => {
+    seen.observe(svg);
+    const well = svg.closest('.fig') || svg;
+    well.addEventListener('pointerenter', () => replay(svg));
+    well.addEventListener('focus', () => replay(svg));
+  });
+  // A drawing that is wider than its well scrolls sideways, and the part that shows can look complete. A line under the well says that more is to the side.
+  const wells = [...document.querySelectorAll('.fig')].map((well) => {
+    const note = document.createElement('p');
+    note.className = 'fig-more';
+    note.hidden = true;
+    note.textContent = 'The drawing is wider than the screen. Scroll it sideways to see all of it.';
+    well.after(note);
+    return { well, note };
+  });
+  // A code block gets a button that copies the code. The block moves into a holder, so the button stays in place when the code scrolls sideways.
+  const blocks = [...document.querySelectorAll('pre')].map((pre) => {
+    const holder = document.createElement('div'), button = document.createElement('button');
+    holder.className = 'code';
+    pre.before(holder);
+    holder.append(pre, button);
+    button.type = 'button';
+    button.className = 'copy';
+    button.textContent = 'Copy';
+    button.setAttribute('aria-live', 'polite');
+    button.addEventListener('click', async () => {
+      const text = (pre.querySelector('code') || pre).textContent;
+      let done = false;
+      try { await navigator.clipboard.writeText(text); done = true; } catch { /* no clipboard here: select the code and copy the selection */ }
+      if (!done) {
+        const range = document.createRange(), selection = getSelection();
+        range.selectNodeContents(pre);
+        selection.removeAllRanges();
+        selection.addRange(range);
+        try { done = document.execCommand('copy'); } catch { /* the code stays selected, so the reader can copy it by hand */ }
+        if (done) selection.removeAllRanges();
+      }
+      button.textContent = done ? 'Copied' : 'Select and copy';
+      setTimeout(() => (button.textContent = 'Copy'), 2000);
+    });
+    return { holder, pre, button };
+  });
+  const fit = () => {
+    wells.forEach(({ well, note }) => (note.hidden = well.scrollWidth <= well.clientWidth + 1));
+    // When the widest line of code reaches the button, the code starts below the button. A block that is hidden now has no size; it is measured when it shows.
+    blocks.forEach(({ holder, pre, button }) => {
+      if (!pre.clientWidth) return;
+      const code = pre.querySelector('code') || pre;
+      holder.classList.toggle('is-long', pre.scrollWidth > pre.clientWidth + 1 || code.getBoundingClientRect().right > button.getBoundingClientRect().left - 8);
+    });
+  };
+  // Measure again when a well or a code block changes its size: the window changes, a chooser shows another case, or a closed section opens.
+  if ('ResizeObserver' in window) {
+    const watch = new ResizeObserver(fit);
+    wells.forEach(({ well }) => watch.observe(well));
+    blocks.forEach(({ pre }) => watch.observe(pre));
+  }
+  addEventListener('resize', fit);
+  fit();
+  // Print: open every closed section so its text prints, then close it again. A deck's speaker notes do not print, so they stay closed.
+  let opened = [];
+  addEventListener('beforeprint', () => { opened = [...document.querySelectorAll('details:not([open]):not(.notes)')]; opened.forEach((d) => (d.open = true)); });
+  addEventListener('afterprint', () => { opened.forEach((d) => (d.open = false)); opened = []; });
+  // The route dot marks the current section. In each walkthrough, the rail dot marks the current step and the diagram lights the leg with the same number.
+  const bar = document.querySelector('.topbar .shell');
+  const routeDot = document.querySelector('.route-dot');
+  const links = [...document.querySelectorAll('.route a[href^="#"]')].filter((a) => document.getElementById(a.getAttribute('href').slice(1)));
+  const sections = links.map((a) => document.getElementById(a.getAttribute('href').slice(1)));
+  const walks = [...document.querySelectorAll('.walk')].map((walk) => ({
+    steps: [...walk.querySelectorAll('.steps > li')],
+    legs: [...walk.querySelectorAll('svg.dg .leg')],
+    dot: walk.querySelector('.rail-dot'),
+  })).filter((walk) => walk.steps.length);
+  const nearest = (items, line) => items.reduce((best, el) => (el.getBoundingClientRect().top <= line ? el : best), items[0]);
+  const update = () => {
+    if (sections.length) {
+      const section = nearest(sections, innerHeight * 0.35);
+      links.forEach((a, i) => (sections[i] === section ? a.setAttribute('aria-current', 'true') : a.removeAttribute('aria-current')));
+      if (bar && routeDot) {
+        const link = links[sections.indexOf(section)].getBoundingClientRect();
+        routeDot.style.setProperty('--x', `${link.left + link.width / 2 - bar.getBoundingClientRect().left - 3.5}px`);
+      }
+    }
+    walks.forEach(({ steps, legs, dot }) => {
+      const step = nearest(steps, innerHeight * 0.5);
+      const number = steps.indexOf(step) + 1;
+      steps.forEach((li) => li.classList.toggle('is-current', li === step));
+      legs.forEach((leg) => leg.classList.toggle('is-current', Number(leg.dataset.leg) === number));
+      if (dot) dot.style.setProperty('--y', `${step.offsetTop}px`);
+    });
+  };
+  let queued = false;
+  const schedule = () => { if (!queued) { queued = true; requestAnimationFrame(() => { queued = false; update(); }); } };
+  addEventListener('scroll', schedule, { passive: true });
+  addEventListener('resize', schedule);
+  // Widgets. Each one is readable without this script. The script adds memory, the count of a checklist and the answer of a decision helper.
+  const load = (key) => { try { return JSON.parse(localStorage.getItem(key)); } catch { return null; } };
+  const save = (key, value) => { try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* private window: it lasts for this visit */ } };
+  // Chooser: the choice is remembered, and choosers with the same options change together.
+  const choosers = [...document.querySelectorAll('.choose')].map((el) => ({
+    inputs: [...el.querySelectorAll(':scope > input')],
+    key: `docent-choice:${[...el.querySelectorAll(':scope > .opt')].map((label) => label.textContent).join('|')}`,
+  }));
+  const choose = (key, n) => choosers.forEach((c) => { if (c.key === key && c.inputs[n]) c.inputs[n].checked = true; });
+  choosers.forEach((c) => {
+    choose(c.key, load(c.key));
+    c.inputs.forEach((input, n) => input.addEventListener('change', () => {
+      const top = input.getBoundingClientRect().top;
+      choose(c.key, n);
+      scrollBy(0, input.getBoundingClientRect().top - top); // a chooser higher on the page changed its height: keep this one in place
+      save(c.key, n);
+      schedule();
+    }));
+  });
+  // Value picker: every place <var data-v="key"> shows the value of the chosen option. The values come from the table of all values. Pickers with the same options change together, and the choice is remembered.
+  const pickers = [...document.querySelectorAll('.values')].map((el) => ({
+    el,
+    inputs: [...el.querySelectorAll(':scope > input')],
+    names: [...el.querySelectorAll(':scope > .opt')].map((label) => label.textContent),
+    rows: [...el.querySelectorAll('tbody tr[data-v]')].map((tr) => ({ key: tr.dataset.v, cells: [...tr.querySelectorAll('td')].map((td) => td.textContent) })),
+  }));
+  const pick = (names, n) => pickers.forEach((p) => {
+    if (p.names.join('|') !== names || !p.inputs[n]) return;
+    p.inputs[n].checked = true;
+    p.el.querySelector('.values-now strong').textContent = p.names[n];
+    p.rows.forEach(({ key, cells }) => document.querySelectorAll(`var[data-v="${CSS.escape(key)}"]`).forEach((v) => (v.textContent = cells[n])));
+  });
+  pickers.forEach((p) => {
+    const key = `docent-values:${p.names.join('|')}`, saved = load(key);
+    if (Number.isInteger(saved)) pick(p.names.join('|'), saved);
+    p.inputs.forEach((input, n) => input.addEventListener('change', () => { pick(p.names.join('|'), n); save(key, n); }));
+    p.el.querySelector('details').open = false;
+  });
+  // Checklist: the ticks are remembered for this document, and the line below the list counts them.
+  document.querySelectorAll('form.checks').forEach((form) => {
+    const boxes = [...form.querySelectorAll('input')], out = form.querySelector('output'), key = `docent-ticks:${location.pathname}#${form.id}`;
+    const saved = load(key);
+    if (Array.isArray(saved) && saved.length === boxes.length) boxes.forEach((box, i) => (box.checked = saved[i] === true));
+    const show = () => { out.textContent = `${boxes.filter((box) => box.checked).length} of ${boxes.length} done`; };
+    const keep = () => { show(); save(key, boxes.map((box) => box.checked)); schedule(); };
+    form.addEventListener('change', keep);
+    form.addEventListener('reset', () => setTimeout(keep));
+    show();
+  });
+  // Decision helper: a row that no longer fits the answers takes the muted color. When every question has an answer, the one row that fits is shown as the answer.
+  document.querySelectorAll('.decide').forEach((el) => {
+    const form = el.querySelector('form'), out = el.querySelector('output'), again = el.querySelector('.wd-foot'), groups = [...el.querySelectorAll('fieldset')], rows = [...el.querySelectorAll('tbody tr')];
+    el.querySelector('details').open = false;
+    const show = () => {
+      const picked = groups.map((group) => [...group.querySelectorAll('input')].findIndex((input) => input.checked) + 1);
+      const fits = rows.filter((row) => {
+        const fit = row.dataset.when.split(',').every((option, q) => option === '0' || !picked[q] || Number(option) === picked[q]);
+        row.classList.toggle('is-out', !fit);
+        return fit;
+      });
+      out.innerHTML = picked.every(Boolean) && fits.length === 1 ? fits[0].lastElementChild.innerHTML : '';
+      again.hidden = !picked.some(Boolean);
+      schedule();
+    };
+    form.addEventListener('change', show);
+    form.addEventListener('reset', () => setTimeout(show));
+    show();
+  });
+  update();
+  requestAnimationFrame(() => requestAnimationFrame(() => root.classList.add('ready')));
+})();
+// /docent:kit
+</script>
+</body>
+</html>
